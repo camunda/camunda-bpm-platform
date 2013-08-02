@@ -1,9 +1,9 @@
 /**
- * dataDepend - a toolkit for implementing complex, data heavy applications
+ * dataDepend - a toolkit for implementing complex, data heavy AngularJS applications
  *
  * See https://github.com/Nikku/angular-data-depend for details.
  *
- * @version 1.1.0
+ * @version 1.0.0
  *
  * @author Nico Rehwaldt <http://github.com/Nikku>
  * @author Roman Smirnov <https://github.com/romansmirnov>
@@ -31,15 +31,26 @@
       }
     }
 
+    function toArray(arrayLike) {
+      return Array.prototype.slice.apply(arrayLike);
+    }
+
     var dataProviderFactory = [ '$rootScope', '$q', function($rootScope, $q) {
       
       function createFactory(nextTick) {
 
+        /**
+         * Create a provider using the specified options
+         * 
+         * @param {object} options
+         *
+         * @returns {object} the newly created, unregistered provider
+         */
         function create(options) {
           
           options = options || {};
 
-          var name = options.name,
+          var produces = options.produces,
               registry = options.registry,
               dependencies = options.dependencies || [],
               factory = options.factory, 
@@ -55,7 +66,7 @@
           // element produced by 
           // the factory
           var provider = {
-            name: name,
+            produces: produces,
             data: data,
             get: get, 
             set: set,
@@ -69,7 +80,9 @@
           });
 
           if (eager) {
+            log('resolve async');
             nextTick(function() {
+              log('resolve');
               resolve();
             });
           }
@@ -78,14 +91,29 @@
             setLoaded(options.value);
           }
 
-          function setLoaded(v) {
-            data.value = v;
+          function setLoaded(newValue) {
+
+            var oldValue = data.value;
+
             data.$loaded = true;
             changed = false;
 
-            allChildrenDo(function(child) {
-              child.parentChanged();
-            });
+            if (oldValue !== newValue) {
+              data.value = newValue;
+              
+              log('setLoaded', oldValue, ' -> ', newValue);
+
+              notifyParentChanged();
+            }
+          }
+
+          function getTracker(name) {
+            var tracker = parentValues[name];
+            if (!tracker) {
+              parentValues[name] = tracker = {};
+            }
+
+            return tracker;
           }
 
           function setLoading() {
@@ -111,33 +139,71 @@
             forEach(dependencies, fn);
           }
 
+          function notifyParentChanged() {
+            allChildrenDo(function(child) {
+              child.parentChanged();
+            });
+          }
+
           function resolveDependencies() {
             var promises = [];
+
+            function logValue(d, value) {
+              var tracker = getTracker(d),
+                  oldValue = tracker.value;
+
+              log('resolveDependencies', d, ':', oldValue, '->', value);
+
+              if (oldValue !== value) {
+                log('resolveDependencies', 'changed');
+                
+                tracker.value = value;
+                changed = true;
+              }
+            }
 
             allDependenciesDo(function(d) {
               var provider = getProvider(d);
 
               var promise = provider.resolve().then(function(value) {
-
-                var oldValue = parentValues[d];
-                if (oldValue != value) {
-                  parentValues[d] = value;
-                  changed = true;
-                }
-
+                logValue(d, value);
                 return value;
               });
 
               promises.push(promise);
             });
 
-            return promises;
+            return $q.all(promises).then(function() {
+
+              var values = [];
+
+              // best effort to receive up-to-date values
+              // return the most current one
+              allDependenciesDo(function(d) {
+                var v = getProvider(d).get();
+
+                logValue(d, v);
+
+                values.push(v);
+              });
+
+              return values;
+            });
           }
 
           function asyncLoad(reload) {
             setLoading();
 
-            var promise = $q.all(resolveDependencies()).then(function(values) {
+            log('asyncLoad: init load');
+
+            var promise = resolveDependencies().then(function(values) {
+
+              log('asyncLoad dependencies resolved', values);
+
+              if (loading !== promise) {
+                log('asyncLoad: skip (new load request)');
+                return loading;
+              }
 
               var value = get();
 
@@ -147,18 +213,23 @@
                 // (i.e. if parent variables changed, reload is explicitly set
                 // or no dependencies are given)
                 if (changed || reload || values.length == 0) {
+                  log('asyncLoad: call factory');
                   value = factory.apply(factory, values);
                 }
               }
 
               return value;
             }).then(function(value) {
-              if (loading === promise) {
-                loading = null;
+
+              if (loading !== promise) {
+                log('asyncLoad: skip (new load request)');
+                return loading;
               }
 
-              setLoaded(value);
+              log('asyncLoad: load complete');
 
+              loading = null;
+              setLoaded(value);
               return value;
             });
 
@@ -171,9 +242,12 @@
            *
            */
           function parentChanged() {
-            
+
+            log('parentChanged START');
+
             // anticipating parent change, everything ok
             if (loading) {
+              log('parentChanged SKIP (loading)');
               return;
             }
 
@@ -182,14 +256,15 @@
             // should this provider resolve its data 
             // eagerly if it got dirty
             if (eager) {
+              log('parentChanged RESOLVE async');
+
               nextTick(function() {
+                log('parentChanged RESOLVE');
                 resolve();
               });
             }
 
-            allChildrenDo(function(child) {
-              child.parentChanged();
-            });
+            notifyParentChanged();
           }
 
           function get() {
@@ -200,15 +275,19 @@
            * Resolve the value of this data holder
            */
           function resolve(options) {
-            var reload = (options || {}).reload;
+            options = options || {};
+
+            var reload = options.reload;
 
             if (dirty || reload) {
               loading = asyncLoad(reload);
             }
 
             if (loading) {
+              log('resolve: load async');
               return loading;
             } else {
+              log('resolve: load sync');
               return $q.when(get());
             }
           }
@@ -221,11 +300,69 @@
             setLoaded(value);
           }
 
+          function log() {
+            // var args = toArray(arguments);
+            // args.unshift('[' + produces + ']');
+            // args.unshift('[dataDepend]');
+
+            // console.log.apply(console, args);
+          }
+
           return provider;
         };
 
+        /**
+         * Return a filtered view on the provider, that exposes only
+         * the dependency with the given name, if multiple dependencies
+         * are produced. 
+         *
+         * @param {object} provider the provider to filter
+         * @param {string} name the produced name to filter for
+         *
+         * @returns {object} a view on the provider that filters for the
+         *                   specified name
+         *
+         * @throws error if the provider is not a multi provider
+         */
+        function filtered(provider, name) {
+
+          if (!isArray(provider.produces)) {
+            throw new Error('[dataDepend] Provider does not produce multiple values');
+          }
+
+          var idx = provider.produces.indexOf(name),
+              __get = provider.get,
+              __resolve = provider.resolve;
+
+          function filter(values) {
+            if (!values) {
+              return values;
+            } else {
+              return values[idx];
+            }
+          }
+          
+          function resolve() {
+            var args = toArray(arguments);
+            return __resolve.apply(null, args).then(filter);
+          }
+
+          function get() {
+            var args = toArray(arguments);
+            return filter(__get.apply(null, args));
+          }
+
+          var filteredProvider = angular.extend({}, provider, { 
+            resolve: resolve,
+            get: get
+          });
+
+          return filteredProvider;
+        }
+
         // factory
         return {
+          filtered: filtered,
           create: create
         };
       }
@@ -239,7 +376,7 @@
 
       function createFactory(annotate, nextTick) {
 
-        function create() {
+        function create(scope) {
 
           var nextId = 0;
           var providers = {};
@@ -268,12 +405,12 @@
             }
 
             var provider = internalCreateProvider({
-              name: name, 
+              produces: name, 
               factory: callback, 
               dependencies: variables, 
               eager: true,
               registry: providers
-            })
+            });
 
             // return handle to the
             // providers data
@@ -281,19 +418,67 @@
           }
 
           function internalCreateProvider(options) {
-            var name = options.name,
+            var produces = options.produces,
                 provider;
 
-            if (!name) {
-              throw new Error("[dataDepend] Must provide name when creating new provider");
+            if (!produces) {
+              throw new Error("[dataDepend] Must provide produces when creating new provider");
             }
 
             provider = dataProviderFactory.create(options);
-            providers[name] = provider;
+
+            if (isArray(produces)) {
+              forEach(produces, function(name) {
+                providers[name] = dataProviderFactory.filtered(provider, name);
+              });
+            } else {
+              providers[produces] = provider;
+            }
 
             return provider;
           }
 
+          /**
+           * Watches an expression on the scope this object was registered on
+           * and publishes that value as a variable.
+           *
+           * The old value of the watch expression is published as {name}:old in the object.
+           *
+           * @param {string} name of the variable to publish
+           * @param {string} expression (optional) expression used to watch on the scope (defaults to name)
+           *
+           * @return {object} data object representing the load status
+           */
+          function watchScope(name, expression) {
+            expression = expression || name;
+
+            var oldValueName = name + ':old';
+
+            // create provider
+            set(name, scope.$eval(expression));
+            set(oldValueName, null);
+
+            var provider = providers[name];
+            var oldValueProvider = providers[oldValueName];
+
+            scope.$watch(expression, function(newValue, oldValue) {
+              if (newValue !== oldValue) {
+                provider.set(newValue);
+
+                // publish old value as {name}:old
+                oldValueProvider.set(oldValue);
+              }
+            });
+
+            return provider.data;
+          }
+
+          /**
+           * Set variable to the given value
+           * 
+           * @param {string} name of the variable
+           * @param {function | object | array } value the value to initialize the object with
+           */
           function set(name, value) {
             var provider = providers[name],
                 factory, 
@@ -317,7 +502,7 @@
             }
 
             var provider = internalCreateProvider({
-              name: name, 
+              produces: name, 
               factory: factory,
               value: value,
               dependencies: variables, 
@@ -344,7 +529,8 @@
 
             get: get,
             set: set,
-            changed: changed
+            changed: changed,
+            watchScope: watchScope
           };
         }
 

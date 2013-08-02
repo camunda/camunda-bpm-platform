@@ -1,12 +1,14 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
 
-   function VariableInstancesController ($scope, $http, $location, $q, Uri, LocalExecutionVariableResource, RequestStatus) {
+   function VariableInstancesController ($scope, $http, $location, Uri, LocalExecutionVariableResource, RequestStatus) {
 
-    // input: processInstanceId, selection, processInstance
+    // input: selection, processInstance, processData
 
-    var pages = $scope.pages = { size: 50, total: 0 };
+    var processData = $scope.processData;
 
-    var activityInstanceIds = null;
+    var pages = $scope.pages = { size: 2, total: 0 };
+
+    var activityInstanceIds = [];
     var alreadyUpdated = false;
 
     // contains the variable instances which are current
@@ -33,46 +35,30 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       var search = $location.search().page;
 
       if (search || currentPage !== 1) {
-        $location.search('page', currentPage);
-        updateView(currentPage);  
+
+        $scope.updateLocation(function(location) {
+          $location.search('page', currentPage);
+        });          
       }
+      updateView(currentPage);
       
     });
 
-    $scope.$watch(function() { return $location.search().activityInstances; }, function (newValue) {
-      activityInstanceIds = [];
+    // processData.set('currentPage', );
 
-      if (newValue && angular.isString(newValue)) {
-        activityInstanceIds = newValue.split(',');
-      } else if (newValue && angular.isArray(newValue)) {
-        activityInstanceIds = newValue;
+    processData.get([ 'filter' ], function (filter) {
+      if (!filter) {
+        return;
       }
 
-      // always reset the current page to null
-      $location.search('page', null);
-
-      function waitForInstanceIdToInstanceMap() {
-        var deferred = $q.defer();
-
-        $scope.$watch('processInstance.instanceIdToInstanceMap', function (newValue) {
-          if (newValue) {
-            deferred.resolve(newValue);
-          }
-        });
-
-        return deferred.promise;
-      }
-
-      if ($scope.processInstance.instanceIdToInstanceMap) {
-        updateView(1);    
-      } else {
-        waitForInstanceIdToInstanceMap().then(function () {
-          updateView(1);
-        });
-      }
-
+      activityInstanceIds = filter.activityInstances || [];
+      updateView(filter.page || 1);
     });
 
+    // processData.set('variableData', [ 'filter', 'currentPage', function() {
+
+    // }]);
+    
     function updateView(page) {
       $scope.variables = null;
 
@@ -80,12 +66,12 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       variableCopies = [];
       variablesInEditMode = [];
       
-      var count = pages.size;
-      var firstResult = (page - 1) * count;
+      var count = pages.size,
+          firstResult = (page - 1) * count;
 
       // get the 'count' of variables
       $http.post(Uri.appUri('engine://engine/:engine/variable-instance/count'), {
-        processInstanceIdIn : [ $scope.processInstanceId ],
+        processInstanceIdIn : [ $scope.processInstance.id ],
         activityInstanceIdIn :  activityInstanceIds
       })
       .success(function(data) {
@@ -94,25 +80,25 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
       // get the variables
       $http.post(Uri.appUri('engine://engine/:engine/variable-instance/'), {
-        processInstanceIdIn : [ $scope.processInstanceId ],
+        processInstanceIdIn : [ $scope.processInstance.id ],
         activityInstanceIdIn :  activityInstanceIds
       }, {
         params: {firstResult: firstResult, maxResults: count}
       })
       .success(function(data) {
-        var instanceIdToInstanceMap = $scope.processInstance.instanceIdToInstanceMap;
-        angular.forEach(data, function(currentVariable) {
-          var instance = instanceIdToInstanceMap[currentVariable.activityInstanceId];
-          currentVariable.instance = instance;
+        processData.get([ 'instanceIdToInstanceMap' ], function (instanceIdToInstanceMap) {
+          angular.forEach(data, function(currentVariable) {
+            var instance = instanceIdToInstanceMap[currentVariable.activityInstanceId];
+            currentVariable.instance = instance;
 
-          // set an internal id
-          currentVariable.id = getNextId();
+            // set an internal id
+            currentVariable.id = getNextId();
 
-          // creates initially a copy of the current variable instance
-          variableCopies[currentVariable.id] = angular.copy(currentVariable);
-
-        });              
-        $scope.variables = data;
+            // creates initially a copy of the current variable instance
+            variableCopies[currentVariable.id] = angular.copy(currentVariable);
+          });
+          $scope.variables = data;
+        });
       });
     };
 
@@ -250,7 +236,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
   };
 
-  module.controller('VariableInstancesController', [ '$scope', '$http', '$location', '$q', 'Uri', 'LocalExecutionVariableResource', 'RequestStatus', VariableInstancesController ]);
+  module.controller('VariableInstancesController', [ '$scope', '$http', '$location', 'Uri', 'LocalExecutionVariableResource', 'RequestStatus', VariableInstancesController ]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
