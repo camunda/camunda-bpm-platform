@@ -48,7 +48,7 @@ import org.camunda.bpm.engine.test.history.SerializableVariable;
 public class FullHistoryTest extends ResourceProcessEngineTestCase {
   
   public FullHistoryTest() {
-    super("org/camunda/bpm/engine/test/standalone/history/fullhistory.activiti.cfg.xml");
+    super("org/camunda/bpm/engine/test/standalone/history/fullhistory.camunda.cfg.xml");
   }
   
   @Override

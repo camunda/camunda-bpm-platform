@@ -230,7 +230,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
    * @throws IOException 
    */
   public void testProcessDiagramCreation() throws IOException {
-    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("activiti.cfg.xml");
+    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
     config.setCreateDiagramOnDeploy(true);
     ProcessEngine engine = config.buildProcessEngine();
     String deploymentId = engine.getRepositoryService().createDeployment()

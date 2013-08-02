@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 public class ReadOnlyIdentityServiceTest extends ResourceProcessEngineTestCase {
 
   public ReadOnlyIdentityServiceTest() {
-    super("org/camunda/bpm/engine/test/api/identity/read.only.identity.service.activiti.cfg.xml");
+    super("org/camunda/bpm/engine/test/api/identity/read.only.identity.service.camunda.cfg.xml");
   }
 
   @Override
