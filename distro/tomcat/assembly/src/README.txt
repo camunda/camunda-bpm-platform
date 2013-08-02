@@ -26,7 +26,7 @@ Contents:
         installed. 
         
         run the     
-            server/apache-tomcat-${tomcat.version}/bin/startup.{bat/sh} 
+            server/apache-tomcat-${version.tomcat}/bin/startup.{bat/sh}
         script to start up the the server.
         
         After starting the server, you can access the 
