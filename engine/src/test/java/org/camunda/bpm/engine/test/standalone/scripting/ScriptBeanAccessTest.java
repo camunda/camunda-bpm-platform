@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class ScriptBeanAccessTest extends ResourceProcessEngineTestCase {
 
   public ScriptBeanAccessTest() {
-    super("org/camunda/bpm/engine/test/standalone/scripting/activiti.cfg.xml");
+    super("org/camunda/bpm/engine/test/standalone/scripting/camunda.cfg.xml");
   }
   
   @Override

@@ -157,7 +157,13 @@ public abstract class ProcessEngineConfiguration {
   public abstract ProcessEngine buildProcessEngine();
   
   public static ProcessEngineConfiguration createProcessEngineConfigurationFromResourceDefault() {
-    return createProcessEngineConfigurationFromResource("activiti.cfg.xml", "processEngineConfiguration");
+    ProcessEngineConfiguration processEngineConfiguration = null;
+    try {
+      processEngineConfiguration = createProcessEngineConfigurationFromResource("camunda.cfg.xml", "processEngineConfiguration");
+    } catch (RuntimeException ex) {
+      processEngineConfiguration = createProcessEngineConfigurationFromResource("activiti.cfg.xml", "processEngineConfiguration");
+    }
+    return processEngineConfiguration;
   }
 
   public static ProcessEngineConfiguration createProcessEngineConfigurationFromResource(String resource) {
