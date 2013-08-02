@@ -10,6 +10,10 @@ public class ApplicationContextPathUtil {
 
   public static String getApplicationPath(ProcessEngine engine, String processDefinitionId) {
     ProcessDefinition processDefinition = engine.getRepositoryService().getProcessDefinition(processDefinitionId);
+    
+    if (processDefinition == null) {
+      return null;
+    }
 
     // get the name of the process application that made the deployment
     String processApplicationName = engine.getManagementService().getProcessApplicationForDeployment(processDefinition.getDeploymentId());
