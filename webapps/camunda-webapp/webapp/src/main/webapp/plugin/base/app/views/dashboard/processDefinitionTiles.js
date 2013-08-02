@@ -27,12 +27,18 @@ ngDefine('cockpit.plugin.base.views', [
           result.push(statistic);
 
         } else {
+          // First save the values of instances
+          var currentInstances = statistic.instances;
+
           if (currentStatistic.definition.version > statistic.definition.version) {
             angular.copy(currentStatistic, statistic);
             if (!statistic.definition.name) {
               statistic.definition.name = statistic.definition.key;
             }
           }
+
+          // Add the saved values to the corresponding values of the current statistic
+          statistic.instances = currentInstances + currentStatistic.instances;
         }
       });
 
