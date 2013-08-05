@@ -13,9 +13,16 @@
 package org.camunda.bpm.engine.rest.impl;
 
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
+
+import java.net.URI;
 import java.util.List;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.AuthorizationService;
@@ -25,6 +32,7 @@ import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AuthorizationRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCheckResultDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCreateDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
@@ -38,13 +46,14 @@ import org.camunda.bpm.engine.rest.util.AuthorizationUtil;
  * @author Daniel Meyer
  *
  */
-public class AuthorizationRestServiceImpl extends AbstractRestProcessEngineAware implements AuthorizationRestService {
+public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource implements AuthorizationRestService {
 
   public AuthorizationRestServiceImpl() {
+    super(AUTHORIZATION, ANY);
   }
   
   public AuthorizationRestServiceImpl(String engineName) {
-    super(engineName);
+    super(engineName,AUTHORIZATION, ANY);
   }
 
   public AuthorizationCheckResultDto isUserAuthorized(String permissionName, String resourceName, Integer resourceType, String resourceId) {    
@@ -84,12 +93,37 @@ public class AuthorizationRestServiceImpl extends AbstractRestProcessEngineAware
   }
   
   public AuthorizationResource getAuthorization(String id) {
-    return new AuthorizationResourceImpl(getProcessEngine(), id, relativeRootResourcePath);
+    return new AuthorizationResourceImpl(getProcessEngine().getName(), id, relativeRootResourcePath);
   }
 
   public List<AuthorizationDto> queryAuthorizations(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     AuthorizationQueryDto queryDto = new AuthorizationQueryDto(uriInfo.getQueryParameters());
     return queryAuthorizations(queryDto, firstResult, maxResults);
+  }
+  
+  public ResourceOptionsDto availableOperations(UriInfo context) {
+    
+    UriBuilder baseUriBuilder = context.getBaseUriBuilder()
+        .path(relativeRootResourcePath)
+        .path(AuthorizationRestService.class);
+    
+    ResourceOptionsDto resourceOptionsDto = new ResourceOptionsDto();
+    
+    // GET /
+    URI baseUri = baseUriBuilder.build();    
+    resourceOptionsDto.addReflexiveLink(baseUri, HttpMethod.GET, "list");
+    
+    // GET /count
+    URI countUri = baseUriBuilder.clone().path("/count").build();
+    resourceOptionsDto.addReflexiveLink(countUri, HttpMethod.GET, "count");
+    
+    // POST /create
+    if(isAuthorized(CREATE)) {
+      URI createUri = baseUriBuilder.clone().path("/create").build();
+      resourceOptionsDto.addReflexiveLink(createUri, HttpMethod.POST, "create");  
+    }
+    
+    return resourceOptionsDto;
   }
 
   public List<AuthorizationDto> queryAuthorizations(AuthorizationQueryDto queryDto, Integer firstResult, Integer maxResults) {

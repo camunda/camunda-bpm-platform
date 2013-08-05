@@ -16,13 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.rest.dto.LinkableDto;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class UserProfileDto extends LinkableDto {
+public class UserProfileDto {
 
   protected String id;
   protected String firstName;
