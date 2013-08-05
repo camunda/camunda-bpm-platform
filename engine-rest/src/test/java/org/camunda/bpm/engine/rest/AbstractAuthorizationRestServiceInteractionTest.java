@@ -459,9 +459,36 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
         .get(AUTH_RESOURCE_PATH);
     
   }
+  
+  @Test
+  public void testAuthenticationRestServiceOptions() {
+    String fullAuthorizationUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + AuthorizationRestService.PATH;
+        
+    given()
+      .then()
+        .statusCode(Status.OK.getStatusCode())
+        
+        .body("links[0].href", equalTo(fullAuthorizationUrl))
+        .body("links[0].method", equalTo(HttpMethod.GET))
+        .body("links[0].rel", equalTo("list"))
+        
+        .body("links[1].href", equalTo(fullAuthorizationUrl+"/count"))
+        .body("links[1].method", equalTo(HttpMethod.GET))
+        .body("links[1].rel", equalTo("count"))
+        
+        .body("links[2].href", equalTo(fullAuthorizationUrl+"/create"))
+        .body("links[2].method", equalTo(HttpMethod.POST))
+        .body("links[2].rel", equalTo("create"))
+                
+    .when()
+        .options(SERVICE_PATH);
+    
+    verify(identityServiceMock, times(1)).getCurrentAuthentication();
+    
+  }
     
   @Test
-  public void testGetSingleAuthenticationLinksUnauthenticated() {
+  public void testAuthorizationResourceOptions() {
     String fullAuthorizationUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + AuthorizationRestService.PATH + "/" + MockProvider.EXAMPLE_AUTHORIZATION_ID;
     
     Authorization authorization = MockProvider.createMockGlobalAuthorization();
@@ -490,14 +517,14 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
         .body("links[2].rel", equalTo("update"))
         
     .when()
-        .get(AUTH_RESOURCE_PATH);
+        .options(AUTH_RESOURCE_PATH);
     
     verify(identityServiceMock, times(2)).getCurrentAuthentication();
     
   }
   
   @Test
-  public void testGetSingleAuthenticationLinksUnauthorized() {
+  public void testAuthorizationResourceOptionsUnauthorized() {
     String fullAuthorizationUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + AuthorizationRestService.PATH + "/" + MockProvider.EXAMPLE_AUTHORIZATION_ID;
     
     Authorization authorization = MockProvider.createMockGlobalAuthorization();
@@ -525,7 +552,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
         .body("links[2]", nullValue())
                 
     .when()
-        .get(AUTH_RESOURCE_PATH);
+        .options(AUTH_RESOURCE_PATH);
     
     verify(identityServiceMock, times(2)).getCurrentAuthentication();    
     verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, AUTHORIZATION, MockProvider.EXAMPLE_AUTHORIZATION_ID);
@@ -534,7 +561,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
   }
     
   @Test
-  public void testGetSingleAuthenticationLinksUpdateUnauthorized() {
+  public void testAuthorizationResourceOptionsUpdateUnauthorized() {
     String fullAuthorizationUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + AuthorizationRestService.PATH + "/" + MockProvider.EXAMPLE_AUTHORIZATION_ID;
     
     Authorization authorization = MockProvider.createMockGlobalAuthorization();
@@ -565,7 +592,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
         .body("links[2]", nullValue())
                 
     .when()
-        .get(AUTH_RESOURCE_PATH);
+        .options(AUTH_RESOURCE_PATH);
     
     verify(identityServiceMock, times(2)).getCurrentAuthentication();    
     verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, AUTHORIZATION, MockProvider.EXAMPLE_AUTHORIZATION_ID);

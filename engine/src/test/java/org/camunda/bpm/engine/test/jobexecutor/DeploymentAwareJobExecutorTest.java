@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
@@ -85,6 +86,18 @@ public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCas
     repositoryService.deleteDeployment(otherDeploymentId, true);
   }
   
+  public void testRegistrationOfNonExistingDeployment() {
+    String nonExistingDeploymentId = "some non-existing id";
+    
+    try {
+      processEngine.getManagementService().registerDeploymentForJobExecutor(nonExistingDeploymentId);
+      Assert.fail("Registering a non-existing deployment should not succeed");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Deployment " + nonExistingDeploymentId + " does not exist", e.getMessage());
+      // happy path
+    }
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
   public void testDeploymentUnregistrationOnUndeployment() {
     Assert.assertEquals(1, managementService.getRegisteredDeployments().size());

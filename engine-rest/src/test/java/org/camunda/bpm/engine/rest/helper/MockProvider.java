@@ -18,8 +18,11 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -183,6 +186,10 @@ public abstract class MockProvider {
   public static final String EXAMPLE_AUTHORIZATION_ID = "someAuthorizationId";
   public static final int EXAMPLE_AUTHORIZATION_TYPE = 0;
   public static final String EXAMPLE_AUTHORIZATION_TYPE_STRING = "0";
+  
+  // process applications
+  public static final String EXAMPLE_PROCESS_APPLICATION_NAME = "aProcessApplication";
+  public static final String EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH = "http://camunda.org/someContext";
 
   
   // tasks
@@ -535,5 +542,17 @@ public abstract class MockProvider {
         createMockGlobalAuthorization()
     });
   }
+  
+  // process application
+  public static ProcessApplicationInfo createMockProcessApplicationInfo() {
+    ProcessApplicationInfo appInfo = mock(ProcessApplicationInfo.class);
+    Map<String, String> mockAppProperties = new HashMap<String, String>();
+    String mockServletContextPath = MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH;
+    mockAppProperties.put(ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH, mockServletContextPath);
+    when(appInfo.getProperties()).thenReturn(mockAppProperties);
+    return appInfo;
+  }
+  
+  
  
 }

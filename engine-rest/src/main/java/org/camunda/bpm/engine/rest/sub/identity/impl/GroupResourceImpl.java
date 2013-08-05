@@ -22,10 +22,10 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.rest.GroupRestService;
+import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.GroupMembersResource;
@@ -39,8 +39,8 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
   
   private String rootResourcePath;
 
-  public GroupResourceImpl(ProcessEngine processEngine, String groupId, String rootResourcePath) {
-    super(processEngine, GROUP, groupId);
+  public GroupResourceImpl(String processEngineName, String groupId, String rootResourcePath) {
+    super(processEngineName, GROUP, groupId);
     this.rootResourcePath = rootResourcePath;
   }
 
@@ -53,6 +53,13 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
     
     GroupDto group = GroupDto.fromGroup(dbGroup);
     
+    return group;
+  }
+  
+  public ResourceOptionsDto availableOperations(UriInfo context) {
+    
+    ResourceOptionsDto dto = new ResourceOptionsDto();
+
     // add links if operations are authorized
     URI uri = context.getBaseUriBuilder()
         .path(rootResourcePath)
@@ -60,15 +67,15 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
         .path(resourceId)
         .build();
     
-    group.addReflexiveLink(uri, HttpMethod.GET, "self");    
-    if(isAuthorized(DELETE)) {
-      group.addReflexiveLink(uri, HttpMethod.DELETE, "delete");
+    dto.addReflexiveLink(uri, HttpMethod.GET, "self");    
+    if(!identityService.isReadOnly() && isAuthorized(DELETE)) {
+      dto.addReflexiveLink(uri, HttpMethod.DELETE, "delete");
     }    
-    if(isAuthorized(UPDATE)) {
-      group.addReflexiveLink(uri, HttpMethod.PUT, "update");
+    if(!identityService.isReadOnly() && isAuthorized(UPDATE)) {
+      dto.addReflexiveLink(uri, HttpMethod.PUT, "update");
     }
     
-    return group;
+    return dto;
   }
 
 
@@ -92,7 +99,7 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
   }
 
   public GroupMembersResource getGroupMembersResource() {
-    return new GroupMembersResourceImpl(processEngine, resourceId);
+    return new GroupMembersResourceImpl(processEngine.getName(), resourceId, rootResourcePath);
   }
   
   protected Group findGroupObject() {

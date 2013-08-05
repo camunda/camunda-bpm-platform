@@ -29,13 +29,14 @@ define(['angular'], function(angular) {
         $scope.group = response.data;
         $scope.groupName = (!!response.data.name ? response.data.name : response.data.id);
         $scope.groupCopy = angular.copy(response.data);
-
-        angular.forEach($scope.group.links, function(link){
-          $scope.availableOperations[link.rel] = true;
-        }); 
-
       });
     }
+
+    GroupResource.OPTIONS({groupId : $routeParams.groupId}).$then(function(response) {
+      angular.forEach(response.data.links, function(link){
+        $scope.availableOperations[link.rel] = true;
+      });    
+    });
 
     $scope.updateGroup = function() {      
 

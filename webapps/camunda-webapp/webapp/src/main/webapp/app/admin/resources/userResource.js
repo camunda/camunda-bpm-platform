@@ -6,7 +6,8 @@ ngDefine('admin.resources', function(module) {
       profile : {method:'GET', params: { 'action' : 'profile'}},
       updateProfile : {method:'PUT', params: { 'action' : 'profile'}},
       updateCredentials : {method:'PUT', params: { 'action' : 'credentials'}},
-      createUser : {method:'POST', params: { 'userId' : 'create'}}
+      createUser : {method:'POST', params: { 'userId' : 'create'}},
+      OPTIONS : {method:'OPTIONS', params: {}}
     });
   }];
 

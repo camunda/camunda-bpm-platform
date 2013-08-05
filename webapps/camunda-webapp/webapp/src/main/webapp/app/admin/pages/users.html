@@ -3,7 +3,7 @@
     <h1>Users</h1>
   </div>      
 
-  <div show-if-authorized auth-permission="CREATE" auth-resource-name="user">
+  <div ng-show="availableOperations.create">
     <a class="btn pull-right" href="#/user-create"><i class="icon-plus"></i> New User</a>
   </div>
      

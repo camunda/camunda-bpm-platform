@@ -39,6 +39,14 @@ define(['angular'], function(angular) {
         && (modelObject == null || !angular.equals($scope[modelObject], $scope[modelObject+'Copy']));
     };
 
+    // load options ////////////////////////////////////
+
+    UserResource.OPTIONS({userId : $scope.userId}).$then(function(response) {
+      angular.forEach(response.data.links, function(link){
+        $scope.availableOperations[link.rel] = true;
+      });    
+    });
+
     // update profile form /////////////////////////////
 
     var loadProfile = $scope.loadProfile = function() {
@@ -46,11 +54,6 @@ define(['angular'], function(angular) {
         $scope.user = response.data;
         $scope.profile = angular.copy(response.data);
         $scope.profileCopy = angular.copy(response.data);
-
-        angular.forEach($scope.user.links, function(link){
-          $scope.availableOperations[link.rel] = true;
-        }); 
-
       });
     }
 

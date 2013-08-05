@@ -50,7 +50,8 @@ import com.jayway.restassured.http.ContentType;
  */
 public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRestServiceTest {
   
-  protected static final String GROUP_URL = TEST_RESOURCE_ROOT_PATH + "/group/{id}";
+  protected static final String SERVICE_URL = TEST_RESOURCE_ROOT_PATH + "/group";
+  protected static final String GROUP_URL = SERVICE_URL + "/{id}";
   protected static final String GROUP_MEMBERS_URL = GROUP_URL + "/members/{userId}";
   protected static final String GROUP_CREATE_URL = TEST_RESOURCE_ROOT_PATH + "/group/create";
   
@@ -85,9 +86,35 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
       .when().get(GROUP_URL);
   }
   
+  @Test
+  public void testUserRestServiceOptions() {
+    String fullAuthorizationUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + GroupRestService.PATH;
+        
+    given()
+      .then()
+        .statusCode(Status.OK.getStatusCode())
+        
+        .body("links[0].href", equalTo(fullAuthorizationUrl))
+        .body("links[0].method", equalTo(HttpMethod.GET))
+        .body("links[0].rel", equalTo("list"))
+        
+        .body("links[1].href", equalTo(fullAuthorizationUrl+"/count"))
+        .body("links[1].method", equalTo(HttpMethod.GET))
+        .body("links[1].rel", equalTo("count"))
+        
+        .body("links[2].href", equalTo(fullAuthorizationUrl+"/create"))
+        .body("links[2].method", equalTo(HttpMethod.POST))
+        .body("links[2].rel", equalTo("create"))
+                
+    .when()
+        .options(SERVICE_URL);
+    
+    verify(identityServiceMock, times(1)).getCurrentAuthentication();
+    
+  }  
 
   @Test
-  public void testGetSingleGroupLinksUnauthenticated() {
+  public void testGroupResourceOptionsUnauthenticated() {
     String fullGroupUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/group/" + MockProvider.EXAMPLE_GROUP_ID;
     
     Group sampleGroup = MockProvider.createMockGroup();
@@ -100,8 +127,6 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
         .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
     .then()
         .expect().statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_GROUP_ID))
-        .body("name", equalTo(MockProvider.EXAMPLE_GROUP_NAME))
                 
         .body("links[0].href", equalTo(fullGroupUrl))
         .body("links[0].method", equalTo(HttpMethod.GET))
@@ -115,13 +140,13 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
         .body("links[2].method", equalTo(HttpMethod.PUT))
         .body("links[2].rel", equalTo("update"))
         
-    .when().get(GROUP_URL);
+    .when().options(GROUP_URL);
        
     verify(identityServiceMock, times(2)).getCurrentAuthentication();    
   }
   
   @Test
-  public void testGetSingleGroupLinksUnauthorized() {
+  public void testGroupResourceOptionsUnauthorized() {
     String fullGroupUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/group/" + MockProvider.EXAMPLE_GROUP_ID;
         
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);    
@@ -139,8 +164,6 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
         .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
     .then()
         .expect().statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_GROUP_ID))
-        .body("name", equalTo(MockProvider.EXAMPLE_GROUP_NAME))
         
         .body("links[0].href", equalTo(fullGroupUrl))
         .body("links[0].method", equalTo(HttpMethod.GET))
@@ -149,7 +172,7 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
         .body("links[1]", nullValue())
         .body("links[2]", nullValue())
        
-    .when().get(GROUP_URL);
+    .when().options(GROUP_URL);
     
     verify(identityServiceMock, times(2)).getCurrentAuthentication();    
     verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, GROUP, MockProvider.EXAMPLE_GROUP_ID);
@@ -157,7 +180,7 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
   }
   
   @Test
-  public void testGetSingleGroupLinksDeleteAuthorized() {
+  public void testGroupResourceOptionsAuthorized() {
     String fullGroupUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/group/" + MockProvider.EXAMPLE_GROUP_ID;
         
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);    
@@ -175,8 +198,6 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
         .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
     .then()
         .expect().statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_GROUP_ID))
-        .body("name", equalTo(MockProvider.EXAMPLE_GROUP_NAME))
         
         .body("links[0].href", equalTo(fullGroupUrl))
         .body("links[0].method", equalTo(HttpMethod.GET))
@@ -188,7 +209,7 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
         
         .body("links[2]", nullValue())
        
-    .when().get(GROUP_URL);
+    .when().options(GROUP_URL);
     
     verify(identityServiceMock, times(2)).getCurrentAuthentication();    
     verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, GROUP, MockProvider.EXAMPLE_GROUP_ID);

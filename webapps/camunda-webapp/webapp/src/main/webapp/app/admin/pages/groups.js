@@ -6,8 +6,16 @@ define(['angular'], function(angular) {
 
   var Controller = ['$scope', 'GroupResource', function ($scope, GroupResource) {
     
+    $scope.availableOperations={};
+    
     GroupResource.query().$then(function(response) {
       $scope.groupList = response.data;
+    });
+
+    GroupResource.OPTIONS().$then(function(response) {
+      angular.forEach(response.data.links, function(link){
+        $scope.availableOperations[link.rel] = true;
+      });    
     });
 
   }];

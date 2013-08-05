@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Resources.GROUP;
+import static org.camunda.bpm.engine.authorization.Resources.USER;
+
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -32,6 +36,8 @@ import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.SortControl;
 
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
@@ -39,7 +45,6 @@ import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.UserQueryProperty;
-import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -52,14 +57,14 @@ import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
  * @author Daniel Meyer
  *
  */
-public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
+public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
-  private final static Logger LOG = Logger.getLogger(LdapIdentityProvider.class.getName());
+  private final static Logger LOG = Logger.getLogger(LdapIdentityProviderSession.class.getName());
 
   protected LdapConfiguration ldapConfiguration;
   protected LdapContext initialContext;
 
-  public LdapIdentityProvider(LdapConfiguration ldapConfiguration) {
+  public LdapIdentityProviderSession(LdapConfiguration ldapConfiguration) {
     this.ldapConfiguration = ldapConfiguration;
   }
 
@@ -86,7 +91,11 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
     env.put(Context.SECURITY_AUTHENTICATION, ldapConfiguration.getSecurityAuthentication());
     env.put(Context.PROVIDER_URL, ldapConfiguration.getServerUrl());
     env.put(Context.SECURITY_PRINCIPAL, userDn);
-    env.put(Context.SECURITY_CREDENTIALS, getPassword(password));
+    env.put(Context.SECURITY_CREDENTIALS, password);
+    
+    if(ldapConfiguration.isUseSsl()) {
+      env.put(Context.SECURITY_PROTOCOL, "ssl");
+    }
 
     // add additional properties
     Map<String, String> contextProperties = ldapConfiguration.getContextProperties();
@@ -136,7 +145,7 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
   public List<User> findUserByQueryCriteria(LdapUserQueryImpl query) {
     ensureContextInitialized();
 
-    String userBaseDn = ldapConfiguration.getUserSearchBase() + ldapConfiguration.getBaseDn();
+    String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
 
     if(ldapConfiguration.isSortControlSupported()) {
       applyRequestControls(query);
@@ -156,7 +165,9 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
 
         if(resultCount >= query.getFirstResult()) {
           UserEntity user = transformUser(result);
-          userList.add(user);
+          if(isAuthorized(READ, USER, user.getId())) {
+            userList.add(user);
+          }
         }
 
         resultCount ++;
@@ -270,7 +281,7 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
   public List<Group> findGroupByQueryCriteria(LdapGroupQuery query) {
     ensureContextInitialized();
 
-    String groupBaseDn = ldapConfiguration.getGroupSearchBase() + ldapConfiguration.getBaseDn();
+    String groupBaseDn = composeDn(ldapConfiguration.getGroupSearchBase(),ldapConfiguration.getBaseDn());
 
     if(ldapConfiguration.isSortControlSupported()) {
       applyRequestControls(query);
@@ -290,7 +301,9 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
 
         if(resultCount >= query.getFirstResult()) {
           GroupEntity group = transformGroup(result);
-          groupList.add(group);
+          if(isAuthorized(READ, GROUP, group.getId())) {
+            groupList.add(group);
+          }
         }
 
         resultCount ++;
@@ -396,6 +409,7 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
     group.setDn(result.getNameInNamespace());
     group.setId(getStringAttributeValue(ldapConfiguration.getGroupIdAttribute(), attributes));
     group.setName(getStringAttributeValue(ldapConfiguration.getGroupNameAttribute(), attributes));
+    group.setType(getStringAttributeValue(ldapConfiguration.getGroupTypeAttribute(), attributes));
     return group;
   }
 
@@ -429,13 +443,32 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
     }
   }
 
-  protected String getPassword(String password) {
-    if(ldapConfiguration.isUsePasswordDigest()) {
-      PasswordEncryptor passwordDigest = ldapConfiguration.getPasswordEncryptor();
-      return passwordDigest.encrypt(password);
-    } else {
-      return password;
-    }
+  protected String composeDn(String... parts) {   
+    StringWriter resultDn = new StringWriter();
+    for (int i = 0; i < parts.length; i++) {     
+      String part = parts[i];      
+      if(part == null || part.length()==0) {
+        continue;
+      }
+      if(part.endsWith(",")) {
+        part = part.substring(part.length()-2, part.length()-1);                
+      }
+      if(part.startsWith(",")) {
+        part = part.substring(1);
+      }
+      String currentDn = resultDn.toString();
+      if(!currentDn.endsWith(",") && currentDn.length()>0) {
+        resultDn.write(",");
+      }
+      resultDn.write(part);
+    }       
+    return resultDn.toString();
+  }
+
+  protected boolean isAuthorized(Permission permission, Resource resource, String resourceId) {
+    return org.camunda.bpm.engine.impl.context.Context.getCommandContext()
+      .getAuthorizationManager()
+      .isAuthorized(permission, resource, resourceId);
   }
 
 }

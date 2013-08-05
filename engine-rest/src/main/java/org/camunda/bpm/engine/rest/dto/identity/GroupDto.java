@@ -16,13 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.rest.dto.LinkableDto;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class GroupDto extends LinkableDto {
+public class GroupDto {
 
   protected String id;
   protected String name;

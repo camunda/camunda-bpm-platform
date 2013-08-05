@@ -12,8 +12,10 @@
  */
 package org.camunda.bpm.container.impl.metadata;
 
+import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 
 /**
@@ -23,12 +25,13 @@ import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
  */
 public class ProcessEngineXmlImpl implements ProcessEngineXml {
   
-  private String name;
-  private boolean isDefault;
-  private String configurationClass;
-  private String jobAcquisitionName;
-  private String datasource;
-  private Map<String, String> properties;
+  protected String name;
+  protected boolean isDefault;
+  protected String configurationClass;
+  protected String jobAcquisitionName;
+  protected String datasource;
+  protected Map<String, String> properties;
+  protected List<ProcessEnginePluginXml> plugins;
   
   public String getName() {
     return name;
@@ -76,6 +79,14 @@ public class ProcessEngineXmlImpl implements ProcessEngineXml {
   
   public void setJobAcquisitionName(String jobAcquisitionName) {
     this.jobAcquisitionName = jobAcquisitionName;
+  }
+  
+  public List<ProcessEnginePluginXml> getPlugins() {
+    return plugins;
+  }
+  
+  public void setPlugins(List<ProcessEnginePluginXml> plugins) {
+    this.plugins = plugins;
   }
 
 }

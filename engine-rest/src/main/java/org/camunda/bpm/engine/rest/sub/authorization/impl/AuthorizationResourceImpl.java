@@ -23,13 +23,13 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.AuthorizationService;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.rest.AuthorizationRestService;
+import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.impl.AbstractAuthorizedRestResource;
 import org.camunda.bpm.engine.rest.sub.authorization.AuthorizationResource;
-import org.camunda.bpm.engine.rest.sub.impl.AbstractAuthorizedRestResource;
 
 /**
  * 
@@ -41,8 +41,8 @@ public class AuthorizationResourceImpl extends AbstractAuthorizedRestResource im
   protected final AuthorizationService authorizationService;
   protected String relativeRootResourcePath;
 
-  public AuthorizationResourceImpl(ProcessEngine processEngine, String resourceId, String relativeRootResourcePath) {
-    super(processEngine, AUTHORIZATION, resourceId);
+  public AuthorizationResourceImpl(String processEngineName, String resourceId, String relativeRootResourcePath) {
+    super(processEngineName, AUTHORIZATION, resourceId);
     this.relativeRootResourcePath = relativeRootResourcePath;
     authorizationService = processEngine.getAuthorizationService();
   }
@@ -51,25 +51,8 @@ public class AuthorizationResourceImpl extends AbstractAuthorizedRestResource im
 
     Authorization dbAuthorization = getDbAuthorization();
 
-    AuthorizationDto dto = AuthorizationDto.fromAuthorization(dbAuthorization);
-    
-    // add links if operations are authorized
-    URI uri = context.getBaseUriBuilder()
-        .path(relativeRootResourcePath)
-        .path(AuthorizationRestService.class)
-        .path(resourceId)
-        .build();
-    
-    dto.addReflexiveLink(uri, HttpMethod.GET, "self");
-    
-    if (isAuthorized(DELETE)) {
-      dto.addReflexiveLink(uri, HttpMethod.DELETE, "delete");
-    }
-    if (isAuthorized(UPDATE)) {
-      dto.addReflexiveLink(uri, HttpMethod.PUT, "update");
-    }
+    return AuthorizationDto.fromAuthorization(dbAuthorization);
 
-    return dto;
   }
 
   public void deleteAuthorization() {
@@ -84,6 +67,28 @@ public class AuthorizationResourceImpl extends AbstractAuthorizedRestResource im
     AuthorizationDto.update(dto, dbAuthorization);
     // save
     authorizationService.saveAuthorization(dbAuthorization);
+  }
+  
+  public ResourceOptionsDto availableOperations(UriInfo context) {
+
+    ResourceOptionsDto dto = new ResourceOptionsDto();
+
+    URI uri = context.getBaseUriBuilder()
+        .path(relativeRootResourcePath)
+        .path(AuthorizationRestService.class)
+        .path(resourceId)
+        .build();
+    
+    dto.addReflexiveLink(uri, HttpMethod.GET, "self");
+    
+    if (isAuthorized(DELETE)) {
+      dto.addReflexiveLink(uri, HttpMethod.DELETE, "delete");
+    }
+    if (isAuthorized(UPDATE)) {
+      dto.addReflexiveLink(uri, HttpMethod.PUT, "update");
+    }
+    
+    return dto;
   }
 
   // utils //////////////////////////////////////////////////
