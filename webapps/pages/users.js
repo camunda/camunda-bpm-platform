@@ -6,8 +6,16 @@ define(['angular'], function(angular) {
 
   var Controller = ['$scope', 'UserResource', function ($scope, UserResource) {
 
+    $scope.availableOperations={};
+
     UserResource.query().$then(function(response) {
       $scope.userList = response.data;
+    });
+
+    UserResource.OPTIONS().$then(function(response) {
+      angular.forEach(response.data.links, function(link){
+        $scope.availableOperations[link.rel] = true;
+      });    
     });
 
   }];

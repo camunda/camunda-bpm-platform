@@ -3,7 +3,7 @@
     <h1>Groups</h1>
   </div>      
 
-  <div show-if-authorized auth-permission="CREATE" auth-resource-name="group"> 
+  <div ng-show="availableOperations.create"> 
     <a class="btn pull-right" href="#/group-create"><i class="icon-plus"></i> New Group</a>
   </div>
      
