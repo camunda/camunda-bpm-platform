@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl;
 
 import java.sql.Connection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +34,7 @@ import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
 import org.camunda.bpm.engine.impl.cmd.UnregisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.UnregisterProcessApplication;
+import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
@@ -88,6 +90,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void setJobRetries(String jobId, int retries) {
     commandExecutor.execute(new SetJobRetriesCmd(jobId, retries));
+  }
+
+  public void setJobDuedate(String jobId, Date newDuedate) {
+    commandExecutor.execute(new SetJobDuedateCmd(jobId, newDuedate));
   }
 
   public TablePageQuery createTablePageQuery() {
