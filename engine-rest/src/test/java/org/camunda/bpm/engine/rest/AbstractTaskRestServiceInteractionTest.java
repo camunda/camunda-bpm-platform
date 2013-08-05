@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -11,16 +12,23 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.ProcessApplicationService;
+import org.camunda.bpm.application.ProcessApplicationInfo;
+import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
@@ -45,16 +53,20 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   protected static final String RESOLVE_TASK_URL = SINGLE_TASK_URL + "/resolve";
   protected static final String DELEGATE_TASK_URL = SINGLE_TASK_URL + "/delegate";
   protected static final String TASK_FORM_URL = SINGLE_TASK_URL + "/form";
+  
+  private Task mockTask;
   private TaskService taskServiceMock;
   private TaskQuery mockQuery;
   private FormService formServiceMock;
+  private ManagementService managementServiceMock;
+  private RepositoryService repositoryServiceMock;
   
   @Before
   public void setUpRuntimeData() {
     taskServiceMock = mock(TaskService.class);
     when(processEngine.getTaskService()).thenReturn(taskServiceMock);
   
-    Task mockTask = MockProvider.createMockTask();
+    mockTask = MockProvider.createMockTask();
     mockQuery = mock(TaskQuery.class);
     when(mockQuery.taskId(anyString())).thenReturn(mockQuery);
     when(mockQuery.singleResult()).thenReturn(mockTask);
@@ -64,8 +76,27 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(processEngine.getFormService()).thenReturn(formServiceMock);
     TaskFormData mockFormData = MockProvider.createMockTaskFormData();
     when(formServiceMock.getTaskFormData(anyString())).thenReturn(mockFormData);
+    
+    repositoryServiceMock = mock(RepositoryService.class);
+    when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
+    ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
+    when(repositoryServiceMock.getProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(mockDefinition);
+    
+    managementServiceMock = mock(ManagementService.class);
+    when(processEngine.getManagementService()).thenReturn(managementServiceMock);
+    when(managementServiceMock.getProcessApplicationForDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID)).thenReturn(MockProvider.EXAMPLE_PROCESS_APPLICATION_NAME);
+    
+    // replace the runtime container delegate & process application service with a mock
+    
+    ProcessApplicationService processApplicationService = mock(ProcessApplicationService.class);
+    ProcessApplicationInfo appMock = MockProvider.createMockProcessApplicationInfo();
+    when(processApplicationService.getProcessApplicationInfo(MockProvider.EXAMPLE_PROCESS_APPLICATION_NAME)).thenReturn(appMock);
+    
+    RuntimeContainerDelegate delegate = mock(RuntimeContainerDelegate.class);
+    when(delegate.getProcessApplicationService()).thenReturn(processApplicationService);
+    RuntimeContainerDelegate.INSTANCE.set(delegate);
   }
-
+  
   @Test
   public void testGetSingleTask() {
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
@@ -92,7 +123,38 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
+      .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
       .when().get(TASK_FORM_URL);
+  }
+  
+  /**
+   * Assuming the task belongs to a deployment that does not belong to any process application
+   */
+  @Test
+  public void testGetFormForNonRegisteredDeployment() {
+    when(managementServiceMock.getProcessApplicationForDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID)).thenReturn(null);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
+      .body("contextPath", nullValue())
+      .when().get(TASK_FORM_URL);
+  }
+  
+  /**
+   * Assuming that the task belongs to no process definition
+   */
+  @Test
+  public void getFormForIndependentTask() {
+    when(mockTask.getProcessDefinitionId()).thenReturn(null);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
+      .body("contextPath", nullValue())
+      .when().get(TASK_FORM_URL);
+    
+    verify(repositoryServiceMock, never()).getProcessDefinition(null);
   }
 
   @Test

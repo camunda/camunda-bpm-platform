@@ -10,6 +10,10 @@ public class ApplicationContextPathUtil {
 
   public static String getApplicationPath(ProcessEngine engine, String processDefinitionId) {
     ProcessDefinition processDefinition = engine.getRepositoryService().getProcessDefinition(processDefinitionId);
+    
+    if (processDefinition == null) {
+      return null;
+    }
 
     if(processDefinition == null) {
       return null;
