@@ -18,14 +18,13 @@ import java.util.List;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.rest.dto.LinkableDto;
 import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AuthorizationDto extends LinkableDto {
+public class AuthorizationDto {
   
   protected String id;
   protected Integer type;

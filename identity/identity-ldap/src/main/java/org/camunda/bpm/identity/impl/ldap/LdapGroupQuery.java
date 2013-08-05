@@ -43,17 +43,17 @@ public class LdapGroupQuery extends GroupQueryImpl {
   // execute queries ////////////////////////////
 
   public long executeCount(CommandContext commandContext) {
-    final LdapIdentityProvider identityProvider = getLdapIdentityProvider(commandContext);
+    final LdapIdentityProviderSession identityProvider = getLdapIdentityProvider(commandContext);
     return identityProvider.findGroupCountByQueryCriteria(this);
   }
 
   public List<Group> executeList(CommandContext commandContext, Page page) {
-    final LdapIdentityProvider identityProvider = getLdapIdentityProvider(commandContext);
+    final LdapIdentityProviderSession identityProvider = getLdapIdentityProvider(commandContext);
     return identityProvider.findGroupByQueryCriteria(this);
   }
   
-  protected LdapIdentityProvider getLdapIdentityProvider(CommandContext commandContext) {
-    return (LdapIdentityProvider) commandContext.getReadOnlyIdentityProvider();
+  protected LdapIdentityProviderSession getLdapIdentityProvider(CommandContext commandContext) {
+    return (LdapIdentityProviderSession) commandContext.getReadOnlyIdentityProvider();
   }
 
 }

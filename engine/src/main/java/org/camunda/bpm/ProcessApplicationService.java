@@ -38,5 +38,4 @@ public interface ProcessApplicationService {
    */
   public ProcessApplicationInfo getProcessApplicationInfo(String processApplicationName);
   
-
 }

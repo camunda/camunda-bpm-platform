@@ -29,7 +29,7 @@ public class LdapIdentityProviderFactory implements SessionFactory {
   }
 
   public Session openSession() {
-    return new LdapIdentityProvider(ldapConfiguration);
+    return new LdapIdentityProviderSession(ldapConfiguration);
   }
   
   public LdapConfiguration getLdapConfiguration() {

@@ -26,12 +26,13 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineController;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -57,17 +58,16 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
   public String getName() {    
     return "Start process engine " + processEngineXml.getName();
   }
-  
 
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
     
     final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
     final AbstractProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
     
-    ClassLoader configurationClassloader = null;
+    ClassLoader classLoader = null;
     
     if(processApplication != null) {
-      configurationClassloader = processApplication.getProcessApplicationClassloader();      
+      classLoader = processApplication.getProcessApplicationClassloader();      
     } 
     
     String configurationClassName = processEngineXml.getConfigurationClass();
@@ -77,23 +77,15 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     }
     
     // create & instantiate configuration class    
-    Class<? extends ProcessEngineConfiguration> configurationClass = loadProcessEngineConfigurationClass(configurationClassName, configurationClassloader);
-    ProcessEngineConfiguration configuration = instantiateConfiguration(configurationClass);
+    Class<? extends ProcessEngineConfigurationImpl> configurationClass = loadClass(configurationClassName, classLoader, ProcessEngineConfigurationImpl.class);
+    ProcessEngineConfigurationImpl configuration = createInstance(configurationClass);
     
     // set UUid generator
     // TODO: move this to configuration and use as default?
     ProcessEngineConfigurationImpl configurationImpl = (ProcessEngineConfigurationImpl)configuration;
     configurationImpl.setIdGenerator(new StrongUuidGenerator());
     
-    // add support for custom Retry strategy
-    // TODO: decide whether this should be moved  to configuration
-    List<BpmnParseListener> customPostBPMNParseListeners = configurationImpl.getCustomPostBPMNParseListeners();
-    if(customPostBPMNParseListeners==null) {
-      customPostBPMNParseListeners = new ArrayList<BpmnParseListener>();
-      configurationImpl.setCustomPostBPMNParseListeners(customPostBPMNParseListeners);
-    }    
-    customPostBPMNParseListeners.add(new FoxFailedJobParseListener());    
-    configurationImpl.setFailedJobCommandFactory(new FoxFailedJobCommandFactory());
+    configureCustomRetryStrategy(configurationImpl);
     
     // set configuration values
     String name = processEngineXml.getName();
@@ -102,8 +94,12 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     String datasourceJndiName = processEngineXml.getDatasource();
     configuration.setDataSourceJndiName(datasourceJndiName);
     
+    // apply properties
     Map<String, String> properties = processEngineXml.getProperties();
     PropertyHelper.applyProperties(configuration, properties);
+    
+    // instantiate plugins:
+    configurePlugins(configuration, processEngineXml, classLoader);
     
     if(processEngineXml.getJobAcquisitionName() != null && !processEngineXml.getJobAcquisitionName().isEmpty()) {
       JobExecutor jobExecutor = getJobExecutorService(serviceContainer);
@@ -121,6 +117,38 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
             
   }
 
+  protected void configureCustomRetryStrategy(ProcessEngineConfigurationImpl configurationImpl) {
+    // add support for custom Retry strategy
+    // TODO: decide whether this should be moved  to configuration or to plugin
+    List<BpmnParseListener> customPostBPMNParseListeners = configurationImpl.getCustomPostBPMNParseListeners();
+    if(customPostBPMNParseListeners==null) {
+      customPostBPMNParseListeners = new ArrayList<BpmnParseListener>();
+      configurationImpl.setCustomPostBPMNParseListeners(customPostBPMNParseListeners);
+    }    
+    customPostBPMNParseListeners.add(new FoxFailedJobParseListener());    
+    configurationImpl.setFailedJobCommandFactory(new FoxFailedJobCommandFactory());
+  }
+
+  /**
+   * <p>Instantiates and applies all {@link ProcessEnginePlugin}s defined in the processEngineXml
+   */
+  protected void configurePlugins(ProcessEngineConfigurationImpl configuration, ProcessEngineXml processEngineXml, ClassLoader classLoader) {
+    
+    for (ProcessEnginePluginXml pluginXml : processEngineXml.getPlugins()) {
+      // create plugin instance
+      Class<? extends ProcessEnginePlugin> pluginClass = loadClass(pluginXml.getPluginClass(), classLoader, ProcessEnginePlugin.class);
+      ProcessEnginePlugin plugin = createInstance(pluginClass);
+      
+      // apply configured properties
+      Map<String, String> properties = pluginXml.getProperties();
+      PropertyHelper.applyProperties(plugin, properties);
+      
+      // add to configuration
+      configuration.getProcessEnginePlugins().add(plugin);
+    }
+    
+  }
+
   protected JobExecutor getJobExecutorService(final MBeanServiceContainer serviceContainer) {
     // lookup container managed job executor
     String jobAcquisitionName = processEngineXml.getJobAcquisitionName();
@@ -128,31 +156,31 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     return jobExecutor;
   }
   
-  protected ProcessEngineConfiguration instantiateConfiguration(Class<? extends ProcessEngineConfiguration> configurationClass) {
+  protected <T> T createInstance(Class<? extends T> clazz) {
     try {
-      return configurationClass.newInstance();
+      return clazz.newInstance();
       
     } catch (InstantiationException e) {
-      throw new ProcessEngineException("Could not instantiate configuration class", e);
+      throw new ProcessEngineException("Could not instantiate class", e);
     } catch (IllegalAccessException e) {
-      throw new ProcessEngineException("IllegalAccessException while instantiating configuration class", e);
+      throw new ProcessEngineException("IllegalAccessException while instantiating class", e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  protected Class<? extends ProcessEngineConfiguration> loadProcessEngineConfigurationClass(String processEngineConfigurationClassName, ClassLoader customClassloader) {
+  protected <T> Class<? extends T> loadClass(String className, ClassLoader customClassloader, Class<T> clazz) {
     try {
       if(customClassloader != null) {
-        return (Class<? extends ProcessEngineConfiguration>) customClassloader.loadClass(processEngineConfigurationClassName);
+        return (Class<? extends T>) customClassloader.loadClass(className);
       }else {
-        return (Class<? extends ProcessEngineConfiguration>) ReflectUtil.loadClass(processEngineConfigurationClassName);
+        return (Class<? extends T>) ReflectUtil.loadClass(className);
       }
       
     } catch (ClassNotFoundException e) {
-      throw new ProcessEngineException("Could not load process engine configuration class", e);
+      throw new ProcessEngineException("Could not load configuration class", e);
       
     } catch (ClassCastException e) {
-      throw new ProcessEngineException("Custom ProcessEngineConfiguration class must extend ProcessEngineConfiguration", e);
+      throw new ProcessEngineException("Custom class of wrong type. Must extend "+clazz.getName(), e);
       
     }
   }

@@ -15,10 +15,9 @@ package org.camunda.bpm.engine.rest.sub.identity.impl;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.sub.impl.AbstractAuthorizedRestResource;
+import org.camunda.bpm.engine.rest.impl.AbstractAuthorizedRestResource;
 
 /**
  * @author Daniel Meyer
@@ -28,8 +27,8 @@ public abstract class AbstractIdentityResource extends AbstractAuthorizedRestRes
   
   protected final IdentityService identityService;
   
-  public AbstractIdentityResource(ProcessEngine processEngine, Resource resource, String resourceId) {
-    super(processEngine, resource, resourceId);
+  public AbstractIdentityResource(String processEngineName, Resource resource, String resourceId) {
+    super(processEngineName, resource, resourceId);
     this.identityService = processEngine.getIdentityService();
   }
   

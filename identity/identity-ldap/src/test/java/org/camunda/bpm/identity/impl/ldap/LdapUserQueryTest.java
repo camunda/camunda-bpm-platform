@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.identity.User;
  */
 public class LdapUserQueryTest extends LdapIdentityProviderTest {
 
-  public void tesQueryNoFilter() {
+  public void testQueryNoFilter() {
     List<User> result = identityService.createUserQuery().list();
     assertEquals(6, result.size());
   }

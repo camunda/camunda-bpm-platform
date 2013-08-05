@@ -193,7 +193,7 @@ public class CommandContext {
       if (exception instanceof Error) {
         throw (Error) exception;
       } else if (exception instanceof PersistenceException) {
-        throw new ProcessEngineException("Process engnine persistence exception", exception);
+        throw new ProcessEngineException("Process engine persistence exception", exception);
       } else if (exception instanceof RuntimeException) {
         throw (RuntimeException) exception;
       } else {

@@ -10,11 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.sub.impl;
+package org.camunda.bpm.engine.rest.impl;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -23,14 +22,19 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
  * @author Daniel Meyer
  *
  */
-public abstract class AbstractAuthorizedRestResource {
+public abstract class AbstractAuthorizedRestResource extends AbstractRestProcessEngineAware {
   
-  protected final ProcessEngine processEngine;
   protected final Resource resource;
   protected final String resourceId;
   
-  public AbstractAuthorizedRestResource(ProcessEngine processEngine, Resource resource, String resourceId) {
-    this.processEngine = processEngine;
+  public AbstractAuthorizedRestResource(String processEngineName, Resource resource, String resourceId) {
+    super(processEngineName);
+    this.resource = resource;
+    this.resourceId = resourceId;
+  }
+  
+  public AbstractAuthorizedRestResource(Resource resource, String resourceId) {
+    super();
     this.resource = resource;
     this.resourceId = resourceId;
   }

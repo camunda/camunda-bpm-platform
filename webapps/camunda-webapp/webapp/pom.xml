@@ -95,6 +95,12 @@
       <version>1.17</version>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.bpm.identity</groupId>
+      <artifactId>camunda-identity-ldap</artifactId>
+      <version>${project.version}</version>
+    </dependency>
           
   </dependencies>
 

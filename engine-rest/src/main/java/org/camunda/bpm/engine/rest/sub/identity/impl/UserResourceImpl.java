@@ -23,10 +23,10 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.UserRestService;
+import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -40,8 +40,8 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
   
   protected String rootResourcePath;
 
-  public UserResourceImpl(ProcessEngine processEngine, String userId, String rootResourcePath) {
-    super(processEngine, USER, userId);
+  public UserResourceImpl(String processEngineName, String userId, String rootResourcePath) {
+    super(processEngineName, USER, userId);
     this.rootResourcePath = rootResourcePath;
   }
 
@@ -54,6 +54,12 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
     
     UserProfileDto user = UserProfileDto.fromUser(dbUser);
     
+    return user;
+  }
+  
+  public ResourceOptionsDto availableOperations(UriInfo context) {
+    ResourceOptionsDto dto = new ResourceOptionsDto();
+    
     // add links if operations are authorized
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
         .path(rootResourcePath)
@@ -62,16 +68,16 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
     URI baseUri = baseUriBuilder.build();
     URI profileUri = baseUriBuilder.path("/profile").build();
     
-    user.addReflexiveLink(profileUri, HttpMethod.GET, "self");    
+    dto.addReflexiveLink(profileUri, HttpMethod.GET, "self");    
     
-    if(isAuthorized(DELETE)) {
-      user.addReflexiveLink(baseUri, HttpMethod.DELETE, "delete");
+    if(!identityService.isReadOnly() && isAuthorized(DELETE)) {
+      dto.addReflexiveLink(baseUri, HttpMethod.DELETE, "delete");
     }    
-    if(isAuthorized(UPDATE)) {
-      user.addReflexiveLink(profileUri, HttpMethod.PUT, "update");
+    if(!identityService.isReadOnly() && isAuthorized(UPDATE)) {
+      dto.addReflexiveLink(profileUri, HttpMethod.PUT, "update");
     }
     
-    return user;
+    return dto;
   }
 
   public void deleteUser() {    

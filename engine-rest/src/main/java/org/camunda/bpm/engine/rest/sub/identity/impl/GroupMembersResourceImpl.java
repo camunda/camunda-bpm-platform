@@ -12,8 +12,17 @@
  */
 package org.camunda.bpm.engine.rest.sub.identity.impl;
 
-import org.camunda.bpm.engine.ProcessEngine;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+
+import java.net.URI;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.rest.GroupRestService;
+import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.sub.identity.GroupMembersResource;
 
 /**
@@ -22,8 +31,9 @@ import org.camunda.bpm.engine.rest.sub.identity.GroupMembersResource;
  */
 public class GroupMembersResourceImpl extends AbstractIdentityResource implements GroupMembersResource {
 
-  public GroupMembersResourceImpl(ProcessEngine processEngine, String resourceId) {
-    super(processEngine, Resources.GROUP_MEMBERSHIP, resourceId);
+  public GroupMembersResourceImpl(String processEngineName, String resourceId, String rootResourcePath) {
+    super(processEngineName, Resources.GROUP_MEMBERSHIP, resourceId);
+    this.relativeRootResourcePath = rootResourcePath;
   }
 
   public void createGroupMember(String userId) {
@@ -36,6 +46,28 @@ public class GroupMembersResourceImpl extends AbstractIdentityResource implement
     ensureNotReadOnly();
     
     identityService.deleteMembership(userId, resourceId);
+  }
+  
+  public ResourceOptionsDto availableOperations(UriInfo context) {
+
+    ResourceOptionsDto dto = new ResourceOptionsDto();
+
+    URI uri = context.getBaseUriBuilder()
+        .path(relativeRootResourcePath)
+        .path(GroupRestService.class)
+        .path(resourceId)
+        .path(PATH)
+        .build();
+    
+    if (!identityService.isReadOnly() && isAuthorized(DELETE)) {
+      dto.addReflexiveLink(uri, HttpMethod.DELETE, "delete");
+    }
+    if (!identityService.isReadOnly() && isAuthorized(CREATE)) {
+      dto.addReflexiveLink(uri, HttpMethod.PUT, "create");
+    }
+    
+    return dto;
+    
   }
 
 }

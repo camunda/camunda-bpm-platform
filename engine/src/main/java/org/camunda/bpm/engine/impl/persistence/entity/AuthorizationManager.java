@@ -116,6 +116,20 @@ public class AuthorizationManager extends AbstractManager {
     
     return getDbSqlSession().selectBoolean("isUserAuthorizedForResource", authCheck);
   }
+  
+  public boolean isAuthorized(Permission permission, Resource resource, String resourceId) {
+    
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    final Authentication currentAuthentication = Context.getCommandContext().getAuthentication();
+    
+    if(processEngineConfiguration.isAuthorizationEnabled() && currentAuthentication != null) {
+      return isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
+      
+    } else {
+      return true;
+      
+    }
+  }
 
   public void deleteAuthorizationsByResourceId(Resource resource, String resourceId) {
 

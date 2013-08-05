@@ -15,17 +15,20 @@ package org.camunda.bpm.container.impl.metadata;
 import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.CONFIGURATION;
 import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.DATASOURCE;
 import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.DEFAULT;
+import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.*;
 import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.JOB_ACQUISITION;
 import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.NAME;
 import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.PROPERTIES;
 import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.PROPERTY;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.xml.Element;
@@ -95,6 +98,7 @@ public abstract class DeploymentMetadataParse extends Parse {
     }
 
     Map<String, String> properties = new HashMap<String, String>();
+    List<ProcessEnginePluginXml> plugins = new ArrayList<ProcessEnginePluginXml>();
     
     for (Element childElement : element.elements()) {
       if(CONFIGURATION.equals(childElement.getTagName())) {
@@ -109,14 +113,43 @@ public abstract class DeploymentMetadataParse extends Parse {
       } else if(PROPERTIES.equals(childElement.getTagName())) {
         parseProperties(childElement, properties);
         
+      } else if(PLUGIN.equals(childElement.getTagName())) {
+        parseProcessEnginePlugin(childElement, plugins);
+      
       }
     }
     
     // set collected properties
     processEngine.setProperties(properties);
+    // set plugins
+    processEngine.setPlugins(plugins);
     // add the process engine to the list of parsed engines. 
     parsedProcessEngines.add(processEngine);
             
+  }
+
+  /**
+   * Transform a <code>&lt;plugin ... /&gt;</code> structure.
+   */
+  protected void parseProcessEnginePlugin(Element element, List<ProcessEnginePluginXml> plugins) {
+    
+    ProcessEnginePluginXmlImpl plugin = new ProcessEnginePluginXmlImpl();
+
+    Map<String, String> properties = new HashMap<String, String>();
+    
+    for (Element childElement : element.elements()) {
+      if(PLUGIN_CLASS.equals(childElement.getTagName())) {
+        plugin.setPluginClass(childElement.getText());
+        
+      } else if(PROPERTIES.equals(childElement.getTagName())) {
+        parseProperties(childElement, properties);
+        
+      }
+
+    }
+    
+    plugin.setProperties(properties);    
+    plugins.add(plugin);    
   }
 
   /**

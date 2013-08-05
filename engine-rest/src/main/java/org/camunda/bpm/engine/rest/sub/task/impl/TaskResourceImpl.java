@@ -17,15 +17,11 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.ProcessApplicationService;
-import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormData;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
@@ -108,7 +104,11 @@ public class TaskResourceImpl implements TaskResource {
     }
 
     FormDto dto = FormDto.fromFormData(formData);
-    dto.setContextPath(ApplicationContextPathUtil.getApplicationPath(engine, task.getProcessDefinitionId()));
+    String processDefinitionId = task.getProcessDefinitionId();
+    if (processDefinitionId != null) {
+      dto.setContextPath(ApplicationContextPathUtil.getApplicationPath(engine, task.getProcessDefinitionId()));
+    }
+    
     return dto;
   }
 

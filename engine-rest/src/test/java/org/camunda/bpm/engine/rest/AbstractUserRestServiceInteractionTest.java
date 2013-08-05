@@ -52,8 +52,9 @@ import com.jayway.restassured.http.ContentType;
  */
 public abstract class AbstractUserRestServiceInteractionTest extends AbstractRestServiceTest {
   
-  protected static final String USER_URL = TEST_RESOURCE_ROOT_PATH + "/user/{id}";
-  protected static final String USER_CREATE_URL = TEST_RESOURCE_ROOT_PATH + "/user/create";
+  protected static final String SERVICE_URL = TEST_RESOURCE_ROOT_PATH + "/user";
+  protected static final String USER_URL = SERVICE_URL + "/{id}";
+  protected static final String USER_CREATE_URL = SERVICE_URL + "/create";
   protected static final String USER_PROFILE_URL = USER_URL + "/profile";
   protected static final String USER_CREDENTIALS_URL = USER_URL + "/credentials";
   
@@ -94,7 +95,34 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
   }
   
   @Test
-  public void testGetSingleUserProfileLinksUnauthenticated() {
+  public void testUserRestServiceOptions() {
+    String fullAuthorizationUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + UserRestService.PATH;
+        
+    given()
+      .then()
+        .statusCode(Status.OK.getStatusCode())
+        
+        .body("links[0].href", equalTo(fullAuthorizationUrl))
+        .body("links[0].method", equalTo(HttpMethod.GET))
+        .body("links[0].rel", equalTo("list"))
+        
+        .body("links[1].href", equalTo(fullAuthorizationUrl+"/count"))
+        .body("links[1].method", equalTo(HttpMethod.GET))
+        .body("links[1].rel", equalTo("count"))
+        
+        .body("links[2].href", equalTo(fullAuthorizationUrl+"/create"))
+        .body("links[2].method", equalTo(HttpMethod.POST))
+        .body("links[2].rel", equalTo("create"))
+                
+    .when()
+        .options(SERVICE_URL);
+    
+    verify(identityServiceMock, times(1)).getCurrentAuthentication();
+    
+  }
+  
+  @Test
+  public void testUserResourceOptionsUnauthenticated() {
     String fullUserUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/user/" + MockProvider.EXAMPLE_USER_ID;
     
     User sampleUser = MockProvider.createMockUser();
@@ -108,10 +136,6 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
         .pathParam("id", MockProvider.EXAMPLE_USER_ID)
     .then()
         .statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_USER_ID))
-        .body("firstName", equalTo(MockProvider.EXAMPLE_USER_FIRST_NAME))
-        .body("lastName", equalTo(MockProvider.EXAMPLE_USER_LAST_NAME))
-        .body("email", equalTo(MockProvider.EXAMPLE_USER_EMAIL))
         
         .body("links[0].href", equalTo(fullUserUrl+"/profile"))
         .body("links[0].method", equalTo(HttpMethod.GET))
@@ -126,14 +150,14 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
         .body("links[2].rel", equalTo("update"))
         
     .when()
-        .get(USER_PROFILE_URL);
+        .options(USER_URL);
     
     verify(identityServiceMock, times(2)).getCurrentAuthentication();
     
   }
   
   @Test
-  public void testGetSingleUserProfileLinksUnauthorized() {
+  public void testUserResourceOptionsUnauthorized() {
     String fullUserUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/user/" + MockProvider.EXAMPLE_USER_ID;
     
     User sampleUser = MockProvider.createMockUser();
@@ -151,10 +175,6 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
         .pathParam("id", MockProvider.EXAMPLE_USER_ID)
     .then()
         .statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_USER_ID))
-        .body("firstName", equalTo(MockProvider.EXAMPLE_USER_FIRST_NAME))
-        .body("lastName", equalTo(MockProvider.EXAMPLE_USER_LAST_NAME))
-        .body("email", equalTo(MockProvider.EXAMPLE_USER_EMAIL))
         
         .body("links[0].href", equalTo(fullUserUrl+"/profile"))
         .body("links[0].method", equalTo(HttpMethod.GET))
@@ -164,7 +184,7 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
         .body("links[2]", nullValue())
        
     .when()
-        .get(USER_PROFILE_URL);
+        .options(USER_URL);
     
     verify(identityServiceMock, times(2)).getCurrentAuthentication();    
     verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, USER, MockProvider.EXAMPLE_USER_ID);
@@ -172,7 +192,7 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
   }
   
   @Test
-  public void testGetSingleUserProfileLinksDeleteAuthorized() {
+  public void testUserResourceOptionsDeleteAuthorized() {
     String fullUserUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/user/" + MockProvider.EXAMPLE_USER_ID;
     
     User sampleUser = MockProvider.createMockUser();
@@ -190,10 +210,6 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
         .pathParam("id", MockProvider.EXAMPLE_USER_ID)
     .then()
         .statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_USER_ID))
-        .body("firstName", equalTo(MockProvider.EXAMPLE_USER_FIRST_NAME))
-        .body("lastName", equalTo(MockProvider.EXAMPLE_USER_LAST_NAME))
-        .body("email", equalTo(MockProvider.EXAMPLE_USER_EMAIL))
         
         .body("links[0].href", equalTo(fullUserUrl+"/profile"))
         .body("links[0].method", equalTo(HttpMethod.GET))
@@ -206,7 +222,7 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
         .body("links[2]", nullValue())
        
     .when()
-        .get(USER_PROFILE_URL);
+        .options(USER_URL);
     
     verify(identityServiceMock, times(2)).getCurrentAuthentication();    
     verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, USER, MockProvider.EXAMPLE_USER_ID);

@@ -135,7 +135,7 @@ public class DeploymentManager extends AbstractManager {
   }
   
   public DeploymentEntity findDeploymentById(String deploymentId) {
-    return (DeploymentEntity) getDbSqlSession().selectOne("selectDeploymentById", deploymentId);
+    return (DeploymentEntity) getDbSqlSession().selectById(DeploymentEntity.class, deploymentId);
   }
   
   public long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery) {

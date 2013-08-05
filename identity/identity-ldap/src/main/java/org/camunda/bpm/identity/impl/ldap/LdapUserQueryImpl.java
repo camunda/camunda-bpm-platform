@@ -44,17 +44,17 @@ public class LdapUserQueryImpl extends UserQueryImpl {
   // execute queries /////////////////////////////////////////
 
   public long executeCount(CommandContext commandContext) {
-    final LdapIdentityProvider provider = getLdapIdentityProvider(commandContext);
+    final LdapIdentityProviderSession provider = getLdapIdentityProvider(commandContext);
     return provider.findUserCountByQueryCriteria(this);
   }
 
   public List<User> executeList(CommandContext commandContext, Page page) {
-    final LdapIdentityProvider provider = getLdapIdentityProvider(commandContext);
+    final LdapIdentityProviderSession provider = getLdapIdentityProvider(commandContext);
     return provider.findUserByQueryCriteria(this);
   }
   
-  protected LdapIdentityProvider getLdapIdentityProvider(CommandContext commandContext) {
-    return (LdapIdentityProvider) commandContext.getReadOnlyIdentityProvider();
+  protected LdapIdentityProviderSession getLdapIdentityProvider(CommandContext commandContext) {
+    return (LdapIdentityProviderSession) commandContext.getReadOnlyIdentityProvider();
   }
   
   public UserQuery desc() {

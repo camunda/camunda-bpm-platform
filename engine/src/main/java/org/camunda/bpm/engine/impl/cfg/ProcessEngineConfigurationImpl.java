@@ -340,17 +340,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Set<String> registeredDeployments;
   
   protected ResourceAuthorizationProvider resourceAuthorizationProvider;
+  
+  protected List<ProcessEnginePlugin> processEnginePlugins = new ArrayList<ProcessEnginePlugin>();
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   public ProcessEngine buildProcessEngine() {
     init();
-    return new ProcessEngineImpl(this);
+    ProcessEngineImpl processEngine = new ProcessEngineImpl(this);
+    invokePostProcessEngineBuild(processEngine);
+    return processEngine;
   }
 
   // init /////////////////////////////////////////////////////////////////////
 
   protected void init() {
+    invokePreInit();
     initHistoryLevel();
     initExpressionManager();
     initVariableTypes();
@@ -382,6 +387,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initPasswordDigest();
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
+    invokePostInit();
+  }
+
+  protected void invokePreInit() {
+    for (ProcessEnginePlugin plugin : processEnginePlugins) {
+      plugin.preInit(this);
+    }    
+  }
+  
+  protected void invokePostInit() {
+    for (ProcessEnginePlugin plugin : processEnginePlugins) {
+      plugin.postInit(this);
+    }    
+  }
+  
+  protected void invokePostProcessEngineBuild(ProcessEngine engine) {
+    for (ProcessEnginePlugin plugin : processEnginePlugins) {
+      plugin.postProcessEngineBuild(engine);
+    }    
   }
 
   // failedJobCommandFactory ////////////////////////////////////////////////////////
@@ -1930,6 +1954,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   public void setResourceAuthorizationProvider(ResourceAuthorizationProvider resourceAuthorizationProvider) {
     this.resourceAuthorizationProvider = resourceAuthorizationProvider;
+  }
+  
+  public List<ProcessEnginePlugin> getProcessEnginePlugins() {
+    return processEnginePlugins;
+  }
+  
+  public void setProcessEnginePlugins(List<ProcessEnginePlugin> processEnginePlugins) {
+    this.processEnginePlugins = processEnginePlugins;
   }
 
 }

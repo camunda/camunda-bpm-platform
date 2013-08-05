@@ -12,9 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Resources.USER;
+
+import java.net.URI;
 import java.util.List;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.IdentityService;
@@ -22,6 +29,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.UserRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserQueryDto;
@@ -33,18 +41,18 @@ import org.camunda.bpm.engine.rest.sub.identity.impl.UserResourceImpl;
  * @author Daniel Meyer
  *
  */
-public class UserRestServiceImpl extends AbstractRestProcessEngineAware implements UserRestService {
+public class UserRestServiceImpl extends AbstractAuthorizedRestResource implements UserRestService {
   
   public UserRestServiceImpl() {
-    super();
+    super(USER, ANY);
   }
 
   public UserRestServiceImpl(String engineName) {
-    super(engineName);
+    super(engineName, USER, ANY);
   }
 
   public UserResource getUser(String id) {
-    return new UserResourceImpl(getProcessEngine(), id, relativeRootResourcePath);
+    return new UserResourceImpl(getProcessEngine().getName(), id, relativeRootResourcePath);
   }
 
   public List<UserProfileDto> queryUsers(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
@@ -99,6 +107,33 @@ public class UserRestServiceImpl extends AbstractRestProcessEngineAware implemen
     
     identityService.saveUser(newUser);      
       
+  }
+    
+  public ResourceOptionsDto availableOperations(UriInfo context) {
+    
+    final IdentityService identityService = getIdentityService();
+    
+    UriBuilder baseUriBuilder = context.getBaseUriBuilder()
+        .path(relativeRootResourcePath)
+        .path(UserRestService.class);
+    
+    ResourceOptionsDto resourceOptionsDto = new ResourceOptionsDto();
+    
+    // GET /
+    URI baseUri = baseUriBuilder.build();    
+    resourceOptionsDto.addReflexiveLink(baseUri, HttpMethod.GET, "list");
+    
+    // GET /count
+    URI countUri = baseUriBuilder.clone().path("/count").build();
+    resourceOptionsDto.addReflexiveLink(countUri, HttpMethod.GET, "count");
+    
+    // POST /create
+    if(!identityService.isReadOnly() && isAuthorized(CREATE)) {
+      URI createUri = baseUriBuilder.clone().path("/create").build();
+      resourceOptionsDto.addReflexiveLink(createUri, HttpMethod.POST, "create");  
+    }
+    
+    return resourceOptionsDto;
   }
   
   // utility methods //////////////////////////////////////
