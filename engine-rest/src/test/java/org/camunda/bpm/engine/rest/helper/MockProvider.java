@@ -46,6 +46,9 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.joda.time.DateTime;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 
 /**
  * Provides mocks for the basic engine entities, such as {@link ProcessDefinition}, {@link User}, etc., 
@@ -129,6 +132,8 @@ public abstract class MockProvider {
  
   public static final String EXAMPLE_ACTIVITY_ID = "anActivity";
   public static final String ANOTHER_EXAMPLE_ACTIVITY_ID = "anotherActivity";
+  public static final String EXAMPLE_ACTIVITY_NAME = "anActivityName";
+  public static final String EXAMPLE_ACTIVITY_TYPE = "anActivityType";
  
   // statistics
   public static final int EXAMPLE_FAILED_JOBS = 42;
@@ -191,6 +196,20 @@ public abstract class MockProvider {
   public static final String EXAMPLE_PROCESS_APPLICATION_NAME = "aProcessApplication";
   public static final String EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH = "http://camunda.org/someContext";
 
+  // Historic Process Instance
+  public static final String EXAMPLE_HIST_PROCESS_DELETE_REASON = "aDeleteReason";
+  public static final Date EXAMPLE_END_TIME = DateTime.now().toDate();
+  public static final String EXAMPLE_HIST_PROCESS_DURATION_MILLIS_AS_STR = "2000";
+  public static final long EXAMPLE_HIST_PROCESS_DURATION_MILLIS_AS_LNG = 2000l;
+  public static final Date EXAMPLE_HISTORIC_PROCESS_END_TIME = DateTime.now().toDate();
+  public static final Date EXAMPLE_HISTORIC_PROCESS_START_TIME = DateTime.now().toDate();  
+  public static final String EXAMPLE_HISTORIC_PROCESS_START_AFTER = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_PROCESS_START_BEFORE ="2013-01-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_PROCESS_FINISH_AFTER = "2013-01-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_PROCESS_FINISH_BEFORE ="2013-04-23T13:42:43";
+  // Historic Activity Instance
+  public static final Date EXAMPLE_ACTIVITY_START_TIME = DateTime.now().toDate();
+  public static final Date EXAMPLE_ACTIVITY_END_TIME = DateTime.now().toDate();
   
   // tasks
   public static Task createMockTask() {
@@ -555,4 +574,91 @@ public abstract class MockProvider {
   
   
  
+  //History
+  public static List<HistoricActivityInstance> createMockHistoricActivityInstances() {
+	List<HistoricActivityInstance> mockList = new ArrayList<HistoricActivityInstance>();
+    mockList.add(createMockHistoricActivityInstance());
+	return mockList;
+  }
+
+  public static HistoricActivityInstance createMockHistoricActivityInstance() {
+    HistoricActivityInstance mock = mock(HistoricActivityInstance.class);
+			when(mock.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+			when(mock.getActivityName()).thenReturn(EXAMPLE_ACTIVITY_NAME);
+			when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+			when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+			when(mock.getActivityType()).thenReturn(EXAMPLE_ACTIVITY_TYPE);	
+			when(mock.getStartTime()).thenReturn(EXAMPLE_ACTIVITY_START_TIME);	
+			when(mock.getEndTime()).thenReturn(EXAMPLE_ACTIVITY_END_TIME);
+	return mock;
+  }
+  
+  public static List<HistoricActivityInstance> createMockRunningHistoricActivityInstances() {
+	List<HistoricActivityInstance> mockList = new ArrayList<HistoricActivityInstance>();
+    mockList.add(createMockRunningHistoricActivityInstance());
+	return mockList;
+  }
+
+  public static HistoricActivityInstance createMockRunningHistoricActivityInstance() {
+    HistoricActivityInstance mock = mock(HistoricActivityInstance.class);
+			when(mock.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+			when(mock.getActivityName()).thenReturn(EXAMPLE_ACTIVITY_NAME);
+			when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+			when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+			when(mock.getActivityType()).thenReturn(EXAMPLE_ACTIVITY_TYPE);	
+			when(mock.getStartTime()).thenReturn(EXAMPLE_ACTIVITY_START_TIME);	
+			when(mock.getEndTime()).thenReturn(null);
+	return mock;
+  }
+
+  public static List<HistoricProcessInstance> createMockHistoricProcessInstances() {
+	List<HistoricProcessInstance> mockList = new ArrayList<HistoricProcessInstance>();
+	mockList.add(createMockHistoricProcessInstance());
+	return mockList;
+  }
+
+  public static HistoricProcessInstance createMockHistoricProcessInstance() {
+	HistoricProcessInstance mock = mock(HistoricProcessInstance.class);
+		    when(mock.getId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+		    when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
+		    when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+		    when(mock.getDeleteReason()).thenReturn(EXAMPLE_HIST_PROCESS_DELETE_REASON);
+		    when(mock.getEndTime()).thenReturn(EXAMPLE_HISTORIC_PROCESS_END_TIME);
+		    when(mock.getStartTime()).thenReturn(EXAMPLE_HISTORIC_PROCESS_START_TIME);
+		    when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HIST_PROCESS_DURATION_MILLIS_AS_LNG);
+	return mock;
+  }
+
+  public static List<HistoricProcessInstance> createMockRunningHistoricProcessInstances() {
+	List<HistoricProcessInstance> mockList = new ArrayList<HistoricProcessInstance>();
+	mockList.add(createMockHistoricProcessInstanceUnfinsished());
+	return mockList;
+  }
+	
+  public static HistoricProcessInstance createMockHistoricProcessInstanceUnfinsished() {
+	HistoricProcessInstance mock = mock(HistoricProcessInstance.class);
+		    when(mock.getId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+		    when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
+		    when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+		    when(mock.getDeleteReason()).thenReturn(EXAMPLE_HIST_PROCESS_DELETE_REASON);
+		    when(mock.getEndTime()).thenReturn(null);
+		    when(mock.getStartTime()).thenReturn(EXAMPLE_HISTORIC_PROCESS_START_TIME);
+		    when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HIST_PROCESS_DURATION_MILLIS_AS_LNG);
+	return mock;
+  }
+	 
+  public static List<HistoricVariableInstance> createMockHistoricVariableInstances() {
+	List<HistoricVariableInstance> mockList = new ArrayList<HistoricVariableInstance>();
+	mockList.add(createMockHistoricVariableInstance());
+	return mockList;
+  }
+
+  public static HistoricVariableInstance createMockHistoricVariableInstance() {
+    HistoricVariableInstance mock = mock(HistoricVariableInstance.class);
+		    when(mock.getVariableName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_NAME);
+		    when(mock.getVariableTypeName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_TYPE);
+		    when(mock.getValue()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_VALUE);
+		    when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID);	  
+	return mock;
+   }
 }
