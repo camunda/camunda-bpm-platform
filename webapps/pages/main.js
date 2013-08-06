@@ -1,7 +1,7 @@
 ngDefine('cockpit.pages', [
   './dashboard', 
-  './processDefinition',
   'module:cockpit.pages.processInstance:./processInstance',
+  'module:cockpit.pages.processDefinition:./processDefinition',
   './cancelProcessInstance',
   './jobRetries'
 ], function(module) {

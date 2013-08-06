@@ -564,7 +564,7 @@ ngDefine('cockpit.pages.processInstance', [
               }
             });
           }]
-      },      
+      },
       reloadOnSearch: false
     });
   };
