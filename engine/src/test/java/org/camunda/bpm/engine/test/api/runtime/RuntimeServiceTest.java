@@ -116,28 +116,9 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testNonUniqueBusinessKey() {
+  public void testDuplicateBusinessKeyAllowed() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
-    try {
-      runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
-      fail("Non-unique business key used, this should fail");
-    } catch(Exception e) {
-      
-    }
-  }
-  
-  // some databases might react strange on having mutiple times null for the business key
-  // when the unique constraint is {processDefinitionId, businessKey}
-  @Deployment(resources={
-    "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testMultipleNullBusinessKeys() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    assertNull(processInstance.getBusinessKey());
-    
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    
-    assertEquals(3, runtimeService.createProcessInstanceQuery().count());
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
   }
 
   

@@ -300,10 +300,6 @@ alter table ACT_RU_INCIDENT
     references ACT_RU_INCIDENT (ID_);   
     
 -- see http://stackoverflow.com/questions/675398/how-can-i-constrain-multiple-columns-to-prevent-duplicates-but-ignore-null-value
-create unique index ACT_UNIQ_RU_BUS_KEY on ACT_RU_EXECUTION
-   (case when BUSINESS_KEY_ is null then null else PROC_DEF_ID_ end,
-    case when BUSINESS_KEY_ is null then null else BUSINESS_KEY_ end);
-
 create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION
    (case when USER_ID_ is null then null else TYPE_ end,
     case when USER_ID_ is null then null else RESOURCE_TYPE_ end,

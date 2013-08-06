@@ -260,8 +260,11 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     Job newTimerJob = managementService.createJobQuery()
       .processInstanceId(processInstance.getId())
       .singleResult();
-    
-    assertEquals(cal.getTime().getTime(), newTimerJob.getDuedate().getTime());
+
+    // normalize date for mysql dropping fractional seconds in time values
+    int SECOND = 1000;
+    assertEquals((cal.getTime().getTime() / SECOND) * SECOND,
+                 (newTimerJob.getDuedate().getTime() / SECOND) * SECOND);
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
