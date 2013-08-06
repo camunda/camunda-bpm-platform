@@ -23,7 +23,11 @@ ngDefine('camunda.common.pages', function(module) {
 
       case 401:
         Authentication.clear();
-        $location.path("/login");
+        if($location.absUrl().indexOf("/setup/#")==-1) {
+          $location.path("/login");
+        } else {
+          $location.path("/setup");
+        }
         break;
 
       case 403:

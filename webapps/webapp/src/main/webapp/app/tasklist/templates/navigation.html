@@ -1,7 +1,7 @@
 <div class="nav-collapse collapse navbar-responsive-collapse" ng-cloak>
   <ul class="nav pull-right" ng-controller="AuthenticationController">
 
-    <li process-definition-select></li>
+    <li if-logged-in process-definition-select></li>
     <li engine-select></li>
 
     <li class="dropdown" if-logged-in>
