@@ -694,15 +694,20 @@ angular
         }
       });
      
-      // <!>Daniel's master HACK to make sure dialog is positioned in 
+      // <!>Daniel's & Stefan's master HACK to make sure dialog is positioned in 
       // the middle of the screen at all times. 
       scope.$watch(function() {
     	  return $(dialog()).outerHeight();
       	}, function(after, before) {
-	      if(after > before) {
-	        var modal = $(dialog());
-			    modal.css('margin-top', (modal.outerHeight() / 2) * -1)
-	 		         .css('margin-left', (modal.outerWidth() / 2) * -1);
+	        if(after > before) {
+	          var modal = $(dialog());
+            var documentHeight = Math.max(
+              $(document).height(),
+              $(window).height(),
+              document.documentElement.clientHeight);
+
+			      modal.css('margin-top', modal.outerHeight() / 2 * -1 + documentHeight - (documentHeight / 4 * 3))
+	 		           .css('margin-left', (modal.outerWidth() / 2) * -1);
 	    }
       });
       
