@@ -183,6 +183,9 @@
       <if test="exceptionMessage">
       	and RES.EXCEPTION_MSG_ = #{exceptionMessage}
       </if>
+      <if test="noRetriesLeft">
+        and RES.RETRIES_ = 0
+      </if>
     </where>
   </sql>
 

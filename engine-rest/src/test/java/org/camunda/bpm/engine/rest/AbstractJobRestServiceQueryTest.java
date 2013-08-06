@@ -290,6 +290,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     parameters.put("timers", MockProvider.EXAMPLE_TIMERS);
     parameters.put("withException", MockProvider.EXAMPLE_WITH_EXCEPTION);
     parameters.put("exceptionMessage", MockProvider.EXAMPLE_EXCEPTION_MESSAGE);
+    parameters.put("noRetriesLeft", MockProvider.EXAMPLE_NO_RETRIES_LEFT);
     return parameters;
   }
 	
@@ -317,6 +318,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 		verify(mockQuery).timers();
 		verify(mockQuery).withException();
 		verify(mockQuery).exceptionMessage((String) parameters.get("exceptionMessage"));
+		verify(mockQuery).noRetriesLeft();
 	}
 
 	@Test

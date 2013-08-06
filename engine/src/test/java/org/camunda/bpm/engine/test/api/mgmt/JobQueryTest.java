@@ -325,6 +325,15 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
     
   }
 
+  public void testQueryByNoRetriesLeft() {
+    JobQuery query = managementService.createJobQuery().noRetriesLeft();
+    verifyQueryResults(query, 0);
+
+    setRetries(processInstanceIdOne, 0);
+    // Re-running the query should give only one jobs now, since three job has retries>0
+    verifyQueryResults(query, 1);
+  }
+
   //sorting //////////////////////////////////////////
   
   public void testQuerySorting() {
