@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
@@ -30,6 +31,7 @@ public class ActivityInstanceDto {
   protected ActivityInstanceDto[] childActivityInstances;
   protected TransitionInstanceDto[] childTransitionInstances;
   protected String[] executionIds;
+  protected String name;
 
   /** The id of the activity instance */
   public String getId() {
@@ -71,9 +73,14 @@ public class ActivityInstanceDto {
   public String[] getExecutionIds() {
     return executionIds; 
   }
+
+  /** the activity name */
+  public String getName() {
+    return name; 
+  }
   
   public static ActivityInstanceDto fromActivityInstance(ActivityInstance instance) {
-    ActivityInstanceDto result = new ActivityInstanceDto();
+    ActivityInstanceDto result = new ActivityInstanceDto();    
     result.id = instance.getId();
     result.parentActivityInstanceId = instance.getParentActivityInstanceId();
     result.activityId = instance.getActivityId();
@@ -82,6 +89,7 @@ public class ActivityInstanceDto {
     result.childActivityInstances = fromListOfActivityInstance(instance.getChildActivityInstances());
     result.childTransitionInstances = TransitionInstanceDto.fromListOfTransitionInstance(instance.getChildTransitionInstances());
     result.executionIds = instance.getExecutionIds();
+    result.name = instance.getActivityName();
     return result;
   }
   

@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -542,8 +543,12 @@ public abstract class MockProvider {
         createMockGlobalAuthorization()
     });
   }
-  
-  // process application
+  public static Date createMockDuedate() {
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(new Date());
+    cal.add(Calendar.DATE, 3);
+    return cal.getTime();
+  }  // process application
   public static ProcessApplicationInfo createMockProcessApplicationInfo() {
     ProcessApplicationInfo appInfo = mock(ProcessApplicationInfo.class);
     Map<String, String> mockAppProperties = new HashMap<String, String>();
@@ -551,8 +556,4 @@ public abstract class MockProvider {
     mockAppProperties.put(ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH, mockServletContextPath);
     when(appInfo.getProperties()).thenReturn(mockAppProperties);
     return appInfo;
-  }
-  
-  
- 
-}
+  }}

@@ -35,8 +35,8 @@ define(['angular'], function(angular) {
 
       InitialUserResource.create(user).$then(
         function(){
-          Notifications.addMessage({ type:"success", status:"Success", message:"Successfully created user. You can now login with user " + user.profile.id });
-          $location.path("/users");
+          // TODO: full page reload necessary?
+          window.location = $location.absUrl().split("setup/#")[0];
         },
         function(){
           Notifications.addError({ type:"error", status:"Error", message:"Could not create initial user." });

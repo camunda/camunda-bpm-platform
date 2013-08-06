@@ -348,3 +348,8 @@ input.ng-invalid {
   padding: 7px 9px;
 }
 
+.placeholder
+{
+  color: #aaa;
+}
+
