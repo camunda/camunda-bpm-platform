@@ -14,7 +14,9 @@ package org.camunda.bpm.webapp.impl.security.auth;
 
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.NewCookie;
 
@@ -31,15 +33,24 @@ public class AuthenticationCookie {
   
   public static final String AUTH_COOKIE_NAME = "CAM-AUTH";
   
+  public static void updateCookie(HttpServletResponse response, HttpSession session) {
+    Cookie cookie = new Cookie(AUTH_COOKIE_NAME, getCockieValue(Authentications.getCurrent()));
+    cookie.setPath(getCookiePath(session));
+    cookie.setMaxAge(Integer.MAX_VALUE);
+    response.addCookie(cookie);
+  }
+  
   public static NewCookie fromAuthentications(Authentications authentications, HttpServletRequest request) {
     
-    final HttpSession session = request.getSession();
-    
-    String contextPath = session.getServletContext().getContextPath();    
+    String cookiePath = getCookiePath(request.getSession());    
     
     String value = getCockieValue(authentications);
         
-    return new NewCookie(AUTH_COOKIE_NAME, value, contextPath, null, null, Integer.MAX_VALUE, false);
+    return new NewCookie(AUTH_COOKIE_NAME, value, cookiePath, null, null, Integer.MAX_VALUE, false);
+  }
+
+  protected static String getCookiePath(HttpSession session) {    
+    return session.getServletContext().getContextPath();    
   }
 
   private static String getCockieValue(Authentications authentications) {
