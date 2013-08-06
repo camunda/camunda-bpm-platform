@@ -22,6 +22,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -47,6 +48,7 @@ public class AuthenticationFilter implements Filter {
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
     
     final HttpServletRequest req = (HttpServletRequest) request;
+    final StatusAwareServletResponse resp = new StatusAwareServletResponse((HttpServletResponse) response);
     
     // get authentication from session
     Authentications authentications = Authentications.getFromSession(req.getSession());      
@@ -64,8 +66,11 @@ public class AuthenticationFilter implements Filter {
           return null;
         }
       }, authentications);
-      
     } finally {      
+      if(resp.getStatus() == 401) {
+        // update cookie
+        AuthenticationCookie.updateCookie(resp, req.getSession());
+      }
       Authentications.clearCurrent();
       Authentications.updateSession(req.getSession(), authentications);
     }

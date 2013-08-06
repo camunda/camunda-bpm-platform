@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,6 +15,7 @@ import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
 import org.camunda.bpm.webapp.impl.security.SecurityActions;
 import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
+import org.camunda.bpm.webapp.impl.security.auth.AuthenticationCookie;
 
 /**
  *
@@ -85,9 +87,10 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
 
       if (needsInitialUser(engineName)) {
         if (!setupPage) {
-          // redirect to setup
+          // redirect to setup          
           response.sendRedirect(String.format("%s/app/admin/%s/setup/#/setup", contextPath, engineName));
         } else {
+          AuthenticationCookie.updateCookie(response, request.getSession());
           // serve the index page as a setup page
           // setup will be handled by app
           serveIndexPage(appName, engineName, contextPath, request, response);
