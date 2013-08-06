@@ -116,14 +116,6 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testDuplicateBusinessKeyAllowed() {
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
-  }
-
-  
-  @Deployment(resources={
-    "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testDeleteProcessInstance() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
