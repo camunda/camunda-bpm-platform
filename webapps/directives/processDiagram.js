@@ -352,7 +352,10 @@ ngDefine('cockpit.directives', [
     $scope.$watch('selection.scrollToBpmnElement', function(newValue) {
       if (newValue) {
         var bpmnElement = bpmnElements[newValue];
-        scrollTo(bpmnElement)
+        if (bpmnElement) {
+          scrollTo(bpmnElement)  
+        }
+        
       }
     });
 
