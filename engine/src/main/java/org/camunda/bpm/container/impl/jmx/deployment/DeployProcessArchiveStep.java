@@ -47,8 +47,6 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
  */
 public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
   
-  private final static Logger LOGGER = Logger.getLogger(DeployProcessArchiveStep.class.getName());      
-  
   protected final ProcessArchiveXml processArchive;
   protected URL metaFileUrl;
   protected Deployment deployment;

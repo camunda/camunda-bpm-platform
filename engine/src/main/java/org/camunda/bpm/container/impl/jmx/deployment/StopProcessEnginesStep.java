@@ -30,8 +30,6 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
  *
  */
 public class StopProcessEnginesStep extends MBeanDeploymentOperationStep {
-  
-  public final static Logger LOGGER = Logger.getLogger(StopProcessEnginesStep.class.getName());
 
   public String getName() {
     return "Stopping process engines";

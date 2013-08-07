@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.container.impl.jmx.kernel;
 
+import java.util.logging.Logger;
+
 /**
  * <p>An atomic step that is part of a composite {@link MBeanDeploymentOperation}.</p>
  * 
@@ -19,7 +21,9 @@ package org.camunda.bpm.container.impl.jmx.kernel;
  *
  */
 public abstract class MBeanDeploymentOperationStep {
-  
+
+  protected final Logger LOGGER = Logger.getLogger(getClass().getName());
+
   public abstract String getName();
   
   public abstract void performOperationStep(MBeanDeploymentOperation operationContext);

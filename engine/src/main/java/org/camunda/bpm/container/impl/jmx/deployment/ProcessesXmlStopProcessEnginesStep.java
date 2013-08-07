@@ -34,8 +34,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
  */
 public class ProcessesXmlStopProcessEnginesStep extends MBeanDeploymentOperationStep {
   
-  protected final static Logger LOGGER = Logger.getLogger(ProcessesXmlStopProcessEnginesStep.class.getName());
-  
   public String getName() {
     return "Stopping process engines";
   }
