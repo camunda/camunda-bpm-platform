@@ -11,16 +11,16 @@
         </a>
       </td>
       <td>
-        <span ng-show="calledProcessDefinition.calledFromActivityIds.length === 1">
-          <a href ng-click="selectBpmnElement(calledProcessDefinition.calledFromActivityIds[0].bpmnElement)">
-            {{ calledProcessDefinition.calledFromActivityIds[0].bpmnElement.name }}
+        <span ng-show="calledProcessDefinition.calledFromActivities.length === 1">
+          <a href="#/process-definition/{{ processDefinition.id }}?activityIds={{ calledProcessDefinition.calledFromActivities[0].id }}">
+            {{ calledProcessDefinition.calledFromActivities[0].name }}
           </a>
         </span>
-        <span ng-show="calledProcessDefinition.calledFromActivityIds.length > 1">
+        <span ng-show="calledProcessDefinition.calledFromActivities.length > 1">
           <ul>
-            <li ng-repeat="activity in calledProcessDefinition.calledFromActivityIds">
-              <a href ng-click="selectBpmnElement(activity.bpmnElement)">
-                {{ activity.bpmnElement.name }}
+            <li ng-repeat="activity in calledProcessDefinition.calledFromActivities">
+              <a href="#/process-definition/{{ processDefinition.id }}?activityIds={{ activity.id }}">
+                {{ activity.name }}
               </a>
             </li>
           <ul>

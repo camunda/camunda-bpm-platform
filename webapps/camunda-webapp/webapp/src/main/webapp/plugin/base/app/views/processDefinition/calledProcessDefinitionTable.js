@@ -1,75 +1,53 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
 
-  var Controller = function ($scope, $location, $q, PluginProcessDefinitionResource) {
+  var Controller = [ '$scope', '$location', '$q', 'PluginProcessDefinitionResource', 
+             function($scope, $location, $q, PluginProcessDefinitionResource) {
 
-    // input processDefinition, selection
+    var filter;
+    var processData = $scope.processData;
 
-    var parentProcessDefinitionId = $location.search().parentProcessDefinitionId || null;
-    var activityIds = null; 
-    
-    $scope.$watch(function () { return $location.search().bpmnElements; }, function (newValue) {
-      activityIds = [];
+    processData.get([ 'processDefinition', 'filter', 'bpmnElements' ], function(processDefinition, filter, bpmnElements) {
 
-      if (newValue && angular.isString(newValue)) {
-        activityIds = newValue.split(',');
-      } else if (newValue && angular.isArray(newValue)) {
-        activityIds = newValue;
-      }
+      var parentId = filter.parentProcessDefinitionId,
+          activityIds = filter.activityIds;
 
-      updateView();
+      return PluginProcessDefinitionResource.getCalledProcessDefinitions({ id: processDefinition.id }, {
+        activityIdIn: activityIds,
+        superProcessDefinitionId: parentId
+      }).$promise.then(function(definitions) {
+        $scope.calledProcessDefinitions = attachCalledFromActivities(definitions, bpmnElements);
+      });
+
+      // remember last filter
+      filter = filter;
     });
 
-    function updateView() {
-      function waitForBpmnElements () {
-        var deferred = $q.defer();
+    // processData.get([ 'calledProcessDefinitions', 'bpmnElements' ], function(calledProcessDefinitions, bpmnElements) {
 
-        $scope.$watch('processDefinition.bpmnElements', function (newValue) {
-          if (newValue) {
-            deferred.resolve(newValue);
-          }
+    //   $scope.calledProcessDefinitions = attachCalledFromActivities(calledProcessDefinitions, bpmnElements);
+    // });
+
+    function attachCalledFromActivities(processDefinitions, bpmnElements) {
+
+      var result = [];
+
+      angular.forEach(processDefinitions, function(d) {
+        var calledFromActivityIds = d.calledFromActivityIds,
+            calledFromActivities = [];
+
+        angular.forEach(calledFromActivityIds, function(activityId) {
+          var bpmnElement = bpmnElements[activityId];
+          var activity = { id: activityId, name: bpmnElement.name || activityId };
+
+          calledFromActivities.push(activity);
         });
 
-        return deferred.promise;
-      }
+        result.push(angular.extend({}, d, { calledFromActivities: calledFromActivities }));
+      });
 
-      function extractBpmnElements (processDefinitions) {
-        angular.forEach(processDefinitions, function (def) {
-          var callActivities = def.calledFromActivityIds;
-          def.calledFromActivityIds = [];
-
-          angular.forEach(callActivities, function (callActivityId) {
-            var bpmnElement = $scope.processDefinition.bpmnElements[callActivityId];
-            var tmp = {activityId: callActivityId, bpmnElement: bpmnElement};
-            def.calledFromActivityIds.push(tmp);
-          });
-
-        });
-      }
-
-      PluginProcessDefinitionResource.getCalledProcessDefinitions({id: $scope.processDefinition.id},
-        {
-          activityIdIn: activityIds,
-          superProcessDefinitionId: parentProcessDefinitionId
-        }).$then(function (response) {
-        if ($scope.processDefinition.bpmnElements) {
-          extractBpmnElements(response.data);
-        } else {
-          waitForBpmnElements().then(function () {
-            extractBpmnElements(response.data);
-          });
-        }
-
-        $scope.calledProcessDefinitions = response.data;
-      });      
+      return result;
     }
-    
-    $scope.selectBpmnElement = function (bpmnElement) {
-      $scope.selection.view = {bpmnElements: [ bpmnElement ], scrollToBpmnElement: bpmnElement};
-    };
-
-  };
-
-  Controller.$inject = [ '$scope', '$location', '$q', 'PluginProcessDefinitionResource' ];
+  }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
