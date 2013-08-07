@@ -23,6 +23,8 @@ public interface PvmProcessInstance extends PvmExecution {
 
   void start();
 
+  void start(String businessKey);
+
   PvmExecution findExecution(String activityId);
 
   List<String> findActiveActivityIds();

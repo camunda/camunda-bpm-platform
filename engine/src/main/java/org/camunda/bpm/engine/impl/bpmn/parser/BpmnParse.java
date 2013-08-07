@@ -2845,9 +2845,16 @@ public class BpmnParse extends Parse {
       for (Element listenerElement : extentionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "in")) {
         String sourceExpression = listenerElement.attribute("sourceExpression");
         String target = listenerElement.attribute("target");
+        String variables = listenerElement.attribute("variables");
+        String businessKeyExpression = listenerElement.attribute("businessKey");
         if (sourceExpression != null) {
           Expression expression = expressionManager.createExpression(sourceExpression.trim());
           callActivityBehaviour.addDataInputAssociation(new SimpleDataInputAssociation(expression, target));
+        } else if (variables != null && ("all").equals(variables)) {
+          callActivityBehaviour.addDataInputAssociation(new SimpleDataInputAssociation(variables));
+        } else if (businessKeyExpression != null) {
+          Expression expression = expressionManager.createExpression(businessKeyExpression.trim());
+          callActivityBehaviour.addDataInputAssociation(new SimpleDataInputAssociation(expression));
         } else {
           String source = listenerElement.attribute("source");
           callActivityBehaviour.addDataInputAssociation(new SimpleDataInputAssociation(source, target));
@@ -2857,9 +2864,12 @@ public class BpmnParse extends Parse {
       for (Element listenerElement : extentionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "out")) {
         String sourceExpression = listenerElement.attribute("sourceExpression");
         String target = listenerElement.attribute("target");
+        String variables = listenerElement.attribute("variables");
         if (sourceExpression != null) {
           Expression expression = expressionManager.createExpression(sourceExpression.trim());
           callActivityBehaviour.addDataOutputAssociation(new MessageImplicitDataOutputAssociation(target, expression));
+        } else if (variables != null && ("all").equals(variables)) {
+          callActivityBehaviour.addDataOutputAssociation(new MessageImplicitDataOutputAssociation(variables));
         } else {
           String source = listenerElement.attribute("source");
           callActivityBehaviour.addDataOutputAssociation(new MessageImplicitDataOutputAssociation(target, source));

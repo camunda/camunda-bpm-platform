@@ -34,7 +34,15 @@ public class SimpleDataInputAssociation extends AbstractDataAssociation {
   public SimpleDataInputAssociation(String source, String target) {
     super(source, target);
   }
-  
+
+  public SimpleDataInputAssociation(String variables) {
+    super(variables);
+  }
+
+  public SimpleDataInputAssociation(Expression businesKeyExpression) {
+    super(businesKeyExpression);
+  }
+
   public void addAssignment(Assignment assignment) {
     this.assignments.add(assignment);
   }

@@ -350,6 +350,14 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     performOperation(AtomicOperation.PROCESS_START);
   }
 
+  public void start(String businessKey) {
+    if(startingExecution == null && isProcessInstance()) {
+      startingExecution = new StartingExecution(processDefinition.getInitial());
+    }
+    setBusinessKey(businessKey);
+    performOperation(AtomicOperation.PROCESS_START);
+  }
+
   public void destroy() {
     log.fine("destroying "+this);
     

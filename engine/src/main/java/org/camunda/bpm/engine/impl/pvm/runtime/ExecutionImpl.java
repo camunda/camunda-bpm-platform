@@ -88,7 +88,10 @@ public class ExecutionImpl implements
   
   /** only available until the process instance is started */
   protected StartingExecution startingExecution;
-  
+
+  /** the business key */
+  protected String businessKey;
+
   // state/type of execution ////////////////////////////////////////////////// 
   
   /** indicates if this execution represents an active path of execution.
@@ -380,7 +383,11 @@ public class ExecutionImpl implements
   public String getBusinessKey() {
     return getProcessInstance().getBusinessKey();
   }
-  
+
+  public void setBusinessKey(String businessKey) {
+    this.businessKey = businessKey;
+  }
+
   public String getProcessBusinessKey() {
     return getProcessInstance().getBusinessKey();
   }
@@ -493,6 +500,14 @@ public class ExecutionImpl implements
     performOperation(AtomicOperation.PROCESS_START);
   }
   
+  public void start(String businessKey) {
+    if(startingExecution == null && isProcessInstance()) {
+      startingExecution = new StartingExecution(processDefinition.getInitial());
+    }
+    setBusinessKey(businessKey);
+    performOperation(AtomicOperation.PROCESS_START);
+  }
+
   // methods that translate to operations /////////////////////////////////////
 
   public void signal(String signalName, Object signalData) {
