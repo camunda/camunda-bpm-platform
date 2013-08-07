@@ -19,7 +19,7 @@
       </properties>
       <plugins>
         <plugin>
-          <class></class>
+          <class>org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin</class>
           <properties>
             <property name="test">abc</property>
             <property name="number">123</property>
