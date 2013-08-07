@@ -29,7 +29,7 @@ public class ErrorEndEventActivityBehavior extends FlowNodeActivityBehavior {
   }
   
   public void execute(ActivityExecution execution) throws Exception {    
-    ErrorPropagation.propagateError(errorCode, execution);    
+    ErrorPropagation.propagateError(errorCode, null, execution);    
   }
 
   public String getErrorCode() {

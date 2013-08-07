@@ -16,6 +16,8 @@ package org.camunda.bpm.engine.impl.bpmn.helper;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.script.ScriptException;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
@@ -47,11 +49,25 @@ public class ErrorPropagation {
 
   private static final Logger LOG = Logger.getLogger(ErrorPropagation.class.getName());
 
-  public static void propagateError(BpmnError error, ActivityExecution execution) throws Exception {    
-    propagateError(error.getErrorCode(), execution);
+  public static void propagateException(Exception ex, ActivityExecution execution) throws Exception {
+    if (ex instanceof ProcessEngineException && ex.getCause() == null) {
+      throw ex;
+    } else {
+      Exception origExeption = ex;
+      String errorCode = ex.getClass().getName();
+      while ((ex instanceof ProcessEngineException || ex instanceof ScriptException) && ex.getCause() != null) {
+          errorCode = ex.getCause().getClass().getName();
+          ex = (Exception) ex.getCause();
+      }
+      propagateError(errorCode, origExeption, execution);
+    }
   }
   
-  public static void propagateError(String errorCode, ActivityExecution execution) throws Exception {
+  public static void propagateError(BpmnError error, ActivityExecution execution) throws Exception {    
+    propagateError(error.getErrorCode(), null, execution);
+  }
+  
+  public static void propagateError(String errorCode, Exception origException, ActivityExecution execution) throws Exception {
     // find local error handler
     String eventHandlerId = findLocalErrorEventHandler(execution, errorCode);  
 
@@ -61,12 +77,16 @@ public class ErrorPropagation {
     }else {
       ActivityExecution superExecution = getSuperExecution(execution);
       if (superExecution != null) {
-        executeCatchInSuperProcess(errorCode, superExecution);
+        executeCatchInSuperProcess(errorCode, origException, superExecution);
       } else {
-        LOG.info(execution.getActivity().getId() + " throws error event with errorCode '"
-                + errorCode + "', but no catching boundary event was defined. "
-                +   "Execution will simply be ended (none end event semantics).");
-        execution.end();
+        if (origException==null) {
+          LOG.info(execution.getActivity().getId() + " throws error event with errorCode '"
+                  + errorCode + "', but no catching boundary event was defined. "
+                  +   "Execution will simply be ended (none end event semantics).");
+          execution.end();
+        } else
+          // throw original exception
+          throw origException;
       }
     }
   }
@@ -96,17 +116,22 @@ public class ErrorPropagation {
     return null;
   }
 
-  private static void executeCatchInSuperProcess(String errorCode, ActivityExecution superExecution) {
+  private static void executeCatchInSuperProcess(String errorCode, Exception origException, ActivityExecution superExecution) throws Exception {
     String errorHandlerId = findLocalErrorEventHandler(superExecution, errorCode);
     if (errorHandlerId != null) {
       executeCatch(errorHandlerId, superExecution);
     } else { // no matching catch found, going one level up in process hierarchy
       ActivityExecution superSuperExecution = getSuperExecution(superExecution);
       if (superSuperExecution != null) {
-        executeCatchInSuperProcess(errorCode, superSuperExecution);
+        executeCatchInSuperProcess(errorCode, origException, superSuperExecution);
       } else {
-        throw new BpmnError(errorCode, "No catching boundary event found for error with errorCode '" 
-                + errorCode + "', neither in same process nor in parent process");
+        if (origException == null) {
+          throw new BpmnError(errorCode, "No catching boundary event found for error with errorCode '" 
+                  + errorCode + "', neither in same process nor in parent process");
+        } else {
+          // throw original exception
+          throw origException;
+        }
       }
     }
   }
