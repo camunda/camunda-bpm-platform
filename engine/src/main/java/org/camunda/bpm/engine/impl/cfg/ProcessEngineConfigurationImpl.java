@@ -97,7 +97,12 @@ import org.camunda.bpm.engine.impl.form.FormTypes;
 import org.camunda.bpm.engine.impl.form.JuelFormEngine;
 import org.camunda.bpm.engine.impl.form.LongFormType;
 import org.camunda.bpm.engine.impl.form.StringFormType;
-import org.camunda.bpm.engine.impl.history.handler.HistoryParseListener;
+import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
+import org.camunda.bpm.engine.impl.history.producer.CacheAwareHistoryEventProducer;
+import org.camunda.bpm.engine.impl.history.producer.DefaultHistoryEventProducer;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
@@ -125,6 +130,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.mail.MailScanner;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
+import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
@@ -343,6 +349,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   protected List<ProcessEnginePlugin> processEnginePlugins = new ArrayList<ProcessEnginePlugin>();
 
+  protected HistoryEventProducer historyEventProducer;
+
+  protected HistoryEventHandler historyEventHandler;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   public ProcessEngine buildProcessEngine() {
@@ -357,6 +367,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void init() {
     invokePreInit();
     initHistoryLevel();
+    initHistoryEventProducer();
+    initHistoryEventHandler();
     initExpressionManager();
     initVariableTypes();
     initBeans();
@@ -674,6 +686,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           properties.put("bitand1" , DbSqlSessionFactory.databaseSpecificBitAnd1.get(databaseType));
           properties.put("bitand2" , DbSqlSessionFactory.databaseSpecificBitAnd2.get(databaseType));
           properties.put("bitand3" , DbSqlSessionFactory.databaseSpecificBitAnd3.get(databaseType));
+          
+          properties.put("dateDiff1" , DbSqlSessionFactory.databaseSpecificDateDiff1.get(databaseType));
+          properties.put("dateDiff2" , DbSqlSessionFactory.databaseSpecificDateDiff2.get(databaseType));
+          properties.put("dateDiff3" , DbSqlSessionFactory.databaseSpecificDateDiff3.get(databaseType));
+          
           properties.put("dbSpecificDummyTable" , DbSqlSessionFactory.databaseSpecificDummyTable.get(databaseType));
         }
         XMLConfigBuilder parser = new XMLConfigBuilder(reader,"", properties);
@@ -820,7 +837,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
         if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      defaultListeners.add(new HistoryParseListener(historyLevel));
+      defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
     }
     return defaultListeners;
   }
@@ -1096,6 +1113,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       correlationHandler = new DefaultCorrelationHandler();
     }
 
+  }
+  
+  // history handlers /////////////////////////////////////////////////////
+  
+  protected void initHistoryEventProducer() {
+    if(historyEventProducer == null) {
+      historyEventProducer = new CacheAwareHistoryEventProducer();
+    }
+  }
+  
+  protected void initHistoryEventHandler() {
+    if(historyEventHandler == null) {
+      historyEventHandler = new DbHistoryEventHandler();
+    }
   }
 
   // password digest //////////////////////////////////////////////////////////
@@ -1904,11 +1935,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.correlationHandler = correlationHandler;
   }
 
+  public ProcessEngineConfigurationImpl setHistoryEventHandler(HistoryEventHandler historyEventHandler) {
+    this.historyEventHandler = historyEventHandler;
+    return this;
+  }
+  
+  public HistoryEventHandler getHistoryEventHandler() {
+    return historyEventHandler;
+  }
+
   public IncidentHandler getIncidentHandler(String incidentType) {
     return incidentHandlers.get(incidentType);
   }
-
-  public Map<String, IncidentHandler> getIncidentHandlers() {
+    public Map<String, IncidentHandler> getIncidentHandlers() {
     return incidentHandlers;
   }
 
@@ -1962,6 +2001,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   public void setProcessEnginePlugins(List<ProcessEnginePlugin> processEnginePlugins) {
     this.processEnginePlugins = processEnginePlugins;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryEventProducer(HistoryEventProducer historyEventProducerFactory) {
+    this.historyEventProducer = historyEventProducerFactory;
+    return this;
+  }
+
+  public HistoryEventProducer getHistoryEventProducer() {
+    return historyEventProducer;
   }
 
 }

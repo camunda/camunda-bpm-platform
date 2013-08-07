@@ -2,7 +2,6 @@ drop index ACT_IDX_HI_PRO_INST_END;
 drop index ACT_IDX_HI_PRO_I_BUSKEY;
 drop index ACT_IDX_HI_ACT_INST_START;
 drop index ACT_IDX_HI_ACT_INST_END;
-drop index ACT_IDX_HI_ACT_INST_COMP;
 drop index ACT_IDX_HI_DETAIL_PROC_INST;
 drop index ACT_IDX_HI_DETAIL_ACT_INST;
 drop index ACT_IDX_HI_DETAIL_TIME;

@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
-import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -29,10 +29,13 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
-import org.camunda.bpm.engine.impl.history.handler.ActivityInstanceEndHandler;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.util.FormPropertyStartContext;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -51,7 +54,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 import org.camunda.bpm.engine.impl.pvm.runtime.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.OutgoingExecution;
-import org.camunda.bpm.engine.impl.pvm.runtime.StartingExecution;
+import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -109,8 +112,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   /** the unique id of the current activity instance */
   protected String activityInstanceId;
   
-  protected StartingExecution startingExecution;
-  
+  protected ProcessInstanceStartContext processInstanceStartContext;
+      
   // state/type of execution ////////////////////////////////////////////////// 
   
   /** indicates if this execution represents an active path of execution.
@@ -222,10 +225,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   protected boolean forcedUpdate;
 
   public ExecutionEntity() {
+    
   }
   
   public ExecutionEntity(ActivityImpl activityImpl) {
-    this.startingExecution = new StartingExecution(activityImpl);
+    this.processInstanceStartContext = new HistoryAwareStartContext(activityImpl);
   }
 
   /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */  
@@ -264,17 +268,20 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
     subProcessInstance.setProcessInstance(subProcessInstance);
     
-    CommandContext commandContext = Context.getCommandContext();
-    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    int historyLevel = configuration.getHistoryLevel();
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
-      HistoricProcessInstanceEntity historicProcessInstance = new HistoricProcessInstanceEntity((ExecutionEntity) subProcessInstance);
-      dbSqlSession.insert(historicProcessInstance);
       
-      HistoricActivityInstanceEntity activitiyInstance = ActivityInstanceEndHandler.findActivityInstance(this);
-      if (activitiyInstance != null) {
-        activitiyInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
-      }
+      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
+      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
+      
+      // publish start event for sub process instance
+      HistoryEvent hpise = eventFactory.createProcessInstanceStartEvt(subProcessInstance);      
+      eventHandler.handleEvent(hpise);
+            
+      // publish update event for current activity instance (containing the id of the sub process)
+      HistoryEvent haie = eventFactory.createActivityInstanceUpdateEvt(this, null);
+      eventHandler.handleEvent(haie);
       
     }
 
@@ -344,11 +351,34 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   public void start() {
-    if(startingExecution == null && isProcessInstance()) {
-      startingExecution = new StartingExecution(processDefinition.getInitial());
+    start(null);
+  }
+   
+  public void start(Map<String, Object> variables) {
+    if(isProcessInstance()) {
+      if(processInstanceStartContext == null) {
+        processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
+      }
+    }
+    if(variables != null) {
+      setVariables(variables);
     }
     performOperation(AtomicOperation.PROCESS_START);
   }
+  
+   public void startWithFormProperties(Map<String, String> properties) {
+     if(isProcessInstance()) {
+       ActivityImpl initial = processDefinition.getInitial();
+       if(processInstanceStartContext != null) {
+         initial = processInstanceStartContext.getInitial();
+       }
+       FormPropertyStartContext formPropertyStartContext = new FormPropertyStartContext(initial);
+       formPropertyStartContext.setFormProperties(properties);
+       processInstanceStartContext = formPropertyStartContext;
+     } 
+     performOperation(AtomicOperation.PROCESS_START);
+   }
+  
 
   public void destroy() {
     log.fine("destroying "+this);
@@ -774,8 +804,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     ActivityImpl activity = getActivity();
     
     // special treatment for starting process instance
-    if(activity == null && startingExecution!= null) {
-      activity = startingExecution.getInitial();
+    if(activity == null && processInstanceStartContext!= null) {
+      activity = processInstanceStartContext.getInitial();
     }
     
     activityInstanceId = generateActivityInstanceId(activity.getId());
@@ -1133,27 +1163,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       }
     }
     
-    // update the cached historic activity instances that are open
-    List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = dbSqlSession.findInCache(HistoricActivityInstanceEntity.class);
-    for (HistoricActivityInstanceEntity cachedHistoricActivityInstance: cachedHistoricActivityInstances) {
-      if ( (cachedHistoricActivityInstance.getEndTime()==null)
-           && (id.equals(cachedHistoricActivityInstance.getExecutionId())) 
-         ) {
-        cachedHistoricActivityInstance.setExecutionId(replacedBy.getId());
-      }
-    }
-    
-    // update the persisted historic activity instances that are open
-    if (Context.getProcessEngineConfiguration().getHistoryLevel()>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      List<HistoricActivityInstanceEntity> historicActivityInstances = (List) new HistoricActivityInstanceQueryImpl(commandContext)
-        .executionId(id)
-        .unfinished()
-        .list();
-      for (HistoricActivityInstanceEntity historicActivityInstance: historicActivityInstances) {
-        historicActivityInstance.setExecutionId(replacedBy.getId());
-      }
-    }
-    
+    // TODO: fire UPDATE activity instance events with new execution?
+            
     // set replaced by activity to our activity id
     replacedBy.setActivityInstanceId(activityInstanceId);    
   }
@@ -1183,19 +1194,28 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   protected ExecutionEntity getSourceActivityExecution() {
     return (activityId!=null ? this : null);
   }
-
-  @Override
-  protected void updateActivityInstanceIdInHistoricVariableUpdate(HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate, ExecutionEntity sourceActivityExecution) {
-    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL
-        && sourceActivityExecution!=null) {
-      HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(sourceActivityExecution); 
-      if (historicActivityInstance!=null) {
-        historicVariableUpdate.setActivityInstanceId(historicActivityInstance.getId());
-      }
-    }
+  
+  protected boolean isAutoFireHistoryEvents() {
+    // as long as the process instance is starting (ie. before activity instance of 
+    // the selected initial (start event) is created), the variable scope should not 
+    // automatic fire history events for variable updates. 
+    
+    // firing the events is triggered by the processInstanceStart context after the initial activity
+    // has been initialized. The effect is that the activity instance id of the historic variable instances
+    // will be the activity instance id of the start event.
+    
+    return processInstanceStartContext == null;
   }
   
+  public void fireHistoricVariableInstanceCreateEvents() {
+    // this method is called by the start context and batch-fires create events for all variable instances
+    if(variableInstances != null) {
+      for (Entry<String, VariableInstanceEntity> variable : variableInstances.entrySet()) {
+        fireHistoricVariableInstanceCreate(variable.getValue(), this);
+      }    
+    }
+  }
+
   // persistent state /////////////////////////////////////////////////////////
 
   public Object getPersistentState() {
@@ -1405,10 +1425,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   public void removeTask(TaskEntity task) {
     getTasksInternal().remove(task);
   }
-    
 
   // getters and setters //////////////////////////////////////////////////////
-  
   
   public void setCachedEntityState(int cachedEntityState) {
     this.cachedEntityState = cachedEntityState;
@@ -1428,7 +1446,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       incidents = new ArrayList<IncidentEntity>();
     }
   }
-    
+
   public int getCachedEntityState() {
     cachedEntityState = 0;
     
@@ -1542,12 +1560,12 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     this.isEventScope = isEventScope;
   }
   
-  public StartingExecution getStartingExecution() {
-    return startingExecution;
+  public ProcessInstanceStartContext getProcessInstanceStartContext() {
+    return processInstanceStartContext;
   }
   
-  public void disposeStartingExecution() {
-    startingExecution = null;
+  public void disposeProcessInstanceStartContext() {
+    processInstanceStartContext = null;
   }
   
   public String getCurrentActivityId() {
@@ -1557,5 +1575,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   public String getCurrentActivityName() {
     return activityName;
   }
+  
   
 }

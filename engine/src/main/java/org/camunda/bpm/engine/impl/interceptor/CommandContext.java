@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,6 +80,8 @@ public class CommandContext {
   protected LinkedList<AtomicOperation> nextOperations = new LinkedList<AtomicOperation>();
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
+  
+  protected List<CommandContextCloseListener> commandContextCloseListeners = new LinkedList<CommandContextCloseListener>();
 
   public CommandContext(Command<?> command, ProcessEngineConfigurationImpl processEngineConfiguration) {
     this(command, processEngineConfiguration, processEngineConfiguration.getTransactionContextFactory());
@@ -154,6 +158,7 @@ public class CommandContext {
         try {
 
           if (exception == null) {
+            fireCommandContextClose();            
             flushSessions();
           }
 
@@ -202,14 +207,22 @@ public class CommandContext {
     }
   }
  
+  protected void fireCommandContextClose() {
+    for (CommandContextCloseListener listener : commandContextCloseListeners) {
+      listener.onCommandContextClose(this);      
+    }    
+  }
+
   protected void flushSessions() {
-    for (Session session : sessions.values()) {
+    List<Session> sessions = new ArrayList<Session>(this.sessions.values());
+    for (Session session : sessions) {
       session.flush();
     }
   }
 
   protected void closeSessions() {
-    for (Session session : sessions.values()) {
+    List<Session> sessions = new ArrayList<Session>(this.sessions.values());
+    for (Session session : sessions) {
       try {
         session.close();
       } catch (Throwable exception) {
@@ -336,7 +349,7 @@ public class CommandContext {
   public StatisticsManager getStatisticsManager() {
     return getSession(StatisticsManager.class);
   }
-  
+
   public AuthorizationManager getAuthorizationManager() {
     return getSession(AuthorizationManager.class);
   }
@@ -351,6 +364,12 @@ public class CommandContext {
 
   // getters and setters //////////////////////////////////////////////////////
 
+  public void registerCommandContextCloseListener(CommandContextCloseListener commandContextCloseListener) {
+    if(!commandContextCloseListeners.contains(commandContextCloseListener)) {
+      commandContextCloseListeners.add(commandContextCloseListener);
+    }
+  }
+  
   public TransactionContext getTransactionContext() {
     return transactionContext;
   }

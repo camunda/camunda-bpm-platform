@@ -14,54 +14,14 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.history.HistoricFormProperty;
-import org.camunda.bpm.engine.impl.history.handler.ActivityInstanceEndHandler;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
 
 
 /**
  * @author Tom Baeyens
  */
-public class HistoricFormPropertyEntity extends HistoricDetailEntity implements HistoricFormProperty {
+public class HistoricFormPropertyEntity extends HistoricFormPropertyEventEntity implements HistoricFormProperty {
 
   private static final long serialVersionUID = 1L;
   
-  protected String propertyId;
-  protected String propertyValue;
-  
-  public HistoricFormPropertyEntity() {
-  }
-
-  public HistoricFormPropertyEntity(ExecutionEntity execution, String propertyId, String propertyValue) {
-    this(execution, propertyId, propertyValue, null);
-  }
-  
-  public HistoricFormPropertyEntity(ExecutionEntity execution, String propertyId, String propertyValue, String taskId) {
-    this.processInstanceId = execution.getProcessInstanceId();
-    this.executionId = execution.getId();
-    this.taskId = taskId;
-    this.propertyId = propertyId;
-    this.propertyValue = propertyValue;
-    this.time = ClockUtil.getCurrentTime();
-
-    HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(execution);
-    if (historicActivityInstance!=null) {
-      this.activityInstanceId = historicActivityInstance.getId();
-    }
-  }
-
-  public String getPropertyId() {
-    return propertyId;
-  }
-  
-  public void setPropertyId(String propertyId) {
-    this.propertyId = propertyId;
-  }
-  
-  public String getPropertyValue() {
-    return propertyValue;
-  }
-  
-  public void setPropertyValue(String propertyValue) {
-    this.propertyValue = propertyValue;
-  }
 }

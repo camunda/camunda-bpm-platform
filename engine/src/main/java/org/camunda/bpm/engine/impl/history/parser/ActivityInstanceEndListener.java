@@ -10,25 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.camunda.bpm.engine.impl.history.parser;
 
-package org.camunda.bpm.engine.impl.pvm.runtime;
-
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 
 /**
  * @author Daniel Meyer
+ *
  */
-public class StartingExecution {
-  
-  protected final ActivityImpl selectedInitial;
+public class ActivityInstanceEndListener extends HistoryExecutionListener {
 
-  public StartingExecution(ActivityImpl selectedInitial) {
-    this.selectedInitial = selectedInitial;
+  public ActivityInstanceEndListener(HistoryEventProducer historyEventProducer) {
+    super(historyEventProducer);
   }
 
-  public ActivityImpl getInitial() {
-    return selectedInitial;
+  protected HistoryEvent createHistoryEvent(DelegateExecution execution) {
+    return eventProducer.createActivityInstanceEndEvt(execution);
   }
-  
+
 }

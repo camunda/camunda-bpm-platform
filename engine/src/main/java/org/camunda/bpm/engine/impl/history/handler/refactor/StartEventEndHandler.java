@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.impl.history.handler;
+package org.camunda.bpm.engine.impl.history.handler.refactor;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class StartEventEndHandler implements ExecutionListener {
            && (activityId.equals(cachedHistoricActivityInstance.getActivityId()))
            && (cachedHistoricActivityInstance.getEndTime()==null)
          ) {
-        cachedHistoricActivityInstance.markEnded(null);
+//        cachedHistoricActivityInstance.markEnded(null);
         return;
       }
     }

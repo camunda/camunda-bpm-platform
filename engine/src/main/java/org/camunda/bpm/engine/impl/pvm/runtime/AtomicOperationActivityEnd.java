@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.pvm.runtime;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.pvm.PvmProcessElement;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
@@ -85,7 +86,7 @@ public class AtomicOperationActivityEnd extends AtomicOperationActivityInstanceE
                 && activity.getOutgoingTransitions().isEmpty()) {
           parentScopeExecution.setActivity(activity);
           // we call end() because it sets isEnded on the execution
-          parentScopeExecution.end(); 
+          parentScopeExecution.performOperation(AtomicOperation.PROCESS_END); 
         } else {
           parentScopeExecution.setActivity(parentActivity);
           parentScopeExecution.performOperation(ACTIVITY_END);

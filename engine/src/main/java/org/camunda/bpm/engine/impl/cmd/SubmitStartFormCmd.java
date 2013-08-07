@@ -21,6 +21,9 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.form.StartFormHandler;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -49,8 +52,9 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
 
   @Override
   public ProcessInstance execute(CommandContext commandContext) {
-    ProcessDefinitionEntity processDefinition = Context
-      .getProcessEngineConfiguration()
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    
+    ProcessDefinitionEntity processDefinition = processEngineConfiguration
       .getDeploymentCache()
       .findDeployedProcessDefinitionById(processDefinitionId);
 
@@ -65,23 +69,7 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
       processInstance = processDefinition.createProcessInstance();
     }
 
-    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
-
-      if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-        for (String propertyId: properties.keySet()) {
-          String propertyValue = properties.get(propertyId);
-          HistoricFormPropertyEntity historicFormProperty = new HistoricFormPropertyEntity(processInstance, propertyId, propertyValue);
-          dbSqlSession.insert(historicFormProperty);
-        }
-      }
-    }
-    
-    StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
-    startFormHandler.submitFormProperties(properties, processInstance);
-
-    processInstance.start();
+    processInstance.startWithFormProperties(properties);
     
     return processInstance;
   }

@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
 
@@ -28,39 +27,11 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
  */
 public class HistoricDetailManager extends AbstractHistoricManager {
 
-//  public void deleteHistoricDetail(HistoricDetailEntity historicDetail) {
-//    if (historicDetail instanceof HistoricDetailVariableInstanceUpdateEntity) {
-//      HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = (HistoricDetailVariableInstanceUpdateEntity) historicDetail;
-//      String byteArrayValueId = historicVariableUpdate.getByteArrayValueId();
-//      if (byteArrayValueId != null) {
-//          // the next apparently useless line is probably to ensure consistency in the DbSqlSession 
-//          // cache, but should be checked and docced here (or removed if it turns out to be unnecessary)
-//          // @see also HistoricVariableInstanceEntity
-//        historicVariableUpdate.getByteArrayValue();
-//        Context
-//          .getCommandContext()
-//          .getSession(DbSqlSession.class)
-//          .delete(ByteArrayEntity.class, byteArrayValueId);
-//      }
-//    }
-//    getDbSqlSession().delete(HistoricDetailEntity.class, historicDetail.getId());
-//  }
-
   @SuppressWarnings("unchecked")
   public void deleteHistoricDetailsByProcessInstanceId(String historicProcessInstanceId) {
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      List<HistoricDetailEntity> historicDetails = (List) getDbSqlSession()
-        .createHistoricDetailQuery()
-        .processInstanceId(historicProcessInstanceId)
-        .list();
-      
-      HistoricDetailManager historicDetailManager = Context
-        .getCommandContext()
-        .getHistoricDetailManager();
-      
-      for (HistoricDetailEntity historicDetail: historicDetails) {
-        historicDetail.delete();
-      }
+      getDbSqlSession().delete("deleteHistoricDetailsByProcessInstanceId_byteArray", historicProcessInstanceId);
+      getDbSqlSession().delete("deleteHistoricDetailsByProcessInstanceId", historicProcessInstanceId);
     }
   }
   
@@ -75,12 +46,8 @@ public class HistoricDetailManager extends AbstractHistoricManager {
 
   public void deleteHistoricDetailsByTaskId(String taskId) {
     if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
-      HistoricDetailQueryImpl detailsQuery = 
-        (HistoricDetailQueryImpl) new HistoricDetailQueryImpl().taskId(taskId);
-      List<HistoricDetail> details = detailsQuery.list();
-      for(HistoricDetail detail : details) {
-        ((HistoricDetailEntity) detail).delete();
-      }
+      getDbSqlSession().delete("deleteHistoricDetailsByTaskId_byteArray", taskId);
+      getDbSqlSession().delete("deleteHistoricDetailsByTaskId", taskId);
     }
   }
 }

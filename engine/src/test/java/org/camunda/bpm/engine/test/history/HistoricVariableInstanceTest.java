@@ -167,7 +167,7 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
     assertEquals("myVar1", historicVariable1.getName());
     assertEquals("test789", historicVariable1.getTextValue());
     
-    assertEquals(15, historyService.createHistoricActivityInstanceQuery().count());
+    assertEquals(18, historyService.createHistoricActivityInstanceQuery().count());
     assertEquals(7, historyService.createHistoricDetailQuery().count());
   }
   
@@ -205,7 +205,7 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("myVar1", "test666").count());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("myVar1", "test666").list().size());
     
-    assertEquals(7, historyService.createHistoricActivityInstanceQuery().count());
+    assertEquals(8, historyService.createHistoricActivityInstanceQuery().count());
     assertEquals(5, historyService.createHistoricDetailQuery().count());
   }
   
