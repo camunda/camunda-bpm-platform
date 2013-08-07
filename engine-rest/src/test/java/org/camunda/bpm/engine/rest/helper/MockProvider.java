@@ -175,6 +175,7 @@ public abstract class MockProvider {
   public static final Boolean EXAMPLE_TIMERS = true;
   public static final Boolean EXAMPLE_MESSAGES = true;
   public static final Boolean EXAMPLE_WITH_EXCEPTION= true;
+  public static final Boolean EXAMPLE_NO_RETRIES_LEFT = true;
   
   public static final String EXAMPLE_RESOURCE_TYPE_NAME = "exampleResource";
   public static final int EXAMPLE_RESOURCE_TYPE_ID = 12345678;

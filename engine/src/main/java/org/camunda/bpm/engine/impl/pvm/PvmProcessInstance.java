@@ -14,14 +14,18 @@
 package org.camunda.bpm.engine.impl.pvm;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
 public interface PvmProcessInstance extends PvmExecution {
 
   void start();
+  
+  void start(Map<String, Object> variables);
 
   PvmExecution findExecution(String activityId);
 

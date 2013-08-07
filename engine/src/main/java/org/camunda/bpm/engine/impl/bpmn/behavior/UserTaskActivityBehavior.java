@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.calendar.DueDateBusinessCalendar;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -89,6 +90,10 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
     }
     
     handleAssignments(task, execution);
+    
+    Context.getCommandContext()
+      .getHistoricTaskInstanceManager()
+      .createHistoricTask(task);
    
     // All properties set, now firing 'create' event
     task.fireEvent(TaskListener.EVENTNAME_CREATE);

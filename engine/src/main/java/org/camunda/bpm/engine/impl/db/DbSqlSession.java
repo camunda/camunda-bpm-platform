@@ -25,6 +25,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +59,8 @@ import org.camunda.bpm.engine.impl.db.upgrade.DbUpgradeStep;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
 import org.camunda.bpm.engine.impl.identity.db.DbUserQueryImpl;
+import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -174,7 +177,7 @@ public class DbSqlSession implements Session {
     BulkUpdateOperation updateOperation = new BulkUpdateOperation(statement, parameter);
     bulkUpdates.add(updateOperation);
   }
-  
+
   /**
    * Use this {@link DeleteOperation} to execute a dedicated delete statement.
    * It is important to note there won't be any optimistic locking checks done 
@@ -220,6 +223,7 @@ public class DbSqlSession implements Session {
     }
   }
   
+
   public void delete(PersistentObject persistentObject) {
     for (DeleteOperation deleteOperation: deleteOperations) {
       if (deleteOperation instanceof DeletePersistentObjectOperation) {
@@ -599,6 +603,7 @@ public class DbSqlSession implements Session {
           Object originalState = cachedObject.getPersistentObjectState();
           if (!persistentObject.getPersistentState().equals(originalState)) {
             updatedObjects.add(persistentObject);
+            
           } else {
             log.finest("loaded object '"+persistentObject+"' was not updated");
           }
@@ -607,7 +612,12 @@ public class DbSqlSession implements Session {
       }
       
     }
+    
     return updatedObjects;
+  }
+  
+  public boolean isUpdated(PersistentObject persistentObject) {
+    return getUpdatedObjects().contains(persistentObject);
   }
   
   protected boolean isPersistentObjectDeleted(PersistentObject persistentObject) {
@@ -683,15 +693,22 @@ public class DbSqlSession implements Session {
       if (updateStatement==null) {
         throw new ProcessEngineException("no update statement for "+updatedObject.getClass()+" in the ibatis mapping files");
       }
-      log.fine("updating: "+toString(updatedObject)+"]");
+      if(log.isLoggable(Level.FINE)) {
+        log.fine("updating: "+toString(updatedObject)+"]");
+      }
       int updatedRecords = sqlSession.update(updateStatement, updatedObject);
-      if (updatedRecords!=1) {
-        throw new OptimisticLockingException(toString(updatedObject)+" was updated by another transaction concurrently");
-      } 
       
-      // See http://jira.codehaus.org/browse/ACT-1290
-      if (updatedObject instanceof HasRevision) {
-        ((HasRevision) updatedObject).setRevision(((HasRevision) updatedObject).getRevisionNext());
+      if (!(updatedObject instanceof HistoricActivityInstanceEventEntity)) {
+      
+        if (updatedRecords!=1) {
+          throw new OptimisticLockingException(toString(updatedObject)+" was updated by another transaction concurrently");
+        } 
+        
+        if (updatedObject instanceof HasRevision) {
+          // See http://jira.codehaus.org/browse/ACT-1290
+          ((HasRevision) updatedObject).setRevision(((HasRevision) updatedObject).getRevisionNext());
+        }        
+      
       }
       
     }
@@ -766,7 +783,7 @@ public class DbSqlSession implements Session {
 
     } catch (Exception e) {
       if (isMissingTablesException(e)) {
-        throw new ProcessEngineException("no activiti tables in db.  set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in activiti.cfg.xml for automatic schema creation", e);
+        throw new ProcessEngineException("no activiti tables in db.  set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in camunda.cfg.xml for automatic schema creation", e);
       } else {
         if (e instanceof RuntimeException) {
           throw (RuntimeException) e;

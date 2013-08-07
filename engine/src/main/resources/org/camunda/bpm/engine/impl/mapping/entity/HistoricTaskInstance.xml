@@ -20,7 +20,7 @@
   
   <!-- HISTORIC TASK INSTANCE INSERT -->
   
-  <insert id="insertHistoricTaskInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
+  <insert id="insertHistoricTaskInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity">
       insert into ${prefix}ACT_HI_TASKINST (
         ID_,
         PROC_DEF_ID_,
@@ -60,7 +60,33 @@
 
   <!-- HISTORIC TASK INSTANCE UPDATE -->
   
-  <update id="updateHistoricTaskInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
+  <update id="updateHistoricTaskInstanceEvent" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
+    update ${prefix}ACT_HI_TASKINST HTI set
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      NAME_ = #{name, jdbcType=VARCHAR},
+      PARENT_TASK_ID_ = #{parentTaskId, jdbcType=VARCHAR},
+      DESCRIPTION_ = #{description, jdbcType=VARCHAR},
+      OWNER_ = #{owner, jdbcType=VARCHAR},
+      ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
+      DELETE_REASON_ = #{deleteReason ,jdbcType=VARCHAR},
+      TASK_DEF_KEY_ = #{taskDefinitionKey ,jdbcType=VARCHAR},
+      PRIORITY_ = #{priority, jdbcType=INTEGER},
+      DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP}
+      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">
+            , DURATION_ = ${dateDiff1} #{endTime, jdbcType=TIMESTAMP} ${dateDiff2} HTI.START_TIME_ ${dateDiff3}
+        </if>
+      </if>
+             
+    where ID_ = #{id}
+  </update>
+    
+  <update id="updateHistoricTaskInstanceEvent_mssql" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
     update ${prefix}ACT_HI_TASKINST set
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       NAME_ = #{name, jdbcType=VARCHAR},
@@ -68,15 +94,53 @@
       DESCRIPTION_ = #{description, jdbcType=VARCHAR},
       OWNER_ = #{owner, jdbcType=VARCHAR},
       ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
-      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-      DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
       DELETE_REASON_ = #{deleteReason ,jdbcType=VARCHAR},
       TASK_DEF_KEY_ = #{taskDefinitionKey ,jdbcType=VARCHAR},
       PRIORITY_ = #{priority, jdbcType=INTEGER},
       DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP}
-    where ID_ = #{id}
+      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">  
+            , DURATION_ = DATEDIFF(ms, HTI.START_TIME_, #{endTime, jdbcType=TIMESTAMP})
+        </if>
+      </if>
+    FROM 
+      ${prefix}ACT_HI_TASKINST HTI             
+    where 
+      ID_ = #{id}
   </update>
-
+   
+  <update id="updateHistoricTaskInstanceEvent_db2" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
+    update ${prefix}ACT_HI_TASKINST HTI set
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      NAME_ = #{name, jdbcType=VARCHAR},
+      PARENT_TASK_ID_ = #{parentTaskId, jdbcType=VARCHAR},
+      DESCRIPTION_ = #{description, jdbcType=VARCHAR},
+      OWNER_ = #{owner, jdbcType=VARCHAR},
+      ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
+      DELETE_REASON_ = #{deleteReason ,jdbcType=VARCHAR},
+      TASK_DEF_KEY_ = #{taskDefinitionKey ,jdbcType=VARCHAR},
+      PRIORITY_ = #{priority, jdbcType=INTEGER},
+      DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP}
+      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">
+          <!--  , DURATION_ = ((DAYS(DATE(#{endTime, jdbcType=TIMESTAMP})) - DAYS(HTI.START_TIME_)) * 86400000)
+            + ((MIDNIGHT_SECONDS(#{endTime, jdbcType=TIMESTAMP}) - MIDNIGHT_SECONDS(HTI.START_TIME_)) * 1000)  -->
+        </if>
+      </if>      
+             
+    where ID_ = #{id}
+    </update>
+  
   <!-- HISTORIC TASK INSTANCE DELETE -->
   
   <delete id="deleteHistoricTaskInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">

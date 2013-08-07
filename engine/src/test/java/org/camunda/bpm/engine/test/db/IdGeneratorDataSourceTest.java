@@ -16,7 +16,7 @@ public class IdGeneratorDataSourceTest extends ResourceProcessEngineTestCase {
   }
 
   public IdGeneratorDataSourceTest() {
-    super("org/camunda/bpm/engine/test/db/IdGeneratorDataSourceTest.activiti.cfg.xml");
+    super("org/camunda/bpm/engine/test/db/IdGeneratorDataSourceTest.camunda.cfg.xml");
   }
 
   @Deployment

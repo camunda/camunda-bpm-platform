@@ -20,7 +20,7 @@
 
   <!-- HISTORIC DETAILS INSERT -->
   
-  <insert id="insertHistoricFormProperty" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricFormPropertyEntity">
+  <insert id="insertHistoricFormPropertyEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity">
     insert into ${prefix}ACT_HI_DETAIL (ID_, TYPE_, PROC_INST_ID_, ACT_INST_ID_, EXECUTION_ID_, TASK_ID_, TIME_, NAME_, TEXT_)
     values (
       #{id, jdbcType=VARCHAR},
@@ -29,13 +29,14 @@
       #{activityInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
-      #{time, jdbcType=TIMESTAMP},
+      #{timestamp, jdbcType=TIMESTAMP},
       #{propertyId, jdbcType=VARCHAR},
       #{propertyValue, jdbcType=VARCHAR}
     )
   </insert>
   
-  <insert id="insertHistoricDetailVariableInstanceUpdate" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity">
+  <insert id="insertHistoricVariableUpdateEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity">
+  
     insert into ${prefix}ACT_HI_DETAIL (ID_, TYPE_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, TIME_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
     values (
       #{id, jdbcType=VARCHAR},
@@ -43,12 +44,12 @@
       #{processInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
       #{activityInstanceId, jdbcType=VARCHAR},
-      #{taskId, jdbcType=VARCHAR},
+      #{taskId, jdbcType=VARCHAR},      
       #{variableName, jdbcType=VARCHAR},
       #{revision, jdbcType=VARCHAR},
-      #{variableType, jdbcType=VARCHAR},
-      #{time, jdbcType=TIMESTAMP },
-      #{byteArrayValueId, jdbcType=VARCHAR},
+      #{variableTypeName, jdbcType=VARCHAR},      
+      #{timestamp, jdbcType=TIMESTAMP},     
+      #{byteArrayId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
       #{textValue, jdbcType=VARCHAR},
@@ -58,67 +59,78 @@
   
   <!-- HISTORIC DETAILS DELETE -->
 
-  <delete id="deleteHistoricDetailAssignment">
-    delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
-  </delete>
-  
-  <delete id="deleteHistoricDetailTransitionInstance">
-    delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
-  </delete>
-  
   <delete id="deleteHistoricDetailVariableInstanceUpdate">
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
   </delete>
   
+  <delete id="deleteHistoricDetailsByProcessInstanceId_byteArray" >
+    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ in
+        (select BYTEARRAY_ID_ from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ = #{id})
+  </delete>
+  
+  <delete id="deleteHistoricDetailsByProcessInstanceId">
+    delete from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ = #{id}
+  </delete>
+  
+  <delete id="deleteHistoricDetailsByTaskId">
+    delete from ${prefix}ACT_HI_DETAIL where TASK_ID_ = #{id}
+  </delete>
+  
+  <delete id="deleteHistoricDetailsByTaskId_byteArray" >
+    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ in
+        (select BYTEARRAY_ID_ from ${prefix}ACT_HI_DETAIL where TASK_ID_ = #{id})
+  </delete>
+    
   <delete id="deleteHistoricFormProperty">
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
   </delete>
   
   <!-- HISTORIC DETAILS RESULTMAP -->
-  <resultMap id="historicDetailResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailEntity">
+  <resultMap id="historicDetailResultMap" type="org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="timestamp" column="TIME_" jdbcType="TIMESTAMP" />
+    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-    <result property="time" column="TIME_" jdbcType="TIMESTAMP" />
     <discriminator javaType="string" column="TYPE_">
       <case value="VariableUpdate" resultMap="historicVariableUpdateResultMap"/> 
       <case value="FormProperty" resultMap="historicFormPropertyResultMap"/> 
     </discriminator>
   </resultMap>
   
-  <resultMap id="historicDetailResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailEntity">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
-    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-    <result property="time" column="TIME_" jdbcType="TIMESTAMP" />
-    <discriminator javaType="string" column="TYPE_">
-      <case value="VariableUpdate" resultMap="historicVariableUpdateResultMap_postgres"/> 
-      <case value="FormProperty" resultMap="historicFormPropertyResultMap"/> 
-    </discriminator>
-  </resultMap>
-
   <resultMap id="historicVariableUpdateResultMap" extends="historicDetailResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity">
-    <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
+    <result property="variableName" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="variableType" column="VAR_TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
-    <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
-    <result property="byteArrayValueId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
+    <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
   </resultMap>
   
+  
+  <resultMap id="historicDetailResultMap_postgres" type="org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="timestamp" column="TIME_" jdbcType="TIMESTAMP" />
+    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <discriminator javaType="string" column="TYPE_">
+      <case value="VariableUpdate" resultMap="historicVariableUpdateResultMap_postgres"/> 
+      <case value="FormProperty" resultMap="historicFormPropertyResultMap"/> 
+    </discriminator>
+  </resultMap>
+  
   <resultMap id="historicVariableUpdateResultMap_postgres" extends="historicDetailResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity">
-    <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
+    <result property="variableName" column="NAME_" javaType="String" jdbcType="VARCHAR" />
+    <result property="variableInstanceId" column="VAR_INST_ID_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="variableType" column="VAR_TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
-    <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
-    <result property="byteArrayValueId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
+    <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />

@@ -82,6 +82,9 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Only select jobs that failed due to an exception with the given message. */
   JobQuery exceptionMessage(String exceptionMessage);
 
+  /** Only select jobs which have no retries left */
+  JobQuery noRetriesLeft();
+
   //sorting //////////////////////////////////////////
   
   /** Order by job id (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -98,4 +101,5 @@ public interface JobQuery extends Query<JobQuery, Job> {
   
   /** Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobQuery orderByExecutionId();
+
 }

@@ -1,0 +1,2 @@
+Please don't rename the activiti.cfg.xml to camunda.cfg.xml because the engine-cdi module tests the usage of the activiti.cfg.xml. 
+It is necessary that the engine works with camunda.cfg.xml or activiti.cfg.xml. There is no other testcase for this functionality.

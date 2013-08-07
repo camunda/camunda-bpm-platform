@@ -13293,8 +13293,8 @@ var VALID_CLASS = 'ng-valid',
  * </example>
  *
  */
-var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$parse',
-    function($scope, $exceptionHandler, $attr, $element, $parse) {
+var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$parse', '$interpolate', 
+    function($scope, $exceptionHandler, $attr, $element, $parse, $interpolate) {
   this.$viewValue = Number.NaN;
   this.$modelValue = Number.NaN;
   this.$parsers = [];
@@ -13304,7 +13304,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
   this.$dirty = false;
   this.$valid = true;
   this.$invalid = false;
-  this.$name = $attr.name;
+  this.$name = $attr.name ? $interpolate($attr.name)($scope) : undefined;
 
   var ngModelGet = $parse($attr.ngModel),
       ngModelSet = ngModelGet.assign;

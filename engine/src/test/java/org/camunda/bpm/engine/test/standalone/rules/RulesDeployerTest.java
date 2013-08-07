@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class RulesDeployerTest extends ResourceProcessEngineTestCase {
 
   public RulesDeployerTest() {
-    super("org/camunda/bpm/engine/test/standalone/rules/rules.activiti.cfg.xml");
+    super("org/camunda/bpm/engine/test/standalone/rules/rules.camunda.cfg.xml");
   }
   
   @Override

@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -37,6 +35,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.DummySerializable;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
+import org.junit.Assert;
 
 
 /**
@@ -48,7 +47,7 @@ import org.camunda.bpm.engine.test.history.SerializableVariable;
 public class FullHistoryTest extends ResourceProcessEngineTestCase {
   
   public FullHistoryTest() {
-    super("org/camunda/bpm/engine/test/standalone/history/fullhistory.activiti.cfg.xml");
+    super("org/camunda/bpm/engine/test/standalone/history/fullhistory.camunda.cfg.xml");
   }
   
   @Override
@@ -130,7 +129,7 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     historicVariableUpdate = (HistoricVariableUpdate) historicDetails.get(5);
     assertEquals("zVar1", historicVariableUpdate.getVariableName());
     assertEquals("Event: start", historicVariableUpdate.getValue());
-    assertEquals(0, historicVariableUpdate.getRevision());
+    assertEquals(0, historicVariableUpdate.getRevision());    
     assertEquals(historicStartEvent.getId(), historicVariableUpdate.getActivityInstanceId());
     
     // Variable set from transition take execution listener

@@ -56,6 +56,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 	private Boolean messages;
 	private Boolean withException;
 	private String exceptionMessage;
+	private Boolean noRetriesLeft;
 
 	private List<ConditionQueryParameterDto> dueDates;
 	
@@ -115,6 +116,11 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 		this.dueDates = dueDates;
 	}
 
+  @CamundaQueryParam(value="noRetriesLeft", converter = BooleanConverter.class)
+  public void setNoRetriesLeft(Boolean noRetriesLeft) {
+    this.noRetriesLeft = noRetriesLeft;
+  }
+
 	@Override
 	protected boolean isValidSortByValue(String value) {
 		return VALID_SORT_BY_VALUES.contains(value);
@@ -168,6 +174,10 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 		if (exceptionMessage != null) {
 			query.exceptionMessage(exceptionMessage);
 		}
+
+    if (noRetriesLeft != null && noRetriesLeft) {
+      query.noRetriesLeft();
+    }
 
 		if (dueDates != null) {
 			DateConverter dateConverter = new DateConverter();

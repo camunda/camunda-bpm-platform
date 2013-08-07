@@ -46,6 +46,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   protected Date duedateLowerThanOrEqual;
   protected boolean withException;
   protected String exceptionMessage;
+  protected boolean noRetriesLeft;
   
   public JobQueryImpl() {
   }
@@ -160,7 +161,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     this.exceptionMessage = exceptionMessage;
     return this;
   }
-  
+
+  public JobQuery noRetriesLeft() {
+    noRetriesLeft = true;
+    return this;
+  }
+
   //sorting //////////////////////////////////////////
   
   public JobQuery orderByJobDuedate() {
