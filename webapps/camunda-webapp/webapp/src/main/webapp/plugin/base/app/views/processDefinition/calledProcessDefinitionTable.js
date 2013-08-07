@@ -47,12 +47,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
       return result;
     }
-    
-    $scope.selectBpmnElement = function(activityId) {
-      var newFilter = angular.extend({}, filter, { activityIds: [ activityId ], scrollToBpmnElement: activityId });
-
-      processData.set('filter', newFilter);
-    };
   }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {

@@ -13,7 +13,8 @@ ngDefine('cockpit.directives', [
     var w = angular.element($window);
 
     var bpmnElements,
-        selection;
+        selection,
+        scrollToBpmnElementId;
     
     var activityHighligtClass = 'activity-highlight';
     var bpmnRenderer = null;
@@ -39,6 +40,9 @@ ngDefine('cockpit.directives', [
 
         // update selection in case it has been provided earlier
         updateSelection(selection);
+
+        // update scroll to in case it has been provided earlier
+        scrollToBpmnElement(scrollToBpmnElementId);
       }
     });
     
@@ -351,13 +355,19 @@ ngDefine('cockpit.directives', [
     
     $scope.$watch('selection.scrollToBpmnElement', function(newValue) {
       if (newValue) {
-        var bpmnElement = bpmnElements[newValue];
+        scrollToBpmnElement(newValue);
+      }
+    });
+
+    function scrollToBpmnElement(bpmnElementId) {
+      if (bpmnElements) {
+        var bpmnElement = bpmnElements[bpmnElementId];
         if (bpmnElement) {
           scrollTo(bpmnElement)  
         }
-        
       }
-    });
+      scrollToBpmnElementId = bpmnElementId;
+    }    
 
     function scrollTo(element) {
       // parent size
