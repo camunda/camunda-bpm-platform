@@ -73,6 +73,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.textValue = historyEvent.getTextValue();
     this.textValue2 = historyEvent.getTextValue2();
     
+    deleteByteArrayValue();
     if(historyEvent.getByteValue() != null) {
       setByteArrayValue(historyEvent.getByteValue());
     }
@@ -117,8 +118,12 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   public String getByteArrayValueId() {
     return byteArrayId;
   }
+  
+  public String getByteArrayId() {
+    return byteArrayId;
+  }
 
-  public void setbyteArrayId(String byteArrayId) {
+  public void setByteArrayId(String byteArrayId) {
     this.byteArrayId = byteArrayId;
     this.byteArrayValue = null;
   }
@@ -135,15 +140,9 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   
   public void setByteArrayValue(byte[] bytes) {
     ByteArrayEntity byteArrayValue = null;
-    if (this.byteArrayId!=null) {
-      getByteArrayValue();
-      Context
-        .getCommandContext()
-        .getByteArrayManager()
-        .deleteByteArrayById(this.byteArrayId);
-    }
+    deleteByteArrayValue();
     if (bytes!=null) {
-      byteArrayValue = new ByteArrayEntity(bytes);
+      byteArrayValue = new ByteArrayEntity(name, bytes);
       Context
         .getCommandContext()
         .getDbSqlSession()
@@ -166,6 +165,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
         .getCommandContext()
         .getByteArrayManager()
         .deleteByteArrayById(this.byteArrayId);
+      byteArrayId = null;
     }
   }
 

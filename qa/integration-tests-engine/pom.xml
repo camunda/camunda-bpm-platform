@@ -223,7 +223,9 @@
                 <!-- HEMERA-2453 -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
                 <exclude>**_OTHERS.java</exclude>
+                <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
               </excludes>
+             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -263,6 +265,7 @@
                 <exclude>**/context/**</exclude>
                 <exclude>**/jar/**</exclude>
               </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -345,9 +348,101 @@
                 <excludes>**/TestDeploymentWithDroolsTaskFails.java</excludes>
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
                 <exclude>**/*_JBOSS.java</exclude>
-                <exclude>**/jar/**</exclude>
+                <exclude>**/jar/**</exclude>                
               </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-sql-scripts</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm</groupId>
+                      <artifactId>camunda-engine</artifactId>
+                      <outputDirectory>${project.build.directory}/sql-scripts/engine</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>sql-maven-plugin</artifactId>
+            <version>1.5</version>
+            <dependencies>
+              <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${version.mysql}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.oracle.jdbc</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>${version.oracle11g}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.oracle.jdbc</groupId>
+                <artifactId>ojdbc14</artifactId>
+                <version>${version.oracle10g}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.ibm.db2.jcc</groupId>
+                <artifactId>db2jcc4</artifactId>
+                <version>${version.db2.97}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>sqljdbc4</artifactId>
+                <version>${version.mssql}</version>
+              </dependency>
+              <dependency>
+                <groupId>postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${version.postgre}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${version.h2}</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <driver>${database.driver}</driver>
+              <url>${database.url}</url>
+              <username>${database.user}</username>
+              <password>${database.password}</password>
+            </configuration>
+            <executions>
+              <execution>
+                <id>create-db</id>
+                <phase>process-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- create the DB -->
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.engine.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.identity.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.history.sql</srcFile>
+                  </srcFiles>
+                  <autocommit>true</autocommit>
+                  <onError>continue</onError>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
         <testResources>
@@ -396,7 +491,99 @@
                 <exclude>**/jar/**</exclude>
                 <exclude>**/*_JBOSS.java</exclude>
               </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-sql-scripts</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm</groupId>
+                      <artifactId>camunda-engine</artifactId>
+                      <outputDirectory>${project.build.directory}/sql-scripts/engine</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>sql-maven-plugin</artifactId>
+            <version>1.5</version>
+            <dependencies>
+              <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${version.mysql}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.oracle.jdbc</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>${version.oracle11g}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.oracle.jdbc</groupId>
+                <artifactId>ojdbc14</artifactId>
+                <version>${version.oracle10g}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.ibm.db2.jcc</groupId>
+                <artifactId>db2jcc4</artifactId>
+                <version>${version.db2.97}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>sqljdbc4</artifactId>
+                <version>${version.mssql}</version>
+              </dependency>
+              <dependency>
+                <groupId>postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${version.postgre}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${version.h2}</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <driver>${database.driver}</driver>
+              <url>${database.url}</url>
+              <username>${database.user}</username>
+              <password>${database.password}</password>
+            </configuration>
+            <executions>
+              <execution>
+                <id>create-db</id>
+                <phase>process-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- create the DB -->
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.engine.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.identity.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.history.sql</srcFile>
+                  </srcFiles>
+                  <autocommit>true</autocommit>
+                  <onError>continue</onError>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
@@ -496,6 +683,7 @@
 
                 <exclude>**/*_JBOSS.java</exclude>
               </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -528,6 +716,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skipTests>true</skipTests>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
           <plugin>
@@ -565,6 +754,7 @@
               <systemPropertyVariables>
                 <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -651,37 +841,37 @@
               <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.21</version>
+                <version>${version.mysql}</version>
               </dependency>
               <dependency>
                 <groupId>com.oracle.jdbc</groupId>
                 <artifactId>ojdbc6</artifactId>
-                <version>11.2.0.3</version>
+                <version>${version.oracle11g}</version>
               </dependency>
               <dependency>
                 <groupId>com.oracle.jdbc</groupId>
                 <artifactId>ojdbc14</artifactId>
-                <version>10.2.0.5</version>
+                <version>${version.oracle10g}</version>
               </dependency>
               <dependency>
                 <groupId>com.ibm.db2.jcc</groupId>
                 <artifactId>db2jcc4</artifactId>
-                <version>9.7</version>
+                <version>${version.db2.97}</version>
               </dependency>
               <dependency>
                 <groupId>com.microsoft.sqlserver</groupId>
                 <artifactId>sqljdbc4</artifactId>
-                <version>4.0</version>
+                <version>${version.mssql}</version>
               </dependency>
               <dependency>
                 <groupId>postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>9.1-902.jdbc4</version>
+                <version>${version.postgre}</version>
               </dependency>
               <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.3.168</version>
+                <version>${version.h2}</version>
               </dependency>
             </dependencies>
             <configuration>
@@ -709,92 +899,6 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <!--
-      deactivate failing
-      CdiDelegateBeanResolutionTest test
-      on xa profile until CAM-788 is fixed
-    -->
-    <profile>
-      <id>db2-xa</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/CdiDelegateBeanResolutionTest</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>mssql-xa</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/CdiDelegateBeanResolutionTest</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>oracle-xa</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/CdiDelegateBeanResolutionTest</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>mysql-xa</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/CdiDelegateBeanResolutionTest</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>postgres-xa</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/CdiDelegateBeanResolutionTest</exclude>
-              </excludes>
-            </configuration>
           </plugin>
         </plugins>
       </build>

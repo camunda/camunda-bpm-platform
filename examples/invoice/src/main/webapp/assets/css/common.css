@@ -1,0 +1,337 @@
+/**
+ * loaded to remove angular template flicker on site load
+ * @see http://docs.angularjs.org/api/ng.directive:ngCloak
+ */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+    display: none;
+}
+
+/** loading icon integration */
+.icon-loading {
+  background-image: url(../img/ajax-loader.gif);
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  background-position: 0px 0px;
+  opacity: 1.0;
+}
+
+/* apply a natural box layout model to box elements */
+div, textarea, .inline-edit input {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+      box-sizing: border-box;
+}
+
+.navbar-inner {
+      box-sizing: content-box;
+  moz-box-sizing: content-box;
+}
+
+/** inline editing of elements */
+form.inline-edit {
+  margin-bottom: 35px;
+}
+
+.inline-edit input {
+  min-height: 30px;
+}
+
+.inline-edit-footer {
+  position: relative;
+  width: 100%;
+  padding-right: 80px;
+}
+
+.inline-edit-footer .btn-group {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+/** help system */
+.help-toggle {
+  display: inline-block;
+  margin-left: 5px;
+  cursor: help;
+  opacity: 0.6;
+}
+
+.help-toggle:hover {
+  opacity: 1;
+}
+/** end help system */
+
+/** edit system */
+.edit-toggle {
+  float: right;
+  display: inline-block;
+  margin-left: 5px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.edit-toggle:hover {
+  opacity: 1;
+}
+/** end help system */
+
+/** utilities */
+/** for image replacement */
+.ir {
+  display: block;
+  text-indent: -999em;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  text-align: left;
+  direction: ltr;
+}
+/** end utilities */
+
+/**
+ * shared style declarations
+ */
+html, body {
+  height: 100%;
+  min-height: 100%;
+}
+
+/** navbar brand */
+.navbar .brand {
+  
+}
+
+/**
+ * form styling
+ */
+form input.ng-dirty.ng-invalid {
+  background-color: #FFDEDE;
+  color: #000;
+}
+
+input.ng-invalid-required {
+  border-color: #f00;
+}
+
+.modal-body {
+  max-height: 480px;
+}
+
+/** make sure that if screen res is 600px high or below, modal dialoges are scrollable */
+@media screen and (max-height: 600px){
+  .modal {
+    position: absolute;
+  }
+}
+
+/**----------------
+Headlines
+-------------------**/
+
+h1 {
+  font-size: 30px;
+}
+
+/**----------------
+Pagination
+-------------------**/
+
+.pagination li {
+  cursor: pointer;
+}
+
+.pagination .active, .pagination .disabled {
+  cursor: auto;
+}
+
+/**----------------
+Icons
+-------------------**/
+
+.circle {
+  background-color: #999999;
+  width: 20px;
+  height: 20px;
+  float: left;
+
+  -webkit-border-radius: 50%;
+     -moz-border-radius: 50%;
+          border-radius: 50%;  
+}
+
+.circle-red {
+  background-color: #b94a48;
+}
+
+.circle-green {
+  background-color: #468847;
+}
+
+/**
+Utilities
+**/
+
+.table .row-select {
+  width: 20px;
+  text-align: center;
+}
+
+.table .row-select input[type=checkbox] {
+  margin: 0;
+}
+
+/****************************\
+ * LAYOUT
+ ****************************/
+
+@media (min-width: 768px) {
+  .ctn-main {
+    position: absolute;
+    top: 41px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+
+    overflow: auto;
+  }
+
+  .ctn-wrapper {
+    min-height: 100%;
+    height: auto !important; /* ie7 fix */
+    height: 100%;
+    margin: 0 auto -64px;
+  }
+}
+
+@media (max-width: 979px) {
+  .ctn-main {
+    top: 51px;
+  }
+}
+
+
+.ctn-push-down {
+  height: 32px;
+}
+
+footer {
+  margin-top: 32px;
+  padding: 5px 10px;
+}
+
+@media (max-width: 767px) {
+  footer {
+    margin-left: -20px;
+    margin-right: -20px;
+  }
+}
+
+/** layout ui tweaks */
+
+footer {
+  border-top: 1px solid #E5E5E5;
+  background-color: whiteSmoke;
+}
+
+footer > div {
+  font-size: 0.83em;
+  text-align: right;
+
+  opacity: 0.7;
+}
+
+footer:hover > div {
+  opacity: 1.0;
+}
+
+footer .version {
+  font-family: monospace;
+}
+
+@media (min-width: 768px) {
+  .ctn-wrapper > .notifications-panel {
+    position: fixed;
+    top: 90px;
+    left: 80px;
+    right: 80px;
+    z-index: 10;
+  }
+
+  .ctn-wrapper > .notifications-panel .alert {
+    -moz-box-shadow: 0 0 8px #888;
+    -webkit-box-shadow: 0 0 8px #888;
+    box-shadow: 0 0 8px #888;
+  }
+
+  .breadcrumb {
+    margin: 0 0 20px;
+    background-color: inherit;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    line-height: 29px;
+    padding: 0 10px 0 10px;
+    font-size: 0.85em;
+  }
+}
+
+/** end layout ui tweaks */
+
+
+/** input tweaks */
+
+.navbar-search select {
+  margin-bottom: 4px;
+}
+
+input:focus.ng-invalid {
+  border-color: #e9322d;
+  -webkit-box-shadow: 0 0 6px #f8b9b7;
+  -moz-box-shadow: 0 0 6px #f8b9b7;
+  box-shadow: 0 0 6px #f8b9b7;
+}
+
+input.ng-invalid {
+  border-color: #e9322d;
+}
+
+/** end input tweaks */
+
+/*---------modal dialog -------------*/
+.modal-body {
+  max-height: 480px;
+}
+
+/** make sure that if screen res is 600px high or below, modal dialoges are scrollable */
+@media screen and (max-height: 600px){
+  .modal {
+    position:absolute;
+  }
+}
+
+/** signin form */
+
+.form-signin {
+  max-width: 300px;
+  padding: 19px 29px 29px;
+  margin: 20px auto;
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+  -webkit-border-radius: 5px;
+     -moz-border-radius: 5px;
+          border-radius: 5px;
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+          box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin input[type="text"],
+.form-signin input[type="password"] {
+  font-size: 16px;
+  height: auto;
+  margin-bottom: 15px;
+  padding: 7px 9px;
+}

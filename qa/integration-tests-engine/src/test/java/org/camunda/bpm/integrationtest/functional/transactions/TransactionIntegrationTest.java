@@ -122,7 +122,7 @@ public class TransactionIntegrationTest extends AbstractFoxPlatformIntegrationTe
       throw e;
     }
     
-    waitForJobExecutorToProcessAllJobs(10000, 100);
+    waitForJobExecutorToProcessAllJobs(10000);
     
   }
   

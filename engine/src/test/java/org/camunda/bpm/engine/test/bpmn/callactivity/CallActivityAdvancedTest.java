@@ -211,7 +211,7 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     
     // When the timer on the subprocess is fired, the complete subprocess is destroyed
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + (6 * 60 * 1000))); // + 6 minutes, timer fires on 5 minutes
-    waitForJobExecutorToProcessAllJobs(10000, 5000L);
+    waitForJobExecutorToProcessAllJobs(10000);
     
     Task escalatedTask = taskQuery.singleResult();
     assertEquals("Escalated Task", escalatedTask.getName());

@@ -33,6 +33,7 @@
     <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
     <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
     <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <discriminator javaType="string" column="TYPE_">
       <case value="message" resultMap="messageResultMap"/> 
       <case value="timer" resultMap="timerResultMap"/> 
@@ -58,15 +59,27 @@
     	RES.* ${limitBetween}    		
     from ${prefix}ACT_RU_JOB RES    
     	LEFT OUTER JOIN ${prefix}ACT_RU_EXECUTION PI ON PI.ID_ = RES.PROCESS_INSTANCE_ID_
-    	LEFT OUTER JOIN ${prefix}ACT_RE_PROCDEF PD ON PD.ID_ = PI.PROC_DEF_ID_    
     where (RES.RETRIES_ &gt; 0)
-      and (RES.DUEDATE_ is null or RES.DUEDATE_ &lt; #{parameter, jdbcType=TIMESTAMP})
-      and (RES.LOCK_OWNER_ is null or RES.LOCK_EXP_TIME_ &lt; #{parameter, jdbcType=TIMESTAMP})
-	  and (
+      and (RES.DUEDATE_ is null or RES.DUEDATE_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
+      and (RES.LOCK_OWNER_ is null or RES.LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
+	    and (
 	  	    (RES.EXECUTION_ID_ is null)
-	  		or ((PI.SUSPENSION_STATE_ = 1)     
-      			and (PD.SUSPENSION_STATE_ = 1))
-      )  
+	  		or 
+	  		(PI.SUSPENSION_STATE_ = 1)
+      )
+      
+      <if test="parameter.deploymentAware">
+        and (RES.DEPLOYMENT_ID_ is null 
+        <if test="parameter.deploymentIds != null">
+          or 
+          RES.DEPLOYMENT_ID_ in 
+	        <foreach item="deploymentId" index="index" collection="parameter.deploymentIds"
+	        open="(" separator="," close=")">
+	          #{deploymentId}
+	        </foreach>
+        </if>
+        )
+      </if>
     ${limitAfter}	    
   </select>
 
@@ -121,6 +134,9 @@
   
   <sql id="selectJobByQueryCriteriaSql">
     from ${prefix}ACT_RU_JOB RES
+    <if test="executable">
+        LEFT OUTER JOIN ${prefix}ACT_RU_EXECUTION PI ON PI.ID_ = RES.PROCESS_INSTANCE_ID_
+    </if>
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -137,6 +153,11 @@
       <if test="executable">
         and (RES.RETRIES_ &gt; 0)
         and (RES.DUEDATE_ is null or RES.DUEDATE_ &lt;= #{now, jdbcType=TIMESTAMP})
+        and (
+            (RES.EXECUTION_ID_ is null)
+            or 
+            (PI.SUSPENSION_STATE_ = 1)     
+      )
       </if>
       <if test="onlyTimers">
         and RES.TYPE_ = 'timer'
@@ -167,21 +188,32 @@
 
   <!--  SELECT DEPENDENT -->  
   <!--  ACT-1064: MySQL-specific select's are needed to handle non-millisecond precision -->
-   <select id="selectNextJobsToExecute_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-   	${limitBefore}
-    select RES.* ${limitBetween} 
-    from ${prefix}ACT_RU_JOB RES
-   		LEFT OUTER JOIN ${prefix}ACT_RU_EXECUTION PI ON PI.ID_ = RES.PROCESS_INSTANCE_ID_
-    	LEFT OUTER JOIN ${prefix}ACT_RE_PROCDEF PD ON PD.ID_ = PI.PROC_DEF_ID_    
-    where (RETRIES_ &gt; 0)
-      and (DUEDATE_ is null or DUEDATE_ &lt;= #{parameter, jdbcType=TIMESTAMP})
-      and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt;= #{parameter, jdbcType=TIMESTAMP})
-      and (
-	  	    (RES.EXECUTION_ID_ is null)
-	  		or ((PI.SUSPENSION_STATE_ = 1)     
-      			and (PD.SUSPENSION_STATE_ = 1))
-      )  
-    ${limitAfter}
+  <select id="selectNextJobsToExecute_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	 	${limitBefore}
+	  select RES.* ${limitBetween} 
+	  from ${prefix}ACT_RU_JOB RES
+	 		LEFT OUTER JOIN ${prefix}ACT_RU_EXECUTION PI ON PI.ID_ = RES.PROCESS_INSTANCE_ID_
+	  where (RETRIES_ &gt; 0)
+	    and (DUEDATE_ is null or DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
+	    and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
+	    and (
+	 	    (RES.EXECUTION_ID_ is null)
+	 		or 
+	 		(PI.SUSPENSION_STATE_ = 1)     
+	    )  
+	   <if test="parameter.deploymentAware">
+        and (RES.DEPLOYMENT_ID_ is null 
+        <if test="parameter.deploymentIds != null">
+          or 
+          RES.DEPLOYMENT_ID_ in 
+          <foreach item="deploymentId" index="index" collection="parameter.deploymentIds"
+          open="(" separator="," close=")">
+            #{deploymentId}
+          </foreach>
+        </if>
+        )
+      </if>  
+	  ${limitAfter}
   </select>
   
   <select id="selectExclusiveJobsToExecute_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
@@ -216,7 +248,8 @@
             DUEDATE_,
             REPEAT_,
             HANDLER_TYPE_,
-            HANDLER_CFG_ )
+            HANDLER_CFG_,
+            DEPLOYMENT_ID_ )
     values (#{id, jdbcType=VARCHAR},
             1,
             'timer',
@@ -231,7 +264,8 @@
             #{duedate, jdbcType=TIMESTAMP},
             #{repeat, jdbcType=VARCHAR},
             #{jobHandlerType, jdbcType=VARCHAR},
-            #{jobHandlerConfiguration, jdbcType=VARCHAR}
+            #{jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{deploymentId, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -290,7 +324,8 @@
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
             HANDLER_TYPE_,
-            HANDLER_CFG_)
+            HANDLER_CFG_,
+            DEPLOYMENT_ID_)
     values (#{id, jdbcType=VARCHAR},
             1,
             'message',
@@ -303,7 +338,8 @@
             #{exceptionByteArrayId, jdbcType=VARCHAR},
             #{exceptionMessage, jdbcType=VARCHAR},
             #{jobHandlerType, jdbcType=VARCHAR},
-            #{jobHandlerConfiguration, jdbcType=VARCHAR}
+            #{jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{deploymentId, jdbcType=VARCHAR}
     )
   </insert>
   

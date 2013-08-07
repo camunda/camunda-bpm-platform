@@ -12,12 +12,24 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
+import java.util.logging.Logger;
+
+import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.container.impl.jboss.util.BindingUtil;
+import org.camunda.bpm.container.impl.jboss.util.ProcessEngineManagedReferenceFactory;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.jboss.as.naming.ManagedReferenceFactory;
+import org.jboss.as.naming.deployment.ContextNames;
+import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceController.Mode;
+import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
+import org.jboss.msc.value.InjectedValue;
 
 /**
  * <p>Service representing a managed process engine instance registered with the Msc.</p>
@@ -32,8 +44,14 @@ import org.jboss.msc.service.StopContext;
  */
 public class MscManagedProcessEngine implements Service<ProcessEngine> {
   
+  private final static Logger LOGG = Logger.getLogger(MscManagedProcessEngine.class.getName());
+  
+  protected InjectedValue<MscRuntimeContainerDelegate> runtimeContainerDelegateInjector = new InjectedValue<MscRuntimeContainerDelegate>();
+  
   /** the process engine managed by this service */
   protected ProcessEngine processEngine;
+
+  private ServiceController<ManagedReferenceFactory> bindingService;
 
   // for subclasses only
   protected MscManagedProcessEngine() {
@@ -48,11 +66,44 @@ public class MscManagedProcessEngine implements Service<ProcessEngine> {
   }
 
   public void start(StartContext context) throws StartException {
-    // no lifecycle
+    MscRuntimeContainerDelegate runtimeContainerDelegate = runtimeContainerDelegateInjector.getValue();
+    runtimeContainerDelegate.processEngineStarted(processEngine);
+    
+    createProcessEngineJndiBinding(context);
   }
 
+  protected void createProcessEngineJndiBinding(StartContext context) {
+    
+    final ProcessEngineManagedReferenceFactory managedReferenceFactory = new ProcessEngineManagedReferenceFactory(processEngine);
+    
+    final ServiceName processEngineServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME            
+        .append(BpmPlatform.APP_JNDI_NAME)
+        .append(BpmPlatform.MODULE_JNDI_NAME)
+        .append(processEngine.getName());
+    
+    final String jndiName = BpmPlatform.JNDI_NAME_PREFIX 
+        + "/" + BpmPlatform.APP_JNDI_NAME 
+        + "/" + BpmPlatform.MODULE_JNDI_NAME 
+        + "/" +processEngine.getName();
+
+    // bind process engine service
+    bindingService = BindingUtil.createJndiBindings(context.getChildTarget(), processEngineServiceBindingServiceName, jndiName, managedReferenceFactory);
+
+    // log info message
+    LOGG.info("jndi binding for process engine " + processEngine.getName() + " is " + jndiName);
+  }
+  
+  protected void removeProcessEngineJndiBinding() {
+    bindingService.setMode(Mode.REMOVE);
+  }
+  
   public void stop(StopContext context) {
-    // no lifecycle    
+    MscRuntimeContainerDelegate runtimeContainerDelegate = runtimeContainerDelegateInjector.getValue();
+    runtimeContainerDelegate.processEngineStopped(processEngine);  
+  }
+
+  public Injector<MscRuntimeContainerDelegate> getRuntimeContainerDelegateInjector() {
+    return runtimeContainerDelegateInjector;
   }
   
 }

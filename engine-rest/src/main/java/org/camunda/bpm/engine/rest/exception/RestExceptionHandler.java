@@ -26,7 +26,7 @@ public class RestExceptionHandler implements ExceptionMapper<RestException> {
 
   @Override
   public Response toResponse(RestException exception) {
-    ExceptionDto dto = ExceptionDto.fromException(exception, true);
+    ExceptionDto dto = ExceptionDto.fromException(exception);
 
     LOGGER.log(Level.WARNING, getStackTrace(exception));
     

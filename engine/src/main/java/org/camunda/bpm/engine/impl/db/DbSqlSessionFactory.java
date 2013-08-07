@@ -37,6 +37,16 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificOrderByStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificLimitBeforeNativeQueryStatements = new HashMap<String, String>();
   
+  public static final Map<String, String> databaseSpecificBitAnd1 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificBitAnd2 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificBitAnd3 = new HashMap<String, String>();
+  
+  public static final Map<String, String> databaseSpecificDateDiff1 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificDateDiff2 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificDateDiff3 = new HashMap<String, String>();
+  
+  public static final Map<String, String> databaseSpecificDummyTable = new HashMap<String, String>();
+  
   static {
     
     String defaultOrderBy = " order by ${orderBy} ";
@@ -46,7 +56,14 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitAfterStatements.put("h2", "LIMIT #{maxResults} OFFSET #{firstResult}");
     databaseSpecificLimitBetweenStatements.put("h2", "");
     databaseSpecificOrderByStatements.put("h2", defaultOrderBy);
-    databaseSpecificLimitBeforeNativeQueryStatements.put("h2", "");
+    databaseSpecificLimitBeforeNativeQueryStatements.put("h2", "");    
+    databaseSpecificBitAnd1.put("h2", "BITAND(");
+    databaseSpecificBitAnd2.put("h2", ",");
+    databaseSpecificBitAnd3.put("h2", ")");    
+    databaseSpecificDateDiff1.put("h2", "DATEDIFF(ms, ");
+    databaseSpecificDateDiff2.put("h2", ",");
+    databaseSpecificDateDiff3.put("h2", ")");    
+    databaseSpecificDummyTable.put("h2", "");
     
 	  //mysql specific
     databaseSpecificLimitBeforeStatements.put("mysql", "");
@@ -54,6 +71,13 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenStatements.put("mysql", "");
     databaseSpecificOrderByStatements.put("mysql", defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put("mysql", "");
+    databaseSpecificBitAnd1.put("mysql", "");
+    databaseSpecificBitAnd2.put("mysql", " & ");
+    databaseSpecificBitAnd3.put("mysql", "");
+    databaseSpecificDummyTable.put("mysql", "");    
+    databaseSpecificDateDiff1.put("mysql", "TIMESTAMPDIFF(SECOND,");
+    databaseSpecificDateDiff2.put("mysql", ",");
+    databaseSpecificDateDiff3.put("mysql", ")*1000");    
     addDatabaseSpecificStatement("mysql", "selectNextJobsToExecute", "selectNextJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
@@ -61,12 +85,20 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("mysql", "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
     addDatabaseSpecificStatement("mysql", "selectDeploymentCountByQueryCriteria", "selectDeploymentCountByQueryCriteria_mysql");
     
+    
     //postgres specific
     databaseSpecificLimitBeforeStatements.put("postgres", "");
     databaseSpecificLimitAfterStatements.put("postgres", "LIMIT #{maxResults} OFFSET #{firstResult}");
     databaseSpecificLimitBetweenStatements.put("postgres", "");
     databaseSpecificOrderByStatements.put("postgres", defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put("postgres", "");
+    databaseSpecificBitAnd1.put("postgres", "");
+    databaseSpecificBitAnd2.put("postgres", " & ");
+    databaseSpecificBitAnd3.put("postgres", "");    
+    databaseSpecificDateDiff1.put("postgres", "(EXTRACT(EPOCH FROM ");
+    databaseSpecificDateDiff2.put("postgres", " AT TIME ZONE 'UTC') * 1000) - (EXTRACT(EPOCH FROM ");
+    databaseSpecificDateDiff3.put("postgres", " AT TIME ZONE 'UTC') * 1000)");    
+    databaseSpecificDummyTable.put("postgres", "");
     addDatabaseSpecificStatement("postgres", "insertByteArray", "insertByteArray_postgres");
     addDatabaseSpecificStatement("postgres", "updateByteArray", "updateByteArray_postgres");
     addDatabaseSpecificStatement("postgres", "selectByteArray", "selectByteArray_postgres");
@@ -84,44 +116,69 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("postgres", "selectCommentsByProcessInstanceId", "selectCommentsByProcessInstanceId_postgres");
     addDatabaseSpecificStatement("postgres", "selectEventsByTaskId", "selectEventsByTaskId_postgres");
     addDatabaseSpecificStatement("postgres", "selectActivityStatistics", "selectActivityStatistics_postgres");
-    addDatabaseSpecificStatement("postgres", "selectActivityStatisticsCount", "selectActivityStatisticsCount_postgres");    
-    addDatabaseSpecificStatement("postgres", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_postgres");
-    addDatabaseSpecificStatement("postgres", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_postgres");
-    addDatabaseSpecificStatement("postgres", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_postgres");
-        
+    addDatabaseSpecificStatement("postgres", "selectActivityStatisticsCount", "selectActivityStatisticsCount_postgres");
+    addDatabaseSpecificStatement("postgres", "selectHistoricVariableInstanceByQueryCriteria", "selectHistoricVariableInstanceByQueryCriteria_postgres");
+    
     // oracle
     databaseSpecificLimitBeforeStatements.put("oracle", "select * from ( select a.*, ROWNUM rnum from (");
     databaseSpecificLimitAfterStatements.put("oracle", "  ) a where ROWNUM < #{lastRow}) where rnum  >= #{firstRow}");
     databaseSpecificLimitBetweenStatements.put("oracle", "");
     databaseSpecificOrderByStatements.put("oracle", defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put("oracle", "");
-    addDatabaseSpecificStatement("oracle", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
-    
+    databaseSpecificDummyTable.put("oracle", "FROM DUAL");
+    databaseSpecificBitAnd1.put("oracle", "BITAND(");
+    databaseSpecificBitAnd2.put("oracle", ",");
+    databaseSpecificBitAnd3.put("oracle", ")");  
+    databaseSpecificDateDiff1.put("oracle", "((cast(");
+    databaseSpecificDateDiff2.put("oracle", " as date) - date '1970-01-01')*24*60*60*1000) - ((cast(");
+    databaseSpecificDateDiff3.put("oracle", " as date) - date '1970-01-01')*24*60*60*1000)");
+    addDatabaseSpecificStatement("oracle", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");      
+        
     // db2
     databaseSpecificLimitBeforeStatements.put("db2", "SELECT SUB.* FROM (");
     databaseSpecificLimitAfterStatements.put("db2", ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
-    databaseSpecificLimitBetweenStatements.put("db2", "RES.*, row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct ");
+    databaseSpecificLimitBetweenStatements.put("db2", ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.* ");
     databaseSpecificOrderByStatements.put("db2", "");
     databaseSpecificLimitBeforeNativeQueryStatements.put("db2", "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
+    databaseSpecificBitAnd1.put("db2", "BITAND(");
+    databaseSpecificBitAnd2.put("db2", ",");
+    databaseSpecificBitAnd3.put("db2", ")");  
+    databaseSpecificDateDiff1.put("db2", "");
+    databaseSpecificDateDiff2.put("db2", "");
+    databaseSpecificDateDiff3.put("db2", "");
+    databaseSpecificDummyTable.put("db2", "FROM SYSIBM.SYSDUMMY1");
     addDatabaseSpecificStatement("db2", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
     addDatabaseSpecificStatement("db2", "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
-    addDatabaseSpecificStatement("db2", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement("db2", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");      
+    addDatabaseSpecificStatement("db2", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_db2");
+    addDatabaseSpecificStatement("db2", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_db2");
+    addDatabaseSpecificStatement("db2", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_db2"); 
     
     // mssql
     databaseSpecificLimitBeforeStatements.put("mssql", "SELECT SUB.* FROM (");
     databaseSpecificLimitAfterStatements.put("mssql", ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
-    databaseSpecificLimitBetweenStatements.put("mssql", "RES.*, row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct ");
+    databaseSpecificLimitBetweenStatements.put("mssql", ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.* ");
     databaseSpecificOrderByStatements.put("mssql", "");
     databaseSpecificLimitBeforeNativeQueryStatements.put("mssql", "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
+    databaseSpecificBitAnd1.put("mssql", "");
+    databaseSpecificBitAnd2.put("mssql", " &");
+    databaseSpecificBitAnd3.put("mssql", "");  
+    databaseSpecificDateDiff1.put("mssql", "");
+    databaseSpecificDateDiff2.put("mssql", "");
+    databaseSpecificDateDiff3.put("mssql", "");
+    databaseSpecificDummyTable.put("mssql", "");
     addDatabaseSpecificStatement("mssql", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
     addDatabaseSpecificStatement("mssql", "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement("mssql", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_mssql");
+    addDatabaseSpecificStatement("mssql", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_mssql");
+    addDatabaseSpecificStatement("mssql", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_mssql");
   }
   
   protected String databaseType;

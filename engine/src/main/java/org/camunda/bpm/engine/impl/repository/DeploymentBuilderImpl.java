@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.repository;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -28,6 +29,7 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
@@ -36,6 +38,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   protected transient RepositoryServiceImpl repositoryService;
   protected DeploymentEntity deployment = new DeploymentEntity();
   protected boolean isDuplicateFilterEnabled = false;
+  protected Date processDefinitionsActivationDate;
 
   public DeploymentBuilderImpl(RepositoryServiceImpl repositoryService) {
     this.repositoryService = repositoryService;
@@ -98,7 +101,12 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   }
   
   public DeploymentBuilder enableDuplicateFiltering() {
-    isDuplicateFilterEnabled = true;
+    this.isDuplicateFilterEnabled = true;
+    return this;
+  }
+  
+  public DeploymentBuilder activateProcessDefinitionsOn(Date date) {
+    this.processDefinitionsActivationDate = date;
     return this;
   }
 
@@ -114,4 +122,8 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   public boolean isDuplicateFilterEnabled() {
     return isDuplicateFilterEnabled;
   }
+  public Date getProcessDefinitionsActivationDate() {
+    return processDefinitionsActivationDate;
+  }
+  
 }

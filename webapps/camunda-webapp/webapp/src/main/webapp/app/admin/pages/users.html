@@ -1,0 +1,36 @@
+<div class="container" ng-cloak>    
+  <div class="page-header">
+    <h1>Users</h1>
+  </div>      
+
+  <div ng-show="availableOperations.create">
+    <a class="btn pull-right" href="#/user-create"><i class="icon-plus"></i> New User</a>
+  </div>
+     
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th><!-- pictures --></th>    
+        <th>Name</th>
+        <th>Username</th>  
+        <th><!-- actions --></th>    
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="user in userList">
+        <td>
+          <!-- add user pictures later -->
+          <i class="icon-user"></i>
+        </td>            
+        <td>
+          <a href="#/users/{{user.id}}">{{user.firstName}} {{user.lastName}}</a>
+        </td>
+        <td>{{user.id}}</td>
+        <td>  
+          <a href="#/users/{{user.id}}">Edit</a> 
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

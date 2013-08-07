@@ -467,7 +467,6 @@
         <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
-          <version>${version.h2}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -511,7 +510,6 @@
         <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
-          <version>${version.h2}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -550,41 +548,6 @@
       </build>
     </profile>
     <profile>
-      <!--
-        usage: mvn wro4j:csslint -Pwro4j or mvn wro4j:jshint -Pwro4j
-      -->
-      <id>wro4j</id>
-      <dependencies>
-        <dependency>
-          <groupId>ro.isdc.wro4j</groupId>
-          <artifactId>wro4j-extensions</artifactId>
-          <version>${version.wro4j}</version>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>ro.isdc.wro4j</groupId>
-            <artifactId>wro4j-maven-plugin</artifactId>
-            <version>${version.wro4j}</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>jshint</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <targetGroups>all</targetGroups>
-              <failNever>true</failNever>
-              <minimize>false</minimize>
-              <options>devel,evil,noarg</options>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <id>tomcat</id>
       <dependencies>
 	  
@@ -592,7 +555,6 @@
         <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
-          <version>${version.h2}</version>
         </dependency>
 		
         <dependency>

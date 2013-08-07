@@ -13,7 +13,10 @@
 package org.camunda.bpm.engine.impl;
 
 import java.sql.Connection;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
@@ -27,8 +30,12 @@ import org.camunda.bpm.engine.impl.cmd.GetPropertiesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTableCountCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTableMetaDataCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTableNameCmd;
+import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
+import org.camunda.bpm.engine.impl.cmd.UnregisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.UnregisterProcessApplication;
+import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -85,6 +92,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new SetJobRetriesCmd(jobId, retries));
   }
 
+  public void setJobDuedate(String jobId, Date newDuedate) {
+    commandExecutor.execute(new SetJobDuedateCmd(jobId, newDuedate));
+  }
+
   public TablePageQuery createTablePageQuery() {
     return new TablePageQueryImpl(commandExecutor);
   }
@@ -122,6 +133,26 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   
   public DeploymentStatisticsQuery createDeploymentStatisticsQuery() {
     return new DeploymentStatisticsQueryImpl(commandExecutor);
+  }
+
+  public Set<String> getRegisteredDeployments() {
+    return commandExecutor.execute(new Command<Set<String>>() {
+      public Set<String> execute(CommandContext commandContext) {
+        Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
+        synchronized (registeredDeployments) {
+          return new HashSet<String>(registeredDeployments);
+        }
+      }
+    });
+  }
+
+  public void registerDeploymentForJobExecutor(final String deploymentId) {
+    commandExecutor.execute(new RegisterDeploymentCmd(deploymentId));
+  }
+
+  @Override
+  public void unregisterDeploymentForJobExecutor(final String deploymentId) {
+    commandExecutor.execute(new UnregisterDeploymentCmd(deploymentId));
   }
 
 }

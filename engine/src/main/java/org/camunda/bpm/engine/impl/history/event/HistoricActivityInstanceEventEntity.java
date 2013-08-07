@@ -57,11 +57,7 @@ public class HistoricActivityInstanceEventEntity extends HistoryEvent {
   }
   
   public void setEndTime(Date endTime) {
-    this.endTime = endTime;
-    
-    if(startTime != null) {
-      durationInMillis = endTime.getTime() - startTime.getTime();
-    }
+    this.endTime = endTime;    
   }
   
   public Date getStartTime() {
@@ -77,7 +73,11 @@ public class HistoricActivityInstanceEventEntity extends HistoryEvent {
   }
   
   public Long getDurationInMillis() {
-    return durationInMillis;
+    if(endTime != null) {      
+        return endTime.getTime() - startTime.getTime();     
+    } else {
+      return durationInMillis;
+    }
   }
   
   public void setDurationInMillis(Long durationInMillis) {

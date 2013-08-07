@@ -27,7 +27,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   
   private void waitForExecutedJobWithRetriesLeft(final int retriesLeft) {
 
-    waitForJobExecutorOnCondition(15000L, 200L, new Callable<Boolean>() {
+    waitForJobExecutorOnCondition(15000L, new Callable<Boolean>() {
 
       public Boolean call() throws Exception {
         List<Job> jobs = managementService.createJobQuery().list();

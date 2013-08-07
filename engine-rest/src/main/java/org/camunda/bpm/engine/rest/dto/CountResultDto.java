@@ -16,6 +16,13 @@ public class CountResultDto {
 
   long count;
 
+  public CountResultDto() {
+  }
+  
+  public CountResultDto(long count) {
+    this.count = count;
+  }
+
   public long getCount() {
     return count;
   }

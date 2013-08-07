@@ -1,0 +1,214 @@
+<div class="container" ng-cloak>
+  <section id="groups">
+    <div class="row">
+      <div class="page-header">
+        <h1>Authorizations</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span3">
+        <div class="well sidebar-nav">          
+          <ul class="nav nav-list">
+            <li class="nav-header">Resources</li>
+            <li ng-class="activeClass('resource='+res.id)" ng-repeat="res in resourceList | orderBy:'name':false">
+              <a href="#/authorization/?resource={{res.id}}">{{res.name}}</a>
+            </li>                 
+          </ul>          
+        </div>
+      </div>
+
+      <div class="span9">
+
+        <div> 
+          <div class="box auth-box">
+
+          <form class="form-horizontal" name="createAuthForm" ng-controller="AuthorizationCreateController">
+
+          <legend>{{title}} Authorizations</legend>
+
+             <table class="table table-condensed table-bordered">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>User / Group</th>                    
+                    <th>Permissions</th>
+                    <th>Resource Id</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="authorization in authorizations | orderBy:getIdentityId:false">
+                    <td>
+                      {{getType(authorization)}}
+                    </td>
+                    <td>
+                      <span ng-show="authorization.userId">      
+                        <i class="icon-user"></i>
+                        {{authorization.userId}}
+                      </span>
+                      <span ng-show="authorization.groupId">
+                        <i class="icon-th"></i>
+                        {{authorization.groupId}}
+                      </span>
+                      
+                    </td>                    
+                    <td>
+                      {{formatPermissions(authorization.permissions)}}
+                    </td>
+                    <td>
+                      {{authorization.resourceId}}
+                    </td>
+                    <td>
+                      <a class="btn btn-link btn-small" ng-click="deleteAuthorization(authorization)">
+                        delete</a>
+                    </td>
+                  </tr>
+               
+                  <tr class="warning" id="createNew" ng-show="isCreateNewAuthorization">
+
+                    <td class="inline-edit">
+                      <select id="selectType" ng-model="newAuthorization.type" class="select-auth-type">
+                        <option value="0">GLOBAL</option>
+                        <option value="1">ALLOW</option>
+                        <option value="2">DENY</option>
+                      </select>
+                    </td>
+
+                    <td  class="inline-edit">
+                      <div class="input-prepend">
+                        <div class="btn-group">
+                          <a class="btn dropdown-toggle select-identity-type" 
+                            ng-disabled="isIdentityIdDisabled()"
+                            data-toggle="dropdown">
+                            {{identityType}}
+                            <span class="caret"></span>
+                          </a>
+                          <ul class="dropdown-menu">
+                            <li ng-show="identityType == 'Group'">
+                              <a ng-click="setIdentityType('User')">User</a>
+                            </li>
+                            <li ng-show="identityType == 'User'">                              
+                              <a ng-click="setIdentityType('Group')">Group</a>
+                            </li>
+                          </ul>
+                        </div>
+                        <input type="text" id="inputIdentityId" 
+                           class="input-auth-name"
+                           placeholder="User / Group Id"   
+                           ng-disabled="isIdentityIdDisabled()"
+                           ng-model="identityId"
+                           required></input>   
+                      </div>                      
+                    </td>    
+
+                    <td class="inline-edit">
+                      <div class="input-append">
+                      <span id="selectPermission" class="input-xlarge uneditable-input span2 permissions-editor">
+                        <a ng-click="addAllPermissions()" ng-show="selectedPermissions != 'ALL'"><i class="icon-remove"></i></a>
+                        {{formatPermissions(selectedPermissions)}}
+                      </span>                      
+                      <div class="btn-group">                        
+                        <a class="btn dropdown-toggle" data-toggle="dropdown">
+                          <i class="icon-pencil"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                          <li ng-repeat="perm in availablePermissions"><a ng-click="addPermission(perm)">{{perm}}</a></li>                          
+                        </ul>
+                      </div>                        
+                    </td>
+
+                    <td class="inline-edit">
+                      <input type="text" id="inputResourceId" ng-model="newAuthorization.resourceId" class="in-place-edit"
+                      required></input>
+                      <span ng-show="selectedResourceType==0" class="muted">(cockpit or tasklist or *)</span>
+                    </td>
+
+                    <td>                      
+                      <div class="btn-group">
+                        <button type="submit" class="btn btn-primary" ng-disabled="createAuthForm.$invalid" ng-click="createAuthorization()">
+                            <i class="icon-ok icon-white"></i>
+                        </button>
+
+                        <a type="submit" class="btn" 
+                          ng-click="toggleCreateNewForm()">
+                            <i class="icon-ban-circle"></i>
+                        </a>
+                      </div>
+                      
+                    </td>
+
+                  </tr>
+                  <tr ng-hide="isCreateNewAuthorization">
+                    <td colspan="5">
+                      <a class="btn btn-link" 
+                        ng-click="toggleCreateNewForm()">
+                        <i class="icon-plus"></i> Create New
+                      </a>                     
+                    </td>
+                  </tr>
+                </tbody>                                               
+              </table>              
+
+            </form>
+      
+          </div>
+        </div>
+     
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- create group membership modal -->
+<div modal-dialog model="confirmDeleteAuthorizationDialog" ng-cloak>
+  <div class="modal hide" ng-if="confirmDeleteAuthorizationDialog.renderHtml()" ng-controller="ConfirmDeleteAuthorizationController"> 
+    <div class="modal-header">
+      <button ng-show="confirmDeleteAuthorizationDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3>Confirm Delete</h3>
+    </div>
+
+    <div class="modal-body">
+      <div notifications-panel></div>                
+                
+      <div ng-hide="status === 'deleteSuccess' || status === 'deleteFailed'">
+        <p>Are you sure you want to delete the following authorization?</p>
+
+        <dl class="dl-horizontal">
+          <dt>Type</dt>
+          <dd>{{getType(authorizationToDelete)}}</dd>
+          <dt>User</dt>
+          <dd>
+            {{authorizationToDelete.userId}} &nbsp;
+          </dd>    
+          <dt>Group</dt>
+          <dd>
+            {{authorizationToDelete.groupId}} &nbsp;
+          </dd>                     
+          <dt>Permissions</dt>
+          <dd>{{formatPermissions(authorizationToDelete.permissions)}}</dd>
+          <dt>Resource</dt>
+          <dd>{{getResource(authorizationToDelete.resourceType)}}</dd>
+          <dt>Resource Id</dt>
+          <dd>{{authorizationToDelete.resourceId}}</dd>        
+        </dl>
+      </div>
+
+      <div ng-show="status === 'deleteSuccess'">
+        <p>The authorization has been deleted successfully.</p>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" ng-click="close()"
+              ng-disabled="status === 'performCreate'"
+              ng-hide="status === 'deleteSuccess' || status === 'deleteFailed'">Close</button>
+      <button class="btn btn-primary" ng-click="close(status)"
+              ng-show="status === 'deleteSuccess' || status === 'deleteFailed'">OK</button>        
+      <button class="btn btn-primary" ng-click="performDelete()"
+              ng-hide="status === 'deleteSuccess' || status === 'deleteFailed'">Delete</button>
+      
+    </div>
+  </div>
+</div>

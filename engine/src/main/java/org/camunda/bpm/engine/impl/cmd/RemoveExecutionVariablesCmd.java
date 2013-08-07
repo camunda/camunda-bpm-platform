@@ -10,6 +10,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * @author roman.smirnov
+ * @author Joram Barrez
  */
 public class RemoveExecutionVariablesCmd implements Command<Void>, Serializable {
 
@@ -25,7 +26,7 @@ public class RemoveExecutionVariablesCmd implements Command<Void>, Serializable 
     this.isLocal = isLocal;
   }
   
-
+  @Override
   public Void execute(CommandContext commandContext) {
     if (executionId == null) {
       throw new ProcessEngineException("executionId is null");
@@ -47,5 +48,4 @@ public class RemoveExecutionVariablesCmd implements Command<Void>, Serializable 
     
     return null;
   }
-
 }

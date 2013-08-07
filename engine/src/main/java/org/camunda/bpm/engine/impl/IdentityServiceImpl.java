@@ -31,10 +31,12 @@ import org.camunda.bpm.engine.impl.cmd.DeleteGroupCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteMembershipCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserInfoCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteUserPictureCmd;
 import org.camunda.bpm.engine.impl.cmd.GetUserAccountCmd;
 import org.camunda.bpm.engine.impl.cmd.GetUserInfoCmd;
 import org.camunda.bpm.engine.impl.cmd.GetUserInfoKeysCmd;
 import org.camunda.bpm.engine.impl.cmd.GetUserPictureCmd;
+import org.camunda.bpm.engine.impl.cmd.IsIdentityServiceReadOnlyCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveGroupCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveUserCmd;
 import org.camunda.bpm.engine.impl.cmd.SetUserInfoCmd;
@@ -49,6 +51,13 @@ import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
  * @author Tom Baeyens
  */
 public class IdentityServiceImpl extends ServiceImpl implements IdentityService {
+  
+  /** thread local holding the current authentication */
+  private ThreadLocal<Authentication> currentAuthentication = new ThreadLocal<Authentication>();
+  
+  public boolean isReadOnly() {
+    return commandExecutor.execute(new IsIdentityServiceReadOnlyCmd());
+  }
   
   public Group newGroup(String groupId) {
     return commandExecutor.execute(new CreateGroupCmd(groupId));
@@ -101,9 +110,33 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   public Picture getUserPicture(String userId) {
     return commandExecutor.execute(new GetUserPictureCmd(userId));
   }
+  
+  public void deleteUserPicture(String userId) {
+    commandExecutor.execute(new DeleteUserPictureCmd(userId));    
+  }
 
   public void setAuthenticatedUserId(String authenticatedUserId) {
-    Authentication.setAuthenticatedUserId(authenticatedUserId);
+    currentAuthentication.set(new Authentication(authenticatedUserId, null));    
+  }
+  
+  public void setAuthentication(Authentication auth) {
+    if(auth == null) {
+      clearAuthentication();
+    } else {
+      currentAuthentication.set(auth);
+    }
+  }
+  
+  public void setAuthentication(String userId, List<String> groups) {
+    currentAuthentication.set(new Authentication(userId, groups));
+  }
+  
+  public void clearAuthentication() {
+    currentAuthentication.remove();
+  }
+  
+  public Authentication getCurrentAuthentication() {
+    return currentAuthentication.get();
   }
 
   public String getUserInfo(String userId, String key) {

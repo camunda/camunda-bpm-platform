@@ -16,7 +16,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -28,6 +27,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 public class CompleteTaskCmd implements Command<Void>, Serializable {
       
   private static final long serialVersionUID = 1L;
+  
   protected String taskId;
   protected Map<String, Object> variables;
   
@@ -41,8 +41,7 @@ public class CompleteTaskCmd implements Command<Void>, Serializable {
       throw new ProcessEngineException("taskId is null");
     }
     
-    TaskEntity task = Context
-      .getCommandContext()
+    TaskEntity task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
     
@@ -58,7 +57,7 @@ public class CompleteTaskCmd implements Command<Void>, Serializable {
     
     return null;
   }
-
+  
   protected void completeTask(TaskEntity task) {
     task.complete();
   }

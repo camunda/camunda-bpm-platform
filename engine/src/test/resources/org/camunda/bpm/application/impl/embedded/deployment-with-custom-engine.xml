@@ -10,6 +10,8 @@
     
     <properties>
         <property name="jdbcUrl">jdbc:h2:mem:embeddedEngine</property>
+        <property name="jobExecutorDeploymentAware">true</property>
+        <property name="jdbcMaxActiveConnections">5</property>
     </properties>
     
   </process-engine>

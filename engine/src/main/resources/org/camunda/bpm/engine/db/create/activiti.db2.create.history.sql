@@ -20,6 +20,7 @@ alter table ACT_HI_PROCINST add constraint PROC_INST_ID_ unique(PROC_INST_ID_);
 
 create table ACT_HI_ACTINST (
     ID_ varchar(64) not null,
+    PARENT_ACT_INST_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64) not null,
     PROC_INST_ID_ varchar(64) not null,
     EXECUTION_ID_ varchar(64) not null,
@@ -118,7 +119,6 @@ create table ACT_HI_ATTACHMENT (
     primary key (ID_)
 );
 
-create unique index ACT_UNIQ_HI_BUS_KEY on ACT_HI_PROCINST(UNI_PROC_DEF_ID, UNI_BUSINESS_KEY);
 create index ACT_IDX_HI_PRO_INST_END on ACT_HI_PROCINST(END_TIME_);
 create index ACT_IDX_HI_PRO_I_BUSKEY on ACT_HI_PROCINST(BUSINESS_KEY_);
 create index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST(START_TIME_);

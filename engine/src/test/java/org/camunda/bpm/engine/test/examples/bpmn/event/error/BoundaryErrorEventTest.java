@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -32,12 +31,12 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     super.setUp();
     
     // Normally the UI will do this automatically for us
-    Authentication.setAuthenticatedUserId("kermit");
+    identityService.setAuthenticatedUserId("kermit");
   }
   
   @Override
   protected void tearDown() throws Exception {
-    Authentication.setAuthenticatedUserId(null);
+    identityService.clearAuthentication();
     super.tearDown();
   }
   

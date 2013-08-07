@@ -98,7 +98,7 @@ public class SpringExpressionResolvingTest extends AbstractFoxPlatformIntegratio
     runtimeService.startProcessInstanceByKey("testResolveBeanFromJobExecutor");
     Assert.assertEquals(1,runtimeService.createProcessInstanceQuery().count());
     
-    waitForJobExecutorToProcessAllJobs(16000, 500);    
+    waitForJobExecutorToProcessAllJobs(16000);    
     
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());    
     

@@ -8,7 +8,7 @@
     <sequenceFlow id="flow2" name="" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
     <boundaryEvent id="boundarytimer1" name="" cancelActivity="true" attachedToRef="usertask1">
       <timerEventDefinition>
-        <timeDuration>PT3S</timeDuration>
+        <timeDuration>PT0S</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <serviceTask id="servicetask1" name="Do Something" activiti:class="org.camunda.bpm.integrationtest.jobexecutor.beans.DemoDelegate">

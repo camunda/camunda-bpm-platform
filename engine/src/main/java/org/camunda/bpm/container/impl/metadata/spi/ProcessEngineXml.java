@@ -12,9 +12,11 @@
  */
 package org.camunda.bpm.container.impl.metadata.spi;
 
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 
 /**
@@ -55,7 +57,7 @@ public interface ProcessEngineXml {
    *         {@link #getConfigurationClass()}). This means that each property
    *         name used here must be a bean property name on the process engine
    *         configuration class and the bean property must be of type
-   *         {@link String}.
+   *         {@link String}, {@link Integer} or {@link Boolean}.
    */
   public Map<String, String> getProperties();
   
@@ -63,5 +65,10 @@ public interface ProcessEngineXml {
    * @return the name of the job acquisition to be used.
    */
   public String getJobAcquisitionName();
+  
+  /**
+   * @return a list of {@link ProcessEnginePlugin} definitions.
+   */
+  public List<ProcessEnginePluginXml> getPlugins();
 
 }

@@ -94,7 +94,7 @@ public abstract class ProcessEngines {
       }
       for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
         URL resource = iterator.next();
-        initProcessEnginFromResource(resource);
+        initProcessEngineFromResource(resource);
       }
       
       try {
@@ -145,7 +145,7 @@ public abstract class ProcessEngines {
     processEngines.remove(processEngine.getName());
   }
 
-  private static ProcessEngineInfo initProcessEnginFromResource(URL resourceUrl) {
+  private static ProcessEngineInfo initProcessEngineFromResource(URL resourceUrl) {
     ProcessEngineInfo processEngineInfo = processEngineInfosByResourceUrl.get(resourceUrl);
     // if there is an existing process engine info
     if (processEngineInfo!=null) {
@@ -229,7 +229,7 @@ public abstract class ProcessEngines {
   public static ProcessEngineInfo retry(String resourceUrl) {
     log.fine("retying initializing of resource " + resourceUrl);
     try {
-      return initProcessEnginFromResource(new URL(resourceUrl));
+      return initProcessEngineFromResource(new URL(resourceUrl));
     } catch (MalformedURLException e) {
       throw new ProcessEngineException("invalid url: "+resourceUrl, e);
     }

@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 public class SubmitTaskFormCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
+  
   protected String taskId;
   protected Map<String, String> properties;
   
@@ -45,7 +46,7 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
     this.taskId = taskId;
     this.properties = properties;
   }
-
+  
   public Object execute(CommandContext commandContext) {
     if(taskId == null) {
       throw new ProcessEngineException("taskId is null");
@@ -55,7 +56,7 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
       .getCommandContext()
       .getTaskManager()
       .findTaskById(taskId);
-
+    
     if (task == null) {
       throw new ProcessEngineException("Cannot find task with id " + taskId);
     }

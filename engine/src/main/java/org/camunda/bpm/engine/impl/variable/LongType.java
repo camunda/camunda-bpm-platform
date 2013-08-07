@@ -19,10 +19,10 @@ package org.camunda.bpm.engine.impl.variable;
  */
 public class LongType implements VariableType {
 
-  private static final long serialVersionUID = 1L;
+  public static final String TYPE_NAME = "long";
   
   public String getTypeName() {
-    return "long";
+    return TYPE_NAME;
   }
 
   public boolean isCachable() {
@@ -48,5 +48,9 @@ public class LongType implements VariableType {
     }
     return Long.class.isAssignableFrom(value.getClass())
            || long.class.isAssignableFrom(value.getClass());
+  }
+  
+  public String getTypeNameForValue(Object value) {
+    return value.getClass().getSimpleName();
   }
 }

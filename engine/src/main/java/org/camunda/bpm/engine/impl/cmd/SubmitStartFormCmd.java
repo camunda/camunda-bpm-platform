@@ -34,11 +34,13 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  protected String processDefinitionId;
+  
+  protected final String processDefinitionId;
   protected final String businessKey;
   protected Map<String, String> properties;
   
@@ -48,12 +50,14 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
     this.properties = properties;
   }
 
+  @Override
   public ProcessInstance execute(CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     
     ProcessDefinitionEntity processDefinition = processEngineConfiguration
       .getDeploymentCache()
       .findDeployedProcessDefinitionById(processDefinitionId);
+
     if (processDefinition == null) {
       throw new ProcessEngineException("No process definition found for id = '" + processDefinitionId + "'");
     }

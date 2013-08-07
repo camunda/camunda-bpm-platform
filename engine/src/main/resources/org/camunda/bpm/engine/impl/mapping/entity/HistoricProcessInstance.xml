@@ -59,28 +59,58 @@
       DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}      
       
       <if test="endTime!=null">
-        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP},      
-        DURATION_ = DATEDIFF(ms, HPI.START_TIME_, #{endTime, jdbcType=TIMESTAMP})
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">     
+            , DURATION_ = ${dateDiff1} #{endTime, jdbcType=TIMESTAMP} ${dateDiff2} HPI.START_TIME_ ${dateDiff3}
+        </if>
       </if>      
       
     where ID_ = #{id}
   </update>
-  
-  <update id="updateHistoricProcessInstanceEvent_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
+    
+  <update id="updateHistoricProcessInstanceEvent_mssql" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
+    update ${prefix}ACT_HI_PROCINST set
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
+      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}      
+      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">       
+            , DURATION_ = DATEDIFF(ms, HPI.START_TIME_, #{endTime, jdbcType=TIMESTAMP})
+        </if>
+      </if>      
+    FROM 
+      ${prefix}ACT_HI_PROCINST HPI      
+    where 
+      ID_ = #{id}
+  </update>
+    
+  <update id="updateHistoricProcessInstanceEvent_db2" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
     update ${prefix}ACT_HI_PROCINST HPI set
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
       DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}      
       
       <if test="endTime!=null">
-        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP},      
-        DURATION_ = EXTRACT(MILLISECONDS FROM (HPI.START_TIME_ - #{endTime, jdbcType=TIMESTAMP}))
-        
-      </if>      
-      
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">
+            , DURATION_ = ((DAYS(#{endTime, jdbcType=TIMESTAMP}) - DAYS(HPI.START_TIME_)) * 86400000)
+            + ((MIDNIGHT_SECONDS(#{endTime, jdbcType=TIMESTAMP}) - MIDNIGHT_SECONDS(HPI.START_TIME_)) * 1000)
+        </if>
+      </if>                
     where ID_ = #{id}
   </update>
-  
+    
   <!-- HISTORIC PROCESS INSTANCE DELETE -->
   
   <delete id="deleteHistoricProcessInstance">

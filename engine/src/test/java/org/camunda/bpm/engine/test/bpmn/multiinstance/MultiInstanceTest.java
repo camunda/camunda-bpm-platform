@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Joram Barrez
+ * @author Bernd Ruecker
  */
 public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   
@@ -179,13 +180,13 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(tasks.get(0).getId());
     
     processInstance = runtimeService.getActivityInstance(procId);
-    // there are still 3 activity instances since they are not joined yet!
-    assertEquals(3, processInstance.getChildActivityInstances().length);
+    
+    assertEquals(2, processInstance.getChildActivityInstances().length);
     
     taskService.complete(tasks.get(1).getId());
     
     processInstance = runtimeService.getActivityInstance(procId);
-    assertEquals(3, processInstance.getChildActivityInstances().length);
+    assertEquals(1, processInstance.getChildActivityInstances().length);
     
     taskService.complete(tasks.get(2).getId());
     assertProcessEnded(procId); 
@@ -273,7 +274,26 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().count());
     assertProcessEnded(procId);
   }
-  
+
+  @Deployment(resources="org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasksBasedOnCollection.bpmn20.xml")
+  public void testEmptyCollectionInMI() {
+    List<String> assigneeList = new ArrayList<String>();
+    String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksBasedOnCollection",
+          CollectionUtil.singletonMap("assigneeList", assigneeList)).getId();
+    
+    assertEquals(0, taskService.createTaskQuery().count());
+    assertProcessEnded(procId);
+    
+    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery().processInstanceId(procId).orderByActivityId().asc().list();
+      assertEquals(3, activities.size());
+      // note that the multiple instance task is mentioned in the history once 
+      assertEquals("miTasks", activities.get(0).getActivityId());
+      assertEquals("theEnd", activities.get(1).getActivityId());
+      assertEquals("theStart", activities.get(2).getActivityId());
+    }
+  }
+
   @Deployment
   public void testParallelUserTasksCustomExtensions() {
     Map<String, Object> vars = new HashMap<String, Object>();

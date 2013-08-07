@@ -28,5 +28,9 @@ public class TestContainer {
     webArchive.addAsManifestResource("jboss-deployment-structure.xml");
     
   }
+
+  public static void addContainerSpecificProcessEngineConfigurationClass(WebArchive deployment) {
+    // nothing to do
+  }
   
 }

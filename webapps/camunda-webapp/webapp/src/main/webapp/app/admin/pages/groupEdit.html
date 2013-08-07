@@ -1,0 +1,70 @@
+<div class="container">
+  <section id="groups">
+    <div class="row">
+      <div class="page-header">
+        <h1>{{groupName}}</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span3">
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li ng-class="activeClass('tab=group')">
+              <a href="#/groups/{{group.id}}?tab=group">Group</a>
+            </li>                 
+          </ul>          
+        </div>
+      </div>
+
+      <div class="span9">
+
+        <div ng-show="show('group')"> 
+          <div class="box">
+            <p ngm-if="!group">
+              <i class="icon-loading"></i> loading group...
+            </p>
+            <form class="form-horizontal" name="editGroupForm" ngm-if="group">
+
+              <legend>Group</legend>
+
+              <div class="control-group">
+                <label class="control-label" for="inputName">Group Name*</label>
+                <div class="controls">
+                  <input id="inputName" name="groupName" type="text" ng-model="group.name" novalidate required ng-disabled="!availableOperations.update"></input>
+                  <p class="text-error" ng-show="createGroupForm.groupName.$error.required">Name is required.</p>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="inputType">Group Type</label>
+                <div class="controls">
+                  <input id="inputType" name="groupType" type="text" ng-model="group.type" ng-disabled="!availableOperations.update"></input>                  
+                </div>
+              </div>
+
+              <div class="control-group" ng-show="availableOperations.update">
+                <div class="controls">
+                  <button type="submit" class="btn"  data-ng-disabled="!canSubmit(editGroupForm, 'group')" data-ng-click="updateGroup()">Update Group</button>
+                </div>
+              </div>
+           
+            </form>
+          </div>
+          <div class="box" ng-show="availableOperations.delete">
+            <form class="form-horizontal">
+
+              <legend>Delete Group</legend>
+              <div class="alert alert-error">
+                <strong>Warning:</strong> deleting a group cannot be undone. 
+              </div>
+
+              <button type="submit" class="btn btn-danger" data-ng-click="deleteGroup()">Delete Group</button>
+           
+            </form>  
+          </div>
+        </div>
+     
+      </div>
+    </div>
+  </section>
+</div>

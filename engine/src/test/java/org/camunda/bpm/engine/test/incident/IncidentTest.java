@@ -36,7 +36,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
 
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
     
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
@@ -45,12 +45,13 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNotNull(incident.getId());
     assertNotNull(incident.getIncidentTimestamp());
     assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals("Exception expected.", incident.getIncidentMessage());
     assertEquals(processInstance.getId(), incident.getExecutionId());
     assertEquals("theServiceTask", incident.getActivityId());
     assertEquals(processInstance.getId(), incident.getProcessInstanceId());
     assertEquals(processInstance.getProcessDefinitionId(), incident.getProcessDefinitionId());
-    assertNull(incident.getCauseIncidentId());
-    assertNull(incident.getRootCauseIncidentId());
+    assertEquals(incident.getId(), incident.getCauseIncidentId());
+    assertEquals(incident.getId(), incident.getRootCauseIncidentId());
     
     Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
     
@@ -63,7 +64,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
   public void testShouldCreateOneIncidentAfterSetRetries() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
 
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
     
     List<Incident> incidents = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).list();
     
@@ -77,7 +78,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     // set job retries to 1 -> should fail again and a second incident should be created
     managementService.setJobRetries(job.getId(), 1);
     
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
     
     incidents = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).list();
     
@@ -90,7 +91,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
   public void testShouldCreateOneIncidentAfterExecuteJob() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
 
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
     
     List<Incident> incidents = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).list();
     
@@ -120,7 +121,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
   public void testShouldCreateOneIncidentForNestedExecution() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcessWithNestedExecutions");
 
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
     
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(incident);
@@ -135,11 +136,12 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNotNull(incident.getId());
     assertNotNull(incident.getIncidentTimestamp());
     assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals("Exception expected.", incident.getIncidentMessage());
     assertEquals(executionIdOfNestedFailingExecution, incident.getExecutionId());
     assertEquals("theServiceTask", incident.getActivityId());
     assertEquals(processInstance.getId(), incident.getProcessInstanceId());
-    assertNull(incident.getCauseIncidentId());
-    assertNull(incident.getRootCauseIncidentId());
+    assertEquals(incident.getId(), incident.getCauseIncidentId());
+    assertEquals(incident.getId(), incident.getRootCauseIncidentId());
     assertEquals(job.getId(), incident.getConfiguration());
   }
 
@@ -148,7 +150,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
   public void testShouldCreateRecursiveIncidents() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callFailingProcess");
 
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
     
     List<Incident> incidents = runtimeService.createIncidentQuery().list();
     assertFalse(incidents.isEmpty());
@@ -156,6 +158,9 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     
     ProcessInstance failingProcess = runtimeService.createProcessInstanceQuery().processDefinitionKey("failingProcess").singleResult();
     assertNotNull(failingProcess);
+    
+    ProcessInstance callProcess = runtimeService.createProcessInstanceQuery().processDefinitionKey("callFailingProcess").singleResult();
+    assertNotNull(callProcess);
     
     // Root cause incident
     Incident causeIncident = runtimeService.createIncidentQuery().processDefinitionId(failingProcess.getProcessDefinitionId()).singleResult();
@@ -167,15 +172,16 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNotNull(causeIncident.getId());
     assertNotNull(causeIncident.getIncidentTimestamp());
     assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, causeIncident.getIncidentType());
+    assertEquals("Exception expected.", causeIncident.getIncidentMessage());
     assertEquals(job.getExecutionId(), causeIncident.getExecutionId());
     assertEquals("theServiceTask", causeIncident.getActivityId());
     assertEquals(failingProcess.getId(), causeIncident.getProcessInstanceId());
-    assertNull(causeIncident.getCauseIncidentId());
-    assertNull(causeIncident.getRootCauseIncidentId());
+    assertEquals(causeIncident.getId(), causeIncident.getCauseIncidentId());
+    assertEquals(causeIncident.getId(), causeIncident.getRootCauseIncidentId());
     assertEquals(job.getId(), causeIncident.getConfiguration());
     
     // Recursive created incident
-    Incident recursiveCreatedIncident = runtimeService.createIncidentQuery().causeIncidentId(causeIncident.getId()).singleResult();
+    Incident recursiveCreatedIncident = runtimeService.createIncidentQuery().processDefinitionId(callProcess.getProcessDefinitionId()).singleResult();
     assertNotNull(recursiveCreatedIncident);
     
     Execution theCallActivityExecution = runtimeService.createExecutionQuery().activityId("theCallActivity").singleResult();
@@ -184,6 +190,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNotNull(recursiveCreatedIncident.getId());
     assertNotNull(recursiveCreatedIncident.getIncidentTimestamp());
     assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, recursiveCreatedIncident.getIncidentType());
+    assertNull(recursiveCreatedIncident.getIncidentMessage());
     assertEquals(theCallActivityExecution.getId(), recursiveCreatedIncident.getExecutionId());
     assertEquals("theCallActivity", recursiveCreatedIncident.getActivityId());
     assertEquals(processInstance.getId(), recursiveCreatedIncident.getProcessInstanceId());
@@ -198,7 +205,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
   public void testShouldCreateRecursiveIncidentsForNestedCallActivity() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callingFailingCallActivity");
 
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
     
     List<Incident> incidents = runtimeService.createIncidentQuery().list();
     assertFalse(incidents.isEmpty());
@@ -217,11 +224,12 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNotNull(rootCauseIncident.getId());
     assertNotNull(rootCauseIncident.getIncidentTimestamp());
     assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, rootCauseIncident.getIncidentType());
+    assertEquals("Exception expected.", rootCauseIncident.getIncidentMessage());
     assertEquals(job.getExecutionId(), rootCauseIncident.getExecutionId());
     assertEquals("theServiceTask", rootCauseIncident.getActivityId());
     assertEquals(failingProcess.getId(), rootCauseIncident.getProcessInstanceId());
-    assertNull(rootCauseIncident.getCauseIncidentId());
-    assertNull(rootCauseIncident.getRootCauseIncidentId());
+    assertEquals(rootCauseIncident.getId(), rootCauseIncident.getCauseIncidentId());
+    assertEquals(rootCauseIncident.getId(), rootCauseIncident.getRootCauseIncidentId());
     assertEquals(job.getId(), rootCauseIncident.getConfiguration());
     
     // Cause Incident
@@ -237,6 +245,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNotNull(causeIncident.getId());
     assertNotNull(causeIncident.getIncidentTimestamp());
     assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, causeIncident.getIncidentType());
+    assertNull(causeIncident.getIncidentMessage());
     assertEquals(theCallActivityExecution.getId(), causeIncident.getExecutionId());
     assertEquals("theCallActivity", causeIncident.getActivityId());
     assertEquals(callFailingProcess.getId(), causeIncident.getProcessInstanceId());
@@ -254,6 +263,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNotNull(topLevelIncident.getId());
     assertNotNull(topLevelIncident.getIncidentTimestamp());
     assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, topLevelIncident.getIncidentType());
+    assertNull(topLevelIncident.getIncidentMessage());
     assertEquals(theCallingCallActivity.getId(), topLevelIncident.getExecutionId());
     assertEquals("theCallingCallActivity", topLevelIncident.getActivityId());
     assertEquals(processInstance.getId(), topLevelIncident.getProcessInstanceId());
@@ -267,7 +277,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     // start failing process
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
 
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
     
     // get the job
     Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -292,7 +302,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     parameters.put("fail", true);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcessWithUserTask", parameters);
     
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
 
     // job exists
     Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -309,7 +319,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     // will be executed successfully
     managementService.setJobRetries(job.getId(), 1);
     
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
     
     // Update process instance
     processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -332,7 +342,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     
     ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 302 * 1000));
     
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
 
     // job exists
     Job job = managementService.createJobQuery().singleResult();

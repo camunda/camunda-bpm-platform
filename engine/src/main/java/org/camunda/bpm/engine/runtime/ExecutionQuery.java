@@ -154,6 +154,16 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
    */
   ExecutionQuery messageEventSubscriptionName(String messageName);
   
+  /**
+   * Only selects executions which are suspended, because their process instance is suspended.
+   */
+  ExecutionQuery suspended();
+  
+  /**
+   * Only selects executions which are active (i.e. not suspended).
+   */
+  ExecutionQuery active();
+  
   //ordering //////////////////////////////////////////////////////////////
   
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */

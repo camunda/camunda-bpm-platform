@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,25 +27,30 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * @author Daniel Meyer
+ * @author Joram Barrez
  */
-public class MessageEventReceivedCmd implements Command<Void> {
+public class MessageEventReceivedCmd implements Command<Void>, Serializable {
   
+  private static final long serialVersionUID = 1L;
+  
+  protected final String executionId;
   protected final Map<String, Object> processVariables;
   protected final String messageName;
-  protected final String executionId;
 
   public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables) {
-    this.messageName = messageName;
     this.executionId = executionId;
+    this.messageName = messageName;
     this.processVariables = processVariables;
   }
 
+  @Override
   public Void execute(CommandContext commandContext) {
+    if(executionId == null) {
+      throw new ProcessEngineException("executionId is null");
+    }
+
     if(messageName == null) {
       throw new ProcessEngineException("messageName cannot be null");
-    }
-    if(executionId == null) {
-      throw new ProcessEngineException("executionId cannot be null");
     }
     
     List<EventSubscriptionEntity> eventSubscriptions = commandContext.getEventSubscriptionManager()

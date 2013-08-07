@@ -53,7 +53,11 @@ public class HistoricProcessInstanceEventEntity extends HistoryEvent {
   // getters / setters ////////////////////////////////////////
 
   public Long getDurationInMillis() {
-    return durationInMillis;
+    if(endTime != null) {      
+      return endTime.getTime() - startTime.getTime();     
+    } else {
+      return durationInMillis;
+    }
   }
 
   public void setDurationInMillis(Long durationInMillis) {
@@ -74,10 +78,6 @@ public class HistoricProcessInstanceEventEntity extends HistoryEvent {
 
   public void setEndTime(Date endTime) {
     this.endTime = endTime;
-    
-    if(startTime != null) {
-      durationInMillis = endTime.getTime() - startTime.getTime();
-    }
   }
 
   public String getEndActivityId() {

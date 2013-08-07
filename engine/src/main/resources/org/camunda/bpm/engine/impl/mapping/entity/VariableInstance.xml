@@ -9,18 +9,18 @@
   <insert id="insertVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
     insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
     values (
-	    #{id, jdbcType=VARCHAR},
-	    1,
-	    #{type, jdbcType=VARCHAR },
-	    #{name, jdbcType=VARCHAR},
+      #{id, jdbcType=VARCHAR},
+      1,
+      #{type, jdbcType=VARCHAR },
+      #{name, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
-	    #{executionId, jdbcType=VARCHAR},
+      #{executionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
-	    #{byteArrayValueId, jdbcType=VARCHAR},
-	    #{doubleValue, jdbcType=DOUBLE},
-	    #{longValue, jdbcType=BIGINT},
-	    #{textValue, jdbcType=VARCHAR},
-	    #{textValue2, jdbcType=VARCHAR}
+      #{byteArrayValueId, jdbcType=VARCHAR},
+      #{doubleValue, jdbcType=DOUBLE},
+      #{longValue, jdbcType=BIGINT},
+      #{textValue, jdbcType=VARCHAR},
+      #{textValue2, jdbcType=VARCHAR}
     )
   </insert>
   
@@ -49,21 +49,22 @@
   <!-- VARIABLE INSTANCE RESULTMAP -->
 
 	<resultMap id="variableInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
-		<id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="revision" column="REV_" jdbcType="INTEGER"/>
-		<result property="type" column="TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
-		<result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-		<result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
-		<result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
-		<result property="isConcurrencyScope" column="IS_CONCURRENCY_SCOPE_" jdbcType="BOOLEAN" />
-		<result property="byteArrayValueId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
-		<result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
-		<result property="textValue" column="TEXT_" jdbcType="VARCHAR"/>
-		<result property="textValue2" column="TEXT2_" jdbcType="VARCHAR"/>
-		<result property="longValue" column="LONG_" jdbcType="BIGINT"/>
+      <id property="id" column="ID_" jdbcType="VARCHAR" />
+      <result property="revision" column="REV_" jdbcType="INTEGER"/>
+      <result property="type" column="TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
+      <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
+      <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+      <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+      <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+      <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+      <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
+      <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
+      <result property="isConcurrencyScope" column="IS_CONCURRENCY_SCOPE_" jdbcType="BOOLEAN" />
+      <result property="byteArrayValueId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
+      <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
+      <result property="textValue" column="TEXT_" jdbcType="VARCHAR"/>
+      <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR"/>
+      <result property="longValue" column="LONG_" jdbcType="BIGINT"/>
 	</resultMap>
 
   <!-- VARIABLE INSTANCE SELECT -->
@@ -82,7 +83,137 @@
     select * from ${prefix}ACT_RU_VARIABLE where
     TASK_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
+  
+  <select id="selectVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.VariableInstanceQueryImpl" resultMap="variableInstanceResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectVariableInstanceByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
 
+  <select id="selectVariableInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.VariableInstanceQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectVariableInstanceByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectVariableInstanceByQueryCriteriaSql">
+    from (
+          select RES.*, EXECUTION.ACT_INST_ID_
+          from ${prefix}ACT_RU_VARIABLE RES 
+          left join ${prefix}ACT_RU_EXECUTION EXECUTION
+          on RES.EXECUTION_ID_ = EXECUTION.ID_
+          <where>
+            <!-- variableName -->
+            <if test="variableName != null">
+              RES.NAME_ = #{variableName}
+            </if>
+            
+            <!-- variableNameLike -->
+            <if test="variableNameLike != null">
+              and RES.NAME_ like #{variableNameLike}
+            </if>
+            
+            <!-- executionIds -->
+            <if test="executionIds != null &amp;&amp; executionIds.length > 0">
+              and RES.EXECUTION_ID_ in
+              <foreach item="item" index="index" collection="executionIds"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+            
+            <!-- processInstanceIds -->
+            <if test="processInstanceIds != null &amp;&amp; processInstanceIds.length > 0">
+              and RES.PROC_INST_ID_ in
+              <foreach item="item" index="index" collection="processInstanceIds"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+            
+            <!-- taskIds -->
+            <if test="taskIds != null &amp;&amp; taskIds.length > 0">
+              and RES.TASK_ID_ in
+              <foreach item="item" index="index" collection="taskIds"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+            
+            <!-- activityInstanceIds -->
+            <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
+              and EXECUTION.ACT_INST_ID_ in
+              <foreach item="item" index="index" collection="activityInstanceIds"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+            
+            <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance & Execution, the same query object is used there! -->
+            <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+              and RES.NAME_= #{queryVariableValue.name}
+              <if test="!queryVariableValue.type.equals('null')">
+              <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                and RES.TYPE_ = #{queryVariableValue.type}
+              </if>
+              <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                and RES.TEXT_
+                <choose>
+                  <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                  <otherwise><include refid="executionVariableOperator" /></otherwise>
+                </choose>
+                #{queryVariableValue.textValue}
+              </if>
+              <if test="queryVariableValue.textValue2 != null">
+                and RES.TEXT2_
+                <choose>
+                  <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                  <otherwise><include refid="executionVariableOperator" /></otherwise>
+                </choose>
+                #{queryVariableValue.textValue2}
+              </if>
+              <if test="queryVariableValue.longValue != null">
+                and RES.LONG_
+                <include refid="executionVariableOperator" />
+                #{queryVariableValue.longValue}
+              </if>
+              <if test="queryVariableValue.doubleValue != null">
+                and RES.DOUBLE_
+                <include refid="executionVariableOperator" />
+                #{queryVariableValue.doubleValue}
+              </if>
+              <!-- Null variable type -->
+              <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                <choose>
+                <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+                  and (RES.TEXT_ is not null or RES.TEXT2_ is not null or RES.LONG_ is not null or RES.DOUBLE_ is not null or RES.BYTEARRAY_ID_ is not null)
+                </when>
+                <otherwise>
+                  and RES.TEXT_ is null and RES.TEXT2_ is null and RES.LONG_ is null and RES.DOUBLE_ is null and RES.BYTEARRAY_ID_ is null
+                </otherwise>
+              </choose>
+              </if>
+            </foreach>
+            
+            <!-- Add this hook to prevent loading of byte arrays -->
+            and RES.TYPE_ != 'bytes'
+            
+          </where>
+    ) RES
+  </sql>
+  
+  <sql id="executionVariableOperator">
+    <choose>
+      <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
+      <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
+      <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
+      <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
+      <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
+      <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+   </choose>
+  </sql>
+  
   <!-- BYTE ARRAY INSERT -->
 
   <insert id="insertByteArray" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">

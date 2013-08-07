@@ -1,9 +1,14 @@
 package org.camunda.bpm.tasklist.test;
 
+
 import org.camunda.bpm.TestProperties;
+import org.camunda.bpm.util.SeleniumScreenshotRule;
+import org.camunda.bpm.util.TestUtil;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Rule;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -11,25 +16,33 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+
 /**
  * @author drobisch
  */
 public class TasklistIT {
-  WebDriver driver;
-  private String appUrl;
+
+  protected static WebDriver driver = new FirefoxDriver();
+  protected String appUrl;
+
+  protected TestProperties testProperties;
+  private TestUtil testUtil;
+
+  @Rule
+  public SeleniumScreenshotRule screenshotRule = new SeleniumScreenshotRule(driver);
 
   @Before
   public void before() throws Exception {
-
-    TestProperties testProperties = new TestProperties(48080);
-
-    appUrl = testProperties.getApplicationPath("/tasklist");
-    driver = new FirefoxDriver();
+    testProperties = new TestProperties(48080);
+    appUrl = testProperties.getApplicationPath("/camunda/app/tasklist");
+    
+    testUtil = new TestUtil(testProperties);
+    testUtil.createInitialUser("admin", "admin", "Mr.", "Admin");
   }
 
   @Test
-  public void testLogin() throws InterruptedException {
-    driver.get(appUrl+"/app/#/login");
+  public void testLogin() {
+    driver.get(appUrl + "/#/login");
 
     WebDriverWait wait = new WebDriverWait(driver, 10);
 
@@ -39,14 +52,20 @@ public class TasklistIT {
     WebElement password= wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type=\"password\"]")));
     password.sendKeys("demo");
 
-    WebElement submit = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".form-signin")));
+    WebElement submit = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("button[type=\"submit\"]")));
     submit.submit();
 
-    wait.until(ExpectedConditions.textToBePresentInElement(By.cssSelector("td"), "Assign Approver"));
+    boolean found = wait.until(ExpectedConditions.textToBePresentInElement(By.cssSelector("td"), "Assign Approver"));
   }
 
   @After
   public void after() {
+    testUtil.deleteUser("admin");
+    testUtil.destroy();
+  }
+
+  @AfterClass
+  public static void cleanup() {
     driver.close();
   }
 }

@@ -17,10 +17,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -42,7 +43,6 @@ import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessElement;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.ExecutionListenerExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
@@ -54,7 +54,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 import org.camunda.bpm.engine.impl.pvm.runtime.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.OutgoingExecution;
-import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
+import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -112,7 +112,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   /** the unique id of the current activity instance */
   protected String activityInstanceId;
   
-  protected ExecutionStartContext executionStartContext;
+  protected ProcessInstanceStartContext processInstanceStartContext;
       
   // state/type of execution ////////////////////////////////////////////////// 
   
@@ -225,10 +225,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   protected boolean forcedUpdate;
 
   public ExecutionEntity() {
+    
   }
   
   public ExecutionEntity(ActivityImpl activityImpl) {
-    this.executionStartContext = new ExecutionStartContext(activityImpl);
+    this.processInstanceStartContext = new HistoryAwareStartContext(activityImpl);
   }
 
   /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */  
@@ -354,22 +355,26 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
    
   public void start(Map<String, Object> variables) {
-    if(executionStartContext == null && isProcessInstance()) {
-      executionStartContext = new ExecutionStartContext(processDefinition.getInitial());
+    if(isProcessInstance()) {
+      if(processInstanceStartContext == null) {
+        processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
+      }
     }
-    executionStartContext.setVariables(variables);
+    if(variables != null) {
+      setVariables(variables);
+    }
     performOperation(AtomicOperation.PROCESS_START);
   }
   
    public void startWithFormProperties(Map<String, String> properties) {
      if(isProcessInstance()) {
        ActivityImpl initial = processDefinition.getInitial();
-       if(executionStartContext != null) {
-         initial = executionStartContext.getInitial();
+       if(processInstanceStartContext != null) {
+         initial = processInstanceStartContext.getInitial();
        }
        FormPropertyStartContext formPropertyStartContext = new FormPropertyStartContext(initial);
        formPropertyStartContext.setFormProperties(properties);
-       executionStartContext = formPropertyStartContext;
+       processInstanceStartContext = formPropertyStartContext;
      } 
      performOperation(AtomicOperation.PROCESS_START);
    }
@@ -543,6 +548,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         outgoingExecutions.add(new OutgoingExecution(outgoingExecution, outgoingTransition, true));
       }
       
+      concurrentRoot.setActivityInstanceId(concurrentRoot.getParentActivityInstanceId());
+
       // prune the executions that are not recycled 
       for (ActivityExecution prunedExecution: recyclableExecutions) {
         log.fine("pruning execution "+prunedExecution);
@@ -582,9 +589,35 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   protected void performOperationSync(AtomicOperation executionOperation) {
+    if (requiresUnsuspendedExecution(executionOperation)) {
+      ensureNotSuspended();
+    }
+    
     Context
       .getCommandContext()
       .performOperation(executionOperation, this);
+  }
+  
+  protected void ensureNotSuspended() {
+    if (isSuspended()) {
+      throw new SuspendedEntityInteractionException("Execution " + id + " is suspended.");
+    }
+  }
+
+  protected boolean requiresUnsuspendedExecution(
+      AtomicOperation executionOperation) {
+    if (executionOperation != AtomicOperation.TRANSITION_NOTIFY_LISTENER_END
+        && executionOperation != AtomicOperation.TRANSITION_DESTROY_SCOPE
+        && executionOperation != AtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE
+        && executionOperation != AtomicOperation.TRANSITION_NOTIFY_LISTENER_END
+        && executionOperation != AtomicOperation.TRANSITION_CREATE_SCOPE
+        && executionOperation != AtomicOperation.TRANSITION_NOTIFY_LISTENER_START
+        && executionOperation != AtomicOperation.DELETE_CASCADE
+        && executionOperation != AtomicOperation.DELETE_CASCADE_FIRE_ACTIVITY_END) {
+      return true;
+    }
+    
+    return false;
   }
 
   protected void scheduleAtomicOperationAsync(AtomicOperation executionOperation) {
@@ -755,7 +788,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
 
   public void setActivity(ActivityImpl activity) {
-  
     this.activity = activity;
     if (activity != null) {
       this.activityId = activity.getId();
@@ -772,8 +804,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     ActivityImpl activity = getActivity();
     
     // special treatment for starting process instance
-    if(activity == null && executionStartContext!= null) {
-      activity = executionStartContext.getInitial();
+    if(activity == null && processInstanceStartContext!= null) {
+      activity = processInstanceStartContext.getInitial();
     }
     
     activityInstanceId = generateActivityInstanceId(activity.getId());
@@ -1132,10 +1164,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
     
     // TODO: fire UPDATE activity instance events with new execution?
-        
-    // set replaced by activity to our activity id
-    replacedBy.setActivityInstanceId(activityInstanceId);
-    
+            
     // set replaced by activity to our activity id
     replacedBy.setActivityInstanceId(activityInstanceId);    
   }
@@ -1164,6 +1193,27 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   /** used to calculate the sourceActivityExecution for method {@link #updateActivityInstanceIdInHistoricVariableUpdate(HistoricDetailVariableInstanceUpdateEntity, ExecutionEntity)} */
   protected ExecutionEntity getSourceActivityExecution() {
     return (activityId!=null ? this : null);
+  }
+  
+  protected boolean isAutoFireHistoryEvents() {
+    // as long as the process instance is starting (ie. before activity instance of 
+    // the selected initial (start event) is created), the variable scope should not 
+    // automatic fire history events for variable updates. 
+    
+    // firing the events is triggered by the processInstanceStart context after the initial activity
+    // has been initialized. The effect is that the activity instance id of the historic variable instances
+    // will be the activity instance id of the start event.
+    
+    return processInstanceStartContext == null;
+  }
+  
+  public void fireHistoricVariableInstanceCreateEvents() {
+    // this method is called by the start context and batch-fires create events for all variable instances
+    if(variableInstances != null) {
+      for (Entry<String, VariableInstanceEntity> variable : variableInstances.entrySet()) {
+        fireHistoricVariableInstanceCreate(variable.getValue(), this);
+      }    
+    }
   }
 
   // persistent state /////////////////////////////////////////////////////////
@@ -1375,10 +1425,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   public void removeTask(TaskEntity task) {
     getTasksInternal().remove(task);
   }
-    
 
   // getters and setters //////////////////////////////////////////////////////
-  
   
   public void setCachedEntityState(int cachedEntityState) {
     this.cachedEntityState = cachedEntityState;
@@ -1398,7 +1446,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       incidents = new ArrayList<IncidentEntity>();
     }
   }
-    
+
   public int getCachedEntityState() {
     cachedEntityState = 0;
     
@@ -1512,12 +1560,12 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     this.isEventScope = isEventScope;
   }
   
-  public ExecutionStartContext getExecutionStartContext() {
-    return executionStartContext;
+  public ProcessInstanceStartContext getProcessInstanceStartContext() {
+    return processInstanceStartContext;
   }
   
-  public void disposeStartingExecution() {
-    executionStartContext = null;
+  public void disposeProcessInstanceStartContext() {
+    processInstanceStartContext = null;
   }
   
   public String getCurrentActivityId() {
@@ -1527,5 +1575,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   public String getCurrentActivityName() {
     return activityName;
   }
+  
   
 }

@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cockpit.base">
+
+  <resultMap id="processInstanceMap" type="org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
+    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP"/>
+    <collection property="incidents" javaType="java.util.ArrayList" ofType="org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentStatisticsDto">
+      <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
+      <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
+    </collection>
+  </resultMap>
+
+  <resultMap id="calledProcessInstanceMap" type="org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="SUPER_PROC_DEF_ID_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionKey" column="KEY_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="callActivityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR"/>
+    <result property="callActivityId" column="ACT_ID_" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <select id="selectRunningProcessInstancesCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
+          resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectProcessInstances" />
+
+  </select>
+
+  <select id="selectRunningProcessInstancesIncludingIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
+          resultMap="processInstanceMap">
+    select
+      INSTANCE.ID_,
+      INSTANCE.BUSINESS_KEY_,
+      INSTANCE.START_TIME_,
+      INCIDENT.INCIDENT_TYPE_,
+      INCIDENT.INCIDENT_COUNT_
+    from
+      (
+        <!-- This statement selects all process instances to an assigned process definition id (by using pagination!).-->
+        ${limitBefore}
+        select RES.* ${limitBetween},
+        <if test="historyEnabled">
+        HISTORY.START_TIME_
+        </if>
+        <if test="!historyEnabled">
+        null START_TIME_
+        </if>
+        <include refid="selectProcessInstances"/>
+        ${orderBy}
+        ${limitAfter}
+      ) INSTANCE
+    <!-- The set of process instances will be (left) joined with a set of incidents. -->
+    left join
+      (
+        <!-- to avoid to have a list of incidents with only one item which type is null and count is zero an extra subselect is needed -->
+        <!-- this subselect selects all incidents to the assigned process definition id -->
+        select
+          INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_, count(INCIDENT.ID_) INCIDENT_COUNT_
+        from
+          ACT_RU_INCIDENT INCIDENT
+        <if test="processDefinitionId != null">
+        where
+          INCIDENT.PROC_DEF_ID_ = #{processDefinitionId}
+        </if>
+        group by
+          INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_
+      ) INCIDENT
+    on
+      INSTANCE.ID_ = INCIDENT.PROC_INST_ID_
+  </select>
+
+  <sql id="selectProcessInstances">
+    from
+      ${prefix}ACT_RU_EXECUTION RES
+    <if test="historyEnabled">
+    left join
+      ${prefix}ACT_HI_PROCINST HISTORY
+    ON
+      RES.ID_ = HISTORY.PROC_INST_ID_
+    </if>
+    <where>
+      RES.ID_ = RES.PROC_INST_ID_
+
+      <!-- processDefinitionId -->
+      <if test="processDefinitionId != null">
+      and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+
+      <!-- businessKey -->
+      <if test="businessKey != null">
+      and RES.BUSINESS_KEY_ = #{businessKey}
+      </if>
+
+      <!-- activityIds -->
+      <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
+      and EXISTS (
+        select
+          PROC_INST_ID_
+        from
+          ${prefix}ACT_RU_EXECUTION
+        where
+          RES.ID_ = PROC_INST_ID_
+          and
+          <foreach item="item" index="index" collection="activityIdIn"
+                   open="(" separator="OR" close=")">
+            ACT_ID_ = #{item}
+          </foreach>
+          <if test="processDefinitionId != null">
+          and PROC_DEF_ID_ = #{processDefinitionId}
+          </if>
+      )
+      </if>
+
+      <!-- parentProcessDefinitionId -->
+      <if test="parentProcessDefinitionId != null">
+      and EXISTS (
+        select
+          ID_
+        from
+          ${prefix}ACT_RU_EXECUTION
+        where
+          PROC_DEF_ID_ = #{parentProcessDefinitionId}
+          and RES.SUPER_EXEC_ = ID_
+      )
+      </if>
+
+      <!-- queryVariables -->
+      <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
+      <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+      and EXISTS (
+        select
+          ID_
+        from
+          ${prefix}ACT_RU_VARIABLE
+        where
+          RES.PROC_INST_ID_ = PROC_INST_ID_
+
+          and NAME_= #{queryVariableValue.name}
+
+        <if test="!queryVariableValue.type.equals('null')">
+        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+          and TYPE_ = #{queryVariableValue.type}
+        </if>
+        <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+          and TEXT_
+        <choose>
+          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+          <otherwise><include refid="executionVariableOperator" /></otherwise>
+        </choose>
+          #{queryVariableValue.textValue}
+        </if>
+        <if test="queryVariableValue.textValue2 != null">
+          and TEXT2_
+        <choose>
+          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+          <otherwise><include refid="executionVariableOperator" /></otherwise>
+        </choose>
+          #{queryVariableValue.textValue2}
+        </if>
+        <if test="queryVariableValue.longValue != null">
+          and LONG_
+        <include refid="executionVariableOperator" />
+        #{queryVariableValue.longValue}
+        </if>
+        <if test="queryVariableValue.doubleValue != null">
+        and DOUBLE_
+        <include refid="executionVariableOperator" />
+        #{queryVariableValue.doubleValue}
+        </if>
+        <!-- Null variable type -->
+        <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+          <choose>
+          <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+            and (TEXT_ is not null or TEXT2_ is not null or LONG_ is not null or DOUBLE_ is not null or BYTEARRAY_ID_ is not null)
+          </when>
+          <otherwise>
+        and TEXT_ is null and TEXT2_ is null and LONG_ is null and DOUBLE_ is null and BYTEARRAY_ID_ is null
+          </otherwise>
+        </choose>
+        </if>
+      )
+      </foreach>
+    </where>
+  </sql>
+
+  <select id="selectCalledProcessInstances" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
+          resultMap="calledProcessInstanceMap">
+    select RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_
+    <include refid="selectCalledProcessInstancesByCriteria" />
+    ${orderBy}
+  </select>
+
+  <sql id="selectCalledProcessInstancesByCriteria">
+    from
+      ${prefix}ACT_RU_EXECUTION RES
+    inner join
+      ${prefix}ACT_RU_EXECUTION EXEC1
+    on
+      RES.SUPER_EXEC_ = EXEC1.ID_
+    inner join
+      ${prefix}ACT_RE_PROCDEF PROC_
+    on
+      RES.PROC_DEF_ID_ = PROC_.ID_
+    <where>
+      <!-- parentProcessInstanceId -->
+      <if test="parentProcessInstanceId != null">
+      EXEC1.PROC_INST_ID_ = #{parentProcessInstanceId}
+      </if>
+
+      <!-- activityInstanceIds -->
+      <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
+      and
+      <foreach item="item" index="index" collection="activityInstanceIdIn"
+               open="(" separator="or" close=")">
+        EXEC1.ACT_INST_ID_ = #{item}
+      </foreach>
+      </if>
+    </where>
+  </sql>
+
+  <sql id="executionVariableOperator">
+    <choose>
+   	  <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
+   	  <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
+   	  <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
+   	  <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
+   	  <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
+   	  <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+   </choose>
+  </sql>
+</mapper>

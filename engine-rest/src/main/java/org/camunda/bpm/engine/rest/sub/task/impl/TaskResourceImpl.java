@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
+import java.text.ParseException;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -28,6 +29,7 @@ import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
+import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.task.Task;
 
@@ -57,8 +59,22 @@ public class TaskResourceImpl implements TaskResource {
   public void complete(CompleteTaskDto dto) {
     TaskService taskService = engine.getTaskService();
 
-    Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
-    taskService.complete(taskId, variables);
+    try {
+      Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
+      taskService.complete(taskId, variables);
+      
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot complete task %s due to number format exception: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot complete task %s due to parse exception: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
+    
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot complete task %s: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);  
+    }
   }
 
   @Override
@@ -70,7 +86,7 @@ public class TaskResourceImpl implements TaskResource {
   public TaskDto getTask() {
     Task task = getTaskById(taskId);
     if (task == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "No task id supplied");
+      throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
     }
     
     return TaskDto.fromTask(task);
@@ -79,22 +95,44 @@ public class TaskResourceImpl implements TaskResource {
   @Override
   public FormDto getForm() {
     FormService formService = engine.getFormService();
-
+    Task task = getTaskById(taskId);
     FormData formData;
     try {
       formData = formService.getTaskFormData(taskId);
     } catch (ProcessEngineException e) {
       throw new RestException(Status.BAD_REQUEST, e, "Cannot get form for task " + taskId);
     }
+
+    FormDto dto = FormDto.fromFormData(formData);
+    String processDefinitionId = task.getProcessDefinitionId();
+    if (processDefinitionId != null) {
+      dto.setContextPath(ApplicationContextPathUtil.getApplicationPath(engine, task.getProcessDefinitionId()));
+    }
     
-    return FormDto.fromFormData(formData);
+    return dto;
   }
 
   @Override
   public void resolve(CompleteTaskDto dto) {
     TaskService taskService = engine.getTaskService();
-    Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
-    taskService.resolveTask(taskId, variables);
+    
+    try {
+      Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
+      taskService.resolveTask(taskId, variables);
+      
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot resolve task %s due to number format exception: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot resolve task %s due to parse exception: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
+    
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot resolve task %s: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);  
+    }
+    
   }
   
 
@@ -104,7 +142,7 @@ public class TaskResourceImpl implements TaskResource {
    * @param id
    * @return
    */
-  private Task getTaskById(String id) {
+  protected Task getTaskById(String id) {
     return engine.getTaskService().createTaskQuery().taskId(id).singleResult();
   }
 }

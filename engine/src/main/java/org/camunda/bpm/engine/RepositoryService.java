@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.task.IdentityLink;
  * @author Tom Baeyens
  * @author Falko Menge
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public interface RepositoryService {
 
@@ -82,22 +84,63 @@ public interface RepositoryService {
   /**
    * Suspends the process definition with the given id. 
    * 
-   * If a process definition is in state suspended, activiti will not 
-   * execute jobs (timers, messages) associated with any process instance of the given definition.
+   * If a process definition is in state suspended, it will not be possible to start new process instances
+   * based on the process definition.
    * 
-   *  @throws ProcessEngineException if no such processDefinition can be found or if the process definition is already in state suspended.
+   * <strong>Note: all the process instances of the process definition will still be active 
+   * (ie. not suspended)!</strong>
+   * 
+   *  @throws ProcessEngineException if no such processDefinition can be found.
    */
   void suspendProcessDefinitionById(String processDefinitionId);
+
+  /**
+   * Suspends the process definition with the given id. 
+   * 
+   * If a process definition is in state suspended, it will not be possible to start new process instances
+   * based on the process definition.
+   * 
+   * @param suspendProcessInstances If true, all the process instances of the provided process definition
+   *                                will be suspended too.
+   * @param suspensionDate The date on which the process definition will be suspended. If null, the 
+   *                       process definition is suspended immediately. 
+   *                       Note: The job executor needs to be active to use this!                                
+   * 
+   * @throws ProcessEngineException if no such processDefinition can be found.
+   * 
+   * @see RuntimeService#suspendProcessInstanceById(String)
+   */
+  void suspendProcessDefinitionById(String processDefinitionId, boolean suspendProcessInstances, Date suspensionDate);
   
   /**
-   * Suspends the process definition with the given key (=id in the bpmn20.xml file). 
+   * Suspends the <strong>all</strong> process definitions with the given key (= id in the bpmn20.xml file). 
    * 
-   * If a process definition is in state suspended, activiti will not 
-   * execute jobs (timers, messages) associated with any process instance of the given definition.
+   * If a process definition is in state suspended, it will not be possible to start new process instances
+   * based on the process definition.
    * 
-   * @throws ProcessEngineException if no such processDefinition can be found or if the process definition is already in state suspended.
+   * <strong>Note: all the process instances of the process definition will still be active 
+   * (ie. not suspended)!</strong>
+   * 
+   *  @throws ProcessEngineException if no such processDefinition can be found.
    */
   void suspendProcessDefinitionByKey(String processDefinitionKey);
+  
+  /**
+   * Suspends the <strong>all</strong> process definitions with the given key (= id in the bpmn20.xml file). 
+   * 
+   * If a process definition is in state suspended, it will not be possible to start new process instances
+   * based on the process definition.
+   * 
+   * @param suspendProcessInstances If true, all the process instances of the provided process definition
+   *                                will be suspended too.
+   * @param suspensionDate The date on which the process definition will be suspended. If null, the 
+   *                       process definition is suspended immediately. 
+   *                       Note: The job executor needs to be active to use this!   
+   * @throws ProcessEngineException if no such processDefinition can be found.
+   * 
+   * @see RuntimeService#suspendProcessInstanceById(String)
+   */
+  void suspendProcessDefinitionByKey(String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate);
   
   /**
    * Activates the process definition with the given id. 
@@ -107,11 +150,41 @@ public interface RepositoryService {
   void activateProcessDefinitionById(String processDefinitionId);
   
   /**
+   * Activates the process definition with the given id. 
+   * 
+   * @param suspendProcessInstances If true, all the process instances of the provided process definition
+   *                                will be activated too.
+   * @param activationDate The date on which the process definition will be activated. If null, the 
+   *                       process definition is suspended immediately. 
+   *                       Note: The job executor needs to be active to use this!                                 
+   *                                
+   * @throws ProcessEngineException if no such processDefinition can be found.
+   * 
+   * @see RuntimeService#activateProcessInstanceById(String)
+   */
+  void activateProcessDefinitionById(String processDefinitionId, boolean activateProcessInstances, Date activationDate);
+  
+  /**
    * Activates the process definition with the given key (=id in the bpmn20.xml file). 
    * 
-   * @throws ProcessEngineException if no such processDefinition can be found or if the process definition is already in state active.
+   * @throws ProcessEngineException if no such processDefinition can be found.
    */
   void activateProcessDefinitionByKey(String processDefinitionKey);
+  
+  /**
+   * Activates the process definition with the given key (=id in the bpmn20.xml file). 
+   * 
+   * @param suspendProcessInstances If true, all the process instances of the provided process definition
+   *                                will be activated too.
+   * @param activationDate The date on which the process definition will be activated. If null, the 
+   *                       process definition is suspended immediately. 
+   *                       Note: The job executor needs to be active to use this!                                 
+   *                                
+   * @throws ProcessEngineException if no such processDefinition can be found.
+   * 
+   * @see RuntimeService#activateProcessInstanceById(String)
+   */
+  void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances,  Date activationDate);
 
   /**
    * Gives access to a deployed process model, e.g., a BPMN 2.0 XML file,

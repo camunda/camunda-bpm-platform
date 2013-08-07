@@ -13,19 +13,50 @@
 
 package org.camunda.bpm.engine.impl.identity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
+ * <p>Allows to expose the id of the currently authenticated user and his 
+ * groups to the process engine.</p>
+ * 
+ * <p>The current authentication is managed using a Thread Local. The value can 
+ * be set using {@link #setCurrentAuthentication(String, List)},  
+ * retrieved using {@link #getCurrentAuthentication()} and cleared 
+ * using {@link #clearCurrentAuthentication()}.</p>
+ * 
+ * <p>Users typically do not use this class directly but rather use 
+ * the corresponding Service API methods:
+ * <ul>
+ * <li></li> 
+ * </ul>
+ * </p>
+ * 
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
-public abstract class Authentication {
-
-  static ThreadLocal<String> authenticatedUserIdThreadLocal = new ThreadLocal<String>();
+public class Authentication {
   
-  public static void setAuthenticatedUserId(String authenticatedUserId) {
-    authenticatedUserIdThreadLocal.set(authenticatedUserId);
+  protected String authenticatedUserId;
+  protected List<String> authenticatedGroupIds;
+  
+  public Authentication() {    
   }
 
-  public static String getAuthenticatedUserId() {
-    return authenticatedUserIdThreadLocal.get();
+  public Authentication(String authenticatedUserId, List<String> groupIds) {
+    this.authenticatedUserId = authenticatedUserId;
+    if(groupIds != null) {
+      this.authenticatedGroupIds = new ArrayList<String>(groupIds);
+    } 
   }
+  
+  public List<String> getGroupIds() {
+    return authenticatedGroupIds;
+  }
+ 
+  public String getUserId() {
+    return authenticatedUserId;
+  }
+  
 }

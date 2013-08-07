@@ -19,9 +19,11 @@ import java.util.Date;
  * @author Tom Baeyens
  */
 public class DateType implements VariableType {
+  
+  public static final String TYPE_NAME = "date";
 
   public String getTypeName() {
-    return "date";
+    return TYPE_NAME;
   }
 
   public boolean isCachable() {
@@ -49,5 +51,9 @@ public class DateType implements VariableType {
     } else {
       valueFields.setLongValue(null);
     }
+  }
+  
+  public String getTypeNameForValue(Object value) {
+    return value.getClass().getSimpleName();
   }
 }

@@ -14,14 +14,18 @@ package org.camunda.bpm.engine.impl.variable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
  * @author Tom Baeyens
@@ -29,8 +33,6 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 public class SerializableType extends ByteArrayType {
 
   public static final String TYPE_NAME = "serializable";
-  
-  private static final long serialVersionUID = 1L;
   
   public String getTypeName() {
     return TYPE_NAME;
@@ -45,7 +47,7 @@ public class SerializableType extends ByteArrayType {
     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
     Object deserializedObject;
     try {
-      ObjectInputStream ois = new ObjectInputStream(bais);
+      ObjectInputStream ois = new ClassloaderAwareObjectInputStream(bais);
       deserializedObject = ois.readObject();
       valueFields.setCachedValue(deserializedObject);
       
@@ -99,5 +101,21 @@ public class SerializableType extends ByteArrayType {
   
   public boolean isAbleToStore(Object value) {
     return value instanceof Serializable;
+  }
+
+  public String getTypeNameForValue(Object value) {
+    return "Serializable";
+  }
+  
+  protected static class ClassloaderAwareObjectInputStream extends ObjectInputStream {
+
+    public ClassloaderAwareObjectInputStream(InputStream in) throws IOException {
+      super(in);
+    }
+    
+    protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+      return ReflectUtil.loadClass(desc.getName());
+    }
+    
   }
 }

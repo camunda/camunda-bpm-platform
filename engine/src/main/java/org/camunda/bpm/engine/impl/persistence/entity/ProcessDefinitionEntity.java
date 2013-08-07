@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -29,7 +31,6 @@ import org.camunda.bpm.engine.impl.form.StartFormHandler;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
-import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
@@ -68,7 +69,15 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     super(null);
   }
   
+  protected void ensureNotSuspended() {
+    if (isSuspended()) {
+      throw new SuspendedEntityInteractionException("Process definition " + id + " is suspended.");
+    }
+  }
+  
   public ExecutionEntity createProcessInstance(String businessKey, ActivityImpl initial) {
+    ensureNotSuspended();
+    
     ExecutionEntity processInstance = null;
   
     if(initial == null) {
@@ -90,7 +99,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     
     String initiatorVariableName = (String) getProperty(BpmnParse.PROPERTYNAME_INITIATOR_VARIABLE_NAME);
     if (initiatorVariableName!=null) {
-      String authenticatedUserId = Authentication.getAuthenticatedUserId();
+      String authenticatedUserId = Context.getCommandContext().getAuthenticatedUserId();
       processInstance.setVariable(initiatorVariableName, authenticatedUserId);
     }
     
@@ -164,6 +173,21 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
   public String toString() {
     return "ProcessDefinitionEntity["+id+"]";
+  }
+  
+  /**
+   * Updates all modifiable fields from another process definition entity.
+   * @param updatingProcessDefinition
+   */
+  public void updateModifiedFieldsFromEntity(ProcessDefinitionEntity updatingProcessDefinition) {
+    if (!this.key.equals(updatingProcessDefinition.key) || !this.deploymentId.equals(updatingProcessDefinition.deploymentId)) {
+      throw new ProcessEngineException("Cannot update entity from an unrelated process definition");
+    }
+    
+    // TODO: add a guard once the mismatch between revisions in deployment cache and database has been resolved
+    this.revision = updatingProcessDefinition.revision;
+    this.suspensionState = updatingProcessDefinition.suspensionState;
+    
   }
 
 

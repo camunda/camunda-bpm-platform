@@ -1,0 +1,9 @@
+language: java
+script: "mvn clean install -Pengine-integration,jboss,h2 -B -q"
+jdk:
+  - oraclejdk7
+notifications:
+  email: false
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"

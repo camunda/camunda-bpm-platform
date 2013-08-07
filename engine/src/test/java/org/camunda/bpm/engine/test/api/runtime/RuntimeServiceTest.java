@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.rules.ExpectedException;
 
 
 /**
@@ -117,28 +116,9 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testNonUniqueBusinessKey() {
+  public void testDuplicateBusinessKeyAllowed() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
-    try {
-      runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
-      fail("Non-unique business key used, this should fail");
-    } catch(Exception e) {
-      
-    }
-  }
-  
-  // some databases might react strange on having mutiple times null for the business key
-  // when the unique constraint is {processDefinitionId, businessKey}
-  @Deployment(resources={
-    "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testMultipleNullBusinessKeys() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    assertNull(processInstance.getBusinessKey());
-    
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    
-    assertEquals(3, runtimeService.createProcessInstanceQuery().count());
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
   }
 
   
@@ -817,7 +797,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
      fail("exeception expected");
    }catch (ProcessEngineException e) {
      // this is good
-     assertTrue(e.getMessage().contains("Execution 'nonexistingExecution' has not subscribed to a signal event with name 'alert'"));
+     assertTrue(e.getMessage().contains("Cannot find execution with id 'nonexistingExecution'"));
    }
   }
  

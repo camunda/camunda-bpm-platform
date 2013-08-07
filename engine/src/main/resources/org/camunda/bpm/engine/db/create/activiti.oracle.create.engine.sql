@@ -66,6 +66,7 @@ create table ACT_RU_JOB (
     REPEAT_ NVARCHAR2(255),
     HANDLER_TYPE_ NVARCHAR2(255),
     HANDLER_CFG_ NVARCHAR2(2000),
+    DEPLOYMENT_ID_ NVARCHAR2(64),
     primary key (ID_)
 );
 
@@ -100,6 +101,7 @@ create table ACT_RU_TASK (
     PRIORITY_ INTEGER,
     CREATE_TIME_ TIMESTAMP(6),
     DUE_DATE_ TIMESTAMP(6),
+    SUSPENSION_STATE_ INTEGER,
     primary key (ID_)
 );
 
@@ -146,6 +148,7 @@ create table ACT_RU_EVENT_SUBSCR (
 create table ACT_RU_INCIDENT (
   ID_ NVARCHAR2(64) not null,
   INCIDENT_TIMESTAMP_ TIMESTAMP(6) not null,
+  INCIDENT_MSG_ NVARCHAR2(2000),
   INCIDENT_TYPE_ NVARCHAR2(255) not null,
   EXECUTION_ID_ NVARCHAR2(64),
   ACTIVITY_ID_ NVARCHAR2(255),
@@ -154,6 +157,18 @@ create table ACT_RU_INCIDENT (
   CAUSE_INCIDENT_ID_ NVARCHAR2(64),
   ROOT_CAUSE_INCIDENT_ID_ NVARCHAR2(64),
   CONFIGURATION_ NVARCHAR2(255),
+  primary key (ID_)
+);
+
+create table ACT_RU_AUTHORIZATION (
+  ID_ varchar(64) not null,
+  REV_ integer not null,
+  TYPE_ integer not null,
+  GROUP_ID_ varchar(255),
+  USER_ID_ varchar(255),
+  RESOURCE_TYPE_ integer not null,
+  RESOURCE_ID_ varchar(64),
+  PERMS_ integer,
   primary key (ID_)
 );
 
@@ -285,6 +300,15 @@ alter table ACT_RU_INCIDENT
     references ACT_RU_INCIDENT (ID_);   
     
 -- see http://stackoverflow.com/questions/675398/how-can-i-constrain-multiple-columns-to-prevent-duplicates-but-ignore-null-value
-create unique index ACT_UNIQ_RU_BUS_KEY on ACT_RU_EXECUTION
-   (case when BUSINESS_KEY_ is null then null else PROC_DEF_ID_ end,
-    case when BUSINESS_KEY_ is null then null else BUSINESS_KEY_ end);
+create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION
+   (case when USER_ID_ is null then null else TYPE_ end,
+    case when USER_ID_ is null then null else RESOURCE_TYPE_ end,
+    case when USER_ID_ is null then null else RESOURCE_ID_ end,
+    case when USER_ID_ is null then null else USER_ID_ end);
+
+create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION
+   (case when GROUP_ID_ is null then null else TYPE_ end,
+    case when GROUP_ID_ is null then null else RESOURCE_TYPE_ end,
+    case when GROUP_ID_ is null then null else RESOURCE_ID_ end,
+    case when GROUP_ID_ is null then null else GROUP_ID_ end);
+    

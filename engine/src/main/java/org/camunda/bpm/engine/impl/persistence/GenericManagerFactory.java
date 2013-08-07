@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.persistence;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 
 /**
@@ -27,6 +28,11 @@ public class GenericManagerFactory implements SessionFactory {
   
   public GenericManagerFactory(Class< ? extends Session> managerImplementation) {
     this.managerImplementation = managerImplementation;
+  }
+  
+  @SuppressWarnings("unchecked")
+  public GenericManagerFactory(String classname) {
+    managerImplementation = (Class<? extends Session>) ReflectUtil.loadClass(classname);    
   }
 
   public Class< ? > getSessionType() {

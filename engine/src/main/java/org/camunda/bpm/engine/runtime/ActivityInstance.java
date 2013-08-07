@@ -26,7 +26,10 @@ public interface ActivityInstance extends ProcessElementInstance {
 
   /** the id of the activity */
   String getActivityId();
-    
+
+  /** the name of the activity */
+  String getActivityName();
+  
   /** Returns the child activity instances.
    * Returns an empty list if there are no child instances */
   ActivityInstance[] getChildActivityInstances();

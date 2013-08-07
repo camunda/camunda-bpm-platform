@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cockpit.base">
+
+  <resultMap id="processDefinitionMap" type="org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessDefinitionDto">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <result property="version" column="VERSION_" jdbcType="INTEGER" />
+    <result property="failedJobs" column="FAILED_JOBS_" jdbcType="INTEGER" />
+
+  </resultMap>
+
+  <resultMap id="calledProcessDefinitionMap" type="org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessDefinitionDto">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="version" column="VERSION_" jdbcType="INTEGER" />
+
+    <collection property="calledFromActivityIds" javaType="java.util.ArrayList" ofType="String" >
+      <result column="ACT_ID_" jdbcType="VARCHAR" />
+    </collection>
+  </resultMap>
+
+  <select id="selectProcessDefinitionWithFailedJobs" resultMap="processDefinitionMap">
+    select procdef.*,
+      (select count(*) FROM ACT_RU_EXECUTION exe, ACT_RU_JOB job
+         where exe.PROC_INST_ID_ = job.PROCESS_INSTANCE_ID_ AND
+               exe.PROC_DEF_ID_ = procdef.ID_ and job.RETRIES_ = 0) FAILED_JOBS_
+    from ACT_RE_PROCDEF procdef
+  </select>
+
+  <select id="selectCalledProcessDefinitions" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessDefinitionQueryDto"
+          resultMap="calledProcessDefinitionMap">
+    select RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
+    <include refid="selectCalledProcesses"/>
+    group by RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
+    ${orderBy}
+  </select>
+
+  <sql id="selectCalledProcesses">
+    from
+      ${prefix}ACT_RE_PROCDEF RES
+    inner join
+      ${prefix}ACT_RU_EXECUTION EXEC1
+    on
+      RES.ID_ = EXEC1.PROC_DEF_ID_
+    inner join
+      ${prefix}ACT_RU_EXECUTION EXEC2
+    on
+      EXEC1.SUPER_EXEC_ = EXEC2.ID_
+
+    <where>
+
+      <!-- parentProcessDefinitionId -->
+      <if test="parentProcessDefinitionId != null">
+        EXEC2.PROC_DEF_ID_ = #{parentProcessDefinitionId}
+      </if>
+
+      <!-- superProcessDefinitionId -->
+      <if test="superProcessDefinitionId != null">
+      and EXISTS (
+                    select
+                      EXEC4.ID_
+                    from
+                      ${prefix}ACT_RU_EXECUTION EXEC3
+                    inner join
+                      ${prefix}ACT_RU_EXECUTION EXEC4
+                    on
+                      EXEC3.SUPER_EXEC_ = EXEC4.ID_
+                    where
+                      EXEC2.PROC_INST_ID_ = EXEC3.ID_
+                      and EXEC4.PROC_DEF_ID_ = #{superProcessDefinitionId}
+                  )
+      </if>
+
+      <!-- activityIds -->
+      <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
+        and
+        <foreach item="item" index="index" collection="activityIdIn"
+                 open="(" separator="or" close=")">
+          EXEC2.ACT_ID_ = #{item}
+        </foreach>
+      </if>
+
+      <!-- businessKey -->
+      <if test="businessKey != null">
+      and EXISTS (
+                    select
+                      ID_
+                    from
+                      ${prefix}ACT_RU_EXECUTION
+                    where
+                      EXEC2.PROC_INST_ID_ = ID_
+                      and BUSINESS_KEY_ = #{businessKey}
+                  )
+      </if>
+
+      <!-- queryVariables -->
+      <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
+      <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+      and EXISTS (
+        select
+          ID_
+        from
+          ${prefix}ACT_RU_VARIABLE
+        where
+          EXEC2.PROC_INST_ID_ = PROC_INST_ID_
+
+          and NAME_= #{queryVariableValue.name}
+
+        <if test="!queryVariableValue.type.equals('null')">
+        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+          and TYPE_ = #{queryVariableValue.type}
+        </if>
+        <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+          and TEXT_
+        <choose>
+          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+          <otherwise><include refid="executionVariableOperator" /></otherwise>
+        </choose>
+          #{queryVariableValue.textValue}
+        </if>
+        <if test="queryVariableValue.textValue2 != null">
+          and TEXT2_
+        <choose>
+          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+          <otherwise><include refid="executionVariableOperator" /></otherwise>
+        </choose>
+          #{queryVariableValue.textValue2}
+        </if>
+        <if test="queryVariableValue.longValue != null">
+          and LONG_
+        <include refid="executionVariableOperator" />
+        #{queryVariableValue.longValue}
+        </if>
+        <if test="queryVariableValue.doubleValue != null">
+        and DOUBLE_
+        <include refid="executionVariableOperator" />
+        #{queryVariableValue.doubleValue}
+        </if>
+        <!-- Null variable type -->
+        <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+          <choose>
+          <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+            and (TEXT_ is not null or TEXT2_ is not null or LONG_ is not null or DOUBLE_ is not null or BYTEARRAY_ID_ is not null)
+          </when>
+          <otherwise>
+        and TEXT_ is null and TEXT2_ is null and LONG_ is null and DOUBLE_ is null and BYTEARRAY_ID_ is null
+          </otherwise>
+        </choose>
+        </if>
+      )
+      </foreach>
+
+    </where>
+  </sql>
+
+</mapper>

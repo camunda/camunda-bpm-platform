@@ -1,0 +1,291 @@
+/**
+ * Logo styling
+ */
+.navbar .brand {
+   background-image: url('../../img/cockpit/app-logo.png');
+   width: 220px;
+}
+
+
+/**------------------
+Tree
+---------------------**/
+
+.none-list-style {
+  list-style-type: none;
+}
+
+.clickable-tree-node:hover {
+  cursor: pointer;
+}
+
+.activity-highlight  {
+  -webkit-box-shadow: 0px 0px 4px 4px rgba(30, 144, 255, 1);
+  -moz-box-shadow: 0px 0px 4px 4px rgba(30, 144, 255, 1);
+  box-shadow: 0px 0px 4px 4px rgb(30, 144, 255);
+  border-radius: 5px;
+}
+
+.process-diagram {
+  overflow: hidden;
+  height: 100%;
+
+  /* disable text selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.badge-position {
+  margin-left: -1.1em;
+  margin-top: -0.75em;
+  top: 100%;
+  position: absolute;
+}
+
+/** ---- sidebar ----**/
+
+a.expand-collapse {
+  display: none;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  z-index: 4;
+
+  text-decoration: none;
+  cursor: pointer;
+
+  opacity: 0.2;
+  filter: alpha(opacity=10);
+
+  padding: 5px;
+}
+
+a.expand-collapse.pull-right {
+  top: 0;
+  left: auto;
+  right: 0;
+}
+
+a.expand-collapse:hover,
+a.expand-collapse:focus {
+  opacity: 0.6;
+  filter: alpha(opacity=40);
+}
+
+.variable-invalid {
+  color: #e9322d;
+}
+
+@media (min-width: 980px) {
+
+  .breadcrumbs-panel {
+    position: absolute;
+    height: 30px;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    background: whiteSmoke;
+    border-bottom: 1px solid #E5E5E5;
+  }
+
+  .ctn-wrapper div[ng-view] {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    bottom: 30px;
+    right: 0;
+    overflow: auto;
+  }
+
+  .ctn-content-container, .ctn-column, .ctn-toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .ctn-toolbar {
+    left: auto;
+    width: 41px;
+
+    border-left: 1px solid #E5E5E5;
+    background-color: whiteSmoke;
+  }
+
+  .ctn-sitebar > div {
+    margin: 10px;
+  }
+
+  .ctn-sitebar {
+    width: 250px;
+    right: auto;
+  }
+
+  .ctn-content {
+    left: 250px;
+    right: 41px;
+  }
+
+  .ctn-sitebar, .ctn-content {
+    overflow: auto;
+  }
+
+  .ctn-content > div {
+    position: absolute;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+  }
+
+  .ctn-content-top {
+    top: 0;
+    bottom: 350px;
+  }
+
+  .ctn-content-bottom {
+    top: auto;
+    bottom: 0;
+    height: 350px;
+  }
+
+  .ctn-collapsable-parent {
+    overflow: visible;
+  }
+
+  .ctn-tabbed .ctn-tabbed-content {
+    position: absolute;
+
+    left: 0;
+    top: 50px;
+    right: 0;
+    bottom: 0;
+  }
+
+  /** bootstrap fixes */
+  .tooltip {
+    position: absolute;
+  }
+}
+
+.resize-handle {
+  border: none 1px #E5E5E5;
+  position: absolute;
+  background: whiteSmoke;
+}
+
+.resize-handle.horizontal {
+  height: 5px;
+
+  right: 0;
+  left: 0;
+
+  border-style: solid none;
+
+  cursor: n-resize;
+}
+
+.resize-handle.vertical {
+  width: 5px;
+  top: 0;
+  bottom: 0;
+  cursor: e-resize;
+
+  border-style: none solid;
+}
+
+@media (max-width: 979px) {
+
+  .ctn-container {
+    margin: 10px;
+  }
+
+  .ctn-sitebar {
+    border-bottom: solid 1px #BBB;
+  }
+
+  a.expand-collapse {
+    visibility: hidden;
+  }
+  
+  .resize-handle {
+    display: none;
+  }
+}
+
+.ctn-tabbed {
+  position: relative;
+}
+
+.ctn-tabbed .nav-tabs {
+  padding: 10px 10px 0 10px;
+  margin-bottom: 10px;
+}
+
+.ctn-tabbed .ctn-tabbed-content {
+  margin: 10px;
+
+  overflow: auto;
+}
+
+/** dashboard page */
+
+.dashboard-view {
+  margin: 10px;
+}
+
+/** bootstrap tweaks */
+
+.btn-toolbar {
+  padding: 6px 8px;
+  line-height: 5px;
+  margin: 4px;
+
+  opacity: 0.7;
+}
+
+.btn-toolbar:hover {
+  opacity: 1;
+}
+
+.ctn-sitebar h1 {
+  font-size: 20px;
+  line-height: 30px;
+
+  margin-top: 2px;
+}
+
+.ctn-sitebar .page-header {
+  padding-bottom: 0;
+}
+
+.table-filter .filter-toggle {
+  width: 10px;
+  text-align: right;
+  padding: 4px 10px;
+}
+
+.table-condensed input[type=text] {
+  height: 14px;
+  line-height: 14px;
+  margin-bottom: 0px;
+}
+
+.table-condensed .btn {
+  padding: 1px 4px;
+}
+
+.input-append {
+  margin-bottom: 0;
+}
+
+.table-filter .filter {
+  background: #FFFBEC;
+}

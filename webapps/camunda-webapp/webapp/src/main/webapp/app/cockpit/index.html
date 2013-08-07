@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>camunda Cockpit</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description" content="camunda Cockpit" />
+    <meta name="author" content="camunda services GmbH" />
+
+    <!-- settings the base path for relative links -->
+    <base href="$BASE" cockpit-api="$APP_ROOT/api/cockpit/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
+
+    <!-- styles -->
+    <link href="$APP_ROOT/assets/css/cockpit/loader.css" rel="stylesheet" />
+
+    <!-- For IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- favicon -->
+    <link href="$APP_ROOT/assets/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <!-- scripts -->
+    <script src="$APP_ROOT/assets/vendor/require/require.js"></script>
+
+    <script src="$APP_ROOT/app/cockpit/cockpit-bootstrap.js"></script>
+
+  </head>
+  <body ng-controller="DefaultController">
+    <!-- navigation -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="brand ir" href="#/">
+            camunda Cockpit
+          </a>
+
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          
+          <div ng-include="'templates/navigation.html'"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- content -->
+    <div class="ctn-main">
+      <div class="ctn-wrapper">
+        <div class="notifications-panel"></div>
+        <div class="breadcrumbs-panel"></div>
+
+        <!-- view body provided by ngView -->
+        <div ng-view>
+        </div>
+
+        <div class="ctn-push-down"></div>
+      </div>
+
+      <!-- footer -->
+      <footer>
+        <div>
+          Powered by <a href="http://camunda.org">camunda BPM</a> / <span class="version">v${project.version}</span>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

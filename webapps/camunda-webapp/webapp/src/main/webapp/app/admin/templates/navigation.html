@@ -1,0 +1,58 @@
+<div class="nav-collapse collapse navbar-responsive-collapse" ng-cloak>
+  <ul class="nav ng-scope" ng-controller="NavigationController" if-logged-in>
+
+    <li class="dropdown" ng-class="activeClass('#/user')">
+      <a href="#/users">Users</a>
+    </li>
+
+    <li class="dropdown" ng-class="activeClass('#/group')">
+      <a href="#/groups">Groups</a>
+    </li>
+
+    <li class="dropdown" ng-class="activeClass('#/authorization')" show-if-authorized auth-permission="ALL" auth-resource-name="authorization">
+      <a href="#/authorization?resource=0">Authorizations</a>
+    </li>
+  </ul>
+
+  <ul class="nav pull-right" ng-controller="AuthenticationController">
+
+    <li engine-select></li>
+
+    <li class="dropdown" if-logged-in>
+      <a href class="dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-user icon-white"></i> {{ authentication.user.name }}
+      </a>
+
+      <ul class="dropdown-menu">
+        <li>
+          <a ng-href="{{ '../../admin/:engine/#/users/' + authentication.user.name + '?tab=profile' | uri }}">
+            My Profile
+          </a>
+        </li>
+        <li class="divider"></li>
+        <li>
+          <a href ng-click="logout()">
+            Sign out
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="divider-vertical" if-logged-in></li>
+
+    <li class="dropdown">
+      <a href class="dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-home icon-white"></i>
+      </a>
+
+      <ul class="dropdown-menu">
+        <li ng-show="authentication.isCockpitAuthorized()">
+          <a ng-href="{{ '../../cockpit/:engine/' | uri }}">Cockpit</a>
+        </li>
+        <li ng-show="authentication.isTasklistAuthorized()">
+          <a ng-href="{{ '../../tasklist/:engine/' | uri }}">Tasklist</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

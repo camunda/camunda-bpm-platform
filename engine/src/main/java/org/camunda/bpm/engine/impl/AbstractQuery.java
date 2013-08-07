@@ -50,11 +50,10 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   protected QueryProperty orderProperty;
 
   protected AbstractQuery() {
-    parameter = this;
   }
-  
+
   protected AbstractQuery(CommandExecutor commandExecutor) {
-    this.commandExecutor = commandExecutor;
+    this.commandExecutor = commandExecutor;    
   }
   
   public AbstractQuery(CommandContext commandContext) {

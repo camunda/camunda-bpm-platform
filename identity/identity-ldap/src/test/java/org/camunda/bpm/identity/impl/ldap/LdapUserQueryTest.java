@@ -1,0 +1,101 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.camunda.bpm.identity.impl.ldap;
+
+import java.util.List;
+
+import org.camunda.bpm.engine.identity.User;
+
+/**
+ * @author Daniel Meyer
+ * 
+ */
+public class LdapUserQueryTest extends LdapIdentityProviderTest {
+
+  public void testQueryNoFilter() {
+    List<User> result = identityService.createUserQuery().list();
+    assertEquals(6, result.size());
+  }
+
+  public void testFilterByUserId() {
+    User user = identityService.createUserQuery().userId("oscar").singleResult();
+    assertNotNull(user);
+    
+    // validate user
+    assertEquals("oscar", user.getId());
+    assertEquals("Oscar", user.getFirstName());
+    assertEquals("The Crouch", user.getLastName());
+    assertEquals("oscar@camunda.org", user.getEmail());
+    
+    
+    user = identityService.createUserQuery().userId("non-existing").singleResult();
+    assertNull(user);
+  }
+  
+  public void testFilterByFirstname() {
+    User user = identityService.createUserQuery().userFirstName("Oscar").singleResult();
+    assertNotNull(user);
+        
+    user = identityService.createUserQuery().userFirstName("non-existing").singleResult();
+    assertNull(user);    
+  }
+  
+  public void testFilterByFirstnameLike() {
+    User user = identityService.createUserQuery().userFirstNameLike("Osc*").singleResult();
+    assertNotNull(user);
+        
+    user = identityService.createUserQuery().userFirstNameLike("non-exist*").singleResult();
+    assertNull(user);    
+  }
+  
+  public void testFilterByLastname() {
+    User user = identityService.createUserQuery().userLastName("The Crouch").singleResult();
+    assertNotNull(user);
+        
+    user = identityService.createUserQuery().userFirstNameLike("non-existing").singleResult();
+    assertNull(user);    
+  }
+  
+  public void testFilterByLastnameLike() {
+    User user = identityService.createUserQuery().userLastNameLike("The Cro*").singleResult();
+    assertNotNull(user);
+    user = identityService.createUserQuery().userLastNameLike("The*").singleResult();
+    assertNotNull(user);
+        
+    user = identityService.createUserQuery().userLastNameLike("non-exist*").singleResult();
+    assertNull(user);    
+  }
+  
+  public void testFilterByEmail() {
+    User user = identityService.createUserQuery().userEmail("oscar@camunda.org").singleResult();
+    assertNotNull(user);
+          
+    user = identityService.createUserQuery().userEmail("non-exist*").singleResult();
+    assertNull(user);    
+  }
+  
+  public void testFilterByEmailLike() {
+    User user = identityService.createUserQuery().userEmailLike("oscar@*").singleResult();
+    assertNotNull(user);
+          
+    user = identityService.createUserQuery().userEmailLike("non-exist*").singleResult();
+    assertNull(user);    
+  }
+
+  // this is not yet supported
+  public void FAILING_testFilterByGroupId() {
+    List<User> result = identityService.createUserQuery().memberOfGroup("development").list();
+    assertEquals(3, result.size());
+  }
+ 
+}

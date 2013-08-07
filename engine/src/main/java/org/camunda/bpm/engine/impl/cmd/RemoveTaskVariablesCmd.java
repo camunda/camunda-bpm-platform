@@ -4,13 +4,13 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
 /**
  * @author roman.smirnov
+ * @author Joram Barrez
  */
 public class RemoveTaskVariablesCmd implements Command<Void>, Serializable {
   
@@ -25,19 +25,19 @@ public class RemoveTaskVariablesCmd implements Command<Void>, Serializable {
     this.variableNames = variableNames;
     this.isLocal = isLocal;
   }
-
+  
   public Void execute(CommandContext commandContext) {
+
     if(taskId == null) {
       throw new ProcessEngineException("taskId is null");
     }
     
-    TaskEntity task = Context
-      .getCommandContext()
+    TaskEntity task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
     
     if (task == null) {
-      throw new ProcessEngineException("task "+taskId+" doesn't exist");
+      throw new ProcessEngineException("Cannot find task with id " + taskId);
     }
     
     if (isLocal) {

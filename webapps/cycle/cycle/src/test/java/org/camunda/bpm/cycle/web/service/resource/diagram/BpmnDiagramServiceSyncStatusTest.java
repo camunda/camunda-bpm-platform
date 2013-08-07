@@ -2,6 +2,7 @@ package org.camunda.bpm.cycle.web.service.resource.diagram;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
 
 import java.util.Date;
 
@@ -17,8 +18,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kubek2k.springockito.annotations.ReplaceWithMock;
 import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
+import org.kubek2k.springockito.annotations.experimental.DirtiesMocks;
+import org.kubek2k.springockito.annotations.experimental.DirtiesMocksTestContextListener;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
 
 /**
@@ -30,29 +36,27 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
   loader = SpringockitoContextLoader.class,
   locations = { "classpath:/spring/mock/test-context.xml", "classpath:/spring/mock/test-persistence.xml" }
 )
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class, DirtiesMocksTestContextListener.class})
 public class BpmnDiagramServiceSyncStatusTest extends AbstractDiagramServiceTest {
 
   @Inject
   @ReplaceWithMock
   private ConnectorRegistry registry;
-  
-  @Inject
-  @ReplaceWithMock
-  private ConnectorCache connectorCache;
-  
+
   @Inject
   @ReplaceWithMock
   private DummyConnector connector;
-  
+
   @Inject
   private BpmnDiagramRepository bpmnDiagramRepository;
 
   @Test
+  @DirtiesMocks
   public void shouldServeIsUnavailable() {
     BpmnDiagram diagram = diagramLastModified(now());
     
     // given
-    given(registry.getConnector(DIAGRAM_NODE.getConnectorId())).willReturn(null);
+    doReturn(null).when(registry).getConnector(DIAGRAM_NODE.getConnectorId());
     
     // when
     BpmnDiagramStatusDTO status = bpmnDiagramService.synchronizationStatus(diagram.getId());
@@ -62,6 +66,7 @@ public class BpmnDiagramServiceSyncStatusTest extends AbstractDiagramServiceTest
   }
   
   @Test
+  @DirtiesMocks
   public void shouldServeInSync() {
     Date now = now();
     
@@ -70,10 +75,15 @@ public class BpmnDiagramServiceSyncStatusTest extends AbstractDiagramServiceTest
     diagram.setLastModified(now);
     diagram.setLastSync(now);
     bpmnDiagramRepository.saveAndFlush(diagram);
-    
+
     // given
-    given(connectorCache.get(DIAGRAM_NODE.getConnectorId())).willReturn(connector);
-    given(connector.getContentInformation(DIAGRAM_NODE)).willReturn(contentInformationLastModified(now));
+    ConnectorCache connectorCache = new ConnectorCache();
+    connectorCache.put(DIAGRAM_NODE.getConnectorId(), connector);
+
+    ConnectorRegistry connectorRegistry = new ConnectorRegistry();
+    connectorRegistry.setConnectorCache(connectorCache);
+    bpmnDiagramService.setConnectorRegistry(connectorRegistry);
+    doReturn(contentInformationLastModified(now)).when(connector).getContentInformation(DIAGRAM_NODE);
     
     // when
     BpmnDiagramStatusDTO status = bpmnDiagramService.synchronizationStatus(diagram.getId());

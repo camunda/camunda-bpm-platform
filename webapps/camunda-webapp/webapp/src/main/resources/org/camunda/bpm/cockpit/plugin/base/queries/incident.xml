@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cockpit.base">
+
+  <resultMap id="incidentResultMap" type="org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="incidentTimestamp" column="INCIDENT_TIMESTAMP_" jdbcType="TIMESTAMP" />
+    <result property="incidentMessage" column="INCIDENT_MSG_" jdbcType="VARCHAR" />
+    <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="causeIncidentId" column="CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentId" column="ROOT_CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
+    <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
+    <result property="causeIncidentProcessInstanceId" column="CAUSE_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="causeIncidentProcessDefinitionId" column="CAUSE_PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="causeIncidentActivityId" column="CAUSE_ACTIVITY_ID_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentProcessDefinitionId" column="ROOT_PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentActivityId" column="ROOT_ACTIVITY_ID_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentMessage" column="ROOT_INC_MSG_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentConfiguration" column="ROOT_INC_CONF_" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="selectIncidentWithCauseAndRootCauseIncidentsCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto"
+           resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectIncidents" />
+  </select>
+
+  <select id="selectIncidentWithCauseAndRootCauseIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto"
+          resultMap="incidentResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectIncidents" />
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+  <sql id="selectIncidents">    
+    from (
+          select RES.*,
+                 CAUSE.PROC_INST_ID_ CAUSE_PROC_INST_ID_,
+                 CAUSE.PROC_DEF_ID_ CAUSE_PROC_DEF_ID_,
+                 CAUSE.ACTIVITY_ID_ CAUSE_ACTIVITY_ID_,
+                 ROOT.PROC_INST_ID_ ROOT_PROC_INST_ID_,
+                 ROOT.PROC_DEF_ID_ ROOT_PROC_DEF_ID_,
+                 ROOT.ACTIVITY_ID_ ROOT_ACTIVITY_ID_,
+                 ROOT.INCIDENT_MSG_ ROOT_INC_MSG_,
+                 ROOT.CONFIGURATION_ ROOT_INC_CONF_
+          from
+            ${prefix}ACT_RU_INCIDENT RES
+            
+          <!-- join with incident table to get the cause incident -->  
+          left join
+            ${prefix}ACT_RU_INCIDENT CAUSE
+          on
+            RES.CAUSE_INCIDENT_ID_ = CAUSE.ID_
+            
+          <!-- join once again with the incident table to get the root cause incident -->            
+          left join
+            ${prefix}ACT_RU_INCIDENT ROOT
+          on
+            RES.ROOT_CAUSE_INCIDENT_ID_ = ROOT.ID_
+            
+          <where>
+            <!-- processInstanceIds -->
+            <if test="processInstanceIdIn != null &amp;&amp; processInstanceIdIn.length > 0">
+              and 
+              <foreach item="item" index="index" collection="processInstanceIdIn"
+                       open="(" separator="or" close=")">
+                RES.PROC_INST_ID_ = #{item}
+              </foreach>
+            </if>
+            
+            <!-- activityIds -->
+            <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
+              and 
+              <foreach item="item" index="index" collection="activityIdIn"
+                       open="(" separator="or" close=")">
+                RES.ACTIVITY_ID_ = #{item}
+              </foreach>
+            </if>         
+            
+          </where>
+    ) RES      
+  </sql>
+
+</mapper>

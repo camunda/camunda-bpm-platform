@@ -12,22 +12,39 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Date;
+
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
-import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
- * 
  * @author Daniel Meyer
+ * @author Joram Barrez
  */
 public class SuspendProcessDefinitionCmd extends AbstractSetProcessDefinitionStateCmd {
-
-  public SuspendProcessDefinitionCmd(String processDefinitionId, String processDefinitionKey) {
-    super(processDefinitionId, processDefinitionKey);
+  
+  public SuspendProcessDefinitionCmd(ProcessDefinitionEntity processDefinitionEntity, 
+          boolean includeProcessInstances, Date executionDate) {
+    super(processDefinitionEntity, includeProcessInstances, executionDate);
   }
 
-  protected void setState(ProcessDefinitionEntity processDefinitionEntity) {    
-      SuspensionStateUtil.setSuspensionState(processDefinitionEntity, SuspensionState.SUSPENDED);   
+  public SuspendProcessDefinitionCmd(String processDefinitionId, String processDefinitionKey,
+          boolean suspendProcessInstances, Date suspensionDate) {
+    super(processDefinitionId, processDefinitionKey, suspendProcessInstances, suspensionDate);
+  }
+  
+  protected SuspensionState getProcessDefinitionSuspensionState() {
+    return SuspensionState.SUSPENDED;
+  }
+
+  protected String getDelayedExecutionJobHandlerType() {
+    return TimerSuspendProcessDefinitionHandler.TYPE;
+  }
+  
+  protected AbstractSetProcessInstanceStateCmd getProcessInstanceChangeStateCmd(ProcessInstance processInstance) {
+    return new SuspendProcessInstanceCmd(processInstance.getId());
   }
   
 }

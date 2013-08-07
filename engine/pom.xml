@@ -124,10 +124,10 @@
 
     <dependency>
       <groupId>org.jboss.spec</groupId>
-	  <artifactId>jboss-javaee-web-6.0</artifactId>
-	  <type>pom</type>
-	  <scope>provided</scope>
-	</dependency>
+      <artifactId>jboss-javaee-web-6.0</artifactId>
+      <type>pom</type>
+      <scope>provided</scope>
+    </dependency>
     
     <dependency>
       <groupId>org.springframework</groupId>
@@ -678,20 +678,37 @@
 		  </dependency>
 	   </dependencies>
 	</profile>
-	
+
+    <profile>
+	  <id>mssql12</id>
+	    <activation>
+		  <property>
+        <name>database</name>
+        <value>mssql12</value>
+		  </property>
+		</activation>
+		<dependencies>
+		  <dependency>
+        <groupId>com.microsoft.sqlserver</groupId>
+        <artifactId>sqljdbc4</artifactId>
+        <scope>test</scope>
+		  </dependency>
+	   </dependencies>
+	</profile>
+
 	<profile>
 	  <id>mysql</id>
 	    <activation>
 		  <property>
-			<name>database</name>
-			<value>mysql</value>
+        <name>database</name>
+        <value>mysql</value>
 		  </property>
 		</activation>
 		<dependencies>
 		  <dependency>
 		    <groupId>mysql</groupId>
-     	    <artifactId>mysql-connector-java</artifactId>
-			<scope>test</scope>
+        <artifactId>mysql-connector-java</artifactId>
+			  <scope>test</scope>
 		  </dependency>
 	   </dependencies>
 	</profile>

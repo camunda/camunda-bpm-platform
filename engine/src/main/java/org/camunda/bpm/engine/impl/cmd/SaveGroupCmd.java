@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 /**
  * @author Joram Barrez
  */
-public class SaveGroupCmd implements Command<Void>, Serializable {
+public class SaveGroupCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
   
   private static final long serialVersionUID = 1L;
   protected GroupEntity group;
@@ -32,19 +32,14 @@ public class SaveGroupCmd implements Command<Void>, Serializable {
     this.group = group;
   }
   
-  public Void execute(CommandContext commandContext) {
+  protected Void executeCmd(CommandContext commandContext) {
     if(group == null) {
       throw new ProcessEngineException("group is null");
     }
-    if (group.getRevision()==0) {
-      commandContext
-        .getGroupManager()
-        .insertGroup(group);
-    } else {
-      commandContext
-        .getGroupManager()
-        .updateGroup(group);
-    }
+    
+    commandContext
+      .getWritableIdentityProvider()
+      .saveGroup(group);
     
     return null;
   }

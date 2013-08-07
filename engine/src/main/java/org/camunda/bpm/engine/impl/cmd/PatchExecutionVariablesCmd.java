@@ -16,8 +16,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -32,10 +30,10 @@ public class PatchExecutionVariablesCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private String executionId;
-  private Map<String, ? extends Object> modifications;
-  private Collection<String> deletions;
-  private boolean isLocal;
+  protected String executionId;
+  protected Map<String, ? extends Object> modifications;
+  protected Collection<String> deletions;
+  protected boolean isLocal;
   
   public PatchExecutionVariablesCmd(String executionId, Map<String, ? extends Object> modifications, Collection<String> deletions, boolean isLocal) {
     this.modifications = modifications;

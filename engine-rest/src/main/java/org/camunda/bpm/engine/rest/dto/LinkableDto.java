@@ -12,10 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.ws.rs.core.UriBuilder;
 
 public abstract class LinkableDto {
 
@@ -29,11 +28,14 @@ public abstract class LinkableDto {
     links.add(link);
   }
   
-  public void addReflexiveLink(UriBuilder rootUriBuilder, String action, String relation) {
-    AtomLink link = generateLink(rootUriBuilder, action, relation);
+  public void addReflexiveLink(URI linkUri, String method, String relation) {
+    AtomLink link = generateLink(linkUri, method, relation);
     links.add(link);
   }
   
-  public abstract AtomLink generateLink(UriBuilder rootUriBuilder, String action, String relation);
+  public AtomLink generateLink(URI linkUri, String method, String relation) {   
+    AtomLink link = new AtomLink(relation, linkUri.toString(), method);
+    return link;
+  }
   
 }

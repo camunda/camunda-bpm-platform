@@ -13,4 +13,6 @@
             global="global/camunda-bpm-platform/process-engine/ProcessApplicationService!org.camunda.bpm.ProcessApplicationService"
             type="org.camunda.bpm.ProcessApplicationService" />
             
+   <ResourceLink name="ProcessEngineDataSource" global="jdbc/ProcessEngine" type="javax.sql.DataSource"/>
+            
 </Context>

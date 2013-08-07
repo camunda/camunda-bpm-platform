@@ -38,7 +38,11 @@ public class HistoricTaskInstanceEventEntity extends HistoryEvent {
   // getters and setters //////////////////////////////////////////////////////
 
   public Long getDurationInMillis() {
-    return durationInMillis;
+    if(endTime != null) {      
+      return endTime.getTime() - startTime.getTime();     
+    } else {
+      return durationInMillis;
+    }
   }
   
   public void setDurationInMillis(Long durationInMillis) {

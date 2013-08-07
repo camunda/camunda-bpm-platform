@@ -65,15 +65,45 @@
         , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR},
         TASK_ID_ = #{taskId, jdbcType=VARCHAR}
       </if>      
-      <if test="endTime != null">
-        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP},      
-        DURATION_ = DATEDIFF(ms, HAI.START_TIME_, #{endTime, jdbcType=TIMESTAMP})
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">        
+            , DURATION_ = ${dateDiff1} #{endTime, jdbcType=TIMESTAMP} ${dateDiff2} HAI.START_TIME_ ${dateDiff3}
+        </if>
       </if>          
     WHERE 
       ID_ = #{id}
   </update>
+
   
-  <update id="updateHistoricActivityInstanceEvent_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
+  <update id="updateHistoricActivityInstanceEvent_mssql" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
+    UPDATE 
+        ${prefix}ACT_HI_ACTINST
+    SET
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+      <if test="eventType == 'update'">
+        , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR},
+        TASK_ID_ = #{taskId, jdbcType=VARCHAR}
+      </if>      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">    
+            , DURATION_ = DATEDIFF(ms, HAI.START_TIME_, #{endTime, jdbcType=TIMESTAMP})
+        </if>
+      </if>
+    FROM
+      ${prefix}ACT_HI_ACTINST HAI          
+    WHERE 
+      ID_ = #{id}
+  </update>
+  
+  <update id="updateHistoricActivityInstanceEvent_db2" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
     UPDATE 
         ${prefix}ACT_HI_ACTINST HAI
     SET
@@ -82,13 +112,20 @@
         , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR},
         TASK_ID_ = #{taskId, jdbcType=VARCHAR}
       </if>      
-      <if test="endTime != null">
-        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP},      
-        DURATION_ = EXTRACT(MILLISECONDS FROM (HAI.START_TIME_ - #{endTime, jdbcType=TIMESTAMP}))
-      </if>          
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">
+            , DURATION_ = ((DAYS(#{endTime, jdbcType=TIMESTAMP}) - DAYS(HAI.START_TIME_)) * 86400000)
+            + ((MIDNIGHT_SECONDS(#{endTime, jdbcType=TIMESTAMP}) - MIDNIGHT_SECONDS(HAI.START_TIME_)) * 1000)
+        </if>
+      </if>             
     WHERE 
       ID_ = #{id}
   </update>
+
   
   <!-- HISTORIC ACTIVITY INSTANCE DELETE -->
   

@@ -1,0 +1,151 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.camunda.bpm.qa.upgrade</groupId>
+  <artifactId>camunda-qa-db-instance-migration</artifactId>
+
+  <packaging>pom</packaging>
+  <name>camunda BPM - QA - upgrade - instance migration</name>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
+    <version>7.0.0-SNAPSHOT</version>
+  </parent>
+
+  <modules>
+    <module>test-fixture-62</module>
+    <module>test-fixture-70</module>
+  </modules>
+
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+    
+    <profile>
+      <id>oracle</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>oracle</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc6</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>oracle10g</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>oracle10g</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc14</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>db2</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>db2</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.ibm.db2.jcc</groupId>
+          <artifactId>db2jcc4</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>mssql</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>mssql</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.microsoft.sqlserver</groupId>
+          <artifactId>sqljdbc4</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    
+    <profile>
+      <id>mssql12</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>mssql12</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.microsoft.sqlserver</groupId>
+          <artifactId>sqljdbc4</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>mysql</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>mysql</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>postgres</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>postgres</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+
+  </profiles>
+
+  <repositories>
+    <repository>
+      <id>camunda-fox-ee</id>
+      <url>https://app.camunda.com/nexus/content/repositories/fox-ee/</url>
+      <!-- you will need credentials to access this repository! See https://app.camunda.com/confluence/display/foxUserGuide/Maven+configuration -->
+    </repository>
+  </repositories>
+
+</project>

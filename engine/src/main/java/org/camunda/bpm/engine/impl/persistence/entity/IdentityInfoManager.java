@@ -157,4 +157,11 @@ public class IdentityInfoManager extends AbstractManager {
     parameters.put("type", type);
     return (List) getDbSqlSession().getSqlSession().selectList("selectIdentityInfoKeysByUserIdAndType", parameters);
   }
+
+  public void deleteUserInfoByUserId(String userId) {
+    List<IdentityInfoEntity> identityInfos = getDbSqlSession().selectList("selectIdentityInfoByUserId", userId);
+    for (IdentityInfoEntity identityInfo: identityInfos) {
+      getIdentityInfoManager().deleteIdentityInfo(identityInfo);
+    }    
+  }
 }

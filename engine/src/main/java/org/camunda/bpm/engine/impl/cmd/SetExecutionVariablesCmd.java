@@ -23,11 +23,13 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class SetExecutionVariablesCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  protected String executionId;
+  
+  private String executionId;
   protected Map<String, ? extends Object> variables;
   protected boolean isLocal;
   
@@ -36,7 +38,8 @@ public class SetExecutionVariablesCmd implements Command<Object>, Serializable {
     this.variables = variables;
     this.isLocal = isLocal;
   }
-
+  
+  @Override
   public Object execute(CommandContext commandContext) {
     if(executionId == null) {
       throw new ProcessEngineException("executionId is null");
@@ -58,5 +61,7 @@ public class SetExecutionVariablesCmd implements Command<Object>, Serializable {
     
     return null;
   }
+  
+  
 }
 

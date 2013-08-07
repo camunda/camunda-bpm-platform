@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
@@ -39,9 +38,9 @@ public class AddCommentCmd implements Command<Object>, Serializable {
     this.processInstanceId = processInstanceId;
     this.message = message;
   }
-
+  
   public Object execute(CommandContext commandContext) {
-    String userId = Authentication.getAuthenticatedUserId();
+    String userId = commandContext.getAuthenticatedUserId();
     CommentEntity comment = new CommentEntity();
     comment.setUserId(userId);
     comment.setType(CommentEntity.TYPE_COMMENT);

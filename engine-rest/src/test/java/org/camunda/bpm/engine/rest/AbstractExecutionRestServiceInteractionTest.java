@@ -14,7 +14,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +121,114 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     expectedSignalVariables.put(variableKey, variableValue);
     
     verify(runtimeServiceMock).signal(eq(MockProvider.EXAMPLE_EXECUTION_ID), argThat(new EqualsMap(expectedSignalVariables)));
+  }
+  
+  @Test
+  public void testSignalWithUnparseableIntegerVariable() {
+    String variableKey = "aKey";
+    String variableValue = "1abc";
+    String variableType = "Integer";
+    
+    
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    variablesJson.put("variables", variables);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId due to number format exception: For input string: \"1abc\""))
+    .when().post(SIGNAL_EXECUTION_URL);
+  }
+  
+  @Test
+  public void testSignalWithUnparseableShortVariable() {
+    String variableKey = "aKey";
+    String variableValue = "1abc";
+    String variableType = "Short";
+    
+    
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    variablesJson.put("variables", variables);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId due to number format exception: For input string: \"1abc\""))
+    .when().post(SIGNAL_EXECUTION_URL);
+  }
+  
+  @Test
+  public void testSignalWithUnparseableLongVariable() {
+    String variableKey = "aKey";
+    String variableValue = "1abc";
+    String variableType = "Long";
+    
+    
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    variablesJson.put("variables", variables);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId due to number format exception: For input string: \"1abc\""))
+    .when().post(SIGNAL_EXECUTION_URL);
+  }
+
+  @Test
+  public void testSignalWithUnparseableDoubleVariable() {
+    String variableKey = "aKey";
+    String variableValue = "1abc";
+    String variableType = "Double";
+    
+    
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    variablesJson.put("variables", variables);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId due to number format exception: For input string: \"1abc\""))
+    .when().post(SIGNAL_EXECUTION_URL);
+  }
+  
+  @Test
+  public void testSignalWithUnparseableDateVariable() {
+    String variableKey = "aKey";
+    String variableValue = "1abc";
+    String variableType = "Date";
+    
+    
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    variablesJson.put("variables", variables);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId due to parse exception: Unparseable date: \"1abc\""))
+    .when().post(SIGNAL_EXECUTION_URL);
+  }
+
+  @Test
+  public void testSignalWithNotSupportedVariableType() {
+    String variableKey = "aKey";
+    String variableValue = "1abc";
+    String variableType = "X";
+    
+    
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    variablesJson.put("variables", variables);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId: The variable type 'X' is not supported."))
+    .when().post(SIGNAL_EXECUTION_URL);
   }
   
   @Test
@@ -261,6 +371,209 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), 
         eq(variableValue));
   }
+  
+  @Test
+  public void testPutSingleVariableWithTypeInteger() {
+    String variableKey = "aVariableKey";
+    Integer variableValue = 123;
+    String type = "Integer";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithUnparseableInteger() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Integer";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testPutSingleVariableWithTypeShort() {
+    String variableKey = "aVariableKey";
+    Short variableValue = 123;
+    String type = "Short";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithUnparseableShort() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Short";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testPutSingleVariableWithTypeLong() {
+    String variableKey = "aVariableKey";
+    Long variableValue = Long.valueOf(123);
+    String type = "Long";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithUnparseableLong() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Long";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testPutSingleVariableWithTypeDouble() {
+    String variableKey = "aVariableKey";
+    Double variableValue = 123.456;
+    String type = "Double";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithUnparseableDouble() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Double";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPutSingleVariableWithTypeBoolean() {
+    String variableKey = "aVariableKey";
+    Boolean variableValue = true;
+    String type = "Boolean";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithTypeDate() throws Exception {
+    Date now = new Date();
+    SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    
+    String variableKey = "aVariableKey";
+    String variableValue = pattern.format(now);
+    String type = "Date";
+    
+    Date expectedValue = pattern.parse(variableValue);
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), 
+        eq(expectedValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithUnparseableDate() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Date";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey due to parse exception: Unparseable date: \"1abc\""))
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testPutSingleVariableWithNotSupportedType() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "X";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey: The variable type 'X' is not supported."))
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+  }  
   
   @Test
   public void testPutSingleLocalVariableWithNoValue() {

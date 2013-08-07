@@ -13,7 +13,9 @@
 package org.camunda.bpm.engine;
 
 import java.sql.Connection;
+import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
@@ -107,7 +109,10 @@ public interface ManagementService {
   JobQuery createJobQuery();
   
   /** 
-   * Forced synchronous execution of a job for testing purposes.
+   * Forced synchronous execution of a job (eg. for administation or testing)
+   * The job will be executed, even if the process definition and/or the process instance
+   * is in suspended state.
+   * 
    * @param jobId id of the job to execute, cannot be null.
    * @throws ProcessEngineException when there is no job with the given id. 
    */
@@ -130,6 +135,15 @@ public interface ManagementService {
    * @param retries number of retries.
    */
   void setJobRetries(String jobId, int retries);
+  
+  /**
+   * Sets a new due date for the provided id. 
+   * When newDuedate is null, the job is executed with the next
+   * job executor run. 
+   * @param jobId id of job to modify, cannot be null.
+   * @param newDuedate new date for job execution
+   */
+  void setJobDuedate(String jobId, Date newDuedate);
 
   /**
    * Returns the full stacktrace of the exception that occurs when the job
@@ -160,5 +174,25 @@ public interface ManagementService {
    * Query for the number of activity instances aggregated by activities of a single process definition.
    */
   ActivityStatisticsQuery createActivityStatisticsQuery(String processDefinitionId);
+
+  /**
+   * Get the deployments that are registered the engine's job executor.
+   * This set is only relevant, if the engine configuration property <code>jobExecutorDeploymentAware</code> is set. 
+   */
+  Set<String> getRegisteredDeployments();
+
+  /**
+   * Register a deployment for the engine's job executor. 
+   * This is required, if the engine configuration property <code>jobExecutorDeploymentAware</code> is set. 
+   * If set to false, the job executor will execute any job.
+   */
+  void registerDeploymentForJobExecutor(String deploymentId);
+  
+  /**
+   * Unregister a deployment for the engine's job executor. 
+   * If the engine configuration property <code>jobExecutorDeploymentAware</code> is set, 
+   * jobs for the given deployment will no longer get acquired.
+   */
+  void unregisterDeploymentForJobExecutor(String deploymentId);
 
 }

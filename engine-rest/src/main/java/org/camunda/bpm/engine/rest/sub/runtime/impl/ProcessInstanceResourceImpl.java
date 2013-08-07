@@ -17,7 +17,6 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -50,10 +49,10 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
   }
   
   @Override
-  public void deleteProcessInstance(DeleteEngineEntityDto dto) {
+  public void deleteProcessInstance() {
     RuntimeService runtimeService = engine.getRuntimeService();
     try {
-      runtimeService.deleteProcessInstance(processInstanceId, dto.getDeleteReason());
+      runtimeService.deleteProcessInstance(processInstanceId, null);
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
     }

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
@@ -68,6 +69,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Date dueBefore;
   protected Date dueAfter;
   protected boolean excludeSubtasks = false;
+  protected SuspensionState suspensionState;
 
   public TaskQueryImpl() {
   }
@@ -321,9 +323,19 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     this.dueAfter = dueAfter;
     return this;
   }
-
+  
   public TaskQuery excludeSubtasks() {
     this.excludeSubtasks = true;
+    return this;
+  }
+
+  public TaskQuery active() {
+    this.suspensionState = SuspensionState.ACTIVE;
+    return this;
+  }
+  
+  public TaskQuery suspended() {
+    this.suspensionState = SuspensionState.SUSPENDED;
     return this;
   }
 
@@ -343,8 +355,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     // and explain alternatives
     List<Group> groups = Context
       .getCommandContext()
-      .getGroupManager()
-      .findGroupsByUser(candidateUser);
+      .getReadOnlyIdentityProvider()
+      .createGroupQuery()
+      .groupMember(candidateUser)
+      .list();
     List<String> groupIds = new ArrayList<String>();
     for (Group group : groups) {
       groupIds.add(group.getId());

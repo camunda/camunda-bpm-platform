@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -25,32 +24,33 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class SetTaskVariablesCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  protected String taskId;
+
   protected Map<String, ? extends Object> variables;
   protected boolean isLocal;
+  protected String taskId;
   
   public SetTaskVariablesCmd(String taskId, Map<String, ? extends Object> variables, boolean isLocal) {
     this.taskId = taskId;
     this.variables = variables;
     this.isLocal = isLocal;
   }
-
+  
   public Object execute(CommandContext commandContext) {
     if(taskId == null) {
       throw new ProcessEngineException("taskId is null");
     }
     
-    TaskEntity task = Context
-      .getCommandContext()
+    TaskEntity task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
     
-    if (task==null) {
-      throw new ProcessEngineException("task "+taskId+" doesn't exist");
+    if (task == null) {
+      throw new ProcessEngineException("Cannot find task with id " + taskId);
     }
     
     if (isLocal) {
@@ -61,4 +61,5 @@ public class SetTaskVariablesCmd implements Command<Object>, Serializable {
     
     return null;
   }
+  
 }

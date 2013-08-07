@@ -16,6 +16,7 @@
       <property name="history">full</property>
       <property name="databaseSchemaUpdate">true</property>
       <property name="transactionManagerJndiName">java:appserver/TransactionManager</property>
+      <property name="authorizationEnabled">true</property>
     </properties>
 
   </process-engine>

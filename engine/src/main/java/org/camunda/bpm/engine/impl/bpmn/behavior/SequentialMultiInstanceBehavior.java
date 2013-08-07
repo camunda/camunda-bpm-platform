@@ -33,13 +33,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
    * Handles the sequential case of spawning the instances.
    * Will only create one instance, since at most one instance can be active.
    */
-  protected void createInstances(ActivityExecution execution) throws Exception {
-    int nrOfInstances = resolveNrOfInstances(execution);
-    if (nrOfInstances <= 0) {
-      throw new ProcessEngineException("Invalid number of instances: must be positive integer value" 
-              + ", but was " + nrOfInstances);
-    }
-    
+  protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {    
     setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
     setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
     setLoopVariable(execution, LOOP_COUNTER, 0);

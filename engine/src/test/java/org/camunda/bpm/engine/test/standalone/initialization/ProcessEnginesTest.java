@@ -17,9 +17,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineInfo;
 import org.camunda.bpm.engine.ProcessEngines;
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 
 /**
  * @author Tom Baeyens

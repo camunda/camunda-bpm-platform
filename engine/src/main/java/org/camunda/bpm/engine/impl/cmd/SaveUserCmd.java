@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 /**
  * @author Joram Barrez
  */
-public class SaveUserCmd implements Command<Void>, Serializable {
+public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
   
   private static final long serialVersionUID = 1L;
   protected UserEntity user;
@@ -33,19 +33,14 @@ public class SaveUserCmd implements Command<Void>, Serializable {
     this.user = (UserEntity) user;
   }
   
-  public Void execute(CommandContext commandContext) {
+  protected Void executeCmd(CommandContext commandContext) {
     if(user == null) {
       throw new ProcessEngineException("user is null");
     }
-    if (user.getRevision()==0) {
-      commandContext
-        .getUserManager()
-        .insertUser(user);
-    } else {
-      commandContext
-        .getUserManager()
-        .updateUser(user);
-    }
+    
+    commandContext
+      .getWritableIdentityProvider()
+      .saveUser(user);
     
     return null;
   }

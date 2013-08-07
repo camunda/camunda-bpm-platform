@@ -21,16 +21,17 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoryAwareStartContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
+import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 
 /**
  * @author Daniel Meyer
  * 
  */
-public class FormPropertyStartContext extends ExecutionStartContext {
+public class FormPropertyStartContext extends HistoryAwareStartContext {
 
   protected Map<String, String> formProperties;
 
@@ -46,6 +47,7 @@ public class FormPropertyStartContext extends ExecutionStartContext {
   }
 
   public void initialStarted(InterpretableExecution execution) {
+
     final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     int historyLevel = processEngineConfiguration.getHistoryLevel();
     if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
@@ -69,6 +71,8 @@ public class FormPropertyStartContext extends ExecutionStartContext {
     StartFormHandler startFormHandler = pd.getStartFormHandler();
     startFormHandler.submitFormProperties(formProperties, (ExecutionEntity) execution);
     
+    // make sure create events are fired after form is submitted
+    super.initialStarted(execution);
   }
 
 }

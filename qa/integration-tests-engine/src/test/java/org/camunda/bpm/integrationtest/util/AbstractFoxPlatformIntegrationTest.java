@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -58,17 +59,21 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   protected RuntimeService runtimeService;
   protected TaskService taskService;
   
-  public static WebArchive initWebArchiveDeployment(String name) {
+  public static WebArchive initWebArchiveDeployment(String name, String processesXmlPath) {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, name)
               .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
               .addAsLibraries(DeploymentHelper.getEngineCdi())
-              .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
+              .addAsResource(processesXmlPath, "META-INF/processes.xml")
               .addClass(AbstractFoxPlatformIntegrationTest.class)
               .addClass(TestContainer.class);
     
     TestContainer.addContainerSpecificResources(archive);
     
     return archive;
+  }
+  
+  public static WebArchive initWebArchiveDeployment(String name) {
+    return initWebArchiveDeployment(name, "META-INF/processes.xml");
   }
   
   public static WebArchive initWebArchiveDeployment() {
@@ -91,8 +96,16 @@ public abstract class AbstractFoxPlatformIntegrationTest {
     taskService = processEngine.getTaskService();
   }
 
-  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
+  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
+    
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
+    waitForJobExecutorToProcessAllJobs(jobExecutor, maxMillisToWait);
+  }
+  
+  public void waitForJobExecutorToProcessAllJobs(JobExecutor jobExecutor, long maxMillisToWait) {
+    
+    int checkInterval = 1000;
+
     jobExecutor.start();
     
     try {
@@ -102,7 +115,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
       boolean areJobsAvailable = true;
       try {
         while (areJobsAvailable && !task.isTimeLimitExceeded()) {
-          Thread.sleep(intervalMillis);
+          Thread.sleep(checkInterval);
           areJobsAvailable = areJobsAvailable();
         }
       } catch (InterruptedException e) {
@@ -119,9 +132,13 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   }
 
   public boolean areJobsAvailable() {
-    List<Job> list = managementService.createJobQuery().executable().list();
-    logger.info("Jobs: " + list.size() + " left.");
-    return !list.isEmpty();
+    List<Job> list = managementService.createJobQuery().list();
+    for (Job job : list) {
+      if (job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private static class InteruptTask extends TimerTask {

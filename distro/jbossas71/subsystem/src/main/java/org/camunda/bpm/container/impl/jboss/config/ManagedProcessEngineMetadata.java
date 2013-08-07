@@ -12,13 +12,14 @@
  */
 package org.camunda.bpm.container.impl.jboss.config;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * @author Daniel Meyer
- *
+ * @author Thorben Lindhauer
  */
 public class ManagedProcessEngineMetadata {
   
@@ -44,7 +45,8 @@ public class ManagedProcessEngineMetadata {
   private String datasourceJndiName;
   private String historyLevel;
   protected String configuration;
-  private Map<String, Object> properties;
+  private Map<String, String> configurationProperties;
+  private Map<String, String> foxLegacyProperties;
 
   /**
    * @param isDefault
@@ -54,13 +56,14 @@ public class ManagedProcessEngineMetadata {
    * @param configuration 
    * @param properties
    */
-  public ManagedProcessEngineMetadata(boolean isDefault, String engineName, String datasourceJndiName, String historyLevel, String configuration, Map<String, Object> properties) {
+  public ManagedProcessEngineMetadata(boolean isDefault, String engineName, String datasourceJndiName, String historyLevel, String configuration, Map<String, String> properties) {
     this.isDefault = isDefault;
     this.engineName = engineName;
     this.datasourceJndiName = datasourceJndiName;
     this.historyLevel = historyLevel;
     this.configuration = configuration;
-    this.properties = properties;
+    this.configurationProperties = selectProperties(properties, false);
+    this.foxLegacyProperties = selectProperties(properties, true);
   }
 
   public boolean isDefault() {
@@ -103,16 +106,24 @@ public class ManagedProcessEngineMetadata {
     this.configuration = configuration;
   }
 
-  public Map<String, Object> getProperties() {
-    return properties;
+  public Map<String, String> getConfigurationProperties() {
+    return configurationProperties;
   }
 
-  public void setProperties(Map<String, Object> properties) {
-    this.properties = properties;
+  public void setConfigurationProperties(Map<String, String> properties) {
+    this.configurationProperties = properties;
   }
   
+  public Map<String, String> getFoxLegacyProperties() {
+    return foxLegacyProperties;
+  }
+
+  public void setFoxLegacyProperties(Map<String, String> foxLegacyProperties) {
+    this.foxLegacyProperties = foxLegacyProperties;
+  }
+
   public boolean isIdentityUsed() {
-    Object object = getProperties().get(PROP_IS_IDENTITY_USED);
+    Object object = getFoxLegacyProperties().get(PROP_IS_IDENTITY_USED);
     if(object == null) {
       return true;
     } else {
@@ -121,7 +132,7 @@ public class ManagedProcessEngineMetadata {
   }
   
   public boolean isAutoSchemaUpdate() {
-    Object object = getProperties().get(PROP_IS_AUTO_SCHEMA_UPDATE);
+    Object object = getFoxLegacyProperties().get(PROP_IS_AUTO_SCHEMA_UPDATE);
     if(object == null) {
       return true;
     } else {
@@ -130,7 +141,7 @@ public class ManagedProcessEngineMetadata {
   }
   
   public boolean isActivateJobExecutor() {
-    Object object = getProperties().get(PROP_IS_ACTIVATE_JOB_EXECUTOR);
+    Object object = getFoxLegacyProperties().get(PROP_IS_ACTIVATE_JOB_EXECUTOR);
     if(object == null) {
       return true;
     } else {
@@ -139,7 +150,7 @@ public class ManagedProcessEngineMetadata {
   }
   
   public String getDbTablePrefix() {
-    Object object = getProperties().get(PROP_DB_TABLE_PREFIX);
+    Object object = getFoxLegacyProperties().get(PROP_DB_TABLE_PREFIX);
     if(object == null) {
       return null;
     } else {
@@ -148,7 +159,7 @@ public class ManagedProcessEngineMetadata {
   }
   
   public String getJobExecutorAcquisitionName() {
-    Object object = getProperties().get(PROP_JOB_EXECUTOR_ACQUISITION_NAME);
+    Object object = getFoxLegacyProperties().get(PROP_JOB_EXECUTOR_ACQUISITION_NAME);
     if(object == null) {
       return "default";
     } else {
@@ -176,5 +187,41 @@ public class ManagedProcessEngineMetadata {
     if(!isValid) {
       throw new ProcessEngineException(validationErrorBuilder.toString());
     }
+  }
+  
+  private Map<String, String> selectProperties(Map<String, String> allProperties, boolean selectFoxProperties) {
+    Map<String, String> result = null;
+    if (selectFoxProperties) {
+      result = new HashMap<String, String>();
+      String isAutoSchemaUpdate = allProperties.get(PROP_IS_AUTO_SCHEMA_UPDATE);
+      String isActivateJobExecutor = allProperties.get(PROP_IS_ACTIVATE_JOB_EXECUTOR);
+      String isIdentityUsed = allProperties.get(PROP_IS_IDENTITY_USED);
+      String dbTablePrefix = allProperties.get(PROP_DB_TABLE_PREFIX);
+      String jobExecutorAcquisitionName = allProperties.get(PROP_JOB_EXECUTOR_ACQUISITION_NAME);
+      
+      if (isAutoSchemaUpdate != null) {
+        result.put(PROP_IS_AUTO_SCHEMA_UPDATE, isAutoSchemaUpdate);
+      }
+      if (isActivateJobExecutor != null) {
+        result.put(PROP_IS_ACTIVATE_JOB_EXECUTOR, isActivateJobExecutor);
+      }
+      if (isIdentityUsed != null) {
+        result.put(PROP_IS_IDENTITY_USED, isIdentityUsed);
+      }
+      if (dbTablePrefix != null) {
+        result.put(PROP_DB_TABLE_PREFIX, dbTablePrefix);
+      }
+      if (jobExecutorAcquisitionName != null) {
+        result.put(PROP_JOB_EXECUTOR_ACQUISITION_NAME, jobExecutorAcquisitionName);
+      }
+    } else {
+      result = new HashMap<String, String>(allProperties);
+      result.remove(PROP_IS_AUTO_SCHEMA_UPDATE);
+      result.remove(PROP_IS_ACTIVATE_JOB_EXECUTOR);
+      result.remove(PROP_IS_IDENTITY_USED);
+      result.remove(PROP_DB_TABLE_PREFIX);
+      result.remove(PROP_JOB_EXECUTOR_ACQUISITION_NAME);
+    }
+    return result;
   }
 }

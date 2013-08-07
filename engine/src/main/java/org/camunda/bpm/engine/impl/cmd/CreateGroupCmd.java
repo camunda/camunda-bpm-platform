@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 /**
  * @author Tom Baeyens
  */
-public class CreateGroupCmd implements Command<Group>, Serializable {
+public class CreateGroupCmd extends AbstractWritableIdentityServiceCmd<Group> implements Command<Group>, Serializable {
 
   private static final long serialVersionUID = 1L;
   
@@ -36,10 +36,10 @@ public class CreateGroupCmd implements Command<Group>, Serializable {
     }
     this.groupId = groupId;
   }
-
-  public Group execute(CommandContext commandContext) {
+  
+  protected Group executeCmd(CommandContext commandContext) {   
     return commandContext
-      .getGroupManager()
+      .getWritableIdentityProvider()
       .createNewGroup(groupId);
   }
 

@@ -69,7 +69,7 @@ public class LocalSingletonBeanInvocationTest extends AbstractFoxPlatformIntegra
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 300);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Assert.assertEquals(runtimeService.getVariable(pi.getId(), "result"), true);
     
@@ -90,7 +90,7 @@ public class LocalSingletonBeanInvocationTest extends AbstractFoxPlatformIntegra
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
         
-    waitForJobExecutorToProcessAllJobs(60*1000, 300);
+    waitForJobExecutorToProcessAllJobs(60*1000);
     
     for(int i=0; i<instances; i++) {    
       Assert.assertEquals(runtimeService.getVariable(ids[i], "result"), true);    

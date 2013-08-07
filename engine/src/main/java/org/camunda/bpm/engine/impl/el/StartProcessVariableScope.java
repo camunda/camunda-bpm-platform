@@ -55,7 +55,7 @@ public class StartProcessVariableScope implements VariableScope {
     return null;
   }
 
-  public Object getVariableLocal(Object variableName) {
+  public Object getVariableLocal(String variableName) {
     return null;
   }
 
@@ -72,7 +72,7 @@ public class StartProcessVariableScope implements VariableScope {
     throw new UnsupportedOperationException("No execution active, no variables can be set");
   }
 
-  public Object setVariableLocal(String variableName, Object value) {
+  public void setVariableLocal(String variableName, Object value) {
     throw new UnsupportedOperationException("No execution active, no variables can be set");
   }
 
@@ -98,14 +98,6 @@ public class StartProcessVariableScope implements VariableScope {
 
   public boolean hasVariableLocal(String variableName) {
     return false;
-  }
-
-  public void createVariableLocal(String variableName, Object value) {
-    throw new UnsupportedOperationException("No execution active, no variables can be created");
-  }
-
-  public void createVariablesLocal(Map<String, ? extends Object> variables) {
-    throw new UnsupportedOperationException("No execution active, no variables can be created");
   }
 
   public void removeVariable(String variableName) {

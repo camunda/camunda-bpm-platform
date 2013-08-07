@@ -34,6 +34,8 @@ public class DeploymentMetadataConstants {
   public static final String PROCESS_ENGINE = "process-engine";
   public static final String CONFIGURATION = "configuration";
   public static final String DATASOURCE = "datasource";
+  public static final String PLUGIN = "plugin";
+  public static final String PLUGIN_CLASS = "class";
   
   public static final String PROCESS_ARCHIVE = "process-archive";
   public static final String PROCESS = "process";

@@ -87,7 +87,7 @@ public class ExecutionImpl implements
   protected ExecutionImpl subProcessInstance;
   
   /** only available until the process instance is started */
-  protected ExecutionStartContext executionStartContext;
+  protected ProcessInstanceStartContext processInstanceStartContext;
   
   // state/type of execution ////////////////////////////////////////////////// 
   
@@ -140,7 +140,7 @@ public class ExecutionImpl implements
   }
   
   public ExecutionImpl(ActivityImpl initial) {
-    executionStartContext = new ExecutionStartContext(initial);
+    processInstanceStartContext = new ProcessInstanceStartContext(initial);
   }
   
   // lifecycle methods ////////////////////////////////////////////////////////
@@ -419,8 +419,8 @@ public class ExecutionImpl implements
     
     activity = getActivity();
     // special treatment for starting process instance
-    if(activity == null && executionStartContext!= null) {
-      activity = executionStartContext.getInitial();
+    if(activity == null && processInstanceStartContext!= null) {
+      activity = processInstanceStartContext.getInitial();
     }
     
     activityInstanceId = generateActivityInstanceId(activity.getId());
@@ -493,10 +493,10 @@ public class ExecutionImpl implements
   }
   
   public void start(Map<String, Object> variables) {
-    if(executionStartContext == null && isProcessInstance()) {
-      executionStartContext = new ExecutionStartContext(processDefinition.getInitial());
-      executionStartContext.setVariables(variables);
+    if(processInstanceStartContext == null && isProcessInstance()) {
+      processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());      
     }
+    setVariables(variables);
     performOperation(AtomicOperation.PROCESS_START);
   }
   
@@ -862,14 +862,7 @@ public class ExecutionImpl implements
     return currentActivityName;
   }
 
-
-  public void createVariableLocal(String variableName, Object value) {
-  }
-
-  public void createVariablesLocal(Map<String, ? extends Object> variables) {
-  }
-
-  public Object getVariableLocal(Object variableName) {
+  public Object getVariableLocal(String variableName) {
     return null;
   }
 
@@ -918,8 +911,7 @@ public class ExecutionImpl implements
   public void deleteVariablesLocal() {
   }
   
-  public Object setVariableLocal(String variableName, Object value) {
-    return null;
+  public void setVariableLocal(String variableName, Object value) {
   }
 
   public void setVariablesLocal(Map<String, ? extends Object> variables) {
@@ -933,12 +925,12 @@ public class ExecutionImpl implements
     this.isEventScope = isEventScope;
   }
   
-  public ExecutionStartContext getExecutionStartContext() {
-    return executionStartContext;
+  public ProcessInstanceStartContext getProcessInstanceStartContext() {
+    return processInstanceStartContext;
   }
   
-  public void disposeStartingExecution() {
-    executionStartContext = null;
+  public void disposeProcessInstanceStartContext() {
+    processInstanceStartContext = null;
   }
 
   public void deleteCascade2(String deleteReason) {

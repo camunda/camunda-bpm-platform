@@ -44,6 +44,21 @@ public interface ProcessEngineRestService {
   
   @Path("/{name}" + MessageRestService.PATH)
   MessageRestService getMessageRestService(@PathParam("name") String engineName);
+
+  @Path("/{name}" + JobRestService.PATH)
+  JobRestService getJobRestService(@PathParam("name") String engineName);
+  
+  @Path("/{name}" + VariableInstanceRestService.PATH)
+  VariableInstanceRestService getVariableInstanceService(@PathParam("name") String engineName);
+  
+  @Path("/{name}" + GroupRestService.PATH)
+  GroupRestService getGroupRestService(@PathParam("name") String engineName);
+  
+  @Path("/{name}" + UserRestService.PATH)
+  UserRestService getUserRestService(@PathParam("name") String engineName);
+
+  @Path("/{name}" + AuthorizationRestService.PATH)
+  AuthorizationRestService getAuthorizationRestService(@PathParam("name") String engineName);
   
   @GET
   @Produces(MediaType.APPLICATION_JSON)

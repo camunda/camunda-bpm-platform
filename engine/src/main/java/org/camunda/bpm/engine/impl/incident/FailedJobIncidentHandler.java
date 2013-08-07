@@ -40,14 +40,14 @@ public class FailedJobIncidentHandler implements IncidentHandler {
     return INCIDENT_HANDLER_TYPE;
   }
 
-  public void handleIncident(String processDefinitionId, String activityId, String executionId, String jobId) {
+  public void handleIncident(String processDefinitionId, String activityId, String executionId, String jobId, String message) {
 
     if(executionId != null) {
-      IncidentEntity newIncident = IncidentEntity.createAndInsertIncident(INCIDENT_HANDLER_TYPE, executionId, jobId);
+      IncidentEntity newIncident = IncidentEntity.createAndInsertIncident(INCIDENT_HANDLER_TYPE, executionId, jobId, message);
       newIncident.createRecursiveIncidents();
 
     } else {
-      IncidentEntity.createAndInsertIncident(INCIDENT_HANDLER_TYPE, processDefinitionId, activityId, jobId);
+      IncidentEntity.createAndInsertIncident(INCIDENT_HANDLER_TYPE, processDefinitionId, activityId, jobId, message);
 
     }
 
