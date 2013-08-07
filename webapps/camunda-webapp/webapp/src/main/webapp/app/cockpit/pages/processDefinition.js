@@ -4,8 +4,8 @@ ngDefine('cockpit.pages.processDefinition', [
 ], function(module, angular) {
 
   var Controller = [
-    '$scope', '$rootScope', 'search', '$q', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Transform', 'dataDependFactory', 'processDefinition',
-    function($scope, $rootScope, search, $q, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Transform, dataDependFactory, processDefinition) {
+    '$scope', '$rootScope', 'search', '$q', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Transform', 'Variables', 'dataDependFactory', 'processDefinition',
+    function($scope, $rootScope, search, $q, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Transform, Variables, dataDependFactory, processDefinition) {
 
     var processData = $scope.processData = dataDependFactory.create($scope);
 
@@ -55,7 +55,7 @@ ngDefine('cockpit.pages.processDefinition', [
       }
 
       currentFilter = {
-        activityIds: parseArray(params.activity), 
+        activityIds: parseArray(params.activityIds), 
         parentProcessDefinitionId: params.parentProcessDefinitionId,
         businessKey: params.businessKey, 
         variables: parseVariables(parseArray(params.variables)),
@@ -201,7 +201,39 @@ ngDefine('cockpit.pages.processDefinition', [
         
         serializeFilterToUri(filter);
       }
+
+      $scope.filter = filter;
     });
+
+    $scope.handleBpmnElementSelection = function(activityId, event) {
+      var newFilter = angular.copy(currentFilter),
+          ctrl = event.ctrlKey,
+          activityIds = angular.copy(newFilter.activityIds) || [],
+          idx = activityIds.indexOf(activityId),
+          selected = idx !== -1;
+
+      if (!activityId) {
+        activityIds = null;
+      } else {
+        if (ctrl) {
+          if (selected) {
+            activityIds = activityIds.splice(idx, 1);
+          } else {
+            activityIds.push(activityId);
+          }
+        } else {
+          if (selected) {
+            activityIds = null;
+          } else {
+            activityIds = [ activityId ];
+          }
+        }
+      }
+
+      newFilter.activityIds = activityIds;
+
+      processData.set('filter', newFilter);
+    };
 
     function getBpmnElements (processDefinition, semantic) {
       var result = {};
@@ -274,7 +306,7 @@ ngDefine('cockpit.pages.processDefinition', [
     setDefaultTab($scope.processDefinitionViews);
   }];
   
-  var ProcessDefinitionFilterController = [ '$scope', 'debounce', function($scope, debounce) {
+  var ProcessDefinitionFilterController = [ '$scope', 'debounce', 'Variables', function($scope, debounce, Variables) {
 
     var processData = $scope.processData,
         filterData,
@@ -292,7 +324,17 @@ ngDefine('cockpit.pages.processDefinition', [
       return result;
     }
 
-    processData.set('filterData', [ 'processDefinition', 'allProcessDefinitions', 'filter', 'parent', function(definition, allDefinitions, filter, parent) {
+    function createActivities(ids, bpmnElements) {
+      var result = [];
+
+      angular.forEach(ids, function(id) {
+        result.push({ id: id, name: bpmnElements[id].name || id });
+      });
+
+      return result;
+    }
+
+    processData.set('filterData', [ 'processDefinition', 'allProcessDefinitions', 'filter', 'parent', 'bpmnElements', function(definition, allDefinitions, filter, parent, bpmnElements) {
 
       if (!filterData || filterData.filter != filter) {
         return {
@@ -302,7 +344,7 @@ ngDefine('cockpit.pages.processDefinition', [
           parent: parent, 
           filter: filter,
           variables: createRefs(filter.variables),
-          activityIds: filter.activityIds
+          activities: createActivities(filter.activityIds, bpmnElements)
         };
       } else {
         return filterData;
@@ -322,10 +364,11 @@ ngDefine('cockpit.pages.processDefinition', [
       }
 
       var variables = filterData.variables,
-          activityIds = filterData.activityIds,
+          activities = filterData.activities,
           parent = filterData.parent,
           businessKey = filterData.businessKey,
           newFilterVariables = [], 
+          newFilterActivityIds = [], 
           newFilter = {};
 
       // business key
@@ -350,7 +393,13 @@ ngDefine('cockpit.pages.processDefinition', [
       }
 
       // activityIds
-      newFilter.activityIds = activityIds;
+      angular.forEach(activities, function(a) {
+        newFilterActivityIds.push(a.id);
+      });
+
+      if (newFilterActivityIds.length) {
+        newFilter.activityIds = newFilterActivityIds;
+      }
 
       // update cached filter
       filterData.filter = newFilter;
@@ -390,10 +439,20 @@ ngDefine('cockpit.pages.processDefinition', [
 
       $scope.filterChanged();
     };
+
+    $scope.removeActivityFilter = function(activity) {
+      var activities = filterData.activities,
+          idx = activities.indexOf(activity);
+
+      if (idx !== -1) {
+        activities.splice(idx, 1);
+      }
+
+      $scope.filterChanged();
+    };
   }];
 
-
-  function ProcessVariableFilter() {
+  var ProcessVariableFilter = [ 'Variables', function(Variables) {
 
     return {
 
@@ -417,173 +476,7 @@ ngDefine('cockpit.pages.processDefinition', [
         ngModel.$formatters.push(Variables.toString);
       }
     }
-  }
-
-  var Variables = (function() {
-
-    // variable specific stuff //////////////
-    
-    function reverse(hash) {
-      var result = {};
-
-      for (var key in hash) {
-        result[hash[key]] = key;
-      }
-
-      return result;
-    }
-
-    function keys(hash) {
-      var keys = [];
-
-      for (var key in hash) {
-        keys.push(key);
-      }
-
-      return keys;
-    }
-
-    var OPS = {
-      eq: '=',
-      neq: '!=',
-      gt : '>',
-      gteq : '>=',
-      lt : '<',
-      lteq : '<=',
-      like: 'like'
-    };
-
-    var SYM_TO_OPS = reverse(OPS);
-    
-    function operatorName(op) {
-      return OPS[op];
-    }
-
-    var PATTERN = new RegExp('^(\\S+)\\s(' + keys(SYM_TO_OPS).join('|') + ')\\s(.+)$');
-
-    /**
-     * Tries to guess the type of the input string
-     * and returns the appropriate representation 
-     * in the guessed type.
-     *
-     * @param value {string}
-     * @return value {string|boolean|number} the interpolated value
-     */
-    function typed(value) {
-
-      // is a string ( "asdf" )
-      if (/^".*"\s*$/.test(value)) {
-        return value.substring(1, value.length - 1);
-      }
-
-      if ((parseFloat(value) + '') === value) {
-        return parseFloat(value);
-      }
-
-      if (value === 'true' || value === 'false') {
-        return value === 'true';
-      }
-
-      throw new Error('Cannot infer type of value ' + value);
-    }
-
-    function typedString(value) {
-
-      if (!value) {
-        return value;
-      }
-
-      if (typeof value === 'string') {
-        return '"' + value + '"';
-      }
-
-      if (typeof value === 'boolean') {
-        return value ? 'true' : 'false';
-      }
-
-      if (typeof value === 'number') {
-        return value;
-      }
-
-
-      throw new Error('Cannot infer type of value ' + value);
-    }
-
-    /**
-     * Public API of Variables utility
-     */
-    return {
-
-      /**
-       * Parse a string into a variableFilter { name: ..., operator: ..., value: ... }
-       * @param  {string} str the string to parse
-       * @return {object}     the parsed variableFilter object
-       */
-      parse: function(str) {
-
-        var match = PATTERN.exec(str),
-            value;
-
-        if (!match) {
-          throw new Error('Invalid variable syntax: ' + str);
-        }
-
-        value = typed(match[3]);
-
-        return {
-          name: match[1],
-          operator: SYM_TO_OPS[match[2]],
-          value: value
-        };
-      },
-
-      toString: function(variable) {
-        if (!variable) {
-          return '';
-        }
-
-        return variable.name + ' ' + operatorName(variable.operator) + ' ' + typedString(variable.value);
-      },
-
-      operators: keys(SYM_TO_OPS)
-    };
-  })();
-
-  var SearchFactory = [ '$location', '$rootScope', function($location, $rootScope) {
-
-    var silent = false;
-
-    $rootScope.$on('$routeUpdate', function(e, lastRoute) {
-      if (silent) {
-        console.log('silenced $routeUpdate');
-        silent = false;
-      } else {
-        $rootScope.$broadcast('$routeChanged', lastRoute);
-      }
-    });
-
-    $rootScope.$on('$routeChangeSuccess', function(e, lastRoute) {
-      silent = false;
-    });
-
-    var search = function() {
-      var args = Array.prototype.slice(arguments);
-
-      return $location.search.apply($location, arguments);
-    }
-
-    search.updateSilently = function(params) {
-      angular.forEach(params, function(value, key) {
-        $location.search(key, value);
-      });
-
-      silent = true;
-    };
-
-    return search;
   }];
-
-  module.factory('search', SearchFactory);
 
   var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/process-definition/:processDefinitionId', {
@@ -606,6 +499,6 @@ ngDefine('cockpit.pages.processDefinition', [
 
   module
     .controller('ProcessDefinitionFilterController', ProcessDefinitionFilterController)
-    .directive('processVariableFilter', ProcessVariableFilter)
+    .directive('processVariable', ProcessVariableFilter)
     .config(RouteConfig);
 });
