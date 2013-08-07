@@ -49,8 +49,8 @@ ngDefine('cockpit.pages.processInstance', [
     function parseFilterFromUri() {
 
       var params = search(),
-          activityInstancesParam = parseArray(params.activityInstances),
-          bpmnElementsParam = parseArray(params.bpmnElements);
+          activityInstanceIdsParam = parseArray(params.activityInstanceIds),
+          activityIdsParam = parseArray(params.activityIds);
 
       function parseArray(str) {
         if (!str) {
@@ -65,8 +65,8 @@ ngDefine('cockpit.pages.processInstance', [
       }
 
       currentFilter = {
-        activityIds: bpmnElementsParam,
-        activityInstanceIds: activityInstancesParam,
+        activityIds: activityIdsParam,
+        activityInstanceIds: activityInstanceIdsParam,
         page: parseInt(params.page) || undefined
       };
 
@@ -84,8 +84,8 @@ ngDefine('cockpit.pages.processInstance', [
       }
 
       search.updateSilently({
-        bpmnElements: nonEmpty(activityIds) ? activityIds.join(',') : null,
-        activityInstances: nonEmpty(activityInstanceIds) ? activityInstanceIds.join(',') : null
+        activityIds: nonEmpty(activityIds) ? activityIds.join(',') : null,
+        activityInstanceIds: nonEmpty(activityInstanceIds) ? activityInstanceIds.join(',') : null
       });
 
       $scope.filter = currentFilter = filter;
@@ -97,8 +97,8 @@ ngDefine('cockpit.pages.processInstance', [
           page = parseInt(filter.page) || undefined,
           scrollToBpmnElement;
 
-      angular.forEach(activityInstanceIds, function (instanceParam) {
-        var instance = instanceIdToInstanceMap[instanceParam],
+      angular.forEach(activityInstanceIds, function (instanceId) {
+        var instance = instanceIdToInstanceMap[instanceId],
             activityId = instance.activityId || instance.targetActivityId,
             idx = activityIds.indexOf(activityId);
 
@@ -107,8 +107,8 @@ ngDefine('cockpit.pages.processInstance', [
         }
       });
 
-      angular.forEach(activityIds, function (bpmnElementParam) {
-        var instanceList = activityIdToInstancesMap[bpmnElementParam],
+      angular.forEach(activityIds, function (activityId) {
+        var instanceList = activityIdToInstancesMap[activityId],
             foundAtLeastOne = false,
             instanceIds = [];
 
