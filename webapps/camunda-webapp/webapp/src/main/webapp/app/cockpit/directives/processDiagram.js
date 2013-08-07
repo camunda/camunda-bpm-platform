@@ -12,7 +12,8 @@ ngDefine('cockpit.directives', [
     
     var w = angular.element($window);
 
-    var bpmnElements;
+    var bpmnElements,
+        selection;
     
     var activityHighligtClass = 'activity-highlight';
     var bpmnRenderer = null;
@@ -35,6 +36,9 @@ ngDefine('cockpit.directives', [
         bpmnRenderer = new Bpmn();
         renderDiagram();
         initializeScrollAndZoomFunctions();
+
+        // update selection in case it has been provided earlier
+        updateSelection(selection);
       }
     });
     
@@ -298,19 +302,28 @@ ngDefine('cockpit.directives', [
     /*------------------- Handle selected activity id---------------------*/
     
     $scope.$watch('selection.activityIds', function(newValue, oldValue) {
-      if (oldValue) {
-        angular.forEach(oldValue, function(elementId) {
-          var bpmnElement = bpmnElements[elementId];
-          deselectActivity(bpmnElement);
-        });
-      }
-      if (newValue) {
-        angular.forEach(newValue, function(elementId) {
-          var bpmnElement = bpmnElements[elementId];
-          selectActivity(bpmnElement);
-        });
-      }
+      updateSelection(newValue);
     });
+
+    function updateSelection(newSelection) {
+      if (bpmnElements) {
+        if (selection) {
+          angular.forEach(selection, function(elementId) {
+            var bpmnElement = bpmnElements[elementId];
+            deselectActivity(bpmnElement);
+          });
+        }
+
+        if (newSelection) {
+          angular.forEach(newSelection, function(elementId) {
+            var bpmnElement = bpmnElements[elementId];
+            selectActivity(bpmnElement);
+          });
+        }
+      }
+
+      selection = newSelection;
+    }
 
     function selectActivity(bpmnElement) {
       if (bpmnElement) {
