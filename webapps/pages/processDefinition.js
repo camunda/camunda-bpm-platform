@@ -54,11 +54,19 @@ ngDefine('cockpit.pages.processDefinition', [
         return collect(vars, Variables.parse);
       }
 
+      var activityIds = parseArray(params.activityIds),
+          scrollToBpmnElement;
+
+      if (activityIds.length > 0) {
+        scrollToBpmnElement = activityIds[activityIds.length-1];
+      }
+
       currentFilter = {
-        activityIds: parseArray(params.activityIds), 
+        activityIds: activityIds, 
         parentProcessDefinitionId: params.parentProcessDefinitionId,
         businessKey: params.businessKey, 
         variables: parseVariables(parseArray(params.variables)),
+        scrollToBpmnElement: scrollToBpmnElement,
         page: parseInt(params.page) || undefined
       };
 
