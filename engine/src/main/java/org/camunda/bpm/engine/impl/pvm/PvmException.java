@@ -13,11 +13,13 @@
 
 package org.camunda.bpm.engine.impl.pvm;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+
 
 /**
  * @author Tom Baeyens
  */
-public class PvmException extends RuntimeException {
+public class PvmException extends ProcessEngineException {
 
   private static final long serialVersionUID = 1L;
 

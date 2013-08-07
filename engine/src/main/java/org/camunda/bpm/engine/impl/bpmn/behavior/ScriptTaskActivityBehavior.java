@@ -61,7 +61,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
           && e.getCause().getCause().getCause() instanceof BpmnError) {
         ErrorPropagation.propagateError((BpmnError) e.getCause().getCause().getCause(), execution);
       } else {
-        throw e;
+        ErrorPropagation.propagateException(e, execution);
       }
     }
      if (noErrors) {

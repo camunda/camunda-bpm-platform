@@ -21,6 +21,10 @@ package org.camunda.bpm.engine;
 public class ProcessEngineException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
+  
+  public ProcessEngineException() {
+    super();
+  }
 
   public ProcessEngineException(String message, Throwable cause) {
     super(message, cause);
@@ -28,5 +32,9 @@ public class ProcessEngineException extends RuntimeException {
 
   public ProcessEngineException(String message) {
     super(message);
+  }
+  
+  public ProcessEngineException(Throwable cause) {
+    super(cause);
   }
 }

@@ -15,10 +15,12 @@
  */
 package org.camunda.bpm.engine.impl.javax.el;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+
 /**
  * Represents any of the exception conditions that can arise during expression evaluation.
  */
-public class ELException extends RuntimeException {
+public class ELException extends ProcessEngineException {
 	private static final long serialVersionUID = 1L;
 
 	/**
