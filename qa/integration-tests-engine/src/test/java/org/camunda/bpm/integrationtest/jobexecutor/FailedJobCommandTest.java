@@ -32,6 +32,7 @@ public class FailedJobCommandTest extends AbstractFoxPlatformIntegrationTest {
     // now the retries = 0
     
     Assert.assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    Assert.assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
     
   }
   
@@ -49,6 +50,7 @@ public class FailedJobCommandTest extends AbstractFoxPlatformIntegrationTest {
     // now the retries = 0
     
     Assert.assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    Assert.assertEquals(51, managementService.createJobQuery().noRetriesLeft().count());
     
   }
 
