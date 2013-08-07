@@ -30,6 +30,7 @@ public abstract class AbstractEventAtomicOperation implements AtomicOperation {
   }
 
   public void execute(InterpretableExecution execution) {
+
     ScopeImpl scope = getScope(execution);
     List<ExecutionListener> exectionListeners = scope.getExecutionListeners(getEventName());
     int executionListenerIndex = execution.getExecutionListenerIndex();
@@ -38,27 +39,38 @@ public abstract class AbstractEventAtomicOperation implements AtomicOperation {
       eventNotificationsStarted(execution);
     }
     
-    if (exectionListeners.size()>executionListenerIndex) {
-      execution.setEventName(getEventName());
-      execution.setEventSource(scope);
-      ExecutionListener listener = exectionListeners.get(executionListenerIndex);
-      try {
-        listener.notify(execution);
-      } catch (RuntimeException e) {
-        throw e;
-      } catch (Exception e) {
-        throw new PvmException("couldn't execute event listener : "+e.getMessage(), e);
-      }
-      execution.setExecutionListenerIndex(executionListenerIndex+1);
-      execution.performOperation(this);
-
-    } else {
-      execution.setExecutionListenerIndex(0);
-      execution.setEventName(null);
-      execution.setEventSource(null);
+    if(!isSkipNotifyListeners(execution)) {      
       
+      if (exectionListeners.size()>executionListenerIndex) {
+        execution.setEventName(getEventName());
+        execution.setEventSource(scope);
+        ExecutionListener listener = exectionListeners.get(executionListenerIndex);
+        try {
+          listener.notify(execution);
+        } catch (RuntimeException e) {
+          throw e;
+        } catch (Exception e) {
+          throw new PvmException("couldn't execute event listener : "+e.getMessage(), e);
+        }
+        execution.setExecutionListenerIndex(executionListenerIndex+1);
+        execution.performOperation(this);
+  
+      } else {
+        execution.setExecutionListenerIndex(0);
+        execution.setEventName(null);
+        execution.setEventSource(null);
+        
+        eventNotificationsCompleted(execution);
+      }
+      
+    } else {
       eventNotificationsCompleted(execution);
+      
     }
+  }
+
+  protected boolean isSkipNotifyListeners(InterpretableExecution execution) {
+    return false;
   }
 
   protected void eventNotificationsStarted(InterpretableExecution execution) {

@@ -21,6 +21,9 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.form.TaskFormHandler;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -58,14 +61,21 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
       throw new ProcessEngineException("Cannot find task with id " + taskId);
     }
     
-    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
     ExecutionEntity execution = task.getExecution();
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT && execution != null) {
-      DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
+      
+      final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
+      final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
+
       for (String propertyId: properties.keySet()) {
         String propertyValue = properties.get(propertyId);
-        HistoricFormPropertyEntity historicFormProperty = new HistoricFormPropertyEntity(execution, propertyId, propertyValue, taskId);
-        dbSqlSession.insert(historicFormProperty);
+        
+        HistoryEvent evt = eventProducer.createFormPropertyUpdateEvt(execution, propertyId, propertyValue, taskId);
+        eventHandler.handleEvent(evt);
+        
       }
     }
     

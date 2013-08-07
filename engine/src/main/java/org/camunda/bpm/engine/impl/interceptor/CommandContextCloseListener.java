@@ -10,14 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.camunda.bpm.engine.impl.persistence.entity;
-
-
+package org.camunda.bpm.engine.impl.interceptor;
 
 /**
- * @author Tom Baeyens
+ * invoked on command context close
+ * 
+ * @author Daniel Meyer
+ *
  */
-public class HistoricDetailTransitionInstanceEntity extends HistoricDetailEntity {
-  private static final long serialVersionUID = 1L;
+public interface CommandContextCloseListener {
+  
+  public void onCommandContextClose(CommandContext commandContext);
+  
 }

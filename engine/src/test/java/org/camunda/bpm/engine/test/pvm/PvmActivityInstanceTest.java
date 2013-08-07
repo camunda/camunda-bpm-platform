@@ -355,5 +355,114 @@ public class PvmActivityInstanceTest extends PvmTestCase {
     verifier.assertStartInstanceCount(1, "end");
     verifier.assertProcessInstanceParent("end", processInstance);
   }
+  
+  /** 
+   *           +-------------------------------------------------------+
+   *           | embedded subprocess                                   |
+   *           |                  +--------------------------------+   |
+   *           |                  | nested embedded subprocess     |   |
+   * +-----+   | +-----------+    |  +-----------+                 |   |
+   * |start|-->| |startInside|--> |  |startInside|                 |   |
+   * +-----+   | +-----------+    |  +-----------+                 |   |
+   *           |                  +--------------------------------+   |
+   *           |                                                       |
+   *           +-------------------------------------------------------+
+   */
+  public void testNestedSubProcessBothNoEnd() {
+    
+    ActivityInstanceVerification verifier = new ActivityInstanceVerification();
+    
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
+      .createActivity("start")
+        .initial()
+        .behavior(new Automatic())
+        .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+        .transition("embeddedsubprocess")
+      .endActivity()
+      .createActivity("embeddedsubprocess")
+        .scope()
+        .behavior(new EmbeddedSubProcess())
+        .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+        .createActivity("startInside")
+          .behavior(new Automatic())
+          .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+          .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+          .transition("nestedSubProcess")
+        .endActivity()
+          .createActivity("nestedSubProcess")
+          .scope()
+          .behavior(new EmbeddedSubProcess())
+          .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+          .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+          .createActivity("startNestedInside")
+            .behavior(new Automatic())
+            .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+            .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+            .endActivity()        
+        .endActivity()
+      .endActivity()  
+    .buildProcessDefinition();
+    
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+    processInstance.start();
+    
+    assertTrue(processInstance.isEnded());
+    
+    verifier.assertStartInstanceCount(1, "start");
+    verifier.assertProcessInstanceParent("start", processInstance);
+    verifier.assertStartInstanceCount(1, "embeddedsubprocess");
+    verifier.assertProcessInstanceParent("embeddedsubprocess", processInstance);
+    verifier.assertStartInstanceCount(1, "startInside");
+    verifier.assertParent("startInside", "embeddedsubprocess");
+    verifier.assertStartInstanceCount(1, "nestedSubProcess");
+    verifier.assertParent("nestedSubProcess", "embeddedsubprocess");
+    verifier.assertStartInstanceCount(1, "startNestedInside");
+    verifier.assertParent("startNestedInside", "nestedSubProcess");
+   
+  }
+  
+ 
+  public void testSubProcessNoEnd() {
+    
+    ActivityInstanceVerification verifier = new ActivityInstanceVerification();
+    
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
+      .createActivity("start")
+        .initial()
+        .behavior(new Automatic())
+        .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+        .transition("embeddedsubprocess")
+      .endActivity()
+      .createActivity("embeddedsubprocess")
+        .scope()
+        .behavior(new EmbeddedSubProcess())
+        .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+        .createActivity("startInside")
+          .behavior(new Automatic())
+          .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+          .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+        .endActivity() 
+      .endActivity()  
+      .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+      .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+    .buildProcessDefinition();
+    
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+    processInstance.start();
+    
+    assertTrue(processInstance.isEnded());
+    
+    verifier.assertStartInstanceCount(1, "start");
+    verifier.assertProcessInstanceParent("start", processInstance);
+    verifier.assertStartInstanceCount(1, "embeddedsubprocess");
+    verifier.assertProcessInstanceParent("embeddedsubprocess", processInstance);
+    verifier.assertStartInstanceCount(1, "startInside");
+    verifier.assertStartInstanceCount(1, "startInside");
+      
+  }
     
 }

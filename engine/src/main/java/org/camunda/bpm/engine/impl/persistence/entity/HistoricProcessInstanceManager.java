@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
@@ -37,7 +38,13 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     }
     return null;
   }
-
+  
+  public HistoricProcessInstanceEventEntity findHistoricProcessInstanceEvent(String eventId) {
+    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      return (HistoricProcessInstanceEventEntity) getDbSqlSession().selectById(HistoricProcessInstanceEventEntity.class, eventId);
+    }
+    return null;
+  }
 
   @SuppressWarnings("unchecked")
   public void deleteHistoricProcessInstanceByProcessDefinitionId(String processDefinitionId) {
@@ -54,12 +61,11 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   public void deleteHistoricProcessInstanceById(String historicProcessInstanceId) {
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       CommandContext commandContext = Context.getCommandContext();
-      HistoricProcessInstanceEntity historicProcessInstance = findHistoricProcessInstance(historicProcessInstanceId);
-      
+            
       commandContext
         .getHistoricDetailManager()
         .deleteHistoricDetailsByProcessInstanceId(historicProcessInstanceId);
-
+      
       commandContext
         .getHistoricVariableInstanceManager()
         .deleteHistoricVariableInstanceByProcessInstanceId(historicProcessInstanceId);
@@ -71,8 +77,9 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
       commandContext
         .getHistoricTaskInstanceManager()
         .deleteHistoricTaskInstancesByProcessInstanceId(historicProcessInstanceId);
-
-      getDbSqlSession().delete(historicProcessInstance);
+      
+      commandContext.getDbSqlSession().delete("deleteHistoricProcessInstance", historicProcessInstanceId);
+      
     }
   }
   

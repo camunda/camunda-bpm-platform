@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
 public class AtomicOperationProcessStartInitial extends AtomicOperationActivityInstanceStart {
 
@@ -42,13 +43,16 @@ public class AtomicOperationProcessStartInitial extends AtomicOperationActivityI
     
     ActivityImpl activity = (ActivityImpl) execution.getActivity();
     ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-    StartingExecution startingExecution = execution.getStartingExecution();
-    if (activity==startingExecution.getInitial()) {
-      execution.disposeStartingExecution();
+    ProcessInstanceStartContext processInstanceStartContext = execution.getProcessInstanceStartContext();
+    if (activity==processInstanceStartContext.getInitial()) {
+      
+      processInstanceStartContext.initialStarted(execution);
+      
+      execution.disposeProcessInstanceStartContext();
       execution.performOperation(ACTIVITY_EXECUTE);
 
     } else {
-      List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack(startingExecution.getInitial());
+      List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack(processInstanceStartContext.getInitial());
       int index = initialActivityStack.indexOf(activity);
       activity = initialActivityStack.get(index+1);
 
@@ -62,4 +66,5 @@ public class AtomicOperationProcessStartInitial extends AtomicOperationActivityI
       executionToUse.performOperation(PROCESS_START_INITIAL);
     }
   }
+
 }
