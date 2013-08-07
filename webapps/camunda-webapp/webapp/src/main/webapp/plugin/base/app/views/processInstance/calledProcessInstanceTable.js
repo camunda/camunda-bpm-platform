@@ -1,44 +1,44 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
 
-   function CalledProcessInstanceController ($scope, $location, PluginProcessInstanceResource) {
+   function CalledProcessInstanceController ($scope, PluginProcessInstanceResource) {
 
-    // input: selection, processInstance, processData
+    // input: processInstance, processData
 
     var processData = $scope.processData;
-    
-    var activityInstanceIds = null;
+    var processInstance = $scope.processInstance;
 
-    processData.get([ 'filter' ], function (filter) {
-      if (!filter) {
-        return;
-      }
+    var filter = null;
 
-      activityInstanceIds = filter.activityInstances || [];
-      updateView();
+    processData.get([ 'filter', 'instanceIdToInstanceMap' ], function (newFilter, instanceIdToInstanceMap) {
+      updateView(newFilter, instanceIdToInstanceMap);
     });
 
-    function updateView() {
+    function updateView (newFilter, instanceIdToInstanceMap) {
+      filter = angular.copy(newFilter);
 
-      PluginProcessInstanceResource.getCalledProcessInstances({id: $scope.processInstance.id}, {
-        activityInstanceIdIn: activityInstanceIds
-      }).$then(function(response) {
-        processData.get('instanceIdToInstanceMap', function (instanceIdToInstanceMap) {
-          angular.forEach(response.data, function (calledInstance) {
-            var instance = instanceIdToInstanceMap[calledInstance.callActivityInstanceId];
-            calledInstance.instance = instance;
-          });
+      delete filter.page;
+      delete filter.activityIds;
+      delete filter.scrollToBpmnElement;
+
+      // fix missmatch -> activityInstanceIds -> activityInstanceIdIn
+      filter.activityInstanceIdIn = filter.activityInstanceIds;
+      delete filter.activityInstanceIds;
+
+      $scope.calledProcessInstances = null;
+
+      PluginProcessInstanceResource.getCalledProcessInstances({id: $scope.processInstance.id}, filter).$then(function(response) {
+
+        angular.forEach(response.data, function (calledInstance) {
+          var instance = instanceIdToInstanceMap[calledInstance.callActivityInstanceId];
+          calledInstance.instance = instance;
         });
+
         $scope.calledProcessInstances = response.data;
       });      
     }
-
-    $scope.selectActivityInstance = function (activityInstance) {
-      $scope.selection.view = {activityInstances: [ activityInstance ], scrollTo: {activityId: activityInstance.activityId || activityInstances.targetActivityId}};
-    };
-
   };
 
-  module.controller('CalledProcessInstanceController', [ '$scope', '$location', 'PluginProcessInstanceResource', CalledProcessInstanceController ]);
+  module.controller('CalledProcessInstanceController', [ '$scope', 'PluginProcessInstanceResource', CalledProcessInstanceController ]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 

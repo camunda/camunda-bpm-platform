@@ -1,76 +1,75 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
 
-   function IncidentsController ($scope, $http, $location, Uri) {
+   function IncidentsController ($scope, $http, search, Uri) {
 
-    // input: selection, processInstance, processData
+    // input: processInstance, processData
 
     var processData = $scope.processData;
+    var processInstance = $scope.processInstance;
 
     $scope.stacktraceDialog = new Dialog();
 
-    var pages = $scope.pages = { size: 50, total: 0 };
+    var DEFAULT_PAGES = { size: 2, total: 0, current: 1 };
 
-    var bpmnElements = [];
-    var alreadyUpdated = false;
+    var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
 
-    $scope.$watch(function() { return $location.search().page; }, function(newValue) {
-      pages.current = parseInt(newValue) || 1;
-    });
+    var filter = null;
 
-    $scope.$watch('pages.current', function(newValue) {
-      var currentPage = newValue || 1;
-      var search = $location.search().page;
-
-      if (search || currentPage !== 1) {
-
-        $scope.updateLocation(function (location) {
-          location.search('page', currentPage);
-        });
-      }
-
-      updateView(currentPage);  
-    });
-
-    processData.get('filter', function (filter) {
-      if (!filter) {
+    $scope.$watch('pages.current', function(newValue, oldValue) {
+      if (newValue == oldValue) {
         return;
       }
 
-      bpmnElements = filter.bpmnElements || [];
-      updateView(filter.page || 1);
+      search('page', !newValue || newValue == 1 ? null : newValue);
     });
 
-    function updateView(page) {
+    processData.get([ 'filter', 'bpmnElements', 'activityIdToInstancesMap' ], function(newFilter, bpmnElements, activityIdToInstancesMap) {
+      pages.current = newFilter.page || 1;
+
+      updateView(newFilter, bpmnElements, activityIdToInstancesMap);
+    });
+
+    function updateView (newFilter, bpmnElements, activityIdToInstancesMap) {
+      filter = angular.copy(newFilter);
+
+      delete filter.page;
+      delete filter.activityInstanceIds;
+      delete filter.scrollToBpmnElement;
+
+      var page = pages.current,
+          count = pages.size,
+          firstResult = (page - 1) * count;
+
+      var defaultParams = {
+        processInstanceIdIn: [ processInstance.id ]
+      };
+
+      var pagingParams = {
+        firstResult: firstResult,
+        maxResults: count
+      };
+
+      var params = angular.extend({}, filter, defaultParams);
+
+      // fix missmatch -> activityIds -> activityIdIn
+      params.activityIdIn = params.activityIds;
+      delete params.activityIds;
+
       $scope.incidents = null;
 
-      var count = pages.size;
-      var firstResult = (page - 1) * count;
-
       // get the 'count' of incidents
-      $http.post(Uri.appUri('plugin://base/:engine/incident/count'), {
-        'processInstanceIdIn' : [ $scope.processInstance.id ],
-        'activityIdIn' :  bpmnElements
-      })
-      .success(function(data) {
+      $http.post(Uri.appUri('plugin://base/:engine/incident/count'), params).success(function(data) {
         pages.total = Math.ceil(data.count / pages.size);
       });
 
       // get the incidents
-      $http.post(Uri.appUri('plugin://base/:engine/incident'), {
-        'processInstanceIdIn' : [ $scope.processInstance.id ],
-        'activityIdIn' :  bpmnElements
-      }, {
-        params: {firstResult: firstResult, maxResults: count}
-      })
-      .success(function(data) { 
-        processData.get([ 'bpmnElements', 'activityIdToInstancesMap'], function (bpmnElements, activityIdToInstancesMap) {
-          angular.forEach(data, function (incident) {
-            var activityId = incident.activityId;
-            var bpmnElement = bpmnElements[activityId];
-            incident.activityName = bpmnElement.name || bpmnElement.id;
-            incident.linkable = bpmnElements[activityId] && activityIdToInstancesMap[activityId].length > 0;
-          });
-        })
+      $http.post(Uri.appUri('plugin://base/:engine/incident'), params, {params: pagingParams }).success(function(data) { 
+        angular.forEach(data, function (incident) {
+          var activityId = incident.activityId;
+          var bpmnElement = bpmnElements[activityId];
+          incident.activityName = bpmnElement.name || bpmnElement.id;
+          incident.linkable = bpmnElements[activityId] && activityIdToInstancesMap[activityId].length > 0;
+        });
 
         $scope.incidents = data;
       });
@@ -89,21 +88,13 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       $scope.stacktraceDialog.open();
     };
 
-    $scope.selectActivity = function (incident) {
-      var activityId = incident.activityId;
-      var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[activityId];
-      $scope.selection.view = {'bpmnElements': [ bpmnElement ], 'scrollTo': {'activityId': bpmnElement.id }, 'selectedBpmnElement': {'element': bpmnElement}};
-    };
-
     $scope.getJobStacktraceUrl = function (incident) {
-
       return Uri.appUri('engine://engine/:engine/job/' + incident.rootCauseIncidentConfiguration + '/stacktrace');
-
     };
 
   };
 
-  module.controller('IncidentsController', [ '$scope', '$http', '$location', 'Uri', IncidentsController ]);
+  module.controller('IncidentsController', [ '$scope', '$http', 'search', 'Uri', IncidentsController ]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
