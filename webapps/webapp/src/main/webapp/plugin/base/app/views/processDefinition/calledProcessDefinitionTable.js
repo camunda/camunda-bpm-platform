@@ -6,7 +6,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     var filter;
     var processData = $scope.processData;
 
-    processData.set('calledProcessDefinitions', [ 'processDefinition', 'filter', function(processDefinition, filter) {
+    processData.get([ 'processDefinition', 'filter', 'bpmnElements' ], function(processDefinition, filter, bpmnElements) {
 
       var parentId = filter.parentProcessDefinitionId,
           activityIds = filter.activityIds;
@@ -14,16 +14,18 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       return PluginProcessDefinitionResource.getCalledProcessDefinitions({ id: processDefinition.id }, {
         activityIdIn: activityIds,
         superProcessDefinitionId: parentId
-      }).$promise;
+      }).$promise.then(function(definitions) {
+        $scope.calledProcessDefinitions = attachCalledFromActivities(definitions, bpmnElements);
+      });
 
       // remember last filter
       filter = filter;
-    }]);
-
-    processData.get([ 'calledProcessDefinitions', 'bpmnElements' ], function(calledProcessDefinitions, bpmnElements) {
-
-      $scope.calledProcessDefinitions = attachCalledFromActivities(calledProcessDefinitions, bpmnElements);
     });
+
+    // processData.get([ 'calledProcessDefinitions', 'bpmnElements' ], function(calledProcessDefinitions, bpmnElements) {
+
+    //   $scope.calledProcessDefinitions = attachCalledFromActivities(calledProcessDefinitions, bpmnElements);
+    // });
 
     function attachCalledFromActivities(processDefinitions, bpmnElements) {
 
