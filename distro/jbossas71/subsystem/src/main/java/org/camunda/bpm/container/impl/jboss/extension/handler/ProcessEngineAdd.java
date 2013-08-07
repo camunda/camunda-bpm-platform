@@ -15,12 +15,7 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.CONFIGURATION;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.DATASOURCE;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.DEFAULT;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.HISTORY_LEVEL;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.NAME;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.PROPERTIES;
+import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.*;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
@@ -29,16 +24,12 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REQ
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYPE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VALUE_TYPE;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration;
 import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.extension.Element;
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -53,6 +44,12 @@ import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 
 /**
@@ -84,7 +81,8 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     node.get(REQUEST_PROPERTIES, HISTORY_LEVEL, DESCRIPTION).set("Which history level to use");
     node.get(REQUEST_PROPERTIES, HISTORY_LEVEL, TYPE).set(ModelType.STRING);
     node.get(REQUEST_PROPERTIES, HISTORY_LEVEL, REQUIRED).set(false);
-    
+
+    // engine properties
     node.get(REQUEST_PROPERTIES, PROPERTIES, DESCRIPTION).set("Additional properties");
     node.get(REQUEST_PROPERTIES, PROPERTIES, TYPE).set(ModelType.OBJECT);
     node.get(REQUEST_PROPERTIES, PROPERTIES, VALUE_TYPE).set(ModelType.LIST);
@@ -93,6 +91,12 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     node.get(REQUEST_PROPERTIES, CONFIGURATION, DESCRIPTION).set("Which configuration class to use");
     node.get(REQUEST_PROPERTIES, CONFIGURATION, TYPE).set(ModelType.STRING);
     node.get(REQUEST_PROPERTIES, CONFIGURATION, REQUIRED).set(false);
+
+    // plugins
+    node.get(REQUEST_PROPERTIES, PLUGINS, DESCRIPTION).set("Additional plugins for process engine");
+    node.get(REQUEST_PROPERTIES, PLUGINS, TYPE).set(ModelType.LIST);
+    node.get(REQUEST_PROPERTIES, PLUGINS, VALUE_TYPE).set(ModelType.OBJECT);
+    node.get(REQUEST_PROPERTIES, PLUGINS, REQUIRED).set(false);
 
     return node;
   }
@@ -135,6 +139,17 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
       properties = operation.get(PROPERTIES).asObject();
     }
     model.get(PROPERTIES).set(properties);
+
+    // retrieve all plugins
+    List<ModelNode> plugins = new ArrayList<ModelNode>();
+    if (operation.hasDefined(PLUGINS)) {
+      plugins = operation.get(PLUGINS).asList();
+    }
+    // do not add when empty, otherwise configuration will diff between different cluster nodes
+    if (!plugins.isEmpty()) {
+      model.get(PLUGINS).set(plugins);
+    }
+
   }
   
   @Override
@@ -166,11 +181,45 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
   }
 
   protected ManagedProcessEngineMetadata transformConfiguration(final OperationContext context, String engineName, final ModelNode model) {
-    String datasourceJndiName = model.get(DATASOURCE).asString();   
-    String historyLevel = model.get(HISTORY_LEVEL).asString();
-    String configuration = model.get(CONFIGURATION).asString();
-    boolean isDefault = model.get(DEFAULT).asBoolean();
-    
+    return new ManagedProcessEngineMetadata(
+        model.get(DEFAULT).asBoolean(),
+        engineName,
+        model.get(DATASOURCE).asString(),
+        model.get(HISTORY_LEVEL).asString(),
+        model.get(CONFIGURATION).asString(),
+        getPropertiesMap(model),
+        getPlugins(model));
+  }
+
+  protected List<ProcessEnginePluginXml> getPlugins(ModelNode model) {
+    List<ProcessEnginePluginXml> pluginConfigurations = null;
+
+    if (model.hasDefined(Element.PLUGINS.getLocalName())) {
+      ModelNode pluginsNode = model.get(Element.PLUGINS.getLocalName());
+
+      pluginConfigurations = new ArrayList<ProcessEnginePluginXml>();
+
+      for (final ModelNode plugin : pluginsNode.asList()) {
+        ProcessEnginePluginXml processEnginePluginXml = new ProcessEnginePluginXml() {
+          @Override
+          public String getPluginClass() {
+            return plugin.get(Element.PLUGIN_CLASS.getLocalName()).asString();
+          }
+
+          @Override
+          public Map<String, String> getProperties() {
+            return getPropertiesMap(plugin);
+          }
+        };
+
+        pluginConfigurations.add(processEnginePluginXml);
+      }
+    }
+
+    return pluginConfigurations;
+  }
+
+  protected Map<String, String> getPropertiesMap(ModelNode model) {
     Map<String, String> properties = new HashMap<String, String>();
     if (model.hasDefined(Element.PROPERTIES.getLocalName())) {
       ModelNode propertiesNode = model.get(Element.PROPERTIES.getLocalName());
@@ -181,8 +230,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
         }
       }
     }
-        
-    return new ManagedProcessEngineMetadata(isDefault, engineName, datasourceJndiName, historyLevel, configuration, properties);
+    return properties;
   }
-  
+
 }

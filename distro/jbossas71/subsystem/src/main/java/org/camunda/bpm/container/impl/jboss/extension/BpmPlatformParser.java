@@ -49,7 +49,10 @@ import org.jboss.staxmapper.XMLExtendedStreamWriter;
 
 
 public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<List<ModelNode>>, XMLElementWriter<SubsystemMarshallingContext> {
-  
+
+  public static final boolean REQUIRED = true;
+  public static final boolean NOT_REQUIRED = false;
+
   /** {@inheritDoc} */
   @Override
   public void readElement(XMLExtendedStreamReader reader, List<ModelNode> list) throws XMLStreamException {
@@ -154,20 +157,24 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
     while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
       final Element element = Element.forName(reader.getLocalName());
       switch (element) {
+        case PLUGINS: {
+          parsePlugins(reader, list, addProcessEngine);
+          break;
+        }
         case PROPERTIES: {
           parseProperties(reader, list, addProcessEngine);
           break;
         }
         case DATASOURCE: {
-          parseElement(Element.DATASOURCE, reader, addProcessEngine);
+          parseElement(Element.DATASOURCE, reader, addProcessEngine, REQUIRED);
           break;
         }
         case HISTORY_LEVEL: {
-          parseElement(Element.HISTORY_LEVEL, reader, addProcessEngine);
+          parseElement(Element.HISTORY_LEVEL, reader, addProcessEngine, NOT_REQUIRED);
           break;
         }
         case CONFIGURATION: {
-          parseElement(Element.CONFIGURATION, reader, addProcessEngine);
+          parseElement(Element.CONFIGURATION, reader, addProcessEngine, NOT_REQUIRED);
           break;
         }
         default: {
@@ -176,7 +183,60 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
       }
     }
   }
-  
+
+  private void parsePlugins(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode addProcessEngine) throws XMLStreamException {
+    if (!Element.PLUGINS.getLocalName().equals(reader.getLocalName())) {
+      throw unexpectedElement(reader);
+    }
+
+    requireNoAttributes(reader);
+
+    ModelNode plugins = new ModelNode();
+
+    while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+      final Element element = Element.forName(reader.getLocalName());
+      switch (element) {
+        case PLUGIN: {
+          parsePlugin(reader, list, plugins);
+          break;
+        }
+        default: {
+          throw unexpectedElement(reader);
+        }
+      }
+    }
+
+    addProcessEngine.get(Element.PLUGINS.getLocalName()).set(plugins);
+  }
+
+  private void parsePlugin(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode plugins) throws XMLStreamException {
+    if (!Element.PLUGIN.getLocalName().equals(reader.getLocalName())) {
+      throw unexpectedElement(reader);
+    }
+
+    requireNoAttributes(reader);
+    ModelNode plugin = new ModelNode();
+
+    while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+      final Element element = Element.forName(reader.getLocalName());
+      switch (element) {
+        case PLUGIN_CLASS: {
+          parseElement(Element.PLUGIN_CLASS, reader, plugin, REQUIRED);
+          break;
+        }
+        case PROPERTIES: {
+          parseProperties(reader, list, plugin);
+          break;
+        }
+        default: {
+          throw unexpectedElement(reader);
+        }
+      }
+    }
+
+    plugins.add(plugin);
+  }
+
   private void parseProperties(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress) throws XMLStreamException {
     if (!Element.PROPERTIES.getLocalName().equals(reader.getLocalName())) {
       throw unexpectedElement(reader);
@@ -245,7 +305,7 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
             break;
           }
           case THREAD_POOL_NAME: {
-            parseElement(Element.THREAD_POOL_NAME, reader, addJobExecutor);
+            parseElement(Element.THREAD_POOL_NAME, reader, addJobExecutor, REQUIRED);
             break;
           }
           default: {
@@ -323,37 +383,43 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
     // iterate deeper
     while (reader.hasNext()) {
       switch (reader.nextTag()) {
-      case END_ELEMENT: {
-        if (Element.forName(reader.getLocalName()) == Element.JOB_AQUISITION) {
-          // should mean we're done, so ignore it.
-          return;
+        case END_ELEMENT: {
+          if (Element.forName(reader.getLocalName()) == Element.JOB_AQUISITION) {
+            // should mean we're done, so ignore it.
+            return;
+          }
         }
-      }
-      case START_ELEMENT: {
-        switch (Element.forName(reader.getLocalName())) {
-        case PROPERTIES: {
-          parseProperties(reader, list, addJobAcquisition);
+        case START_ELEMENT: {
+          switch (Element.forName(reader.getLocalName())) {
+            case PROPERTIES: {
+              parseProperties(reader, list, addJobAcquisition);
+              break;
+            }
+            case ACQUISITION_STRATEGY: {
+              parseElement(Element.ACQUISITION_STRATEGY, reader, addJobAcquisition, REQUIRED);
+              break;
+            }
+            default: {
+              throw unexpectedElement(reader);
+            }
+          }
           break;
-        }       
-        case ACQUISITION_STRATEGY: {
-          parseElement(Element.ACQUISITION_STRATEGY, reader, addJobAcquisition);
-          break;
         }
-        default: {
-          throw unexpectedElement(reader);
-        }
-        }
-        break;
-      }
       }
     }
   }  
-  private void parseElement(Element element, XMLExtendedStreamReader reader, ModelNode parentAddress) throws XMLStreamException {
+  private void parseElement(Element element, XMLExtendedStreamReader reader, ModelNode parentAddress, boolean required) throws XMLStreamException {
     if (!element.equals(Element.forName(reader.getLocalName()))) {
       throw unexpectedElement(reader);
     }
-    
-    parentAddress.get(reader.getLocalName()).set(rawElementText(reader));
+
+    String elementName = reader.getLocalName();
+    String elementValue = rawElementText(reader);
+    if (elementValue == null && required) {
+      throw missingRequiredElement(reader, Collections.singleton(element.getLocalName()));
+    }
+
+    parentAddress.get(elementName).set(elementValue);
   }
   
   /** {@inheritDoc} */
@@ -390,6 +456,7 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
         writeElement(Element.CONFIGURATION, writer, entry);
   
         writeProperties(writer, entry);
+        writePlugins(writer, entry);
   
         writer.writeEndElement();
       }
@@ -468,6 +535,30 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
       
       writer.writeEndElement();
     }
+  }
+
+  private void writePlugins(final XMLExtendedStreamWriter writer, ModelNode entry) throws XMLStreamException {
+    if (entry.hasDefined(Element.PLUGINS.getLocalName())) {
+      writer.writeStartElement(Element.PLUGINS.getLocalName());
+
+      List<ModelNode> plugins = entry.get(Element.PLUGINS.getLocalName()).asList();
+      if (!plugins.isEmpty()) {
+        for (ModelNode plugin : plugins) {
+          writePlugin(writer, plugin);
+        }
+      }
+
+      writer.writeEndElement();
+    }
+  }
+
+  public void writePlugin(final XMLExtendedStreamWriter writer, ModelNode entry) throws XMLStreamException {
+    writer.writeStartElement(Element.PLUGIN.getLocalName());
+
+    writeElement(Element.PLUGIN_CLASS, writer, entry);
+
+    writeProperties(writer, entry);
+    writer.writeEndElement();
   }
 
   /**

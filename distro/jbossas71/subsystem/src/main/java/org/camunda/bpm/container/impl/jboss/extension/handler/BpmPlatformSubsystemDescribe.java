@@ -15,16 +15,7 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.ACQUISITION_STRATEGY;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.DATASOURCE;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.DEFAULT;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.HISTORY_LEVEL;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.JOB_ACQUISITIONS;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.JOB_EXECUTOR;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.NAME;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.PROCESS_ENGINES;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.PROPERTIES;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.THREAD_POOL_NAME;
+import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.*;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
@@ -122,6 +113,9 @@ public class BpmPlatformSubsystemDescribe implements OperationStepHandler, Descr
     }
     if (property.hasDefined(PROPERTIES)) {
       processEngineAdd.get(PROPERTIES).set(property.get(PROPERTIES).asList());
+    }
+    if (property.hasDefined(PLUGINS)) {
+      processEngineAdd.get(PLUGINS).set(property.get(PLUGINS).asList());
     }
     
     result.add(processEngineAdd);
