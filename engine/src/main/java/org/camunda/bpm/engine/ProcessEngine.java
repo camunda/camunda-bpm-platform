@@ -57,7 +57,7 @@ public interface ProcessEngine {
   public static String VERSION = "fox";
 
   /** The name as specified in 'process-engine-name' in 
-   * the activiti.cfg.xml configuration file.
+   * the camunda.cfg.xml configuration file.
    * The default name for a process engine is 'default */
   String getName();
 

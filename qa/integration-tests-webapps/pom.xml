@@ -592,7 +592,7 @@
                 </goals>
                 <configuration>
                   <target>
-                    <copy file="${basedir}/src/test/resources/activiti.cfg.xml" tofile="target/test-classes/activiti.cfg.xml" overwrite="true">
+                    <copy file="${basedir}/src/test/resources/camunda.cfg.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true">
                       <filterset>
                         <filter token="@database.url@" value="${database.url}" />
                         <filter token="@database.driver@" value="${database.driver}" />

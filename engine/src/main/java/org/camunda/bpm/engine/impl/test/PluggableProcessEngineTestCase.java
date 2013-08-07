@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.test;
 
+import java.io.FileNotFoundException;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 
@@ -39,9 +41,19 @@ public class PluggableProcessEngineTestCase extends AbstractProcessEngineTestCas
 
   private static ProcessEngine getOrInitializeCachedProcessEngine() {
     if (cachedProcessEngine == null) {
-      cachedProcessEngine = ProcessEngineConfiguration
+      try {
+        cachedProcessEngine = ProcessEngineConfiguration
+                .createProcessEngineConfigurationFromResource("camunda.cfg.xml")
+                .buildProcessEngine();
+      } catch (RuntimeException ex) {
+        if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
+          cachedProcessEngine = ProcessEngineConfiguration
               .createProcessEngineConfigurationFromResource("activiti.cfg.xml")
               .buildProcessEngine();
+        } else {
+          throw ex;
+        }
+      }
     }
     return cachedProcessEngine;
   }
