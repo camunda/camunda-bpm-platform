@@ -268,3 +268,7 @@ create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION (TYPE_,GROUP_ID_
 /** add deployment ids to jobs **/
 alter table ACT_RU_JOB 
     add DEPLOYMENT_ID_ nvarchar(64);
+    
+/** parent act inst to HAI **/
+alter table ACT_HI_ACTINST 
+    add PARENT_ACT_INST_ID_ nvarchar(64);

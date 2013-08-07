@@ -117,6 +117,10 @@ create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION(TYPE_,UNI_GROUP_
 
 -- add deployment id -------------------------------------------
 
-/** add deployment id to job table */
 alter table ACT_RU_JOB 
     add DEPLOYMENT_ID_ varchar(64);
+    
+-- add new column to HAI table ---------------------------------
+
+alter table ACT_HI_ACTINST 
+    add PARENT_ACT_INST_ID_ varchar(64);

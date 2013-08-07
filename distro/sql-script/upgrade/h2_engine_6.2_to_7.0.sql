@@ -261,3 +261,8 @@ alter table ACT_RU_AUTHORIZATION
 /** add deployment id to job table */
 alter table ACT_RU_JOB 
   add DEPLOYMENT_ID_ varchar(64);
+  
+/** add new column to HAI table */
+
+alter table ACT_HI_ACTINST 
+    add PARENT_ACT_INST_ID_ varchar(64);
