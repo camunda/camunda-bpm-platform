@@ -1,7 +1,7 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
 
-  var Controller = [ '$scope', 'search', 'debounce', 'PluginProcessInstanceResource', 'Uri', 'ProcessInstanceResource',
-      function ($scope, search, debounce, PluginProcessInstanceResource, Uri, ProcessInstanceResource) {
+  var Controller = [ '$scope', 'search', 'PluginProcessInstanceResource',
+      function ($scope, search, PluginProcessInstanceResource) {
 
     var processData = $scope.processData;
 

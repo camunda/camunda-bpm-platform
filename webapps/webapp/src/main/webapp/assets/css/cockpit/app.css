@@ -328,6 +328,12 @@ a.expand-collapse:focus {
   position: relative;
 }
 
+.filter .search.search-text {
+  padding-right: 25px;
+  line-height: 20px;
+  margin-bottom: 5px;
+}
+
 .filter .search .remove {
   position: absolute;
   height: 26px;

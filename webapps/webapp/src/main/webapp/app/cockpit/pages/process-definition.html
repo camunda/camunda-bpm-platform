@@ -64,7 +64,7 @@
               Parent
             </div>
 
-            <div class="search">
+            <div class="search search-text">
 
               <button class="btn btn-link btn-mini btn-control remove"
                       ng-click="removeParentFilter()">
@@ -114,9 +114,9 @@
                      required
                      name="variableFilter{{$index}}"
                      placeholder="Filter Variable"
-                     process-variable-filter 
                      ng-model="variable.value"
-                     ng-change="filterChanged()" />
+                     ng-change="filterChanged()" 
+                     process-variable />
 
               <div class="note note-small" ng-show="filterForm['variableFilter' + $index].$invalid">
                 <div ng-show="filterForm['variableFilter' + $index].$error.required">
@@ -153,12 +153,12 @@
               Activity
             </div>
 
-            <div class="search" ng-repeat="activity in filterData.activities">
+            <div class="search search-text" ng-repeat="activity in filterData.activities">
               <button class="btn btn-link btn-mini btn-control remove"
                       ng-click="removeActivityFilter(activity)">
                 <i class="icon-remove"></i>
               </button>
-              {{ activity.value }}
+              {{ activity.name }}
             </div>
           </li>
         </ul>
