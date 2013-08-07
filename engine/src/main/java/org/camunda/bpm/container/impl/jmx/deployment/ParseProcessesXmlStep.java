@@ -43,8 +43,6 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
  *
  */
 public class ParseProcessesXmlStep extends MBeanDeploymentOperationStep {
-  
-  private final static Logger LOGGER = Logger.getLogger(ParseProcessesXmlStep.class.getName());
 
   private static final String META_INF_PROCESSES_XML = "META-INF/processes.xml";
 

@@ -14,6 +14,7 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.PreUndeploy;
@@ -31,7 +32,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
  */
 public class PreUndeployInvocationStep extends MBeanDeploymentOperationStep {
 
-
   public String getName() {
     return "Invoking @PreUndeploy";
   }
@@ -42,9 +42,16 @@ public class PreUndeployInvocationStep extends MBeanDeploymentOperationStep {
         
     Class<? extends AbstractProcessApplication> paClass = processApplication.getClass();
     Method preUndeployMethod = InjectionUtil.detectAnnotatedMethod(paClass, PreUndeploy.class);
-    
+
     if(preUndeployMethod == null) {
+      if (LOGGER.isLoggable(Level.FINE)) {
+        LOGGER.fine("Found no @PreUndeploy annotated method.");
+      }
       return;
+    }
+
+    if (LOGGER.isLoggable(Level.FINE)) {
+      LOGGER.fine("Found @PreUndeploy annotated method: " + preUndeployMethod.getName());
     }
     
     // resolve injections

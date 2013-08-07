@@ -16,13 +16,10 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
@@ -37,20 +34,51 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
  */
 public class CallActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
   
-  protected String processDefinitonKey;
+  protected String processDefinitionKey;
+  protected String binding;
+  protected Integer version;
   private List<AbstractDataAssociation> dataInputAssociations = new ArrayList<AbstractDataAssociation>();
   private List<AbstractDataAssociation> dataOutputAssociations = new ArrayList<AbstractDataAssociation>();
   private Expression processDefinitionExpression;
+  
+  public enum CalledElementBinding {
+    LATEST("latest"),
+    DEPLOYMENT("deployment"),
+    VERSION("version");
+    
+    private String value;
+    
+    private CalledElementBinding(String value) {
+      this.value = value;
+    }
+    
+    public String getValue() {
+      return value;
+    }
+    
+  }
 
   public CallActivityBehavior(String processDefinitionKey) {
-    this.processDefinitonKey = processDefinitionKey;
+    this.processDefinitionKey = processDefinitionKey;
   }
   
   public CallActivityBehavior(Expression processDefinitionExpression) {
     super();
     this.processDefinitionExpression = processDefinitionExpression;
   }
+  
+  public CallActivityBehavior(String processDefinitionKey, String binding, Integer version) {
+    this.processDefinitionKey = processDefinitionKey;
+    this.binding = binding;
+    this.version = version;
+  }
 
+  public CallActivityBehavior(Expression processDefinitionExpression, String binding, Integer version) {
+    this.processDefinitionExpression = processDefinitionExpression;
+    this.binding = binding;
+    this.version = version;
+  }
+  
   public void addDataInputAssociation(AbstractDataAssociation dataInputAssociation) {
     this.dataInputAssociations.add(dataInputAssociation);
   }
@@ -61,15 +89,30 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
   public void execute(ActivityExecution execution) throws Exception {
     
-	String processDefinitonKey = this.processDefinitonKey;
+	String processDefinitionKey = this.processDefinitionKey;
+	String binding = this.binding;
+	Integer version = this.version;
     if (processDefinitionExpression != null) {
-      processDefinitonKey = (String) processDefinitionExpression.getValue(execution);
+      processDefinitionKey = (String) processDefinitionExpression.getValue(execution);
     }
     
-    ProcessDefinitionImpl processDefinition = Context
-      .getProcessEngineConfiguration()
-      .getDeploymentCache()
-      .findDeployedLatestProcessDefinitionByKey(processDefinitonKey);
+    ProcessDefinitionImpl processDefinition = null;
+    if (binding == null || CalledElementBinding.LATEST.getValue().equals(binding)) {
+      processDefinition = Context
+        .getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
+    } else if (binding != null && CalledElementBinding.DEPLOYMENT.getValue().equals(binding)) {
+      processDefinition = Context
+        .getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findDeployedProcessDefinitionByDeploymentAndKey(Context.getExecutionContext().getExecution().getProcessDefinition().getDeploymentId(), processDefinitionKey);
+    } else if (binding != null && CalledElementBinding.VERSION.getValue().equals(binding) && version != null) {
+      processDefinition = Context
+        .getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findDeployedProcessDefinitionByKeyAndVersion(processDefinitionKey, version);
+    }
     
     PvmProcessInstance subProcessInstance = execution.createSubProcessInstance(processDefinition);
     

@@ -35,8 +35,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
  */
 public class UndeployProcessArchivesStep extends MBeanDeploymentOperationStep {
   
-  protected final static Logger log = Logger.getLogger(UndeployProcessArchivesStep.class.getName());
-  
   public String getName() {
     return "Stopping process engines";
   }

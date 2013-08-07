@@ -31,8 +31,6 @@ import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
  *
  */
 public class StopProcessApplicationsStep extends MBeanDeploymentOperationStep {
-  
-  public final static Logger LOGGER = Logger.getLogger(StopProcessApplicationsStep.class.getName());
 
   public String getName() {
     return "Stopping process applications";

@@ -2827,16 +2827,36 @@ public class BpmnParse extends Parse {
     activity.setExclusive(isExclusive(callActivityElement));
     
     String calledElement = callActivityElement.attribute("calledElement");
+    String calledElementBinding = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "calledElementBinding");
+    String calledElementVersion = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "calledElementVersion");
     if (calledElement == null) {
       addError("Missing attribute 'calledElement'", callActivityElement);
     }
-
+    if (calledElementBinding != null &&
+        calledElementBinding.equals(CallActivityBehavior.CalledElementBinding.VERSION.getValue()) && 
+        calledElementVersion == null) {
+        addError("Missing attribute 'calledElementVersion' when calledElementBinding has value '" + CallActivityBehavior.CalledElementBinding.VERSION.getValue() + "'", callActivityElement);
+    }
+    
+    Integer processDefinitionVersion = null;
+    if (calledElementVersion != null) {
+      processDefinitionVersion = Integer.parseInt(calledElementVersion);
+    }
+    
     CallActivityBehavior callActivityBehaviour = null;
     String expressionRegex = "\\$+\\{+.+\\}";
     if (calledElement != null && calledElement.matches(expressionRegex)) {
-      callActivityBehaviour = new CallActivityBehavior(expressionManager.createExpression(calledElement));
+      if (calledElementBinding == null) {
+        callActivityBehaviour = new CallActivityBehavior(expressionManager.createExpression(calledElement));
+      } else {
+        callActivityBehaviour = new CallActivityBehavior(expressionManager.createExpression(calledElement), calledElementBinding, processDefinitionVersion);
+      }
     } else {
-      callActivityBehaviour = new CallActivityBehavior(calledElement);
+      if (calledElementBinding == null) {
+        callActivityBehaviour = new CallActivityBehavior(calledElement);
+      } else {
+        callActivityBehaviour = new CallActivityBehavior(calledElement, calledElementBinding, processDefinitionVersion);
+      }
     }
 
     Element extentionsElement = callActivityElement.element("extensionElements");
