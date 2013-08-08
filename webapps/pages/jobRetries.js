@@ -51,7 +51,7 @@ ngDefine('cockpit.pages', function(module, $) {
       var count = jobPages.size;
       var firstResult = (page - 1) * count;
 
-      JobResource.query({'firstResult': firstResult, 'maxResults': count},{'processInstanceId': processInstance.id, 'withException': true}).$then(function (response) {
+      JobResource.query({'firstResult': firstResult, 'maxResults': count},{'processInstanceId': processInstance.id, 'withException': true, 'noRetriesLeft': true}).$then(function (response) {
         for (var i = 0, job; !!(job = response.data[i]); i++) {
           jobIdToFailedJobMap[job.id] = job;
           var instance = executionIdToInstanceMap[job.executionId];
