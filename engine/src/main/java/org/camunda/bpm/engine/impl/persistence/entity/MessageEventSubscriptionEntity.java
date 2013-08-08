@@ -30,4 +30,19 @@ public class MessageEventSubscriptionEntity extends EventSubscriptionEntity {
     eventType = "message";
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", eventType=" + eventType
+           + ", eventName=" + eventName
+           + ", executionId=" + executionId
+           + ", processInstanceId=" + processInstanceId
+           + ", activityId=" + activityId
+           + ", configuration=" + configuration
+           + ", revision=" + revision
+           + ", created=" + created
+           + "]";
+  }
+
 }

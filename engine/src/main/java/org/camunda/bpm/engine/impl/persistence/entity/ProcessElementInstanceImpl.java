@@ -49,5 +49,15 @@ public class ProcessElementInstanceImpl implements ProcessElementInstance {
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
-  
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", parentActivityInstanceId=" + parentActivityInstanceId
+           + ", processInstanceId=" + processInstanceId
+           + ", processDefinitionId=" + processDefinitionId
+           + "]";
+  }
+
 }

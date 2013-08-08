@@ -51,4 +51,12 @@ public class MembershipEntity implements Serializable, PersistentObject {
   public void setGroup(GroupEntity group) {
     this.group = group;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[user=" + user
+           + ", group=" + group
+           + "]";
+  }
 }

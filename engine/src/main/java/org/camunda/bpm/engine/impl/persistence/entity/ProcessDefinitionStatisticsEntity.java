@@ -43,4 +43,25 @@ public class ProcessDefinitionStatisticsEntity extends ProcessDefinitionEntity i
   public void setIncidentStatistics(List<IncidentStatistics> incidentStatistics) {
     this.incidentStatistics = incidentStatistics;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[instances=" + instances
+           + ", failedJobs=" + failedJobs
+           + ", id=" + id
+           + ", deploymentId=" + deploymentId
+           + ", description=" + description
+           + ", historyLevel=" + historyLevel
+           + ", category=" + category
+           + ", hasStartFormKey=" + hasStartFormKey
+           + ", diagramResourceName=" + diagramResourceName
+           + ", key=" + key
+           + ", name=" + name
+           + ", resourceName=" + resourceName
+           + ", revision=" + revision
+           + ", version=" + version
+           + ", suspensionState=" + suspensionState
+           + "]";
+  }
 }

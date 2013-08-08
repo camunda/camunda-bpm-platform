@@ -148,5 +148,17 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, Persisten
     this.processDefId = processDef.getId();
   }
 
-  
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", type=" + type
+           + ", userId=" + userId
+           + ", groupId=" + groupId
+           + ", taskId=" + taskId
+           + ", processDefId=" + processDefId
+           + ", task=" + task
+           + ", processDef=" + processDef
+           + "]";
+  }
 }
