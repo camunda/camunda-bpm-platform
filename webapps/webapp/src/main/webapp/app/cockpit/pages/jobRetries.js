@@ -22,8 +22,8 @@ ngDefine('cockpit.pages', function(module, $) {
         SUCCESS = 'successful',
         FAILED = 'failed';
 
-    var executionIdToInstanceMap = jobRetriesData.observe('executionIdToInstanceMap', function (executionIdToInstanceMap) {
-      executionIdToInstanceMap = executionIdToInstanceMap;
+    var executionIdToInstanceMap = jobRetriesData.observe('executionIdToInstanceMap', function (executionMap) {
+      executionIdToInstanceMap = executionMap;
     });
 
     $scope.$on('$routeChangeStart', function () {
