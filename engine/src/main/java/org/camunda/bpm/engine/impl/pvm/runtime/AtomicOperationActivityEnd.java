@@ -142,4 +142,10 @@ public class AtomicOperationActivityEnd extends AtomicOperationActivityInstanceE
     }
     return true;
   }
+
+  @Override
+  public String getCanonicalName() {
+    return "activity-end";
+  }
+
 }

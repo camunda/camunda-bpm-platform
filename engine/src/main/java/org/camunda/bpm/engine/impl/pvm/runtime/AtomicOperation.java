@@ -38,4 +38,6 @@ public interface AtomicOperation {
   void execute(InterpretableExecution execution);
   
   boolean isAsync(InterpretableExecution execution);
+  
+  String getCanonicalName();
 }

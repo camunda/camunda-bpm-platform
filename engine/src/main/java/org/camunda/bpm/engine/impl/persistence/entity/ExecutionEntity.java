@@ -355,11 +355,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
    
   public void start(Map<String, Object> variables) {
-    if(isProcessInstance()) {
-      if(processInstanceStartContext == null) {
-        processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
-      }
-    }
     if(variables != null) {
       setVariables(variables);
     }
@@ -632,7 +627,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     message.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
     // At the moment, only AtomicOperationTransitionCreateScope can be performed asynchronously,
     // so there is no need to pass it to the handler
-
+    message.setJobHandlerConfiguration(executionOperation.getCanonicalName());
+    
     Context
       .getCommandContext()
       .getJobManager()
@@ -1566,6 +1562,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   public ProcessInstanceStartContext getProcessInstanceStartContext() {
+    if(isProcessInstance()) {
+      if(processInstanceStartContext == null) {
+        processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
+      }
+    }
     return processInstanceStartContext;
   }
   
