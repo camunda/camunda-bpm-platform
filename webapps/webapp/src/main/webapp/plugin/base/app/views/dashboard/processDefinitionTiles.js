@@ -7,7 +7,7 @@ ngDefine('cockpit.plugin.base.views', [
     $scope.orderByPredicate = 'definition.name';
     $scope.orderByReverse = false;
 
-    ProcessDefinitionResource.queryStatistics().$then(function (data) {
+    ProcessDefinitionResource.queryStatistics({ incidents: true }).$then(function (data) {
       $scope.statistics = aggregateStatistics(data.resource);
     });
 
