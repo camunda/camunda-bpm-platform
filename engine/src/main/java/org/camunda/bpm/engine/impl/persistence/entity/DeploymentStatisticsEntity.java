@@ -44,4 +44,18 @@ public class DeploymentStatisticsEntity extends DeploymentEntity implements Depl
   public void setIncidentStatistics(List<IncidentStatistics> incidentStatistics) {
     this.incidentStatistics = incidentStatistics;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[instances=" + instances
+           + ", failedJobs=" + failedJobs
+           + ", id=" + id
+           + ", name=" + name
+           + ", resources=" + resources
+           + ", deploymentTime=" + deploymentTime
+           + ", validatingSchema=" + validatingSchema
+           + ", isNew=" + isNew
+           + "]";
+  }
 }

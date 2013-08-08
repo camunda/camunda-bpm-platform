@@ -35,5 +35,17 @@ public class TransitionInstanceImpl extends ProcessElementInstanceImpl implement
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
   }
-  
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[executionId=" + executionId
+           + ", targetActivityId=" + targetActivityId
+           + ", id=" + id
+           + ", parentActivityInstanceId=" + parentActivityInstanceId
+           + ", processInstanceId=" + processInstanceId
+           + ", processDefinitionId=" + processDefinitionId
+           + "]";
+  }
+
 }

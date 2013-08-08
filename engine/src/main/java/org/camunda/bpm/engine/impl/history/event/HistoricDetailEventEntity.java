@@ -53,4 +53,18 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
     this.timestamp = timestamp;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[activityInstanceId=" + activityInstanceId
+           + ", taskId=" + taskId
+           + ", timestamp=" + timestamp
+           + ", eventType=" + eventType
+           + ", executionId=" + executionId
+           + ", processDefinitionId=" + processDefinitionId
+           + ", processInstanceId=" + processInstanceId
+           + ", id=" + id
+           + "]";
+  }
+
 }

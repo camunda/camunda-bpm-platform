@@ -75,4 +75,14 @@ public class GroupEntity implements Group, Serializable, PersistentObject, HasRe
   public void setRevision(int revision) {
     this.revision = revision;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", revision=" + revision
+           + ", name=" + name
+           + ", type=" + type
+           + "]";
+  }
 }
