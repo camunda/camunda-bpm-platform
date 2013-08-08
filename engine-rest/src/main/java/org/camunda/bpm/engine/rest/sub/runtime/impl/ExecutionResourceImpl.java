@@ -23,9 +23,9 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.rest.dto.job.JobDeleteMessageDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionTriggerDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobDeleteExceptionDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
@@ -93,7 +93,7 @@ public class ExecutionResourceImpl implements ExecutionResource {
   }
 
   @Override
-  public List<JobDeleteMessageDto> deleteJobs() {
+  public List<JobDeleteExceptionDto> deleteJobs() {
       RuntimeService runtimeService = engine.getRuntimeService();
       Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
 
@@ -104,21 +104,20 @@ public class ExecutionResourceImpl implements ExecutionResource {
      ManagementService managementService = engine.getManagementService();
      List<Job> jobs = managementService.createJobQuery().executionId(execution.getId()).list();
 
-     List<JobDeleteMessageDto> jobDeleteMessages = new ArrayList<JobDeleteMessageDto>();
+     List<JobDeleteExceptionDto> jobDeleteExceptions = new ArrayList<JobDeleteExceptionDto>();
 
      if (jobs == null) {
-        return jobDeleteMessages;
+        return jobDeleteExceptions;
      }
 
      for (Job job : jobs) {
 		try {
 		  managementService.deleteJob(job.getId());
 		} catch (ProcessEngineException e) {
-          jobDeleteMessages.add(JobDeleteMessageDto.fromMessage(e.getMessage()));
-		  continue;
+			jobDeleteExceptions.add(JobDeleteExceptionDto.fromExceptionDetails(job.getId(),e.getMessage()));		  
         }
 	 }
 
-    return jobDeleteMessages;
+    return jobDeleteExceptions;
   }
 }
