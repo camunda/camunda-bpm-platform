@@ -4,7 +4,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
     // input: processInstance, processData
 
-    var processData = $scope.processData;
+    var variableInstanceData = $scope.processData.newChild($scope);
     var processInstance = $scope.processInstance;
 
     // contains the variable instances which are current
@@ -36,7 +36,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       search('page', !newValue || newValue == 1 ? null : newValue);
     });
 
-    processData.get([ 'filter', 'instanceIdToInstanceMap' ], function(newFilter, instanceIdToInstanceMap) {
+    variableInstanceData.observe([ 'filter', 'instanceIdToInstanceMap' ], function(newFilter, instanceIdToInstanceMap) {
       pages.current = newFilter.page || 1;
 
       updateView(newFilter, instanceIdToInstanceMap);

@@ -2,6 +2,8 @@ ngDefine('cockpit.pages', function(module, $) {
 
   function JobRetriesController ($scope, $q, $location, Notifications, JobResource) {
 
+    var jobRetriesData = $scope.processData.newChild($scope);
+
     var jobPages = $scope.jobPages = { size: 5, total: 0 };
     var summarizePages = $scope.summarizePages = { size: 5, total: 0 };
 
@@ -19,6 +21,10 @@ ngDefine('cockpit.pages', function(module, $) {
         PERFORM = 'performing'
         SUCCESS = 'successful',
         FAILED = 'failed';
+
+    var executionIdToInstanceMap = jobRetriesData.observe('executionIdToInstanceMap', function (executionIdToInstanceMap) {
+      executionIdToInstanceMap = executionIdToInstanceMap;
+    });
 
     $scope.$on('$routeChangeStart', function () {
       $scope.jobRetriesDialog.close();
@@ -48,7 +54,7 @@ ngDefine('cockpit.pages', function(module, $) {
       JobResource.query({'firstResult': firstResult, 'maxResults': count},{'processInstanceId': processInstance.id, 'withException': true}).$then(function (response) {
         for (var i = 0, job; !!(job = response.data[i]); i++) {
           jobIdToFailedJobMap[job.id] = job;
-          var instance = $scope.processInstance.executionIdToInstanceMap[job.executionId];
+          var instance = executionIdToInstanceMap[job.executionId];
           job.instance = instance;
 
           var index = selectedFailedJobIds.indexOf(job.id);
