@@ -709,4 +709,7 @@
     </repository>
   </repositories>
   
+  <modules>
+  	<module>history-ext</module>
+  </modules>
 </project>
