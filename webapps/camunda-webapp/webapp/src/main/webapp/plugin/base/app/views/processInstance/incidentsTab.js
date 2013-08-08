@@ -4,7 +4,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
     // input: processInstance, processData
 
-    var processData = $scope.processData;
+    var incidentData = $scope.processData.newChild($scope);
     var processInstance = $scope.processInstance;
 
     $scope.stacktraceDialog = new Dialog();
@@ -23,7 +23,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       search('page', !newValue || newValue == 1 ? null : newValue);
     });
 
-    processData.get([ 'filter', 'bpmnElements', 'activityIdToInstancesMap' ], function(newFilter, bpmnElements, activityIdToInstancesMap) {
+    incidentData.observe([ 'filter', 'bpmnElements', 'activityIdToInstancesMap' ], function(newFilter, bpmnElements, activityIdToInstancesMap) {
       pages.current = newFilter.page || 1;
 
       updateView(newFilter, bpmnElements, activityIdToInstancesMap);

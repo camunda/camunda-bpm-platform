@@ -3,7 +3,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
   var Controller = [ '$scope', 'search', 'PluginProcessInstanceResource',
       function ($scope, search, PluginProcessInstanceResource) {
 
-    var processData = $scope.processData;
+    var processData = $scope.processData.newChild($scope);
 
     var processDefinition = $scope.processDefinition;
     
@@ -21,7 +21,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       search('page', !newValue || newValue == 1 ? null : newValue);
     });
 
-    processData.get('filter', function(newFilter) {
+    processData.observe('filter', function(newFilter) {
       pages.current = newFilter.page || 1;
 
       updateView(newFilter);

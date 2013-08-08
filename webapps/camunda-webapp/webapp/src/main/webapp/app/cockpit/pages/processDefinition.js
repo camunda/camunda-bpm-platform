@@ -4,10 +4,10 @@ ngDefine('cockpit.pages.processDefinition', [
 ], function(module, angular) {
 
   var Controller = [
-    '$scope', '$rootScope', 'search', '$q', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Transform', 'Variables', 'dataDependFactory', 'processDefinition',
-    function($scope, $rootScope, search, $q, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Transform, Variables, dataDependFactory, processDefinition) {
+    '$scope', '$rootScope', 'search', '$q', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Transform', 'Variables', 'dataDepend', 'processDefinition',
+    function($scope, $rootScope, search, $q, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Transform, Variables, dataDepend, processDefinition) {
 
-    var processData = $scope.processData = dataDependFactory.create($scope);
+    var processData = $scope.processData = dataDepend.create($scope);
 
 
     // utilities ///////////////////////
@@ -98,13 +98,13 @@ ngDefine('cockpit.pages.processDefinition', [
 
     // begin data definition //////////////////////
 
-    processData.set('processDefinition', processDefinition);
+    processData.provide('processDefinition', processDefinition);
 
-    processData.set('filter', parseFilterFromUri());
+    processData.provide('filter', parseFilterFromUri());
 
-    processData.set('parentId', [ 'filter', function(filter) { return filter.parentProcessDefinitionId; } ]);
+    processData.provide('parentId', [ 'filter', function(filter) { return filter.parentProcessDefinitionId; } ]);
 
-    processData.set('parent', [ 'parentId', function(parentId) {
+    processData.provide('parent', [ 'parentId', function(parentId) {
       if (!parentId) {
         return null;
       } else {
@@ -112,51 +112,31 @@ ngDefine('cockpit.pages.processDefinition', [
       }
     }]);
 
-    processData.set('instances.all', [ 'processDefinition', function(definition) {
+    processData.provide('instances.all', [ 'processDefinition', function(definition) {
       return ProcessInstanceResource.count({ processDefinitionKey : definition.key }).$promise;
     }]);
 
-    processData.set('instances.current', [ 'processDefinition', function(definition) {
+    processData.provide('instances.current', [ 'processDefinition', function(definition) {
       return ProcessInstanceResource.count({ processDefinitionId : definition.id }).$promise;
     }]);
 
-    processData.set('semantic', [ 'processDefinition', function(definition) {
+    processData.provide('semantic', [ 'processDefinition', function(definition) {
       return ProcessDefinitionResource.getBpmn20Xml({ id : definition.id}).$promise.then(function(value) {
         return Transform.transformBpmn20Xml(value.bpmn20Xml);
       });
     }]);
 
-    processData.set('bpmnElements', [ 'processDefinition', 'semantic', function(definition, semantic) {
+    processData.provide('bpmnElements', [ 'processDefinition', 'semantic', function(definition, semantic) {
       return getBpmnElements(definition, semantic);
     }]);
 
-    processData.set('allProcessDefinitions', [ 'processDefinition', function(definition) {
+    processData.provide('allProcessDefinitions', [ 'processDefinition', function(definition) {
       return ProcessDefinitionResource.query({ 'key' : definition.key, 'sortBy': 'version', 'sortOrder': 'asc' }).$promise;
     }]);
 
-    // end data definition /////////////////////////
-
-
-    // begin data usage ////////////////////////////
-
-    $scope.breadcrumbData = processData.get([ 'processDefinition', 'parent' ], function(definition, parent) {
-      $rootScope.clearBreadcrumbs();
-
-      if (parent) {
-        $rootScope.addBreadcrumb({ type: 'processDefinition', processDefinition: parent });
-      }
-
-      $rootScope.addBreadcrumb({ type: 'processDefinition', processDefinition: definition });  
-    });
-
-    $scope.instanceStatistics = processData.get([ 'instances.all', 'instances.current' ], function(allCount, currentCount) {
-      $scope.instanceStatistics.all = allCount;
-      $scope.instanceStatistics.current = currentCount;
-    });
-
     // processDiagram /////////////////////
     
-    processData.set('processDiagram', [ 'semantic', 'processDefinition', 'bpmnElements', function (semantic, processDefinition, bpmnElements) {
+    processData.provide('processDiagram', [ 'semantic', 'processDefinition', 'bpmnElements', function (semantic, processDefinition, bpmnElements) {
       var diagram = $scope.processDiagram = $scope.processDiagram || {};
 
       angular.extend(diagram, {
@@ -168,7 +148,7 @@ ngDefine('cockpit.pages.processDefinition', [
       return diagram;
     }]);
 
-    processData.set([ 'activityInstanceStatistics', 'incidentStatistics', 'clickableElements' ], [ 'processDefinition', function(definition) {
+    processData.provide([ 'activityInstanceStatistics', 'incidentStatistics', 'clickableElements' ], [ 'processDefinition', function(definition) {
 
       return ProcessDefinitionResource.queryActivityStatistics({ id : definition.id, incidents: true }).$promise.then(function(stats) {
         var activityStatistics = [],
@@ -190,7 +170,7 @@ ngDefine('cockpit.pages.processDefinition', [
       });
     }]);
 
-    processData.set('processDiagramOverlay', [ 'processDiagram', 'activityInstanceStatistics', 'clickableElements', 'incidentStatistics', function (processDiagram, activityInstanceStatistics, clickableElements, incidentStatistics) {
+    processData.provide('processDiagramOverlay', [ 'processDiagram', 'activityInstanceStatistics', 'clickableElements', 'incidentStatistics', function (processDiagram, activityInstanceStatistics, clickableElements, incidentStatistics) {
       return {
         annotations: activityInstanceStatistics,
         incidents: incidentStatistics,
@@ -198,12 +178,32 @@ ngDefine('cockpit.pages.processDefinition', [
       };
     }]);
 
-    $scope.processDiagramData = processData.get([ 'processDiagram', 'processDiagramOverlay' ], function(processDiagram, processDiagramOverlay) {
+    // end data definition /////////////////////////
+
+
+    // begin data usage ////////////////////////////
+
+    $scope.breadcrumbData = processData.observe([ 'processDefinition', 'parent' ], function(definition, parent) {
+      $rootScope.clearBreadcrumbs();
+
+      if (parent) {
+        $rootScope.addBreadcrumb({ type: 'processDefinition', processDefinition: parent });
+      }
+
+      $rootScope.addBreadcrumb({ type: 'processDefinition', processDefinition: definition });  
+    });
+
+    $scope.instanceStatistics = processData.observe([ 'instances.all', 'instances.current' ], function(allCount, currentCount) {
+      $scope.instanceStatistics.all = allCount;
+      $scope.instanceStatistics.current = currentCount;
+    });
+
+    $scope.processDiagramData = processData.observe([ 'processDiagram', 'processDiagramOverlay' ], function(processDiagram, processDiagramOverlay) {
       $scope.processDiagram = processDiagram;
       $scope.processDiagramOverlay = processDiagramOverlay;
     });
 
-    processData.get('filter', function(filter) {
+    processData.observe('filter', function(filter) {
       if (filter != currentFilter) {
         console.log('filter changed -> ', filter);
         
@@ -316,7 +316,7 @@ ngDefine('cockpit.pages.processDefinition', [
   
   var ProcessDefinitionFilterController = [ '$scope', 'debounce', 'Variables', function($scope, debounce, Variables) {
 
-    var processData = $scope.processData,
+    var processData = $scope.processData.newChild($scope),
         filterData,
         cachedFilter;
 
@@ -342,7 +342,7 @@ ngDefine('cockpit.pages.processDefinition', [
       return result;
     }
 
-    processData.set('filterData', [ 'processDefinition', 'allProcessDefinitions', 'filter', 'parent', 'bpmnElements', function(definition, allDefinitions, filter, parent, bpmnElements) {
+    processData.provide('filterData', [ 'processDefinition', 'allProcessDefinitions', 'filter', 'parent', 'bpmnElements', function(definition, allDefinitions, filter, parent, bpmnElements) {
 
       if (!filterData || filterData.filter != filter) {
         return {
@@ -359,7 +359,7 @@ ngDefine('cockpit.pages.processDefinition', [
       }
     }]);
 
-    processData.get([ 'filterData' ], function(_filterData) {
+    processData.observe([ 'filterData' ], function(_filterData) {
       $scope.filterData = filterData = _filterData;
     });
 
