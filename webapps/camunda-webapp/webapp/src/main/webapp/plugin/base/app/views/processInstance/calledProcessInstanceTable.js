@@ -1,68 +1,44 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
 
-   function CalledProcessInstanceController ($scope, $location, $q, PluginProcessInstanceResource) {
+   function CalledProcessInstanceController ($scope, PluginProcessInstanceResource) {
 
-    // input: processInstanceId, selection, processInstance
-    
-    var activityInstanceIds = null;
+    // input: processInstance, processData
 
-    $scope.$watch(function () { return $location.search().activityInstances; }, function (newValue) {
-      activityInstanceIds = [];
+    var processData = $scope.processData;
+    var processInstance = $scope.processInstance;
 
-      if (newValue && angular.isString(newValue)) {
-        activityInstanceIds = newValue.split(',');
-      } else if (newValue && angular.isArray(newValue)) {
-        activityInstanceIds = newValue;
-      }
+    var filter = null;
 
-      updateView();
+    processData.get([ 'filter', 'instanceIdToInstanceMap' ], function (newFilter, instanceIdToInstanceMap) {
+      updateView(newFilter, instanceIdToInstanceMap);
     });
 
-    function updateView() {
+    function updateView (newFilter, instanceIdToInstanceMap) {
+      filter = angular.copy(newFilter);
 
-      function waitForInstanceIdToInstanceMap() {
-        var deferred = $q.defer();
+      delete filter.page;
+      delete filter.activityIds;
+      delete filter.scrollToBpmnElement;
 
-        $scope.$watch('processInstance.instanceIdToInstanceMap', function (newValue) {
-          if (newValue) {
-            deferred.resolve(newValue);
-          }
-        });
+      // fix missmatch -> activityInstanceIds -> activityInstanceIdIn
+      filter.activityInstanceIdIn = filter.activityInstanceIds;
+      delete filter.activityInstanceIds;
 
-        return deferred.promise;
-      }
+      $scope.calledProcessInstances = null;
 
-      function setInstances(calledProcessInstances, instances) {
-        angular.forEach(calledProcessInstances, function (calledInstance) {
-          var instance = instances[calledInstance.callActivityInstanceId];
+      PluginProcessInstanceResource.getCalledProcessInstances({id: $scope.processInstance.id}, filter).$then(function(response) {
+
+        angular.forEach(response.data, function (calledInstance) {
+          var instance = instanceIdToInstanceMap[calledInstance.callActivityInstanceId];
           calledInstance.instance = instance;
         });
-
-      }
-
-      PluginProcessInstanceResource.getCalledProcessInstances({id: $scope.processInstanceId}, {
-        activityInstanceIdIn: activityInstanceIds
-      }).$then(function(response) {
-
-        if ($scope.processInstance.instanceIdToInstanceMap) {
-          setInstances(response.data, $scope.processInstance.instanceIdToInstanceMap);
-        } else {
-          waitForInstanceIdToInstanceMap().then(function (result) {
-            setInstances(response.data, result);
-          });
-        }
 
         $scope.calledProcessInstances = response.data;
       });      
     }
-
-    $scope.selectActivityInstance = function (activityInstance) {
-      $scope.selection.view = {activityInstances: [ activityInstance ], scrollTo: {activityId: activityInstance.activityId || activityInstances.targetActivityId}};
-    };
-
   };
 
-  module.controller('CalledProcessInstanceController', [ '$scope', '$location', '$q', 'PluginProcessInstanceResource', CalledProcessInstanceController ]);
+  module.controller('CalledProcessInstanceController', [ '$scope', 'PluginProcessInstanceResource', CalledProcessInstanceController ]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 

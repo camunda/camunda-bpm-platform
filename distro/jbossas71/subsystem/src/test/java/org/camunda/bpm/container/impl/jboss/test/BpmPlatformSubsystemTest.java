@@ -18,7 +18,7 @@ package org.camunda.bpm.container.impl.jboss.test;
 import java.io.IOException;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension;
 import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
@@ -44,7 +44,7 @@ public class BpmPlatformSubsystemTest extends AbstractSubsystemBaseTest {
     try {
 //      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_PROCESS_ENGINES_ELEMENT_ONLY);
 //      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_ENGINES);
-      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_ENGINES_AND_PROPERTIES);
+      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_ENGINES_PROPERTIES_PLUGINS);
 //      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_DUPLICATE_ENGINE_NAMES);
     } catch (Exception e) {
       e.printStackTrace();
@@ -59,23 +59,27 @@ public class BpmPlatformSubsystemTest extends AbstractSubsystemBaseTest {
 
     // Parse the subsystem xml and install into the first controller
     final String subsystemXml = configId == null ? getSubsystemXml() : getSubsystemXml(configId);
-    final KernelServices servicesA = super.installInController(additionalInit, subsystemXml);
+    final KernelServices servicesA = createKernelServicesBuilder(additionalInit)
+                                        .setSubsystemXml(subsystemXml)
+                                        .build();
     Assert.assertNotNull(servicesA);
     //Get the model and the persisted xml from the first controller
     final ModelNode modelA = servicesA.readWholeModel();
     Assert.assertNotNull(modelA);
 
-    // Test marshaling
+    // Test marshalling
     final String marshalled = servicesA.getPersistedSubsystemXml();
     servicesA.shutdown();
 
 
     // validate the the normalized xmls
     String normalizedSubsystem = normalizeXML(subsystemXml);
-//    compareXml(configId, normalizedSubsystem, normalizeXML(marshalled));
+    compareXml(configId, normalizedSubsystem, normalizeXML(marshalled));
 
     //Install the persisted xml from the first controller into a second controller
-    final KernelServices servicesB = super.installInController(additionalInit, marshalled);
+    final KernelServices servicesB = createKernelServicesBuilder(additionalInit)
+                                        .setSubsystemXml(marshalled)
+                                        .build();
     final ModelNode modelB = servicesB.readWholeModel();
 
     //Make sure the models from the two controllers are identical
@@ -89,11 +93,13 @@ public class BpmPlatformSubsystemTest extends AbstractSubsystemBaseTest {
     final List<ModelNode> operations = result.get(ModelDescriptionConstants.RESULT).asList();
     servicesB.shutdown();
 
-    final KernelServices servicesC = super.installInController(additionalInit, operations);
+    final KernelServices servicesC = createKernelServicesBuilder(additionalInit)
+                                        .setBootOperations(operations)
+                                        .build();
     final ModelNode modelC = servicesC.readWholeModel();
 
     compare(modelA, modelC);
 
-    assertRemoveSubsystemResources(servicesA, getIgnoredChildResourcesForRemovalTest());
+    assertRemoveSubsystemResources(servicesA);
   }
 }

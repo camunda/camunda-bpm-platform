@@ -143,7 +143,7 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
       .addStep(new PostDeployInvocationStep())
       .execute();
     
-    LOGGER.info("Process Application "+processApplication.getName()+" sucessfully deployed.");  
+    LOGGER.info("Process Application "+processApplication.getName()+" successfully deployed.");
     
   }
 

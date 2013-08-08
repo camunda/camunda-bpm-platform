@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 public class VariableHistoryLevelCompatibilityTest extends ResourceProcessEngineTestCase {
   
   public VariableHistoryLevelCompatibilityTest() {
-    super("org/camunda/bpm/engine/test/standalone/history/variablehistory.activiti.cfg.xml");
+    super("org/camunda/bpm/engine/test/standalone/history/variablehistory.camunda.cfg.xml");
   }
   
   @Override

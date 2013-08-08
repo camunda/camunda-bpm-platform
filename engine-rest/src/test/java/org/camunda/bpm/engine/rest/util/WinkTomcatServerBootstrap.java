@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,10 +14,15 @@ package org.camunda.bpm.engine.rest.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.commons.io.FileUtils;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
@@ -31,16 +36,16 @@ import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
 public class WinkTomcatServerBootstrap extends EmbeddedServerBootstrap {
 
   private static final String DEFAULT_REST_WEB_XML_PATH = "runtime/wink/web.xml";
-  
+
   private Tomcat tomcat;
   private String workingDir = System.getProperty("java.io.tmpdir");
-  
+
   private String webXmlPath;
 
   public WinkTomcatServerBootstrap() {
     this(DEFAULT_REST_WEB_XML_PATH);
   }
-  
+
   public WinkTomcatServerBootstrap(String webXmlPath) {
     this.webXmlPath = webXmlPath;
   }
@@ -52,6 +57,7 @@ public class WinkTomcatServerBootstrap extends EmbeddedServerBootstrap {
     tomcat = new Tomcat();
     tomcat.setPort(port);
     tomcat.setBaseDir(workingDir);
+
     tomcat.getHost().setAppBase(workingDir);
     tomcat.getHost().setAutoDeploy(true);
     tomcat.getHost().setDeployOnStartup(true);
@@ -60,10 +66,17 @@ public class WinkTomcatServerBootstrap extends EmbeddedServerBootstrap {
     File webApp = new File(workingDir, getContextPath());
     File oldWebApp = new File(webApp.getAbsolutePath());
 
-    try {
-      FileUtils.deleteDirectory(oldWebApp);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    // check if old webapp folder exists (may not do so on windows)
+    if (oldWebApp.exists() && oldWebApp.isDirectory()) {
+      try {
+        FileUtils.deleteDirectory(oldWebApp);
+      } catch (IOException e) {
+        if ((oldWebApp.exists())) {
+          throw new RuntimeException(e);
+        } else {
+          // well, task done
+        }
+      }
     }
 
     PomEquippedResolveStage resolver = Maven.resolver().loadPomFromFile("pom.xml");
@@ -80,7 +93,15 @@ public class WinkTomcatServerBootstrap extends EmbeddedServerBootstrap {
     wa.as(ZipExporter.class).exportTo(
         new File(workingDir + "/" + getContextPath() + ".war"), true);
 
-    tomcat.addWebapp(tomcat.getHost(), contextPath, webApp.getAbsolutePath());
+    Context ctx = tomcat.addWebapp(tomcat.getHost(), contextPath, webApp.getAbsolutePath());
+
+    // add anti-locking config to avoid locked files
+    // on windows systems
+    try {
+      ctx.setConfigFile(new File("src/test/resources/runtime/wink/context.xml").toURI().toURL());
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
 
     try {
       tomcat.start();
@@ -94,17 +115,26 @@ public class WinkTomcatServerBootstrap extends EmbeddedServerBootstrap {
   }
 
   public void stop() {
+    if (tomcat.getServer() == null) {
+      return;
+    }
+
     try {
-      if (tomcat.getServer() != null
-          && tomcat.getServer().getState() != LifecycleState.DESTROYED) {
-        if (tomcat.getServer().getState() != LifecycleState.STOPPED) {
-          tomcat.stop();
-        }
-        tomcat.destroy();
+      try {
+        tomcat.stop();
+      } catch (Exception e) {
+        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Failed to stop tomcat instance", e);
       }
-    }catch (Exception e) {
+
+      try {
+        tomcat.destroy();
+      } catch (Exception e) {
+        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Failed to destroy instance", e);
+      }
+
+      tomcat = null;
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
-
 }

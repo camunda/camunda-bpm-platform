@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test;
 
+import java.io.FileNotFoundException;
 import java.util.Date;
 
 import org.camunda.bpm.engine.FormService;
@@ -20,6 +21,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -43,7 +45,7 @@ import org.junit.runners.model.FrameworkMethod;
  * 
  * <p>The ProcessEngine and the services will be made available to the test class 
  * through the getters of the activitiRule.  
- * The processEngine will be initialized by default with the activiti.cfg.xml resource 
+ * The processEngine will be initialized by default with the camunda.cfg.xml resource 
  * on the classpath.  To specify a different configuration file, pass the 
  * resource location in {@link #ProcessEngineRule(String) the appropriate constructor}.
  * Process engines will be cached statically.  Right before the first time the setUp is called for a given 
@@ -67,7 +69,8 @@ import org.junit.runners.model.FrameworkMethod;
  */
 public class ProcessEngineRule extends TestWatchman {
 
-  protected String configurationResource = "activiti.cfg.xml";
+  protected String configurationResource = "camunda.cfg.xml";
+  protected String configurationResourceCompat = "activiti.cfg.xml";
   protected String deploymentId = null;
 
   protected ProcessEngine processEngine;
@@ -102,7 +105,17 @@ public class ProcessEngineRule extends TestWatchman {
   }
   
   protected void initializeProcessEngine() {
-    processEngine = TestHelper.getProcessEngine(configurationResource);
+    try {
+      processEngine = TestHelper.getProcessEngine(configurationResource);
+    } catch (RuntimeException ex) {
+      if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
+        processEngine = ProcessEngineConfiguration
+            .createProcessEngineConfigurationFromResource(configurationResourceCompat)
+            .buildProcessEngine();
+      } else {
+        throw ex;
+      }
+    }
   }
 
   protected void initializeServices() {

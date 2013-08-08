@@ -1,19 +1,494 @@
-ngDefine('cockpit.pages', function(module) {
+ngDefine('cockpit.pages.processInstance', [
+  'module:dataDepend:angular-data-depend'
+], function(module) {
 
-  function ProcessInstanceController ($scope, $rootScope, $routeParams, $location, $q, $filter, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Transform, processInstance) {
+  function ProcessInstanceController ($scope, $rootScope, $location, $filter, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Transform, processInstance, dataDependFactory) {
     
-    $scope.processDefinitionId = $routeParams.processDefinitionId;
-    $scope.processInstanceId = $routeParams.processInstanceId;
+    $rootScope.clearBreadcrumbs();
 
     $scope.processInstance = processInstance;
-
-    $scope.selection = {};
 
     $scope.cancelProcessInstanceDialog = new Dialog();
     $scope.cancelProcessInstanceDialog.setAutoClosable(false);
 
     $scope.jobRetriesDialog = new Dialog();
     $scope.jobRetriesDialog.setAutoClosable(false);
+
+    var currentFilter;
+    var controllerInitialized = false;
+    
+    var processData = $scope.processData = dataDependFactory.create($scope);
+
+    // utilities ///////////////////////
+
+    $scope.$on('$routeChanged', function() {
+      var filter = completeFilter(parseFilterFromUri(), $scope.instanceIdToInstanceMap, $scope.activityIdToInstancesMap)
+      processData.set('filter', filter);              
+    });
+
+    function collect(elements, fn) {
+      var result = [];
+
+      angular.forEach(elements, function(e) {
+        try {
+          var c = fn(e);
+
+          if (c !== undefined) {
+            result.push(c);
+          }
+        } catch (e) {
+          ; // safe collect -> error skips element
+        }
+      });
+
+      return result;
+    }
+
+    var currentFilter = null;
+
+    function parseFilterFromUri() {
+
+      var params = search(),
+          activityInstanceIdsParam = parseArray(params.activityInstanceIds),
+          activityIdsParam = parseArray(params.activityIds);
+
+      function parseArray(str) {
+        if (!str) {
+          return [];
+        }
+
+        return str.split(/,/);
+      }
+
+      function parseVariables(vars) {
+        return collect(vars, Variables.parse);
+      }
+
+      currentFilter = {
+        activityIds: activityIdsParam,
+        activityInstanceIds: activityInstanceIdsParam,
+        page: parseInt(params.page) || undefined
+      };
+
+      $scope.filter = currentFilter;
+
+      return currentFilter;
+    }
+
+    function serializeFilterToUri(filter) {
+      var activityIds = filter.activityIds,
+          activityInstanceIds = filter.activityInstanceIds;
+
+      function nonEmpty(array) {
+        return array && array.length;
+      }
+
+      search.updateSilently({
+        activityIds: nonEmpty(activityIds) ? activityIds.join(',') : null,
+        activityInstanceIds: nonEmpty(activityInstanceIds) ? activityInstanceIds.join(',') : null
+      });
+
+      $scope.filter = currentFilter = filter;
+    }
+
+    function completeFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap) {
+      var activityIds = angular.copy(filter.activityIds) || [],
+          activityInstanceIds = angular.copy(filter.activityInstanceIds) || [],
+          page = parseInt(filter.page) || undefined,
+          scrollToBpmnElement;
+
+      angular.forEach(activityInstanceIds, function (instanceId) {
+        var instance = instanceIdToInstanceMap[instanceId],
+            activityId = instance.activityId || instance.targetActivityId,
+            idx = activityIds.indexOf(activityId);
+
+        if (idx === -1) {
+          activityIds.push(activityId);
+        }
+      });
+
+      angular.forEach(activityIds, function (activityId) {
+        var instanceList = activityIdToInstancesMap[activityId],
+            foundAtLeastOne = false,
+            instanceIds = [];
+
+        if (instanceList) {
+
+          for (var i = 0, instance; !!(instance = instanceList[i]); i++) {
+            var idx = activityInstanceIds.indexOf(instance.id);
+
+            if (idx !== -1) {
+              foundAtLeastOne = true;
+              break;
+            }
+
+            instanceIds.push(instance.id);
+          }
+
+          if (!foundAtLeastOne) {
+            activityInstanceIds = activityInstanceIds.concat(instanceIds);
+          }
+
+        }
+      });
+
+      if (activityIds.length > 0) {
+        scrollToBpmnElement = activityIds[activityIds.length-1];
+      }
+
+      filter = {};
+
+      filter['activityIds'] = activityIds;
+      filter['activityInstanceIds'] = activityInstanceIds;
+      filter['scrollToBpmnElement'] = scrollToBpmnElement;
+      filter['page'] = page;
+
+      $scope.filter = currentFilter = filter;
+
+      return filter;
+    }
+
+    // end utilities ///////////////////////
+
+    // /////// Begin definition of process data 
+
+    // processInstance
+    processData.set('processInstance', processInstance);
+
+    // processDefinition
+    processData.set('processDefinition', ['processInstance', function (processInstance) {
+      return ProcessDefinitionResource.get({ id: processInstance.definitionId }).$promise;
+    }]);
+
+    // semantic
+    processData.set('semantic', ['processDefinition', function (processDefinition) {
+      return ProcessDefinitionResource.getBpmn20Xml({ id: processDefinition.id }).$promise.then(function(response) {
+        return Transform.transformBpmn20Xml(response.bpmn20Xml);
+      });
+    }]);
+
+    // bpmnElements
+    processData.set('bpmnElements', ['semantic', 'processDefinition', function (semantic, processDefinition) {
+      var bpmnElements = {},
+          key = processDefinition.key,
+          model = null;
+
+      for (var i = 0, currentSemantic; !!(currentSemantic = semantic[i]); i++) {
+        var id = currentSemantic.id,
+            type = currentSemantic.type;
+
+        if (id === key && type === 'process') {
+          model = currentSemantic;
+          break;
+        }
+      }
+
+      function collectBpmnElements(element, result) {
+        result[element.id] = element;
+
+        var baseElements = element.baseElements;
+        if (baseElements && baseElements.length > 0) {
+          for (var i = 0, child; !!(child = baseElements[i]); i++) {
+            collectBpmnElements(child, result);
+          }
+        }
+      }
+
+      collectBpmnElements(model, bpmnElements);
+      
+      return bpmnElements;
+
+    }]);
+
+    // activityInstances
+    processData.set('activityInstances', ['processInstance', function (processInstance) {
+      return ProcessInstanceResource.activityInstances({ id: processInstance.id }).$promise;
+    }]);
+
+    // activityInstanceTree, activityIdToInstancesMap, instanceIdToInstanceMap
+    processData.set([ 'activityInstanceTree', 'activityIdToInstancesMap', 'instanceIdToInstanceMap' ], 
+      [ 'activityInstances',
+        'processDefinition',
+        'bpmnElements', function (activityInstances, processDefinition, bpmnElements) {
+      var activityIdToInstancesMap = {},
+          instanceIdToInstanceMap = {},
+          model = bpmnElements[processDefinition.key];
+
+      function getActivityName(bpmnElement) {
+        var name = bpmnElement.name;
+        if (!name) {
+          var shortenFilter = $filter('shorten');
+          name = bpmnElement.type + ' (' + shortenFilter(bpmnElement.id, 8) + '...)';
+        }
+
+        return name;
+      }
+
+      function decorateActivityInstanceTree(instance) {
+        var children = instance.childActivityInstances;
+
+
+        if (children && children.length > 0) {
+
+          for (var i = 0, child; !!(child = children[i]); i++) {
+            var activityId = child.activityId,
+                bpmnElement = bpmnElements[activityId],
+                instances = activityIdToInstancesMap[activityId] || [];
+
+
+            child.name = getActivityName(bpmnElement);
+            activityIdToInstancesMap[activityId] = instances;
+            instanceIdToInstanceMap[child.id] = child;            
+            instances.push(child);
+
+            decorateActivityInstanceTree(child);
+          }
+        }
+
+        var transitions = instance.childTransitionInstances;
+        if (transitions && transitions.length > 0) {
+
+          for (var i = 0, transition; !!(transition = transitions[i]); i++) {
+            var activityId = transition.targetActivityId,
+                bpmnElement = bpmnElements[activityId],
+                instances = activityIdToInstancesMap[activityId] || [];
+
+            transition.name = getActivityName(bpmnElement);
+            activityIdToInstancesMap[activityId] = instances;
+            instanceIdToInstanceMap[transition.id] = transition;     
+            instances.push(transition);
+          }  
+        }
+      }
+
+      activityInstances.name = getActivityName(model);
+      // add initially the root to the map
+      instanceIdToInstanceMap[activityInstances.id] = activityInstances;
+     
+      decorateActivityInstanceTree(activityInstances);
+
+      return [ activityInstances, activityIdToInstancesMap, instanceIdToInstanceMap ];
+    }]);
+
+    // activityInstanceStatistics, clickableElements
+    processData.set([ 'activityInstanceStatistics', 'clickableElements'], [ 'activityIdToInstancesMap', function (activityIdToInstancesMap) {
+      var activityInstanceStatistics = [],
+          clickableElements = [];
+
+      for (var activityId in activityIdToInstancesMap) {
+        var instances = activityIdToInstancesMap[activityId];
+        activityInstanceStatistics.push( {id: activityId, count: instances.length });
+        clickableElements.push(activityId);
+      }
+
+      return [ activityInstanceStatistics, clickableElements ];
+    }]);
+
+    // incidents
+    processData.set('incidents', ['processInstance', function (processInstance) {
+      return IncidentResource.query({ id : processInstance.id }).$promise;
+    }]);
+
+    // incidentStatistics
+    processData.set('incidentStatistics', ['incidents', function (incidents) {
+      var incidentStatistics = [],
+          statistics = {};
+
+      for (var i = 0, incident; !!(incident = incidents[i]); i++) {
+        var activity = statistics[incident.activityId];
+        if (!activity) {
+          activity = [];
+          statistics[incident.activityId] = activity;
+        }
+        activity.push(incident);
+      }
+
+      for (var key in statistics) {
+        var tmp = {};
+        tmp.id = key;
+        tmp.incidents = statistics[key];
+        incidentStatistics.push(tmp);
+      }
+
+      return incidentStatistics;
+    }]);
+
+    // processDiagram
+    processData.set('processDiagram', [ 'semantic', 'processDefinition', 'bpmnElements', function (semantic, processDefinition, bpmnElements) {
+      var processDiagram = {};
+
+      processDiagram.semantic = semantic;
+      processDiagram.processDefinition = processDefinition;
+      processDiagram.bpmnElements = bpmnElements;
+
+      return processDiagram;
+    }]);
+
+    processData.set('filter', parseFilterFromUri());
+
+    // /////// End definition of process data 
+
+
+    // /////// Begin usage of definied process data 
+
+    processData.get([ 'filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'], function (filter, instanceIdToInstanceMap, activityIdToInstancesMap) {
+      if (!controllerInitialized) {
+        console.log('begin to initialize controller');
+
+        filter = completeFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap)
+        processData.set('filter', filter);
+
+        controllerInitialized = true;
+
+        console.log('end of initialize controller', filter);
+      }
+    });
+
+    processData.get('filter',  function(filter) {
+      if (filter != currentFilter) {
+        console.log('filter changed -> ', filter);
+        
+        serializeFilterToUri(filter);
+        $scope.filter = filter;
+      }
+    });
+
+    processData.get([ 'processDefinition', 'processInstance'], function (processDefinition, processInstance) {
+      $rootScope.addBreadcrumb({'type': 'processDefinition', 'processDefinition': processDefinition});
+      $rootScope.addBreadcrumb({'type': 'processInstance', 'processInstance': processInstance,'processDefinition': processDefinition});
+    });
+
+    $scope.activityInstanceTree = processData.get('activityInstanceTree', function (activityInstanceTree) {
+      $scope.activityInstanceTree = activityInstanceTree;
+    });
+
+    $scope.processDiagram = processData.get('processDiagram', function (processDiagram) {
+      $scope.processDiagram = processDiagram;
+    });
+
+    $scope.processDiagramOverlay = processData.get([ 'processDiagram', 'activityInstanceStatistics', 'clickableElements', 'incidentStatistics' ], function (processDiagram, activityInstanceStatistics, clickableElements, incidentStatistics) {
+      $scope.processDiagramOverlay.annotations = activityInstanceStatistics;
+      $scope.processDiagramOverlay.incidents = incidentStatistics;
+      $scope.processDiagramOverlay.clickableElements = clickableElements;
+      $scope.processDiagramOverlay = angular.extend({}, $scope.processDiagramOverlay);
+    });
+
+    processData.get([ 'instanceIdToInstanceMap', 'activityIdToInstancesMap' ], function (instanceIdToInstanceMap, activityIdToInstancesMap) {
+      $scope.instanceIdToInstanceMap = instanceIdToInstanceMap;
+      $scope.activityIdToInstancesMap = activityIdToInstancesMap;
+    });
+
+    // /////// End of usage of definied process data 
+
+    $scope.handleBpmnElementSelection = function (id, $event) {
+      if (!id) {
+        var filter = {activityIds: null, activityInstanceIds: null};
+        processData.set('filter', filter);
+        return;
+      }
+
+      var ctrlKey = $event.ctrlKey,
+          activityIds = angular.copy(currentFilter.activityIds) || [],
+          activityInstanceIds = angular.copy(currentFilter.activityInstanceIds) || [],
+          idx = activityIds.indexOf(id),
+          instanceList = $scope.activityIdToInstancesMap[id],
+          filter = {};
+
+      if (!ctrlKey) {
+        activityIds = [ id ];
+        activityInstanceIds = [];
+        angular.forEach(instanceList, function (instance) {
+          activityInstanceIds.push(instance.id);
+        });
+      } else
+
+      if (ctrlKey) {
+
+        if (idx === -1) {
+          activityIds.push(id);
+          angular.forEach(instanceList, function (instance) {
+            activityInstanceIds.push(instance.id);
+          });        
+        } else
+
+        if (idx !== -1) {
+          activityIds.splice(idx, 1);
+
+          angular.forEach(instanceList, function (instance) {
+            var instanceId = instance.id,
+                index = activityInstanceIds.indexOf(instanceId);
+
+            if (index !== -1) {
+              activityInstanceIds.splice(index, 1);
+            }
+          });
+          
+        }
+      }
+
+      filter['activityIds'] = activityIds;
+      filter['activityInstanceIds'] = activityInstanceIds;
+
+      processData.set('filter', filter);
+    }; 
+
+    $scope.handleActivityInstanceSelection = function (id, activityId, $event) {
+      if (!id) {
+        var filter = {activityIds: null, activityInstanceIds: null};
+        processData.set('filter', filter);
+        return;
+      }
+
+      var ctrlKey = $event.ctrlKey,
+          activityIds = angular.copy(currentFilter.activityIds) || [],
+          activityInstanceIds = angular.copy(currentFilter.activityInstanceIds) || [],
+          idx = activityInstanceIds.indexOf(id),
+          instanceList = $scope.activityIdToInstancesMap[activityId],
+          filter = {};
+
+      if (!ctrlKey) {
+        activityIds = [ activityId ];
+        activityInstanceIds = [ id ];
+      } else
+
+      if (ctrlKey) {
+
+        if (idx === -1) {
+
+          activityInstanceIds.push(id);
+
+          var index = activityIds.indexOf(activityId);
+          if (index === -1) {
+            activityIds.push(activityId);
+          }       
+        } else
+
+        if (idx !== -1) {
+          activityInstanceIds.splice(idx, 1);
+
+          var foundAnotherActivityInstance = false;
+          for (var i = 0, instance; !!(instance = instanceList[i]); i++) {
+            var instanceId = instance.id,
+                index = activityInstanceIds.indexOf(instanceId);
+
+            if (index !== -1) {
+              foundAnotherActivityInstance = true;
+            }
+          }
+
+          if (!foundAnotherActivityInstance) {
+            var index = activityIds.indexOf(activityId);
+            activityIds.splice(index, 1);
+          }         
+        }
+      }
+
+      filter['activityIds'] = activityIds;
+      filter['activityInstanceIds'] = activityInstanceIds;
+      filter['scrollToBpmnElement'] = activityId;
+
+      processData.set('filter', filter);
+    };
 
     $scope.openCancelProcessInstanceDialog = function () {
       $scope.cancelProcessInstanceDialog.open();      
@@ -26,406 +501,8 @@ ngDefine('cockpit.pages', function(module) {
     $scope.$on('$routeChangeStart', function () {
       $rootScope.clearBreadcrumbs();
     });
-    
-    $scope.$watch('selection.view', function (newValue, oldValue) {
-      if (!newValue) {
-        return;
-      }
 
-      if (newValue.scrollTo) {
-        var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[newValue.scrollTo.activityId || newValue.scrollTo.targetActivityId];
-        $scope.selection.view.scrollTo = null;
-        $scope.selection.view.scrollToBpmnElement = bpmnElement;
-      }
-      
-      if (newValue.initialize) {
-
-        if (newValue.initialize.bpmnElements) {
-          newValue['activityInstances'] = newValue.activityInstances || [];
-          
-          var activityInstances = $location.search().activityInstances || [];
-          if (angular.isString(activityInstances)) {
-            activityInstances = activityInstances.split(',');
-          }
-
-          angular.forEach(newValue.initialize.bpmnElements, function(bpmnElement) {
-            var instanceList = $scope.processInstance.activityIdToInstancesMap[bpmnElement.id];
-
-            if (activityInstances.length === 0) {
-              newValue.activityInstances = newValue.activityInstances.concat(instanceList);
-
-            } else {
-              var atLeastOneAdded = false;
-              angular.forEach(instanceList, function (instance) {
-                var index = activityInstances.indexOf(instance.id);
-                if (index !== -1) {
-                  newValue.activityInstances.push(instance);
-                  atLeastOneAdded = true;
-                }
-              });
-              if (!atLeastOneAdded) {
-                newValue.activityInstances = newValue.activityInstances.concat(instanceList);                
-              }
-            }
-
-          });
-          return;
-        }
-        if (newValue.initialize.activityInstances) {
-          newValue['bpmnElements'] = newValue.bpmnElements || [];
-
-          var bpmnElements = $location.search().bpmnElements || [];
-          if (angular.isString(bpmnElements)) {
-            bpmnElements = bpmnElements.split(',');
-          }
-
-          angular.forEach(newValue.initialize.activityInstances, function (instance) {
-            var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[instance.activityId || instance.targetActivityId];
-            if (bpmnElement) {
-              var index = newValue.bpmnElements.indexOf(bpmnElement);
-              if (index === -1) {
-                newValue.bpmnElements.push(bpmnElement);
-              }
-              var searchParamIndex = bpmnElements.indexOf(bpmnElement.id);
-              if (searchParamIndex === -1) {
-                bpmnElements.push(bpmnElement.id);
-              }
-            }          
-          });
-          
-          if (bpmnElements.length > 0) {
-            $location.search('bpmnElements', bpmnElements);
-            $location.replace();
-            newValue.scrollToBpmnElement = newValue.bpmnElements[newValue.bpmnElements.length-1];
-          }
-          return;          
-        }        
-
-      }
-
-      if (newValue.selectedBpmnElement) {
-        newValue.activityInstances = newValue.selectedBpmnElement.ctrlKey ? oldValue.activityInstances : [];
-
-        if (newValue.selectedBpmnElement.remove) {
-          var activityInstances = [];
-          angular.forEach(newValue.activityInstances, function(instance) {
-            if (instance.activityId !== newValue.selectedBpmnElement.id ||
-                instance.targetActivityId !== newValue.selectedBpmnElement.id)
-              activityInstances.push(instance);
-          });
-          newValue.activityInstances = activityInstances;
-        } else {
-          var instanceList = $scope.processInstance.activityIdToInstancesMap[newValue.selectedBpmnElement.element.id];
-          $scope.selection.view.activityInstances = $scope.selection.view.activityInstances.concat(instanceList);
-        }
-        newValue.selectedBpmnElement = null;
-        return;
-      }
-
-      if (newValue.activityInstances) {
-        $scope.selection.view.bpmnElements = [];
-        angular.forEach(newValue.activityInstances, function(activityInstance) {
-          var activityId = activityInstance.activityId || activityInstance.targetActivityId;
-          var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[activityId];
-          $scope.selection.view.bpmnElements.push(bpmnElement);
-        });
-        return;
-      }
-      
-    });
-
-    $scope.$watch(function() { return $location.search().activityInstances; }, function (newValue, oldValue) {
-
-      function waitForActivityInstances() {
-        var deferred = $q.defer();
-
-        $scope.$watch('processInstance.instanceIdToInstanceMap', function (newValue, oldValue) {
-          if (!oldValue && newValue) {
-            deferred.resolve(newValue);
-          }
-        })
-
-        return deferred.promise;
-      }
-
-      if (!newValue && oldValue) {
-        if ($scope.selection.view) {
-          $scope.selection.view = {activityInstances: []};
-        }
-        return;
-      }
-
-      if (newValue && angular.isString(newValue)) {
-
-        var searchParameter = newValue.split(',');
-
-        if (searchParameter.length === 0) {
-          $scope.selection.view = {activityInstances: []};
-          return;          
-        }
-
-        if ($scope.processInstance.activityInstances) {
-          selectActivityInstances($scope.processInstance.instanceIdToInstanceMap, searchParameter);
-        } else {
-          waitForActivityInstances().then(function (result) {
-            selectActivityInstances(result, searchParameter);
-          });
-        }
-      }
-
-    });
-
-    function selectActivityInstances(instanceMap, searchParameter) {
-      var selectedActivityInstances = [];
-      for(var i = 0, selection; !!(selection = searchParameter[i]); i++) {
-        var instance = instanceMap[selection];
-        if (instance) {
-          selectedActivityInstances.push(instance);
-        }
-      }
-      $scope.selection['view'] = {};
-      $scope.selection.view['initialize'] = {activityInstances: selectedActivityInstances}
-      $scope.selection.view['activityInstances'] = selectedActivityInstances;
-    }
-    
-    // get the process definition
-    function loadProcessDefinition() {
-      var deferred = $q.defer();
-      
-      ProcessDefinitionResource.get({ id: $scope.processDefinitionId }).$then(function(response) {
-        deferred.resolve(response.data);
-      });
-      
-      return deferred.promise;
-    }
-    
-    // get the bpmn20xml
-    function loadBpmn20Xml() {
-      var deferred = $q.defer();
-      
-      ProcessDefinitionResource.getBpmn20Xml({ id: $scope.processDefinitionId }).$then(function(response) {
-        deferred.resolve(response.data);
-      });
-      
-      return deferred.promise;
-    }
-    
-    // get the activity instance tree
-    function loadActivityInstances() {
-      var deferred = $q.defer();
-      
-      ProcessInstanceResource.activityInstances({ id: $scope.processInstanceId }).$then(function(response) {
-        deferred.resolve(response.data);
-      });
-      
-      return deferred.promise;
-    }
-
-    // get the incidents
-    function loadIncidents() {
-      var deferred = $q.defer();
-      
-      IncidentResource.query({ id : $scope.processInstanceId }).$then(function(response) {
-        deferred.resolve(response.data);
-      });
-      
-      return deferred.promise;
-    }
-    
-    $q.all([ loadProcessDefinition(),
-             loadBpmn20Xml(),
-             loadActivityInstances(),
-             loadIncidents() 
-           ])
-      .then(function(results) {
-        // first result is the process definition
-        var processDefinition = results[0];
-        $scope.processInstance.processDefinition = processDefinition;     
-
-        // add process definition and process instance breadcrumb
-        $rootScope.addBreadcrumb({'type': 'processDefinition', 'processDefinition': processDefinition});
-        $rootScope.addBreadcrumb({'type': 'processInstance', 'processInstance': processInstance,'processDefinition': processDefinition});
-        
-        // second result is the bpmn20Xml
-        var bpmn20Xml = results[1].bpmn20Xml;
-        $scope.processInstance.semantic = Transform.transformBpmn20Xml(bpmn20Xml);
-
-        // contains for each activity id the corresponding bpmnElement
-        $scope.processInstance.activityIdToBpmnElementMap = {};
-        createActivityIdToBpmnElementMap($scope.processInstance.semantic, $scope.processInstance.activityIdToBpmnElementMap);
-        
-        // third result is the activity instance tree
-        var activityInstances = results[2];
-        $scope.processInstance.activityInstanceTree = activityInstances;
-
-        // contains for each activity id the corresponding activity/transition instance
-        $scope.processInstance.activityIdToInstancesMap = {};
-        // contains for each activity/transition id the corresponding activity/transition instance
-        $scope.processInstance.instanceIdToInstanceMap = {};
-
-        decorateActivityInstanceTree($scope.processInstance.activityInstanceTree, $scope.processInstance.activityIdToBpmnElementMap, $scope.processInstance.activityIdToInstancesMap, $scope.processInstance.instanceIdToInstanceMap, $scope.processInstance.semantic, processDefinition);
-       
-        $scope.processInstance.executionIdToInstanceMap = {};
-
-        createExecutionIdToActivityInstanceMap($scope.processInstance.instanceIdToInstanceMap, $scope.processInstance.executionIdToInstanceMap);
-
-        // contains activity id the current count of activity/transition instances
-        $scope.processInstance.activityInstanceStatistics = [];
-
-        // contains the activity ids which are clickable on the process diagram
-        $scope.processInstance.clickableElements = [];
-        
-        $scope.processInstance.activityInstanceIdToActivityIdMap = {};
-
-        for (key in $scope.processInstance.activityIdToInstancesMap) {
-          var items = $scope.processInstance.activityIdToInstancesMap[key];
-          var activityInstanceStatistics = { id: key, count: items.length};
-          $scope.processInstance.activityInstanceStatistics.push(activityInstanceStatistics);
-          
-          $scope.processInstance.clickableElements.push(key);
-        }
-              
-        // fourth result are the incidents
-        var incidents = results[3];
-        
-        // contains for each activity id the corresponding incidents
-        $scope.processInstance.incidentsStatistics = {};
-
-        // get for each activity the incidents such as:
-        // {ServiceTask_1: [firstIncident, secondIncident, ...], ServiceTask_2: [...], ...}
-        angular.forEach(incidents, function (incident) {
-          var activity = $scope.processInstance.incidentsStatistics[incident.activityId];
-          if (!activity) {
-            activity = [];
-            $scope.processInstance.incidentsStatistics[incident.activityId] = activity;
-          }
-          activity.push(incident);
-        });
-        
-        $scope.processInstance.incidentsOnActivityArray = [];
-        for (var key in $scope.processInstance.incidentsStatistics) {
-          var tmp = {};
-          tmp.id = key;
-          tmp.incidents = $scope.processInstance.incidentsStatistics[key];
-          $scope.processInstance.incidentsOnActivityArray.push(tmp);
-        }
-      });
-    
-    function createActivityIdToBpmnElementMap(semantic, result) {
-      angular.forEach(semantic, function(currentSemantic) {
-        result[currentSemantic.id] = currentSemantic;
-        
-        if (currentSemantic.baseElements) {
-          createActivityIdToBpmnElementMap(currentSemantic.baseElements, result);
-        }
-        
-      });
-    }
-
-    function createExecutionIdToActivityInstanceMap (instanceIdToInstanceMap, result) {
-      for (var key in instanceIdToInstanceMap) {
-        var instance = instanceIdToInstanceMap[key];
-
-        var executionIds = instance.executionIds;
-        if (executionIds) {
-          for (var i = 0, executionId; !!(executionId = executionIds[i]); i++) {
-            result[executionId] = instance;
-          }          
-        }
-
-        var executionId = instance.executionId;
-        if (executionId) {
-          result[executionId] = instance;
-        }
-
-      }
-    }
-
-    function decorateActivityInstanceTree(activityInstanceTree, activityIdToBpmnElementMap, activityIdToInstancesMap, instanceIdToInstanceMap, semantic, processDefinition) {
-
-      // the root node has to be handled quite different then the child nodes
-      var model = null;
-      for (var i = 0; i < semantic.length; i++) {
-        var currentSemantic = semantic[i];
-        if (currentSemantic.id === processDefinition.key && currentSemantic.type === 'process') {
-          model = currentSemantic;
-        }
-      }
-      activityIdToBpmnElementMap[activityInstanceTree.activityId] = model;
-      activityInstanceTree.name = getActivityName(model);
-
-      // if (activityIdToInstancesMap) {
-      //   activityIdToInstancesMap[model.id] = [ activityInstanceTree ];
-      // }
-
-      if (instanceIdToInstanceMap) {
-        instanceIdToInstanceMap[activityInstanceTree.id] = activityInstanceTree;
-      }
-
-      decorateActivityInstanceTreeHelper(activityInstanceTree, activityIdToBpmnElementMap, activityIdToInstancesMap, instanceIdToInstanceMap);
-    }
-
-    function decorateActivityInstanceTreeHelper(activityInstanceTree, activityIdToBpmnElementMap, activityIdToInstancesMap, instanceIdToInstanceMap) {
-      var children = activityInstanceTree.childActivityInstances;
-      if (children) {
-        for (var i = 0; i < children.length; i++) {
-          var child = children[i];
-          decorateActivityInstanceTreeHelper(child, activityIdToBpmnElementMap, activityIdToInstancesMap, instanceIdToInstanceMap)
-
-          var bpmnElement = activityIdToBpmnElementMap[child.activityId];
-          child.name = getActivityName(bpmnElement);
-
-          if (activityIdToInstancesMap) {
-            var instances = activityIdToInstancesMap[child.activityId];
-            if (!instances) {
-              instances = [];
-              activityIdToInstancesMap[child.activityId] = instances;
-            }
-            instances.push(child);            
-          }
-          
-          if (instanceIdToInstanceMap) {
-            instanceIdToInstanceMap[child.id] = child;
-          }
-
-        }
-      }
-
-      var transitions = activityInstanceTree.childTransitionInstances;
-      if (transitions) {
-        for (var i = 0; i < transitions.length; i++) {
-          var transition = transitions[i];
-          
-          var bpmnElement = activityIdToBpmnElementMap[transition.targetActivityId];
-          transition.name = getActivityName(bpmnElement);
-
-          if (activityIdToInstancesMap) {
-            var instances = activityIdToInstancesMap[transition.targetActivityId];
-            if (!instances) {
-              instances = [];
-              activityIdToInstancesMap[transition.targetActivityId] = instances;
-            }
-            instances.push(transition);            
-          }
-          
-          if (instanceIdToInstanceMap) {
-            instanceIdToInstanceMap[transition.id] = transition;
-          }
-        };     
-      }
-    }
-
-    function getActivityName(bpmnElement) {
-      var name = bpmnElement.name;
-      if (!name) {
-        var shortenFilter = $filter('shorten');
-        name = bpmnElement.type + ' (' + shortenFilter(bpmnElement.id, 8) + '...)';
-      }
-
-      return name;
-    }
-
-    $scope.processInstanceVars = { read: [ 'processInstanceId', 'processInstance', 'selection' ] };
+    $scope.processInstanceVars = { read: [ 'processInstance', 'processData' ] };
     $scope.processInstanceViews = Views.getProviders({ component: 'cockpit.processInstance.instanceDetails' });
 
     $scope.selectView = function(view) {
@@ -456,7 +533,7 @@ ngDefine('cockpit.pages', function(module) {
 
   };
 
-  module.controller('ProcessInstanceController', [ '$scope', '$rootScope','$routeParams', '$location', '$q', '$filter', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Transform', 'processInstance', ProcessInstanceController ]);
+  module.controller('ProcessInstanceController', [ '$scope', '$rootScope', '$location', '$filter', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Transform', 'processInstance', 'dataDependFactory', ProcessInstanceController ]);
 
   var RouteConfig = function ($routeProvider) {
     $routeProvider.when('/process-definition/:processDefinitionId/process-instance/:processInstanceId', {
@@ -472,7 +549,7 @@ ngDefine('cockpit.pages', function(module) {
               }
             });
           }]
-      },      
+      },
       reloadOnSearch: false
     });
   };

@@ -120,6 +120,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
     
     execution = refreshExecutionEntity(execution.getId());
     assertEquals("failingServiceTask", execution.getActivityId());
@@ -180,6 +181,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
     
     execution = refreshExecutionEntity(execution.getId());
     assertEquals("failingUserTask", execution.getActivityId());
@@ -240,6 +242,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
 
     execution = refreshExecutionEntity(execution.getId());
     assertEquals("failingBusinessRuleTask", execution.getActivityId());
@@ -300,6 +303,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
     
     execution = refreshExecutionEntity(execution.getId());
     assertEquals("failingCallActivity", execution.getActivityId());
@@ -360,6 +364,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
     
     execution = refreshExecutionEntity(execution.getId());
     assertEquals("failingScriptTask", execution.getActivityId());
@@ -420,6 +425,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
     
     execution = refreshExecutionEntity(execution.getId());
     assertEquals("failingSendTask", execution.getActivityId());
@@ -480,6 +486,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
     
     execution = refreshExecutionEntity(execution.getId());
     assertEquals("failingSubProcess", execution.getActivityId());
@@ -540,6 +547,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
     
     execution = refreshExecutionEntity(execution.getId());
     assertEquals("failingTask", execution.getActivityId());
@@ -600,6 +608,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
     
     execution = refreshExecutionEntity(execution.getId());
     assertEquals("failingTransaction", execution.getActivityId());
@@ -660,6 +669,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
     
     execution = refreshExecutionEntity(execution.getId());
     assertEquals("failingReceiveTask", execution.getActivityId());
@@ -713,6 +723,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
   }
   
   @Deployment(resources = { "org/camunda/bpm/engine/test/cmd/FoxJobRetryCmdTest.testFailedBoundaryTimerEvent.bpmn20.xml" })
@@ -769,6 +780,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(pi.getProcessInstanceId(), job.getProcessInstanceId());
     
     assertEquals(0, job.getRetries());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
 
   }
   
@@ -826,6 +838,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(pi.getProcessInstanceId(), job.getProcessInstanceId());
     
     assertEquals(0, job.getRetries());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
 
   }
   
@@ -840,6 +853,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     waitForExecutedJobWithRetriesLeft(0);
     job = refreshJob(job.getId());
     assertEquals(0, job.getRetries());
+    assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
   }
 
 }

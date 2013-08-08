@@ -26,6 +26,7 @@
       <xs:element name="history-level" minOccurs="0" maxOccurs="1" />
       <xs:element name="configuration" minOccurs="0" maxOccurs="1" />
       <xs:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="plugins" type="pluginsType" minOccurs="0" maxOccurs="1" />
     </xs:sequence>
     <xs:attribute name="name" use="required" />
     <xs:attribute name="default" use="optional" />
@@ -61,4 +62,18 @@
   <xs:complexType name="propertyType" mixed="true">
     <xs:attribute name="name" use="required" />
   </xs:complexType>
+
+  <xs:complexType name="pluginsType">
+    <xs:sequence>
+      <xs:element name="plugin" type="pluginType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pluginType">
+    <xs:sequence>
+      <xs:element name="class" minOccurs="1" maxOccurs="1" />
+      <xs:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
 </xs:schema>

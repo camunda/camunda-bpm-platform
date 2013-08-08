@@ -274,7 +274,7 @@
     </doc:example>
  */
 angular.module('ngResource', ['ng']).
-  factory('$resource', ['$http', '$parse', function($http, $parse) {
+  factory('$resource', ['$http', '$q', '$parse', function($http, $q, $parse) {
     var DEFAULT_ACTIONS = {
       'get':    {method:'GET'},
       'save':   {method:'POST'},
@@ -466,8 +466,11 @@ angular.module('ngResource', ['ng']).
 
           function markResolved() { value.$resolved = true; }
 
+          var deferred = $q.defer();
+
           promise = $http(httpConfig);
           value.$resolved = false;
+          value.$promise = deferred.promise;
 
           promise.then(markResolved, markResolved);
           value.$then = promise.then(function(response) {
@@ -487,6 +490,8 @@ angular.module('ngResource', ['ng']).
               }
             }
 
+            deferred.resolve(value);
+
             (success||noop)(value, response.headers);
 
             response.resource = value;
@@ -495,7 +500,6 @@ angular.module('ngResource', ['ng']).
 
           return value;
         };
-
 
         Resource.prototype['$' + name] = function(a1, a2, a3) {
           var params = extractParams(this),

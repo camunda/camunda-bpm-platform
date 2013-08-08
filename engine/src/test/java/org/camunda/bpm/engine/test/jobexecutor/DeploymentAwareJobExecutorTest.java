@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,10 +27,20 @@ public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCas
 
   @Override
   protected void initializeProcessEngine() {
-    processEngine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("activiti.cfg.xml")
-      .setJobExecutorDeploymentAware(true)
-      .buildProcessEngine();
+    try {
+      processEngine = ProcessEngineConfiguration
+        .createProcessEngineConfigurationFromResource("camunda.cfg.xml")
+        .setJobExecutorDeploymentAware(true)
+        .buildProcessEngine();
+    } catch (RuntimeException ex) {
+      if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
+        processEngine = ProcessEngineConfiguration
+            .createProcessEngineConfigurationFromResource("activiti.cfg.xml")
+            .buildProcessEngine();
+      } else {
+        throw ex;
+      }
+    }
   }
   
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
@@ -154,9 +165,20 @@ public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCas
   
   private String deployAndInstantiateWithNewEngineConfiguration(String resource) {
     // 1. create another process engine confguration
-    ProcessEngineConfiguration otherProcessEngineConfiguration = ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("activiti.cfg.xml")
-        .setJobExecutorDeploymentAware(true);
+    ProcessEngineConfiguration otherProcessEngineConfiguration = null;
+    try {
+      otherProcessEngineConfiguration = ProcessEngineConfiguration
+          .createProcessEngineConfigurationFromResource("camunda.cfg.xml")
+          .setJobExecutorDeploymentAware(true);
+    } catch (RuntimeException ex) {
+      if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
+        otherProcessEngineConfiguration = ProcessEngineConfiguration
+            .createProcessEngineConfigurationFromResource("activiti.cfg.xml")
+            .setJobExecutorDeploymentAware(true);
+      } else {
+        throw ex;
+      }
+    }
     ProcessEngine otherEngine = otherProcessEngineConfiguration.buildProcessEngine();
     
     // 2. deploy again

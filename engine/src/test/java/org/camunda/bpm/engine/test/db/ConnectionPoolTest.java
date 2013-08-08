@@ -29,7 +29,7 @@ public class ConnectionPoolTest extends PvmTestCase {
   
   public void testMyBatisConnectionPoolProperlyConfigured() {
     ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/db/connection-pool.activiti.cfg.xml");
+      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/db/connection-pool.camunda.cfg.xml");
     
     ProcessEngine engine = config.buildProcessEngine();
     

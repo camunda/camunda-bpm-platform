@@ -20,9 +20,10 @@
 
   <!-- HISTORIC ACTIVITY INSTANCE INSERT -->
   
-  <insert id="insertHistoricActivityInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
+  <insert id="insertHistoricActivityInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity">
       insert into ${prefix}ACT_HI_ACTINST (
         ID_,
+        PARENT_ACT_INST_ID_,
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
@@ -37,6 +38,7 @@
         DURATION_
       ) values (
         #{id ,jdbcType=VARCHAR},
+        #{parentActivityInstanceId ,jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
@@ -45,7 +47,7 @@
         #{calledProcessInstanceId ,jdbcType=VARCHAR},
         #{activityName ,jdbcType=VARCHAR},
         #{activityType ,jdbcType=VARCHAR},
-        #{assignee ,jdbcType=VARCHAR},
+        #{taskAssignee ,jdbcType=VARCHAR},
         #{startTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
         #{durationInMillis ,jdbcType=BIGINT}
@@ -54,15 +56,77 @@
 
   <!-- HISTORIC ACTIVITY INSTANCE UPDATE -->
   
-  <update id="updateHistoricActivityInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
-    update ${prefix}ACT_HI_ACTINST set
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
-      ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
-      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-      DURATION_ = #{durationInMillis ,jdbcType=BIGINT}
-    where ID_ = #{id}
+  <update id="updateHistoricActivityInstanceEvent" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
+    UPDATE 
+        ${prefix}ACT_HI_ACTINST HAI
+    SET
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+      <if test="eventType == 'update'">
+        , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR},
+        TASK_ID_ = #{taskId, jdbcType=VARCHAR}
+      </if>      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">        
+            , DURATION_ = ${dateDiff1} #{endTime, jdbcType=TIMESTAMP} ${dateDiff2} HAI.START_TIME_ ${dateDiff3}
+        </if>
+      </if>          
+    WHERE 
+      ID_ = #{id}
   </update>
 
+  
+  <update id="updateHistoricActivityInstanceEvent_mssql" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
+    UPDATE 
+        ${prefix}ACT_HI_ACTINST
+    SET
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+      <if test="eventType == 'update'">
+        , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR},
+        TASK_ID_ = #{taskId, jdbcType=VARCHAR}
+      </if>      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">    
+            , DURATION_ = DATEDIFF(ms, HAI.START_TIME_, #{endTime, jdbcType=TIMESTAMP})
+        </if>
+      </if>
+    FROM
+      ${prefix}ACT_HI_ACTINST HAI          
+    WHERE 
+      ID_ = #{id}
+  </update>
+  
+  <update id="updateHistoricActivityInstanceEvent_db2" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
+    UPDATE 
+        ${prefix}ACT_HI_ACTINST HAI
+    SET
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+      <if test="eventType == 'update'">
+        , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR},
+        TASK_ID_ = #{taskId, jdbcType=VARCHAR}
+      </if>      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">
+          <!--   , DURATION_ = ((DAYS(DATE(#{endTime, jdbcType=TIMESTAMP})) - DAYS(HAI.START_TIME_)) * 86400000)
+            + ((MIDNIGHT_SECONDS(#{endTime, jdbcType=TIMESTAMP}) - MIDNIGHT_SECONDS(HAI.START_TIME_)) * 1000) -->
+        </if>
+      </if>             
+    WHERE 
+      ID_ = #{id}
+  </update>
+
+  
   <!-- HISTORIC ACTIVITY INSTANCE DELETE -->
   
   <delete id="deleteHistoricActivityInstancesByProcessInstanceId">
@@ -73,6 +137,7 @@
 
   <resultMap id="historicActivityInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="parentActivityInstanceId" column="PARENT_ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -81,7 +146,7 @@
     <result property="calledProcessInstanceId" column="CALL_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="activityName" column="ACT_NAME_" jdbcType="VARCHAR" />
     <result property="activityType" column="ACT_TYPE_" jdbcType="VARCHAR" />
-    <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
+    <result property="taskAssignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
@@ -90,7 +155,7 @@
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->
   
   <select id="selectHistoricActivityInstance" resultMap="historicActivityInstanceResultMap">
-    select * from ${prefix}ACT_HI_ACTINST where ACT_ID_ = #{activityId} and PROC_INST_ID_ = #{processInstanceId}
+    select * from ${prefix}ACT_HI_ACTINST where Id_ = #{id}
   </select>
 
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">

@@ -34,7 +34,7 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
   public void testNoTables() {
     try {
       ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/notables.activiti.cfg.xml")
+      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/notables.camunda.cfg.xml")
         .buildProcessEngine();
       fail("expected exception");
     } catch (Exception e) {
@@ -46,7 +46,7 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
   public void testVersionMismatch() {
     // first create the schema
     ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/notables.activiti.cfg.xml")
+      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/notables.camunda.cfg.xml")
       .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP)
       .buildProcessEngine();
 
@@ -79,7 +79,7 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
       // now we can see what happens if when a process engine is being
       // build with a version mismatch between library and db tables
       ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/notables.activiti.cfg.xml")
+        .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/notables.camunda.cfg.xml")
         .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
         .buildProcessEngine();
       

@@ -67,11 +67,7 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
     
     // Start the process instance
     ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey);
-    if (variables!=null) {
-      processInstance.setVariables(variables);
-    }
-    processInstance.start();
-    
+    processInstance.start(variables);
     return processInstance;
   }
 }

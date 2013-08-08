@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceMa
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
@@ -97,10 +96,6 @@ public abstract class AbstractManager implements Session {
 
   protected HistoricActivityInstanceManager getHistoricActivityInstanceManager() {
     return getSession(HistoricActivityInstanceManager.class);
-  }
-  
-  protected HistoricVariableInstanceManager getHistoricVariableInstanceManager() {
-    return getSession(HistoricVariableInstanceManager.class);
   }
   
   protected HistoricTaskInstanceManager getHistoricTaskInstanceManager() {

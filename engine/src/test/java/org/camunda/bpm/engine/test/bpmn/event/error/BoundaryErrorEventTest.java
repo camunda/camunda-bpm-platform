@@ -322,6 +322,11 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
   public void testCatchErrorThrownByJavaDelegateOnServiceTask() {
     String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnServiceTask").getId();
     assertThatErrorHasBeenCaught(procId);
+    
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("exceptionType", true);
+    procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnServiceTask", variables).getId();
+    assertThatExceptionHasBeenCaught(procId);
   }
 
   @Deployment
@@ -340,6 +345,11 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
   public void testCatchErrorThrownByJavaDelegateOnEmbeddedSubProcess() {
     String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnEmbeddedSubProcess").getId();
     assertThatErrorHasBeenCaught(procId);
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("exceptionType", true);
+    procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnEmbeddedSubProcess", variables).getId();
+    assertThatExceptionHasBeenCaught(procId);
   }
 
   @Deployment
@@ -355,6 +365,11 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
   public void testCatchErrorThrownByJavaDelegateOnCallActivity() {
     String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnCallActivity-parent").getId();
     assertThatErrorHasBeenCaught(procId);
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("exceptionType", true);
+    procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnCallActivity-parent", variables).getId();
+    assertThatExceptionHasBeenCaught(procId);
   }
 
   @Deployment(resources = {
@@ -386,6 +401,11 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     variables.put("executionsBeforeError", 2);
     String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskSequential", variables).getId();
     assertThatErrorHasBeenCaught(procId);
+    
+    variables.put("executionsBeforeError", 2);
+    variables.put("exceptionType", true);
+    procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskSequential", variables).getId();
+    assertThatExceptionHasBeenCaught(procId);
   }
 
   @Deployment
@@ -394,6 +414,11 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     variables.put("executionsBeforeError", 2);
     String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskParallel", variables).getId();
     assertThatErrorHasBeenCaught(procId);
+    
+    variables.put("executionsBeforeError", 2);
+    variables.put("exceptionType", true);
+    procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskParallel", variables).getId();
+    assertThatExceptionHasBeenCaught(procId);
   }
   
   @Deployment
@@ -408,6 +433,18 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     assertEquals("No tasks found in task list.", 1, taskService.createTaskQuery().count());
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("Escalated Task", task.getName());
+    
+    // Completing the task will end the process instance
+    taskService.complete(task.getId());
+    assertProcessEnded(procId);
+  }
+  
+  private void assertThatExceptionHasBeenCaught(String procId) {
+    // The service task will throw an error event,
+    // which is caught on the service task boundary
+    assertEquals("No tasks found in task list.", 1, taskService.createTaskQuery().count());
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("Escalated Exception Task", task.getName());
     
     // Completing the task will end the process instance
     taskService.complete(task.getId());
@@ -440,6 +477,10 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     variables.put("bpmnErrorBean", new BpmnErrorBean());
     String procId = runtimeService.startProcessInstanceByKey("testCatchErrorThrownByDelegateExpressionOnServiceTask", variables).getId();
     assertThatErrorHasBeenCaught(procId);
+    
+    variables.put("exceptionType", true);
+    procId = runtimeService.startProcessInstanceByKey("testCatchErrorThrownByDelegateExpressionOnServiceTask", variables).getId();
+    assertThatExceptionHasBeenCaught(procId);
   }
 
   @Deployment
@@ -449,5 +490,20 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     String procId = runtimeService.startProcessInstanceByKey("testCatchErrorThrownByJavaDelegateProvidedByDelegateExpressionOnServiceTask", variables).getId();
     assertThatErrorHasBeenCaught(procId);
   }
-
+  
+  @Deployment
+  public void testCatchExceptionThrownByExpressionOnServiceTask() {
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("bpmnErrorBean", new BpmnErrorBean());
+    String procId = runtimeService.startProcessInstanceByKey("testCatchExceptionThrownByExpressionOnServiceTask", variables).getId();
+    assertThatExceptionHasBeenCaught(procId);
+  }
+  
+  @Deployment
+  public void testCatchExceptionThrownByScriptTask() {
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    String procId = runtimeService.startProcessInstanceByKey("testCatchExceptionThrownByScriptTask", variables).getId();
+    assertThatExceptionHasBeenCaught(procId);
+  }
+  
 }

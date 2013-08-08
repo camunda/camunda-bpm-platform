@@ -7,59 +7,6 @@
         Business Key
       </th>
       <th>State</th>
-      <th class="filter-toggle">
-
-        <a href
-           ng-click="toggleFilter()"
-           ng-class="{ 'filter-open': filter.open }">
-
-          <i class="icon-filter"></i>
-        </a>
-      </th>
-    </tr>
-    <tr class="filter" ng-show="filter.open">
-      <th></th>
-      <th></th>
-      <th>
-        <input class="span2" type="text" ng-model="filter.search.businessKey">
-      </th>
-      <th></th>
-      <th>
-        <div class="btn-group"
-             ng-if="filter.active">
-          <button class="btn" type="button" ng-click="clearFilter()">
-            <i class="icon-remove"></i>
-          </button>
-        </div>
-      </th>
-    </tr>
-    <tr class="filter" ng-show="filter.open">
-      <th colspan="5">
-        <div>
-          <strong>
-            Process Variables 
-          </strong>
-          <button class="btn" ng-click="addVariable()">
-            <i class="icon-plus"></i>
-          </button>
-        </div>
-
-        <div class="var" ng-repeat="variable in filter.variables">
-          
-          <input type="text" process-variable-filter 
-                 ng-model="variable.input"
-                 ng-change="variablesChanged()" />
-
-          <button class="btn" ng-click="removeVariable(variable)">
-            <i class="icon-trash"></i>
-          </button>
-        </div>
-
-        <div>
-          <small>Use <code>variable OPERATOR value</code> in queries where operator may be any of <code>{{ operators }}</code>. 
-          All variable filters are applied using the logical <code>AND</code>.
-        </div>
-      </th>
     </tr>
   </thead>
   <tbody>
@@ -79,14 +26,14 @@
     </tr>
 
     <tr ng-if="!processInstances">
-      <td colspan="5">
+      <td colspan="4">
         <i class="icon-loading"></i> loading process instances...
       </td>
     </tr>
 
     <tr ng-if="processInstances && !processInstances.length">
-      <td colspan="5">
-        No process instances
+      <td colspan="4">
+        No process instances matched by current filter.
       </td>
     </tr>
 

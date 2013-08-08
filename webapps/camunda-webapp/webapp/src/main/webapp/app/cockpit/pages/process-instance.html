@@ -27,7 +27,7 @@
       <h1 ng-show="!processInstance.processDefinition.name">{{ processInstance.processDefinition.key }} <span title="{{ processInstance.id }}">{{ processInstance.id | shorten:8 }}</span></h1>
     </div>
 
-    <div activity-instance-tree="processInstance.activityInstanceTree" selection="selection"></div>
+    <div activity-instance-tree="activityInstanceTree" on-element-click="handleActivityInstanceSelection(id, activityId, $event)" selection="filter"></div>
 
     <a class="hide-collapsable pull-right"></a>
   </div>
@@ -36,10 +36,7 @@
 
     <!-- content top pane -->
     <div class="ctn-row ctn-content-top">
-      <div process-diagram="processInstance.semantic" process-definition="processInstance.processDefinition"
-            annotations="processInstance.activityInstanceStatistics" incidents="processInstance.incidentsOnActivityArray"
-            selection="selection" clickable-elements="processInstance.clickableElements">
-      </div>
+      <div process-diagram="processDiagram" process-diagram-overlay="processDiagramOverlay" on-element-click="handleBpmnElementSelection(id, $event)" selection="filter"></div>
     </div>
 
     <!-- content bottom pane -->

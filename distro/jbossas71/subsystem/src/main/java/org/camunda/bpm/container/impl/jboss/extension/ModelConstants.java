@@ -38,6 +38,10 @@ public interface ModelConstants {
   public final static String PROPERTY = "property";
   public final static String PROPERTIES = "properties";
   public final static String CONFIGURATION = "configuration";
+
+  public final static String PLUGINS = "plugins";
+  public final static String PLUGIN = "plugin";
+  public final static String PLUGIN_CLASS = "class";
   
   // attributes
   public final static String DEFAULT = "default";

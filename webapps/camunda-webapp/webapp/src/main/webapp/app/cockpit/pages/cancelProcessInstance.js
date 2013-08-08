@@ -1,6 +1,6 @@
 ngDefine('cockpit.pages', function(module, $) {
 
-  function CancelProcessInstanceController ($scope, $q, $location, Uri, Notifications, ProcessInstanceResource) {
+  function CancelProcessInstanceController ($scope, $location, Notifications, ProcessInstanceResource) {
 
     var BEFORE_CANCEL = 'beforeCancellation',
         PERFORM_CANCEL = 'performCancellation',
@@ -8,42 +8,26 @@ ngDefine('cockpit.pages', function(module, $) {
         CANCEL_FAILED = 'cancellationFailed',
         LOADING_FAILED = 'loadingFailed';
 
+    var processData = $scope.processData;
+
     $scope.$on('$routeChangeStart', function () {
       $scope.cancelProcessInstanceDialog.close();
     });
 
-    function loadSubProcessInstances () {
-      var deferred = $q.defer();
+    processData.set('subProcessInstances', function () {
+      return ProcessInstanceResource.query({'firstResult': 0, 'maxResults': 5}, {'superProcessInstance': $scope.processInstance.id}).$promise;
+    });
 
-      ProcessInstanceResource.query({'firstResult': 0, 'maxResults': 5}, {'superProcessInstance': $scope.processInstance.id}).$then(function (response) {
-        deferred.resolve(response.data);
-      }, function (error) {
-        deferred.reject(error.data);
-      });
+    processData.set('subProcessInstancesCount', function () {
+      return ProcessInstanceResource.count({'superProcessInstance': $scope.processInstance.id}).$promise;
+    });
 
-      return deferred.promise;
-    }
-
-    function countSubProcessInstances () {
-      var deferred = $q.defer();
-
-        ProcessInstanceResource.count({'superProcessInstance': $scope.processInstance.id}).$then(function (response) {
-          deferred.resolve(response.data);
-        }, function (error) {
-          deferred.reject(error.data);
-        });
-
-      return deferred.promise;
-    }
-
-    $q.all([ loadSubProcessInstances(), countSubProcessInstances() ]).then(function(results) {
-      $scope.subProcessInstances = results[0];
-      $scope.subProcessInstancesCount = results[1].count;
-
+    processData.get([ 'subProcessInstancesCount', 'subProcessInstances' ], function (subProcessInstancesCount, subProcessInstances) {
+      $scope.subProcessInstancesCount = subProcessInstancesCount.count;
+      $scope.subProcessInstances = subProcessInstances;
+      
       $scope.status = BEFORE_CANCEL;
-    }, function (error) {
-      $scope.status = LOADING_FAILED;
-      Notifications.addError({'status': 'Failed', 'message': 'Loading of further process instance information failed: ' + error.message, 'exclusive': ['type']});
+
     });
 
     $scope.cancelProcessInstance = function () {
@@ -75,9 +59,7 @@ ngDefine('cockpit.pages', function(module, $) {
   };
 
   module.controller('CancelProcessInstanceController', [ '$scope',
-                                                         '$q',
                                                          '$location',
-                                                         'Uri',
                                                          'Notifications',
                                                          'ProcessInstanceResource',
                                                          CancelProcessInstanceController ]);

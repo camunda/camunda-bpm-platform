@@ -13,8 +13,10 @@
 package org.camunda.bpm.container.impl.jboss.config;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
@@ -47,16 +49,18 @@ public class ManagedProcessEngineMetadata {
   protected String configuration;
   private Map<String, String> configurationProperties;
   private Map<String, String> foxLegacyProperties;
+  private List<ProcessEnginePluginXml> pluginConfigurations;
 
   /**
    * @param isDefault
    * @param engineName
    * @param datasourceJndiName
    * @param historyLevel
-   * @param configuration 
+   * @param configuration
    * @param properties
+   * @param pluginConfigurations
    */
-  public ManagedProcessEngineMetadata(boolean isDefault, String engineName, String datasourceJndiName, String historyLevel, String configuration, Map<String, String> properties) {
+  public ManagedProcessEngineMetadata(boolean isDefault, String engineName, String datasourceJndiName, String historyLevel, String configuration, Map<String, String> properties, List<ProcessEnginePluginXml> pluginConfigurations) {
     this.isDefault = isDefault;
     this.engineName = engineName;
     this.datasourceJndiName = datasourceJndiName;
@@ -64,6 +68,7 @@ public class ManagedProcessEngineMetadata {
     this.configuration = configuration;
     this.configurationProperties = selectProperties(properties, false);
     this.foxLegacyProperties = selectProperties(properties, true);
+    this.pluginConfigurations = pluginConfigurations;
   }
 
   public boolean isDefault() {
@@ -122,6 +127,14 @@ public class ManagedProcessEngineMetadata {
     this.foxLegacyProperties = foxLegacyProperties;
   }
 
+  public List<ProcessEnginePluginXml> getPluginConfigurations() {
+    return pluginConfigurations;
+  }
+
+  public void setPluginConfigurations(List<ProcessEnginePluginXml> pluginConfigurations) {
+    this.pluginConfigurations = pluginConfigurations;
+  }
+
   public boolean isIdentityUsed() {
     Object object = getFoxLegacyProperties().get(PROP_IS_IDENTITY_USED);
     if(object == null) {
@@ -175,13 +188,21 @@ public class ManagedProcessEngineMetadata {
     StringBuilder validationErrorBuilder = new StringBuilder("Process engine configuration is invalid: \n");
     boolean isValid = true;    
     
-    if(datasourceJndiName == null || datasourceJndiName.length() == 0) {
+    if(datasourceJndiName == null || datasourceJndiName.isEmpty()) {
       isValid = false;
       validationErrorBuilder.append(" property 'datasource' cannot be null \n");      
     }
     if(engineName == null || engineName.isEmpty()) {
       isValid = false;
       validationErrorBuilder.append(" property 'engineName' cannot be null \n");
+    }
+
+    for (int i = 0; i < pluginConfigurations.size(); i++) {
+      ProcessEnginePluginXml pluginConfiguration = pluginConfigurations.get(i);
+      if (pluginConfiguration.getPluginClass() == null || pluginConfiguration.getPluginClass().isEmpty()) {
+        isValid = false;
+        validationErrorBuilder.append(" property 'class' in plugin[" + i + "] cannot be null \n");
+      }
     }
     
     if(!isValid) {
@@ -224,4 +245,5 @@ public class ManagedProcessEngineMetadata {
     }
     return result;
   }
+
 }

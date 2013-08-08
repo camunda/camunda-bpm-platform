@@ -4,6 +4,9 @@
   xmlns:activiti="http://activiti.org/bpmn"
   targetNamespace="Examples">
   
+  <error id="myError" errorCode="23"/>
+  <error id="myException" errorCode="org.camunda.bpm.engine.test.bpmn.event.error.MyBusinessException" />
+  
   <process id="catchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskSequential">
   
     <startEvent id="theStart" />
@@ -16,13 +19,22 @@
     </serviceTask>
     
     <boundaryEvent id="catchError" attachedToRef="serviceTask">
-      <errorEventDefinition />
+      <errorEventDefinition errorRef="myError"/>
+    </boundaryEvent>
+
+    <boundaryEvent id="catchException" attachedToRef="serviceTask">
+      <errorEventDefinition errorRef="myException"/>
     </boundaryEvent>
     
     <sequenceFlow id="flow3" sourceRef="catchError" targetRef="escalatedTask" />
     
+    <sequenceFlow id="flow4" sourceRef="catchException" targetRef="escalatedExceptionTask" />
+    
     <userTask id="escalatedTask" name="Escalated Task" />
-    <sequenceFlow id="flow4" sourceRef="serviceTask" targetRef="theEnd" />
+    
+    <userTask id="escalatedExceptionTask" name="Escalated Exception Task" />
+    
+    <sequenceFlow id="flow5" sourceRef="serviceTask" targetRef="theEnd" />
     
     <endEvent id="theEnd" />
     

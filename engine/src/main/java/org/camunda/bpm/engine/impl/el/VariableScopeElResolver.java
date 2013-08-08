@@ -17,7 +17,6 @@ import java.util.Iterator;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;

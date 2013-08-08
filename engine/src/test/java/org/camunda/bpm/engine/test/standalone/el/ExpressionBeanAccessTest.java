@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class ExpressionBeanAccessTest extends ResourceProcessEngineTestCase {
 
   public ExpressionBeanAccessTest() {
-    super("org/camunda/bpm/engine/test/standalone/el/activiti.cfg.xml");
+    super("org/camunda/bpm/engine/test/standalone/el/camunda.cfg.xml");
   }
   
   @Override

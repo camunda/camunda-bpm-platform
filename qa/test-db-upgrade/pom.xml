@@ -25,7 +25,7 @@
         <directory>${project.build.directory}/engine-test-sources</directory>
         <excludes>
           <exclude>**/*.java</exclude>
-          <exclude>activiti.cfg.xml</exclude>
+          <exclude>camunda.cfg.xml</exclude>
         </excludes>
       </testResource>
       <testResource>

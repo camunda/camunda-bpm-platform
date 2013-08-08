@@ -20,7 +20,7 @@
 
   <!-- HISTORIC PROCESS INSTANCE INSERT -->
   
-  <insert id="insertHistoricProcessInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
+  <insert id="insertHistoricProcessInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity">
       insert into ${prefix}ACT_HI_PROCINST (
         ID_,
         PROC_INST_ID_,
@@ -52,17 +52,65 @@
 
   <!-- HISTORIC PROCESS INSTANCE UPDATE -->
   
-  <update id="updateHistoricProcessInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
-    update ${prefix}ACT_HI_PROCINST set
+  <update id="updateHistoricProcessInstanceEvent" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
+    update ${prefix}ACT_HI_PROCINST HPI set
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-      START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
-      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-      DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
       END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
-      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}
+      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}      
+      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">     
+            , DURATION_ = ${dateDiff1} #{endTime, jdbcType=TIMESTAMP} ${dateDiff2} HPI.START_TIME_ ${dateDiff3}
+        </if>
+      </if>      
+      
     where ID_ = #{id}
   </update>
-
+    
+  <update id="updateHistoricProcessInstanceEvent_mssql" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
+    update ${prefix}ACT_HI_PROCINST set
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
+      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}      
+      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">       
+            , DURATION_ = DATEDIFF(ms, HPI.START_TIME_, #{endTime, jdbcType=TIMESTAMP})
+        </if>
+      </if>      
+    FROM 
+      ${prefix}ACT_HI_PROCINST HPI      
+    where 
+      ID_ = #{id}
+  </update>
+    
+  <update id="updateHistoricProcessInstanceEvent_db2" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
+    update ${prefix}ACT_HI_PROCINST HPI set
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
+      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}      
+      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">
+          <!--  , DURATION_ = ((DAYS(DATE(#{endTime, jdbcType=TIMESTAMP})) - DAYS(HPI.START_TIME_)) * 86400000)
+            + ((MIDNIGHT_SECONDS(#{endTime, jdbcType=TIMESTAMP}) - MIDNIGHT_SECONDS(HPI.START_TIME_)) * 1000)  -->
+        </if>
+      </if>                
+    where ID_ = #{id}
+  </update>
+    
   <!-- HISTORIC PROCESS INSTANCE DELETE -->
   
   <delete id="deleteHistoricProcessInstance">

@@ -113,9 +113,14 @@ public class MBeanDeploymentOperation {
       currentStep = steps.remove(0);
 
       try {
+        if (log.isLoggable(Level.FINE)) {
+          log.fine("Performing operation step: '" + currentStep.getName() + "'");
+        }
         currentStep.performOperationStep(this);
         successfulSteps.add(currentStep);
-
+        if (log.isLoggable(Level.FINE)) {
+          log.fine("Successfully performed operation step: '" + currentStep.getName() + "'");
+        }
       } catch (Exception e) {
         
         if(isRollbackOnFailure) {

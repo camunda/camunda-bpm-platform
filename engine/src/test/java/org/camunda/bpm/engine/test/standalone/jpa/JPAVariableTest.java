@@ -71,7 +71,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
   protected void initializeProcessEngine() {
     if (cachedProcessEngine==null) {
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/jpa/activiti.cfg.xml");
+        .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/jpa/camunda.cfg.xml");
       
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
 
