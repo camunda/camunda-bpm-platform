@@ -1,6 +1,6 @@
 <div>
   <div class="page-header">
-    <h1>Deployed Processes</h1>
+    <h1>Deployed Processes (Icons)</h1>
   </div>
   
   <div class="tile-grid">
@@ -18,7 +18,7 @@
         <span process-diagram-preview process-definition-id="statistic.definition.id"></span>
       </span>
       <span class="tile-footer">
-        Running Instances: {{ statistic.instances }}
+        Running Instances: {{ statistic.instances }} <span state-circle incidents="statistic.incidents" class="circle-tiles"></span>
       </span>
     </a>
   </div>
