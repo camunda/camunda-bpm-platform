@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:activiti="http://activiti.org/bpmn" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="" id="sid-2852a21b-8c85-49e4-b859-2d7aaaf2e7fc" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <process name="testSignalInactiveExecution" id="testSignalInactiveExecution">
+      <startEvent id="StartNoneEvent" name="StartNoneEvent" />
+      <sequenceFlow id="SequenceFlow_3" name="SequenceFlow" sourceRef="StartNoneEvent" targetRef="Receive_Task" />
+      
+      <receiveTask id="Receive_Task" name="Receive Task" />
+      <sequenceFlow id="SequenceFlow_4" name="SequenceFlow" sourceRef="Receive_Task" targetRef="User_Task" />
+      
+      <boundaryEvent attachedToRef="Receive_Task" cancelActivity="false" id="IntermediateTimerEvent" name="IntermediateTimerEvent">
+			<timerEventDefinition>
+				<timeDuration>PT1H</timeDuration>
+			</timerEventDefinition>      
+      </boundaryEvent>
+      <sequenceFlow id="SequenceFlow" name="SequenceFlow" sourceRef="IntermediateTimerEvent" targetRef="Escalation_Task" />
+      
+      <userTask id="Escalation_Task" name="Escalation Task" />
+      
+      <userTask id="User_Task" name="User Task" />
+      <sequenceFlow id="SequenceFlow_5" name="SequenceFlow" sourceRef="User_Task" targetRef="EndNoneEvent" />
+      
+      <endEvent id="EndNoneEvent" name="EndNoneEvent" />
+   </process>
+</definitions>

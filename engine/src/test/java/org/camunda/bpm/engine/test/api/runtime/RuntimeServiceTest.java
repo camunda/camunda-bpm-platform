@@ -308,6 +308,23 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
        
   }
   
+  @Deployment
+  public void testSignalInactiveExecution() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("testSignalInactiveExecution");
+    
+    // there exist two executions: the inactive parent (the process instance) and the child that actually waits in the receive task
+    try {
+      runtimeService.signal(instance.getId());
+      fail();
+    } catch(ProcessEngineException e) {
+      // happy path
+      assertTextPresent("cannot signal execution " + instance.getId() + ": it has no current activity", e.getMessage());
+    } catch (Exception e) {
+      fail("Signalling an inactive execution that has no activity should result in a ProcessEngineException");
+    }
+
+  }
+  
   public void testGetVariablesUnexistingExecutionId() {
     try {
       runtimeService.getVariables("unexistingExecutionId");
