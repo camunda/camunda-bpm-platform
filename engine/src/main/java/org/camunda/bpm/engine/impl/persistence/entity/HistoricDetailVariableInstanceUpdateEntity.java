@@ -147,4 +147,28 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
   public void setVariableType(VariableType variableType) {
     this.variableType = variableType;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[byteArrayValue=" + byteArrayValue
+           + ", variableName=" + variableName
+           + ", variableInstanceId=" + variableInstanceId
+           + ", revision=" + revision
+           + ", variableTypeName=" + variableTypeName
+           + ", longValue=" + longValue
+           + ", doubleValue=" + doubleValue
+           + ", textValue=" + textValue
+           + ", textValue2=" + textValue2
+           + ", byteArrayId=" + byteArrayId
+           + ", activityInstanceId=" + activityInstanceId
+           + ", eventType=" + eventType
+           + ", executionId=" + executionId
+           + ", id=" + id
+           + ", processDefinitionId=" + processInstanceId
+           + ", processInstanceId=" + processInstanceId
+           + ", taskId=" + taskId
+           + ", timestamp=" + timestamp
+           + "]";
+  }
 }

@@ -147,4 +147,20 @@ public class AttachmentEntity implements Attachment, PersistentObject, HasRevisi
   public void setContent(ByteArrayEntity content) {
     this.content = content;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", revision=" + revision
+           + ", name=" + name
+           + ", description=" + description
+           + ", type=" + type
+           + ", taskId=" + taskId
+           + ", processInstanceId=" + processInstanceId
+           + ", url=" + url
+           + ", contentId=" + contentId
+           + ", content=" + content
+           + "]";
+  }
 }

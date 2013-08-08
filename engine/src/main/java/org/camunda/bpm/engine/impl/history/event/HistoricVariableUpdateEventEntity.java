@@ -97,5 +97,28 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
   public void setVariableInstanceId(String variableInstanceId) {
     this.variableInstanceId = variableInstanceId;
   }
-  
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[variableName=" + variableName
+           + ", variableInstanceId=" + variableInstanceId
+           + ", revision=" + revision
+           + ", variableTypeName=" + variableTypeName
+           + ", longValue=" + longValue
+           + ", doubleValue=" + doubleValue
+           + ", textValue=" + textValue
+           + ", textValue2=" + textValue2
+           + ", byteArrayId=" + byteArrayId
+           + ", activityInstanceId=" + activityInstanceId
+           + ", eventType=" + eventType
+           + ", executionId=" + executionId
+           + ", id=" + id
+           + ", processDefinitionId=" + processInstanceId
+           + ", processInstanceId=" + processInstanceId
+           + ", taskId=" + taskId
+           + ", timestamp=" + timestamp
+           + "]";
+  }
+
 }

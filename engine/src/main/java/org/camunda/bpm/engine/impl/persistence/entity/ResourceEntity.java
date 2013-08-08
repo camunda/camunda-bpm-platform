@@ -78,4 +78,14 @@ public class ResourceEntity implements Serializable, PersistentObject {
   public boolean isGenerated() {
     return generated;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", name=" + name
+           + ", deploymentId=" + deploymentId
+           + ", generated=" + generated
+           + "]";
+  }
 }

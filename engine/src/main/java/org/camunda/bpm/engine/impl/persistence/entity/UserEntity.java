@@ -16,9 +16,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 
@@ -92,6 +90,18 @@ public class UserEntity implements User, Serializable, PersistentObject, HasRevi
   }
   public void setRevision(int revision) {
     this.revision = revision;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", revision=" + revision
+           + ", firstName=" + firstName
+           + ", lastName=" + lastName
+           + ", email=" + email
+           + ", password=" + password
+           + "]";
   }
 
 }

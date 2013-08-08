@@ -148,4 +148,15 @@ public class HistoryEvent implements Serializable, PersistentObject {
     return HistoryEvent.class;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", eventType=" + eventType
+           + ", executionId=" + executionId
+           + ", processDefinitionId=" + processDefinitionId
+           + ", processInstanceId=" + processInstanceId
+           + "]";
+  }
+
 }
