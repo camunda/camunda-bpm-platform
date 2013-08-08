@@ -14,9 +14,11 @@ ngDefine('camunda.common.services.debounce', function(module) {
     return function debounce(fn, wait) {
       var timer;
 
-      return function() {
+      var debounced = function() {
         var context = this,
             args = arguments;
+
+        debounced.$loading = true;
 
         if (timer) {
           $timeout.cancel(timer);
@@ -24,9 +26,12 @@ ngDefine('camunda.common.services.debounce', function(module) {
 
         timer = $timeout(function() {
           timer = null;
+          debounced.$loading = false;
           fn.apply(context, args);
         }, wait);
       };
+
+      return debounced;
     };
   }];
 
