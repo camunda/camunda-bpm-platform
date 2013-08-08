@@ -9,7 +9,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
     $scope.stacktraceDialog = new Dialog();
 
-    var DEFAULT_PAGES = { size: 2, total: 0, current: 1 };
+    var DEFAULT_PAGES = { size: 50, total: 0, current: 1 };
 
     var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
 
