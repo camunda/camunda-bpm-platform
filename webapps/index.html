@@ -23,10 +23,14 @@
     <link href="$APP_ROOT/assets/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
     <!-- scripts -->
+    <!-- For IE9 support of placeholder tag -->
+    <!--[if (lt IE 9)| (IE 9) ]>
+    <script src="$APP_ROOT/assets/vendor/better-dom/better-dom.js" data-htc="$APP_ROOT/assets/vendor/better-dom/better-dom.htc"></script>
+    <script src="$APP_ROOT/assets/vendor/better-placeholder-polyfill/better-placeholder-polyfill.js"></script>
+    <![endif]-->
     <script src="$APP_ROOT/assets/vendor/require/require.js"></script>
 
     <script src="$APP_ROOT/app/admin/admin-bootstrap.js"></script>
-
   </head>
   <body ng-controller="DefaultController">
     <!-- navigation -->
