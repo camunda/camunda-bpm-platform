@@ -6,7 +6,6 @@ ngDefine('cockpit.services', function(module) {
 
     $rootScope.$on('$routeUpdate', function(e, lastRoute) {
       if (silent) {
-        console.log('silenced $routeUpdate');
         silent = false;
       } else {
         $rootScope.$broadcast('$routeChanged', lastRoute);
@@ -24,11 +23,17 @@ ngDefine('cockpit.services', function(module) {
     }
 
     search.updateSilently = function(params) {
+      var oldPath = $location.absUrl();
+
       angular.forEach(params, function(value, key) {
         $location.search(key, value);
       });
 
-      silent = true;
+      var newPath = $location.absUrl();
+      
+      if (newPath != oldPath) {
+        silent = true;
+      }
     };
 
     return search;
