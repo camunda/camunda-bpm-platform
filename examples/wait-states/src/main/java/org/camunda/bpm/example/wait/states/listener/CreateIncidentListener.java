@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 public class CreateIncidentListener implements ExecutionListener  {
 
   public void notify(DelegateExecution execution) throws Exception {
-    IncidentEntity newIncident = IncidentEntity.createAndInsertIncident("aCustomIncidentType", execution.getId(), execution.getId());
+    IncidentEntity newIncident = IncidentEntity.createAndInsertIncident("aCustomIncidentType", execution.getId(), execution.getId(), "A custom incident message.");
     newIncident.createRecursiveIncidents();
   }
 
