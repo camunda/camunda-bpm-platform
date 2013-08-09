@@ -27,6 +27,10 @@ ngDefine('tasklist.directives', [
             divider = null;
           }
         });
+
+        scope.$on('$destroy', function() {
+          divider.remove();
+        });
       }
     }
   }];
