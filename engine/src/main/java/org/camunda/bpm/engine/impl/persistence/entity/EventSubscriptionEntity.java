@@ -278,8 +278,17 @@ public abstract class EventSubscriptionEntity implements EventSubscription, Pers
 
   @Override
   public String toString() {
-    return "EventSubscriptionEntity [id=" + id + ", eventType=" + eventType + ", eventName=" + eventName + ", executionId=" + executionId
-        + ", processInstanceId=" + processInstanceId + ", activityId=" + activityId + ", configuration=" + configuration + "]";
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", eventType=" + eventType
+           + ", eventName=" + eventName
+           + ", executionId=" + executionId
+           + ", processInstanceId=" + processInstanceId
+           + ", activityId=" + activityId
+           + ", configuration=" + configuration
+           + ", revision=" + revision
+           + ", created=" + created
+           + "]";
   }
-  
+
 }

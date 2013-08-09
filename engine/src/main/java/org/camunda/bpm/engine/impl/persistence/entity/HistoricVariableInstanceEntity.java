@@ -278,4 +278,22 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", processInstanceId=" + processInstanceId
+           + ", taskId=" + taskId
+           + ", executionId=" + executionId
+           + ", name=" + name
+           + ", revision=" + revision
+           + ", variableTypeName=" + variableTypeName
+           + ", longValue=" + longValue
+           + ", doubleValue=" + doubleValue
+           + ", textValue=" + textValue
+           + ", textValue2=" + textValue2
+           + ", byteArrayId=" + byteArrayId
+           + "]";
+  }
 }

@@ -144,4 +144,28 @@ public class HistoricTaskInstanceEventEntity extends HistoryEvent {
   public void setTaskDefinitionKey(String taskDefinitionKey) {
     this.taskDefinitionKey = taskDefinitionKey;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[taskId" + taskId
+           + ", assignee=" + assignee
+           + ", owner=" + owner
+           + ", name=" + name
+           + ", description=" + description
+           + ", dueDate=" + dueDate
+           + ", priority=" + priority
+           + ", parentTaskId=" + parentTaskId
+           + ", deleteReason=" + deleteReason
+           + ", taskDefinitionKey=" + taskDefinitionKey
+           + ", durationInMillis=" + durationInMillis
+           + ", startTime=" + startTime
+           + ", endTime=" + endTime
+           + ", id=" + id
+           + ", eventType=" + eventType
+           + ", executionId=" + executionId
+           + ", processDefinitionId=" + processDefinitionId
+           + ", processInstanceId=" + processInstanceId
+           + "]";
+  }
 }

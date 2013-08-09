@@ -128,4 +128,24 @@ public class HistoricProcessInstanceEventEntity extends HistoryEvent {
     this.deleteReason = deleteReason;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[businessKey=" + businessKey
+           + ", startUserId=" + startUserId
+           + ", superProcessInstanceId=" + superProcessInstanceId
+           + ", deleteReason=" + deleteReason
+           + ", durationInMillis=" + durationInMillis
+           + ", startTime=" + startTime
+           + ", endTime=" + endTime
+           + ", endActivityId=" + endActivityId
+           + ", startActivityId=" + startActivityId
+           + ", id=" + id
+           + ", eventType=" + eventType
+           + ", executionId=" + executionId
+           + ", processDefinitionId=" + processDefinitionId
+           + ", processInstanceId=" + processInstanceId
+           + "]";
+  }
+
 }

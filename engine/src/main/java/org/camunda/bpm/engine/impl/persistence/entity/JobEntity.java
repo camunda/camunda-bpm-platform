@@ -304,4 +304,25 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
   public void setDeploymentId(String deploymentId) {
     this.deploymentId = deploymentId;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", revision=" + revision
+           + ", duedate=" + duedate
+           + ", lockOwner=" + lockOwner
+           + ", lockExpirationTime=" + lockExpirationTime
+           + ", executionId=" + executionId
+           + ", processInstanceId=" + processInstanceId
+           + ", isExclusive=" + isExclusive
+           + ", retries=" + retries
+           + ", jobHandlerType=" + jobHandlerType
+           + ", jobHandlerConfiguration=" + jobHandlerConfiguration
+           + ", exceptionByteArray=" + exceptionByteArray
+           + ", exceptionByteArrayId=" + exceptionByteArrayId
+           + ", exceptionMessage=" + exceptionMessage
+           + ", deploymentId=" + deploymentId
+           + "]";
+  }
 }

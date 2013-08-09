@@ -141,4 +141,19 @@ public class IdentityInfoEntity implements PersistentObject, HasRevision, Accoun
   public void setDetails(Map<String, String> details) {
     this.details = details;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", revision=" + revision
+           + ", type=" + type
+           + ", userId=" + userId
+           + ", key=" + key
+           + ", value=" + value
+           + ", password=" + password
+           + ", parentId=" + parentId
+           + ", details=" + details
+           + "]";
+  }
 }

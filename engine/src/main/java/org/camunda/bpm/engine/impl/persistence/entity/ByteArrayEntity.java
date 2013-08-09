@@ -82,4 +82,14 @@ public class ByteArrayEntity implements Serializable, PersistentObject, HasRevis
   public void setRevision(int revision) {
     this.revision = revision;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", revision=" + revision
+           + ", name=" + name
+           + ", deploymentId=" + deploymentId
+           + "]";
+  }
 }

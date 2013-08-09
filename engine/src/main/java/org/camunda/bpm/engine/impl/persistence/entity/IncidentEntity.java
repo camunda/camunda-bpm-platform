@@ -279,4 +279,21 @@ public class IncidentEntity implements Incident, PersistentObject {
     return persistentState;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", incidentTimestamp=" + incidentTimestamp
+           + ", incidentType=" + incidentType
+           + ", executionId=" + executionId
+           + ", activityId=" + activityId
+           + ", processInstanceId=" + processInstanceId
+           + ", processDefinitionId=" + processDefinitionId
+           + ", causeIncidentId=" + causeIncidentId
+           + ", rootCauseIncidentId=" + rootCauseIncidentId
+           + ", configuration=" + configuration
+           + ", incidentMessage=" + incidentMessage
+           + "]";
+  }
+
 }
