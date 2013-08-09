@@ -168,4 +168,19 @@ public class CommentEntity implements Comment, Event, PersistentObject, Serializ
   public void setAction(String action) {
     this.action = action;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", type=" + type
+           + ", userId=" + userId
+           + ", time=" + time
+           + ", taskId=" + taskId
+           + ", processInstanceId=" + processInstanceId
+           + ", action=" + action
+           + ", message=" + message
+           + ", fullMessage=" + fullMessage
+           + "]";
+  }
 }

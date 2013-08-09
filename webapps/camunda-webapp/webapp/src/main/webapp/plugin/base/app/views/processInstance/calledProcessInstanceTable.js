@@ -4,12 +4,12 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
     // input: processInstance, processData
 
-    var processData = $scope.processData;
+    var calledProcessInstanceData = $scope.processData.newChild($scope);
     var processInstance = $scope.processInstance;
 
     var filter = null;
 
-    processData.get([ 'filter', 'instanceIdToInstanceMap' ], function (newFilter, instanceIdToInstanceMap) {
+    calledProcessInstanceData.observe([ 'filter', 'instanceIdToInstanceMap' ], function (newFilter, instanceIdToInstanceMap) {
       updateView(newFilter, instanceIdToInstanceMap);
     });
 

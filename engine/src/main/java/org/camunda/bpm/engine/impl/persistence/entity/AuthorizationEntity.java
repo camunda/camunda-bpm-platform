@@ -222,5 +222,18 @@ public class AuthorizationEntity implements Authorization, PersistentObject, Has
     
     return state;
   }
-  
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", revision=" + revision
+           + ", authorizationType=" + authorizationType
+           + ", permissions=" + permissions
+           + ", userId=" + userId
+           + ", groupId=" + groupId
+           + ", resourceType=" + resourceType
+           + ", resourceId=" + resourceId
+           + "]";
+  }
 }

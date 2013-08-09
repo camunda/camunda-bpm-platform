@@ -280,4 +280,24 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Pe
   public String getTypeName() {
     return (type != null ? type.getTypeName() : null);
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", revision=" + revision
+           + ", name=" + name
+           + ", processInstanceId=" + processInstanceId
+           + ", executionId=" + executionId
+           + ", taskId=" + taskId
+           + ", activityInstanceId=" + activityInstanceId
+           + ", longValue=" + longValue
+           + ", doubleValue=" + doubleValue
+           + ", textValue=" + textValue
+           + ", textValue2=" + textValue2
+           + ", byteArrayValue=" + byteArrayValue
+           + ", byteArrayValueId=" + byteArrayValueId
+           + ", forcedUpdate=" + forcedUpdate
+           + "]";
+  }
 }

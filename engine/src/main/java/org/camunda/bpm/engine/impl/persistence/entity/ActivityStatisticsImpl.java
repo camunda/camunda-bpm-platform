@@ -49,4 +49,14 @@ public class ActivityStatisticsImpl implements ActivityStatistics {
   public void setIncidentStatistics(List<IncidentStatistics> incidentStatistics) {
     this.incidentStatistics = incidentStatistics;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", instances=" + instances
+           + ", failedJobs=" + failedJobs
+           + "]";
+  }
+
 }

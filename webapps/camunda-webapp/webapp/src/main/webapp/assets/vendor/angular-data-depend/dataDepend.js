@@ -35,9 +35,45 @@
       return Array.prototype.slice.apply(arrayLike);
     }
 
-    var dataProviderFactory = [ '$rootScope', '$q', function($rootScope, $q) {
-      
-      function createFactory(nextTick) {
+    var dataDependFactory = [ '$rootScope', '$injector', '$q', function($rootScope, $injector, $q) {
+
+      function createDataDependFactory(annotate, nextTick) {
+
+        function createProviders(parent) {
+
+          var providers = {};
+
+          function get(key) {
+            var v = providers[key];
+            if (!v) {
+              if (parent) {
+                v = parent.get(key);
+              }
+            }
+
+            return v;
+          }
+
+          function put(key, value) {
+            if (get(key)) {
+              throw new Error('[dataDepend] provider with key ' + key + ' already registered');
+            }
+
+            providers[key] = value;
+          }
+
+          return {
+            local: providers, 
+            get: get,
+            put: put
+          };
+        }
+
+        var id = 0;
+
+        function nextId() {
+          return id++;
+        }
 
         /**
          * Create a provider using the specified options
@@ -46,7 +82,7 @@
          *
          * @returns {object} the newly created, unregistered provider
          */
-        function create(options) {
+        function createProvider(options) {
           
           options = options || {};
 
@@ -71,7 +107,9 @@
             get: get, 
             set: set,
             resolve: resolve,
-            children: children, 
+            children: children,
+            filter: filter,
+            destroy: destroy,
             parentChanged: parentChanged
           };
 
@@ -122,7 +160,7 @@
           }
 
           function getProvider(key) {
-            var provider = registry[key];
+            var provider = registry.get(key);
             
             if (!provider) {
               throw new Error('[dataDepend] No provider for ' + key);
@@ -308,82 +346,114 @@
             // console.log.apply(console, args);
           }
 
+          /**
+           * Return a filtered view on the provider, that exposes only
+           * the dependency with the given name, if multiple dependencies
+           * are produced. 
+           *
+           * @param {object} provider the provider to filter
+           * @param {string} name the produced name to filter for
+           *
+           * @returns {object} a view on the provider that filters for the
+           *                   specified name
+           *
+           * @throws error if the provider is not a multi provider
+           */
+          function filter(name) {
+
+            if (!isArray(provider.produces)) {
+              throw new Error('[dataDepend] Provider does not produce multiple values');
+            }
+
+            var idx = provider.produces.indexOf(name),
+                __get = provider.get,
+                __resolve = provider.resolve;
+
+            function filter(values) {
+              if (!values) {
+                return values;
+              } else {
+                return values[idx];
+              }
+            }
+            
+            function resolve() {
+              var args = toArray(arguments);
+              return __resolve.apply(null, args).then(filter);
+            }
+
+            function get() {
+              var args = toArray(arguments);
+              return filter(__get.apply(null, args));
+            }
+
+            var filteredProvider = angular.extend({}, provider, { 
+              resolve: resolve,
+              get: get
+            });
+
+            return filteredProvider;
+          }
+
+          function destroy() {
+            allDependenciesDo(function(d) {
+              var parent = getProvider(d),
+                  parentChildren =  parent.children,
+                  idx = parentChildren.indexOf(provider);
+
+              if (idx !== -1) {
+                parentChildren.splice(idx, 1);
+              }
+            });
+          }
+
           return provider;
         };
 
-        /**
-         * Return a filtered view on the provider, that exposes only
-         * the dependency with the given name, if multiple dependencies
-         * are produced. 
-         *
-         * @param {object} provider the provider to filter
-         * @param {string} name the produced name to filter for
-         *
-         * @returns {object} a view on the provider that filters for the
-         *                   specified name
-         *
-         * @throws error if the provider is not a multi provider
-         */
-        function filtered(provider, name) {
+        function createDataDepend(scope, inheritedProvides) {
 
-          if (!isArray(provider.produces)) {
-            throw new Error('[dataDepend] Provider does not produce multiple values');
-          }
+          var providers = createProviders(inheritedProvides);
 
-          var idx = provider.produces.indexOf(name),
-              __get = provider.get,
-              __resolve = provider.resolve;
+          /**
+           * Registers an observer on the data object that gets called whenever 
+           * any of the required observed variables change. 
+           *
+           * @param {String|Array<String>} variables single variable or list of 
+           *                                         variables the callback depends on
+           * @param {Function} callback to be invoked when any of the required variables
+           *                            change
+           * @return {Object} a handle to getters data, including a $loaded attribute
+           *                  that reflects the load status of the getter.
+           * 
+           * The method accepts a single variable name or an array of variable names 
+           * the provided callback depends on.
+           *
+           * The second parameter is the callback that is executed when the required 
+           * variables change. When no variables argument is given the dependencies
+           * may be provided using the [ 'a', 'b', function callback(a, b) { }]
+           * notation.
+           * 
+           * Example: 
+           *
+           *      var data = dataDepend.create($scope);
+           *      data.provide('a', 'A');
+           *      
+           *      var status = data.observe('a', function(a) {
+           *        console.log('a is ' + a);
+           *      });
+           *  
+           *      $timeout(function() {
+           *        data.set('a', 'B');
+           *      }, 2000);
+           *
+           *   prints out the following to the console: 
+           *
+           *      > a is A
+           *      > a is B
+           */
+          function observe(variables, callback) {
 
-          function filter(values) {
-            if (!values) {
-              return values;
-            } else {
-              return values[idx];
-            }
-          }
-          
-          function resolve() {
-            var args = toArray(arguments);
-            return __resolve.apply(null, args).then(filter);
-          }
-
-          function get() {
-            var args = toArray(arguments);
-            return filter(__get.apply(null, args));
-          }
-
-          var filteredProvider = angular.extend({}, provider, { 
-            resolve: resolve,
-            get: get
-          });
-
-          return filteredProvider;
-        }
-
-        // factory
-        return {
-          filtered: filtered,
-          create: create
-        };
-      }
-
-      return createFactory(function(fn) {
-        $rootScope.$evalAsync(fn);
-      });
-    }];
-
-    var dataDependFactory = [ '$rootScope', '$injector', 'dataProviderFactory', function($rootScope, $injector, dataProviderFactory) {
-
-      function createFactory(annotate, nextTick) {
-
-        function create(scope) {
-
-          var nextId = 0;
-          var providers = {};
-
-          function get(variables, callback) {
-
-            var name = 'provider$' + nextId++;
+            var name = 'provider$' + nextId();
             
             if (!callback) {
               // parse callback and variables from 
@@ -425,14 +495,14 @@
               throw new Error("[dataDepend] Must provide produces when creating new provider");
             }
 
-            provider = dataProviderFactory.create(options);
+            provider = createProvider(options);
 
             if (isArray(produces)) {
               forEach(produces, function(name) {
-                providers[name] = dataProviderFactory.filtered(provider, name);
+                providers.put(name, provider.filter(name));
               });
             } else {
-              providers[produces] = provider;
+              providers.put(produces, provider);
             }
 
             return provider;
@@ -455,11 +525,11 @@
             var oldValueName = name + ':old';
 
             // create provider
-            set(name, scope.$eval(expression));
-            set(oldValueName, null);
+            provide(name, scope.$eval(expression));
+            provide(oldValueName, null);
 
-            var provider = providers[name];
-            var oldValueProvider = providers[oldValueName];
+            var provider = providers.get(name);
+            var oldValueProvider = providers.get(oldValueName);
 
             scope.$watch(expression, function(newValue, oldValue) {
               if (newValue !== oldValue) {
@@ -474,19 +544,20 @@
           }
 
           /**
-           * Set variable to the given value
+           * Provide one ore more variables under well known names.
            * 
-           * @param {string} name of the variable
-           * @param {function | object | array } value the value to initialize the object with
+           * @param {String|Array<String>} name of the variable(s)
+           * @param {Function | Object | Array } value the value to initialize the object with
+           *
+           * @return {Object} handle to the newly created providers data
            */
-          function set(name, value) {
-            var provider = providers[name],
-                factory, 
-                variables;
+          function provide(name, value) {
+            var factory, 
+                variables,
+                provider;
 
-            if (provider) {
-              provider.set(value);
-              return;
+            if (providers.get(name)) {
+              throw new Error('[dataDepend] provider with name ' + name + ' already registered');
             }
 
             if (isFunction(value) || isArray(value)) {
@@ -501,7 +572,7 @@
               }
             }
 
-            var provider = internalCreateProvider({
+            provider = internalCreateProvider({
               produces: name, 
               factory: factory,
               value: value,
@@ -514,8 +585,29 @@
             return provider.data;
           }
 
+          /**
+           * Set a provided variable to the given value
+           * 
+           * @param {string} name of the variable
+           * @param {function | object | array } value the value to initialize the object with
+           */
+          function set(name, value) {
+
+            if (typeof name !== 'string') {
+              throw new Error("[dataDepend] expected name to be a string, got " + name);
+            }
+
+            var provider = providers.get(name);
+
+            if (!provider) {
+              throw new Error("[dataDepend] no provider with name " + name);
+            }
+
+            provider.set(value);
+          }
+
           function changed(name) {
-            var provider = providers[name];
+            var provider = providers.get(name);
 
             if (!provider) {
               throw new Error('[dataDepend] Provider "' + name + '" does not exists');
@@ -524,28 +616,43 @@
             provider.resolve({ reload: true });
           }
 
+          function destroy() {
+            var localProviders = providers.local;
+            
+            forEach(localProviders, function(provider) {
+              provider.destroy();
+            });
+          }
+
+          function createChild(scope) {
+            return createDataDepend(scope, providers);
+          }
+
+          scope.$on('$destroy', destroy);
+
           return {
             $providers: providers, 
 
-            get: get,
+            observe: observe,
+            provide: provide,
             set: set,
             changed: changed,
-            watchScope: watchScope
+            watchScope: watchScope,
+            newChild: createChild
           };
         }
 
         return {
-          create: create
+          create: createDataDepend
         };
       }
 
-      return createFactory($injector.annotate, function(fn) {
+      return createDataDependFactory($injector.annotate, function(fn) {
         $rootScope.$evalAsync(fn);
       });
     }];
 
-    module.factory('dataDependFactory', dataDependFactory);
-    module.factory('dataProviderFactory', dataProviderFactory);
+    module.factory('dataDepend', dataDependFactory);
 
     return module;
   }

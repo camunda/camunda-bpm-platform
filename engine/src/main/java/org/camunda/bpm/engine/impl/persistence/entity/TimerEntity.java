@@ -97,4 +97,26 @@ public class TimerEntity extends JobEntity {
   public void setRepeat(String repeat) {
     this.repeat = repeat;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[repeat" + repeat
+           + ", id=" + id
+           + ", revision=" + revision
+           + ", duedate=" + duedate
+           + ", lockOwner=" + lockOwner
+           + ", lockExpirationTime=" + lockExpirationTime
+           + ", executionId=" + executionId
+           + ", processInstanceId=" + processInstanceId
+           + ", isExclusive=" + isExclusive
+           + ", retries=" + retries
+           + ", jobHandlerType=" + jobHandlerType
+           + ", jobHandlerConfiguration=" + jobHandlerConfiguration
+           + ", exceptionByteArray=" + exceptionByteArray
+           + ", exceptionByteArrayId=" + exceptionByteArrayId
+           + ", exceptionMessage=" + exceptionMessage
+           + ", deploymentId=" + deploymentId
+           + "]";
+  }
 }

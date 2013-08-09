@@ -8,21 +8,21 @@ ngDefine('cockpit.pages', function(module, $) {
         CANCEL_FAILED = 'cancellationFailed',
         LOADING_FAILED = 'loadingFailed';
 
-    var processData = $scope.processData;
+    var cancelProcessInstanceData = $scope.processData.newChild($scope);
 
     $scope.$on('$routeChangeStart', function () {
       $scope.cancelProcessInstanceDialog.close();
     });
 
-    processData.set('subProcessInstances', function () {
+    cancelProcessInstanceData.provide('subProcessInstances', function () {
       return ProcessInstanceResource.query({'firstResult': 0, 'maxResults': 5}, {'superProcessInstance': $scope.processInstance.id}).$promise;
     });
 
-    processData.set('subProcessInstancesCount', function () {
+    cancelProcessInstanceData.provide('subProcessInstancesCount', function () {
       return ProcessInstanceResource.count({'superProcessInstance': $scope.processInstance.id}).$promise;
     });
 
-    processData.get([ 'subProcessInstancesCount', 'subProcessInstances' ], function (subProcessInstancesCount, subProcessInstances) {
+    cancelProcessInstanceData.observe([ 'subProcessInstancesCount', 'subProcessInstances' ], function (subProcessInstancesCount, subProcessInstances) {
       $scope.subProcessInstancesCount = subProcessInstancesCount.count;
       $scope.subProcessInstances = subProcessInstances;
       

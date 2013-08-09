@@ -7,7 +7,7 @@ ngDefine('cockpit.plugin.base.views', [
     $scope.orderByPredicate = 'definition.name';
     $scope.orderByReverse = false;
 
-    ProcessDefinitionResource.queryStatistics().$then(function (data) {
+    ProcessDefinitionResource.queryStatistics({ incidents: true }).$then(function (data) {
       $scope.statistics = aggregateStatistics(data.resource);
     });
 
@@ -29,6 +29,7 @@ ngDefine('cockpit.plugin.base.views', [
         } else {
           // First save the values of instances
           var currentInstances = statistic.instances;
+          var currentIncidents = angular.copy(statistic.incidents);
 
           if (currentStatistic.definition.version > statistic.definition.version) {
             angular.copy(currentStatistic, statistic);
@@ -39,6 +40,26 @@ ngDefine('cockpit.plugin.base.views', [
 
           // Add the saved values to the corresponding values of the current statistic
           statistic.instances = currentInstances + currentStatistic.instances;
+
+          angular.forEach(currentIncidents, function (incident) {
+            var incidentType = incident.incidentType;
+            var incidentCount = incident.incidentCount;
+
+            var newIncident = true;
+            for(var i = 0; i < statistic.incidents.length; i++) {
+              var statisticIncident = statistic.incidents[i];
+              if (statisticIncident.incidentType == incidentType) {
+                statisticIncident.incidentCount = incidentCount + statisticIncident.incidentCount;
+                newIncident = false;
+              }
+            }
+
+            if (!!newIncident) {
+              // merge the incidents
+              statistic.incidents.push(incident);
+            }
+
+          });
         }
       });
 

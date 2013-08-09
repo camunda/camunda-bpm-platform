@@ -403,6 +403,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
   public void signal(String signalName, Object signalData) {
     ensureActivityInitialized();
+    
+    if (activity == null) {
+      throw new PvmException("cannot signal execution " + this.id + ": it has no current activity");
+    }
+    
     SignallableActivityBehavior activityBehavior = (SignallableActivityBehavior) activity.getActivityBehavior();
     try {
       activityBehavior.signal(this, signalName, signalData);

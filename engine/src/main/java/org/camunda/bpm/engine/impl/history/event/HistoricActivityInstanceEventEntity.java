@@ -148,4 +148,24 @@ public class HistoricActivityInstanceEventEntity extends HistoryEvent {
     this.taskAssignee = taskAssignee;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[activityId=" + activityId
+           + ", activityName=" + activityName
+           + ", activityType=" + activityType
+           + ", activityInstanceId=" + activityInstanceId
+           + ", parentActivityInstanceId=" + parentActivityInstanceId
+           + ", calledProcessInstanceId=" + calledProcessInstanceId
+           + ", taskId=" + taskId
+           + ", taskAssignee=" + taskAssignee
+           + ", durationInMillis=" + durationInMillis
+           + ", startTime=" + startTime
+           + ", endTime=" + endTime
+           + ", eventType=" + eventType
+           + ", executionId=" + executionId
+           + ", processDefinitionId=" + processDefinitionId
+           + ", processInstanceId=" + processInstanceId
+           + "]";
+  }
 }

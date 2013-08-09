@@ -178,6 +178,11 @@ Icons
   background-color: #468847;
 }
 
+.circle-tiles {
+  float: right;
+  margin-top: 5px;
+}
+
 /**
 Utilities
 **/
@@ -334,10 +339,5 @@ footer .version {
   height: auto;
   margin-bottom: 15px;
   padding: 7px 9px;
-}
-
-.placeholder
-{
-  color: #aaa;
 }
 

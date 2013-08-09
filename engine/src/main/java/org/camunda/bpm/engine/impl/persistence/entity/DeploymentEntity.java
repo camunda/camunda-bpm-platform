@@ -145,4 +145,16 @@ public class DeploymentEntity implements Serializable, Deployment, PersistentObj
   public void setNew(boolean isNew) {
     this.isNew = isNew;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[id=" + id
+           + ", name=" + name
+           + ", resources=" + resources
+           + ", deploymentTime=" + deploymentTime
+           + ", validatingSchema=" + validatingSchema
+           + ", isNew=" + isNew
+           + "]";
+  }
 }

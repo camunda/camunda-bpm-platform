@@ -4,28 +4,31 @@ ngDefine('cockpit.plugin.base.views', function(module) {
              function($scope, $location, $q, PluginProcessDefinitionResource) {
 
     var filter;
-    var processData = $scope.processData;
+    var processData = $scope.processData.newChild($scope);
 
-    processData.get([ 'processDefinition', 'filter', 'bpmnElements' ], function(processDefinition, filter, bpmnElements) {
+    processData.provide('calledProcessDefinitions', [ 'processDefinition', 'filter', 'bpmnElements', function(processDefinition, newFilter, bpmnElements) {
 
-      var parentId = filter.parentProcessDefinitionId,
-          activityIds = filter.activityIds;
+      filter = angular.copy(newFilter);
 
-      return PluginProcessDefinitionResource.getCalledProcessDefinitions({ id: processDefinition.id }, {
-        activityIdIn: activityIds,
-        superProcessDefinitionId: parentId
-      }).$promise.then(function(definitions) {
-        $scope.calledProcessDefinitions = attachCalledFromActivities(definitions, bpmnElements);
-      });
+      delete filter.page;
+      delete filter.scrollToBpmnElement;
 
-      // remember last filter
-      filter = filter;
+      // the parent process definition id is the super process definition id...
+      filter.superProcessDefinitionId = filter.parentProcessDefinitionId;
+      // ...and the process definition id of the current view is the
+      // parent process definition id of query.
+      filter.parentProcessDefinitionId = $scope.processDefinition.id;
+
+      filter.activityIdIn = filter.activityIds;
+      delete filter.activityIds;
+
+      return PluginProcessDefinitionResource.getCalledProcessDefinitions({ id: processDefinition.id }, filter).$promise;
+    }]);
+
+    processData.observe([ 'calledProcessDefinitions', 'bpmnElements' ], function(calledProcessDefinitions, bpmnElements) {
+
+      $scope.calledProcessDefinitions = attachCalledFromActivities(calledProcessDefinitions, bpmnElements);
     });
-
-    // processData.get([ 'calledProcessDefinitions', 'bpmnElements' ], function(calledProcessDefinitions, bpmnElements) {
-
-    //   $scope.calledProcessDefinitions = attachCalledFromActivities(calledProcessDefinitions, bpmnElements);
-    // });
 
     function attachCalledFromActivities(processDefinitions, bpmnElements) {
 

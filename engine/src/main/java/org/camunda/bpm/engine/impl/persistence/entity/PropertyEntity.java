@@ -72,4 +72,13 @@ public class PropertyEntity implements PersistentObject, HasRevision, Serializab
   public int getRevisionNext() {
     return revision+1;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+           + "[name=" + name
+           + ", revision=" + revision
+           + ", value=" + value
+           + "]";
+  }
 }

@@ -41,6 +41,10 @@ public enum Element {
   JOB_EXECUTOR(ModelConstants.JOB_EXECUTOR),
   JOB_AQUISITIONS(ModelConstants.JOB_ACQUISITIONS),
   JOB_AQUISITION(ModelConstants.JOB_ACQUISITION),
+
+  PLUGINS(ModelConstants.PLUGINS),
+  PLUGIN(ModelConstants.PLUGIN),
+  PLUGIN_CLASS(ModelConstants.PLUGIN_CLASS),
   
   @Deprecated
   ACQUISITION_STRATEGY(ModelConstants.ACQUISITION_STRATEGY),

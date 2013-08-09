@@ -98,15 +98,14 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
    * into a {@link ManagedProcessEngineMetadata} */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected ManagedProcessEngineMetadata transformConfiguration(ProcessEngineXml processEngineXml) {
-    
-    boolean isDefault = processEngineXml.getName().equals("default");
-    String engineName = processEngineXml.getName();
-    String datasourceJndiName = processEngineXml.getDatasource();
-    String historyLevel = processEngineXml.getProperties().get("history");
-    String configurationClass = processEngineXml.getConfigurationClass();
-    
-    return new ManagedProcessEngineMetadata(isDefault, engineName, datasourceJndiName, historyLevel, configurationClass, (Map) processEngineXml.getProperties());
-        
+    return new ManagedProcessEngineMetadata(
+        processEngineXml.getName().equals("default"),
+        processEngineXml.getName(),
+        processEngineXml.getDatasource(),
+        processEngineXml.getProperties().get("history"),
+        processEngineXml.getConfigurationClass(),
+        (Map) processEngineXml.getProperties(),
+        processEngineXml.getPlugins());
   }
 
   public void undeploy(DeploymentUnit deploymentUnit) {
