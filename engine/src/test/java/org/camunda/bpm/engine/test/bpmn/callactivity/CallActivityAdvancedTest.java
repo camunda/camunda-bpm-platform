@@ -38,7 +38,24 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
   })
   public void testCallSimpleSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
-    assertThatSubProcessCalled();
+    
+    // one task in the subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskBeforeSubProcess = taskQuery.singleResult();
+    assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+    
+    // Completing the task continues the process which leads to calling the subprocess
+    taskService.complete(taskBeforeSubProcess.getId());
+    Task taskInSubProcess = taskQuery.singleResult();
+    assertEquals("Task in subprocess", taskInSubProcess.getName());
+    
+    // Completing the task in the subprocess, finishes the subprocess
+    taskService.complete(taskInSubProcess.getId());
+    Task taskAfterSubProcess = taskQuery.singleResult();
+    assertEquals("Task after subprocess", taskAfterSubProcess.getName());
+    
+    // Completing this task end the process instance
+    taskService.complete(taskAfterSubProcess.getId());
     assertProcessEnded(processInstance.getId());
   }
   
@@ -122,62 +139,62 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSequentialSubProcess.bpmn20.xml",
-		  "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithExpressions.bpmn20.xml",
-		  "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml",
-  	      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess2.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithExpressions.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml",
+          "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess2.bpmn20.xml"})
   public void testCallSequentialSubProcessWithExpressions() {
 
-	    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSequentialSubProcess");
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSequentialSubProcess");
 
-	    // FIRST sub process calls simpleSubProcess
-	    
-	    // one task in the subprocess should be active after starting the process
-	    // instance
-	    TaskQuery taskQuery = taskService.createTaskQuery();
-	    Task taskBeforeSubProcess = taskQuery.singleResult();
-	    assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+      // FIRST sub process calls simpleSubProcess
 
-	    // Completing the task continues the process which leads to calling the
-	    // subprocess. The sub process we want to call is passed in as a variable
-	    // into this task
-	    taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess");
-	    taskService.complete(taskBeforeSubProcess.getId());
-	    Task taskInSubProcess = taskQuery.singleResult();
-	    assertEquals("Task in subprocess", taskInSubProcess.getName());
+      // one task in the subprocess should be active after starting the process
+      // instance
+      TaskQuery taskQuery = taskService.createTaskQuery();
+      Task taskBeforeSubProcess = taskQuery.singleResult();
+      assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
 
-	    // Completing the task in the subprocess, finishes the subprocess
-	    taskService.complete(taskInSubProcess.getId());
-	    Task taskAfterSubProcess = taskQuery.singleResult();
-	    assertEquals("Task after subprocess", taskAfterSubProcess.getName());
+      // Completing the task continues the process which leads to calling the
+      // subprocess. The sub process we want to call is passed in as a variable
+      // into this task
+      taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess");
+      taskService.complete(taskBeforeSubProcess.getId());
+      Task taskInSubProcess = taskQuery.singleResult();
+      assertEquals("Task in subprocess", taskInSubProcess.getName());
 
-	    // Completing this task end the process instance
-	    taskService.complete(taskAfterSubProcess.getId());
-	    
-	    
-	    // SECOND sub process calls simpleSubProcess2
-	    
-	    // one task in the subprocess should be active after starting the process
-	    // instance
-	    taskQuery = taskService.createTaskQuery();
-	    taskBeforeSubProcess = taskQuery.singleResult();
-	    assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+      // Completing the task in the subprocess, finishes the subprocess
+      taskService.complete(taskInSubProcess.getId());
+      Task taskAfterSubProcess = taskQuery.singleResult();
+      assertEquals("Task after subprocess", taskAfterSubProcess.getName());
 
-	    // Completing the task continues the process which leads to calling the
-	    // subprocess. The sub process we want to call is passed in as a variable
-	    // into this task
-	    taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess2");
-	    taskService.complete(taskBeforeSubProcess.getId());
-	    taskInSubProcess = taskQuery.singleResult();
-	    assertEquals("Task in subprocess 2", taskInSubProcess.getName());
+      // Completing this task end the process instance
+      taskService.complete(taskAfterSubProcess.getId());
 
-	    // Completing the task in the subprocess, finishes the subprocess
-	    taskService.complete(taskInSubProcess.getId());
-	    taskAfterSubProcess = taskQuery.singleResult();
-	    assertEquals("Task after subprocess", taskAfterSubProcess.getName());
 
-	    // Completing this task end the process instance
-	    taskService.complete(taskAfterSubProcess.getId());
-	    assertProcessEnded(processInstance.getId());
+      // SECOND sub process calls simpleSubProcess2
+
+      // one task in the subprocess should be active after starting the process
+      // instance
+      taskQuery = taskService.createTaskQuery();
+      taskBeforeSubProcess = taskQuery.singleResult();
+      assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+
+      // Completing the task continues the process which leads to calling the
+      // subprocess. The sub process we want to call is passed in as a variable
+      // into this task
+      taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess2");
+      taskService.complete(taskBeforeSubProcess.getId());
+      taskInSubProcess = taskQuery.singleResult();
+      assertEquals("Task in subprocess 2", taskInSubProcess.getName());
+
+      // Completing the task in the subprocess, finishes the subprocess
+      taskService.complete(taskInSubProcess.getId());
+      taskAfterSubProcess = taskQuery.singleResult();
+      assertEquals("Task after subprocess", taskAfterSubProcess.getName());
+
+      // Completing this task end the process instance
+      taskService.complete(taskAfterSubProcess.getId());
+      assertProcessEnded(processInstance.getId());
   }
   
   @Deployment(resources = {
@@ -264,7 +281,7 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
   }
-  
+
   /**
    * Test case for handing over process variables to a sub process
    */
@@ -292,54 +309,96 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     assertNotNull(taskList);
     assertEquals(0, taskList.size());
   }
-  
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessFromSameDeployment.bpmn20.xml", 
-      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" 
-    })
-    public void testCallSimpleSubProcessFromSameDeployment() {
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcessFromSameDeployment");
-      assertThatSubProcessCalled();
-      assertProcessEnded(processInstance.getId());
-    }
-  
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithVersion.bpmn20.xml", 
-      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" 
-    })
-    public void testCallSimpleSubProcessWithVersion() {
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcessWithVersion");
-      assertThatSubProcessCalled();
-      assertProcessEnded(processInstance.getId());
-    }  
 
+  /**
+   * Test case for handing all over process variables to a sub process
+   */
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessLatest.bpmn20.xml", 
-      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" 
-    })
-    public void testCallSimpleSubProcessLatest() {
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcessLatest");
-      assertThatSubProcessCalled();
-      assertProcessEnded(processInstance.getId());
-    }
-  
-  private void assertThatSubProcessCalled() {
-    // one task in the subprocess should be active after starting the process instance
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutput.bpmn20.xml", 
+    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+  public void testSubProcessAllDataInputOutput() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("superVariable", "Hello from the super process.");
+    vars.put("testVariable", "Only a test.");
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessAllDataInputOutput", vars);
+
+    // one task in the super process should be active after starting the process instance
     TaskQuery taskQuery = taskService.createTaskQuery();
     Task taskBeforeSubProcess = taskQuery.singleResult();
     assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
-    
-    // Completing the task continues the process which leads to calling the subprocess
+    assertEquals("Hello from the super process.", runtimeService.getVariable(taskBeforeSubProcess.getProcessInstanceId(), "superVariable"));
+    assertEquals("Hello from the super process.", taskService.getVariable(taskBeforeSubProcess.getId(), "superVariable"));
+    assertEquals("Only a test.", runtimeService.getVariable(taskBeforeSubProcess.getProcessInstanceId(), "testVariable"));
+    assertEquals("Only a test.", taskService.getVariable(taskBeforeSubProcess.getId(), "testVariable"));
+
     taskService.complete(taskBeforeSubProcess.getId());
+
+    // one task in sub process should be active after starting sub process instance
+    taskQuery = taskService.createTaskQuery();
     Task taskInSubProcess = taskQuery.singleResult();
     assertEquals("Task in subprocess", taskInSubProcess.getName());
-    
-    // Completing the task in the subprocess, finishes the subprocess
+    assertEquals("Hello from the super process.", runtimeService.getVariable(taskInSubProcess.getProcessInstanceId(), "superVariable"));
+    assertEquals("Hello from the super process.", taskService.getVariable(taskInSubProcess.getId(), "superVariable"));
+    assertEquals("Only a test.", runtimeService.getVariable(taskInSubProcess.getProcessInstanceId(), "testVariable"));
+    assertEquals("Only a test.", taskService.getVariable(taskInSubProcess.getId(), "testVariable"));
+
+    // changed variables in sub process
+    runtimeService.setVariable(taskInSubProcess.getProcessInstanceId(), "superVariable", "Hello from sub process.");
+    runtimeService.setVariable(taskInSubProcess.getProcessInstanceId(), "testVariable", "Variable changed in sub process.");
+
     taskService.complete(taskInSubProcess.getId());
+
+    // task after sub process in super process
+    taskQuery = taskService.createTaskQuery();
     Task taskAfterSubProcess = taskQuery.singleResult();
     assertEquals("Task after subprocess", taskAfterSubProcess.getName());
-    
-    // Completing this task end the process instance
+
+    // variables are changed after finished sub process
+    assertEquals("Hello from sub process.", runtimeService.getVariable(processInstance.getId(), "superVariable"));
+    assertEquals("Variable changed in sub process.", runtimeService.getVariable(processInstance.getId(), "testVariable"));
+
     taskService.complete(taskAfterSubProcess.getId());
+
+    assertProcessEnded(processInstance.getId());
+    assertEquals(0, runtimeService.createExecutionQuery().list().size());
   }
+
+  /**
+   * Test case for handing businessKey to a sub process
+   */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessBusinessKeyInput.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+  public void testSubProcessBusinessKeyInput() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessBusinessKeyInput", "myBusinessKey");
+
+    // one task in the super process should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskBeforeSubProcess = taskQuery.singleResult();
+    assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+    assertEquals("myBusinessKey", processInstance.getBusinessKey());
+
+    taskService.complete(taskBeforeSubProcess.getId());
+
+    // one task in sub process should be active after starting sub process instance
+    taskQuery = taskService.createTaskQuery();
+    Task taskInSubProcess = taskQuery.singleResult();
+    assertEquals("Task in subprocess", taskInSubProcess.getName());
+    ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().processInstanceId(taskInSubProcess.getProcessInstanceId()).singleResult();
+    assertEquals("myBusinessKey", subProcessInstance.getBusinessKey());
+
+    taskService.complete(taskInSubProcess.getId());
+
+    // task after sub process in super process
+    taskQuery = taskService.createTaskQuery();
+    Task taskAfterSubProcess = taskQuery.singleResult();
+    assertEquals("Task after subprocess", taskAfterSubProcess.getName());
+
+    taskService.complete(taskAfterSubProcess.getId());
+
+    assertProcessEnded(processInstance.getId());
+    assertEquals(0, runtimeService.createExecutionQuery().list().size());
+  }
+
 }

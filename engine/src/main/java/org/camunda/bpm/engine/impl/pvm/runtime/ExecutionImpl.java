@@ -88,7 +88,9 @@ public class ExecutionImpl implements
   
   /** only available until the process instance is started */
   protected ProcessInstanceStartContext processInstanceStartContext;
-  
+
+  /** the business key */
+  protected String businessKey;
   // state/type of execution ////////////////////////////////////////////////// 
   
   /** indicates if this execution represents an active path of execution.
@@ -382,7 +384,11 @@ public class ExecutionImpl implements
   public String getBusinessKey() {
     return getProcessInstance().getBusinessKey();
   }
-  
+
+  public void setBusinessKey(String businessKey) {
+    this.businessKey = businessKey;
+  }
+
   public String getProcessBusinessKey() {
     return getProcessInstance().getBusinessKey();
   }
@@ -489,17 +495,35 @@ public class ExecutionImpl implements
   // process instance start implementation ////////////////////////////////////
 
   public void start() {
-    start(null);
+    start(null, null);
+  }
+   
+  public void start(Map<String, Object> variables) {
+    start(null, variables);
   }
   
-  public void start(Map<String, Object> variables) {
-    if(processInstanceStartContext == null && isProcessInstance()) {
-      processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());      
+  public void start(String businessKey) {
+    start(businessKey, null);
+  }
+  
+  public void start(String businessKey, Map<String, Object> variables) {
+    if(isProcessInstance()) {
+      if(processInstanceStartContext == null) {
+        processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
+      }
     }
-    setVariables(variables);
+    
+    if(variables != null) {
+      setVariables(variables);
+    }
+    
+    if(businessKey != null) {
+      setBusinessKey(businessKey);
+    }
+    
     performOperation(AtomicOperation.PROCESS_START);
   }
-  
+
   // methods that translate to operations /////////////////////////////////////
 
   public void signal(String signalName, Object signalData) {
