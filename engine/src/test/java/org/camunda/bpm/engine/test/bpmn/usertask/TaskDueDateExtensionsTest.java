@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.joda.time.Period;
 
 
 /**
@@ -59,5 +60,24 @@ public class TaskDueDateExtensionsTest extends PluggableProcessEngineTestCase {
     assertNotNull(task.getDueDate());
     Date date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse("06-07-1986 12:10:00");
     assertEquals(date, task.getDueDate());
+  }
+  
+  @Deployment
+  public void testRelativeDueDate() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("dateVariable", "P2DT2H30M");
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
+
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    
+    
+    Date dueDate = task.getDueDate();
+    assertNotNull(dueDate);
+    
+    Period period = new Period(task.getCreateTime().getTime(), dueDate.getTime());
+    assertEquals(period.getDays(), 2);
+    assertEquals(period.getHours(), 2);
+    assertEquals(period.getMinutes(), 30);
   }
 }
