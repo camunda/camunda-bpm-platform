@@ -95,6 +95,7 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID = "anotherId";
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED = false;
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_ENDED = false;
+  public static final String EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID = "aNonExistentProcInstId";
   
   // variable instance
   public static final String EXAMPLE_VARIABLE_INSTANCE_NAME = "aVariableInstanceName";
