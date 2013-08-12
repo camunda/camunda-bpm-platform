@@ -46,6 +46,11 @@ Tree
   position: absolute;
 }
 
+/* IE Highlight Fix */
+.bpmnElement {
+  background-color: rgba(255,255,255,0);
+}
+
 /** ---- sidebar ----**/
 
 a.expand-collapse {

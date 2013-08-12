@@ -525,7 +525,7 @@ ngDefine('cockpit.pages.processInstance', [
     });
 
     $scope.processInstanceVars = { read: [ 'processInstance', 'processData' ] };
-    $scope.processInstanceViews = Views.getProviders({ component: 'cockpit.processInstance.instanceDetails' });
+    $scope.processInstanceTabs = Views.getProviders({ component: 'cockpit.processInstance.instanceDetails' });
 
     $scope.selectView = function(view) {
       $scope.selectedView = view;
@@ -543,7 +543,7 @@ ngDefine('cockpit.pages.processInstance', [
       }
 
       if (selectedTabId) {
-        var provider = Views.getProvider({ component: 'cockpit.processDefinition.view', id: selectedTabId });
+        var provider = Views.getProvider({ component: 'cockpit.processInstance.instanceDetails', id: selectedTabId });
         if (provider && tabs.indexOf(provider) != -1) {
           $scope.selectedView = provider;
           return;
@@ -557,7 +557,7 @@ ngDefine('cockpit.pages.processInstance', [
       $scope.selectedView = tabs[0];
     }
 
-    setDefaultTab($scope.processInstanceViews);
+    setDefaultTab($scope.processInstanceTabs);
 
   };
 
