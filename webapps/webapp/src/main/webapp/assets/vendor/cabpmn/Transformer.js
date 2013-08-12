@@ -79,7 +79,7 @@ define([], function () {
 
       // TODO an we do this better?
       if (bpmnObject.type == "textAnnotation") {
-        var text = element.getElementsByTagName("text")[0].firstChild.data;
+        var text = element.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "text")[0].firstChild.data;
         bpmnObject["text"] = text;
       }
 
@@ -186,8 +186,8 @@ define([], function () {
 
     function transformIoSpecification(element, scope, bpmnDiElementIndex) {
       var ioObject = createBpmnObject(element, scope, bpmnDiElementIndex);
-      var inputElements = element.getElementsByTagName("dataInput");
-      var outputElements = element.getElementsByTagName("dataOutput");
+      var inputElements = element.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "dataInput");
+      var outputElements = element.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "dataOutput");
 
       var baseElements = [];
 
