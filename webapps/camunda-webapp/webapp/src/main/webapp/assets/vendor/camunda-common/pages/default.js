@@ -89,13 +89,14 @@ ngDefine('camunda.common.pages', function(module) {
   }];
 
   var AuthenticationController = [
-    '$scope', 'Notifications', 'Authentication', '$location',
-    function($scope, Notifications, Authentication, $location) {
+    '$scope', '$window', 'Notifications', 'Authentication', 'Uri',
+    function($scope, $window, Notifications, Authentication, Uri) {
       
       $scope.logout = function() {
-        Authentication.logout();
-        $location.path("#/login");
-      }
+        Authentication.logout().then(function() {
+          $window.location.href = Uri.appUri('app://#/login');
+        });
+      };
   }];
 
   module

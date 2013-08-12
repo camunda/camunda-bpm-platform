@@ -49,6 +49,15 @@
     }];
 
     module.config(ModuleConfig);
+
+    // CAM-1098
+    var ProcessDefinitionsController = [ '$scope', 'EngineApi', function($scope, EngineApi) {
+      var queryObject = { latest : true };
+
+      $scope.processDefinitions = EngineApi.getProcessDefinitions().query(queryObject);
+    }];
+    
+    module.controller('ProcessDefinitionsController', ProcessDefinitionsController);
   });
 
 })(window || this);
