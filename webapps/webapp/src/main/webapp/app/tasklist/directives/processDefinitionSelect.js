@@ -2,17 +2,24 @@ ngDefine('tasklist.directives', [
   'require'
 ], function(module, require) {
 
-  var ProcessDefinitionsController = [ '$scope', 'EngineApi', function($scope, EngineApi) {
-    var queryObject = { latest : true };
+  // CAM-1098: austin, we have got a problem:
+  // - for some reason, angular does not allow us to use ngIf -> directive(replace=true, templaceUrl='some-url') reliably
+  // - fix: put template directly in nagivation.html
+  // 
+  // left the old code here (commented out). We may check future angularJs versions for a fix.
+  // 
+  
+  // var ProcessDefinitionsController = [ '$scope', 'EngineApi', function($scope, EngineApi) {
+  //   var queryObject = { latest : true };
 
-    $scope.processDefinitions = EngineApi.getProcessDefinitions().query(queryObject);
-  }];
+  //   $scope.processDefinitions = EngineApi.getProcessDefinitions().query(queryObject);
+  // }];
 
   var ProcessDefinitionSelect = [ function() {
     return {
-      replace: true,
-      controller: ProcessDefinitionsController, 
-      templateUrl: require.toUrl('./process-definition-select.html'),
+      // replace: true,
+      // controller: ProcessDefinitionsController, 
+      // templateUrl: require.toUrl('./process-definition-select.html'),
       link: function(scope, element, attrs) {
 
         var divider;
