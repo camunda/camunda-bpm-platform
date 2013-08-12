@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
+  <process id="testTaskListenerProcess">
+    <startEvent id="theStart" name="Start"></startEvent>
+    
+    <userTask id="usertask" name="First User Task">
+	    <extensionElements>
+			  <camunda:taskListener event="complete" class="org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleTaskListener" ></camunda:taskListener>
+			</extensionElements>
+    </userTask>
+    <userTask id="usertask2" name="Second User Task">
+	    <extensionElements>
+	      <camunda:taskListener event="complete" delegateExpression="${taskListener}" ></camunda:taskListener>
+	    </extensionElements>
+    </userTask>
+    
+    <userTask id="usertask3" name="Third User Task"></userTask>
+    
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" name="" sourceRef="theStart" targetRef="usertask"></sequenceFlow>
+    <sequenceFlow id="flow2" name="" sourceRef="usertask" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow3" name="" sourceRef="usertask2" targetRef="usertask3"></sequenceFlow>
+    <sequenceFlow id="flow4" name="" sourceRef="usertask3" targetRef="endevent1"></sequenceFlow>
+  </process>
+</definitions>

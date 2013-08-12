@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package org.camunda.bpm.integrationtest.functional.classloading.war;
-import javax.transaction.SystemException;
 
 import org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleDelegate;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -40,7 +39,7 @@ import org.junit.runner.RunWith;
  * @author Daniel Meyer
  */
 @RunWith(Arquillian.class)
-public class JavaDelegateResolutionTestWar extends AbstractFoxPlatformIntegrationTest {
+public class JavaDelegateResolutionTest extends AbstractFoxPlatformIntegrationTest {
     
   @Deployment
   public static WebArchive createProcessArchiveDeplyoment() {    
@@ -78,7 +77,7 @@ public class JavaDelegateResolutionTestWar extends AbstractFoxPlatformIntegratio
   
   @Test
   @OperateOnDeployment("clientDeployment")
-  public void testResolveClassFromJobExecutor() throws InterruptedException, SystemException {
+  public void testResolveClassFromJobExecutor() throws InterruptedException {
     
     runtimeService.startProcessInstanceByKey("testResolveClassFromJobExecutor");        
     

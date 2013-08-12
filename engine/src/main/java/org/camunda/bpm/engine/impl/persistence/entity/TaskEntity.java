@@ -502,7 +502,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
           try {
             Context.getProcessEngineConfiguration()
               .getDelegateInterceptor()
-              .handleInvocation(new TaskListenerInvocation(taskListener, (DelegateTask)this));
+              .handleInvocation(new TaskListenerInvocation(taskListener, (DelegateTask)this, execution));
           }catch (Exception e) {
             throw new ProcessEngineException("Exception while invoking TaskListener: "+e.getMessage(), e);
           }

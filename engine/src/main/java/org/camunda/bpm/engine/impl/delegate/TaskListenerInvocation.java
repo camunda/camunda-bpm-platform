@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.delegate;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 
 /**
  * Class handling invocations of {@link TaskListener TaskListeners}
@@ -26,8 +27,14 @@ public class TaskListenerInvocation extends DelegateInvocation {
   protected final DelegateTask delegateTask;
 
   public TaskListenerInvocation(TaskListener executionListenerInstance, DelegateTask delegateTask) {
+    this(executionListenerInstance, delegateTask, null);
+  }
+  
+  public TaskListenerInvocation(TaskListener executionListenerInstance, DelegateTask delegateTask, 
+      InterpretableExecution contextExecution) {
     this.executionListenerInstance = executionListenerInstance;
     this.delegateTask = delegateTask;
+    this.contextExecution = contextExecution;
   }
 
   protected void invoke() throws Exception {

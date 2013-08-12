@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.interceptor;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,11 +26,11 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
-import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
@@ -132,19 +131,12 @@ public class CommandContext {
 
   protected ProcessApplicationReference getTargetProcessApplication(InterpretableExecution execution) {
     
-    String deploymentId = execution.getProcessDefinition().getDeploymentId();
-    ProcessApplicationManager processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
-    
-    return processApplicationManager.getProcessApplicationForDeployment(deploymentId);
+    return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
   }
   
   protected boolean requiresContextSwitch(final AtomicOperation executionOperation, ProcessApplicationReference processApplicationReference) {
     
-    final ProcessApplicationReference currentProcessApplication = Context.getCurrentProcessApplication();
-    
-    return processApplicationReference != null 
-      && ( currentProcessApplication == null || !processApplicationReference.getName().equals(currentProcessApplication.getName()) );
-    
+    return ProcessApplicationContextUtil.requiresContextSwitch(processApplicationReference);
   }
 
   public void close() {
