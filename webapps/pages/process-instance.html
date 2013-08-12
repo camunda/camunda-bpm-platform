@@ -41,9 +41,9 @@
 
     <!-- content bottom pane -->
     <div class="ctn-row ctn-content-bottom ctn-tabbed ctn-collapsable" collapse="bottom">
-      <div ng-show="processInstanceViews.length">
+      <div ng-show="processInstanceTabs.length">
         <ul class="nav nav-tabs">
-          <li ng-class="{ active: selectedView == viewProvider }" ng-repeat="viewProvider in processInstanceViews">
+          <li ng-class="{ active: selectedView == viewProvider }" ng-repeat="viewProvider in processInstanceTabs">
             <a href ng-click="selectView(viewProvider)">{{ viewProvider.label }}</a>
           </li>
         </ul>
