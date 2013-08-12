@@ -1,7 +1,29 @@
 <div class="nav-collapse collapse navbar-responsive-collapse" ng-cloak>
   <ul class="nav pull-right" ng-controller="AuthenticationController">
 
-    <li if-logged-in process-definition-select></li>
+    <!-- CAM-1098 -->
+    <li class="dropdown"
+        process-definition-select
+        help
+        help-text="Start a process instance"
+        help-placement="'bottom'"
+        ng-show="processDefinitions.length"
+        ng-controller="ProcessDefinitionsController"
+        if-logged-in>
+
+      <a href class="dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-th-list icon-white"></i>
+      </a>
+
+      <ul class="dropdown-menu">
+        <li ng-repeat="definition in processDefinitions">
+          <a ng-href="#/process-definition/{{ definition.id }}">
+            {{ definition.name || definition.key }}
+          </a>
+        </li>
+      </ul>
+    </li>
+
     <li engine-select></li>
 
     <li class="dropdown" if-logged-in>

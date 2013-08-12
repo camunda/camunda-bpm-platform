@@ -34,6 +34,10 @@ public class MessageImplicitDataOutputAssociation extends AbstractDataAssociatio
     super(sourceRef, targetRef);
   }
 
+  public MessageImplicitDataOutputAssociation(String variables) {
+    super(variables);
+  }
+
   @Override
   public void evaluate(ActivityExecution execution) {
     MessageInstance message = (MessageInstance) execution.getVariable(WebServiceActivityBehavior.CURRENT_MESSAGE);

@@ -27,7 +27,11 @@ public abstract class AbstractDataAssociation {
   protected Expression sourceExpression;
 
   protected String target;
-  
+
+  protected String variables;
+
+  protected Expression businessKeyExpression;
+
   protected AbstractDataAssociation(String source, String target) {
     this.source = source;
     this.target = target;
@@ -38,18 +42,34 @@ public abstract class AbstractDataAssociation {
     this.target = target;
   }
 
+  protected AbstractDataAssociation(String variables) {
+    this.variables = variables;
+  }
+
+  protected AbstractDataAssociation(Expression businessKeyExpression) {
+    this.businessKeyExpression = businessKeyExpression;
+  }
+
   public abstract void evaluate(ActivityExecution execution);
-  
+
   public String getSource() {
     return source;
   }
-  
+
   public String getTarget() {
     return target;
   }
 
-  
+
   public Expression getSourceExpression() {
     return sourceExpression;
+  }
+
+  public String getVariables() {
+    return variables;
+  }
+
+  public Expression getBusinessKeyExpression() {
+    return businessKeyExpression;
   }
 }

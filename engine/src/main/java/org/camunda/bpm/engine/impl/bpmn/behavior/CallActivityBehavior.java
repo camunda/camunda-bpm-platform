@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
@@ -115,20 +117,35 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     }
     
     PvmProcessInstance subProcessInstance = execution.createSubProcessInstance(processDefinition);
-    
-    // copy process variables
+
+    // copy process variables / businessKey
+    String businessKey = null;
     for (AbstractDataAssociation dataInputAssociation : dataInputAssociations) {
       Object value = null;
-      if (dataInputAssociation.getSourceExpression()!=null) {
-        value = dataInputAssociation.getSourceExpression().getValue(execution);
-      }
-      else {
-        value = execution.getVariable(dataInputAssociation.getSource());
-      }
-      subProcessInstance.setVariable(dataInputAssociation.getTarget(), value);
+        if (dataInputAssociation.getBusinessKeyExpression() != null) {
+          businessKey = (String) dataInputAssociation.getBusinessKeyExpression().getValue(execution);
+        }
+        else if (dataInputAssociation.getVariables() != null) {
+          Map<String, Object> variables = execution.getVariables();
+          if (variables != null && !variables.isEmpty()) {
+            Set<String> variableKeys = variables.keySet();
+            for (String variableKey : variableKeys) {
+              subProcessInstance.setVariable(variableKey, variables.get(variableKey));
+            }
+          }
+        }
+        else if (dataInputAssociation.getSourceExpression()!=null) {
+          value = dataInputAssociation.getSourceExpression().getValue(execution);
+        }
+        else {
+          value = execution.getVariable(dataInputAssociation.getSource());
+        }
+
+        if (value != null) {
+          subProcessInstance.setVariable(dataInputAssociation.getTarget(), value);
+        }
     }
-    
-    subProcessInstance.start();
+    subProcessInstance.start(businessKey);
   }
   
   public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
@@ -137,14 +154,22 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     // copy process variables
     for (AbstractDataAssociation dataOutputAssociation : dataOutputAssociations) {
       Object value = null;
-      if (dataOutputAssociation.getSourceExpression()!=null) {
-        value = dataOutputAssociation.getSourceExpression().getValue(subProcessInstance);
-      }
-      else {
-        value = subProcessInstance.getVariable(dataOutputAssociation.getSource());
-      }
-      
-      execution.setVariable(dataOutputAssociation.getTarget(), value);
+        if (dataOutputAssociation.getVariables() != null) {
+          Map<String, Object> variables = execution.getVariables();
+          if (variables != null && !variables.isEmpty()) {
+            execution.setVariables(subProcessInstance.getVariables());
+          }
+        }
+        else if (dataOutputAssociation.getSourceExpression()!=null) {
+          value = dataOutputAssociation.getSourceExpression().getValue(subProcessInstance);
+        }
+        else {
+          value = subProcessInstance.getVariable(dataOutputAssociation.getSource());
+        }
+
+        if (value != null) {
+          execution.setVariable(dataOutputAssociation.getTarget(), value);
+        }
     }
   }
 

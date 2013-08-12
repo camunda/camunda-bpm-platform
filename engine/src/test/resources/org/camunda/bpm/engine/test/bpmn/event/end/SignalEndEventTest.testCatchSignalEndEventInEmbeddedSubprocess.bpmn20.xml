@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:activiti="http://activiti.org/bpmn" 
+	targetNamespace="Examples">
+
+	<signal id="mySignal" name="alert" />
+
+	<process id="catchSignalEndEventInEmbeddedSubprocess">
+
+		<startEvent id="start" />
+    
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="parallelGatewayFork" />
+    
+    <parallelGateway id="parallelGatewayFork" gatewayDirection="Diverging"/>
+      <sequenceFlow id="flow2" sourceRef="parallelGatewayFork" targetRef="subprocess" />
+      <sequenceFlow id="flow3" sourceRef="parallelGatewayFork" targetRef="catchSignal" />
+
+    <subProcess id="subprocess">
+      <startEvent id="subprocessStart" />
+      <sequenceFlow id="subFlow1" sourceRef="subprocessStart" targetRef="subprocessTask" />
+      <userTask id="subprocessTask" name="subprocessTask" />
+      <sequenceFlow id="subFlow2" sourceRef="subprocessTask" targetRef="subprocessEnd" />
+      <endEvent id="subprocessEnd">
+        <signalEventDefinition signalRef="mySignal" />
+      </endEvent>
+    </subProcess>
+    
+    <parallelGateway id="parallelGatewayJoin" gatewayDirection="Converging" />
+    <sequenceFlow id="flow4" sourceRef="subprocess" targetRef="parallelGatewayJoin" />
+    <sequenceFlow id="flow6" sourceRef="taskAfterSignalCatch" targetRef="parallelGatewayJoin" />
+
+    <intermediateCatchEvent id="catchSignal">
+      <signalEventDefinition signalRef="mySignal"/>
+    </intermediateCatchEvent>
+    
+    <sequenceFlow id="flow5" sourceRef="catchSignal" targetRef="taskAfterSignalCatch" />
+    
+    <userTask id="taskAfterSignalCatch" name="task after catching the signal" />
+    
+    <sequenceFlow id="flow7" sourceRef="parallelGatewayJoin" targetRef="end" />
+    
+		<endEvent id="end" />
+
+	</process>
+
+	
+
+</definitions>

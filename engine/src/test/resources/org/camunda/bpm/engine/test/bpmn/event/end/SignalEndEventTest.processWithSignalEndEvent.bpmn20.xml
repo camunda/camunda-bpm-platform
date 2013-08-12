@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn" 
+  targetNamespace="Examples">
+  
+  <signal id="mySignal" name="alert" />
+
+  <process id="processWithSignalEndEvent">
+
+    <startEvent id="start" />
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="end" />
+    
+    <endEvent id="end">
+       <signalEventDefinition signalRef="mySignal" />
+    </endEvent>
+
+  </process>
+
+</definitions>

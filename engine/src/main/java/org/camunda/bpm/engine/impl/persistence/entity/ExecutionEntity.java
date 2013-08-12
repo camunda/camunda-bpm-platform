@@ -351,18 +351,32 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   public void start() {
-    start(null);
+    start(null, null);
   }
    
   public void start(Map<String, Object> variables) {
+    start(null, variables);
+  }
+  
+  public void start(String businessKey) {
+    start(businessKey, null);
+  }
+  
+  public void start(String businessKey, Map<String, Object> variables) {
     if(isProcessInstance()) {
       if(processInstanceStartContext == null) {
         processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
       }
     }
+    
     if(variables != null) {
       setVariables(variables);
     }
+    
+    if(businessKey != null) {
+      setBusinessKey(businessKey);
+    }
+    
     performOperation(AtomicOperation.PROCESS_START);
   }
   
@@ -378,7 +392,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
      } 
      performOperation(AtomicOperation.PROCESS_START);
    }
-  
 
   public void destroy() {
     log.fine("destroying "+this);

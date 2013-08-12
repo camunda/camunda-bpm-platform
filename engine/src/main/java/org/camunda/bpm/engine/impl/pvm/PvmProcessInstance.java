@@ -26,6 +26,10 @@ public interface PvmProcessInstance extends PvmExecution {
   void start();
   
   void start(Map<String, Object> variables);
+  
+  void start(String businessKey);
+  
+  void start(String businessKey, Map<String, Object> variables);
 
   PvmExecution findExecution(String activityId);
 
