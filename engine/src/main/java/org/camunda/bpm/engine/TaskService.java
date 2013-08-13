@@ -114,8 +114,9 @@ public interface TaskService {
    */
   void deleteTasks(Collection<String> taskIds, String deleteReason);
   
-	 /**
-   * Claim responsibility for a task: the given user is made assignee for the task.
+  /**
+   * Claim responsibility for a task:
+   * the given user is made {@link Task#getAssignee() assignee} for the task.
    * The difference with {@link #setAssignee(String, String)} is that here 
    * a check is done if the task already has a user assigned to it.
    * No check is done whether the user is known by the identity component.
@@ -128,17 +129,27 @@ public interface TaskService {
   void claim(String taskId, String userId);
   
   /**
-   * Called when the task is successfully executed.
+   * Marks a task as done and continues process execution.
+   *
+   * This method is typically called by a task list user interface
+   * after a task form has been submitted by the
+   * {@link Task#getAssignee() assignee}.
    * @param taskId the id of the task to complete, cannot be null.
    * @throws ProcessEngineException when no task exists with the given id or when this task is {@link DelegationState#PENDING} delegation.
    */
   void complete(String taskId);
   
   /**
-   * Delegates the task to another user. This means that the assignee is set 
-   * and the delegation state is set to {@link DelegationState#PENDING}.
-   * If no owner is set on the task, the owner is set to the current assignee
-   * of the task.
+   * Delegates the task to another user.
+   *
+   * This means that the {@link Task#getAssignee() assignee} is set
+   * and the {@link Task#getDelegationState() delegation state} is set to
+   * {@link DelegationState#PENDING}.
+   * If no owner is set on the task, the owner is set to the current
+   * {@link Task#getAssignee() assignee} of the task.
+   * The new assignee must use {@link TaskService#resolveTask(String)}
+   * to report back to the owner.
+   * Only the owner can {@link TaskService#complete(String) complete} the task.
    * @param taskId The id of the task that will be delegated.
    * @param userId The id of the user that will be set as assignee.
    * @throws ProcessEngineException when no task exists with the given id.
@@ -146,18 +157,27 @@ public interface TaskService {
   void delegateTask(String taskId, String userId);
   
   /**
-   * Marks that the assignee is done with this task and that it can be sent back to the owner.  
+   * Marks that the {@link Task#getAssignee() assignee} is done with the task
+   * {@link TaskService#delegateTask(String, String) delegated}
+   * to her and that it can be sent back to the {@link Task#getOwner() owner}.
    * Can only be called when this task is {@link DelegationState#PENDING} delegation.
-   * After this method returns, the {@link Task#getDelegationState() delegationState} is set to {@link DelegationState#RESOLVED}.
+   * After this method returns, the {@link Task#getDelegationState() delegation state}
+   * is set to {@link DelegationState#RESOLVED} and the task can be
+   * {@link TaskService#complete(String) completed}.
    * @param taskId the id of the task to resolve, cannot be null.
    * @throws ProcessEngineException when no task exists with the given id.
    */
   void resolveTask(String taskId);
   
   /**
-   * Marks that the assignee is done with this task providing the required variables and that it can be sent back to the owner.  
+   * Marks that the {@link Task#getAssignee() assignee} is done with the task
+   * {@link TaskService#delegateTask(String, String) delegated}
+   * to her and that it can be sent back to the {@link Task#getOwner() owner}
+   * with the provided variables.
    * Can only be called when this task is {@link DelegationState#PENDING} delegation.
-   * After this method returns, the {@link Task#getDelegationState() delegationState} is set to {@link DelegationState#RESOLVED}.
+   * After this method returns, the {@link Task#getDelegationState() delegation state}
+   * is set to {@link DelegationState#RESOLVED} and the task can be
+   * {@link TaskService#complete(String) completed}.
    * @param taskId
    * @param variables
    * @throws ProcessEngineException when no task exists with the given id.
@@ -165,8 +185,12 @@ public interface TaskService {
   void resolveTask(String taskId, Map<String, Object> variables);
 
   /**
-   * Called when the task is successfully executed, 
-   * and the required task parameters are given by the end-user.
+   * Marks a task as done and continues process execution.
+   *
+   * This method is typically called by a task list user interface
+   * after a task form has been submitted by the
+   * {@link Task#getAssignee() assignee}
+   * and the required task parameters have been provided.
    * @param taskId the id of the task to complete, cannot be null.
    * @param variables task parameters. May be null or empty.
    * @throws ProcessEngineException when no task exists with the given id.
