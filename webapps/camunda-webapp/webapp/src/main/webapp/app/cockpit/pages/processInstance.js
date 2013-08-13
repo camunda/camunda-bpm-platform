@@ -14,6 +14,19 @@ ngDefine('cockpit.pages.processInstance', [
     $scope.jobRetriesDialog = new Dialog();
     $scope.jobRetriesDialog.setAutoClosable(false);
 
+    $scope.addVariableDialog = new Dialog();
+    $scope.addVariableDialog.setAutoClosable(false);
+
+    $scope.variableTypes = [
+                          'String',
+                          'Boolean',
+                          'Short',
+                          'Integer',
+                          'Long',
+                          'Double',
+                          'Date'
+                        ];
+
     var currentFilter;
     var controllerInitialized = false;
     
@@ -517,9 +530,17 @@ ngDefine('cockpit.pages.processInstance', [
     };
 
     $scope.openJobRetriesDialog = function () {
-      $scope.jobRetriesDialog.open();      
+      $scope.jobRetriesDialog.open();
     };
     
+    $scope.openAddVariableDialog = function () {
+      $scope.addVariableDialog.open();
+    };
+
+    $scope.newVariableAdded = function () {
+      processData.set('filter', angular.extend({}, $scope.filter));
+    };
+
     $scope.$on('$routeChangeStart', function () {
       $rootScope.clearBreadcrumbs();
     });
