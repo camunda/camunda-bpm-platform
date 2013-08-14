@@ -486,7 +486,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(VARIABLE_INSTANCE_QUERY_URL);
     
-    verify(mockedQuery).processInstanceIdIn("aProcessInstanceId", "anotherProcessInstanceId");
+    verify(mockedQuery).processInstanceIdIn(aProcessInstanceId, anotherProcessInstanceId);
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId, anotherTaskId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId, anotherActivityInstanceId);

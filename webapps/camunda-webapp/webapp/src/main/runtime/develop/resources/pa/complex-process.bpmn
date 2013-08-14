@@ -141,7 +141,7 @@
         <incoming>sid-49DD233F-FBB0-4D11-98A2-0909BAFFA1BB</incoming>
         <outgoing>sid-EB98009B-2B25-49E5-8FD7-07ACBFAB35DB</outgoing>
       </userTask>
-      <userTask id="UserTask_6" name="Do more work" implementation="webService">
+      <userTask id="UserTask_6" activiti:dueDate="PT2H" name="Do more work" implementation="webService">
         <extensionElements>
           <signavio:signavioMetaData xsi:type="xsd:anyType" metaKey="bgcolor" metaValue="#ffffcc"/>
           <signavio:signavioMetaData xsi:type="xsd:anyType" metaKey="adaptereventtype" metaValue=""/>
@@ -284,7 +284,7 @@
         <outgoing>sid-60781CDF-4625-4AC2-BD81-4416EB9C3030</outgoing>
         <outgoing>sid-FD8A85EA-75B1-42EF-B472-5337E6DC8B35</outgoing>
       </parallelGateway>
-      <userTask id="UserTask_3" name="Outer Task" implementation="webService">
+      <userTask id="UserTask_3" activiti:dueDate="PT30M" name="Outer Task" implementation="webService">
         <extensionElements>
           <signavio:signavioMetaData xsi:type="xsd:anyType" metaKey="bgcolor" metaValue="#ffffcc"/>
           <signavio:signavioMetaData xsi:type="xsd:anyType" metaKey="adaptereventtype" metaValue=""/>
@@ -693,7 +693,7 @@
         <compensateEventDefinition id="CompensateEventDefinition_2"/>
       </boundaryEvent>
       <userTask id="Task_1" name="Compensation Task1" isForCompensation="true"/>
-      <userTask id="Task_2" name="Compensation Task2" isForCompensation="true"/>
+      <userTask id="Task_2" activiti:dueDate="PT40S" name="Compensation Task2" isForCompensation="true"/>
       <endEvent id="EndEvent_1" name="End Event">
         <incoming>SequenceFlow_5</incoming>
       </endEvent>

@@ -22,10 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
@@ -730,6 +732,49 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     
     assertEquals(0, taskService.createTaskQuery().dueAfter(oneHourLater.getTime()).count());
     assertEquals(0, taskService.createTaskQuery().dueAfter(oneHourAgo.getTime()).count());
+  }
+  
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  public void testQueryByActivityInstanceId() throws Exception {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    
+    assertTrue(processInstance instanceof ExecutionEntity);
+    ExecutionEntity execution = (ExecutionEntity) processInstance;
+    String activityInstanceId = execution.getActivityInstanceId();
+    
+    assertEquals(1, taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId).list().size());
+  }
+  
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  public void testQueryByMultipleActivityInstanceIds() throws Exception {
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    
+    assertTrue(processInstance1 instanceof ExecutionEntity);
+    ExecutionEntity execution1 = (ExecutionEntity) processInstance1;
+    String activityInstanceId1 = execution1.getActivityInstanceId();
+
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    
+    assertTrue(processInstance2 instanceof ExecutionEntity);
+    ExecutionEntity execution2 = (ExecutionEntity) processInstance2;
+    String activityInstanceId2 = execution2.getActivityInstanceId();
+    
+    List<Task> result1 = taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId1).list();
+    assertEquals(1, result1.size());
+    assertEquals(processInstance1.getId(), result1.get(0).getProcessInstanceId());
+    
+    List<Task> result2 = taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId2).list();
+    assertEquals(1, result2.size());
+    assertEquals(processInstance2.getId(), result2.get(0).getProcessInstanceId());
+    
+    assertEquals(2, taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId1, activityInstanceId2).list().size());
+  }
+  
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  public void testQueryByInvalidActivityInstanceId() throws Exception {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        
+    assertEquals(0, taskService.createTaskQuery().activityInstanceIdIn("anInvalidActivityInstanceId").list().size());
   }
   
   public void testQueryPaging() {

@@ -1147,7 +1147,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     // All tasks have been moved to 'replacedBy', safe to clear the list 
     this.tasks.clear();
     
-    tasks = dbSqlSession.findInCache(TaskEntity.class);
+    List<TaskEntity> tasks = dbSqlSession.findInCache(TaskEntity.class);
     for (TaskEntity task: tasks) {
       if (id.equals(task.getExecutionId())) {
         task.setExecutionId(replacedBy.getId());

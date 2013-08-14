@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DelegationStateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -63,6 +64,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String processDefinitionKey;
   private String processDefinitionId;
   private String executionId;
+  private String[] activityInstanceIdIn;
   private String processDefinitionName;
   private String processInstanceId;
   private String assignee;
@@ -125,6 +127,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.executionId = executionId;
   }
 
+  @CamundaQueryParam(value="activityInstanceIdIn", converter = StringArrayConverter.class)  
+  public void setActivityInstanceIdIn(String[] activityInstanceIdIn) {
+    this.activityInstanceIdIn = activityInstanceIdIn;
+  }
+  
   @CamundaQueryParam("processDefinitionName")
   public void setProcessDefinitionName(String processDefinitionName) {
     this.processDefinitionName = processDefinitionName;
@@ -294,6 +301,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (executionId != null) {
       query.executionId(executionId);
     }
+    if (activityInstanceIdIn != null && activityInstanceIdIn.length > 0) {
+      query.activityInstanceIdIn(activityInstanceIdIn);
+    }    
     if (processDefinitionName != null) {
       query.processDefinitionName(processDefinitionName);
     }

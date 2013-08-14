@@ -7,8 +7,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     var incidentData = $scope.processData.newChild($scope);
     var processInstance = $scope.processInstance;
 
-    $scope.stacktraceDialog = new Dialog();
-
     var DEFAULT_PAGES = { size: 50, total: 0, current: 1 };
 
     var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
@@ -83,11 +81,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       return incident.incidentType;
     };
 
-    $scope.openStacktraceDialog = function (incident) {
-      $scope.selectedIncidentToShowStacktrace = incident;
-      $scope.stacktraceDialog.open();
-    };
-
     $scope.getJobStacktraceUrl = function (incident) {
       return Uri.appUri('engine://engine/:engine/job/' + incident.rootCauseIncidentConfiguration + '/stacktrace');
     };
@@ -103,7 +96,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       label: 'Incidents',
       url: 'plugin://base/static/app/views/processInstance/incidents-tab.html',
       controller: 'IncidentsController',
-      priority: 10
+      priority: 15
     });
   };
 

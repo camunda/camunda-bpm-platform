@@ -133,6 +133,9 @@
     <if test="processInstanceBusinessKey != null">
         inner join ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
     </if>
+    <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
+        inner join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_
+    </if>
     <where> 
       <if test="taskId != null">
         RES.ID_ = #{taskId}
@@ -220,6 +223,13 @@
       </if>
       <if test="excludeSubtasks">
         and RES.PARENT_TASK_ID_ IS NULL
+      </if>
+      <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
+        and E1.ACT_INST_ID_ in
+        <foreach item="item" index="index" collection="activityInstanceIdIn"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>      
       </if>
       <if test="candidateUser != null || candidateGroups != null">
         and RES.ASSIGNEE_ is null

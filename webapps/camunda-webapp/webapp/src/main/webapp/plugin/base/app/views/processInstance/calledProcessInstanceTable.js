@@ -47,7 +47,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       label: 'Called Process Instances',
       url: 'plugin://base/static/app/views/processInstance/called-process-instance-table.html',
       controller: 'CalledProcessInstanceController',
-      priority: 5
+      priority: 10
     });
   };
 

@@ -139,8 +139,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       return !form.$invalid;
     }
 
-
-
     $scope.submit = function (variable, form) {
       if (!isValid(form)) {
         return;
@@ -152,7 +150,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
           newType = $scope.getCopy(variable.id).type;
 
       // If the value did not change then there is nothing to do!
-      if (newValue === variable.value) {
+      if (newValue === variable.value && newType === variable.type) {
         $scope.closeInPlaceEditing(variable);
         RequestStatus.setBusy(false);
         return;
@@ -169,8 +167,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
           // Load the variable
           LocalExecutionVariableResource.get({ executionId: variable.executionId, localVariableName: variable.name })
           .$then(function (data) {
-            variable.value = data.data.value;
-            variable.type = data.data.type;
+            angular.extend(variable, data.data);
 
             $scope.closeInPlaceEditing(variable);
           })
@@ -262,7 +259,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       label: 'Variables',
       url: 'plugin://base/static/app/views/processInstance/variable-instances-tab.html',
       controller: 'VariableInstancesController',
-      priority: 15
+      priority: 20
     });
   };
 

@@ -100,6 +100,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks for the given execution. */
   TaskQuery executionId(String executionId);
   
+  /** Only select task which have one of the activity instance ids. **/
+  TaskQuery activityInstanceIdIn(String... activityInstanceIds);
+  
   /** Only select tasks that are created on the given date. **/
   TaskQuery taskCreatedOn(Date createTime);
   
