@@ -150,7 +150,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
           newType = $scope.getCopy(variable.id).type;
 
       // If the value did not change then there is nothing to do!
-      if (newValue === variable.value) {
+      if (newValue === variable.value && newType === variable.type) {
         $scope.closeInPlaceEditing(variable);
         RequestStatus.setBusy(false);
         return;
@@ -167,8 +167,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
           // Load the variable
           LocalExecutionVariableResource.get({ executionId: variable.executionId, localVariableName: variable.name })
           .$then(function (data) {
-            variable.value = data.data.value;
-            variable.type = data.data.type;
+            angular.extend(variable, data.data);
 
             $scope.closeInPlaceEditing(variable);
           })
