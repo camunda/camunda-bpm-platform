@@ -100,7 +100,7 @@
             <tbody>
               <tr ng-repeat="subProcessInstance in subProcessInstances">
                 <td>
-                  <a target="__blank" ng-href="#/process-definition/{{ subProcessInstance.definitionId }}/process-instance/{{ subProcessInstance.id }}">
+                  <a target="__blank" ng-href="#/process-instance/{{ subProcessInstance.id }}">
                     {{ subProcessInstance.id | shorten:8 }}
                   </a>
                 </td>
