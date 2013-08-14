@@ -1,11 +1,23 @@
 <div class="container">
-  <section id="users">
+  <section id="users" ng-switch on="created">
     <div class="row">
       <div class="page-header">
         <h1><i class="icon-user-large"></i> Setup</h1>
       </div>
     </div>
-    <div class="row">
+    <div class="row" ng-switch-when="true">
+      <div class="span12">
+
+        <div class="alert alert-success">
+          <strong>User created</strong>
+          You have created an initial user.
+        </div>
+
+        Head over to the <a href="./#/login">signin page</a> to login using the newly created credentials.
+      </div>
+    </div>
+
+    <div class="row" ng-switch-when="false">
       <div class="span8 box">
         <form class="form-horizontal" name="createUserForm">
                     
