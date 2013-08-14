@@ -139,8 +139,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       return !form.$invalid;
     }
 
-
-
     $scope.submit = function (variable, form) {
       if (!isValid(form)) {
         return;
@@ -262,7 +260,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       label: 'Variables',
       url: 'plugin://base/static/app/views/processInstance/variable-instances-tab.html',
       controller: 'VariableInstancesController',
-      priority: 15
+      priority: 20
     });
   };
 

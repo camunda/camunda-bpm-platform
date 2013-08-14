@@ -155,12 +155,19 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
     Map<String, Integer> intQueryParameters = getCompleteIntQueryParameters();
     
-    given().queryParams(stringQueryParameters).queryParams(intQueryParameters)
+    String[] stringArrayQueryParameters = getCompleteStringArrayQueryParameters().get("activityInstanceIdIn");
+    String activityInstanceIds = stringArrayQueryParameters[0] + "," + stringArrayQueryParameters[1];
+    
+    given()
+      .queryParams(stringQueryParameters)
+      .queryParams(intQueryParameters)
+      .queryParam("activityInstanceIdIn", activityInstanceIds)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
     
     verifyIntegerParameterQueryInvocations();
     verifyStringParameterQueryInvocations();
+    verifyStringArrayParametersInvocations();
     
     verify(mockQuery).taskUnassigned();
     verify(mockQuery).active();
@@ -187,6 +194,16 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     return parameters;
   }
 
+  private Map<String, String[]> getCompleteStringArrayQueryParameters() {
+    Map<String, String[]> parameters = new HashMap<String, String[]>();
+    
+    String[] activityInstanceIds = { "anActivityInstanceId", "anotherActivityInstanceId" };
+    
+    parameters.put("activityInstanceIdIn", activityInstanceIds);
+    
+    return parameters;
+  }
+  
   private Map<String, String> getCompleteStringQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
     
@@ -234,6 +251,12 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     verify(mockQuery).taskName(stringQueryParameters.get("name"));
     verify(mockQuery).taskNameLike(stringQueryParameters.get("nameLike"));
     verify(mockQuery).taskOwner(stringQueryParameters.get("owner"));
+  }
+  
+  private void verifyStringArrayParametersInvocations() {
+    Map<String, String[]> stringArrayParameter = getCompleteStringArrayQueryParameters();
+    
+    verify(mockQuery).activityInstanceIdIn(stringArrayParameter.get("activityInstanceIdIn"));
   }
 
   @Test
@@ -480,9 +503,12 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     Map<String, Object> queryParameters = new HashMap<String, Object>();
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
     Map<String, Integer> intQueryParameters = getCompleteIntQueryParameters();
+    Map<String, String[]> stringArrayQueryParameters = getCompleteStringArrayQueryParameters();
     
     queryParameters.putAll(stringQueryParameters);
     queryParameters.putAll(intQueryParameters);
+    queryParameters.putAll(stringArrayQueryParameters);
+    
     List<String> candidateGroups = new ArrayList<String>();
     candidateGroups.add("boss");
     candidateGroups.add("worker");
@@ -495,6 +521,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     
     verifyStringParameterQueryInvocations();
     verifyIntegerParameterQueryInvocations();
+    verifyStringArrayParametersInvocations();
     
     verify(mockQuery).taskUnassigned();
     verify(mockQuery).active();

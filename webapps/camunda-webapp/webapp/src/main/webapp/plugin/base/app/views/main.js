@@ -5,7 +5,8 @@ ngDefine('cockpit.plugin.base.views', [
   './processDefinition/calledProcessDefinitionTable',  
   './processInstance/variableInstancesTab',
   './processInstance/incidentsTab',
-  './processInstance/calledProcessInstanceTable'
+  './processInstance/calledProcessInstanceTable',
+  './processInstance/userTasksTable'
 ], function(module) {
 
 });

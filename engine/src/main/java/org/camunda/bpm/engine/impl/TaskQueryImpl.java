@@ -55,6 +55,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   private List<String> candidateGroups;
   protected String processInstanceId;
   protected String executionId;
+  protected String[] activityInstanceIdIn;
   protected Date createTime;
   protected Date createTimeBefore;
   protected Date createTimeAfter;
@@ -246,6 +247,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   
   public TaskQueryImpl executionId(String executionId) {
     this.executionId = executionId;
+    return this;
+  }
+  
+  public TaskQuery activityInstanceIdIn(String... activityInstanceIds) {
+    this.activityInstanceIdIn = activityInstanceIds;
     return this;
   }
   
@@ -463,6 +469,9 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
   public String getExecutionId() {
     return executionId;
+  }
+  public String[] getActivityInstanceIdIn() {
+    return activityInstanceIdIn;
   }
   public String getTaskId() {
     return taskId;
