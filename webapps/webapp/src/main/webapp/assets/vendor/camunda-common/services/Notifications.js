@@ -86,7 +86,10 @@ ngDefine('camunda.common.services.notifications', ['angular'], function(module, 
         removeCandidates.push(notification);
 
         angular.forEach(removeCandidates, function(e) {
-          notifications.splice(notifications.indexOf(e), 1);
+          var idx = notifications.indexOf(e);
+          if (idx != -1) {
+            notifications.splice(idx, 1);
+          }
 
           angular.forEach(consumers, function(consumer) {
             consumer.remove(e);
