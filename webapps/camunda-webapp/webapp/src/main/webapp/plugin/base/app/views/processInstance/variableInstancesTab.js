@@ -7,6 +7,8 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     var variableInstanceData = $scope.processData.newChild($scope);
     var processInstance = $scope.processInstance;
 
+    $scope.addVariableDialog = new Dialog();
+
     // contains the variable instances which are current
     // in the edit mode
     var variablesInEditMode = [];
@@ -19,6 +21,16 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     // this map contains for each shown variable instane
     // a copy from it
     var variableCopies = {};
+
+    $scope.variableTypes = [
+                          'String',
+                          'Boolean',
+                          'Short',
+                          'Integer',
+                          'Long',
+                          'Double',
+                          'Date'
+                        ];    
 
     var sequencer = 0;
 
@@ -123,10 +135,21 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       copy.type = variable.type;
     };
 
-    $scope.submit = function (variable) {
+    var isValid = $scope.isValid = function (form) {
+      return !form.$invalid;
+    }
+
+
+
+    $scope.submit = function (variable, form) {
+      if (!isValid(form)) {
+        return;
+      }
+
       RequestStatus.setBusy(true);
 
-      var newValue = $scope.getCopy(variable.id).value;
+      var newValue = $scope.getCopy(variable.id).value,
+          newType = $scope.getCopy(variable.id).type;
 
       // If the value did not change then there is nothing to do!
       if (newValue === variable.value) {
@@ -136,7 +159,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       }
 
       var modifiedVariable = {};
-      modifiedVariable[variable.name] = {value: newValue, type: variable.type};
+      modifiedVariable[variable.name] = {value: newValue, type: newType};
 
       LocalExecutionVariableResource.updateVariables({ executionId: variable.executionId }, { modifications : modifiedVariable })
       .$then(
@@ -165,14 +188,15 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     };
 
     $scope.getCopy = function (variableId) {
-      return variableCopies[variableId];
+      var copy = variableCopies[variableId];
+      if (isNull(copy)) {
+        copy.type = 'String';
+      }
+      return copy;
     };
 
     var isBoolean = $scope.isBoolean = function (variable) {
-      if (variable.value === true || variable.value === false) {
-        return true;
-      }
-      return false;
+      return variable.type === 'boolean' || variable.type === 'Boolean';
     };
 
     var isInteger = $scope.isInteger = function (variable) {
@@ -217,6 +241,14 @@ ngDefine('cockpit.plugin.base.views', function(module) {
           !isDate(variable) &&
           !isBoolean(variable) &&
           !isNull(variable);
+    };
+
+    $scope.openAddVariableDialog = function () {
+      $scope.addVariableDialog.open();
+    };
+
+    $scope.isDateValueValid = function (param) {
+      console.log(param);
     };
 
   };

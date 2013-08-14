@@ -6,7 +6,8 @@ ngDefine('cockpit.directives', [
   './processDiagramPreview',
   './activityInstanceTree',
   './sitebarContainer',
-  './stateCircle'
+  './stateCircle',
+  './variable'
 ], function(module) {
 
 });

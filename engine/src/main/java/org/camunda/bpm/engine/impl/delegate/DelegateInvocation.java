@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.delegate;
 
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
+import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 
 /**
  * Provides context about the invocation of usercode and handles the actual
@@ -25,6 +26,7 @@ public abstract class DelegateInvocation {
 
   protected Object invocationResult;
   protected Object[] invocationParameters;
+  protected InterpretableExecution contextExecution;
 
   /**
    * make the invocation proceed, performing the actual invocation of the user
@@ -60,4 +62,10 @@ public abstract class DelegateInvocation {
    */
   public abstract Object getTarget();
 
+  /**
+   * returns the execution in which context this delegate is invoked. may be null
+   */
+  public InterpretableExecution getContextExecution() {
+    return contextExecution;
+  }
 }

@@ -1,16 +1,23 @@
 package org.camunda.bpm.example.invoice;
 
-import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
-import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
-import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.AuthorizationService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.User;
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
+import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
 
 /**
  * Creates demo credentials to be used in the invoice showcase.
@@ -76,9 +83,33 @@ public class DemoDataGenerator {
       managementGroup.setType("WORKFLOW");
       engine.getIdentityService().saveGroup(managementGroup);
 
+      final IdentityService identityService = engine.getIdentityService();
+      final AuthorizationService authorizationService = engine.getAuthorizationService();
+
+      // create group
+      if(identityService.createGroupQuery().groupId(Groups.CAMUNDA_ADMIN).count() == 0) {
+        Group camundaAdminGroup = identityService.newGroup(Groups.CAMUNDA_ADMIN);
+        camundaAdminGroup.setName("camunda BPM Administrators");
+        camundaAdminGroup.setType(Groups.GROUP_TYPE_SYSTEM);
+        identityService.saveGroup(camundaAdminGroup);
+      }
+
+      // create ADMIN authorizations on all built-in resources
+      for (Resource resource : Resources.values()) {
+        if(authorizationService.createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).resourceType(resource).resourceId(ANY).count() == 0) {
+          AuthorizationEntity userAdminAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
+          userAdminAuth.setGroupId(Groups.CAMUNDA_ADMIN);
+          userAdminAuth.setResource(resource);
+          userAdminAuth.setResourceId(ANY);
+          userAdminAuth.addPermission(ALL);
+          authorizationService.saveAuthorization(userAdminAuth);
+        }
+      }
+
       engine.getIdentityService().createMembership("demo", "sales");
       engine.getIdentityService().createMembership("demo", "accounting");
       engine.getIdentityService().createMembership("demo", "management");
+      engine.getIdentityService().createMembership("demo", "camunda-admin");
 
       engine.getIdentityService().createMembership("john", "sales");
       engine.getIdentityService().createMembership("mary", "accounting");
@@ -86,8 +117,6 @@ public class DemoDataGenerator {
       
 
       // authorize groups for tasklist only:
-      
-      AuthorizationService authorizationService = engine.getAuthorizationService();
       
       Authorization salesTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       salesTasklistAuth.setGroupId("sales");

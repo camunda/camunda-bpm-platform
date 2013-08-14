@@ -33,7 +33,7 @@ form.inline-edit {
   margin-bottom: 35px;
 }
 
-.inline-edit input {
+.inline-edit input:not([type=radio]) {
   min-height: 30px;
 }
 
@@ -162,12 +162,15 @@ Icons
 -------------------**/
 
 .circle {
-  border-radius: 50%;
   width: 20px;
   height: 20px;
   background-color: #999999;
   top: 100%;
   float: left;
+
+  -webkit-border-radius: 50%;
+   -moz-border-radius: 50%;
+        border-radius: 50%;
 }
 
 .circle-red {

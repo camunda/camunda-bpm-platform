@@ -16,6 +16,7 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.joda.time.DateTime;
+import org.joda.time.Period;
 
 
 public class DueDateBusinessCalendar implements BusinessCalendar {
@@ -24,6 +25,10 @@ public class DueDateBusinessCalendar implements BusinessCalendar {
   
   public Date resolveDuedate(String duedate) {
     try {
+      if(duedate.startsWith("P")){
+        return DateTime.now().plus(Period.parse(duedate)).toDate();
+      }
+      
       return DateTime.parse(duedate).toDate();
 
     } catch (Exception e) {
