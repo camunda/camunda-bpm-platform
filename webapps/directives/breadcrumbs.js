@@ -32,7 +32,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           var processDefinition = breadcrumb.processDefinition;
 
           breadcrumb.label = processInstance.id;
-          breadcrumb.href = '/process-definition/' + processDefinition.id + '/process-instance/' + processInstance.id;
+          breadcrumb.href = '/process-instance/' + processInstance.id;
           breadcrumb.divider = ':';
 
           ProcessInstanceResource.count({ subProcessInstance: processInstance.id }).$then(function(response) {
@@ -70,7 +70,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
               'processInstance': superProcessIntance,
               'label': superProcessIntance.id,
               'divider': ':',
-              'href': '/process-definition/' + processDefinition.id + '/process-instance/' + superProcessIntance.id
+              'href': '/process-instance/' + superProcessIntance.id
             };
 
             $rootScope.breadcrumbs.unshift(processInstanceBreadcrumb);

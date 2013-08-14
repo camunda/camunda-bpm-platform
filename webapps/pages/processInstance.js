@@ -585,7 +585,7 @@ ngDefine('cockpit.pages.processInstance', [
   module.controller('ProcessInstanceController', [ '$scope', '$rootScope', '$location', '$filter', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Transform', 'processInstance', 'dataDepend', ProcessInstanceController ]);
 
   var RouteConfig = function ($routeProvider) {
-    $routeProvider.when('/process-definition/:processDefinitionId/process-instance/:processInstanceId', {
+    $routeProvider.when('/process-instance/:processInstanceId', {
       templateUrl: 'pages/process-instance.html',
       controller: 'ProcessInstanceController',
       resolve: {
