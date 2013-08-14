@@ -4,8 +4,8 @@ define(['angular'], function(angular) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', 'AuthorizationResource',
-    function ($scope, $routeParams, UserResource, GroupResource, GroupMembershipResource, Notifications, $location, AuthorizationResource) {
+  var Controller = ['$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', 'AuthorizationResource',
+    function ($scope, $window, $routeParams, UserResource, GroupResource, GroupMembershipResource, Notifications, $location, AuthorizationResource) {
 
     $scope.userId = $routeParams.userId;
 
@@ -87,6 +87,15 @@ define(['angular'], function(angular) {
     // delete user form /////////////////////////////
 
     $scope.deleteUser = function() {
+
+      function confirmDelete() {
+        return $window.confirm('Really delete user ' + $scope.user.id + '?');
+      }
+
+      if (!confirmDelete()) {
+        return;
+      }
+
       UserResource.delete({'userId':$scope.user.id}).$then(
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"User "+$scope.user.id+" successfully deleted."});

@@ -23,14 +23,13 @@ define(['angular'], function(angular) {
     $scope.createUser = function() {
       var user = {
         profile : $scope.profile,
-        credentials : { password : $scope.credentials.password}
+        credentials : { password : $scope.credentials.password }
       }
-      UserResource.createUser(user).$then(
-        function(){
-          Notifications.addMessage({type:"success", status:"Success", message:"Successfully created new user "+user.profile.id});
-          $location.path("/users");
-        }
-      );
+      
+      UserResource.createUser(user).$then(function() {
+        Notifications.addMessage({ type: "success", status: "Success", message: "Created new user "+user.profile.id});
+        $location.path("/users");
+      });
     }
 
   }];
