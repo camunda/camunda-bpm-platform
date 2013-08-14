@@ -68,7 +68,7 @@ ngDefine('camunda.common.directives.notificationsPanel', [
           return 'alert-' + type;
         };
 
-        scope.$on($destroy, function() {
+        scope.$on('$destroy', function() {
           Notifications.unregisterConsumer(consumer);
         });
       }
