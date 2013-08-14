@@ -72,7 +72,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     }
 
     $scope.getHref = function (userTask) {
-      return '#/process-definition/' + processInstance.definitionId + '/process-instance/' + processInstance.id + '?activityInstanceIds=' + userTask.instance.id;
+      return '#/process-instance/' + processInstance.id + '?activityInstanceIds=' + userTask.instance.id;
     };
 
   };

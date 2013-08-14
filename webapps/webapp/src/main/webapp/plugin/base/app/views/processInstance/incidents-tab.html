@@ -43,7 +43,7 @@
       </td>
       <td>
         <span ng-show="incident.linkable">
-          <a href="#/process-definition/{{ processInstance.definitionId }}/process-instance/{{ processInstance.id }}?activityIds={{ incident.activityId }}">
+          <a href="#/process-instance/{{ processInstance.id }}?activityIds={{ incident.activityId }}">
             {{ incident.activityName }}
           </a>
         </span>
@@ -54,14 +54,14 @@
       </td>
       <td>
         <span ng-show="incident.causeIncidentProcessInstanceId !== incident.processInstanceId" >
-          <a href="#/process-definition/{{ incident.causeIncidentProcessDefinitionId }}/process-instance/{{incident.causeIncidentProcessInstanceId}}?activityIds={{ incident.causeIncidentActivityId }}&detailsTab=incidents-tab">
+          <a href="#/process-instance/{{incident.causeIncidentProcessInstanceId}}?activityIds={{ incident.causeIncidentActivityId }}&detailsTab=incidents-tab">
             {{ incident.causeIncidentProcessInstanceId | shorten:8}}
           </a>
         </span>
       </td>
       <td>
         <span ng-show="incident.rootCauseIncidentProcessInstanceId !== incident.processInstanceId" >
-          <a href="#/process-definition/{{ incident.rootCauseIncidentProcessDefinitionId }}/process-instance/{{incident.rootCauseIncidentProcessInstanceId}}?activityIds={{ incident.rootCauseIncidentActivityId }}&detailsTab=incidents-tab">
+          <a href="#/process-instance/{{incident.rootCauseIncidentProcessInstanceId}}?activityIds={{ incident.rootCauseIncidentActivityId }}&detailsTab=incidents-tab">
             {{ incident.rootCauseIncidentProcessInstanceId | shorten:8}}
           </a>
         </span>
