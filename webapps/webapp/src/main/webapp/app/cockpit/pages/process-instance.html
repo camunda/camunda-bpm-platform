@@ -16,6 +16,13 @@
        help-placement="'left'">
       <i class="icon-repeat"></i>
     </a>
+
+    <a class="btn btn-toolbar" href ng-click="openAddVariableDialog()"
+       help
+       help-text="Add a new variable to Process Instance"
+       help-placement="'left'">
+      <i class="icon-plus"></i>
+    </a>
   </div>
 
   <!-- sitebar -->
@@ -57,6 +64,9 @@
     <a class="show-collapsable"></a>
   </div>
 </div>
+
+
+
 
 <!-- begin cancel process instance confirmation-dialog -->
 <div modal-dialog model="cancelProcessInstanceDialog" ng-cloak>
@@ -233,3 +243,75 @@
   </div>
 </div>
 <!-- end set job retries dialog -->
+
+<!-- begin add variable dialog -->
+<div modal-dialog model="addVariableDialog" ng-cloak>
+  <div class="modal hide" ng-controller="AddVariableController" ng-if="addVariableDialog.renderHtml()"> 
+    <div class="modal-header">
+      <button ng-show="addVariableDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3>Add Variable to Process Instance</h3>
+    </div>
+
+    <div class="modal-body">
+      <div notifications-panel></div>
+
+      <form class="form-horizontal" name="addVariableForm" novalidate ng-submit="save()" ng-hide="status === 'SUCCESS' || status === 'FAIL'">
+        <fieldset>
+
+          <div class="control-group">
+            <label class="control-label" for="variableName">Variable Name*</label>
+            <div class="controls">
+              <input id="variableNameId" name="variableName" type="text" ng-model="newVariable.name" autofocus required>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="variableType">Variable Type*</label>
+            <div class="controls">
+              <select id="variableTypeId" name="variableType" ng-options="variableType for variableType in variableTypes" ng-model="newVariable.type" ng-change="changeVariableType(variableType)">
+              </select>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="variableValue">Variable Value*</label>
+            <div class="controls">
+              <div variable="newVariable"></div>
+
+              <p class="variable-invalid" ng-show="this.addVariableForm.editDateValue.$error.date">
+                Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
+              </p>
+              <p class="variable-invalid" ng-show="this.addVariableForm.editIntegerValue.$error.numeric || this.addVariableForm.editFloatValue.$error.numeric">
+                Only a {{ newVariable.type }} value is allowed.
+              </p>
+
+            </div>
+          </div>
+
+        </fieldset>
+      </form>
+
+      <div ng-show="status === 'SUCCESS'">
+        The variable "{{ newVariable.name }}" has been added to the process instance successfully.
+      </div>
+
+      <div ng-show="status === 'FAIL'">
+        The variable "{{ newVariable.name }}" could not be added to the process instance.
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn" ng-click="close()"
+              ng-disabled="status === 'PERFORM_SAVE'"
+              ng-hide="status === 'SUCCESS' || status === 'FAIL'">Close</button>
+
+      <button type="submit" class="btn btn-primary" ng-click="save()"
+              ng-hide="status === 'SUCCESS' || status === 'FAIL'"
+              ng-disabled="!isValid()" request-aware="addVariableForm">Add</button>      
+
+      <button class="btn btn-primary" ng-click="close()"
+              ng-show="status === 'SUCCESS' || status === 'FAIL'">OK</button>               
+    </div>
+  </div>
+</div>
+<!-- end add variable dialog -->
