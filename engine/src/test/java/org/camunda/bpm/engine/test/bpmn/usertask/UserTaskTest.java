@@ -72,4 +72,14 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
   	// attempt to complete the task and get PersistenceException pointing to "referential integrity constraint violation"
   	taskService.complete(task.getId());
 	}
+  
+  @Deployment
+  public void testComplexScenarioWithSubprocessesAndParallelGateways() {
+    runtimeService.startProcessInstanceByKey("processWithSubProcessesAndParallelGateways");
+    
+    List<Task> taskList = taskService.createTaskQuery().list();
+    assertNotNull(taskList);
+    assertEquals(13, taskList.size());
+    
+  }
 }
