@@ -48,16 +48,11 @@ public class StartProcessInterceptor implements Serializable {
 
       StartProcess startProcessAnnotation = ctx.getMethod().getAnnotation(StartProcess.class);
 
-      String name = startProcessAnnotation.name();
       String key = startProcessAnnotation.value();
 
       Map<String, Object> variables = extractVariables(startProcessAnnotation, ctx);
       
-      if (name.length() > 0) {
-        businessProcess.startProcessByName(name, variables);
-      } else {
-        businessProcess.startProcessByKey(key, variables);
-      }
+      businessProcess.startProcessByKey(key, variables);
 
       return result;
     } catch (InvocationTargetException e) {

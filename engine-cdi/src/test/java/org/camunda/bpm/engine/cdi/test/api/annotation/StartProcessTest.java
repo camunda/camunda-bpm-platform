@@ -46,22 +46,5 @@ public class StartProcessTest extends CdiProcessEngineTestCase {
     businessProcess.completeTask();
   }
 
-  @Test
-  @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
-  public void testStartProcessByName() {
-
-    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
-
-    getBeanInstance(DeclarativeProcessController.class).startProcessByName();
-
-    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
-
-    assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
-
-    assertEquals("Activiti", businessProcess.getVariable("name"));
-
-    businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());  
-    businessProcess.completeTask();
-  }
 
 }

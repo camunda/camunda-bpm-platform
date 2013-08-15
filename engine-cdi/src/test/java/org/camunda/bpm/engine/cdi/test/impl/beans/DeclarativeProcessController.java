@@ -25,11 +25,6 @@ public class DeclarativeProcessController {
   @ProcessVariable
   String name; // this is going to be set as a process variable
 
-  @StartProcess(name = "Name of the Process")
-  public void startProcessByName() {
-    name = "Activiti";
-  }
-
   @StartProcess("keyOfTheProcess")
   public void startProcessByKey() {
     name = "Activiti";
