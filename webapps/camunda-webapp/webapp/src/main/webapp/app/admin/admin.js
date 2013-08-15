@@ -18,8 +18,7 @@
 
   ngDefine('admin', dependencies, function(module, $, angular) {
   
-    var ModuleConfig = [ '$routeProvider', '$httpProvider', 'UriProvider', function($routeProvider, $httpProvider, UriProvider) {
-      $httpProvider.responseInterceptors.push('httpStatusInterceptor');
+    var ModuleConfig = [ '$routeProvider', 'UriProvider', function($routeProvider, UriProvider) {
       $routeProvider.otherwise({ redirectTo: '/users' });
 
       function getUri(id) {

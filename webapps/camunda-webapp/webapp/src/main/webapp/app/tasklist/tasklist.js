@@ -15,9 +15,8 @@
 
   ngDefine('tasklist', dependencies, function(module) {
 
-    var ModuleConfig = [ '$routeProvider', '$httpProvider', 'UriProvider', function($routeProvider, $httpProvider, UriProvider) {
+    var ModuleConfig = [ '$routeProvider', 'UriProvider', function($routeProvider, UriProvider) {
 
-      $httpProvider.responseInterceptors.push('httpStatusInterceptor');
       $routeProvider.otherwise({ redirectTo: '/overview' });
 
       function getUri(id) {
