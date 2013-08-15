@@ -1,80 +1,60 @@
 ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, angular, $) {
 
-module.directive('requestAware', function(RequestStatus) {    
-  return {
-      link: function(scope, element, attrs) {
+  var requestAwareDirective = [ function() {    
+    return {
+      require: 'form',
 
-        var DISABLE_AJAX_LOADER = "disableAjaxLoader";
-
-        var formName;
-        var showAjaxLoader = true;
-
-        if (attrs.requestAware) {
-          var params = attrs.requestAware.split(",");
-          formName = $.trim(params[0]);
-          if (params[1] && $.trim(params[1]) == DISABLE_AJAX_LOADER) {
-            showAjaxLoader = false;
-          }
-        }
+      link: function(scope, element, attrs, ngForm) {
 
         function setFormValidity(valid) {
-            var form  = scope[formName];
-            if(!!form) {
-              form.$setValidity("request", valid);
-            }
-          }
+          ngForm.$setValidity("request", valid);
+        }
 
-        function setFormFieldsDisabled(disable) {
-          var formElement = $('form[name="'+formName+'"]');
-          if(disable) {
-            $(":input", formElement).attr("disabled", "disabled");
+        function setFormFieldsEnabled(enabled) {
+          var inputs = $(":input", element);
+
+          if (!enabled) {
+            inputs.attr("disabled", "disabled");
           } else {
-            $(":input", formElement).removeAttr("disabled");
+            inputs.removeAttr("disabled");
           }
         }
 
-        scope.$watch(RequestStatus.watchBusy, function(newValue) {
-          scope.isBusy = newValue;
-          if(scope.isBusy) {
+        function setFormEnabled(enabled) {
+          setFormFieldsEnabled(enabled);
+          setFormValidity(enabled);
+        }
 
-            if(!!formName) {
-              setFormValidity(false);
-              setFormFieldsDisabled(true);
-            }
+        ngForm.$load = {
+          start: function() {
+            scope.$broadcast('formLoadStarted');
+          },
 
-            if ($(element).is("button")) {
-              if(!formName) {
-                $(element).attr("disabled", "disabled");
-              }
-            }
-
-          } else {
-
-            if(!!formName) {
-            setFormValidity(true);
-            setFormFieldsDisabled(false);
-            }
-
-            if ($(element).is("button")) {
-              if(!formName) {
-                $(element).removeAttr("disabled");
-              }
-              if (showAjaxLoader) {
-                $(".icon-loading", element).remove();
-              }
-            }
+          finish: function() {
+            scope.$broadcast('formLoadFinished');
           }
+        };
+
+        scope.$on('formLoadStarted', function() {
+          setFormEnabled(false);
+        });
+        
+        scope.$on('formLoadFinished', function() {
+          setFormEnabled(true);
         });
 
-        if($(element).is("button") && showAjaxLoader) {
-          $(element)
-          .bind({
-            click: function() {
-              $(element).append("<i class=\"icon-loading\" style=\"margin-left:5px\"></i>");
-            }
+        if (attrs.requestAware != 'manual') {
+          scope.$on('requestStarted', function() {
+            ngForm.$load.start();
+          });
+
+          scope.$on('requestFinished', function() {
+            ngForm.$load.finish();
           });
         }
       }
     };
-  });
+  }];
+
+  module.directive('requestAware', requestAwareDirective);
 });

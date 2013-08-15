@@ -93,7 +93,7 @@
                      ng-change="filterChanged()" />
             </div>
 
-            <div class="note note-small" ng-if="filterForm.businessKey.$invalid">
+            <div class="note note-error note-small" ng-if="filterForm.businessKey.$invalid">
               Field is required
             </div>
           </li>
@@ -118,7 +118,7 @@
                      ng-change="filterChanged()" 
                      process-variable />
 
-              <div class="note note-small" ng-show="filterForm['variableFilter' + $index].$invalid">
+              <div class="note note-error note-small" ng-show="filterForm['variableFilter' + $index].$invalid">
                 <div ng-show="filterForm['variableFilter' + $index].$error.required">
                   Field is required.
                 </div>
@@ -143,7 +143,10 @@
                 <code>variableName OPERATOR value</code> where <code>OPERATOR</code> may be any of 
                 <span ng-repeat="op in operators"><span ng-show="$index > 0">, </span><code>{{ op }}</code></span>.
                 All variable filters are applied using the logical <code>AND</code>.
-                Strings must be properly enclosed in <code>"</code>.
+                Strings must be properly enclosed in <code>""</code>.
+                <br/>
+                <br/>
+                Samples: <code>customerId = 1212</code>, <code>name like "%Walter"</code>, <code>checked = true</code>
               </div>
             </div>
           </li>

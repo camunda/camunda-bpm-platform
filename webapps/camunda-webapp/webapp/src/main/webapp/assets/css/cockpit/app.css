@@ -360,6 +360,10 @@ a.expand-collapse:focus {
   font-size: 0.83em;
 }
 
+.filters .note-error {
+  color: #D12020;
+}
+
 .filters .note code {
   padding: 0;
   color: inherit;
