@@ -21,7 +21,7 @@
           </span>
         </div>
 
-        <form ng-if="isInEditMode(variable)" ng-submit="submit(variable, this.editVariableForm)" novalidate name="editVariableForm" class="inline-edit">
+        <form class="inline-edit" name="editVariableForm" ng-if="isInEditMode(variable)" ng-submit="submit(variable, this.editVariableForm)" novalidate request-aware>
 
           <fieldset>
           
@@ -43,7 +43,7 @@
             </p>
 
             <div class="btn-group">
-              <button type="submit" class="btn btn-primary" ng-disabled="!isValid(this.editVariableForm)" request-aware="this.editVariableForm">
+              <button type="submit" class="btn btn-primary" ng-disabled="!isValid(this.editVariableForm)">
                 <i class="icon-ok icon-white"></i>
               </button>
               <button type="button" class="btn" ng-click="closeInPlaceEditing(variable)">
