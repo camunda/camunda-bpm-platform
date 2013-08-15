@@ -1,21 +1,20 @@
 ngDefine('camunda.common.services', function(module) {
 
   var HttpStatusInterceptorFactory = 
-    [ '$rootScope', '$q', 'RequestStatus', 
-      function($rootScope, $q, RequestStatus) {
+    [ '$rootScope', '$q', 'RequestLogger', 
+      function($rootScope, $q, RequestLogger) {
     
     return function(promise) {
 
-      RequestStatus.setBusy(true);
+      RequestLogger.logStarted();
 
       function success(response) {
-        RequestStatus.setBusy(false);
-        
+        RequestLogger.logFinished();
         return response;
       }
 
       function error(response) {
-        RequestStatus.setBusy(false);
+        RequestLogger.logFinished();
 
         var httpError = {
           status: parseInt(response.status),

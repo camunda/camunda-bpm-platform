@@ -1,6 +1,6 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
 
-   function VariableInstancesController ($scope, $http, search, Uri, LocalExecutionVariableResource, RequestStatus) {
+   function VariableInstancesController ($scope, $http, search, Uri, LocalExecutionVariableResource) {
 
     // input: processInstance, processData
 
@@ -144,40 +144,30 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         return;
       }
 
-      RequestStatus.setBusy(true);
-
       var newValue = $scope.getCopy(variable.id).value,
           newType = $scope.getCopy(variable.id).type;
 
       // If the value did not change then there is nothing to do!
       if (newValue === variable.value && newType === variable.type) {
         $scope.closeInPlaceEditing(variable);
-        RequestStatus.setBusy(false);
         return;
       }
 
       var modifiedVariable = {};
-      modifiedVariable[variable.name] = {value: newValue, type: newType};
+      var newVariable = { value: newValue, type: newType };
+      modifiedVariable[variable.name] = newVariable;
 
-      LocalExecutionVariableResource.updateVariables({ executionId: variable.executionId }, { modifications : modifiedVariable })
-      .$then(
+      LocalExecutionVariableResource.updateVariables({ executionId: variable.executionId }, { modifications : modifiedVariable }).$then(
         // success
         function(response) {
-          RequestStatus.setBusy(false);
-          // Load the variable
-          LocalExecutionVariableResource.get({ executionId: variable.executionId, localVariableName: variable.name })
-          .$then(function (data) {
-            angular.extend(variable, data.data);
-
-            $scope.closeInPlaceEditing(variable);
-          })
-      },
+          angular.extend(variable, newVariable);
+          $scope.closeInPlaceEditing(variable);
+        },
         // error
-       function (error) {
-        // set the exception
-        RequestStatus.setBusy(false);
-        variableInstanceIdexceptionMessageMap[variable.id] = error.data;
-      });
+        function (error) {
+          // set the exception
+          variableInstanceIdexceptionMessageMap[variable.id] = error.data;
+        });
     };
 
     $scope.getExceptionForVariableId = function (variableId) {
@@ -250,7 +240,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
   };
 
-  module.controller('VariableInstancesController', [ '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'RequestStatus', VariableInstancesController ]);
+  module.controller('VariableInstancesController', [ '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', VariableInstancesController ]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
