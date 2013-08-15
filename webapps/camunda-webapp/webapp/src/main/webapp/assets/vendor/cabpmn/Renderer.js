@@ -1267,7 +1267,7 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
       if(!!delegate) {
         this.svgElement = delegate.render(this, gfxGroup);
       } else {
-        console.log("Unable to render element of type ", currentElement.type);
+        log("Unable to render element of type ", currentElement.type);
       }
 
       // if the current element has child base elements, create the
@@ -1451,5 +1451,12 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
 
   BpmnElementRenderer.prototype.RENDERER_DELEGATES = RENDERER_DELEGATES;
 
+
+  function log() {
+    // if (console) {
+    //   console.log.apply(console, arguments);
+    // }
+  }
+  
   return BpmnElementRenderer;
 });
