@@ -37,7 +37,7 @@ public class TasklistIT {
     appUrl = testProperties.getApplicationPath("/camunda/app/tasklist");
     
     testUtil = new TestUtil(testProperties);
-    testUtil.createInitialUser("admin", "admin", "Mr.", "Admin");
+//    testUtil.createInitialUser("admin", "admin", "Mr.", "Admin");
   }
 
   @Test
@@ -60,7 +60,7 @@ public class TasklistIT {
 
   @After
   public void after() {
-    testUtil.deleteUser("admin");
+//    testUtil.deleteUser("admin");
     testUtil.destroy();
   }
 
