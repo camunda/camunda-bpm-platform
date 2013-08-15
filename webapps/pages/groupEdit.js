@@ -4,8 +4,8 @@ define(['angular'], function(angular) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', '$routeParams', 'GroupResource', 'AuthorizationResource', 'Notifications', '$location', 
-    function ($scope, $routeParams, GroupResource, AuthorizationResource, Notifications, $location) {
+  var Controller = ['$scope', '$routeParams', 'GroupResource', 'AuthorizationResource', 'Notifications', '$location', '$window', 
+    function ($scope, $routeParams, GroupResource, AuthorizationResource, Notifications, $location, $window) {
 
     $scope.group = null;
     $scope.groupName = null;
@@ -54,6 +54,15 @@ define(['angular'], function(angular) {
     // delete group form /////////////////////////////
 
     $scope.deleteGroup = function() {
+
+      function confirmDelete() {
+        return $window.confirm('Really delete group ' + $scope.group.id + '?');
+      }
+
+      if (!confirmDelete()) {
+        return;
+      }
+
       GroupResource.delete({'groupId':$scope.group.id}).$then(
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Group "+$scope.group.id+" successfully deleted."});
