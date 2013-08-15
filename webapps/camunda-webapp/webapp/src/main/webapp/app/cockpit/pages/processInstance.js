@@ -368,21 +368,15 @@ ngDefine('cockpit.pages.processInstance', [
 
     processData.observe([ 'filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'], function (filter, instanceIdToInstanceMap, activityIdToInstancesMap) {
       if (!controllerInitialized) {
-        console.log('begin to initialize controller');
-
         filter = completeFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap)
         processData.set('filter', filter);
 
         controllerInitialized = true;
-
-        console.log('end of initialize controller', filter);
       }
     });
 
     processData.observe('filter',  function(filter) {
       if (filter != currentFilter) {
-        console.log('filter changed -> ', filter);
-        
         serializeFilterToUri(filter);
         $scope.filter = filter;
       }

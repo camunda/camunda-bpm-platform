@@ -205,8 +205,6 @@ ngDefine('cockpit.pages.processDefinition', [
 
     processData.observe('filter', function(filter) {
       if (filter != currentFilter) {
-        console.log('filter changed -> ', filter);
-        
         serializeFilterToUri(filter);
       }
 
