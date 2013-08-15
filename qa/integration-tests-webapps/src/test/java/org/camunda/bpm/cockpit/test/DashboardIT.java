@@ -36,7 +36,7 @@ public class DashboardIT {
 
     testUtil = new TestUtil(testProperties);
 
-    testUtil.createInitialUser("admin", "admin", "Mr.", "Admin");
+//    testUtil.createInitialUser("admin", "admin", "Mr.", "Admin");
   }
 
   @Test
@@ -61,7 +61,7 @@ public class DashboardIT {
 
   @After
   public void after() {
-    testUtil.deleteUser("admin");
+//    testUtil.deleteUser("admin");
     testUtil.destroy();
   }
 
