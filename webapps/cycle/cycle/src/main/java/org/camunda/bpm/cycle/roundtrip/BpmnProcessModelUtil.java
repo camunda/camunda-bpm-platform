@@ -227,8 +227,11 @@ public class BpmnProcessModelUtil {
     }
     
     NodeList processes = businessModel.getElementsByTagNameNS(NAMESPACE_URI_BPMN_20, PROCESS);
+    NodeList participants = businessModel.getElementsByTagNameNS(NAMESPACE_URI_BPMN_20, PARTICIPANT);
+    
     String mergedBpmn20XmlContent;
-    if (processes.getLength() < 2) {
+    
+    if (processes.getLength() < 2 && participants.getLength() < 2) {
       // no merge required
       mergedBpmn20XmlContent = sourceModel;
     } else {
@@ -400,13 +403,13 @@ public class BpmnProcessModelUtil {
 
       
       // compare old with new engine process add reconnect if reference is deleted
-      if ( null != getElementById(engineProcessDocument, sourceRef) && null == getElementById(technicalModel, sourceRef)){
+      if (getElementById(engineProcessDocument, sourceRef) != null && getElementById(technicalModel, sourceRef) == null){
         messageFlow.setAttribute(SOURCE_REF, engineParticpantId);
         this.updateMessageFlowDISource(businessModel, messageFlow, engineParticpantId);
       }
       
       // compare old with new engine process add reconnect if reference is deleted
-      if ( null != getElementById(engineProcessDocument, targetRef) && null == getElementById(technicalModel, targetRef)){
+      if (getElementById(engineProcessDocument, targetRef) != null && getElementById(technicalModel, targetRef) == null){
         messageFlow.setAttribute(TARGET_REF, engineParticpantId);
         this.updateMessageFlowDITarget(businessModel, messageFlow, engineParticpantId);
       }
