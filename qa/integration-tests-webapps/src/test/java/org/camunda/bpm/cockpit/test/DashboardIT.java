@@ -46,10 +46,10 @@ public class DashboardIT {
     WebDriverWait wait = new WebDriverWait(driver, 10);
 
     WebElement user = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type=\"text\"]")));
-    user.sendKeys("admin");
+    user.sendKeys("demo");
 
     WebElement password= wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type=\"password\"]")));
-    password.sendKeys("admin");
+    password.sendKeys("demo");
 
     WebElement submit = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("button[type=\"submit\"]")));
     submit.submit();
