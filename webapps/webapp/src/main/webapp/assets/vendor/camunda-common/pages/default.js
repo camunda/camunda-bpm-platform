@@ -1,22 +1,24 @@
 ngDefine('camunda.common.pages', function(module) {
 
-  var ResponseErrorHandler = function(Notifications, Authentication, $location) {
-
-    function clearErrors() {
-      Notifications.clear({ type: 'http' });
-    }
+  var ResponseErrorHandlerInitializer = [ 
+    '$rootScope', 'Notifications', 'Authentication', '$location', 
+    function($rootScope, Notifications, Authentication, $location) {
 
     function addError(error) {
       error.http = true;
-
+      error.exclusive = [ 'http' ];
+      
       Notifications.addError(error);
     }
 
-    this.handlerFn = function(event, responseError) {
-      var status = responseError.status,
-          data = responseError.data;
+    /**
+     * A handler function that handles HTTP error responses, 
+     * i.e. 4XX and 5XX responses by redirecting / notifying the user.
+     */
+    function handleHttpError(event, error) {
 
-      clearErrors();
+      var status = error.status,
+          data = error.data;
 
       switch (status) {
       case 500:
@@ -40,7 +42,9 @@ ngDefine('camunda.common.pages', function(module) {
 
       case 401:
         Authentication.clear();
-        if ($location.absUrl().indexOf('/setup/#')==-1) {
+
+        if ($location.absUrl().indexOf('/setup/#') == -1) {
+          addError({ status: 'Unauthorized', message: 'Login is required to access the resource' });
           $location.path('/login');
         } else {
           $location.path('/setup');
@@ -73,12 +77,10 @@ ngDefine('camunda.common.pages', function(module) {
           message: 'The application received an unexpected ' + status + ' response from the server. Try to refresh the page or login and out of the application.' 
         });
       }
-    };
-  };
+    }
 
-  var DefaultController = [ '$scope', '$rootScope', 'Notifications', 'Authentication', '$location', function($scope, $rootScope, Notifications, Authentication, $location) {
-    $rootScope.$on('responseError', new ResponseErrorHandler(Notifications, Authentication, $location).handlerFn);
-
+    // triggered by httpStatusInterceptor
+    $rootScope.$on('httpError', handleHttpError);
   }];
 
   var ProcessEngineSelectionController = [
@@ -130,7 +132,7 @@ ngDefine('camunda.common.pages', function(module) {
   }];
 
   module
-    .controller('DefaultController', DefaultController)
+    .run(ResponseErrorHandlerInitializer)
     .controller('ProcessEngineSelectionController', ProcessEngineSelectionController)
     .controller('AuthenticationController', AuthenticationController)
     .controller('NavigationController', NavigationController);
