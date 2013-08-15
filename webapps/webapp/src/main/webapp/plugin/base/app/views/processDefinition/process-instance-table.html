@@ -12,7 +12,7 @@
   <tbody>
     <tr ng-repeat="processInstance in processInstances">
       <td>
-        <a href="#/process-definition/{{ processDefinition.id }}/process-instance/{{ processInstance.id }}" title="{{ processInstance.id }}">
+        <a href="#/process-instance/{{ processInstance.id }}" title="{{ processInstance.id }}">
           {{ processInstance.id | shorten:8 }}
         </a>
       </td>
@@ -21,7 +21,7 @@
       <td colspan="2">
         <a state-circle 
            incidents="processInstance.incidents"
-           href="#/process-definition/{{ processDefinition.id }}/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
+           href="#/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
       </td>
     </tr>
 
