@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.cdi.annotation.event;
 
 import javax.enterprise.util.AnnotationLiteral;
 
-public class BusinessProcessLiteral extends AnnotationLiteral<BusinessProcess> implements BusinessProcess {
+public class BusinessProcessLiteral extends AnnotationLiteral<BusinessProcessDefinition> implements BusinessProcessDefinition {
   
   protected final String key;   
   

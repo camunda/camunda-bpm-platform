@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Qualifier
-public @interface BusinessProcess {
+public @interface BusinessProcessDefinition {
   /** the key of the process */  
   String value() default "";
 }

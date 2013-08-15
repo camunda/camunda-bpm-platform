@@ -19,7 +19,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 
 import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
-import org.camunda.bpm.engine.cdi.annotation.event.BusinessProcess;
+import org.camunda.bpm.engine.cdi.annotation.event.BusinessProcessDefinition;
 import org.camunda.bpm.engine.cdi.annotation.event.EndActivity;
 import org.camunda.bpm.engine.cdi.annotation.event.StartActivity;
 import org.camunda.bpm.engine.cdi.annotation.event.TakeTransition;
@@ -39,7 +39,7 @@ public class TestEventListener {
   private final Set<BusinessProcessEvent> eventsReceivedByKey = new HashSet<BusinessProcessEvent>();
   
   // receives all events related to "process1"
-  public void onProcessEventByKey(@Observes @BusinessProcess("process1") BusinessProcessEvent businessProcessEvent) {
+  public void onProcessEventByKey(@Observes @BusinessProcessDefinition("process1") BusinessProcessEvent businessProcessEvent) {
     eventsReceivedByKey.add(businessProcessEvent);
   }
 
