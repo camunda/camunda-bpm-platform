@@ -61,6 +61,18 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
     assertNull(processEngine.getRuntimeService().createProcessInstanceQuery().singleResult());
 
   }
+  
+  @Test
+  @Deployment
+  public void testProcessWithoutWatestate() {
+    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+
+    // start the process
+    businessProcess.startProcessByKey("businessProcessBeanTest").getId();
+
+    // assert that the process is ended:
+    assertNull(processEngine.getRuntimeService().createProcessInstanceQuery().singleResult());
+  }
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
