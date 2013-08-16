@@ -7,15 +7,12 @@ import org.camunda.bpm.webapp.impl.security.filter.util.FilterRules;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 
 import org.camunda.bpm.webapp.impl.security.auth.Authentication;
 import org.camunda.bpm.webapp.impl.security.auth.Authentications;
@@ -52,8 +49,8 @@ public class SecurityFilterRulesTest {
 
   @Test
   public void shouldPassStaticPluginResources_GET() throws Exception {
-    assertThat(isAuthorized("GET", "/camunda/api/cockpit/plugin/some-plugin/static/foo.html")).isTrue();
-    assertThat(isAuthorized("GET", "/camunda/api/cockpit/plugin/bar/static/foo.html")).isTrue();
+    assertThat(isAuthorized("GET", "/api/cockpit/plugin/some-plugin/static/foo.html")).isTrue();
+    assertThat(isAuthorized("GET", "/api/cockpit/plugin/bar/static/foo.html")).isTrue();
   }
 
   @Test
@@ -62,7 +59,26 @@ public class SecurityFilterRulesTest {
     authenticatedForEngine("otherEngine", new Runnable() {
       @Override
       public void run() {
-        assertThat(isAuthorized("GET", "/camunda/api/cockpit/plugin/reporting-process-count/default/process-instance-count")).isFalse();
+
+        AppRequest checkedRequest = check("POST", "/api/cockpit/plugin/reporting-process-count/default/process-instance-count");
+
+        assertThat(checkedRequest.isAuthorized()).isFalse();
+        assertThat(checkedRequest.isAuthenticated()).isFalse();
+      }
+    });
+  }
+
+  @Test
+  public void shouldRejectCockpitApi_GET() throws Exception {
+
+    authenticatedForEngine("otherEngine", new Runnable() {
+      @Override
+      public void run() {
+
+        AppRequest checkedRequest = check("POST", "/api/cockpit/plugin/reporting-process-count/default/process-instance-count");
+
+        assertThat(checkedRequest.isAuthorized()).isFalse();
+        assertThat(checkedRequest.isAuthenticated()).isFalse();
       }
     });
   }
@@ -72,19 +88,22 @@ public class SecurityFilterRulesTest {
     authenticatedForEngine("default", new Runnable() {
       @Override
       public void run() {
-        assertThat(isAuthorized("POST", "/camunda/api/cockpit/plugin/reporting-process-count/default/process-instance-count")).isTrue();
+
+        AppRequest checkedRequest = check("POST", "/api/cockpit/plugin/reporting-process-count/default/process-instance-count");
+
+        assertThat(checkedRequest.isAuthorized()).isTrue();
+        assertThat(checkedRequest.isAuthenticated()).isTrue();
       }
     });
   }
 
+  protected AppRequest check(String method, String uri) {
+    AppRequest request = new AppRequest(method, uri);
+    return FilterRules.checkAuthorization(request, FILTER_RULES);
+  }
+
   protected boolean isAuthorized(String method, String uri) {
-
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.getMethod()).thenReturn(method);
-    when(request.getContextPath()).thenReturn("/camunda");
-    when(request.getRequestURI()).thenReturn(uri);
-
-    return FilterRules.isAuthorized(request, FILTER_RULES);
+    return check(method, uri).isAuthorized();
   }
 
   private static List<SecurityFilterRule> loadFilterRules() throws FileNotFoundException, IOException {

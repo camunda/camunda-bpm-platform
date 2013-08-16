@@ -15,7 +15,6 @@ package org.camunda.bpm.webapp.impl.security.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -30,28 +29,29 @@ public class PathFilterRule implements SecurityFilterRule {
   protected List<RequestMatcher> allowedPaths = new ArrayList<RequestMatcher>();
 
   @Override
-  public boolean isRequestAuthorized(HttpServletRequest req) {
+  public AppRequest authorize(AppRequest request) {
 
-    String contextPath = req.getContextPath();
-    String requestUri = req.getRequestURI().substring(contextPath.length());
+    // assume authorization per default
+    request.authorize();
 
-    boolean isRequestAuthorized = true;
     for (RequestMatcher requestMatcher : deniedPaths) {
-      if (requestMatcher.matches(req.getMethod(), requestUri)) {
-        isRequestAuthorized = false;
+      if (requestMatcher.isAuthorized(request)) {
+        request.unauthorize();
         break;
       }
     }
 
-    if (!isRequestAuthorized) {
+    if (!request.isAuthorized()) {
       for (RequestMatcher requestMatcher : allowedPaths) {
-        if (requestMatcher.matches(req.getMethod(), requestUri)) {
-          return true;
+        if (requestMatcher.isAuthorized(request)) {
+          request.authorize();
+
+          return request;
         }
       }
     }
 
-    return isRequestAuthorized;
+    return request;
   }
 
   public List<RequestMatcher> getAllowedPaths() {

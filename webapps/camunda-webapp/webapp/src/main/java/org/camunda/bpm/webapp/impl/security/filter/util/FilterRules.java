@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.webapp.impl.security.filter.AppRequest;
 import org.camunda.bpm.webapp.impl.security.filter.PathFilterRule;
 import org.camunda.bpm.webapp.impl.security.filter.RequestMatcher;
 import org.camunda.bpm.webapp.impl.security.filter.SecurityFilterConfig;
@@ -65,21 +66,19 @@ public class FilterRules {
 
   /**
    * Iterate over a number of filter rules and match them against
-   * the specified request.
+   * the given {@link AppRequest}.
    *
    * @param request
    * @param filterRules
    *
-   * @return true if the request is authorized against all filter rules, false otherwise
+   * @return the checked request with authorization information attached
    */
-  public static boolean isAuthorized(HttpServletRequest request, List<SecurityFilterRule> filterRules) {
+  public static AppRequest checkAuthorization(AppRequest request, List<SecurityFilterRule> filterRules) {
 
     for (SecurityFilterRule filterRule : filterRules) {
-      if (!filterRule.isRequestAuthorized((HttpServletRequest) request)) {
-        return false;
-      }
+      request = filterRule.authorize(request);
     }
 
-    return true;
+    return request;
   }
 }
