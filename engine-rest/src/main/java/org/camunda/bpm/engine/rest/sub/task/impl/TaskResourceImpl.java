@@ -145,4 +145,10 @@ public class TaskResourceImpl implements TaskResource {
   protected Task getTaskById(String id) {
     return engine.getTaskService().createTaskQuery().taskId(id).singleResult();
   }
+
+  public void setAssignee(UserIdDto dto) {
+    TaskService taskService = engine.getTaskService();
+    taskService.setAssignee(taskId, dto.getUserId());  
+  }
+  
 }

@@ -53,6 +53,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   protected static final String RESOLVE_TASK_URL = SINGLE_TASK_URL + "/resolve";
   protected static final String DELEGATE_TASK_URL = SINGLE_TASK_URL + "/delegate";
   protected static final String TASK_FORM_URL = SINGLE_TASK_URL + "/form";
+  protected static final String ASSIGNEE_TASK_URL = SINGLE_TASK_URL + "/assignee";
   
   private Task mockTask;
   private TaskService taskServiceMock;
@@ -170,7 +171,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     
     verify(taskServiceMock).claim(MockProvider.EXAMPLE_TASK_ID, MockProvider.EXAMPLE_USER_ID);
   }
-
+  
   @Test
   public void testMissingUserId() {
     Map<String, Object> json = new HashMap<String, Object>();
@@ -220,6 +221,47 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().post(UNCLAIM_TASK_URL);
   }
 
+  @Test
+  public void testSetAssignee() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("userId", MockProvider.EXAMPLE_USER_ID);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(ASSIGNEE_TASK_URL);
+    
+    verify(taskServiceMock).setAssignee(MockProvider.EXAMPLE_TASK_ID, MockProvider.EXAMPLE_USER_ID);
+  }
+  
+  @Test
+  public void testMissingUserIdSetAssignee() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("userId", null);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(ASSIGNEE_TASK_URL);
+    
+    verify(taskServiceMock).setAssignee(MockProvider.EXAMPLE_TASK_ID, null);
+  }
+  
+  @Test
+  public void testUnsuccessfulSetAssignee() {
+    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).setAssignee(any(String.class), any(String.class));
+    
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+        .body("message", equalTo("expected exception"))
+      .when().post(ASSIGNEE_TASK_URL);
+  }  
+  
   @Test
   public void testCompleteTask() {
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
