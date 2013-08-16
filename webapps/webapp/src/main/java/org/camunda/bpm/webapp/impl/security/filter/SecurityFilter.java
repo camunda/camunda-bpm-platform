@@ -27,20 +27,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.webapp.impl.security.auth.Authentications;
 import org.camunda.bpm.webapp.impl.security.filter.util.FilterRules;
 
 
 /**
  * <p>Simple filter implementation which delegates to a list of {@link SecurityFilterRule FilterRules},
- * evaluating their {@link SecurityFilterRule#isRequestAuthorized(HttpServletRequest)} condition
- * for the given request. Each rule may veto the request by returing 'false'. If the request is
- * vetoed, a 401 (unauthorized) response is returned.</p>
+ * evaluating their {@link SecurityFilterRule#authorize(org.camunda.bpm.webapp.impl.security.filter.AppRequest)} condition
+ * for the given request.</p>
  *
  * <p>This filter must be configured using a init-param in the web.xml file. The parameter must be named
  * "configFile" and point to the configuration file located in the servlet context.</p>
  *
  * @author Daniel Meyer
- *
+ * @author nico.rehwaldt
  */
 public class SecurityFilter implements Filter {
 
@@ -53,13 +53,27 @@ public class SecurityFilter implements Filter {
 
   public void doFilterSecure(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-    if (!isAuthorized(request, filterRules)) {
-      response.sendError(401);
-      return;
-    }
+    String requestUri = getRequestUri(request);
 
-    // if request is authorized
-    chain.doFilter(request, response);
+    AppRequest appRequest = new AppRequest(request.getMethod(), requestUri);
+
+    AppRequest checkedRequest = checkAuthorization(appRequest, filterRules);
+
+    if (checkedRequest.isAuthorized()) {
+      // if request is authorize
+      chain.doFilter(request, response);
+    } else
+    if (checkedRequest.isAuthenticated()) {
+      String application = checkedRequest.getApplication();
+
+      if (application != null) {
+        sendForbiddenApplicationAccess(application, request, response);
+      } else {
+        sendForbidden(request, response);
+      }
+    } else {
+      sendUnauthorized(request, response);
+    }
   }
 
   @Override
@@ -79,10 +93,10 @@ public class SecurityFilter implements Filter {
    * @param request
    * @param filterRules
    *
-   * @return true if the request is authorized against all filter rules, false otherwise
+   * @return the joined {@link AuthorizationStatus} for this request matched against all filter rules
    */
-  public static boolean isAuthorized(HttpServletRequest request, List<SecurityFilterRule> filterRules) {
-    return FilterRules.isAuthorized(request, filterRules);
+  public static AppRequest checkAuthorization(AppRequest request, List<SecurityFilterRule> filterRules) {
+    return FilterRules.checkAuthorization(request, filterRules);
   }
 
   protected void loadFilterRules(FilterConfig filterConfig) throws ServletException {
@@ -99,5 +113,26 @@ public class SecurityFilter implements Filter {
         IoUtil.closeSilently(configFileResource);
       }
     }
+  }
+
+  protected void sendForbidden(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    response.sendError(403);
+  }
+
+  protected void sendUnauthorized(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    response.sendError(401);
+  }
+
+  protected void sendForbiddenApplicationAccess(String application, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    response.sendError(403, "No access rights for " + application);
+  }
+
+  protected boolean isAuthenticated(HttpServletRequest request) {
+    return Authentications.getCurrent() != null;
+  }
+
+  protected String getRequestUri(HttpServletRequest request) {
+    String contextPath = request.getContextPath();
+    return request.getRequestURI().substring(contextPath.length());
   }
 }
