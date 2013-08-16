@@ -382,6 +382,10 @@ ngDefine('cockpit.pages.processInstance', [
       }
     });
 
+    $scope.processDefinition = processData.observe('processDefinition', function (processDefinition) {
+      $scope.processDefinition = processDefinition;
+    });
+
     processData.observe([ 'processDefinition', 'processInstance'], function (processDefinition, processInstance) {
       $rootScope.addBreadcrumb({'type': 'processDefinition', 'processDefinition': processDefinition});
       $rootScope.addBreadcrumb({'type': 'processInstance', 'processInstance': processInstance,'processDefinition': processDefinition});

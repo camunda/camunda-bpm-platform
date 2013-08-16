@@ -3,34 +3,50 @@
     <tr>
       <th>Activity</th>
       <th>Asignee</th>
+      <th>Owner</th>
       <th>Creation Date</th>
       <th>Due Date</th>
+      <th>Priority</th>
+      <th>Delegation State</th>
+      <th>Task ID</th>
     </tr>
   </thead>
   <tbody>
     <tr ng-repeat="userTask in userTasks">
       <td>
-        <a href="{{ getHref(userTask) }}">{{ userTask.instance.name }}</a>
+        <a href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
       </td>
       <td>
         {{ userTask.assignee }}
       </td>
+      <td>
+        {{ userTask.owner }}
+      </td>      
       <td>
         {{ userTask.created }}
       </td>            
       <td>
         {{ userTask.due }}
       </td>
+      <td>
+        {{ userTask.priority }}
+      </td>
+      <td>
+        {{ userTask.delegationState }}
+      </td>
+      <td>
+        {{ userTask.id }}
+      </td>            
     </tr>
 
     <tr ng-if="!userTasks">
-      <td colspan="4">
+      <td colspan="8">
         <i class="icon-loading"></i> loading user tasks...
       </td>
     </tr>    
   
     <tr ng-if="userTasks && !userTasks.length">
-      <td  colspan="4">
+      <td  colspan="8">
         No user tasks
       </td>
     </tr>
