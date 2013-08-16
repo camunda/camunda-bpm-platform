@@ -14,14 +14,15 @@
       </td>
       <td class="variable-value">
 
-        <div ng-if="!isInEditMode(variable)">
+        <!-- <div ng-if="!isInEditMode(variable)"> -->
+        <div ng-if="!variable.inEditMode">
           {{ variable.value }}
           <span ng-if="!isSerializable(variable)" class="edit-toggle" ng-click="editVariable(variable)">
             <i class="icon-pencil"></i>
           </span>
         </div>
 
-        <form class="inline-edit" name="editVariableForm" ng-if="isInEditMode(variable)" ng-submit="submit(variable, this.editVariableForm)" novalidate request-aware>
+        <form class="inline-edit" name="editVariableForm" ng-if="variable.inEditMode" ng-submit="submit(variable, this.editVariableForm)" novalidate request-aware>
 
           <fieldset>
           
@@ -31,14 +32,14 @@
 
           <div class="inline-edit-footer">
 
-            <p class="variable-invalid" ng-show="this.editVariableForm.editDateValue.$error.date">
+            <p class="invalid" ng-show="this.editVariableForm.editDateValue.$error.date">
               Invalid date: The date should have the pattern 'yyyy-MM-ddTHH:mm:ss'.
             </p>
-            <p class="variable-invalid" ng-show="this.editVariableForm.editIntegerValue.$error.numeric || this.editVariableForm.editFloatValue.$error.numeric">
+            <p class="invalid" ng-show="this.editVariableForm.editIntegerValue.$error.numeric || this.editVariableForm.editFloatValue.$error.numeric">
               Invalid value: Only a {{ variable.type }} value is allowed.
             </p>
 
-            <p class="variable-invalid" ng-show="getExceptionForVariableId(variable.id)">
+            <p class="invalid" ng-show="getExceptionForVariableId(variable.id)">
               The passed value could not be stored, see error message: {{ getExceptionForVariableId(variable.id).message }}.
             </p>
 

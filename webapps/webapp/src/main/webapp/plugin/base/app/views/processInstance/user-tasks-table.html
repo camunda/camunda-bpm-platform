@@ -17,7 +17,37 @@
         <a href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
       </td>
       <td>
-        {{ userTask.assignee }}
+        <div ng-if="!userTask.inEditMode">
+          {{ userTask.assignee }}
+          <span class="edit-toggle" ng-click="editAssignee(userTask)">
+            <i class="icon-pencil"></i>
+          </span>
+        </div>
+
+        <form ng-if="userTask.inEditMode" class="inline-edit" name="editAssigneeFrom" ng-submit="submit(this.editAssigneeFrom, userTask)" novalidate request-aware>
+
+          <fieldset>
+            <input name="editAssignee" type="text" class="in-place-edit" ng-model="getCopy(userTask.id).assignee" autofocus required>
+          </fieldset>
+
+          <div class="inline-edit-footer">
+
+            <p class="invalid" ng-show="getExceptionForUserTask(userTask)">
+              The assignee could not be changed: {{ getExceptionForUserTask(userTask).message }}.
+            </p>
+
+            <div class="btn-group">
+              <button type="submit" class="btn btn-primary" ng-disabled="!isValid(this.editAssigneeFrom, userTask)">
+                <i class="icon-ok icon-white"></i>
+              </button>
+              <button type="button" class="btn" ng-click="closeInPlaceEditing(userTask)">
+                <i class="icon-ban-circle"></i>
+              </button>
+            </div>
+          </div>
+
+        </form>
+
       </td>
       <td>
         {{ userTask.owner }}
