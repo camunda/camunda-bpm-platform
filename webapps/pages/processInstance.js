@@ -361,6 +361,11 @@ ngDefine('cockpit.pages.processInstance', [
 
     processData.provide('filter', parseFilterFromUri());
 
+    // processData.provide('filter', [ 'instanceIdToInstanceMap', 'activityIdToInstancesMap', function (instanceIdToInstanceMap, activityIdToInstancesMap) {
+    //   var filter = completeFilter(parseFilterFromUri(), instanceIdToInstanceMap, activityIdToInstancesMap);
+    //   return filter;
+    // }]);
+
     // /////// End definition of process data 
 
 
@@ -580,7 +585,54 @@ ngDefine('cockpit.pages.processInstance', [
 
   };
 
-  module.controller('ProcessInstanceController', [ '$scope', '$rootScope', '$location', '$filter', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Transform', 'processInstance', 'dataDepend', ProcessInstanceController ]);
+  function ProcessInstanceFilterController ($scope) {
+
+    var processData = $scope.processData.newChild($scope),
+        filterData;
+
+    processData.provide('filterData', [ 'filter', function(filter) {
+
+      if (!filterData || filterData.filter != filter) {
+        var activityIds = filter.activityIds || [],
+            activityInstanceIds = filter.activityInstanceIds || [];
+        return {
+          filter: filter,
+          activityCount: activityIds.length || 0,
+          activityInstanceCount: activityInstanceIds.length || 0
+        };
+      } else {
+        return filterData;
+      }
+    }]);
+
+    processData.observe([ 'filterData' ], function(_filterData) {
+      $scope.filterData = filterData = _filterData;
+    });
+
+    $scope.clearSelection = function () {
+      // update cached filter
+      filterData = {};
+      filterData.filter = {};
+
+      processData.set('filter', filterData.filter);
+    };
+
+  };
+
+  module
+    .controller('ProcessInstanceController', [ '$scope',
+                                               '$rootScope',
+                                               '$location',
+                                               '$filter',
+                                               'search',
+                                               'ProcessDefinitionResource',
+                                               'ProcessInstanceResource',
+                                               'IncidentResource',
+                                               'Views',
+                                               'Transform',
+                                               'processInstance',
+                                               'dataDepend', ProcessInstanceController ])
+    .controller('ProcessInstanceFilterController', ['$scope', ProcessInstanceFilterController]);
 
   var RouteConfig = function ($routeProvider) {
     $routeProvider.when('/process-instance/:processInstanceId', {
