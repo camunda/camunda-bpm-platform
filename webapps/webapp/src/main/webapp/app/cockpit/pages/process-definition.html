@@ -9,8 +9,7 @@
 
     <div class="page-header">
       <small>Process Definition</small>
-      <h1 ng-show="!!processDefinition.name">{{ processDefinition.name }}</h1>
-      <h1 ng-show="!processDefinition.name">{{ processDefinition.key }}</h1>
+      <h1>{{ processDefinition.name || processDefinition.key }}</h1>
     </div>
 
     <div class="filters" ng-controller="ProcessDefinitionFilterController">

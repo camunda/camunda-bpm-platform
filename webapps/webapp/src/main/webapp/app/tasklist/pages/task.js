@@ -72,9 +72,9 @@ ngDefine('tasklist.pages', [
       var variablesMap = Forms.variablesToMap(variables);
 
       var taskList = EngineApi.getTaskList();
-
+      
       var action = "complete";
-      if (task.delegationState) {
+      if (task.delegationState === 'PENDING') {
         action = "resolve";
       }
 
