@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.*;
 import static org.camunda.bpm.engine.authorization.Resources.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -26,13 +27,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -48,6 +48,8 @@ import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 public class UserAuthenticationResource {
 
   public static final String PATH = "/auth/user";
+
+  private static final String[] APPS = new String[] { "cockpit", "tasklist" };
 
   @Context
   protected HttpServletRequest request;
@@ -69,7 +71,7 @@ public class UserAuthenticationResource {
     boolean isPasswordValid = processEngine.getIdentityService().checkPassword(username, password);
 
     if (!isPasswordValid) {
-      return Response.status(Status.UNAUTHORIZED).build();
+      return unauthorized();
 
     } else {
 
@@ -78,35 +80,38 @@ public class UserAuthenticationResource {
         .groupMember(username)
         .list();
 
-      // transform into list of strings:
+      // transform into array of strings:
       List<String> groupIds = new ArrayList<String>();
+
       for (Group group : groupList) {
         groupIds.add(group.getId());
       }
 
       // check user's app authorizations
       AuthorizationService authorizationService = processEngine.getAuthorizationService();
-      boolean tasklistAuthorized = authorizationService.isUserAuthorized(username, groupIds, ACCESS, APPLICATION, "tasklist");
-      boolean cockpitAuthorized = authorizationService.isUserAuthorized(username, groupIds, ACCESS, APPLICATION, "cockpit");
 
-      if(appName.equals("tasklist") && !tasklistAuthorized) {
-        return Response.status(Status.FORBIDDEN).build();
+      HashSet<String> authorizedApps = new HashSet<String>();
 
-      } else if(appName.equals("cockpit") && !cockpitAuthorized) {
-        return Response.status(Status.FORBIDDEN).build();
+      for (String application: APPS) {
+        if (isAuthorizedForApp(authorizationService, username, groupIds, application)) {
+          authorizedApps.add(application);
+        }
+      }
 
+      authorizedApps.add("admin");
+
+      if (!authorizedApps.contains(appName)) {
+        return forbidden();
       }
 
       final Authentications authentications = Authentications.getCurrent();
 
       // create new authentication
-      UserAuthentication newAuthentication = new UserAuthentication(username, groupIds, engineName, tasklistAuthorized, cockpitAuthorized);
+      UserAuthentication newAuthentication = new UserAuthentication(username, groupIds, engineName, authorizedApps);
       authentications.addAuthentication(newAuthentication);
 
       // send reponse including updated cookie
-      return createAuthCookie(Response.ok(), authentications)
-        .entity(AuthenticationDto.fromAuthentication(newAuthentication))
-        .build();
+      return Response.ok(AuthenticationDto.fromAuthentication(newAuthentication)).build();
     }
   }
 
@@ -119,15 +124,7 @@ public class UserAuthenticationResource {
     // remove authentication for process engine
     authentications.removeAuthenticationForProcessEngine(engineName);
 
-    // send reponse including updated cookie.
-    return createAuthCookie(Response.ok(), authentications).build();
-  }
-
-  /** constructs a new authentication cookie and returns the response.
-   * @param responseBuilder */
-  protected ResponseBuilder createAuthCookie(ResponseBuilder responseBuilder, Authentications authentications) {
-    NewCookie cookie = AuthenticationCookie.fromAuthentications(authentications, request);
-    return responseBuilder.cookie(cookie);
+    return Response.ok().build();
   }
 
   protected ProcessEngine lookupProcessEngine(String engineName) {
@@ -146,4 +143,15 @@ public class UserAuthenticationResource {
 
   }
 
+  private Response unauthorized() {
+    return Response.status(Status.UNAUTHORIZED).build();
+  }
+
+  private Response forbidden() {
+    return Response.status(Status.FORBIDDEN).build();
+  }
+
+  protected boolean isAuthorizedForApp(AuthorizationService authorizationService, String username, List<String> groupIds, String application) {
+    return authorizationService.isUserAuthorized(username, groupIds, ACCESS, APPLICATION, application);
+  }
 }

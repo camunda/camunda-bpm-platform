@@ -33,7 +33,7 @@ import org.camunda.bpm.webapp.impl.security.filter.util.FilterRules;
 
 /**
  * <p>Simple filter implementation which delegates to a list of {@link SecurityFilterRule FilterRules},
- * evaluating their {@link SecurityFilterRule#authorize(org.camunda.bpm.webapp.impl.security.filter.AppRequest)} condition
+ * evaluating their {@link SecurityFilterRule#setAuthorized(org.camunda.bpm.webapp.impl.security.filter.AppRequest)} condition
  * for the given request.</p>
  *
  * <p>This filter must be configured using a init-param in the web.xml file. The parameter must be named
@@ -55,16 +55,19 @@ public class SecurityFilter implements Filter {
 
     String requestUri = getRequestUri(request);
 
-    AppRequest appRequest = new AppRequest(request.getMethod(), requestUri);
+    Authorization authorization = authorize(request.getMethod(), requestUri, filterRules);
 
-    AppRequest checkedRequest = checkAuthorization(appRequest, filterRules);
+    // attach authorization headers
+    // to response
+    authorization.attachHeaders(response);
 
-    if (checkedRequest.isAuthorized()) {
-      // if request is authorize
+    if (authorization.isGranted()) {
+
+      // if request is authorized
       chain.doFilter(request, response);
     } else
-    if (checkedRequest.isAuthenticated()) {
-      String application = checkedRequest.getApplication();
+    if (authorization.isAuthenticated()) {
+      String application = authorization.getApplication();
 
       if (application != null) {
         sendForbiddenApplicationAccess(application, request, response);
@@ -95,8 +98,8 @@ public class SecurityFilter implements Filter {
    *
    * @return the joined {@link AuthorizationStatus} for this request matched against all filter rules
    */
-  public static AppRequest checkAuthorization(AppRequest request, List<SecurityFilterRule> filterRules) {
-    return FilterRules.checkAuthorization(request, filterRules);
+  public static Authorization authorize(String requestMethod, String requestUri, List<SecurityFilterRule> filterRules) {
+    return FilterRules.authorize(requestMethod, requestUri, filterRules);
   }
 
   protected void loadFilterRules(FilterConfig filterConfig) throws ServletException {

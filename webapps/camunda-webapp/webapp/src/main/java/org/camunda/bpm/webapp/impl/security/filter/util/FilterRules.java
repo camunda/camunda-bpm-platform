@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.camunda.bpm.webapp.impl.security.filter.util;
 
 import java.io.IOException;
@@ -6,11 +18,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
-import org.camunda.bpm.webapp.impl.security.filter.AppRequest;
+import org.camunda.bpm.webapp.impl.security.auth.Authentication;
+import org.camunda.bpm.webapp.impl.security.filter.Authorization;
 import org.camunda.bpm.webapp.impl.security.filter.PathFilterRule;
 import org.camunda.bpm.webapp.impl.security.filter.RequestMatcher;
+import org.camunda.bpm.webapp.impl.security.filter.RequestAuthorizer;
+import org.camunda.bpm.webapp.impl.security.filter.RequestFilter;
 import org.camunda.bpm.webapp.impl.security.filter.SecurityFilterConfig;
 import org.camunda.bpm.webapp.impl.security.filter.SecurityFilterConfig.PathFilterConfig;
 import org.camunda.bpm.webapp.impl.security.filter.SecurityFilterConfig.PathMatcherConfig;
@@ -53,32 +67,44 @@ public class FilterRules {
   }
 
   protected static RequestMatcher transformPathMatcher(PathMatcherConfig pathMatcherConfig) {
-    RequestMatcher requestMatcher = null;
-    if(pathMatcherConfig.getMatcher() == null || pathMatcherConfig.getMatcher().isEmpty()) {
-      requestMatcher = new RequestMatcher(pathMatcherConfig.getPath(), pathMatcherConfig.getParsedMethods());
-    } else {
-      String matcher = pathMatcherConfig.getMatcher();
-      Object[] params = new Object[]{pathMatcherConfig.getPath(), pathMatcherConfig.getParsedMethods()};
-      requestMatcher = (RequestMatcher) ReflectUtil.instantiate(matcher, params);
+    RequestFilter requestMatcher = new RequestFilter(
+        pathMatcherConfig.getPath(),
+        pathMatcherConfig.getParsedMethods());
+
+    RequestAuthorizer requestAuthorizer = RequestAuthorizer.AUTHORIZE_ANNONYMOUS;
+
+    if (pathMatcherConfig.getAuthorizer() != null) {
+      String authorizeCls = pathMatcherConfig.getAuthorizer();
+      Object[] params = new Object[] { };
+      requestAuthorizer = (RequestAuthorizer) ReflectUtil.instantiate(authorizeCls);
     }
-    return requestMatcher;
+
+    return new RequestMatcher(requestMatcher, requestAuthorizer);
   }
 
   /**
    * Iterate over a number of filter rules and match them against
-   * the given {@link AppRequest}.
+   * the given request.
    *
-   * @param request
+   * @param requestMethod
+   * @param requestUri
    * @param filterRules
    *
    * @return the checked request with authorization information attached
    */
-  public static AppRequest checkAuthorization(AppRequest request, List<SecurityFilterRule> filterRules) {
+  public static Authorization authorize(String requestMethod, String requestUri, List<SecurityFilterRule> filterRules) {
+
+    Authorization authorization;
 
     for (SecurityFilterRule filterRule : filterRules) {
-      request = filterRule.authorize(request);
+      authorization = filterRule.authorize(requestMethod, requestUri);
+
+      if (authorization != null) {
+        return authorization;
+      }
     }
 
-    return request;
+    // grant if no filter disallows it
+    return Authorization.granted(Authentication.ANONYMOUS);
   }
 }
