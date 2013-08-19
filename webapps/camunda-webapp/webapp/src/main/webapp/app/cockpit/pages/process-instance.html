@@ -30,9 +30,56 @@
 
     <div class="page-header">
       <small>Process Instance</small>
-      <h1 ng-show="!!processInstance.processDefinition.name">{{ processInstance.processDefinition.name }} <span title="{{ processInstance.id }}">{{ processInstance.id | shorten:8 }}</span></h1>
-      <h1 ng-show="!processInstance.processDefinition.name">{{ processInstance.processDefinition.key }} <span title="{{ processInstance.id }}">{{ processInstance.id | shorten:8 }}</span></h1>
+      <h1>{{ processDefinition.name || processDefinition.key }}</h1>
+      <p>
+        <strong>{{ processInstance.id }}</strong>
+      </p>
     </div>
+
+    <div class="filters" ng-controller="ProcessInstanceFilterController">
+      <h5>
+        Filter
+      </h5>
+
+      <i ng-if="!filterData.activityCount && !filterData.activityInstanceCount">
+        No view elements selected.
+      </i>
+
+      <ul class="unstyled">
+
+        <li class="filter" ng-if="filterData.activityInstanceCount">
+          <div class="name">
+            Activity Instances
+          </div>
+
+          <div class="search search-text">
+            <button class="btn btn-link btn-mini btn-control remove"
+                    ng-click="clearSelection()">
+              <i class="icon-remove"></i>
+            </button>
+            {{ filterData.activityInstanceCount }} elements selected
+          </div>
+        </li>
+      </ul>
+
+      <ul class="unstyled">
+
+        <li class="filter" ng-if="filterData.activityCount">
+          <div class="name">
+            Activities
+          </div>
+
+          <div class="search search-text">
+            <button class="btn btn-link btn-mini btn-control remove"
+                    ng-click="clearSelection()">
+              <i class="icon-remove"></i>
+            </button>
+            {{ filterData.activityCount }} elements selected
+          </div>
+        </li>
+      </ul>
+
+    </div>    
 
     <div activity-instance-tree="activityInstanceTree" on-element-click="handleActivityInstanceSelection(id, activityId, $event)" selection="filter"></div>
 
@@ -64,9 +111,6 @@
     <a class="show-collapsable"></a>
   </div>
 </div>
-
-
-
 
 <!-- begin cancel process instance confirmation-dialog -->
 <div modal-dialog model="cancelProcessInstanceDialog" ng-cloak>
@@ -255,7 +299,7 @@
     <div class="modal-body">
       <div notifications-panel></div>
 
-      <form class="form-horizontal" name="addVariableForm" novalidate ng-submit="save()" ng-hide="status === 'SUCCESS' || status === 'FAIL'">
+      <form class="form-horizontal" name="addVariableForm" novalidate ng-submit="save()" ng-hide="status === 'SUCCESS' || status === 'FAIL'" request-aware>
         <fieldset>
 
           <div class="control-group">
@@ -278,10 +322,10 @@
             <div class="controls">
               <div variable="newVariable"></div>
 
-              <p class="variable-invalid" ng-show="this.addVariableForm.editDateValue.$error.date">
+              <p class="invalid" ng-show="this.addVariableForm.editDateValue.$error.date">
                 Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
               </p>
-              <p class="variable-invalid" ng-show="this.addVariableForm.editIntegerValue.$error.numeric || this.addVariableForm.editFloatValue.$error.numeric">
+              <p class="invalid" ng-show="this.addVariableForm.editIntegerValue.$error.numeric || this.addVariableForm.editFloatValue.$error.numeric">
                 Only a {{ newVariable.type }} value is allowed.
               </p>
 
@@ -307,7 +351,7 @@
 
       <button type="submit" class="btn btn-primary" ng-click="save()"
               ng-hide="status === 'SUCCESS' || status === 'FAIL'"
-              ng-disabled="!isValid()" request-aware="addVariableForm">Add</button>      
+              ng-disabled="!isValid()">Add</button>      
 
       <button class="btn btn-primary" ng-click="close()"
               ng-show="status === 'SUCCESS' || status === 'FAIL'">OK</button>               

@@ -31,7 +31,8 @@
     </div>
 
     <div ngm-if="form.embedded || form.generic">
-      <button class="btn btn-primary" type="submit">Complete Task</button>
+      <button ng-show="!task.delegationState || (task.delegationState && task.delegationState === 'RESOLVED')" class="btn btn-primary" type="submit">Complete Task</button>
+      <button ng-hide="!task.delegationState || (task.delegationState && task.delegationState === 'RESOLVED')" class="btn btn-primary" type="submit">Resolve Task</button>
       <button class="btn" ng-click="cancel()">Cancel</button>
     </div>
   </form>

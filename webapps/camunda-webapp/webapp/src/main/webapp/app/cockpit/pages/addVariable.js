@@ -1,6 +1,6 @@
 ngDefine('cockpit.pages', function(module, $) {
 
-  function AddVariableController ($scope, $http, Uri, RequestStatus, Notifications) {
+  function AddVariableController ($scope, $http, Uri, Notifications) {
 
     var processInstance = $scope.processInstance;
 
@@ -36,7 +36,6 @@ ngDefine('cockpit.pages', function(module, $) {
       }
 
       $scope.status = PERFORM_SAVE;
-      RequestStatus.setBusy(true);
 
       var data = angular.extend({}, newVariable),
           name = data.name;
@@ -45,13 +44,11 @@ ngDefine('cockpit.pages', function(module, $) {
 
       $http.put(Uri.appUri('engine://engine/:engine/process-instance/' + processInstance.id + '/variables/' + name), data).success(function (data) {
         $scope.status = SUCCESS;
-        RequestStatus.setBusy(false);
 
         Notifications.addMessage({'status': 'Finished', 'message': 'Adding new variable to the process instance finished.', 'exclusive': true}); 
 
       }).error(function (data) {
         $scope.status = FAIL;
-        RequestStatus.setBusy(false);
 
         Notifications.addError({'status': 'Finished', 'message': 'Adding new variable to the process instance failed: ' + data.message, 'exclusive': true});
 
@@ -59,6 +56,6 @@ ngDefine('cockpit.pages', function(module, $) {
     };
   };
 
-  module.controller('AddVariableController', [ '$scope', '$http', 'Uri', 'RequestStatus', 'Notifications', AddVariableController ]);
+  module.controller('AddVariableController', [ '$scope', '$http', 'Uri', 'Notifications', AddVariableController ]);
 
 });

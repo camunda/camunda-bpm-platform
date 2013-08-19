@@ -1,26 +1,13 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
 
-   function VariableInstancesController ($scope, $http, search, Uri, LocalExecutionVariableResource) {
+   function VariableInstancesController ($scope, $http, search, Uri, LocalExecutionVariableResource, Notifications) {
 
     // input: processInstance, processData
 
-    var variableInstanceData = $scope.processData.newChild($scope);
-    var processInstance = $scope.processInstance;
-
-    $scope.addVariableDialog = new Dialog();
-
-    // contains the variable instances which are current
-    // in the edit mode
-    var variablesInEditMode = [];
-
-    // contains for each failed request to save new value
-    // of a variable instance the corresponding returned
-    // exception
-    var variableInstanceIdexceptionMessageMap = {};
-
-    // this map contains for each shown variable instane
-    // a copy from it
-    var variableCopies = {};
+    var variableInstanceData = $scope.processData.newChild($scope),
+        processInstance = $scope.processInstance,
+        variableInstanceIdexceptionMessageMap,
+        variableCopies;
 
     $scope.variableTypes = [
                           'String',
@@ -87,6 +74,9 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         pages.total = Math.ceil(data.count / pages.size);
       });
 
+      variableInstanceIdexceptionMessageMap = {};
+      variableCopies = {};
+
       $http.post(Uri.appUri('engine://engine/:engine/variable-instance/'), params, { params: pagingParams }).success(function(data) {
 
         angular.forEach(data, function(currentVariable) {
@@ -111,20 +101,11 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     }
 
     $scope.editVariable = function (variable) {
-      variablesInEditMode.push(variable);
-    };
-
-    $scope.isInEditMode = function (variable) {
-      if (variablesInEditMode.indexOf(variable) === -1) {
-        return false;
-      }
-
-      return true;
+      variable.inEditMode = true;
     };
 
     $scope.closeInPlaceEditing = function (variable) {
-      var index = variablesInEditMode.indexOf(variable);
-      variablesInEditMode.splice(index, 1);
+      delete variable.inEditMode;
 
       // clear the exception for the passed variable
       variableInstanceIdexceptionMessageMap[variable.id] = null;
@@ -160,12 +141,14 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       LocalExecutionVariableResource.updateVariables({ executionId: variable.executionId }, { modifications : modifiedVariable }).$then(
         // success
         function(response) {
+          Notifications.addMessage({ status: 'Variable', message: 'The variable \'' + variable.name + '\' has been changed successfully.', duration: 5000 });
           angular.extend(variable, newVariable);
           $scope.closeInPlaceEditing(variable);
         },
         // error
         function (error) {
           // set the exception
+          Notifications.addError({ status: 'Variable', message: 'The variable \'' + variable.name + '\' could not be changed successfully.', exclusive: true, duration: 5000 });
           variableInstanceIdexceptionMessageMap[variable.id] = error.data;
         });
     };
@@ -230,17 +213,13 @@ ngDefine('cockpit.plugin.base.views', function(module) {
           !isNull(variable);
     };
 
-    $scope.openAddVariableDialog = function () {
-      $scope.addVariableDialog.open();
-    };
-
     $scope.isDateValueValid = function (param) {
       console.log(param);
     };
 
   };
 
-  module.controller('VariableInstancesController', [ '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', VariableInstancesController ]);
+  module.controller('VariableInstancesController', [ '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', VariableInstancesController ]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 

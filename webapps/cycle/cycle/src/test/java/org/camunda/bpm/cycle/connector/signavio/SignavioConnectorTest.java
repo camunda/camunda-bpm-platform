@@ -62,14 +62,6 @@ public class SignavioConnectorTest {
     assertNotNull(config.getLoginMode());
     assertNotNull(config.getGlobalUser());
     assertNotNull(config.getGlobalPassword());
-//    assertNotNull(prop.get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL));
-    
-    // TODO: nre: cannot do this if credentials are configurable
-    // assertEquals(ConnectorLoginMode.GLOBAL, config.getLoginMode());
-    // assertEquals("test@camunda.com", config.getGlobalUser());
-    // assertEquals("testtest", config.getGlobalPassword()); // TODO: decrypt password!
-    
-    // assertEquals("http://vm2.camunda.com:8080", prop.get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL));
   }
   
   @Test

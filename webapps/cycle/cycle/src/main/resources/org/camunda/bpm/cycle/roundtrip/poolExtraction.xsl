@@ -97,7 +97,7 @@
 	<xsl:template match="bpmn:incoming" />
 	<xsl:template match="bpmn:outgoing" />
 	<xsl:template match="bpmn:messageFlow" />
-	<xsl:template match="bpmn:participant[@processRef != $enginePool/@id]" />
+	<xsl:template match="bpmn:participant[@processRef != $enginePool/@id or @id != $enginePoolId]" />
 	
 	<!-- just allow messageEventDefinitions where parent is a startEvent -->
 	<xsl:template match="bpmn:laneSet[not($keepLanes ='true')]" />

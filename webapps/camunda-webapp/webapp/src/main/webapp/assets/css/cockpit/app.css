@@ -83,7 +83,7 @@ a.expand-collapse:focus {
   filter: alpha(opacity=40);
 }
 
-.variable-invalid {
+.invalid {
   color: #e9322d;
 }
 

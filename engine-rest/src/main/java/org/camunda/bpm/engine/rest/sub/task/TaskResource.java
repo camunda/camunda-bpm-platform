@@ -58,4 +58,9 @@ public interface TaskResource {
   @Path("/delegate")
   @Consumes(MediaType.APPLICATION_JSON)
   void delegate(UserIdDto delegatedUser);
+  
+  @POST
+  @Path("/assignee")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void setAssignee(UserIdDto dto);
 }

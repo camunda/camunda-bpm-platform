@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="sid-ef8443df-7a72-464c-b024-b50492322080" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL">
+  <collaboration id="sid-17de21ea-4577-4fd0-9857-fdb93e0bb513">
+    <participant id="sid-EB04A09A-8E36-4453-AE17-110751D47E9D" name="Process Engine" processRef="sid-02651518-3957-4E89-BAC3-754A641CEE95"/>
+  </collaboration>
+  <process id="sid-02651518-3957-4E89-BAC3-754A641CEE95" name="Process Engine" isExecutable="true">
+    <laneSet id="sid-1c32d0d7-1d9e-44df-ac91-ee38b1d88517">
+      <lane id="sid-5B3543BF-A5CD-4586-824E-DD1C3A28A9A6">
+        <flowNodeRef>sid-1158A40E-F475-47DC-9DFA-8999DCF7A0D2</flowNodeRef>
+        <flowNodeRef>sid-07E56EAF-BA6F-47D6-841F-D5906DBB8E15</flowNodeRef>
+        <flowNodeRef>sid-D3265F66-3E21-4668-B547-00B3FBC8D5C7</flowNodeRef>
+        <flowNodeRef>ServiceTask_1</flowNodeRef>
+      </lane>
+    </laneSet>
+    <task id="sid-1158A40E-F475-47DC-9DFA-8999DCF7A0D2" name="Do something">
+      <incoming>SequenceFlow_1</incoming>
+      <outgoing>sid-A9511496-3954-4D3B-84E4-5D6426A89D38</outgoing>
+    </task>
+    <endEvent id="sid-07E56EAF-BA6F-47D6-841F-D5906DBB8E15" name="">
+      <incoming>sid-A9511496-3954-4D3B-84E4-5D6426A89D38</incoming>
+    </endEvent>
+    <sequenceFlow id="sid-A9511496-3954-4D3B-84E4-5D6426A89D38" name="" isImmediate="true" sourceRef="sid-1158A40E-F475-47DC-9DFA-8999DCF7A0D2" targetRef="sid-07E56EAF-BA6F-47D6-841F-D5906DBB8E15"/>
+    <startEvent id="sid-D3265F66-3E21-4668-B547-00B3FBC8D5C7" name="">
+      <outgoing>sid-087BF25A-DAA2-451A-BBA9-4AB1772D1E4B</outgoing>
+    </startEvent>
+    <sequenceFlow id="sid-087BF25A-DAA2-451A-BBA9-4AB1772D1E4B" name="" isImmediate="true" sourceRef="sid-D3265F66-3E21-4668-B547-00B3FBC8D5C7" targetRef="ServiceTask_1"/>
+    <serviceTask id="ServiceTask_1" name="A new Service Task">
+      <incoming>sid-087BF25A-DAA2-451A-BBA9-4AB1772D1E4B</incoming>
+      <outgoing>SequenceFlow_1</outgoing>
+    </serviceTask>
+    <sequenceFlow id="SequenceFlow_1" name="" sourceRef="ServiceTask_1" targetRef="sid-1158A40E-F475-47DC-9DFA-8999DCF7A0D2"/>
+  </process>
+  <bpmndi:BPMNDiagram id="sid-e74ddf9c-eed0-43a6-a88d-f8e1ca547cd5">
+    <bpmndi:BPMNPlane id="sid-d8a8b52d-e7e8-4dfc-b92a-cf6a67e6ff4a" bpmnElement="sid-17de21ea-4577-4fd0-9857-fdb93e0bb513">
+      <bpmndi:BPMNShape id="sid-EB04A09A-8E36-4453-AE17-110751D47E9D_gui" bpmnElement="sid-EB04A09A-8E36-4453-AE17-110751D47E9D" isHorizontal="true">
+        <omgdc:Bounds height="250.0" width="600.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-5B3543BF-A5CD-4586-824E-DD1C3A28A9A6_gui" bpmnElement="sid-5B3543BF-A5CD-4586-824E-DD1C3A28A9A6" isHorizontal="true">
+        <omgdc:Bounds height="250.0" width="570.0" x="30.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-D3265F66-3E21-4668-B547-00B3FBC8D5C7_gui" bpmnElement="sid-D3265F66-3E21-4668-B547-00B3FBC8D5C7">
+        <omgdc:Bounds height="30.0" width="30.0" x="60.0" y="111.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="6.0" width="6.0" x="72.0" y="146.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-1158A40E-F475-47DC-9DFA-8999DCF7A0D2_gui" bpmnElement="sid-1158A40E-F475-47DC-9DFA-8999DCF7A0D2">
+        <omgdc:Bounds height="80.0" width="100.0" x="265.0" y="85.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-07E56EAF-BA6F-47D6-841F-D5906DBB8E15_gui" bpmnElement="sid-07E56EAF-BA6F-47D6-841F-D5906DBB8E15">
+        <omgdc:Bounds height="30.0" width="30.0" x="434.0" y="110.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sid-A9511496-3954-4D3B-84E4-5D6426A89D38_gui" bpmnElement="sid-A9511496-3954-4D3B-84E4-5D6426A89D38">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="365.0" y="125.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="434.0" y="125.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-087BF25A-DAA2-451A-BBA9-4AB1772D1E4B_gui" bpmnElement="sid-087BF25A-DAA2-451A-BBA9-4AB1772D1E4B" targetElement="_BPMNShape_ServiceTask_18">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="90.0" y="126.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="132.0" y="126.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="6.0" width="6.0" x="101.0" y="126.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_18" bpmnElement="ServiceTask_1">
+        <omgdc:Bounds height="80.0" width="100.0" x="132.0" y="86.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_ServiceTask_18" targetElement="sid-1158A40E-F475-47DC-9DFA-8999DCF7A0D2_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="232.0" y="126.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="265.0" y="125.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="6.0" width="6.0" x="253.0" y="125.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
