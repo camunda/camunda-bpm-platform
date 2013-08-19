@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.task;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.TaskService;
+
 
 
 /** Represents one task for a human user.
@@ -53,19 +55,25 @@ public interface Task {
    * [80..100] highest */
 	void setPriority(int priority);
 	
-  /** The {@link User.getId() userId} of the person that is responsible for this task. */
+  /** The {@link User#getId() userId} of the person that is responsible for this task.
+   * This is used when a task is {@link TaskService#delegateTask(String, String) delegated}. */
   String getOwner();
   
-  /** The {@link User.getId() userId} of the person that is responsible for this task. */
+  /** The {@link User#getId() userId} of the person that is responsible for this task.
+   * This is used when a task is {@link TaskService#delegateTask(String, String) delegated}. */
   void setOwner(String owner);
   
-  /** The {@link User.getId() userId} of the person to which this task is delegated. */
-	String getAssignee();
+  /** The {@link User#getId() userId} of the person to which this task is
+   * {@link TaskService#setAssignee(String, String) assigned} or
+   * {@link TaskService#delegateTask(String, String) delegated}. */
+  String getAssignee();
 	
-	/** The {@link User.getId() userId} of the person to which this task is delegated. */
-	void setAssignee(String assignee);
-	
-	/** The current {@link DelegationState} for this task. */ 
+  /** The {@link User#getId() userId} of the person to which this task is 
+   * {@link TaskService#setAssignee(String, String) assigned} or
+   * {@link TaskService#delegateTask(String, String) delegated}. */
+  void setAssignee(String assignee);
+
+  /** The current {@link DelegationState} for this task. */ 
   DelegationState getDelegationState();
   
   /** The current {@link DelegationState} for this task. */ 
