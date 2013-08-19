@@ -15,43 +15,47 @@ package org.camunda.bpm.webapp.impl.security.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import org.camunda.bpm.webapp.impl.security.auth.Authentication;
+import org.camunda.bpm.webapp.impl.security.filter.RequestMatcher.Match;
 
 /**
- * <p>A {@link SecurityFilterRule} that deleagates to a set of Path Matchers</p>
+ * <p>A {@link SecurityFilterRule} that deleagates to a set of {@link PathMatcher}s</p>
  *
  * @author Daniel Meyer
- *
+ * @author nico.rehwaldt
  */
 public class PathFilterRule implements SecurityFilterRule {
 
-  protected List<RequestMatcher> deniedPaths = new ArrayList<RequestMatcher>();
   protected List<RequestMatcher> allowedPaths = new ArrayList<RequestMatcher>();
+  protected List<RequestMatcher> deniedPaths = new ArrayList<RequestMatcher>();
 
   @Override
-  public AppRequest authorize(AppRequest request) {
+  public Authorization authorize(String requestMethod, String requestUri) {
 
-    // assume authorization per default
-    request.authorize();
+    boolean secured = false;
 
-    for (RequestMatcher requestMatcher : deniedPaths) {
-      if (requestMatcher.isAuthorized(request)) {
-        request.unauthorize();
+    for (RequestMatcher pattern : deniedPaths) {
+      Match match = pattern.match(requestMethod, requestUri);
+
+      if (match != null) {
+        secured = true;
         break;
       }
     }
 
-    if (!request.isAuthorized()) {
-      for (RequestMatcher requestMatcher : allowedPaths) {
-        if (requestMatcher.isAuthorized(request)) {
-          request.authorize();
+    if (!secured) {
+      return Authorization.granted(Authentication.ANONYMOUS);
+    }
 
-          return request;
-        }
+    for (RequestMatcher pattern : allowedPaths) {
+      Match match = pattern.match(requestMethod, requestUri);
+
+      if (match != null) {
+        return match.authorize();
       }
     }
 
-    return request;
+    return null;
   }
 
   public List<RequestMatcher> getAllowedPaths() {
@@ -61,5 +65,4 @@ public class PathFilterRule implements SecurityFilterRule {
   public List<RequestMatcher> getDeniedPaths() {
     return deniedPaths;
   }
-
 }

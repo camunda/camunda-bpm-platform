@@ -25,6 +25,10 @@ ngDefine('tasklist.pages', [
       return query;
     };
 
+    $scope.$watch(Authentication.username, function(newValue) {
+      $scope.groupInfo = EngineApi.getGroups(newValue);
+    });
+
     var reloadTasks = debounce(function() {
       var view = $scope.taskList.view;
 
@@ -47,8 +51,6 @@ ngDefine('tasklist.pages', [
       var filter = view.filter,
           search = view.search,
           user = Authentication.username();
-
-      $scope.groupInfo = EngineApi.getGroups(user);
 
       $scope.taskList.view = { filter: filter, search: search };
 

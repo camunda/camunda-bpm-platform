@@ -13,20 +13,24 @@
 package org.camunda.bpm.webapp.impl.security.filter;
 
 
-
 /**
  * <p>This interface is used by the {@link SecurityFilter} to authorize incoming requests.</p>
  *
  * @author Daniel Meyer
- *
+ * @author nico.rehwaldt
  */
 public interface SecurityFilterRule {
 
   /**
-   * 
-   * @param req the {@link AppRequest} to check for authorization.
-   * @return the {@link AppRequest} with attached authorization information.
+   * Authorize the given request and return a {@link Authorization} as a result.
+   * May return <code>null</code> if the request could not be authorized.
+   *
+   * @param requestMethod
+   * @param requestUri
+   *
+   * @return the authorization for the given request or <code>null</code> if the authorization
+   *         for the request could not be checked
    */
-  public AppRequest authorize(AppRequest req);
+  public Authorization authorize(String requestMethod, String requestUri);
 
 }

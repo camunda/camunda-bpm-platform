@@ -41,10 +41,17 @@ ngDefine('camunda.common.pages', function(module) {
         break;
 
       case 401:
+        var wasLoggedIn = !!Authentication.username();
+
         Authentication.clear();
 
         if ($location.absUrl().indexOf('/setup/#') == -1) {
-          addError({ status: 'Unauthorized', message: 'Login is required to access the resource' });
+          if (wasLoggedIn) {
+            addError({ type: 'warning', status: 'Session ended', message: 'Your session timed out or was ended from another browser window. Please signin again.' });
+          } else {
+            addError({ status: 'Unauthorized', message: 'Login is required to access the resource' });
+          }
+          
           $location.path('/login');
         } else {
           $location.path('/setup');

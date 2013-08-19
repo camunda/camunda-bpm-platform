@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.camunda.bpm.webapp.impl.security.filter;
 
 import java.io.InputStream;
@@ -11,13 +23,18 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 
 import org.camunda.bpm.webapp.impl.security.auth.Authentication;
 import org.camunda.bpm.webapp.impl.security.auth.Authentications;
+import org.camunda.bpm.webapp.impl.security.auth.UserAuthentication;
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 /**
  *
@@ -31,6 +48,8 @@ public class SecurityFilterRulesTest {
 
   public static Authentication NO_AUTHENTICATION = null;
   public static Authentication LOGGED_IN_USER = new Authentication("user", "default");
+
+  public static final String TESTUSER_ID = "testuser";
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -60,10 +79,10 @@ public class SecurityFilterRulesTest {
       @Override
       public void run() {
 
-        AppRequest checkedRequest = check("POST", "/api/cockpit/plugin/reporting-process-count/default/process-instance-count");
+        Authorization authorization = getAuthorization("POST", "/api/cockpit/plugin/reporting-process-count/default/process-instance-count");
 
-        assertThat(checkedRequest.isAuthorized()).isFalse();
-        assertThat(checkedRequest.isAuthenticated()).isFalse();
+        assertThat(authorization.isGranted()).isFalse();
+        assertThat(authorization.isAuthenticated()).isFalse();
       }
     });
   }
@@ -75,10 +94,10 @@ public class SecurityFilterRulesTest {
       @Override
       public void run() {
 
-        AppRequest checkedRequest = check("POST", "/api/cockpit/plugin/reporting-process-count/default/process-instance-count");
+        Authorization authorization = getAuthorization("POST", "/api/cockpit/plugin/reporting-process-count/default/process-instance-count");
 
-        assertThat(checkedRequest.isAuthorized()).isFalse();
-        assertThat(checkedRequest.isAuthenticated()).isFalse();
+        assertThat(authorization.isGranted()).isFalse();
+        assertThat(authorization.isAuthenticated()).isFalse();
       }
     });
   }
@@ -89,21 +108,63 @@ public class SecurityFilterRulesTest {
       @Override
       public void run() {
 
-        AppRequest checkedRequest = check("POST", "/api/cockpit/plugin/reporting-process-count/default/process-instance-count");
+        Authorization authorization = getAuthorization("POST", "/api/cockpit/plugin/reporting-process-count/default/process-instance-count");
 
-        assertThat(checkedRequest.isAuthorized()).isTrue();
-        assertThat(checkedRequest.isAuthenticated()).isTrue();
+        assertThat(authorization.isGranted()).isTrue();
+        assertThat(authorization.isAuthenticated()).isTrue();
       }
     });
   }
 
-  protected AppRequest check(String method, String uri) {
-    AppRequest request = new AppRequest(method, uri);
-    return FilterRules.checkAuthorization(request, FILTER_RULES);
+  @Test
+  public void shouldPassCockpit_GET_LOGGED_OUT() throws Exception {
+
+    Authorization authorization = getAuthorization("GET", "/app/cockpit/non-existing-engine");
+
+    assertThat(authorization.isGranted()).isTrue();
+    assertThat(authorization.isAuthenticated()).isFalse();
+  }
+
+  @Test
+  @Ignore // need test environment (see below)
+  public void shouldPassCockpit_GET_LOGGED_IN() throws Exception {
+
+    // TODO: need bootstrapped environment to test
+    // logged in behavior --nre
+
+    authenticatedForApp("default", "cockpit", new Runnable() {
+
+      @Override
+      public void run() {
+        Authorization authorization = getAuthorization("GET", "/app/cockpit/default/");
+
+        assertThat(authorization.isGranted()).isTrue();
+        assertThat(authorization.isAuthenticated()).isTrue();
+      }
+    });
+  }
+
+  @Test
+  public void shouldPassCockpitNonExistingEngine_GET_LOGGED_IN() throws Exception {
+
+    authenticatedForApp("default", "cockpit", new Runnable() {
+
+      @Override
+      public void run() {
+        Authorization authorization = getAuthorization("GET", "/app/cockpit/non-existing-engine/");
+
+        assertThat(authorization.isGranted()).isTrue();
+        assertThat(authorization.isAuthenticated()).isFalse();
+      }
+    });
+  }
+
+  protected Authorization getAuthorization(String method, String uri) {
+    return FilterRules.authorize(method, uri, FILTER_RULES);
   }
 
   protected boolean isAuthorized(String method, String uri) {
-    return check(method, uri).isAuthorized();
+    return getAuthorization(method, uri).isGranted();
   }
 
   private static List<SecurityFilterRule> loadFilterRules() throws FileNotFoundException, IOException {
@@ -118,7 +179,25 @@ public class SecurityFilterRulesTest {
   }
 
   private void authenticatedForEngine(String engineName, Runnable codeBlock) {
-    Authentication engineAuth = new Authentication("testuser", engineName);
+    Authentication engineAuth = new Authentication(LOGGED_IN_USER.getIdentityId(), engineName);
+
+    Authentications authentications = new Authentications();
+    authentications.addAuthentication(engineAuth);
+
+    Authentications.setCurrent(authentications);
+
+    try {
+      codeBlock.run();
+    } finally {
+      Authentications.clearCurrent();
+    }
+  }
+
+  private void authenticatedForApp(String engineName, String appName, Runnable codeBlock) {
+    List<String> groups = Collections.<String>emptyList();
+    HashSet<String> authorizedApps = new HashSet<String>(Arrays.asList(appName));
+
+    Authentication engineAuth = new UserAuthentication(LOGGED_IN_USER.getIdentityId(), groups, engineName, authorizedApps);
 
     Authentications authentications = new Authentications();
     authentications.addAuthentication(engineAuth);

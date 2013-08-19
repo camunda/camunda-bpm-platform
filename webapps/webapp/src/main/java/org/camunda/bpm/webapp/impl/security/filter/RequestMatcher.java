@@ -12,44 +12,44 @@
  */
 package org.camunda.bpm.webapp.impl.security.filter;
 
-import java.util.regex.Pattern;
+import java.util.Map;
 
 /**
- * <p>A simple request matcher composed of "Method" and "Path" information.</p>
  *
- * @author Daniel Meyer
- *
+ * @author nico.rehwaldt
  */
 public class RequestMatcher {
 
-  protected String[] methods;
-  protected Pattern uriMatcher;
+  private final RequestFilter filter;
+  private final RequestAuthorizer authorizer;
 
-  public RequestMatcher(String pattern, String... methods) {
-    this.methods = methods;
-    this.uriMatcher = Pattern.compile(pattern);
+  public RequestMatcher(RequestFilter filter, RequestAuthorizer authorizer) {
+    this.filter = filter;
+    this.authorizer = authorizer;
   }
 
-  public boolean isAuthorized(AppRequest request) {
-    return isMethodMatched(request.getMethod()) && isUriMatched(request.getUri());
-  }
+  public Match match(String requestMethod, String requestUri) {
+    Map<String, String> match = filter.match(requestMethod, requestUri);
 
-  protected boolean isMethodMatched(String reqMethod) {
-    boolean isMethodMatched = false;
-    if (methods.length != 0) {
-      for (String method : methods) {
-        if (method.equals(reqMethod)) {
-          isMethodMatched = true;
-          break;
-        }
-      }
+    if (match != null) {
+      return new Match(match, authorizer);
     } else {
-      isMethodMatched = true;
+      return null;
     }
-    return isMethodMatched;
   }
 
-  protected boolean isUriMatched(String uri) {
-    return uriMatcher.matcher(uri).matches();
+  public static class Match {
+
+    private final Map<String, String> parameters;
+    private final RequestAuthorizer authorizer;
+
+    public Match(Map<String, String> parameters, RequestAuthorizer authorizer) {
+      this.parameters = parameters;
+      this.authorizer = authorizer;
+    }
+
+    public Authorization authorize() {
+      return authorizer.authorize(parameters);
+    }
   }
 }
