@@ -37,4 +37,9 @@ public class AtomicOperationActivityStart extends AtomicOperationActivityInstanc
     return (ScopeImpl) execution.getActivity();
   }
 
+  @Override
+  public String getCanonicalName() {
+    return "activity-start";
+  }
+
 }

@@ -363,11 +363,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   public void start(String businessKey, Map<String, Object> variables) {
-    if(isProcessInstance()) {
-      if(processInstanceStartContext == null) {
-        processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
-      }
-    }
     
     if(variables != null) {
       setVariables(variables);
@@ -606,7 +601,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }    
   }
   
-  protected void performOperationSync(AtomicOperation executionOperation) {
+  public void performOperationSync(AtomicOperation executionOperation) {
     if (requiresUnsuspendedExecution(executionOperation)) {
       ensureNotSuspended();
     }
@@ -643,9 +638,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     message.setExecution(this);
     message.setExclusive(getActivity().isExclusive());
     message.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
-    // At the moment, only AtomicOperationTransitionCreateScope can be performed asynchronously,
-    // so there is no need to pass it to the handler
-
+    message.setJobHandlerConfiguration(executionOperation.getCanonicalName());
+    
     Context
       .getCommandContext()
       .getJobManager()
@@ -1579,6 +1573,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   public ProcessInstanceStartContext getProcessInstanceStartContext() {
+    if(isProcessInstance()) {
+      if(processInstanceStartContext == null) {
+        processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
+      }
+    }
     return processInstanceStartContext;
   }
   

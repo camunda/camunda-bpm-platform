@@ -55,4 +55,9 @@ public class AtomicOperationTransitionNotifyListenerStart extends AtomicOperatio
       execution.performOperation(ACTIVITY_EXECUTE);
     }
   }
+
+  @Override
+  public String getCanonicalName() {
+    return "transition-notifiy-listener-start";
+  }
 }
