@@ -80,4 +80,9 @@ public class AtomicOperationTransitionNotifyListenerTake implements AtomicOperat
     }
     return nextScope;
   }
+
+  @Override
+  public String getCanonicalName() {
+    return "transition-notify-listener-take";
+  }
 }

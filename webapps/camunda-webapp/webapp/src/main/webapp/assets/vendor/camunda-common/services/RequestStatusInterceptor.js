@@ -1,9 +1,9 @@
 ngDefine('camunda.common.services', function(module) {
 
   var HttpStatusInterceptorFactory = 
-    [ '$rootScope', '$q', 'RequestLogger', 
-      function($rootScope, $q, RequestLogger) {
-    
+    [ '$rootScope', '$q', '$injector', 'RequestLogger', 
+      function($rootScope, $q, $injector, RequestLogger) {
+
     return function(promise) {
 
       RequestLogger.logStarted();
@@ -27,7 +27,24 @@ ngDefine('camunda.common.services', function(module) {
         return $q.reject(response);
       }
 
-      return promise.then(success, error);
+      function updateAuthentication(fn) {
+
+        return function(response) {
+          var Authentication = $injector.get('Authentication');
+
+          var authorizedUser = response.headers('X-Authorized-User');
+          var authorizedApps = response.headers('X-Authorized-Apps');
+
+          Authentication.update(authorizedUser ? {
+            name: authorizedUser,
+            authorizedApps: authorizedApps ? authorizedApps.split(/,/) : [] 
+          } : null);
+
+          return fn(response);
+        };
+      }
+
+      return promise.then(updateAuthentication(success), error);
     };
   }];
 

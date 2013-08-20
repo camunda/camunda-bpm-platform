@@ -35,4 +35,9 @@ public class AtomicOperationTransitionNotifyListenerEnd extends AtomicOperationA
     super.eventNotificationsCompleted(execution);
     execution.performOperation(TRANSITION_DESTROY_SCOPE);
   }
+
+  @Override
+  public String getCanonicalName() {
+    return "transition-notify-listener-end";
+  }
 }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,29 +17,31 @@ import java.security.Principal;
 
 /**
  * <p>Represents an active authentication of a given identity (usually a user).</p>
- * 
+ *
  * <p>In camunda webapps, an authentication exists between some identity (user) and
- * a process engine</p> 
- * 
- * <p>Implements java.security.Principal so that this object may be used everywhere where a 
+ * a process engine</p>
+ *
+ * <p>Implements java.security.Principal so that this object may be used everywhere where a
  * {@link Principal} is required.</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public class Authentication implements Principal, Serializable {
+
+  public static final Authentication ANONYMOUS = new Authentication(null, null);
   
   private static final long serialVersionUID = 1L;
 
   protected final String identityId;
-  
+
   protected final String processEngineName;
-  
+
   public Authentication(String identityId, String processEngineName) {
     this.identityId = identityId;
     this.processEngineName = processEngineName;
   }
-  
+
   /**
    * java.security.Principal implementation: return the id of the identity
    * (userId) behind this authentication
@@ -47,7 +49,7 @@ public class Authentication implements Principal, Serializable {
   public String getName() {
     return identityId;
   }
-  
+
   /**
    * @return the id of the identity
    * (userId) behind this authentication
@@ -94,6 +96,6 @@ public class Authentication implements Principal, Serializable {
       return false;
     return true;
   }
-  
+
 
 }

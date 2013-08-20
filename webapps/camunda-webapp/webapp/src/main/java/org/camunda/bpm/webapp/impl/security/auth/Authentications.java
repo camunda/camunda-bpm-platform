@@ -60,7 +60,7 @@ public class Authentications implements Serializable {
    * @return {@link Authentication} for the provided process engine or
    *         "null" if no user is authenticated for this process engine.
    */
-  public Authentication getAuthentictionForProcessEngine(String engineName) {
+  public Authentication getAuthenticationForProcessEngine(String engineName) {
     return authentications.get(engineName);
   }
   
@@ -100,7 +100,7 @@ public class Authentications implements Serializable {
    * @return true if a user is authenticated for the provided process engine name.
    */
   public boolean hasAuthenticationForProcessEngine(String engineName) {
-    return getAuthentictionForProcessEngine(engineName) != null;
+    return getAuthenticationForProcessEngine(engineName) != null;
   }
   
   // thread-local //////////////////////////////////////////////////////////

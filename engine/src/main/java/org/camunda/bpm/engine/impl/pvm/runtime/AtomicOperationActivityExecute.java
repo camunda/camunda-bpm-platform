@@ -48,4 +48,9 @@ public class AtomicOperationActivityExecute implements AtomicOperation {
       throw new PvmException("couldn't execute activity <"+activity.getProperty("type")+" id=\""+activity.getId()+"\" ...>: "+e.getMessage(), e);
     }
   }
+
+  @Override
+  public String getCanonicalName() {
+    return "activity-execute";
+  }
 }

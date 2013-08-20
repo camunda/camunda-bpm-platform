@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,10 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.FormService;
@@ -56,13 +54,13 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   private ProcessEngine engine;
   private String processDefinitionId;
   private String rootResourcePath;
-  
+
   public ProcessDefinitionResourceImpl(ProcessEngine engine, String processDefinitionId, String rootResourcePath) {
     this.engine = engine;
     this.processDefinitionId = processDefinitionId;
     this.rootResourcePath = rootResourcePath;
   }
-  
+
   @Override
   public ProcessDefinitionDto getProcessDefinition() {
     RepositoryService repoService = engine.getRepositoryService();
@@ -87,33 +85,34 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     try {
       Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
       instance = runtimeService.startProcessInstanceById(processDefinitionId, variables);
-      
+
     } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot instantiate process definition " + processDefinitionId);
-      
+      String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
+
     } catch (NumberFormatException e) {
       String errorMessage = String.format("Cannot instantiate process definition %s due to number format exception: %s", processDefinitionId, e.getMessage());
       throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-      
+
     } catch (ParseException e) {
       String errorMessage = String.format("Cannot instantiate process definition %s due to parse exception: %s", processDefinitionId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
-    
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+
     } catch (IllegalArgumentException e) {
       String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);  
+      throw new RestException(Status.BAD_REQUEST, errorMessage);
     }
 
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
-    
+
     URI uri = context.getBaseUriBuilder()
       .path(rootResourcePath)
       .path(ProcessInstanceRestService.class)
       .path(instance.getId())
       .build();
-    
-    result.addReflexiveLink(uri, HttpMethod.GET, "self");    
-    
+
+    result.addReflexiveLink(uri, HttpMethod.GET, "self");
+
     return result;
   }
 
@@ -123,14 +122,14 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     if (includeIncidents != null && includeIncidentsForType != null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Only one of the query parameter includeIncidents or includeIncidentsForType can be set.");
     }
-    
+
     ManagementService mgmtService = engine.getManagementService();
     ActivityStatisticsQuery query = mgmtService.createActivityStatisticsQuery(processDefinitionId);
-    
+
     if (includeFailedJobs != null && includeFailedJobs) {
       query.includeFailedJobs();
     }
-    
+
     if (includeIncidents != null && includeIncidents) {
       query.includeIncidents();
     } else if (includeIncidentsForType != null) {
@@ -167,7 +166,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   @Override
   public FormDto getStartForm() {
     final FormService formService = engine.getFormService();
-    
+
     final StartFormData formData;
     try {
       formData = formService.getStartFormData(processDefinitionId);

@@ -80,4 +80,9 @@ public class AtomicOperationProcessEnd extends AtomicOperationActivityInstanceEn
       }
     }
   }
+
+  @Override
+  public String getCanonicalName() {
+    return "process-end";
+  }
 }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,12 +37,12 @@ public class TaskResourceImpl implements TaskResource {
 
   private ProcessEngine engine;
   private String taskId;
-  
+
   public TaskResourceImpl(ProcessEngine engine, String taskId) {
     this.engine = engine;
     this.taskId = taskId;
   }
-  
+
   @Override
   public void claim(UserIdDto dto) {
     TaskService taskService = engine.getTaskService();
@@ -62,18 +62,22 @@ public class TaskResourceImpl implements TaskResource {
     try {
       Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
       taskService.complete(taskId, variables);
-      
+
     } catch (NumberFormatException e) {
       String errorMessage = String.format("Cannot complete task %s due to number format exception: %s", taskId, e.getMessage());
       throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-      
+
     } catch (ParseException e) {
       String errorMessage = String.format("Cannot complete task %s due to parse exception: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
-    
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+
     } catch (IllegalArgumentException e) {
       String errorMessage = String.format("Cannot complete task %s: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);  
+      throw new RestException(Status.BAD_REQUEST, errorMessage);
+
+    } catch (ProcessEngineException e) {
+      String errorMessage = String.format("Cannot complete task %s: %s", taskId, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
   }
 
@@ -88,7 +92,7 @@ public class TaskResourceImpl implements TaskResource {
     if (task == null) {
       throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
     }
-    
+
     return TaskDto.fromTask(task);
   }
 
@@ -108,33 +112,33 @@ public class TaskResourceImpl implements TaskResource {
     if (processDefinitionId != null) {
       dto.setContextPath(ApplicationContextPathUtil.getApplicationPath(engine, task.getProcessDefinitionId()));
     }
-    
+
     return dto;
   }
 
   @Override
   public void resolve(CompleteTaskDto dto) {
     TaskService taskService = engine.getTaskService();
-    
+
     try {
       Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
       taskService.resolveTask(taskId, variables);
-      
+
     } catch (NumberFormatException e) {
       String errorMessage = String.format("Cannot resolve task %s due to number format exception: %s", taskId, e.getMessage());
       throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-      
+
     } catch (ParseException e) {
       String errorMessage = String.format("Cannot resolve task %s due to parse exception: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
-    
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+
     } catch (IllegalArgumentException e) {
       String errorMessage = String.format("Cannot resolve task %s: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);  
+      throw new RestException(Status.BAD_REQUEST, errorMessage);
     }
-    
+
   }
-  
+
 
   /**
    * Returns the task with the given id
@@ -148,7 +152,7 @@ public class TaskResourceImpl implements TaskResource {
 
   public void setAssignee(UserIdDto dto) {
     TaskService taskService = engine.getTaskService();
-    taskService.setAssignee(taskId, dto.getUserId());  
+    taskService.setAssignee(taskId, dto.getUserId());
   }
-  
+
 }

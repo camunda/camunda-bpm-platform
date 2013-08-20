@@ -70,4 +70,9 @@ public class AtomicOperationDeleteCascadeFireActivityEnd extends AtomicOperation
       }
     }
   }
+
+  @Override
+  public String getCanonicalName() {
+    return "delete-cascade-fire-activity-end";
+  }
 }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,24 +12,25 @@
  */
 package org.camunda.bpm.webapp.impl.security.filter;
 
-import javax.servlet.http.HttpServletRequest;
-
-
 
 /**
- * <p>This interface is used by the {@link SecurityFilter} to check incoming requests for 
- * authorization.</p>
- * 
- * @author Daniel Meyer
+ * <p>This interface is used by the {@link SecurityFilter} to authorize incoming requests.</p>
  *
+ * @author Daniel Meyer
+ * @author nico.rehwaldt
  */
 public interface SecurityFilterRule {
 
   /**
-   * 
-   * @param req the {@link HttpServletRequest} to check for authorizatiobn.
-   * @return true if the current request is authorized, false otherwise.
+   * Authorize the given request and return a {@link Authorization} as a result.
+   * May return <code>null</code> if the request could not be authorized.
+   *
+   * @param requestMethod
+   * @param requestUri
+   *
+   * @return the authorization for the given request or <code>null</code> if the authorization
+   *         for the request could not be checked
    */
-  public boolean isRequestAuthorized(HttpServletRequest req);
-  
+  public Authorization authorize(String requestMethod, String requestUri);
+
 }
