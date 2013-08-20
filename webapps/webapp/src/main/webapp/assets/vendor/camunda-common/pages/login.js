@@ -1,4 +1,4 @@
-ngDefine('camunda.common.pages.login', [ 'angular', 'require', 'module:camunda.common.services.authentication:camunda-common/services/Authentication' ], 
+ngDefine('camunda.common.pages.login', [ 'angular', 'require', 'module:camunda.common.services.authentication:camunda-common/services/Authentication' ],
   function(module, angular, require) {
 
   var Controller = ['$scope', 'Authentication', 'Notifications', '$location',
@@ -13,11 +13,11 @@ ngDefine('camunda.common.pages.login', [ 'angular', 'require', 'module:camunda.c
         .login($scope.username, $scope.password)
         .then(function(success) {
           Notifications.clearAll();
-          
+
           if (success) {
             $location.path("/");
           } else {
-            Notifications.addError({ status: "Login Failed", message: "Username / password are incorrect" });
+            Notifications.addError({ status: "Login Failed", message: "Wrong credentials or missing access rights to application" });
           }
         });
     }

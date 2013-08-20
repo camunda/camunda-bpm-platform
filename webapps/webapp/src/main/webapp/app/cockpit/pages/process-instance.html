@@ -36,6 +36,51 @@
       </p>
     </div>
 
+    <div class="filters" ng-controller="ProcessInstanceFilterController">
+      <h5>
+        Filter
+      </h5>
+
+      <i ng-if="!filterData.activityCount && !filterData.activityInstanceCount">
+        No view elements selected.
+      </i>
+
+      <ul class="unstyled">
+
+        <li class="filter" ng-if="filterData.activityInstanceCount">
+          <div class="name">
+            Activity Instances
+          </div>
+
+          <div class="search search-text">
+            <button class="btn btn-link btn-mini btn-control remove"
+                    ng-click="clearSelection()">
+              <i class="icon-remove"></i>
+            </button>
+            {{ filterData.activityInstanceCount }} elements selected
+          </div>
+        </li>
+      </ul>
+
+      <ul class="unstyled">
+
+        <li class="filter" ng-if="filterData.activityCount">
+          <div class="name">
+            Activities
+          </div>
+
+          <div class="search search-text">
+            <button class="btn btn-link btn-mini btn-control remove"
+                    ng-click="clearSelection()">
+              <i class="icon-remove"></i>
+            </button>
+            {{ filterData.activityCount }} elements selected
+          </div>
+        </li>
+      </ul>
+
+    </div>    
+
     <div activity-instance-tree="activityInstanceTree" on-element-click="handleActivityInstanceSelection(id, activityId, $event)" selection="filter"></div>
 
     <a class="hide-collapsable pull-right"></a>
@@ -66,9 +111,6 @@
     <a class="show-collapsable"></a>
   </div>
 </div>
-
-
-
 
 <!-- begin cancel process instance confirmation-dialog -->
 <div modal-dialog model="cancelProcessInstanceDialog" ng-cloak>
