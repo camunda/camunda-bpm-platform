@@ -1,0 +1,51 @@
+<div class="modal-header">
+  <h3>Select Groups</h3>
+</div>
+
+<div class="modal-body">
+  <div notifications-panel></div>                
+  
+  <table class="table table-condensed" ng-hide="status !== 'beforeCreate' || availableGroups.length == 0">
+    <thead>
+      <tr>
+        <th></th>    
+        <th>Group Id</th>
+        <th>Group Name</th>
+        <th>Group Type</th>  
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="group in availableGroups">
+        <td class="row-select">
+          <input type="checkbox" ng-model="group.checked" />
+        </td>
+        <td>
+          <a href="#/groups/{{group.id}}">{{group.id}}</a>
+        </td>            
+        <td>
+          {{group.name}}
+        </td>
+        <td>
+          {{group.type}}
+        </td>            
+      </tr>
+    </tbody>
+  </table>
+  
+  <p ng-show="availableGroups.length == 0">There are no additional groups available to which the user can be added. You can create a new group <a href="#/group-create" ng-click="close">here</a>.</p>
+
+  <p ng-show="status === 'SUCCESS'">User was successfully added to selected groups.</p>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn" ng-click="close()"
+          ng-disabled="status === 'performCreate'"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">Close</button>
+  <button class="btn btn-primary" ng-click="close(status)"
+          ng-show="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">OK</button>        
+  <button class="btn btn-primary" ng-click="createGroupMemberships()"
+          ng-disabled="status !== 'beforeCreate'"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableGroups.length == 0">Add Groups</button>
+  
+</div>
