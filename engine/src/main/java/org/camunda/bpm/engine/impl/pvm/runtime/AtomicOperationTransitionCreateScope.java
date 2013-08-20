@@ -53,4 +53,9 @@ public class AtomicOperationTransitionCreateScope implements AtomicOperation {
     
     propagatingExecution.performOperation(AtomicOperation.TRANSITION_NOTIFY_LISTENER_START);
   }
+
+  @Override
+  public String getCanonicalName() {
+    return "transition-create-scope";
+  }
 }

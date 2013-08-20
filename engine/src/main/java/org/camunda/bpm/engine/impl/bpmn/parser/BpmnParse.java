@@ -883,6 +883,7 @@ public class BpmnParse extends Parse {
     for (Element startEventElement : startEventElements) {
       
       ActivityImpl startEventActivity = createActivityOnScope(startEventElement, scope);
+      startEventActivity.setAsync(isAsync(startEventElement));
 
       if (scope instanceof ProcessDefinitionEntity) {        
         parseProcessDefinitionStartEvent(startEventActivity, startEventElement, parentElement, scope);           

@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.camunda.bpm.webapp.impl.engine;
 
 import java.io.IOException;
@@ -5,7 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,7 +26,6 @@ import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
 import org.camunda.bpm.webapp.impl.security.SecurityActions;
 import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
-import org.camunda.bpm.webapp.impl.security.auth.AuthenticationCookie;
 
 /**
  *
@@ -87,10 +97,9 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
 
       if (needsInitialUser(engineName)) {
         if (!setupPage) {
-          // redirect to setup          
+          // redirect to setup
           response.sendRedirect(String.format("%s/app/admin/%s/setup/#/setup", contextPath, engineName));
         } else {
-          AuthenticationCookie.updateCookie(response, request.getSession());
           // serve the index page as a setup page
           // setup will be handled by app
           serveIndexPage(appName, engineName, contextPath, request, response);
@@ -133,9 +142,9 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
 
     if (processEngine.getIdentityService().isReadOnly()) {
       return false;
-      
+
     } else {
-    
+
       return SecurityActions.runWithoutAuthentication(new SecurityAction<Boolean>() {
         public Boolean execute() {
           return processEngine.getIdentityService()
@@ -143,8 +152,8 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
               .memberOfGroup(Groups.CAMUNDA_ADMIN).count() == 0;
         }
       }, processEngine);
-   
-      
+
+
     }
 
   }

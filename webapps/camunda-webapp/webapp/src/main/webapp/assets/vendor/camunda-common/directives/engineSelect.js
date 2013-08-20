@@ -47,8 +47,10 @@ ngDefine('camunda.common.directives', [
         });
 
         scope.$on('$destroy', function() {
-          divider.remove();
-        })
+          if (divider) {
+            divider.remove();
+          }
+        });
       }
     };
   };

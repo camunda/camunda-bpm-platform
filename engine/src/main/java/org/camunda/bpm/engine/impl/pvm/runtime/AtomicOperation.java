@@ -17,6 +17,7 @@ package org.camunda.bpm.engine.impl.pvm.runtime;
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
+ * @author Thorben Lindhauer
  */
 public interface AtomicOperation {
   
@@ -38,4 +39,6 @@ public interface AtomicOperation {
   void execute(InterpretableExecution execution);
   
   boolean isAsync(InterpretableExecution execution);
+  
+  String getCanonicalName();
 }

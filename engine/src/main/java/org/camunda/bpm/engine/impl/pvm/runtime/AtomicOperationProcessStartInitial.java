@@ -67,4 +67,9 @@ public class AtomicOperationProcessStartInitial extends AtomicOperationActivityI
     }
   }
 
+  @Override
+  public String getCanonicalName() {
+    return "process-start-initial";
+  }
+
 }

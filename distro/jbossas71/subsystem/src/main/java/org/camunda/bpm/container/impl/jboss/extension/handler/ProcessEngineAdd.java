@@ -54,30 +54,30 @@ import java.util.Map;
 
 /**
  * Provides the description and the implementation of the process-engine#add operation.
- * 
+ *
  * @author Daniel Meyer
  */
 public class ProcessEngineAdd extends AbstractAddStepHandler implements DescriptionProvider {
-    
+
   public static final ProcessEngineAdd INSTANCE = new ProcessEngineAdd();
 
   public ModelNode getModelDescription(Locale locale) {
     ModelNode node = new ModelNode();
     node.get(DESCRIPTION).set("Adds a process engine");
     node.get(OPERATION_NAME).set(ADD);
-    
+
     node.get(REQUEST_PROPERTIES, NAME, DESCRIPTION).set("Name of the process engine");
     node.get(REQUEST_PROPERTIES, NAME, TYPE).set(ModelType.STRING);
     node.get(REQUEST_PROPERTIES, NAME, REQUIRED).set(true);
-    
+
     node.get(REQUEST_PROPERTIES, DATASOURCE, DESCRIPTION).set("Which datasource to use");
     node.get(REQUEST_PROPERTIES, DATASOURCE, TYPE).set(ModelType.STRING);
     node.get(REQUEST_PROPERTIES, DATASOURCE, REQUIRED).set(true);
-    
+
     node.get(REQUEST_PROPERTIES, DEFAULT, DESCRIPTION).set("Should it be the default engine");
     node.get(REQUEST_PROPERTIES, DEFAULT, TYPE).set(ModelType.BOOLEAN);
     node.get(REQUEST_PROPERTIES, DEFAULT, REQUIRED).set(false);
-    
+
     node.get(REQUEST_PROPERTIES, HISTORY_LEVEL, DESCRIPTION).set("Which history level to use");
     node.get(REQUEST_PROPERTIES, HISTORY_LEVEL, TYPE).set(ModelType.STRING);
     node.get(REQUEST_PROPERTIES, HISTORY_LEVEL, REQUIRED).set(false);
@@ -87,7 +87,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     node.get(REQUEST_PROPERTIES, PROPERTIES, TYPE).set(ModelType.OBJECT);
     node.get(REQUEST_PROPERTIES, PROPERTIES, VALUE_TYPE).set(ModelType.LIST);
     node.get(REQUEST_PROPERTIES, PROPERTIES, REQUIRED).set(false);
-    
+
     node.get(REQUEST_PROPERTIES, CONFIGURATION, DESCRIPTION).set("Which configuration class to use");
     node.get(REQUEST_PROPERTIES, CONFIGURATION, TYPE).set(ModelType.STRING);
     node.get(REQUEST_PROPERTIES, CONFIGURATION, REQUIRED).set(false);
@@ -108,31 +108,31 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
       name = operation.get(NAME).asString();
     }
     model.get(NAME).set(name);
-    
+
     Boolean isDefault = Boolean.FALSE;
     if (operation.hasDefined(DEFAULT)) {
       isDefault = operation.get(DEFAULT).asBoolean();
     }
     model.get(DEFAULT).set(isDefault);
-    
+
     String historyLevel = "audit";
     if (operation.hasDefined(HISTORY_LEVEL)) {
       historyLevel = operation.get(HISTORY_LEVEL).asString();
     }
     model.get(HISTORY_LEVEL).set(historyLevel);
-    
+
     String datasource = "java:jboss/datasources/ExampleDS";
     if (operation.hasDefined(DATASOURCE)) {
       datasource = operation.get(DATASOURCE).asString();
     }
     model.get(DATASOURCE).set(datasource);
-    
+
     String configuration = ManagedJtaProcessEngineConfiguration.class.getName();
     if (operation.hasDefined(CONFIGURATION)) {
       configuration = operation.get(CONFIGURATION).asString();
     }
     model.get(CONFIGURATION).set(configuration);
-    
+
     // retrieve all properties
     ModelNode properties = new ModelNode();
     if (operation.hasDefined(PROPERTIES)) {
@@ -151,32 +151,32 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     }
 
   }
-  
+
   @Override
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model,
           ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
           throws OperationFailedException {
-    
+
     String engineName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
 
     ManagedProcessEngineMetadata processEngineConfiguration = transformConfiguration(context, engineName, model);
-    
+
     ServiceController<ProcessEngine> controller = installService(context, verificationHandler, processEngineConfiguration);
-        
+
     newControllers.add(controller);
   }
 
   protected ServiceController<ProcessEngine> installService(OperationContext context, ServiceVerificationHandler verificationHandler,
       ManagedProcessEngineMetadata processEngineConfiguration) {
-    
-    MscManagedProcessEngineController service = new MscManagedProcessEngineController(processEngineConfiguration);        
-    ServiceName name = ServiceNames.forManagedProcessEngine(processEngineConfiguration.getEngineName());    
-    
+
+    MscManagedProcessEngineController service = new MscManagedProcessEngineController(processEngineConfiguration);
+    ServiceName name = ServiceNames.forManagedProcessEngine(processEngineConfiguration.getEngineName());
+
     ServiceBuilder<ProcessEngine> serviceBuilder = context.getServiceTarget().addService(name, service);
-    
+
     MscManagedProcessEngineController.initializeServiceBuilder(processEngineConfiguration, service, serviceBuilder, processEngineConfiguration.getJobExecutorAcquisitionName());
-    
-    serviceBuilder.addListener(verificationHandler);    
+
+    serviceBuilder.addListener(verificationHandler);
     return serviceBuilder.install();
   }
 
@@ -192,12 +192,10 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
   }
 
   protected List<ProcessEnginePluginXml> getPlugins(ModelNode model) {
-    List<ProcessEnginePluginXml> pluginConfigurations = null;
+    List<ProcessEnginePluginXml> pluginConfigurations =  new ArrayList<ProcessEnginePluginXml>();
 
     if (model.hasDefined(Element.PLUGINS.getLocalName())) {
       ModelNode pluginsNode = model.get(Element.PLUGINS.getLocalName());
-
-      pluginConfigurations = new ArrayList<ProcessEnginePluginXml>();
 
       for (final ModelNode plugin : pluginsNode.asList()) {
         ProcessEnginePluginXml processEnginePluginXml = new ProcessEnginePluginXml() {

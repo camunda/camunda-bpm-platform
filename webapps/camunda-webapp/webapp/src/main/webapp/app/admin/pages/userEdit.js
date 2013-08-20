@@ -16,7 +16,7 @@ define(['angular'], function(angular) {
     $scope.profile = null;
     $scope.profileCopy = null;
 
-    // data model for the changePassword form 
+    // data model for the changePassword form
     $scope.credentials = {
         password : "",
         password2 : ""
@@ -34,7 +34,7 @@ define(['angular'], function(angular) {
 
     /** form must be valid & user must have made some changes */
     var canSubmit = $scope.canSubmit = function(form, modelObject) {
-      return form.$valid 
+      return form.$valid
         && !form.$pristine
         && (modelObject == null || !angular.equals($scope[modelObject], $scope[modelObject+'Copy']));
     };
@@ -44,7 +44,7 @@ define(['angular'], function(angular) {
     UserResource.OPTIONS({userId : $scope.userId}).$then(function(response) {
       angular.forEach(response.data.links, function(link){
         $scope.availableOperations[link.rel] = true;
-      });    
+      });
     });
 
     // update profile form /////////////////////////////
@@ -57,12 +57,15 @@ define(['angular'], function(angular) {
       });
     }
 
-    $scope.updateProfile = function() {      
+    $scope.updateProfile = function() {
 
       UserResource.updateProfile($scope.profile).$then(
-        function(){
+        function() {
           Notifications.addMessage({type:"success", status:"Success", message:"User profile successfully updated."});
           loadProfile();
+        },
+        function() {
+          Notifications.addError({ status: "Failed", message: "Failed to update user profile" });
         }
       );
     }
@@ -71,17 +74,16 @@ define(['angular'], function(angular) {
 
     var resetCredentials = function() {
       $scope.credentials.password = "";
-      $scope.credentials.password2 = "";    
-      $scope.updateCredentialsForm.$setPristine();      
+      $scope.credentials.password2 = "";
+      $scope.updateCredentialsForm.$setPristine();
     }
 
-    $scope.updateCredentials = function() {    
-      UserResource.updateCredentials({'userId':$scope.user.id},{'password' : $scope.credentials.password}).$then(
-        function(){
-          Notifications.addMessage({type:"success", status:"Success", message:"Password successfully changed."});
+    $scope.updateCredentials = function() {
+      UserResource.updateCredentials({ userId: $scope.user.id }, { password: $scope.credentials.password })
+        .$then(function() {
+          Notifications.addMessage({ type: "success", status: "Success", message: "Password changed." });
           resetCredentials();
-        }
-      );
+        });
     }
 
     // delete user form /////////////////////////////
@@ -108,11 +110,11 @@ define(['angular'], function(angular) {
 
     var loadGroups = $scope.loadGroups = function() {
       GroupResource.query({'member' : $routeParams.userId}).$then(function(response) {
-        $scope.groupList = response.data;     
+        $scope.groupList = response.data;
         $scope.groupIdList = [];
         angular.forEach($scope.groupList, function(group) {
           $scope.groupIdList.push(group.id);
-        });   
+        });
       });
     }
 
@@ -136,18 +138,18 @@ define(['angular'], function(angular) {
     }
 
     // page controls ////////////////////////////////////
-    
+
     $scope.show = function(fragment) {
       return fragment == $location.search().tab;
     };
 
     $scope.activeClass = function(link) {
-      var path = $location.absUrl();      
+      var path = $location.absUrl();
       return path.indexOf(link) != -1 ? "active" : "";
     };
 
     // initialization ///////////////////////////////////
-    
+
     loadProfile();
     loadGroups();
     checkRemoveGroupMembershipAuthorized();

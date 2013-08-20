@@ -296,6 +296,12 @@ footer .version {
 
 /** end layout ui tweaks */
 
+.ctn-scroll::-webkit-scrollbar{width:8px;height:8px;}
+.ctn-scroll::-webkit-scrollbar-button:start:decrement,
+.ctn-scroll::-webkit-scrollbar-button:end:increment{display:block;height:0;background-color:transparent;}
+.ctn-scroll::-webkit-scrollbar-track-piece{background-color:#FAFAFA;-webkit-border-radius:0;-webkit-border-bottom-right-radius:3px;-webkit-border-bottom-left-radius:3px;}
+.ctn-scroll::-webkit-scrollbar-thumb:vertical{height:50px;background-color:#999;-webkit-border-radius:3px;}
+.ctn-scroll::-webkit-scrollbar-thumb:horizontal{width:50px;background-color:#999;-webkit-border-radius:3px;}
 
 /** input tweaks */
 

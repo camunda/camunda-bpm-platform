@@ -13,11 +13,7 @@ ngDefine('camunda.common.directives.ifLoggedIn', [
           var animate = $animator($scope, $attr);
           var childElement, childScope;
 
-          function watchUser() {
-            return Authentication.user;
-          }
-
-          $scope.$watch(watchUser, function ifLoggedInWatchAction(value) {
+          $scope.$watch(Authentication.username, function ifLoggedInWatchAction(value) {
             if (childElement) {
               animate.leave(childElement);
               childElement = undefined;
@@ -50,11 +46,7 @@ ngDefine('camunda.common.directives.ifLoggedIn', [
           var animate = $animator($scope, $attr);
           var childElement, childScope;
 
-          function watchUser() {
-            return !Authentication.user;
-          }
-
-          $scope.$watch(watchUser, function ifLoggedInWatchAction(value) {
+          $scope.$watch(Authentication.username, function ifLoggedInWatchAction(value) {
             if (childElement) {
               animate.leave(childElement);
               childElement = undefined;
@@ -63,7 +55,7 @@ ngDefine('camunda.common.directives.ifLoggedIn', [
               childScope.$destroy();
               childScope = undefined;
             }
-            if (!!value) {
+            if (!value) {
               childScope = $scope.$new();
               transclude(childScope, function (clone) {
                 childElement = clone;
