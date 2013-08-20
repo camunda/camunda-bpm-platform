@@ -34,13 +34,13 @@
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
       <version>1.4.1</version>
     </dependency>   
-    
+
     <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
@@ -50,24 +50,29 @@
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
     </dependency>
-    
-    
+
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-cdi</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-spring</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.camunda.bpm.identity</groupId>
+      <artifactId>camunda-identity-ldap</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>

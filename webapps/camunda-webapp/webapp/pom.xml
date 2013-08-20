@@ -102,12 +102,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.camunda.bpm.identity</groupId>
-      <artifactId>camunda-identity-ldap</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
   </dependencies>
 
   <build>
@@ -226,6 +220,11 @@
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.bpm.identity</groupId>
+          <artifactId>camunda-identity-ldap</artifactId>
+          <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>com.h2database</groupId>
