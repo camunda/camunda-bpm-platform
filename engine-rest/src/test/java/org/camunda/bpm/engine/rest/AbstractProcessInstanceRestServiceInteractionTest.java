@@ -47,11 +47,15 @@ import com.jayway.restassured.response.Response;
 public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     AbstractRestServiceTest {
 
+  protected static final String PROCESS_INSTANCES_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
   protected static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance/{id}";
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = PROCESS_INSTANCE_URL + "/variables";
   protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
   protected static final String PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL = PROCESS_INSTANCE_URL + "/activity-instances";
-  
+  protected static final String PROCESS_INSTANCES_BULK_COMMAND_URL = PROCESS_INSTANCES_URL + "/bulk-command";
+  protected static final String PROCESS_INSTANCES_BULK_COMMAND_DELETE_URL = PROCESS_INSTANCES_BULK_COMMAND_URL + "/delete";
+  protected static final String PROCESS_INSTANCES_BULK_COMMAND_SUSPENDED_URL = PROCESS_INSTANCES_BULK_COMMAND_URL + "/suspended";
+ 
   private static final String EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE = "aProcessInstanceWithNullValueAsVariable";
   
   protected static final Map<String, Object> EXAMPLE_OBJECT_VARIABLES = new HashMap<String, Object>();
@@ -736,5 +740,121 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot delete process instance variable " + variableKey + ": expected exception"))
       .when().delete(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }  
+  
+  @Test
+  public void testBulkCommandsDelete() {
+
+	Map<String, Object> commandVariablesJson = new HashMap<String, Object>();
+	commandVariablesJson.put("deleteReason", MockProvider.EXAMPLE_HIST_PROCESS_DELETE_REASON); 
+	
+	Map<String, Object> commandDetailsJson = new HashMap<String, Object>();
+	commandDetailsJson.put("variables", commandVariablesJson);	    
+	List<String> ids = new ArrayList<String>();
+	ids.add(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+	ids.add(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+	commandDetailsJson.put("ids", ids);
+	
+	given().contentType(ContentType.JSON).body(commandDetailsJson)
+	      .then().expect().statusCode(Status.OK.getStatusCode())	    
+	      .when().delete(PROCESS_INSTANCES_BULK_COMMAND_DELETE_URL);
+	    
+	 verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.EXAMPLE_HIST_PROCESS_DELETE_REASON);
+	 verify(runtimeServiceMock).deleteProcessInstance(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.EXAMPLE_HIST_PROCESS_DELETE_REASON);
   }
+
+  @Test
+  public void testBulkCommandsSuspend() {
+	Map<String, Object> commandVariablesJson = new HashMap<String, Object>();
+	commandVariablesJson.put("suspended", true); 
+	  
+	Map<String, Object> commandDetailsJson = new HashMap<String, Object>();   
+	commandDetailsJson.put("variables", commandVariablesJson);	    
+	List<String> ids = new ArrayList<String>();
+	ids.add(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+	ids.add(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+	commandDetailsJson.put("ids", ids);
+		
+	given().contentType(ContentType.JSON).body(commandDetailsJson)
+		      .then().expect().statusCode(Status.OK.getStatusCode())	    
+		      .when().put(PROCESS_INSTANCES_BULK_COMMAND_SUSPENDED_URL);
+		    
+	verify(runtimeServiceMock).suspendProcessInstanceById(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+	verify(runtimeServiceMock).suspendProcessInstanceById(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+  
+  @Test
+  public void testBulkCommandsSuspendIncorrectFormat() {
+	Map<String, Object> commandVariablesJson = new HashMap<String, Object>();
+	commandVariablesJson.put("suspended", "incorrectType"); 
+	  
+	Map<String, Object> commandDetailsJson = new HashMap<String, Object>();   
+	commandDetailsJson.put("variables", commandVariablesJson);	    
+	List<String> ids = new ArrayList<String>();
+	ids.add(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+	ids.add(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+	commandDetailsJson.put("ids", ids);
+		
+	given().contentType(ContentType.JSON).body(commandDetailsJson)
+		      .then().expect()
+		      .body("type", is(InvalidRequestException.class.getSimpleName()))
+              .body("message", is("The value for the variable 'suspended' is not the correct type"))
+		      .when().put(PROCESS_INSTANCES_BULK_COMMAND_SUSPENDED_URL);	
+  }  
+  
+  @Test
+  public void testBulkCommandsActivate() {
+	Map<String, Object> commandVariablesJson = new HashMap<String, Object>();
+	commandVariablesJson.put("suspended", false); 
+	  
+	Map<String, Object> commandDetailsJson = new HashMap<String, Object>();   
+	commandDetailsJson.put("variables", commandVariablesJson);	    
+	List<String> ids = new ArrayList<String>();
+	ids.add(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+	ids.add(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+	commandDetailsJson.put("ids", ids);
+	
+	given().contentType(ContentType.JSON).body(commandDetailsJson)
+	      .then().expect().statusCode(Status.OK.getStatusCode())	    
+	      .when().put(PROCESS_INSTANCES_BULK_COMMAND_SUSPENDED_URL);
+	    
+	 verify(runtimeServiceMock).activateProcessInstanceById(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+	 verify(runtimeServiceMock).activateProcessInstanceById(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+  }  
+  
+  @Test
+  public void testBulkCommandsDeleteNonExistingId() {
+	
+	String exceptionMessage = "No process instance found for id '" + MockProvider.EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID + "'";
+	String anotherExceptionMessage = "No process instance found for id '" + MockProvider.EXAMPLE_ANOTHER_NON_EXISTENT_PROCESS_INSTANCE_ID + "'";
+	doThrow(new ProcessEngineException(exceptionMessage))
+	      .when(runtimeServiceMock).deleteProcessInstance(eq(MockProvider.EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID), eq(MockProvider.EXAMPLE_HIST_PROCESS_DELETE_REASON));
+	  
+	doThrow(new ProcessEngineException(anotherExceptionMessage))
+        .when(runtimeServiceMock).deleteProcessInstance(eq(MockProvider.EXAMPLE_ANOTHER_NON_EXISTENT_PROCESS_INSTANCE_ID), eq(MockProvider.EXAMPLE_HIST_PROCESS_DELETE_REASON));
+	
+	Map<String, Object> commandVariablesJson = new HashMap<String, Object>();
+	commandVariablesJson.put("deleteReason", MockProvider.EXAMPLE_HIST_PROCESS_DELETE_REASON);	 
+		
+	Map<String, Object> commandDetailsJson = new HashMap<String, Object>();
+	commandDetailsJson.put("variables", commandVariablesJson);	    
+	List<String> ids = new ArrayList<String>();
+	ids.add(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+	ids.add(MockProvider.EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID);
+	ids.add(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+	ids.add(MockProvider.EXAMPLE_ANOTHER_NON_EXISTENT_PROCESS_INSTANCE_ID);
+	
+	commandDetailsJson.put("ids", ids);
+		
+	given().contentType(ContentType.JSON).body(commandDetailsJson)
+		      .then().expect().statusCode(Status.OK.getStatusCode())
+		      .body("[0].id", equalTo(MockProvider.EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID))
+              .body("[0].exceptionMessage", equalTo(exceptionMessage))
+		      .body("[1].id", equalTo(MockProvider.EXAMPLE_ANOTHER_NON_EXISTENT_PROCESS_INSTANCE_ID))
+              .body("[1].exceptionMessage", equalTo(anotherExceptionMessage))
+		      .when().delete(PROCESS_INSTANCES_BULK_COMMAND_DELETE_URL);     
+     
+	verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.EXAMPLE_HIST_PROCESS_DELETE_REASON);
+	verify(runtimeServiceMock).deleteProcessInstance(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.EXAMPLE_HIST_PROCESS_DELETE_REASON);
+  }  
 }
