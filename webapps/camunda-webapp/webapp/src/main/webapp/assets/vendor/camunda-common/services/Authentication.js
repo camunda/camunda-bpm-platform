@@ -3,67 +3,34 @@ ngDefine('camunda.common.services.authentication', function(module) {
   var ServiceProducer = [ '$rootScope', '$http', '$cookies', 'Uri', '$cacheFactory',
   function AuthenticationFactory($rootScope, $http, $cookies, Uri, $cacheFactory) {
 
-    var AUTH_COOKIE_NAME = "CAM-AUTH";
-
-    function parseCookie(name) {
-      var str = $cookies[name],
-          cookie;
-
-      if (str) {
-        try {
-          // replace leading and trailing `"` 
-          // from cookie and parse it as JSON
-          cookie = JSON.parse(str.replace(/^"|"$|\\/g, ''));
-        } catch (e) {
-          console.log('[Authentication] Failed to parse camunda cookie');
-        }
-      }
-
-      return cookie;
-    }
-
-    function readFromCookie(engine) {
-      
-      var cookie = parseCookie(AUTH_COOKIE_NAME),
-          name;
-
-      if (cookie) {
-        name = cookie[engine];
-
-        if (name) {
-          return { 
-            name: cookie[engine].userId,
-            isCockpitAuthorized: cookie[engine].cockpit,
-            isTasklistAuthorized: cookie[engine].tasklist
-           };
-        }
-      } else {
-        return null;
-      }
-    }
- 
     function Authentication() {
-      var engine = Uri.appUri(':engine');
-      this.user = readFromCookie(engine);
-
       $rootScope.authentication = this;
-    }
 
-    Authentication.prototype.username = function() {
-      return (this.user || {}).name;
-    };
+      var self = this;
+
+      this.username = function() {
+        return (self.user || {}).name;
+      }
+    }
 
     Authentication.prototype.isCockpitAuthorized = function() {
-      return !!this.user ? this.user.isCockpitAuthorized : true;
+      return !this.user || (this.user.authorizedApps && this.user.authorizedApps.indexOf('cockpit') !== -1);
     };
 
     Authentication.prototype.isTasklistAuthorized = function() {
-      return !!this.user ? this.user.isTasklistAuthorized : true;
+      return !this.user || (this.user.authorizedApps && this.user.authorizedApps.indexOf('tasklist') !== -1);
     };
 
     Authentication.prototype.clear = function() {
-
       this.user = null;
+    };
+
+    Authentication.prototype.update = function(data) {
+      var user = this.user;
+
+      if ((!user && data) || (user && data && data.name != user.name)) {
+        this.user = data;
+      }
     };
 
     Authentication.prototype.login = function(username, password) {
@@ -82,11 +49,10 @@ ngDefine('camunda.common.services.authentication', function(module) {
 
       return promise.then(function(response) {
         if (response.status == 200) {
-          self.user = { 
+          self.update({
             name: response.data.userId,
-            isCockpitAuthorized: response.data.cockpitAuthorized,
-            isTasklistAuthorized: response.data.tasklistAuthorized
-          };      
+            authorizedApps: response.data.authorizedApps
+          });
           return true;
         } else {
           return false;
@@ -106,7 +72,7 @@ ngDefine('camunda.common.services.authentication', function(module) {
 
         // clear cache
         $cacheFactory.get("$http").removeAll();
-        
+
         return true;
       });
     };

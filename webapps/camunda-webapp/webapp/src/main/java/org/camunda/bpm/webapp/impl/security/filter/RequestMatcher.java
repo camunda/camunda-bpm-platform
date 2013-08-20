@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,44 +12,44 @@
  */
 package org.camunda.bpm.webapp.impl.security.filter;
 
-import java.util.regex.Pattern;
+import java.util.Map;
 
 /**
- * <p>A simple request matcher composed of "Method" and "Path" information.</p>
- * 
- * @author Daniel Meyer
- * 
+ *
+ * @author nico.rehwaldt
  */
 public class RequestMatcher {
 
-  protected String[] methods;
-  protected Pattern uriMatcher;
+  private final RequestFilter filter;
+  private final RequestAuthorizer authorizer;
 
-  public RequestMatcher(String pattern, String... methods) {
-    this.methods = methods;
-    this.uriMatcher = Pattern.compile(pattern);
+  public RequestMatcher(RequestFilter filter, RequestAuthorizer authorizer) {
+    this.filter = filter;
+    this.authorizer = authorizer;
   }
 
-  public boolean matches(String reqMethod, String uri) {
-    return isMethodMatched(reqMethod) && isUriMatched(uri);
-  }
+  public Match match(String requestMethod, String requestUri) {
+    Map<String, String> match = filter.match(requestMethod, requestUri);
 
-  protected boolean isMethodMatched(String reqMethod) {
-    boolean isMethodMatched = false;
-    if (methods.length != 0) {
-      for (String method : methods) {
-        if (method.equals(reqMethod)) {
-          isMethodMatched = true;
-          break;
-        }
-      }
+    if (match != null) {
+      return new Match(match, authorizer);
     } else {
-      isMethodMatched = true;
+      return null;
     }
-    return isMethodMatched;
   }
 
-  protected boolean isUriMatched(String uri) {
-    return uriMatcher.matcher(uri).matches();
+  public static class Match {
+
+    private final Map<String, String> parameters;
+    private final RequestAuthorizer authorizer;
+
+    public Match(Map<String, String> parameters, RequestAuthorizer authorizer) {
+      this.parameters = parameters;
+      this.authorizer = authorizer;
+    }
+
+    public Authorization authorize() {
+      return authorizer.authorize(parameters);
+    }
   }
 }

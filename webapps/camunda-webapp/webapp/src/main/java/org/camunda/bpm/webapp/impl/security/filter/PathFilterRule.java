@@ -15,43 +15,47 @@ package org.camunda.bpm.webapp.impl.security.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.camunda.bpm.webapp.impl.security.auth.Authentication;
+import org.camunda.bpm.webapp.impl.security.filter.RequestMatcher.Match;
 
 /**
- * <p>A {@link SecurityFilterRule} that deleagates to a set of Path Matchers</p>
+ * <p>A {@link SecurityFilterRule} that deleagates to a set of {@link PathMatcher}s</p>
  *
  * @author Daniel Meyer
- *
+ * @author nico.rehwaldt
  */
 public class PathFilterRule implements SecurityFilterRule {
 
-  protected List<RequestMatcher> deniedPaths = new ArrayList<RequestMatcher>();
   protected List<RequestMatcher> allowedPaths = new ArrayList<RequestMatcher>();
+  protected List<RequestMatcher> deniedPaths = new ArrayList<RequestMatcher>();
 
   @Override
-  public boolean isRequestAuthorized(HttpServletRequest req) {
+  public Authorization authorize(String requestMethod, String requestUri) {
 
-    String contextPath = req.getContextPath();
-    String requestUri = req.getRequestURI().substring(contextPath.length());
+    boolean secured = false;
 
-    boolean isRequestAuthorized = true;
-    for (RequestMatcher requestMatcher : deniedPaths) {
-      if (requestMatcher.matches(req.getMethod(), requestUri)) {
-        isRequestAuthorized = false;
+    for (RequestMatcher pattern : deniedPaths) {
+      Match match = pattern.match(requestMethod, requestUri);
+
+      if (match != null) {
+        secured = true;
         break;
       }
     }
 
-    if (!isRequestAuthorized) {
-      for (RequestMatcher requestMatcher : allowedPaths) {
-        if (requestMatcher.matches(req.getMethod(), requestUri)) {
-          return true;
-        }
+    if (!secured) {
+      return Authorization.granted(Authentication.ANONYMOUS);
+    }
+
+    for (RequestMatcher pattern : allowedPaths) {
+      Match match = pattern.match(requestMethod, requestUri);
+
+      if (match != null) {
+        return match.authorize();
       }
     }
 
-    return isRequestAuthorized;
+    return null;
   }
 
   public List<RequestMatcher> getAllowedPaths() {
@@ -61,5 +65,4 @@ public class PathFilterRule implements SecurityFilterRule {
   public List<RequestMatcher> getDeniedPaths() {
     return deniedPaths;
   }
-
 }
