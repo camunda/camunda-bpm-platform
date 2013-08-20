@@ -1,15 +1,18 @@
 ngDefine('admin.pages', function(module, $) {
 
-  function CreateGroupMembershipController ($scope, $q, $location, Uri, Notifications, GroupMembershipResource, GroupResource) {
+  function CreateGroupMembershipController ($scope, $q, $location, Uri, Notifications, GroupMembershipResource, GroupResource, dialog, user, groupIdList) {
 
     var BEFORE_CREATE = 'beforeCreate',
         PERFORM_CREATE = 'performCancel',
-        CREATE_SUCCESS = 'createSuccess',
-        CREATE_FAILED = 'createFailed',
+        CREATE_SUCCESS = 'SUCCESS',
+        CREATE_FAILED = 'FAILED',
         LOADING_FAILED = 'loadingFailed';
 
+    $scope.user = user;
+    $scope.groupIdList = groupIdList;
+
     $scope.$on('$routeChangeStart', function () {
-      $scope.close();
+      dialog.close($scope.status);
     });
 
     function loadAllGroups () {
@@ -53,7 +56,7 @@ ngDefine('admin.pages', function(module, $) {
       var deferred = $q.defer();
       angular.forEach(selectedGroupIds, function(groupId) {        
         
-        GroupMembershipResource.create({'groupId': groupId, 'userId':$scope.user.id}).$then(function (response) {          
+        GroupMembershipResource.create({'groupId': groupId, 'userId': $scope.user.id}).$then(function (response) {          
           completeCount++;
           if(completeCount == selectedGroupIds.length) {
             deferred.resolve();
@@ -68,8 +71,7 @@ ngDefine('admin.pages', function(module, $) {
       });
      
       deferred.promise.then(function(results) {
-        $scope.status = CREATE_SUCCESS;        
-        $scope.loadGroups();     
+        $scope.status = CREATE_SUCCESS;
       }, function (error) {
         $scope.status = CREATE_FAILED;
         Notifications.addError({'status': 'Failed', 'message': 'Creating group memberships failed: ' + error.message, 'exclusive': ['type']});
@@ -78,7 +80,7 @@ ngDefine('admin.pages', function(module, $) {
     };
 
     $scope.close = function (status) {
-      $scope.createGroupMembershipDialog.close();
+      dialog.close(status);
     };
   };
 
@@ -89,6 +91,9 @@ ngDefine('admin.pages', function(module, $) {
                                                          'Notifications',
                                                          'GroupMembershipResource',
                                                          'GroupResource',
+                                                         'dialog',
+                                                         'user',
+                                                         'groupIdList',
                                                          CreateGroupMembershipController ]);
 
 });

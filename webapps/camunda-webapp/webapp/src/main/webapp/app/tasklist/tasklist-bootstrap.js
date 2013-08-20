@@ -15,7 +15,7 @@
       'angular' : 'assets/vendor/angular/angular',
       'angular-resource' : 'assets/vendor/angular/angular-resource',
       'angular-sanitize' : 'assets/vendor/angular/angular-sanitize',
-      'angular-cookies' : 'assets/vendor/angular/angular-cookies'
+      'angular-ui' : 'assets/vendor/angular-ui/ui-bootstrap-dialog-tpls-0.5.0'
     },
     shim: {
       'bootstrap' : { deps: [ 'jquery' ] },
@@ -23,7 +23,7 @@
       'angular' : { deps: [ 'jquery' ], exports: 'angular' },
       'angular-resource': { deps: [ 'angular' ] },
       'angular-sanitize': { deps: [ 'angular' ] },
-      'angular-cookies': { deps: [ 'angular' ] }
+      'angular-ui': { deps: [ 'angular' ] }
     },
     packages: [
       { name: 'tasklist', location: 'app/tasklist', main: 'tasklist' },
@@ -64,7 +64,7 @@
     ensureScenarioCompatibility();
   }
 
-  require([ 'angular', 'angular-resource', 'angular-sanitize', 'angular-cookies', 'ngDefine', 'bootstrap' ], function(angular) {
+  require([ 'angular', 'angular-resource', 'angular-sanitize', 'angular-ui', 'ngDefine', 'bootstrap' ], function(angular) {
     require([ APP_NAME, 'domReady!' ], function() {
       bootstrapApp(angular);
     });

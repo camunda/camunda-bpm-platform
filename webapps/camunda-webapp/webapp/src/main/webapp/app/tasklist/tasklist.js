@@ -11,7 +11,7 @@
     'module:camunda.common.services:camunda-common/services/main',
     'module:camunda.common.pages:camunda-common/pages/main' ];
 
-  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ngCookies', 'module:ngSanitize'].concat(commons, core);
+  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ngSanitize', 'module:ui.bootstrap:angular-ui' ].concat(commons, core);
 
   ngDefine('tasklist', dependencies, function(module) {
 

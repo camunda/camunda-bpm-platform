@@ -1,7 +1,7 @@
 ngDefine('camunda.common.services.authentication', function(module) {
 
-  var ServiceProducer = [ '$rootScope', '$http', '$cookies', 'Uri', '$cacheFactory',
-  function AuthenticationFactory($rootScope, $http, $cookies, Uri, $cacheFactory) {
+  var ServiceProducer = [ '$rootScope', '$http', 'Uri', '$cacheFactory',
+  function AuthenticationFactory($rootScope, $http, Uri, $cacheFactory) {
 
     function Authentication() {
       $rootScope.authentication = this;
