@@ -26,7 +26,7 @@
   </div>
 
   <!-- sitebar -->
-  <div class="ctn-column ctn-sitebar ctn-collapsable" collapsable="left">
+  <div class="ctn-column ctn-sitebar ctn-collapsable ctn-scroll" collapsable="left">
 
     <div class="page-header">
       <small>Process Instance</small>
@@ -81,7 +81,21 @@
 
     </div>    
 
-    <div activity-instance-tree="activityInstanceTree" on-element-click="handleActivityInstanceSelection(id, activityId, $event)" selection="filter"></div>
+    <div class="instance-tree">
+      <h5>
+        Activity Instance Tree
+
+        <button class="btn btn-small btn-link btn-control btn-control-link"
+                help help-text="The tree of active activity instances corresponding to the process diagram">
+          <i class="icon-question-sign"></i>
+        </button>
+      </h5>
+
+      <div activity-instance-tree="activityInstanceTree" 
+           selection="filter"
+           on-element-click="handleActivityInstanceSelection(id, activityId, $event)">
+      </div>
+    </div>
 
     <a class="hide-collapsable pull-right"></a>
   </div>
@@ -102,7 +116,7 @@
           </li>
         </ul>
   
-        <div class="ctn-tabbed-content">
+        <div class="ctn-tabbed-content ctn-scroll">
           <view provider="selectedView" vars="processInstanceVars" />
         </div>
       </div>
