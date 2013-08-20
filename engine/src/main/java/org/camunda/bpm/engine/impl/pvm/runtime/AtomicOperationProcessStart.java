@@ -27,6 +27,15 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 public class AtomicOperationProcessStart extends AbstractEventAtomicOperation {
 
   @Override
+  public boolean isAsync(InterpretableExecution execution) {
+    ProcessInstanceStartContext startContext = execution.getProcessInstanceStartContext();
+    if (startContext != null && startContext.isAsync()) {
+      return true;
+    }
+    return false;
+  }
+  
+  @Override
   protected ScopeImpl getScope(InterpretableExecution execution) {
     return execution.getProcessDefinition();
   }
@@ -43,6 +52,11 @@ public class AtomicOperationProcessStart extends AbstractEventAtomicOperation {
     List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack(processInstanceStartContext.getInitial());  
     execution.setActivity(initialActivityStack.get(0));
     execution.performOperation(PROCESS_START_INITIAL);
+  }
+
+  @Override
+  public String getCanonicalName() {
+    return "process-start";
   }
   
 }

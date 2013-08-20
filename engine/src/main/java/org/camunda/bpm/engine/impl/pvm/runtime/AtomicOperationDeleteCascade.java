@@ -43,4 +43,9 @@ public class AtomicOperationDeleteCascade implements AtomicOperation {
     }
     return execution;
   }
+
+  @Override
+  public String getCanonicalName() {
+    return "delete-cascade";
+  }
 }

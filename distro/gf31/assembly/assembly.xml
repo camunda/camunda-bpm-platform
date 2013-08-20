@@ -41,8 +41,9 @@
       <outputDirectory>modules/lib</outputDirectory>
       <includes>
         <include>org.camunda.bpm:camunda-engine:jar:*</include>
+        <include>org.camunda.bpm.identity:camunda-identity-ldap:jar:*</include>
         <include>org.mybatis:mybatis:jar:*</include>
-        <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>      
+        <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
       </includes>     
     </dependencySet>
@@ -78,6 +79,7 @@
       <outputDirectory>server/glassfish3/glassfish/lib</outputDirectory>
       <includes>
         <include>org.camunda.bpm:camunda-engine:jar:*</include>
+        <include>org.camunda.bpm.identity:camunda-identity-ldap:jar:*</include>
         <include>org.mybatis:mybatis:jar:*</include>
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>

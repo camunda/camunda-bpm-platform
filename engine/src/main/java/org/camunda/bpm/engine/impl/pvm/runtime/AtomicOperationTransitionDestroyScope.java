@@ -121,4 +121,9 @@ public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
   public boolean transitionLeavesNextOuterScope(ScopeImpl nextScopeElement, ActivityImpl destination) {
     return !nextScopeElement.contains(destination);
   }
+
+  @Override
+  public String getCanonicalName() {
+    return "transition-destroy-scope";
+  }
 }
