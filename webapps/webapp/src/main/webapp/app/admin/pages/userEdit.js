@@ -60,9 +60,12 @@ define(['angular'], function(angular) {
     $scope.updateProfile = function() {
 
       UserResource.updateProfile($scope.profile).$then(
-        function(){
+        function() {
           Notifications.addMessage({type:"success", status:"Success", message:"User profile successfully updated."});
           loadProfile();
+        },
+        function() {
+          Notifications.addError({ status: "Failed", message: "Failed to update user profile" });
         }
       );
     }

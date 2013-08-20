@@ -29,6 +29,9 @@ define(['angular'], function(angular) {
       UserResource.createUser(user).$then(function() {
         Notifications.addMessage({ type: "success", status: "Success", message: "Created new user "+user.profile.id});
         $location.path("/users");
+      },
+      function() {
+        Notifications.addError({ status: "Failed", message: "Failed to create user. Check if it already exists." });
       });
     }
 

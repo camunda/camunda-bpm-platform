@@ -45,8 +45,8 @@ define(['angular'], function(angular) {
           Notifications.addMessage({type:"success", status:"Success", message:"Group successfully updated."});
           loadGroup();
         },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not update group."});
+        function() {
+          Notifications.addError({ status: "Failed", message: "Failed to update group" });
         }
       );
     }
