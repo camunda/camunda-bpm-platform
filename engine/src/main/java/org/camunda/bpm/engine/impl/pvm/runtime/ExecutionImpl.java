@@ -647,6 +647,10 @@ public class ExecutionImpl implements
   }
   
   public void performOperation(AtomicOperation executionOperation) {
+    performOperationSync(executionOperation);
+  }
+  
+  public void performOperationSync(AtomicOperation executionOperation) {
     this.nextOperation = executionOperation;
     if (!isOperating) {
       isOperating = true;
@@ -660,10 +664,6 @@ public class ExecutionImpl implements
       }
       isOperating = false;
     }
-  }
-  
-  public void performOperationSync(AtomicOperation executionOperation) {
-    performOperation(executionOperation);
   }
 
   

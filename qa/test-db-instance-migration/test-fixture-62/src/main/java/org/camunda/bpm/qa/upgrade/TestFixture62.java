@@ -80,6 +80,9 @@ public class TestFixture62 {
     // suspended process instance
     fixture.startSuspendedAndActiveSingleTaskProcess();
     
+    // async continuatuion
+    fixture.startAsyncContinutationProcess();
+    
     processEngine.close();
 
   }
@@ -355,6 +358,15 @@ public class TestFixture62 {
     runtimeService.startProcessInstanceByKey("TestFixture62.suspensionStateSingleTaskProcess", "activeInstance");  
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("TestFixture62.suspensionStateSingleTaskProcess", "suspendedInstance");  
     runtimeService.suspendProcessInstanceById(instance.getId());
+  }
+  
+  public void startAsyncContinutationProcess() {
+    repositoryService
+      .createDeployment() 
+      .addClasspathResource("org/camunda/bpm/qa/upgrade/TestFixture62.asyncContinuationProcess.bpmn20.xml")
+      .deploy();
+    
+    runtimeService.startProcessInstanceByKey("TestFixture62.asyncContinuationProcess");    
   }
       
 }

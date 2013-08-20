@@ -51,7 +51,12 @@ public class AsyncContinuationJobHandler implements JobHandler {
       .performOperation(atomicOperation, execution);
   }
   
-  protected AtomicOperation findMatchingAtomicOperation(String atomicOperationName) {
-    return supportedOperations.get(atomicOperationName);
+  protected AtomicOperation findMatchingAtomicOperation(String configuration) {
+    if (configuration == null) {
+      // default operation for backwards compatibility
+      return AtomicOperation.TRANSITION_CREATE_SCOPE;
+    } else {
+      return supportedOperations.get(configuration);
+    }
   }
 }

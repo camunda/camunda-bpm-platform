@@ -625,8 +625,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     message.setExecution(this);
     message.setExclusive(getActivity().isExclusive());
     message.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
-    // At the moment, only AtomicOperationTransitionCreateScope can be performed asynchronously,
-    // so there is no need to pass it to the handler
     message.setJobHandlerConfiguration(executionOperation.getCanonicalName());
     
     Context
