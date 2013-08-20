@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
+import org.camunda.bpm.engine.rest.dto.runtime.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
@@ -37,6 +38,7 @@ import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,9 +53,9 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = PROCESS_INSTANCE_URL + "/variables";
   protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
   protected static final String PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL = PROCESS_INSTANCE_URL + "/activity-instances";
-  
   private static final String EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE = "aProcessInstanceWithNullValueAsVariable";
-  
+  protected static final String PROCESS_INSTANCE_SUSPENDED_URL = PROCESS_INSTANCE_URL + "/suspended";
+    
   protected static final Map<String, Object> EXAMPLE_OBJECT_VARIABLES = new HashMap<String, Object>();
   static {
     ExampleVariableObject variableValue = new ExampleVariableObject();
@@ -737,4 +739,37 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .body("message", is("Cannot delete process instance variable " + variableKey + ": expected exception"))
       .when().delete(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
+  
+  @Test
+  public void testActivateInstance() {
+		given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(SuspensionStateDto.fromState(false))
+	      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())	    
+	      .when().put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+	verify(runtimeServiceMock).activateProcessInstanceById(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+  
+  @Test
+  public void testSuspendInstance() {
+
+	given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(SuspensionStateDto.fromState(true))
+	      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())	    
+	      .when().put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+	verify(runtimeServiceMock).suspendProcessInstanceById(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+  }   
+  
+  @Test
+  public void testSuspendedNonExistentInstanceId() {
+	  String exceptionMessage = "Process instance with id " + MockProvider.EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID + " does not exist";
+	  
+	  doThrow(new ProcessEngineException(exceptionMessage))
+      .when(runtimeServiceMock).suspendProcessInstanceById(eq(MockProvider.EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID));
+	  
+		given().pathParam("id", MockProvider.EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(SuspensionStateDto.fromState(true))
+	      .then().expect()
+	      .body("type", is(InvalidRequestException.class.getSimpleName()))
+          .body("message", is(exceptionMessage))
+	      .when().put(PROCESS_INSTANCE_SUSPENDED_URL);
+  } 
 }
