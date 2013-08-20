@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -195,25 +195,25 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("rootValue", "test");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("concurrent", vars);
-    
+
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-    for (Task task : tasks) {      
+    for (Task task : tasks) {
       Map<String, Object> variables = new HashMap<String, Object>();
       // set token local variable
       log.fine("setting variables on task "+task.getId()+", execution "+task.getExecutionId());
       runtimeService.setVariableLocal(task.getExecutionId(), "parallelValue1", task.getName());
       runtimeService.setVariableLocal(task.getExecutionId(), "parallelValue2", "test");
-      taskService.complete(task.getId(), variables);      
+      taskService.complete(task.getId(), variables);
     }
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
-    
+
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("rootValue", "test").count());
-    
+
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue1", "Receive Payment").count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue1", "Ship Order").count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue2", "test").count());
   }
-  
+
   /**
    * basically copied from {@link ProcessInstanceQueryTest}
    */
@@ -233,7 +233,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     vars = new HashMap<String, Object>();
     vars.put("stringVar", "azerty");
     ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
-    taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult().getId());    
+    taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult().getId());
 
     // Test EQUAL on single string variable, should result in 2 matches
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().variableValueEquals("stringVar", "abcdef");
@@ -309,7 +309,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
 
   /**
    * Only do one second type, as the logic is same as in {@link ProcessInstanceQueryTest} and I do not want to duplicate
-   * all test case logic here. 
+   * all test case logic here.
    * Basically copied from {@link ProcessInstanceQueryTest}
    */
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
@@ -319,21 +319,21 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     vars.put("dateVar", date1);
 
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
-    taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult().getId());    
+    taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult().getId());
 
     Date date2 = Calendar.getInstance().getTime();
     vars = new HashMap<String, Object>();
     vars.put("dateVar", date1);
     vars.put("dateVar2", date2);
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
-    taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult().getId());    
+    taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult().getId());
 
     Calendar nextYear = Calendar.getInstance();
     nextYear.add(Calendar.YEAR, 1);
     vars = new HashMap<String, Object>();
     vars.put("dateVar", nextYear.getTime());
     ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
-    taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult().getId());    
+    taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult().getId());
 
     Calendar nextMonth = Calendar.getInstance();
     nextMonth.add(Calendar.MONTH, 1);
@@ -407,30 +407,30 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     historyService.deleteHistoricProcessInstance(processInstance2.getId());
     historyService.deleteHistoricProcessInstance(processInstance3.getId());
   }
-  
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void testNativeHistoricProcessInstanceTest() {    
+  public void testNativeHistoricProcessInstanceTest() {
     // just test that the query will be constructed and executed, details are tested in the TaskQueryTest
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");    
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertEquals(1, historyService.createNativeHistoricProcessInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(HistoricProcessInstance.class)).count());
     assertEquals(1, historyService.createNativeHistoricProcessInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).list().size());
 //  assertEquals(1, historyService.createNativeHistoricProcessInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).listPage(0, 1).size());
   }
-  
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void testNativeHistoricTaskInstanceTest() {    
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");    
+  public void testNativeHistoricTaskInstanceTest() {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertEquals(1, historyService.createNativeHistoricTaskInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(HistoricProcessInstance.class)).count());
     assertEquals(1, historyService.createNativeHistoricTaskInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).list().size());
     assertEquals(1, historyService.createNativeHistoricTaskInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).listPage(0, 1).size());
   }
-  
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void testNativeHistoricActivityInstanceTest() {    
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");    
+  public void testNativeHistoricActivityInstanceTest() {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertEquals(1, historyService.createNativeHistoricActivityInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(HistoricProcessInstance.class)).count());
     assertEquals(1, historyService.createNativeHistoricActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).list().size());
     assertEquals(1, historyService.createNativeHistoricActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).listPage(0, 1).size());
   }
-  
+
 }
