@@ -588,7 +588,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }    
   }
   
-  protected void performOperationSync(AtomicOperation executionOperation) {
+  public void performOperationSync(AtomicOperation executionOperation) {
     if (requiresUnsuspendedExecution(executionOperation)) {
       ensureNotSuspended();
     }

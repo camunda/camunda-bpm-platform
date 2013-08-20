@@ -53,7 +53,7 @@ public abstract class AbstractEventAtomicOperation implements AtomicOperation {
           throw new PvmException("couldn't execute event listener : "+e.getMessage(), e);
         }
         execution.setExecutionListenerIndex(executionListenerIndex+1);
-        execution.performOperation(this);
+        execution.performOperationSync(this);
   
       } else {
         execution.setExecutionListenerIndex(0);

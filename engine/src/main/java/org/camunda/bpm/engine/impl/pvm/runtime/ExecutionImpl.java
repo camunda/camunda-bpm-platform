@@ -661,6 +661,10 @@ public class ExecutionImpl implements
       isOperating = false;
     }
   }
+  
+  public void performOperationSync(AtomicOperation executionOperation) {
+    performOperation(executionOperation);
+  }
 
   
   public boolean isActive(String activityId) {

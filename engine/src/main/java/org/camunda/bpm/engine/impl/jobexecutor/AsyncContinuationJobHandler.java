@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 /**
  * 
  * @author Daniel Meyer
+ * @author Thorben Lindhauer
  */
 public class AsyncContinuationJobHandler implements JobHandler {
   
@@ -41,7 +42,6 @@ public class AsyncContinuationJobHandler implements JobHandler {
   }
 
   public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
-    // ATM only AtomicOperationTransitionCreateScope can be performed asynchronously 
     AtomicOperation atomicOperation = findMatchingAtomicOperation(configuration);
     if (atomicOperation == null) {
       throw new ProcessEngineException("Cannot process job with configuration " + configuration);
