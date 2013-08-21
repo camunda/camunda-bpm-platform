@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.end;
 
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,23 +23,31 @@ import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Kristin Polenz
+ * @author Nico Rehwaldt
  */
 public class MessageEndEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testMessageEndEvent() throws Exception {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertNotNull(processInstance);
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment
+  public void testMessageEndEventServiceTaskBehavior() throws Exception {
     Map<String, Object> variables = new HashMap<String, Object>();
-    
+
     // class
     variables.put("wasExecuted", true);
     variables.put("expressionWasExecuted", false);
     variables.put("delegateExpressionWasExecuted", false);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
     assertNotNull(processInstance);
-    
+
     assertProcessEnded(processInstance.getId());
     assertTrue(DummyServiceTask.wasExecuted);
-    
+
     // expression
     variables = new HashMap<String, Object>();
     variables.put("wasExecuted", false);
@@ -46,10 +56,10 @@ public class MessageEndEventTest extends PluggableProcessEngineTestCase {
     variables.put("endEventBean", new EndEventBean());
     processInstance = runtimeService.startProcessInstanceByKey("process", variables);
     assertNotNull(processInstance);
-    
+
     assertProcessEnded(processInstance.getId());
     assertTrue(DummyServiceTask.expressionWasExecuted);
-    
+
     // delegate expression
     variables = new HashMap<String, Object>();
     variables.put("wasExecuted", false);
@@ -58,7 +68,7 @@ public class MessageEndEventTest extends PluggableProcessEngineTestCase {
     variables.put("endEventBean", new EndEventBean());
     processInstance = runtimeService.startProcessInstanceByKey("process", variables);
     assertNotNull(processInstance);
-    
+
     assertProcessEnded(processInstance.getId());
     assertTrue(DummyServiceTask.delegateExpressionWasExecuted);
   }
