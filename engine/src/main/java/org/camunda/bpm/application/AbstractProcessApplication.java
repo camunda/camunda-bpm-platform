@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.application.impl.DefaultElResolverLookup;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -31,22 +30,22 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
  *
  */
 public abstract class AbstractProcessApplication implements ProcessApplicationInterface {
-  
+
   private final static Logger LOGGER = Logger.getLogger(AbstractProcessApplication.class.getName());
-  
+
   protected ELResolver processApplicationElResolver;
 
   protected boolean isDeployed = false;
-              
+
   // deployment /////////////////////////////////////////////////////
 
   public void deploy() {
     if(isDeployed) {
-      LOGGER.warning("Calling deploy() on process application that is already deployed.");      
-    } else {      
+      LOGGER.warning("Calling deploy() on process application that is already deployed.");
+    } else {
       // deploy the application
       RuntimeContainerDelegate.INSTANCE.get().deployProcessApplication(this);
-      isDeployed = true;      
+      isDeployed = true;
     }
   }
 
@@ -59,63 +58,65 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
       isDeployed = false;
     }
   }
-    
+
   public void createDeployment(String processArchiveName, DeploymentBuilder deploymentBuilder) {
     // default implementation does nothing
   }
-    
+
   // Runtime ////////////////////////////////////////////
-  
+
   public String getName() {
     Class<? extends AbstractProcessApplication> processApplicationClass = getClass();
     String name = null;
-    
-    try {
-      ProcessApplication annotation = processApplicationClass.getAnnotation(ProcessApplication.class);      
+
+    ProcessApplication annotation = processApplicationClass.getAnnotation(ProcessApplication.class);
+    if(annotation != null) {
       name = annotation.value();
-    } catch(NullPointerException nullPointerException) {
-      // ignore
     }
-    
+
     if(name == null || name.length()==0) {
       name = autodetectProcessApplicationName();
-    }    
-    
-    return name;    
+    }
+
+    return name;
   }
-  
+
   /**
    * Override this method to autodetect an application name in case the
    * {@link ProcessApplication} annotation was used but without parameter.
    */
   protected abstract String autodetectProcessApplicationName();
-   
+
   public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
     ClassLoader originalClassloader = ClassLoaderUtil.getContextClassloader();
-    
+
     ClassLoader processApplicationClassloader = getProcessApplicationClassloader();
-    
+
     try {
       ClassLoaderUtil.setContextClassloader(processApplicationClassloader);
-      
+
       return callable.call();
-      
+
     } catch(Exception e) {
       throw new ProcessApplicationExecutionException(e);
-      
+
     } finally {
       ClassLoaderUtil.setContextClassloader(originalClassloader);
     }
-    
+
   }
 
 
   public ClassLoader getProcessApplicationClassloader() {
-    // the default implementation uses the classloader that loaded 
-    // the application-provided subclass of this class.    
+    // the default implementation uses the classloader that loaded
+    // the application-provided subclass of this class.
     return ClassLoaderUtil.getClassloader(getClass());
   }
-  
+
+  public ProcessApplicationInterface getRawObject() {
+    return this;
+  }
+
   public Map<String, String> getProperties() {
     return Collections.<String, String>emptyMap();
   }
@@ -124,30 +125,30 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     if(processApplicationElResolver == null) {
       synchronized (this) {
         if(processApplicationElResolver == null) {
-          processApplicationElResolver = initProcessApplicationElResolver();          
-        }        
+          processApplicationElResolver = initProcessApplicationElResolver();
+        }
       }
     }
     return processApplicationElResolver;
-    
+
   }
 
   /**
    * <p>Initializes the process application provided ElResolver. This implementation uses the
    * Java SE {@link ServiceLoader} facilities for resolving implementations of {@link ProcessApplicationElResolver}.</p>
-   * 
-   * <p>If you want to provide a custom implementation in your application, place a file named 
+   *
+   * <p>If you want to provide a custom implementation in your application, place a file named
    * <code>META-INF/org.camunda.bpm.application.ProcessApplicationElResolver</code> inside your application
    * which contains the fully qualified classname of your implementation.</p>
-   * 
+   *
    * <p>Override this method in order to implement a custom resolving scheme.</p>
-   *  
-   * @return the process application ElResolver. 
+   *
+   * @return the process application ElResolver.
    */
   protected ELResolver initProcessApplicationElResolver() {
 
     return DefaultElResolverLookup.lookupResolver(this);
-    
+
   }
-  
+
 }

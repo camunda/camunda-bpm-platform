@@ -1,7 +1,7 @@
 ngDefine('camunda.common.services.authentication', function(module) {
 
-  var ServiceProducer = [ '$rootScope', '$http', 'Uri', '$cacheFactory',
-  function AuthenticationFactory($rootScope, $http, Uri, $cacheFactory) {
+  var ServiceProducer = [ '$rootScope', '$http', 'Uri', '$window',
+  function AuthenticationFactory($rootScope, $http, Uri, $window) {
 
     function Authentication() {
       $rootScope.authentication = this;
@@ -70,8 +70,8 @@ ngDefine('camunda.common.services.authentication', function(module) {
         // clear authentication
         self.clear();
 
-        // clear cache
-        $cacheFactory.get("$http").removeAll();
+        // reload to clear the caches
+        $window.location.reload(true);
 
         return true;
       });
