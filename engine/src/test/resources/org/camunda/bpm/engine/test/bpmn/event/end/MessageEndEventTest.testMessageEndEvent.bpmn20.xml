@@ -1,43 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions id="definitions" 
-  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:activiti="http://activiti.org/bpmn"
-  targetNamespace="Examples"
-  xmlns:tns="Examples">
-  
-  <process id="process">
-  
-    <startEvent id="theStart" />
-    
-    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="exclusiveGateway" />
-    
-    <exclusiveGateway id="exclusiveGateway" />
-     
-     <sequenceFlow id="flow2" sourceRef="exclusiveGateway" targetRef="expressionEnd">
-      <conditionExpression xsi:type="tFormalExpression">${expressionWasExecuted}</conditionExpression>
-     </sequenceFlow>
-     
-     <sequenceFlow id="flow3" sourceRef="exclusiveGateway" targetRef="delegateExpressionEnd">
-      <conditionExpression xsi:type="tFormalExpression">${delegateExpressionWasExecuted}</conditionExpression>
-     </sequenceFlow>
-     
-     <sequenceFlow id="flow4" sourceRef="exclusiveGateway" targetRef="classEnd">
-      <conditionExpression xsi:type="tFormalExpression">${wasExecuted}</conditionExpression>
-     </sequenceFlow>
-     
-     <endEvent id="expressionEnd">
-       <messageEventDefinition activiti:expression="#{endEventBean.getJavaDelegate().execute(execution)}" />
-     </endEvent>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:activiti="http://activiti.org/bpmn"
+             targetNamespace="Examples"
+             xmlns:tns="Examples">
 
-     <endEvent id="delegateExpressionEnd">
-       <messageEventDefinition activiti:delegateExpression="#{endEventBean.getJavaDelegate()}" />
-     </endEvent>
-  
-     <endEvent id="classEnd">
-       <messageEventDefinition activiti:class="org.camunda.bpm.engine.test.bpmn.event.end.DummyServiceTask" />
-     </endEvent>
-    
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theEnd" />
+
+    <endEvent id="theEnd">
+      <messageEventDefinition />
+    </endEvent>
   </process>
 
 </definitions>

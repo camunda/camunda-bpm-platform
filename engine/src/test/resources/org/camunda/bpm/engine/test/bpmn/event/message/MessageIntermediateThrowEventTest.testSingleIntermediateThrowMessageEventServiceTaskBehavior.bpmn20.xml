@@ -12,9 +12,9 @@
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="messageThrow" />
 
     <intermediateThrowEvent id="messageThrow">
-      <messageEventDefinition />
+      <messageEventDefinition activiti:class="org.camunda.bpm.engine.test.bpmn.event.message.DummyServiceTask" />
     </intermediateThrowEvent>
-
+  	
     <sequenceFlow id="flow2" sourceRef="messageThrow" targetRef="theEnd" />
 
     <endEvent id="theEnd" />
