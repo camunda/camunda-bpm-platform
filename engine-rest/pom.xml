@@ -210,6 +210,14 @@
       <scope>test</scope>
     </dependency>
 
+		<dependency>
+		  <groupId>org.springframework</groupId>
+		  <artifactId>spring-mock</artifactId>
+		  <version>2.0.8</version>
+		  <scope>test</scope>
+		</dependency>
+    
+
   </dependencies>
 
   <dependencyManagement>
@@ -249,8 +257,13 @@
           <execution>
             <id>default-test</id>
             <configuration>
+              <includes>
+                <include>**/rest/standalone/**</include>
+              </includes>
               <excludes>
-                <exclude>**/*</exclude>
+                <exclude>**/rest/resteasy/**</exclude>
+                <exclude>**/rest/jersey/**</exclude>
+                <exclude>**/rest/wink/**</exclude>
               </excludes>
             </configuration>
           </execution>
@@ -267,6 +280,7 @@
               <excludes>
                 <exclude>**/rest/jersey/**</exclude>
                 <exclude>**/rest/wink/**</exclude>
+                <exclude>**/rest/standalone/**</exclude>
               </excludes>
             </configuration>
           </execution>
@@ -283,6 +297,7 @@
               <excludes>
                 <exclude>**/rest/resteasy/**</exclude>
                 <exclude>**/rest/wink/**</exclude>
+                <exclude>**/rest/standalone/**</exclude>
               </excludes>
             </configuration>
           </execution>
@@ -299,6 +314,7 @@
               <excludes>
                 <exclude>**/rest/resteasy/**</exclude>
                 <exclude>**/rest/jersey/**</exclude>
+                <exclude>**/rest/standalone/**</exclude>
               </excludes>
             </configuration>
           </execution>

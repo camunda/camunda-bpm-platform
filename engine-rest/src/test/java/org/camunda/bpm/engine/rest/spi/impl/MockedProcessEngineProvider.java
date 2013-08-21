@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,12 +35,19 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
 
   private static ProcessEngine cachedDefaultProcessEngine;
   private static Map<String, ProcessEngine> cachedEngines = new HashMap<String, ProcessEngine>();
-  
+
   public void resetEngines() {
     cachedDefaultProcessEngine = null;
     cachedEngines = new HashMap<String, ProcessEngine>();
   }
-  
+
+  private ProcessEngine mockProcessEngine(String engineName) {
+    ProcessEngine engine = mock(ProcessEngine.class);
+    when(engine.getName()).thenReturn(engineName);
+    mockServices(engine);
+    return engine;
+  }
+
   private void mockServices(ProcessEngine engine) {
     RepositoryService repoService = mock(RepositoryService.class);
     IdentityService identityService = mock(IdentityService.class);
@@ -49,7 +56,7 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
     FormService formService = mock(FormService.class);
     HistoryService historyService = mock(HistoryService.class);
     ManagementService managementService = mock(ManagementService.class);
-    
+
     when(engine.getRepositoryService()).thenReturn(repoService);
     when(engine.getIdentityService()).thenReturn(identityService);
     when(engine.getTaskService()).thenReturn(taskService);
@@ -62,10 +69,9 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
   @Override
   public ProcessEngine getDefaultProcessEngine() {
     if (cachedDefaultProcessEngine == null) {
-      cachedDefaultProcessEngine = mock(ProcessEngine.class);
-      mockServices(cachedDefaultProcessEngine);
+      cachedDefaultProcessEngine = mockProcessEngine("default");
     }
-    
+
     return cachedDefaultProcessEngine;
   }
 
@@ -74,17 +80,16 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
     if (name.equals(MockProvider.NON_EXISTING_PROCESS_ENGINE_NAME)) {
       return null;
     }
-    
+
     if (name.equals("default")) {
       return getDefaultProcessEngine();
     }
-    
+
     if (cachedEngines.get(name) == null) {
-      ProcessEngine mock = mock(ProcessEngine.class);
-      mockServices(mock);
+      ProcessEngine mock = mockProcessEngine(name);
       cachedEngines.put(name, mock);
     }
-    
+
     return cachedEngines.get(name);
   }
 
@@ -95,6 +100,6 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
     result.add(MockProvider.ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME);
     return result;
   }
-  
+
 
 }

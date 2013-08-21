@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.webapp.impl.security;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.cockpit.Cockpit;
@@ -52,7 +51,7 @@ public class SecurityActions {
     }
   }
 
-  private static void authenticateProcessEngine(org.camunda.bpm.webapp.impl.security.auth.Authentication authentication) {
+  private static void authenticateProcessEngine(Authentication authentication) {
 
     ProcessEngine processEngine = Cockpit.getProcessEngine(authentication.getProcessEngineName());
     if (processEngine != null) {

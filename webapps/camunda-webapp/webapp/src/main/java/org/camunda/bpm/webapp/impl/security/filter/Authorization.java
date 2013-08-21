@@ -13,8 +13,9 @@
 package org.camunda.bpm.webapp.impl.security.filter;
 
 import java.util.Collection;
-import java.util.Set;
+
 import javax.servlet.http.HttpServletResponse;
+
 import org.camunda.bpm.webapp.impl.security.auth.Authentication;
 import org.camunda.bpm.webapp.impl.security.auth.UserAuthentication;
 
