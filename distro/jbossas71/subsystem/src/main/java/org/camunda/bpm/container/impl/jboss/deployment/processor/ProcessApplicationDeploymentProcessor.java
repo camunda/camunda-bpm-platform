@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
@@ -57,95 +58,100 @@ import org.jboss.vfs.VirtualFile;
 
 
 /**
- * <p>This processor installs the process application into the container.</p> 
- *  
- * <p>First, we initialize the deployments for all process archives declared by the process application. 
+ * <p>This processor installs the process application into the container.</p>
+ *
+ * <p>First, we initialize the deployments for all process archives declared by the process application.
  * It then registers a {@link ProcessApplicationDeploymentService} for each process archive to be deployed.
- * Finally it registers the {@link MscManagedProcessApplication} service which depends on all the deployment services 
- * to have completed deployment</p> 
- * 
+ * Finally it registers the {@link MscManagedProcessApplication} service which depends on all the deployment services
+ * to have completed deployment</p>
+ *
  * @author Daniel Meyer
- * 
+ *
  */
 public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProcessor {
-  
+
   public static final int PRIORITY = 0x0000; // this can happen at the beginning of the phase
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-    
+
     final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
-    
+
     if(!ProcessApplicationAttachments.isProcessApplication(deploymentUnit)) {
       return;
     }
 
     final ComponentDescription paComponent = getProcessApplicationComponent(deploymentUnit);
     final ServiceName paViewServiceName = getProcessApplicationViewServiceName(paComponent);
-    
+
     Module module = deploymentUnit.getAttachment(Attachments.MODULE);
     final String moduleName = module.getIdentifier().toString();
     final ServiceName paStartServiceName = ServiceNames.forProcessApplicationStartService(moduleName);
     final ServiceName noViewStartService = ServiceNames.forNoViewProcessApplicationStartService(moduleName);
-              
+
     List<ServiceName> deploymentServiceNames = new ArrayList<ServiceName>();
 
     // deploy all process archives
     List<ProcessesXmlWrapper> processesXmlWrappers = ProcessApplicationAttachments.getProcessesXmls(deploymentUnit);
-    for (ProcessesXmlWrapper processesXmlWrapper : processesXmlWrappers) {   
-      
+    for (ProcessesXmlWrapper processesXmlWrapper : processesXmlWrappers) {
+
       ProcessesXml processesXml = processesXmlWrapper.getProcessesXml();
       for (ProcessArchiveXml processArchive : processesXml.getProcessArchives()) {
-  
+
         ServiceName processEngineServiceName = getProcessEngineServiceName(processArchive);
         Map<String, byte[]> deploymentResources = getDeploymentResources(processArchive, deploymentUnit, processesXmlWrapper.getProcessesXmlFile());
-          
+
         // add the deployment service for each process archive we deploy.
         ProcessApplicationDeploymentService deploymentService = new ProcessApplicationDeploymentService(deploymentResources, processArchive);
-        ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArchive.getName());        
+        String processArachiveName = processArchive.getName();
+        if(processArachiveName == null) {
+          // use random name for deployment service if name is null (we cannot ask the process application yet since the component might not be up.
+          processArachiveName = UUID.randomUUID().toString();
+        }
+        ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArachiveName);
         ServiceBuilder<ProcessApplicationDeploymentService> serviceBuilder = phaseContext.getServiceTarget().addService(deploymentServiceName, deploymentService)
           .addDependency(phaseContext.getPhaseServiceName())
-          .addDependency(processEngineServiceName, ProcessEngine.class, deploymentService.getProcessEngineInjector())         
+          .addDependency(processEngineServiceName, ProcessEngine.class, deploymentService.getProcessEngineInjector())
           .setInitialMode(Mode.ACTIVE);
-        
+
         if(paViewServiceName != null) {
           // add a dependency on the component start service to make sure we are started after the pa-component (Singleton EJB) has started
-          serviceBuilder.addDependency(paComponent.getStartServiceName()); 
+          serviceBuilder.addDependency(paComponent.getStartServiceName());
           serviceBuilder.addDependency(paViewServiceName, ComponentView.class, deploymentService.getPaComponentViewInjector());
         } else {
           serviceBuilder.addDependency(noViewStartService, ProcessApplicationInterface.class, deploymentService.getNoViewProcessApplication());
         }
-        
+
         Services.addServerExecutorDependency(serviceBuilder, deploymentService.getExecutorInjector(), false);
-        
+
         serviceBuilder.install();
-        
+
         deploymentServiceNames.add(deploymentServiceName);
-        
+
       }
     }
-    
+
     AnnotationInstance postDeploy = ProcessApplicationAttachments.getPostDeployDescription(deploymentUnit);
     AnnotationInstance preUndeploy = ProcessApplicationAttachments.getPreUndeployDescription(deploymentUnit);
-    
-    // register the managed process application start service    
+
+    // register the managed process application start service
     ProcessApplicationStartService paStartService = new ProcessApplicationStartService(deploymentServiceNames, postDeploy, preUndeploy, module);
     ServiceBuilder<ProcessApplicationStartService> serviceBuilder = phaseContext.getServiceTarget().addService(paStartServiceName, paStartService)
       .addDependency(phaseContext.getPhaseServiceName())
       .addDependency(ServiceNames.forDefaultProcessEngine(), ProcessEngine.class, paStartService.getDefaultProcessEngineInjector())
       .addDependencies(deploymentServiceNames)
       .setInitialMode(Mode.ACTIVE);
-    
+
     if(paViewServiceName != null) {
       serviceBuilder.addDependency(paViewServiceName, ComponentView.class, paStartService.getPaComponentViewInjector());
-    } else {      
+    } else {
       serviceBuilder.addDependency(noViewStartService, ProcessApplicationInterface.class, paStartService.getNoViewProcessApplication());
     }
-    
+
     serviceBuilder.install();
   }
 
   public void undeploy(DeploymentUnit deploymentUnit) {
-    
+
   }
 
   protected ServiceName getProcessApplicationViewServiceName(ComponentDescription paComponent) {
@@ -157,7 +163,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
       return next.getServiceName();
     }
   }
-    
+
   protected ComponentDescription getProcessApplicationComponent(DeploymentUnit deploymentUnit) {
     ComponentDescription paComponentDescription = ProcessApplicationAttachments.getProcessApplicationComponent(deploymentUnit);
     return paComponentDescription;
@@ -182,14 +188,14 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
   protected Map<String, byte[]> getDeploymentResources(ProcessArchiveXml processArchive, DeploymentUnit deploymentUnit, VirtualFile processesXmlFile) {
 
     final Module module = deploymentUnit.getAttachment(MODULE);
-    
+
     Map<String, byte[]> resources = new HashMap<String, byte[]>();
 
     // first, add all resources listed in the processe.xml
     List<String> process = processArchive.getProcessResourceNames();
     ModuleClassLoader classLoader = module.getClassLoader();
-    
-    for (String resource : process) {      
+
+    for (String resource : process) {
       InputStream inputStream = null;
       try {
         inputStream = classLoader.getResourceAsStream(resource);
@@ -198,19 +204,19 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
         IoUtil.closeSilently(inputStream);
       }
     }
-    
+
     // scan for process definitions
     if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, process.isEmpty())) {
-     
+
       //always use VFS scanner on JBoss
-      final VfsProcessApplicationScanner scanner = new VfsProcessApplicationScanner();      
-    
-      String resourceRootPath = processArchive.getProperties().get(ProcessArchiveXml.PROP_RESOURCE_ROOT_PATH);      
-      URL processesXmlUrl = vfsFileAsUrl(processesXmlFile);      
-      resources.putAll(scanner.findResources(classLoader, resourceRootPath, processesXmlUrl));      
+      final VfsProcessApplicationScanner scanner = new VfsProcessApplicationScanner();
+
+      String resourceRootPath = processArchive.getProperties().get(ProcessArchiveXml.PROP_RESOURCE_ROOT_PATH);
+      URL processesXmlUrl = vfsFileAsUrl(processesXmlFile);
+      resources.putAll(scanner.findResources(classLoader, resourceRootPath, processesXmlUrl));
     }
-    
-    return resources;  
+
+    return resources;
   }
 
   protected URL vfsFileAsUrl(VirtualFile processesXmlFile)  {
