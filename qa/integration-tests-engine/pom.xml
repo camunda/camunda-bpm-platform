@@ -224,6 +224,7 @@
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
                 <exclude>**_OTHERS.java</exclude>
                 <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
+                <excludes>**/SpringServletPALifecycleTest.java</excludes>
               </excludes>
              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>

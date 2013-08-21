@@ -76,7 +76,7 @@ public class SpringExpressionResolvingTest extends AbstractFoxPlatformIntegratio
             .addAsLibraries(DeploymentHelper.getEngineCdi());
     
     TestContainer.addContainerSpecificResourcesForNonPa(deployment);
-    
+   
     return deployment;
   }
 
