@@ -411,7 +411,8 @@
                         <class>org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin</class>
                         <properties>
                 
-                          <property name="serverUrl">ldap://localhost:4334/</property>
+                          <property name="serverUrl">ldaps://localhost:4334/</property>
+                          <property name="acceptUntrustedCertificates">false</property>
                           <property name="managerDn">uid=jonny,ou=office-berlin,o=camunda,c=org</property>
                           <property name="managerPassword">s3cr3t</property>
                 
@@ -428,7 +429,7 @@
                 
                           <property name="groupSearchBase">ou=roles</property>
                           <property name="groupSearchFilter">(objectclass=groupOfNames)</property>
-                          <property name="groupIdAttribute">ou</property>
+                          <property name="groupIdAttribute">cn</property>
                           <property name="groupNameAttribute">cn</property>
                 
                           <property name="groupMemberAttribute">member</property>
@@ -438,7 +439,7 @@
                       -->
                 
                       <!-- LDAP CONFIGURATION -->
-                      <!-- The following plugin allows you to grant administraotor authorizations to an existing LDAP user -->
+                      <!-- The following plugin allows you to grant administrator authorizations to an existing LDAP user -->
                       <!-- 
                       <plugin>
                         <class>org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin</class>
