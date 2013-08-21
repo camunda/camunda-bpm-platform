@@ -13,7 +13,6 @@
 package org.camunda.bpm.webapp.impl.security.filter;
 
 import java.util.Collection;
-import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 import org.camunda.bpm.webapp.impl.security.auth.Authentication;
 import org.camunda.bpm.webapp.impl.security.auth.UserAuthentication;
@@ -51,8 +50,14 @@ public class Authorization {
   public void attachHeaders(HttpServletResponse response) {
 
     if (authentication != null) {
-      response.addHeader("X-Authorized-User", authentication.getIdentityId());
-      response.addHeader("X-Authorized-Engine", authentication.getProcessEngineName());
+      // header != null checks required for websphere compatibility
+      if (authentication.getIdentityId() != null) {
+        response.addHeader("X-Authorized-User", authentication.getIdentityId());
+      }
+
+      if (authentication.getProcessEngineName() != null) {
+        response.addHeader("X-Authorized-Engine", authentication.getProcessEngineName());
+      }
 
       if (authentication instanceof UserAuthentication) {
         response.addHeader("X-Authorized-Apps", join(",", ((UserAuthentication) authentication).getAuthorizedApps()));
