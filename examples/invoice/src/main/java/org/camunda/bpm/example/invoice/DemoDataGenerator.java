@@ -21,7 +21,7 @@ import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
 
 /**
  * Creates demo credentials to be used in the invoice showcase.
- * 
+ *
  * @author drobisch
  */
 public class DemoDataGenerator {
@@ -30,60 +30,66 @@ public class DemoDataGenerator {
 
     public void createUsers(ProcessEngine engine) {
 
-      User singleResult = engine.getIdentityService().createUserQuery().userId("demo").singleResult();
+      final IdentityService identityService = engine.getIdentityService();
+
+      if(identityService.isReadOnly()) {
+        LOGGER.info("Identity service provider is Read Only, not creating any demo users.");
+        return;
+      }
+
+      User singleResult = identityService.createUserQuery().userId("demo").singleResult();
       if (singleResult != null) {
         return;
       }
 
       LOGGER.info("Generating demo data for invoice showcase");
 
-      User user = engine.getIdentityService().newUser("demo");
+      User user = identityService.newUser("demo");
       user.setFirstName("Demo");
       user.setLastName("Demo");
       user.setPassword("demo");
       user.setEmail("demo@camunda.org");
-      engine.getIdentityService().saveUser(user);
+      identityService.saveUser(user);
 
-      User user2 = engine.getIdentityService().newUser("john");
+      User user2 = identityService.newUser("john");
       user2.setFirstName("John");
       user2.setLastName("Doe");
       user2.setPassword("john");
       user2.setEmail("john@camunda.org");
 
-      engine.getIdentityService().saveUser(user2);
+      identityService.saveUser(user2);
 
-      User user3 = engine.getIdentityService().newUser("mary");
+      User user3 = identityService.newUser("mary");
       user3.setFirstName("Mary");
       user3.setLastName("Anne");
       user3.setPassword("mary");
       user3.setEmail("mary@camunda.org");
 
-      engine.getIdentityService().saveUser(user3);
+      identityService.saveUser(user3);
 
-      User user4 = engine.getIdentityService().newUser("peter");
+      User user4 = identityService.newUser("peter");
       user4.setFirstName("Peter");
       user4.setLastName("Meter");
       user4.setPassword("peter");
       user4.setEmail("peter@camunda.org");
 
-      engine.getIdentityService().saveUser(user4);
+      identityService.saveUser(user4);
 
-      Group salesGroup = engine.getIdentityService().newGroup("sales");
+      Group salesGroup = identityService.newGroup("sales");
       salesGroup.setName("Sales");
       salesGroup.setType("WORKFLOW");
-      engine.getIdentityService().saveGroup(salesGroup);
+      identityService.saveGroup(salesGroup);
 
-      Group accountingGroup = engine.getIdentityService().newGroup("accounting");
+      Group accountingGroup = identityService.newGroup("accounting");
       accountingGroup.setName("Accounting");
       accountingGroup.setType("WORKFLOW");
-      engine.getIdentityService().saveGroup(accountingGroup);
+      identityService.saveGroup(accountingGroup);
 
-      Group managementGroup = engine.getIdentityService().newGroup("management");
+      Group managementGroup = identityService.newGroup("management");
       managementGroup.setName("Management");
       managementGroup.setType("WORKFLOW");
-      engine.getIdentityService().saveGroup(managementGroup);
+      identityService.saveGroup(managementGroup);
 
-      final IdentityService identityService = engine.getIdentityService();
       final AuthorizationService authorizationService = engine.getAuthorizationService();
 
       // create group
@@ -106,32 +112,32 @@ public class DemoDataGenerator {
         }
       }
 
-      engine.getIdentityService().createMembership("demo", "sales");
-      engine.getIdentityService().createMembership("demo", "accounting");
-      engine.getIdentityService().createMembership("demo", "management");
-      engine.getIdentityService().createMembership("demo", "camunda-admin");
+      identityService.createMembership("demo", "sales");
+      identityService.createMembership("demo", "accounting");
+      identityService.createMembership("demo", "management");
+      identityService.createMembership("demo", "camunda-admin");
 
-      engine.getIdentityService().createMembership("john", "sales");
-      engine.getIdentityService().createMembership("mary", "accounting");
-      engine.getIdentityService().createMembership("peter", "management");
-      
+      identityService.createMembership("john", "sales");
+      identityService.createMembership("mary", "accounting");
+      identityService.createMembership("peter", "management");
+
 
       // authorize groups for tasklist only:
-      
+
       Authorization salesTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       salesTasklistAuth.setGroupId("sales");
       salesTasklistAuth.addPermission(ACCESS);
       salesTasklistAuth.setResourceId("tasklist");
       salesTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(salesTasklistAuth);
-      
+
       Authorization accountingTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       accountingTasklistAuth.setGroupId("accounting");
       accountingTasklistAuth.addPermission(ACCESS);
       accountingTasklistAuth.setResourceId("tasklist");
       accountingTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(accountingTasklistAuth);
-      
+
       Authorization managementTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       managementTasklistAuth.setGroupId("management");
       managementTasklistAuth.addPermission(ACCESS);
