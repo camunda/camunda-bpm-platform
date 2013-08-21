@@ -69,11 +69,9 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     Class<? extends AbstractProcessApplication> processApplicationClass = getClass();
     String name = null;
 
-    try {
-      ProcessApplication annotation = processApplicationClass.getAnnotation(ProcessApplication.class);
+    ProcessApplication annotation = processApplicationClass.getAnnotation(ProcessApplication.class);
+    if(annotation != null) {
       name = annotation.value();
-    } catch(NullPointerException nullPointerException) {
-      // ignore
     }
 
     if(name == null || name.length()==0) {
