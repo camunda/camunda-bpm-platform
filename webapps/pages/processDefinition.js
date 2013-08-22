@@ -484,12 +484,13 @@ ngDefine('cockpit.pages.processDefinition', [
     }
   }];
 
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/process-definition/:processDefinitionId', {
       templateUrl: 'pages/process-definition.html',
       controller: Controller,
       resolve: {
-        processDefinition: ['ResourceResolver', 'ProcessDefinitionResource',
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
+        processDefinition: [ 'ResourceResolver', 'ProcessDefinitionResource',
           function(ResourceResolver, ProcessDefinitionResource) {
             return ResourceResolver.getByRouteParam('processDefinitionId', {
               name: 'process definition',
