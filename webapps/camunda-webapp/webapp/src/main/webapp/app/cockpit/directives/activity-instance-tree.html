@@ -6,6 +6,11 @@
       <i ng-class="{ 'icon-chevron-right' : !node.isOpen, 'icon-chevron-down' : node.isOpen }"></i>
     </button>
     
+    <button class="btn btn-link btn-control-link btn-control remove"
+            ng-click="deselect($event)">
+      <i class="icon-remove"></i>
+    </button>
+    
     <a id="{{ node.id }}"
        ng-click="select($event)">
       {{ node.name }}

@@ -53,6 +53,11 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
           }
         });
         
+        scope.deselect = function($event) {
+          $event.ctrlKey = true;
+          scope.select($event);
+        };
+
         scope.select = function($event) {
 
           var node = scope.node;

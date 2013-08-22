@@ -482,12 +482,14 @@ ngDefine('cockpit.pages.processInstance', [
           activityInstanceIds.splice(idx, 1);
 
           var foundAnotherActivityInstance = false;
-          for (var i = 0, instance; !!(instance = instanceList[i]); i++) {
-            var instanceId = instance.id,
-                index = activityInstanceIds.indexOf(instanceId);
+          if (instanceList) {
+            for (var i = 0, instance; !!(instance = instanceList[i]); i++) {
+              var instanceId = instance.id,
+                  index = activityInstanceIds.indexOf(instanceId);
 
-            if (index !== -1) {
-              foundAnotherActivityInstance = true;
+              if (index !== -1) {
+                foundAnotherActivityInstance = true;
+              }
             }
           }
 
@@ -606,6 +608,7 @@ ngDefine('cockpit.pages.processInstance', [
       if (!filterData || filterData.filter != filter) {
         var activityIds = filter.activityIds || [],
             activityInstanceIds = filter.activityInstanceIds || [];
+
         return {
           filter: filter,
           activityCount: activityIds.length || 0,
@@ -622,8 +625,11 @@ ngDefine('cockpit.pages.processInstance', [
 
     $scope.clearSelection = function () {
       // update cached filter
-      filterData = {};
-      filterData.filter = {};
+      filterData = {
+        activityCount: 0,
+        activityInstanceCount: 0,
+        filter: {}
+      };
 
       processData.set('filter', filterData.filter);
     };
