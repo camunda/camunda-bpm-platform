@@ -269,8 +269,6 @@ a.expand-collapse:focus {
 
 .btn-control-link {
   padding: 0;
-  line-height: 20px;
-  margin: -1px 0 0 0;
 }
 
 /**
@@ -409,8 +407,6 @@ textarea.variable-type-string {
 /** activity instance tree */
 
 .instance-tree {
-  margin-top: 15px;
-  border-top: 1px solid #EEE;
   padding-top: 10px;
 
   font-size: 0.83em;
@@ -424,14 +420,37 @@ textarea.variable-type-string {
   background: #D5E8FF;
 }
 
+.instance-tree .remove {
+  display: none;
+}
+
+.instance-tree .tree-node.selected > .tree-node-label .remove {
+  display: inline-block;
+  opacity: 0.3;
+}
+
+.instance-tree:hover .tree-node-label .remove {
+  opacity: 1.0;
+}
+
+/*
+.instance-tree .tree-node-label {
+  opacity: 0.5;
+}*/
+
+/*
+.instance-tree .tree-node.selected > .tree-node-label, .instance-tree:hover .tree-node-label {
+  opacity: 1.0;
+}*/
+
 .instance-tree a {
   text-decoration: none;
   color: inherit;
   cursor: pointer;
 }
 
-.instance-tree .btn-toggle {
-  line-height: 16px;
+.instance-tree .btn-toggle i {
+  margin-top: 0;
 }
 
 .instance-tree .tree-node {
@@ -439,11 +458,9 @@ textarea.variable-type-string {
 }
 
 .instance-tree .tree-node-label {
-  padding: 2px 5px;
+  padding: 0px 5px;
   border-radius: 4px;
   border: solid 1px #CCC;
-
-  background-color: #EEE;
 }
 
 .instance-tree .tree-node ul {
