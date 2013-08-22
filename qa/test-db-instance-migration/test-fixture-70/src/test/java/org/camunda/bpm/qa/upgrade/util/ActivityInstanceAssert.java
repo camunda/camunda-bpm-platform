@@ -110,7 +110,7 @@ public class ActivityInstanceAssert {
       activityInstanceStack.push(rootInstance);
     }
     
-    public ActivityInstanceTreeBuilder beginActivity(String activityId) {
+    public ActivityInstanceTreeBuilder beginScope(String activityId) {
       ActivityInstanceImpl newInstance = new ActivityInstanceImpl();
       newInstance.setActivityId(activityId);
       
@@ -124,15 +124,15 @@ public class ActivityInstanceAssert {
       return this;
     }
     
-    public ActivityInstanceTreeBuilder createActivity(String activityId) {
+    public ActivityInstanceTreeBuilder activity(String activityId) {
       
-      beginActivity(activityId);
-      endActivity();
+      beginScope(activityId);
+      endScope();
       
       return this;
     }
     
-    public ActivityInstanceTreeBuilder endActivity() {
+    public ActivityInstanceTreeBuilder endScope() {
       activityInstanceStack.pop();    
       return this;
     }

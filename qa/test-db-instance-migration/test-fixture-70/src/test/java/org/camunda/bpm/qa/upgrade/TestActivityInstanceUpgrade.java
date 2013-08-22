@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,969 +29,971 @@ import org.junit.Test;
  *
  */
 public class TestActivityInstanceUpgrade extends AbstractDbUpgradeTestCase {
-  
+
   @Test
   public void testSingleTaskProcess() {
     String processDefinitionKey = "TestFixture62.singleTaskProcess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
          describeActivityInstanceTree()
-           .createActivity("waitHere")
+           .activity("waitHere")
          .done());
-    
+
     // assert that the process instance can be completed:
     Task task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .singleResult();
-    
+
     taskService.complete(task.getId());
   }
-  
+
   @Test
   public void testNestedSingleTaskProcess() {
     String processDefinitionKey = "TestFixture62.nestedSingleTaskProcess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
         .processDefinitionKey(processDefinitionKey)
-        .singleResult();    
+        .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .createActivity("waitHere")
-          .endActivity()
+          .beginScope("outerProcess")
+            .activity("waitHere")
+          .endScope()
         .done());
-    
+
     // assert that the process instance can be completed:
     Task task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .singleResult();
-    
+
     taskService.complete(task.getId());
   }
-  
+
   @Test
   public void testConcurrentTaskProcess() {
     String processDefinitionKey = "TestFixture62.concurrentTaskProcess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .createActivity("task1")
-          .createActivity("task2")
+          .activity("task1")
+          .activity("task2")
         .done());
-    
+
     // complete first task
     Task firstTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("task1")
-      .singleResult();  
+      .singleResult();
     taskService.complete(firstTask.getId());
-    
+
     // task removed from tree
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .createActivity("task2")
+          .activity("task2")
         .done());
-        
+
     // complete second task
-    taskService.complete(taskService.createTaskQuery().processDefinitionKey(processDefinitionKey).singleResult().getId());    
+    taskService.complete(taskService.createTaskQuery().processDefinitionKey(processDefinitionKey).singleResult().getId());
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testNestedConcurrentTaskProcess() {
     String processDefinitionKey = "TestFixture62.nestedConcurrentTaskProcess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .createActivity("task1")
-            .createActivity("task2")
-          .endActivity()
+          .beginScope("outerProcess")
+            .activity("task1")
+            .activity("task2")
+          .endScope()
         .done());
-    
+
     // complete first task
     Task firstTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("task1")
-      .singleResult();  
+      .singleResult();
     taskService.complete(firstTask.getId());
-    
+
     // task removed from tree
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .createActivity("task2")
-          .endActivity()
+          .beginScope("outerProcess")
+            .activity("task2")
+          .endScope()
         .done());
-        
+
     // complete second task
-    taskService.complete(taskService.createTaskQuery().processDefinitionKey(processDefinitionKey).singleResult().getId());    
+    taskService.complete(taskService.createTaskQuery().processDefinitionKey(processDefinitionKey).singleResult().getId());
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testJoinOneExecutionProcess() {
     String processDefinitionKey = "TestFixture62.joinOneExecutionProcess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .createActivity("task1")
-          .createActivity("join")
+          .activity("task1")
+          .activity("join")
         .done());
-    
+
     // complete first task
     Task firstTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();  
+      .singleResult();
     taskService.complete(firstTask.getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testNestedJoinOneExecutionProcess() {
     String processDefinitionKey = "TestFixture62.nestedJoinOneExecutionProcess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .createActivity("task1")
-            .createActivity("join")
-          .endActivity()
+          .beginScope("outerProcess")
+            .activity("task1")
+            .activity("join")
+          .endScope()
         .done());
-    
+
     // complete first task
     Task firstTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();  
+      .singleResult();
     taskService.complete(firstTask.getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testJoinTwoExecutionsProcess() {
     String processDefinitionKey = "TestFixture62.joinTwoExecutionsProcess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .createActivity("task1")
-          .createActivity("join")
-          .createActivity("join")
+          .activity("task1")
+          .activity("join")
+          .activity("join")
         .done());
-    
+
     // complete first task
     Task firstTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();  
+      .singleResult();
     taskService.complete(firstTask.getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testNestedJoinTwoExecutionsProcess() {
     String processDefinitionKey = "TestFixture62.nestedJoinTwoExecutionsProcess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .createActivity("task1")
-            .createActivity("join")
-            .createActivity("join")
-          .endActivity()
+          .beginScope("outerProcess")
+            .activity("task1")
+            .activity("join")
+            .activity("join")
+          .endScope()
         .done());
-    
+
     // complete first task
     Task firstTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();  
+      .singleResult();
     taskService.complete(firstTask.getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-      
+
   @Test
   public void testSingleEmbeddedSubprocess() {
     String processDefinitionKey = "TestFixture62.singleEmbeddedSubprocess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-          .endActivity()
+          .beginScope("scope1")
+            .activity("waitInside1")
+          .endScope()
         .done());
-    
+
     // assert that the process instance can be completed:
     List<Task> tasks = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .list();    
+      .list();
     // complete first task
-    taskService.complete(tasks.get(0).getId());    
-    
+    taskService.complete(tasks.get(0).getId());
+
     // process ended
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
-  
+
+
   @Test
   public void testNestedSingleEmbeddedSubprocess() {
     String processDefinitionKey = "TestFixture62.nestedSingleEmbeddedSubprocess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .beginActivity("scope1")
-              .createActivity("waitInside1")
-            .endActivity()
-          .endActivity()
+          .beginScope("outerProcess")
+            .beginScope("scope1")
+              .activity("waitInside1")
+            .endScope()
+          .endScope()
         .done());
-    
+
     // assert that the process instance can be completed:
     List<Task> tasks = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .list();    
+      .list();
     // complete first task
-    taskService.complete(tasks.get(0).getId());    
-    
+    taskService.complete(tasks.get(0).getId());
+
     // process ended
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testConcurrentEmbeddedSubprocess() {
     String processDefinitionKey = "TestFixture62.concurrentEmbeddedSubprocess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-          .endActivity()
-          .beginActivity("scope2")
-            .createActivity("waitInside2")
-          .endActivity()
+          .beginScope("scope1")
+            .activity("waitInside1")
+          .endScope()
+          .beginScope("scope2")
+            .activity("waitInside2")
+          .endScope()
         .done());
-   
+
     // complete first task
     Task firstTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside1")
-      .singleResult();  
+      .singleResult();
     taskService.complete(firstTask.getId());
-    
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope2")
-            .createActivity("waitInside2")
-          .endActivity()
+          .beginScope("scope2")
+            .activity("waitInside2")
+          .endScope()
         .done());
-    
+
     // complete second task
     Task secondTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();  
+      .singleResult();
     taskService.complete(secondTask.getId());
-    
+
     // process ended
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testNestedConcurrentEmbeddedSubprocess() {
     String processDefinitionKey = "TestFixture62.nestedConcurrentEmbeddedSubprocess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .beginActivity("scope1")
-              .createActivity("waitInside1")
-            .endActivity()
-            .beginActivity("scope2")
-              .createActivity("waitInside2")
-            .endActivity()
-          .endActivity()
+          .beginScope("outerProcess")
+            .beginScope("scope1")
+              .activity("waitInside1")
+            .endScope()
+            .beginScope("scope2")
+              .activity("waitInside2")
+            .endScope()
+          .endScope()
         .done());
-   
+
     // complete first task
     Task firstTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside1")
-      .singleResult();  
+      .singleResult();
     taskService.complete(firstTask.getId());
-    
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .beginActivity("scope2")
-              .createActivity("waitInside2")
-            .endActivity()
-          .endActivity()
+          .beginScope("outerProcess")
+            .beginScope("scope2")
+              .activity("waitInside2")
+            .endScope()
+          .endScope()
         .done());
-    
+
     // complete second task
     Task secondTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();  
+      .singleResult();
     taskService.complete(secondTask.getId());
-    
+
     // process ended
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testMultiInstanceSequentialTask() {
     String processDefinitionKey = "TestFixture62.multiInstanceSequentialTask";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .createActivity("waitHere")
+          .activity("waitHere")
         .done());
-   
+
     // complete first task
     Task task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-    
+
     // validate tree
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .createActivity("waitHere")
+          .activity("waitHere")
         .done());
-    
+
     // complete second task
     task = taskService
         .createTaskQuery()
         .processDefinitionKey(processDefinitionKey)
-        .singleResult();  
+        .singleResult();
     taskService.complete(task.getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testNestedMultiInstanceSequentialTask() {
     String processDefinitionKey = "TestFixture62.nestedMultiInstanceSequentialTask";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .createActivity("waitHere")
-          .endActivity()
+          .beginScope("outerProcess")
+            .activity("waitHere")
+          .endScope()
         .done());
-   
+
     // complete first task
     Task task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-    
+
     // validate tree
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .createActivity("waitHere")
-          .endActivity()
+          .beginScope("outerProcess")
+            .activity("waitHere")
+          .endScope()
         .done());
-    
+
     // complete second task
     task = taskService
         .createTaskQuery()
         .processDefinitionKey(processDefinitionKey)
-        .singleResult();  
+        .singleResult();
     taskService.complete(task.getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testMultiInstanceSequentialSubprocess() {
     String processDefinitionKey = "TestFixture62.multiInstanceSequentialSubprocess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-          .endActivity()
+          .beginScope("scope1")
+            .activity("waitInside1")
+          .endScope()
         .done());
-   
+
     // complete first task
     Task task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-    
+
     // validate tree
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-          .endActivity()
+          .beginScope("scope1")
+            .activity("waitInside1")
+          .endScope()
         .done());
-    
+
     // complete second task
     task = taskService
         .createTaskQuery()
         .processDefinitionKey(processDefinitionKey)
-        .singleResult();  
+        .singleResult();
     taskService.complete(task.getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testNestedMultiInstanceSequentialSubprocess() {
     String processDefinitionKey = "TestFixture62.nestedMultiInstanceSequentialSubprocess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .beginActivity("scope1")
-              .createActivity("waitInside1")
-            .endActivity()
-          .endActivity()
+          .beginScope("outerProcess")
+            .beginScope("scope1")
+              .activity("waitInside1")
+            .endScope()
+          .endScope()
         .done());
-   
+
     // complete first task
     Task task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-    
+
     // validate tree
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
       describeActivityInstanceTree()
-        .beginActivity("outerProcess")
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-          .endActivity()
-        .endActivity()
+        .beginScope("outerProcess")
+          .beginScope("scope1")
+            .activity("waitInside1")
+          .endScope()
+        .endScope()
       .done());
-    
+
     // complete second task
     task = taskService
         .createTaskQuery()
         .processDefinitionKey(processDefinitionKey)
-        .singleResult();  
+        .singleResult();
     taskService.complete(task.getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testMultiInstanceSequentialSubprocessConcurrent() {
     String processDefinitionKey = "TestFixture62.multiInstanceSequentialSubprocessConcurrent";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-            .createActivity("waitInside2")
-          .endActivity()
+          .beginScope("scope1")
+            .activity("waitInside1")
+            .activity("waitInside2")
+          .endScope()
         .done());
-   
+
     // complete first task
     Task task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside1")
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-    
+
     // validate tree
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope1")
-            .createActivity("waitInside2")
-          .endActivity()
+          .beginScope("scope1")
+            .activity("waitInside2")
+          .endScope()
         .done());
-    
+
     // complete second task
     task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside2")
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-    
+
     // second instance created:
     actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-            .createActivity("waitInside2")
-          .endActivity()
+          .beginScope("scope1")
+            .activity("waitInside1")
+            .activity("waitInside2")
+          .endScope()
         .done());
-    
+
     // complete first task
     task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside1")
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-    
+
     // validate tree
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope1")
-            .createActivity("waitInside2")
-          .endActivity()
+          .beginScope("scope1")
+            .activity("waitInside2")
+          .endScope()
         .done());
-    
+
     // complete second task
     task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside2")
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-            
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   /** this is still failing */
   @Test
   @Ignore
   public void testNestedMultiInstanceSequentialSubprocessConcurrent() {
     String processDefinitionKey = "TestFixture62.nestedMultiInstanceSequentialSubprocessConcurrent";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     // validate tree
-    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .beginActivity("scope1")
-              .createActivity("waitInside1")
-              .createActivity("waitInside2")
-            .endActivity()
-          .endActivity()
+          .beginScope("outerProcess")
+            .beginScope("scope1")
+              .activity("waitInside1")
+              .activity("waitInside2")
+            .endScope()
+          .endScope()
         .done());
-   
+
     // complete first task
     Task task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside1")
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-    
+
     // validate tree
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .beginActivity("scope1")
-              .createActivity("waitInside2")
-            .endActivity()
-          .endActivity()
+          .beginScope("outerProcess")
+            .beginScope("scope1")
+              .activity("waitInside2")
+            .endScope()
+          .endScope()
         .done());
-    
+
     // complete second task
     task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside2")
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-    
+
     // second instance created
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .beginActivity("scope1")
-              .createActivity("waitInside1")
-              .createActivity("waitInside2")
-            .endActivity()
-          .endActivity()
+          .beginScope("outerProcess")
+            .beginScope("scope1")
+              .activity("waitInside1")
+              .activity("waitInside2")
+            .endScope()
+          .endScope()
         .done());
-        
+
     // complete first task
     task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside1")
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-    
-    actualTree = runtimeService.getActivityInstance(processInstance.getId());    
+
+    actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .beginActivity("scope1")
-              .createActivity("waitInside2")
-            .endActivity()
-          .endActivity()
+          .beginScope("outerProcess")
+            .beginScope("scope1")
+              .activity("waitInside2")
+            .endScope()
+          .endScope()
         .done());
-        
+
     // complete second task
     task = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside2")
-      .singleResult();  
+      .singleResult();
     taskService.complete(task.getId());
-            
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testMultiInstanceParallelTask() {
     String processDefinitionKey = "TestFixture62.multiInstanceParallelTask";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .createActivity("waitHere")
-          .createActivity("waitHere")          
+          .activity("waitHere")
+          .activity("waitHere")
         .done());
-        
+
     // assert that the process instance can be completed:
     List<Task> tasks = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .list();    
+      .list();
     // complete first task
     taskService.complete(tasks.get(0).getId());
-    
+
     actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .createActivity("waitHere")
+          .activity("waitHere")
         .done());
-        
+
     // assert that the process instance can be completed:
     tasks = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .list();
-    
+
     // complete second task
     taskService.complete(tasks.get(0).getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testNestedMultiInstanceParallelTask() {
     String processDefinitionKey = "TestFixture62.nestedMultiInstanceParallelTask";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .createActivity("waitHere")
-            .createActivity("waitHere")
-          .endActivity()
+          .beginScope("outerProcess")
+            .activity("waitHere")
+            .activity("waitHere")
+          .endScope()
         .done());
-        
+
     // assert that the process instance can be completed:
     List<Task> tasks = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .list();    
+      .list();
     // complete first task
     taskService.complete(tasks.get(0).getId());
-    
+
     actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .createActivity("waitHere")
-          .endActivity()
+          .beginScope("outerProcess")
+            .activity("waitHere")
+          .endScope()
         .done());
-        
+
     // assert that the process instance can be completed:
     tasks = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .list();    
+      .list();
     // complete second task
     taskService.complete(tasks.get(0).getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testMultiInstanceParallelSubprocess() {
     String processDefinitionKey = "TestFixture62.multiInstanceParallelSubprocess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-          .endActivity()
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-          .endActivity()
+          .beginScope("scope1")
+            .activity("waitInside1")
+          .endScope()
+          .beginScope("scope1")
+            .activity("waitInside1")
+          .endScope()
         .done());
-        
+
     List<Task> tasks = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .list();    
+      .list();
     // complete first task
     taskService.complete(tasks.get(0).getId());
-    
+
     // validate tree
     actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
-        describeActivityInstanceTree()          
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-          .endActivity()
+        describeActivityInstanceTree()
+          .beginScope("scope1")
+            .activity("waitInside1")
+          .endScope()
+          .activity("scope1")
         .done());
-    
+
     tasks = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .list();    
+      .list();
     // complete next task
     taskService.complete(tasks.get(0).getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testNestedMultiInstanceParallelSubprocess() {
     String processDefinitionKey = "TestFixture62.nestedMultiInstanceParallelSubprocess";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .beginActivity("scope1")
-              .createActivity("waitInside1")
-            .endActivity()
-            .beginActivity("scope1")
-              .createActivity("waitInside1")
-            .endActivity()
-          .endActivity()
+          .beginScope("outerProcess")
+            .beginScope("scope1")
+              .activity("waitInside1")
+            .endScope()
+            .beginScope("scope1")
+              .activity("waitInside1")
+            .endScope()
+          .endScope()
         .done());
-        
+
     List<Task> tasks = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .list();    
+      .list();
     // complete first task
     taskService.complete(tasks.get(0).getId());
-    
+
     // validate tree
     actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
-        describeActivityInstanceTree()      
-          .beginActivity("outerProcess")
-            .beginActivity("scope1")
-              .createActivity("waitInside1")
-            .endActivity()
-          .endActivity()
+        describeActivityInstanceTree()
+          .beginScope("outerProcess")
+            .beginScope("scope1")
+              .activity("waitInside1")
+            .endScope()
+            .activity("scope1")
+          .endScope()
         .done());
-    
+
     tasks = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .list();    
+      .list();
     // complete next task
     taskService.complete(tasks.get(0).getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testMultiInstanceParallelSubprocessConcurrent() {
-    
+
     String processDefinitionKey = "TestFixture62.multiInstanceParallelSubprocessConcurrent";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-            .createActivity("waitInside2")
-          .endActivity()
-          .beginActivity("scope1")
-            .createActivity("waitInside1")
-            .createActivity("waitInside2")
-          .endActivity()
+          .beginScope("scope1")
+            .activity("waitInside1")
+            .activity("waitInside2")
+          .endScope()
+          .beginScope("scope1")
+            .activity("waitInside1")
+            .activity("waitInside2")
+          .endScope()
         .done());
-    
+
     List<Task> waitInside1 = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
@@ -999,60 +1001,61 @@ public class TestActivityInstanceUpgrade extends AbstractDbUpgradeTestCase {
       .listPage(0, 2);
     taskService.complete(waitInside1.get(0).getId());
     taskService.complete(waitInside1.get(1).getId());
-    
+
     List<Task> waitInside2 = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside2")
       .listPage(0, 1);
-    
+
     // this completes the first subprocess instance
     taskService.complete(waitInside2.get(0).getId());
-    
+
     actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("scope1")
-            .createActivity("waitInside2")
-          .endActivity()          
+          .beginScope("scope1")
+            .activity("waitInside2")
+          .endScope()
+          .activity("scope1")
         .done());
-    
+
     // assert that the process instance can be completed:
     Task lastTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     // complete first task
     taskService.complete(lastTask.getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
-  
+
   @Test
   public void testNestedMultiInstanceParallelSubprocessConcurrent() {
-    
+
     String processDefinitionKey = "TestFixture62.nestedMultiInstanceParallelSubprocessConcurrent";
-    
+
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     Assert.assertNotNull(processInstance);
-    
+
     ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .beginActivity("scope1")
-              .createActivity("waitInside1")
-              .createActivity("waitInside2")
-            .endActivity()
-            .beginActivity("scope1")
-              .createActivity("waitInside1")
-              .createActivity("waitInside2")
-            .endActivity()
-          .endActivity()
+          .beginScope("outerProcess")
+            .beginScope("scope1")
+              .activity("waitInside1")
+              .activity("waitInside2")
+            .endScope()
+            .beginScope("scope1")
+              .activity("waitInside1")
+              .activity("waitInside2")
+            .endScope()
+          .endScope()
         .done());
-    
+
     List<Task> waitInside1 = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
@@ -1060,34 +1063,35 @@ public class TestActivityInstanceUpgrade extends AbstractDbUpgradeTestCase {
       .listPage(0, 2);
     taskService.complete(waitInside1.get(0).getId());
     taskService.complete(waitInside1.get(1).getId());
-    
+
     List<Task> waitInside2 = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
       .taskDefinitionKey("waitInside2")
       .listPage(0, 1);
-    
+
     // this completes the first subprocess instance
     taskService.complete(waitInside2.get(0).getId());
-    
+
     actualTree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(actualTree).hasStructure(
         describeActivityInstanceTree()
-          .beginActivity("outerProcess")
-            .beginActivity("scope1")
-              .createActivity("waitInside2")
-            .endActivity()          
-          .endActivity()
+          .beginScope("outerProcess")
+            .beginScope("scope1")
+              .activity("waitInside2")
+            .endScope()
+            .activity("scope1")
+          .endScope()
         .done());
-    
+
     // assert that the process instance can be completed:
     Task lastTask = taskService
       .createTaskQuery()
       .processDefinitionKey(processDefinitionKey)
-      .singleResult();    
+      .singleResult();
     // complete first task
     taskService.complete(lastTask.getId());
-        
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
   }
 
