@@ -1,8 +1,8 @@
 ngDefine('camunda.common.pages', function(module) {
 
   var ResponseErrorHandlerInitializer = [ 
-    '$rootScope', 'Notifications', 'Authentication', '$location', 
-    function($rootScope, Notifications, Authentication, $location) {
+    '$rootScope', '$location', 'Notifications', 'Authentication',
+    function($rootScope, $location, Notifications, Authentication) {
 
     function addError(error) {
       error.http = true;
@@ -41,17 +41,11 @@ ngDefine('camunda.common.pages', function(module) {
         break;
 
       case 401:
-        var wasLoggedIn = !!Authentication.username();
-
         Authentication.clear();
 
         if ($location.absUrl().indexOf('/setup/#') == -1) {
-          if (wasLoggedIn) {
-            addError({ type: 'warning', status: 'Session ended', message: 'Your session timed out or was ended from another browser window. Please signin again.' });
-          } else {
-            addError({ status: 'Unauthorized', message: 'Login is required to access the resource' });
-          }
-          
+          addError({ type: 'warning', status: 'Session ended', message: 'Your session timed out or was ended from another browser window. Please signin again.' });
+
           $location.path('/login');
         } else {
           $location.path('/setup');
@@ -128,11 +122,11 @@ ngDefine('camunda.common.pages', function(module) {
   }];
 
   var AuthenticationController = [
-    '$scope', '$window', 'Notifications', 'Authentication', 'Uri',
-    function($scope, $window, Notifications, Authentication, Uri) {
+    '$scope', '$window', 'Notifications', 'AuthenticationService', 'Uri',
+    function($scope, $window, Notifications, AuthenticationService, Uri) {
       
       $scope.logout = function() {
-        Authentication.logout().then(function() {
+        AuthenticationService.logout().then(function() {
           $window.location.href = Uri.appUri('app://#/login');
         });
       };

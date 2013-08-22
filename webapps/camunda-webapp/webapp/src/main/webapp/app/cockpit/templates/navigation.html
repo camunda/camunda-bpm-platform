@@ -34,7 +34,7 @@
         <li>
           <a ng-href="{{ '../../admin/:engine/' | uri }}">Admin</a>
         </li>
-        <li ng-show="authentication.isTasklistAuthorized()">
+        <li ng-show="authentication.canAccess('tasklist')">
           <a ng-href="{{ '../../tasklist/:engine/' | uri }}">Tasklist</a>
         </li>
       </ul>

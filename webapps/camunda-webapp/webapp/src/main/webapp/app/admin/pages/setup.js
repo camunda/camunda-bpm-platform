@@ -47,15 +47,13 @@ define(['angular'], function(angular) {
 
   }];
 
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/setup', {
       templateUrl: 'pages/setup.html',
-      controller: Controller
-    });
-    // multi tenacy
-    $routeProvider.when('/:engine/setup', {
-      templateUrl: 'pages/setup.html',
-      controller: Controller
+      controller: Controller,
+      resolve: {
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
+      }
     });
   }];
 

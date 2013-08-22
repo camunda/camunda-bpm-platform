@@ -1,15 +1,15 @@
 ngDefine('camunda.common.pages.login', [ 'angular', 'require', 'module:camunda.common.services.authentication:camunda-common/services/Authentication' ],
   function(module, angular, require) {
 
-  var Controller = ['$scope', 'Authentication', 'Notifications', '$location',
-           function ($scope, Authentication, Notifications, $location) {
+  var Controller = ['$scope', 'Authentication', 'AuthenticationService', 'Notifications', '$location',
+           function ($scope, Authentication, AuthenticationService, Notifications, $location) {
 
     if (Authentication.username()) {
       $location.path("/");
     }
 
     $scope.login = function () {
-      Authentication
+      AuthenticationService
         .login($scope.username, $scope.password)
         .then(function(success) {
           Notifications.clearAll();

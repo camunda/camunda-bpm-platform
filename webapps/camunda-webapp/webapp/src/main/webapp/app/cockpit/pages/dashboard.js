@@ -10,23 +10,17 @@ define(['angular'], function(angular) {
 
     // reset breadcrumbs
     $rootScope.clearBreadcrumbs();
-
   }];
 
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/dashboard', {
       templateUrl: 'pages/dashboard.html',
-      controller: Controller
-    });
-
-    // multi tenacy
-    $routeProvider.when('/:engine/dashboard', {
-      templateUrl: 'pages/dashboard.html',
-      controller: Controller
+      controller: Controller,
+      resolve: {
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser
+      }
     });
   }];
 
-  module
-    .config(RouteConfig);
-
+  module.config(RouteConfig);
 });
