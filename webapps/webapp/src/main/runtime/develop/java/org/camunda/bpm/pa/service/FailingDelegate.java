@@ -7,7 +7,10 @@ public class FailingDelegate implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    throw new RuntimeException("I am failing!");
+    Object variable = execution.getVariable("fail");
+    if(variable == null || ((Boolean)variable)) {
+      throw new RuntimeException("I am failing!");
+    }
   }
 
 }

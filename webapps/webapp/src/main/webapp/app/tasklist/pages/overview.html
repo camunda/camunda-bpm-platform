@@ -1,3 +1,5 @@
+<div notifications-panel></div>
+
 <!-- task list -->
 <table class="table table-hover task-table" multi-select="taskList.selection">
   <thead>
@@ -31,14 +33,14 @@
           <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </button>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu pull-right">
             <li ng-show="taskList.view.filter == 'mytasks'">
               <a href ng-click="unclaimTask(task)" title="Unassign this task from me">Unclaim</a>
             </li>
             <li ng-show="taskList.view.filter != 'mytasks' && taskList.view.filter != 'colleague'">
               <a href title="Claim task to work on it later" ng-click="claimTask(task)">Claim</a>
             </li>
-            <li class="dropdown-submenu" ng-show="taskList.view.filter == 'mytasks'">
+            <li class="dropdown-submenu pull-left" ng-show="groupInfo.groupUsers.length && taskList.view.filter == 'mytasks'">
               <a tabindex="-1" href>Delegate</a>
               <ul class="dropdown-menu">
                 <li data-ng-repeat="user in groupInfo.groupUsers">

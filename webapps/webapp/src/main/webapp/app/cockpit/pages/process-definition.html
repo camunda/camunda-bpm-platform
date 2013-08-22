@@ -5,10 +5,10 @@
   </div>
 
   <!-- sitebar -->
-  <div class="ctn-column ctn-sitebar ctn-collapsable" collapsable="left">
+  <div class="ctn-column ctn-sitebar ctn-collapsable ctn-scroll" collapsable="left">
 
     <div class="page-header">
-      <small>Process Definition</small>
+      <small>Process Definition View</small>
       <h1>{{ processDefinition.name || processDefinition.key }}</h1>
     </div>
 
@@ -205,7 +205,7 @@
           </li>
         </ul>
   
-        <div class="ctn-tabbed-content">
+        <div class="ctn-tabbed-content ctn-scroll">
           <view provider="selectedView" vars="processDefinitionVars" />
         </div>
       </div>

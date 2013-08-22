@@ -1,25 +1,30 @@
 ngDefine('admin.pages', function(module, $) {
 
-  function ConfirmDeleteAuthorizationController ($scope, $q, $location, Uri, Notifications, AuthorizationResource) {
+  function ConfirmDeleteAuthorizationController ($scope, $q, $location, Uri, Notifications, AuthorizationResource, dialog, authorizationToDelete, formatPermissions, getResource, getType) {
 
     var BEFORE_DELETE = 'beforeDelete',
         PERFORM_DELETE = 'performDelete',
-        DELETE_SUCCESS = 'deleteSuccess',
-        DELETE_FAILED = 'deleteFailed';
+        DELETE_SUCCESS = 'SUCCESS',
+        DELETE_FAILED = 'FAILED';
 
+    $scope.authorizationToDelete = authorizationToDelete;
+
+    $scope.formatPermissions = formatPermissions;
+    $scope.getResource = getResource;
+    $scope.getType = getType;
+    
     $scope.$on('$routeChangeStart', function () {
-      $scope.close();
+      dialog.close($scope.status);
     });
 
     $scope.close = function (status) {
-      $scope.confirmDeleteAuthorizationDialog.close();
+      dialog.close(status);
     };
 
     $scope.performDelete = function () {
-      AuthorizationResource.delete({action: $scope.authorizationToDelete.id}).$then(function(response) {
-        $scope.loadAuthorizations();
+      AuthorizationResource.delete({ action: authorizationToDelete.id }).$then(function(response) {
         $scope.status = DELETE_SUCCESS;
-      });      
+      });
     };
   };
 
@@ -29,6 +34,11 @@ ngDefine('admin.pages', function(module, $) {
                                                          'Uri',
                                                          'Notifications',
                                                          'AuthorizationResource',
+                                                         'dialog',
+                                                         'authorizationToDelete',
+                                                         'formatPermissions',
+                                                         'getResource',
+                                                         'getType',
                                                          ConfirmDeleteAuthorizationController ]);
 
 });

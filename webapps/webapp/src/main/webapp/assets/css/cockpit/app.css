@@ -11,14 +11,6 @@
 Tree
 ---------------------**/
 
-.none-list-style {
-  list-style-type: none;
-}
-
-.clickable-tree-node:hover {
-  cursor: pointer;
-}
-
 .activity-highlight  {
   -webkit-box-shadow: 0px 0px 4px 4px rgba(30, 144, 255, 1);
   -moz-box-shadow: 0px 0px 4px 4px rgba(30, 144, 255, 1);
@@ -271,6 +263,14 @@ a.expand-collapse:focus {
   padding-bottom: 0;
 }
 
+.btn-control {
+  float: right;
+}
+
+.btn-control-link {
+  padding: 0;
+}
+
 /**
  * Filters
  */
@@ -296,10 +296,6 @@ a.expand-collapse:focus {
 .filters .footer {
   border-top: solid 1px #F5D99C;
   padding-top: 8px;
-}
-
-.filters h5 .btn-control {
-  float: right;
 }
 
 .filters .dropdown-menu {
@@ -406,4 +402,68 @@ td .select-variable-type {
 
 textarea.variable-type-string {
   min-width: 220px;
+}
+
+/** activity instance tree */
+
+.instance-tree {
+  padding-top: 10px;
+
+  font-size: 0.83em;
+}
+
+.instance-tree .tree-node.selected > .tree-node-label {
+  -webkit-box-shadow: 0px 0px 2px 2px rgba(30, 144, 255, 1);
+  -moz-box-shadow: 0px 0px 2px 2px rgba(30, 144, 255, 1);
+  box-shadow: 0px 0px 2px 2px rgb(30, 144, 255);
+
+  background: #D5E8FF;
+}
+
+.instance-tree .remove {
+  display: none;
+}
+
+.instance-tree .tree-node.selected > .tree-node-label .remove {
+  display: inline-block;
+  opacity: 0.3;
+}
+
+.instance-tree:hover .tree-node-label .remove {
+  opacity: 1.0;
+}
+
+/*
+.instance-tree .tree-node-label {
+  opacity: 0.5;
+}*/
+
+/*
+.instance-tree .tree-node.selected > .tree-node-label, .instance-tree:hover .tree-node-label {
+  opacity: 1.0;
+}*/
+
+.instance-tree a {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.instance-tree .btn-toggle i {
+  margin-top: 0;
+}
+
+.instance-tree .tree-node {
+  margin: 2px 0;
+}
+
+.instance-tree .tree-node-label {
+  padding: 0px 5px;
+  border-radius: 4px;
+  border: solid 1px #CCC;
+}
+
+.instance-tree .tree-node ul {
+  margin-left: 19px;
+  margin-bottom: 10px;
 }
