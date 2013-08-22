@@ -31,7 +31,12 @@ ngDefine('tasklist.pages', [
         Forms.parseFormData(data, form);
 
         if (form.external) {
-          var externalUrl = encodeURI(form.key + "?taskId=" + taskId + "&callbackUrl=" + $location.absUrl() + "/complete");
+          var action = "/complete";
+          if (task.delegationState === 'PENDING') {
+            action = "/resolve";
+          }
+
+          var externalUrl = encodeURI(form.key + "?taskId=" + taskId + "&callbackUrl=" + $location.absUrl() + action);
 
           $window.location.href = externalUrl;
         } else {
@@ -80,7 +85,7 @@ ngDefine('tasklist.pages', [
 
       taskList[action]({ id: taskId }, { variables : variablesMap }).$then(function() {
         $rootScope.$broadcast("tasklist.reload");
-        $location.url("/task/" + taskId + "/complete");
+        $location.url("/task/" + taskId + "/" + action);
       });
     };
 
@@ -99,8 +104,17 @@ ngDefine('tasklist.pages', [
 
   CompleteController.$inject = ["$scope", "$location", "Notifications"];
 
+  var ResolveController = function($scope, $location, Notifications) {
+    Notifications.addMessage({ status: "Resolved", message: "Task has been resolved", duration: 5000 });
+    $location.url("/overview");
+  };
 
-  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
+  ResolveController.$inject = ["$scope", "$location", "Notifications"];
+
+
+  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, 
+
+AuthenticationServiceProvider) {
 
     $routeProvider.when("/task/:id", {
       templateUrl: "pages/task.html",
@@ -119,11 +133,23 @@ ngDefine('tasklist.pages', [
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
       }
     });
+
+    // controller which handles task resolving
+
+    $routeProvider.when("/task/:id/resolve", {
+      controller: ResolveController,
+      templateUrl: "pages/resolve.html",
+      resolve: {
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
+      }
+    });
+
   }];
 
   module
     .config(RouteConfig)
     .controller("CompleteTaskController", CompleteController)
+    .controller("ResolveTaskController", ResolveController)
     .controller("TaskController", Controller);
 
 });
