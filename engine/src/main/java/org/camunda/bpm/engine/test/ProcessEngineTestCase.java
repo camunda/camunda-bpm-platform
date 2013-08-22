@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.test.ProcessEngineAssert;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -75,7 +76,7 @@ public class ProcessEngineTestCase extends TestCase {
   }
   
   public void assertProcessEnded(final String processInstanceId) {
-    TestHelper.assertProcessEnded(processEngine, processInstanceId);
+    ProcessEngineAssert.assertProcessEnded(processEngine, processInstanceId);
   }
   
   @Override
