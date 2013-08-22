@@ -23,6 +23,7 @@ import java.util.ServiceLoader;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -53,6 +54,24 @@ public class UserAuthenticationResource {
 
   @Context
   protected HttpServletRequest request;
+
+  @GET
+  @Path("/{processEngineName}")
+  public Response getAuthenticatedUser(@PathParam("processEngineName") String engineName) {
+    Authentications allAuthentications = Authentications.getCurrent();
+
+    if (allAuthentications == null) {
+      return notFound();
+    }
+    
+    Authentication engineAuth = allAuthentications.getAuthenticationForProcessEngine(engineName);
+
+    if (engineAuth == null) {
+      return notFound();
+    } else {
+      return Response.ok(AuthenticationDto.fromAuthentication(engineAuth)).build();
+    }
+  }
 
   @POST
   @Path("/{processEngineName}/login/{appName}")
@@ -153,5 +172,9 @@ public class UserAuthenticationResource {
 
   protected boolean isAuthorizedForApp(AuthorizationService authorizationService, String username, List<String> groupIds, String application) {
     return authorizationService.isUserAuthorized(username, groupIds, ACCESS, APPLICATION, application);
+  }
+
+  private Response notFound() {
+    return Response.status(Status.NOT_FOUND).build();
   }
 }
