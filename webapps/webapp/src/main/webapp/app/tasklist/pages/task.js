@@ -100,22 +100,26 @@ ngDefine('tasklist.pages', [
   CompleteController.$inject = ["$scope", "$location", "Notifications"];
 
 
-  var RouteConfig = function($routeProvider) {
+  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
 
     $routeProvider.when("/task/:id", {
       templateUrl: "pages/task.html",
-      controller: Controller
+      controller: Controller,
+      resolve: {
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
+      }
     });
 
     // controller which handles task completion
 
     $routeProvider.when("/task/:id/complete", {
+      templateUrl: "pages/complete.html",
       controller: CompleteController,
-      templateUrl: "pages/complete.html"
+      resolve: {
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
+      }
     });
-  };
-
-  RouteConfig.$inject = [ "$routeProvider"];
+  }];
 
   module
     .config(RouteConfig)

@@ -54,7 +54,7 @@
       </a>
 
       <ul class="dropdown-menu">
-        <li ng-show="authentication.isCockpitAuthorized()">
+        <li ng-show="authentication.canAccess('cockpit')">
           <a ng-href="{{ '../../cockpit/:engine/' | uri }}">Cockpit</a>
         </li>
         <li>
