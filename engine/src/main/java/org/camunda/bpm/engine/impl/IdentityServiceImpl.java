@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,14 +51,14 @@ import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
  * @author Tom Baeyens
  */
 public class IdentityServiceImpl extends ServiceImpl implements IdentityService {
-  
+
   /** thread local holding the current authentication */
   private ThreadLocal<Authentication> currentAuthentication = new ThreadLocal<Authentication>();
-  
+
   public boolean isReadOnly() {
     return commandExecutor.execute(new IsIdentityServiceReadOnlyCmd());
   }
-  
+
   public Group newGroup(String groupId) {
     return commandExecutor.execute(new CreateGroupCmd(groupId));
   }
@@ -74,11 +74,11 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   public void saveUser(User user) {
     commandExecutor.execute(new SaveUserCmd(user));
   }
-  
+
   public UserQuery createUserQuery() {
     return commandExecutor.execute(new CreateUserQueryCmd());
   }
-  
+
   public GroupQuery createGroupQuery() {
     return commandExecutor.execute(new CreateGroupQueryCmd());
   }
@@ -110,15 +110,15 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   public Picture getUserPicture(String userId) {
     return commandExecutor.execute(new GetUserPictureCmd(userId));
   }
-  
+
   public void deleteUserPicture(String userId) {
-    commandExecutor.execute(new DeleteUserPictureCmd(userId));    
+    commandExecutor.execute(new DeleteUserPictureCmd(userId));
   }
 
   public void setAuthenticatedUserId(String authenticatedUserId) {
-    currentAuthentication.set(new Authentication(authenticatedUserId, null));    
+    currentAuthentication.set(new Authentication(authenticatedUserId, null));
   }
-  
+
   public void setAuthentication(Authentication auth) {
     if(auth == null) {
       clearAuthentication();
@@ -126,15 +126,15 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
       currentAuthentication.set(auth);
     }
   }
-  
+
   public void setAuthentication(String userId, List<String> groups) {
     currentAuthentication.set(new Authentication(userId, groups));
   }
-  
+
   public void clearAuthentication() {
     currentAuthentication.remove();
   }
-  
+
   public Authentication getCurrentAuthentication() {
     return currentAuthentication.get();
   }
