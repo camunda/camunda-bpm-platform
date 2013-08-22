@@ -86,39 +86,60 @@ angular
       }
     };
   })
-  .service('Connector', function($http, App) {
-	  var connectors;
-	  return {	  
-		  ensureInitialized : function() {
-			  if(!connectors) {
-				  this.init();
-			  }
-		  },		  
-		  init : function() {
-			  $http.get(App.uri("secured/resource/connector/list")).success(function(data) {
-			      connectors = data;
-			  });  
-		  },
-		  supportsCommitMessages : function(connectorId) {
-			  this.ensureInitialized();
-			  for(var i =0; i<connectors.length; i++) {
-				  var instance = connectors[i];
-				  if(instance.connectorId == connectorId) {
-					  return instance.supportsCommitMessage;
-				  }
-			  }	
-			  // if the connector is not found this could mean that it has been added while the user is on the page 
-			  // -> refresh connectors once and check again
-			  this.init();			  
-			  // check again (feel welcome to refactor this... :) )
-			  for(var i =0; i<connectors.length; i++) {
-				  var instance = connectors[i];
-				  if(instance.connectorId == connectorId) {
-					  return instance.supportsCommitMessage;
-				  }
-			  }	
-			  return false;
-		  }	  
+  .service('Connector', function($http, $q, App) {
+    var connectorMap;
+    var connectorMapLoadPromise;
+
+    function withConnectors() {
+      if (connectorMap) {
+        return $q.when(connectorMap);
+      }
+
+      return initConnectors();
+    }
+
+    function loadConnectorMap() {
+      var deferred = $q.defer();
+
+      $http.get(App.uri("secured/resource/connector/list")).success(function(data) {
+        var map = {};
+
+        angular.forEach(data, function(connector) {
+          map[connector.connectorId] = connector;
+        });
+
+        deferred.resolve(map);
+      });
+
+      return deferred.promise;
+    }
+
+    function supportsCommitMessages(connectorConfig) {
+      var id = connectorConfig.connectorId;
+
+      // is our connectorMap loaded
+      if (connectorMap) {
+        var connector = connectorMap[id];
+        return connector && connector.supportsCommitMessage;
+      } else
+      if (connectorMapLoadPromise) {
+        // nothing to do, already loading stuff
+      } else {
+
+        // must load connector information
+        connectorMapLoadPromise = loadConnectorMap().then(function(map) {
+          connectorMapLoadPromise = null;
+          connectorMap = map;
+        });
+      }
+
+      // connector not found
+      // or connector map not yet loaded
+      return false;
+    }
+
+	  return { 
+      supportsCommitMessages : supportsCommitMessages
 	  };
 	  
   })

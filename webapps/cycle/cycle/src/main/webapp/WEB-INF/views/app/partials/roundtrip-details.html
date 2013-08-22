@@ -53,7 +53,7 @@
         <button ng-show="syncDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
         <h3 th:text="#{Synchronize models}">Synchronize models</h3>
       </div>
-      <div class="modal-body">
+      <div class="modal-body edit-diagram-modal">
         <div class="sync-note">
           <div ng-class="syncNoteCls(syncMode)">
         </div>
@@ -119,7 +119,7 @@
                          data-help>Commit Message</label>
                   <div class="controls">
                     <!-- display a combobox on leftside, otherwise a disabled input field -->
-                    <textarea id="commitMessageSync" ng-model="commitMessage" />                      
+                    <textarea id="commitMessageSync" rows="3" ng-model="commitMessage" />                      
                   </div>
                 </div>
               </fieldset>
