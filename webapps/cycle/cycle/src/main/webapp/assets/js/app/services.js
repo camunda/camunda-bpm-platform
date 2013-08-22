@@ -138,38 +138,7 @@ angular
       return false;
     }
 
-	  return {	  
-		  // ensureInitialized : function() {
-			 //  if(!connectors) {
-				//   this.init();
-			 //  }
-		  // },		  
-		  // init : function() {
-			 //  $http.get(App.uri("secured/resource/connector/list")).success(function(data) {
-			 //      connectors = data;
-			 //  });  
-		  // },
-		  // supportsCommitMessages : function(connectorId) {
-			 //  this.ensureInitialized();
-			 //  for(var i =0; i<connectors.length; i++) {
-				//   var instance = connectors[i];
-				//   if(instance.connectorId == connectorId) {
-				// 	  return instance.supportsCommitMessage;
-				//   }
-			 //  }	
-			 //  // if the connector is not found this could mean that it has been added while the user is on the page 
-			 //  // -> refresh connectors once and check again
-			 //  this.init();			  
-			 //  // check again (feel welcome to refactor this... :) )
-			 //  for(var i =0; i<connectors.length; i++) {
-				//   var instance = connectors[i];
-				//   if(instance.connectorId == connectorId) {
-				// 	  return instance.supportsCommitMessage;
-				//   }
-			 //  }	
-			 //  return false;
-		  // }	  
-
+	  return { 
       supportsCommitMessages : supportsCommitMessages
 	  };
 	  

@@ -214,9 +214,9 @@ function SyncRoundtripController($scope, $http, $q, App, Event, Connector) {
   
   $scope.targetConnectorSupportsCommitMessage = function() {
 	if($scope.syncMode == "LEFT_TO_RIGHT") {
-		return Connector.supportsCommitMessages($scope.roundtrip.rightHandSide.connectorNode.connectorId);
+		return Connector.supportsCommitMessages($scope.roundtrip.rightHandSide.connectorNode);
 	} else if($scope.syncMode == "RIGHT_TO_LEFT") {
-		return Connector.supportsCommitMessages($scope.roundtrip.leftHandSide.connectorNode.connectorId);
+		return Connector.supportsCommitMessages($scope.roundtrip.leftHandSide.connectorNode);
 	}    
   };
   
@@ -276,6 +276,7 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
   }
 
   $scope.editDiagramDialog = new Dialog();
+  $scope.editDiagramDialog.setAutoClosable(false);
 
   $scope.addDiagram = function() {
     $scope.editDialogMode = "ADD_DIAGRAM";
