@@ -363,7 +363,10 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration, C
   };
   
   $scope.showCommitMessageInput = function() {	  
-    return $scope.editDialogMode == "CREATE_NEW_DIAGRAM" && Connector.supportsCommitMessages($scope.connector.connectorId);
+    if (!$scope.connector) {
+      return false;
+    }
+    return $scope.editDialogMode == "CREATE_NEW_DIAGRAM" && Connector.supportsCommitMessages($scope.connector);
   };
 
   // is the dialog model valid and can be submitted?
