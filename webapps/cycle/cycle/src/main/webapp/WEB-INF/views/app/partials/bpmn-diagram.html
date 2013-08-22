@@ -73,11 +73,10 @@
   <modal-dialog model="editDiagramDialog" ng-cloak>
     <div class="modal" ng-controller="EditDiagramController" ngm-if="editDiagramDialog.renderHtml()">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h3 data-ng-show="editDialogMode == 'ADD_DIAGRAM'" th:text="#{Add Process Model}"></h3>
         <h3 data-ng-show="editDialogMode == 'CREATE_NEW_DIAGRAM'" th:text="#{Create Process Model}"></h3>
       </div>
-      <div class="modal-body">
+      <div class="modal-body edit-diagram-modal">
         <div data-error-panel></div>
         <form class="form-horizontal" novalidate ng-submit="save()" name="addModelForm">
           <fieldset>
@@ -152,7 +151,7 @@
                          data-help>Commit Message</label>
                   <div class="controls">
                     <!-- display a combobox on leftside, otherwise a disabled input field -->
-                    <textarea id="commitMessageCreate"  ng-model="commitMessage" />                      
+                    <textarea id="commitMessageCreate" rows="3" ng-model="commitMessage" />                      
                   </div>
                 </div>
               

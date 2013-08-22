@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +16,10 @@ import java.util.Date;
 
 /**
  * <p>{@link HistoryEvent} signifying a top-level event in a process instance.</p>
- * 
+ *
  * @author Daniel Meyer
  * @author Marcel Wieczorek
- * 
+ *
  */
 public class HistoricProcessInstanceEventEntity extends HistoryEvent {
 
@@ -39,22 +39,22 @@ public class HistoricProcessInstanceEventEntity extends HistoryEvent {
 
   /** duration in millis */
   protected Long durationInMillis;
-  
+
   protected Date startTime;
-  
+
   protected Date endTime;
-  
+
   /** id of the activity which started the process instance */
   protected String endActivityId;
-  
+
   /** id of the activity which ended the process instance */
   protected String startActivityId;
 
   // getters / setters ////////////////////////////////////////
 
   public Long getDurationInMillis() {
-    if(endTime != null) {      
-      return endTime.getTime() - startTime.getTime();     
+    if(endTime != null) {
+      return endTime.getTime() - startTime.getTime();
     } else {
       return durationInMillis;
     }
@@ -126,6 +126,10 @@ public class HistoricProcessInstanceEventEntity extends HistoryEvent {
 
   public void setDeleteReason(String deleteReason) {
     this.deleteReason = deleteReason;
+  }
+
+  public Long getDurationRaw() {
+    return durationInMillis;
   }
 
   @Override

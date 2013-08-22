@@ -288,15 +288,12 @@ li.actions .btn:last-child {
   right: 10px;
 }
 
-#commitMessageSync {
-  height: 65px;
-  width: 385px;
-  margin-left: -25px;
+.edit-diagram-modal .controls {
+  width: 320px;
 }
 
-#commitMessageCreate {
-  width: 343px;
-  height: 60px;
+.edit-diagram-modal .controls .tree, .edit-diagram-modal .controls textarea {
+  width: 100%;
 }
 
 .sync-options {
@@ -350,7 +347,6 @@ li.actions .btn:last-child {
  * Tree
  */
 .controls .tree {
-  width: 343px;
   height: 220px;
   overflow: auto;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -375,8 +371,7 @@ li.actions .btn:last-child {
 }
 
 .controls .tree .dijitTree {
-  overflow: auto;
-  min-height: 220px;
+  overflow: visible;
 }
 
 .modal-body {
@@ -413,6 +408,11 @@ div#myCarousel .carousel-control.right {
 div#myCarousel .carousel-control.left {
   position: fixed;
   left: 12%;
+}
+
+.popover {
+  /* placement above modal dialog */
+  z-index: 1060;
 }
 
 /** popover styles */

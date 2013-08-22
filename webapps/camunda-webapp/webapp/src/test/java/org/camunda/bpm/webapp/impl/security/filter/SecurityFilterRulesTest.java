@@ -12,29 +12,26 @@
  */
 package org.camunda.bpm.webapp.impl.security.filter;
 
-import java.io.InputStream;
-
-import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.webapp.impl.security.filter.util.FilterRules;
-import org.junit.Test;
-
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.webapp.impl.security.auth.Authentication;
 import org.camunda.bpm.webapp.impl.security.auth.Authentications;
 import org.camunda.bpm.webapp.impl.security.auth.UserAuthentication;
+import org.camunda.bpm.webapp.impl.security.filter.util.FilterRules;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  *

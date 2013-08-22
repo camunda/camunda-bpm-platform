@@ -70,6 +70,45 @@
       
     where ID_ = #{id}
   </update>
+  
+  <update id="updateHistoricProcessInstanceEvent_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
+    update ${prefix}ACT_HI_PROCINST HPI set
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
+      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}      
+      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>        
+      </if>            
+    where ID_ = #{id};    
+    <if test="endTime!=null &amp;&amp; startTime == null">
+      UPDATE ${prefix}ACT_HI_PROCINST HPI set
+        DURATION_ = ${dateDiff1} HPI.END_TIME_ ${dateDiff2} HPI.START_TIME_ ${dateDiff3}
+      WHERE ID_ = #{id};
+    </if>
+  </update>
+  
+  <update id="updateHistoricProcessInstanceEvent_nativeDateDiff" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
+    update ${prefix}ACT_HI_PROCINST HPI set
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
+      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}      
+      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">     
+            , DURATION_ = ${dateDiff1} HPI.START_TIME_ ${dateDiff2} #{endTime, jdbcType=TIMESTAMP} ${dateDiff3}
+        </if>
+      </if>      
+      
+    where ID_ = #{id}
+  </update>
     
   <update id="updateHistoricProcessInstanceEvent_mssql" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
     update ${prefix}ACT_HI_PROCINST set
@@ -104,8 +143,8 @@
             , DURATION_ = #{duration, jdbcType=TIMESTAMP}
         </if>
         <if test="startTime == null">
-          <!--  , DURATION_ = ((DAYS(DATE(#{endTime, jdbcType=TIMESTAMP})) - DAYS(HPI.START_TIME_)) * 86400000)
-            + ((MIDNIGHT_SECONDS(#{endTime, jdbcType=TIMESTAMP}) - MIDNIGHT_SECONDS(HPI.START_TIME_)) * 1000)  -->
+          , DURATION_ = ((DAYS(TIMESTAMP(#{endTime, jdbcType=TIMESTAMP})) - DAYS(HPI.START_TIME_)) * 86400000)
+            + ((MIDNIGHT_SECONDS(#{endTime, jdbcType=TIMESTAMP}) - MIDNIGHT_SECONDS(HPI.START_TIME_)) * 1000)
         </if>
       </if>                
     where ID_ = #{id}

@@ -73,6 +73,52 @@
         <if test="startTime == null">        
             , DURATION_ = ${dateDiff1} #{endTime, jdbcType=TIMESTAMP} ${dateDiff2} HAI.START_TIME_ ${dateDiff3}
         </if>
+      </if>
+    WHERE 
+      ID_ = #{id}
+  </update>
+
+  <update id="updateHistoricActivityInstanceEvent_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
+    UPDATE
+        ${prefix}ACT_HI_ACTINST HAI
+    SET
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+      <if test="eventType == 'update'">
+        , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR},
+        TASK_ID_ = #{taskId, jdbcType=VARCHAR}
+      </if>
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+      </if>
+    WHERE 
+      ID_ = #{id};
+    <if test="endTime!=null &amp;&amp; startTime == null">
+      UPDATE ${prefix}ACT_HI_ACTINST HAI set
+        DURATION_ = ${dateDiff1} HAI.END_TIME_ ${dateDiff2} HAI.START_TIME_ ${dateDiff3}
+      WHERE ID_ = #{id};
+    </if>
+  </update>
+
+  <update id="updateHistoricActivityInstanceEvent_nativeDateDiff" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
+    UPDATE 
+        ${prefix}ACT_HI_ACTINST HAI
+    SET
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+      <if test="eventType == 'update'">
+        , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR},
+        TASK_ID_ = #{taskId, jdbcType=VARCHAR}
+      </if>      
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        <if test="startTime!=null">
+            , DURATION_ = #{duration, jdbcType=TIMESTAMP}
+        </if>
+        <if test="startTime == null">        
+            , DURATION_ = ${dateDiff1} HAI.START_TIME_ ${dateDiff2} #{endTime, jdbcType=TIMESTAMP} ${dateDiff3}
+        </if>
       </if>          
     WHERE 
       ID_ = #{id}
@@ -111,17 +157,17 @@
       <if test="eventType == 'update'">
         , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR},
         TASK_ID_ = #{taskId, jdbcType=VARCHAR}
-      </if>      
+      </if>
       <if test="endTime!=null">
-        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         <if test="startTime!=null">
             , DURATION_ = #{duration, jdbcType=TIMESTAMP}
         </if>
         <if test="startTime == null">
-          <!--   , DURATION_ = ((DAYS(DATE(#{endTime, jdbcType=TIMESTAMP})) - DAYS(HAI.START_TIME_)) * 86400000)
-            + ((MIDNIGHT_SECONDS(#{endTime, jdbcType=TIMESTAMP}) - MIDNIGHT_SECONDS(HAI.START_TIME_)) * 1000) -->
+          , DURATION_ = ((DAYS(TIMESTAMP(#{endTime, jdbcType=TIMESTAMP})) - DAYS(HAI.START_TIME_)) * 86400000)
+            + ((MIDNIGHT_SECONDS(#{endTime, jdbcType=TIMESTAMP}) - MIDNIGHT_SECONDS(HAI.START_TIME_)) * 1000)
         </if>
-      </if>             
+      </if>
     WHERE 
       ID_ = #{id}
   </update>

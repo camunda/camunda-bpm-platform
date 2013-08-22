@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,11 +13,15 @@
 
 package org.camunda.bpm.engine.test.history;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -60,6 +64,10 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(processInstance.getId(), historicActivityInstance.getExecutionId());
     assertNotNull(historicActivityInstance.getStartTime());
 
+    // move clock by 1 second
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(new Date(now.getTime() + 1000));
+
     runtimeService.signal(processInstance.getId());
 
     historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult();
@@ -67,11 +75,12 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertEquals("receive", historicActivityInstance.getActivityId());
     assertEquals("receiveTask", historicActivityInstance.getActivityType());
     assertNotNull(historicActivityInstance.getEndTime());
-    assertTrue(historicActivityInstance.getDurationInMillis() >= 0);
     assertNotNull(historicActivityInstance.getProcessDefinitionId());
     assertEquals(processInstance.getId(), historicActivityInstance.getProcessInstanceId());
     assertEquals(processInstance.getId(), historicActivityInstance.getExecutionId());
     assertNotNull(historicActivityInstance.getStartTime());
+    assertTrue(historicActivityInstance.getDurationInMillis() >= 1000);
+    assertTrue(((HistoricActivityInstanceEventEntity)historicActivityInstance).getDurationRaw() >= 1000);
   }
 
   @Deployment

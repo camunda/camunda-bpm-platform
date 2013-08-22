@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +16,10 @@ import java.util.Date;
 
 /**
  * <p>{@link HistoryEvent} implementation for events that happen in an activity.</p>
- * 
+ *
  * @author Daniel Meyer
  * @author Marcel Wieczorek
- * 
+ *
  */
 public class HistoricActivityInstanceEventEntity extends HistoryEvent {
 
@@ -39,47 +39,47 @@ public class HistoricActivityInstanceEventEntity extends HistoryEvent {
 
   /** the id of the parent activity instance */
   protected String parentActivityInstanceId;
-  
+
   /** the id of the child activity instance */
   protected String calledProcessInstanceId;
-  
+
   protected String taskId;
   protected String taskAssignee;
-  
+
   protected Long durationInMillis;
   protected Date startTime;
   protected Date endTime;
-  
+
   // getters and setters //////////////////////////////////////////////////////
- 
+
   public Date getEndTime() {
     return endTime;
   }
-  
+
   public void setEndTime(Date endTime) {
-    this.endTime = endTime;    
+    this.endTime = endTime;
   }
-  
+
   public Date getStartTime() {
     return startTime;
   }
-  
+
   public void setStartTime(Date startTime) {
     this.startTime = startTime;
   }
-  
+
   public String getAssignee() {
     return taskAssignee;
   }
-  
+
   public Long getDurationInMillis() {
-    if(endTime != null) {      
-        return endTime.getTime() - startTime.getTime();     
+    if(endTime != null) {
+        return endTime.getTime() - startTime.getTime();
     } else {
       return durationInMillis;
     }
   }
-  
+
   public void setDurationInMillis(Long durationInMillis) {
     this.durationInMillis = durationInMillis;
   }
@@ -146,6 +146,10 @@ public class HistoricActivityInstanceEventEntity extends HistoryEvent {
 
   public void setTaskAssignee(String taskAssignee) {
     this.taskAssignee = taskAssignee;
+  }
+
+  public Long getDurationRaw() {
+    return durationInMillis;
   }
 
   @Override
