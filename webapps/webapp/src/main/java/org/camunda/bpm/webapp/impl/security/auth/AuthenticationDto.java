@@ -14,7 +14,6 @@ package org.camunda.bpm.webapp.impl.security.auth;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Daniel Meyer
@@ -28,11 +27,14 @@ public class AuthenticationDto {
 
   // transformer ///////////////////////
 
-  public static AuthenticationDto fromAuthentication(UserAuthentication auth) {
+  public static AuthenticationDto fromAuthentication(Authentication authentication) {
     AuthenticationDto dto = new AuthenticationDto();
 
-    dto.setUserId(auth.getIdentityId());
-    dto.setAuthorizedApps(new ArrayList<String>(auth.getAuthorizedApps()));
+    dto.setUserId(authentication.getIdentityId());
+
+    if (authentication instanceof UserAuthentication) {
+      dto.setAuthorizedApps(new ArrayList<String>(((UserAuthentication) authentication).getAuthorizedApps()));
+    }
 
     return dto;
   }
