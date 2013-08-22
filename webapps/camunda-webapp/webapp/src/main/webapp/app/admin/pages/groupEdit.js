@@ -93,17 +93,13 @@ define(['angular'], function(angular) {
 
   }];
 
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/groups/:groupId', {
       templateUrl: 'pages/groupEdit.html',
       controller: Controller,
-      reloadOnSearch: false
-    });
-
-    // multi tenacy
-    $routeProvider.when('/:engine/groups/:groupId', {
-      templateUrl: 'pages/groupEdit.html',
-      controller: Controller,
+      resolve: {
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
+      },
       reloadOnSearch: false
     });
   }];

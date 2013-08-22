@@ -3,19 +3,20 @@ ngDefine('tasklist.pages', [
   'bpmn/Bpmn',
 ], function(module, angular, Bpmn) {
 
-  var Controller = function($rootScope, $scope, $location, debounce, EngineApi, Notifications, Authentication) {
+  var OverviewController = [ '$rootScope', '$scope', '$location', 'debounce', 'EngineApi', 'Notifications', 'authenticatedUser', 
+                     function($rootScope, $scope, $location, debounce, EngineApi, Notifications, authenticatedUser) {
 
     var fireTaskListChanged = debounce(function() {
-      $rootScope.$broadcast("tasklist.reload");
+      $rootScope.$broadcast('tasklist.reload');
     }, 300);
 
     var notifyScopeChange = function(message) {
-      Notifications.addMessage({ status: "Scope change", message: message, exclusive: [ "status" ], duration: 5000 });
+      Notifications.addMessage({ status: 'Scope change', message: message, exclusive: [ 'status' ], duration: 5000 });
     };
 
     function searchQuery(query, view) {
       angular.forEach(view, function(value, key) {
-        if (key == "filter" || key == "search") {
+        if (key == 'filter' || key == 'search') {
           return;
         }
 
@@ -25,55 +26,57 @@ ngDefine('tasklist.pages', [
       return query;
     };
 
-    $scope.$watch(Authentication.username, function(newValue) {
-      $scope.groupInfo = EngineApi.getGroups(newValue);
-    });
-
     var reloadTasks = debounce(function() {
       var view = $scope.taskList.view;
 
-      $scope.loadTasks(view);
+      loadTasks(view);
     }, 300);
 
     $scope.taskList = {
       sort: {
-        by: "created",
-        order: "desc"
+        by: 'created',
+        order: 'desc'
       },
       selection: []
     };
 
-    $scope.$on("sortChanged", function() {
+    $scope.$on('sortChanged', function() {
       reloadTasks();
     });
 
-    $scope.loadTasks = function(view) {
+    $scope.$watch(function() { return $location.search(); }, function(newValue) {
+      var view = angular.extend({ filter: 'mytasks' }, newValue);
+      loadTasks(view);
+    });
+
+    $scope.groupInfo = EngineApi.getGroups(authenticatedUser);
+    
+    function loadTasks(view) {
       var filter = view.filter,
-          search = view.search,
-          user = Authentication.username();
+          search = view.search;
 
       $scope.taskList.view = { filter: filter, search: search };
 
       var queryObject = {},
-          user = Authentication.username(),
+          user = authenticatedUser,
           sort = $scope.taskList.sort;
 
-      queryObject.userId = user;
+      queryObject.userId = authenticatedUser;
 
       switch (filter) {
-        case "mytasks":
-          queryObject.assignee = user;
+        case 'mytasks':
+          queryObject.assignee = authenticatedUser;
           break;
-        case "unassigned":
-          queryObject.candidateUser = user;
+        case 'unassigned':
+          queryObject.candidateUser = authenticatedUser;
           break;
-        case "colleague":
+        case 'colleague':
           queryObject.assignee = search;
           break;
-        case "group":
+        case 'group':
           queryObject.candidateGroup = search;
           break;
-        case "search":
+        case 'search':
           searchQuery(queryObject, view);
           break;
       }
@@ -94,24 +97,19 @@ ngDefine('tasklist.pages', [
       });
     };
 
-    $scope.$watch(function() { return $location.search(); }, function(newValue) {
-      var view = angular.extend({ filter: "mytasks" }, newValue);
-      $scope.loadTasks(view);
-    });
-
     $scope.claimTask = function(task) {
 
       return EngineApi.getTaskList().claim({ id : task.id }, { userId: Authentication.username() }).$then(function () {
         var tasks = $scope.taskList.tasks,
             view = $scope.taskList.view;
 
-        if (view.filter == "mytasks") {
+        if (view.filter == 'mytasks') {
           $scope.addTask(task);
         } else {
           $scope.removeTask(task);
         }
 
-        notifyScopeChange("Claimed task <a href='#/overview?filter=mytasks&selection=" + task.id + "'>" + task.name + "</a>");
+        notifyScopeChange('Claimed task <a href="#/overview?filter=mytasks&selection=' + task.id + '">' + task.name + '</a>');
 
         fireTaskListChanged();
       });
@@ -121,7 +119,7 @@ ngDefine('tasklist.pages', [
       return EngineApi.getTaskList().unclaim({ id : task.id }).$then(function () {
         $scope.removeTask(task);
 
-        notifyScopeChange("Unclaimed task <a href='#/overview?filter=unassigned&selection=" + task.id + "'>" + task.name + "</a>");
+        notifyScopeChange('Unclaimed task <a href="#/overview?filter=unassigned&selection=' + task.id + '">' + task.name + '</a>');
 
         fireTaskListChanged();
       });
@@ -144,7 +142,7 @@ ngDefine('tasklist.pages', [
       return EngineApi.getTaskList().delegate( { id : task.id}, { userId: user.id }).$then(function () {
         $scope.removeTask(task);
 
-        notifyScopeChange("Delegated task");
+        notifyScopeChange('Delegated task');
         fireTaskListChanged();
       });
     };
@@ -155,7 +153,7 @@ ngDefine('tasklist.pages', [
         $scope.claimTask(task);
       }
 
-      notifyScopeChange("Claimed " + selection.length + " tasks");
+      notifyScopeChange('Claimed ' + selection.length + ' tasks');
     };
 
     $scope.delegateTasks = function (selection) {
@@ -164,7 +162,7 @@ ngDefine('tasklist.pages', [
         $scope.delegateTask(task);
       }
 
-      notifyScopeChange("Delegated " + selection.length + " tasks");
+      notifyScopeChange('Delegated ' + selection.length + ' tasks');
     };
 
     $scope.isSelected = function(task) {
@@ -223,34 +221,33 @@ ngDefine('tasklist.pages', [
           diagram.clear();
         }
 
-        var width = $("#diagram").width();
-        var height = $("#diagram").height();
+        var width = $('#diagram').width();
+        var height = $('#diagram').height();
 
         diagram = new Bpmn().render(xml, {
-          diagramElement : "diagram",
+          diagramElement : 'diagram',
           width: width,
           height: 400
         });
 
-        diagram.annotation(task.taskDefinitionKey).addClasses([ "bpmn-highlight" ]);
+        diagram.annotation(task.taskDefinitionKey).addClasses([ 'bpmn-highlight' ]);
 
         $scope.bpmn.diagram = diagram;
       });
     };
-  };
+  }];
 
-  Controller.$inject = ["$rootScope", "$scope", "$location", "debounce", "EngineApi", "Notifications", "Authentication"];
-
-  var RouteConfig = function($routeProvider) {
-    $routeProvider.when("/overview", {
-      templateUrl: "pages/overview.html",
-      controller: Controller
+  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
+    $routeProvider.when('/overview', {
+      templateUrl: 'pages/overview.html',
+      controller: OverviewController,
+      resolve: {
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
+      }
     });
-  };
-
-  RouteConfig.$inject = [ "$routeProvider"];
+  }];
 
   module
     .config(RouteConfig)
-    .controller("OverviewController", Controller);
+    .controller('OverviewOverviewController', OverviewController);
 });
