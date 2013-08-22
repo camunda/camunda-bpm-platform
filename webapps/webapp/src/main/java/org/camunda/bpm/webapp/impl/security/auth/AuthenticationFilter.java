@@ -13,8 +13,6 @@
 package org.camunda.bpm.webapp.impl.security.auth;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -70,21 +68,6 @@ public class AuthenticationFilter implements Filter {
       Authentications.updateSession(req.getSession(), authentications);
     }
 
-  }
-
-  protected void setProcessEngineAuthentications(Authentications authentications) {
-    for (Authentication authentication : authentications.getAuthentications()) {
-      ProcessEngine processEngine = Cockpit.getProcessEngine(authentication.getProcessEngineName());
-      if (processEngine != null) {
-        List<String> groupIds = null;
-        String identityId = authentication.getIdentityId();
-        if (authentication instanceof UserAuthentication) {
-          groupIds = ((UserAuthentication) authentication).getGroupIds();
-        }
-
-        processEngine.getIdentityService().setAuthentication(identityId, groupIds);
-      }
-    }
   }
 
   protected void clearProcessEngineAuthentications(Authentications authentications) {
