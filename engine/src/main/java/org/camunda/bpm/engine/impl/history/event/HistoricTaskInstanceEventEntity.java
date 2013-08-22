@@ -34,33 +34,33 @@ public class HistoricTaskInstanceEventEntity extends HistoryEvent {
   protected Long durationInMillis;
   protected Date startTime;
   protected Date endTime;
-      
+
   // getters and setters //////////////////////////////////////////////////////
 
   public Long getDurationInMillis() {
-    if(endTime != null) {      
-      return endTime.getTime() - startTime.getTime();     
+    if(endTime != null) {
+      return endTime.getTime() - startTime.getTime();
     } else {
       return durationInMillis;
     }
   }
-  
+
   public void setDurationInMillis(Long durationInMillis) {
     this.durationInMillis = durationInMillis;
   }
-  
+
   public Date getStartTime() {
     return startTime;
   }
-  
+
   public void setStartTime(Date startTime) {
     this.startTime = startTime;
   }
-  
+
   public Date getEndTime() {
-    return endTime;    
+    return endTime;
   }
-  
+
   public void setEndTime(Date endTime) {
     this.endTime = endTime;
   }
@@ -136,13 +136,17 @@ public class HistoricTaskInstanceEventEntity extends HistoryEvent {
   public String getTaskId() {
     return taskId;
   }
-  
+
   public String getTaskDefinitionKey() {
     return taskDefinitionKey;
   }
-  
+
   public void setTaskDefinitionKey(String taskDefinitionKey) {
     this.taskDefinitionKey = taskDefinitionKey;
+  }
+
+  public Long getDurationRaw() {
+    return durationInMillis;
   }
 
   @Override

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,41 +30,44 @@ import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 public class DbSqlSessionFactory implements SessionFactory {
 
   protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String,String>>();
-  
+
   public static final Map<String, String> databaseSpecificLimitBeforeStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificLimitAfterStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificLimitBetweenStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificOrderByStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificLimitBeforeNativeQueryStatements = new HashMap<String, String>();
-  
+
   public static final Map<String, String> databaseSpecificBitAnd1 = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificBitAnd2 = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificBitAnd3 = new HashMap<String, String>();
-  
+
   public static final Map<String, String> databaseSpecificDateDiff1 = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificDateDiff2 = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificDateDiff3 = new HashMap<String, String>();
-  
+
   public static final Map<String, String> databaseSpecificDummyTable = new HashMap<String, String>();
-  
+
   static {
-    
+
     String defaultOrderBy = " order by ${orderBy} ";
-    
+
     // h2
     databaseSpecificLimitBeforeStatements.put("h2", "");
     databaseSpecificLimitAfterStatements.put("h2", "LIMIT #{maxResults} OFFSET #{firstResult}");
     databaseSpecificLimitBetweenStatements.put("h2", "");
     databaseSpecificOrderByStatements.put("h2", defaultOrderBy);
-    databaseSpecificLimitBeforeNativeQueryStatements.put("h2", "");    
+    databaseSpecificLimitBeforeNativeQueryStatements.put("h2", "");
     databaseSpecificBitAnd1.put("h2", "BITAND(");
     databaseSpecificBitAnd2.put("h2", ",");
-    databaseSpecificBitAnd3.put("h2", ")");    
+    databaseSpecificBitAnd3.put("h2", ")");
     databaseSpecificDateDiff1.put("h2", "DATEDIFF(ms, ");
     databaseSpecificDateDiff2.put("h2", ",");
-    databaseSpecificDateDiff3.put("h2", ")");    
+    databaseSpecificDateDiff3.put("h2", ")");
     databaseSpecificDummyTable.put("h2", "");
-    
+    addDatabaseSpecificStatement("h2", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_nativeDateDiff");
+    addDatabaseSpecificStatement("h2", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_nativeDateDiff");
+    addDatabaseSpecificStatement("h2", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_nativeDateDiff");
+
 	  //mysql specific
     databaseSpecificLimitBeforeStatements.put("mysql", "");
     databaseSpecificLimitAfterStatements.put("mysql", "LIMIT #{maxResults} OFFSET #{firstResult}");
@@ -74,18 +77,21 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd1.put("mysql", "");
     databaseSpecificBitAnd2.put("mysql", " & ");
     databaseSpecificBitAnd3.put("mysql", "");
-    databaseSpecificDummyTable.put("mysql", "");    
+    databaseSpecificDummyTable.put("mysql", "");
     databaseSpecificDateDiff1.put("mysql", "TIMESTAMPDIFF(SECOND,");
     databaseSpecificDateDiff2.put("mysql", ",");
-    databaseSpecificDateDiff3.put("mysql", ")*1000");    
+    databaseSpecificDateDiff3.put("mysql", ")*1000");
     addDatabaseSpecificStatement("mysql", "selectNextJobsToExecute", "selectNextJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
     addDatabaseSpecificStatement("mysql", "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
     addDatabaseSpecificStatement("mysql", "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
     addDatabaseSpecificStatement("mysql", "selectDeploymentCountByQueryCriteria", "selectDeploymentCountByQueryCriteria_mysql");
-    
-    
+    addDatabaseSpecificStatement("mysql", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_nativeDateDiff");
+    addDatabaseSpecificStatement("mysql", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_nativeDateDiff");
+    addDatabaseSpecificStatement("mysql", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_nativeDateDiff");
+
+
     //postgres specific
     databaseSpecificLimitBeforeStatements.put("postgres", "");
     databaseSpecificLimitAfterStatements.put("postgres", "LIMIT #{maxResults} OFFSET #{firstResult}");
@@ -94,10 +100,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBeforeNativeQueryStatements.put("postgres", "");
     databaseSpecificBitAnd1.put("postgres", "");
     databaseSpecificBitAnd2.put("postgres", " & ");
-    databaseSpecificBitAnd3.put("postgres", "");    
+    databaseSpecificBitAnd3.put("postgres", "");
     databaseSpecificDateDiff1.put("postgres", "(EXTRACT(EPOCH FROM ");
     databaseSpecificDateDiff2.put("postgres", " AT TIME ZONE 'UTC') * 1000) - (EXTRACT(EPOCH FROM ");
-    databaseSpecificDateDiff3.put("postgres", " AT TIME ZONE 'UTC') * 1000)");    
+    databaseSpecificDateDiff3.put("postgres", " AT TIME ZONE 'UTC') * 1000)");
     databaseSpecificDummyTable.put("postgres", "");
     addDatabaseSpecificStatement("postgres", "insertByteArray", "insertByteArray_postgres");
     addDatabaseSpecificStatement("postgres", "updateByteArray", "updateByteArray_postgres");
@@ -118,7 +124,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("postgres", "selectActivityStatistics", "selectActivityStatistics_postgres");
     addDatabaseSpecificStatement("postgres", "selectActivityStatisticsCount", "selectActivityStatisticsCount_postgres");
     addDatabaseSpecificStatement("postgres", "selectHistoricVariableInstanceByQueryCriteria", "selectHistoricVariableInstanceByQueryCriteria_postgres");
-    
+    addDatabaseSpecificStatement("postgres", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_postgres");
+    addDatabaseSpecificStatement("postgres", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_postgres");
+    addDatabaseSpecificStatement("postgres", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_postgres");
+
     // oracle
     databaseSpecificLimitBeforeStatements.put("oracle", "select * from ( select a.*, ROWNUM rnum from (");
     databaseSpecificLimitAfterStatements.put("oracle", "  ) a where ROWNUM < #{lastRow}) where rnum  >= #{firstRow}");
@@ -128,12 +137,12 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDummyTable.put("oracle", "FROM DUAL");
     databaseSpecificBitAnd1.put("oracle", "BITAND(");
     databaseSpecificBitAnd2.put("oracle", ",");
-    databaseSpecificBitAnd3.put("oracle", ")");  
+    databaseSpecificBitAnd3.put("oracle", ")");
     databaseSpecificDateDiff1.put("oracle", "((cast(");
     databaseSpecificDateDiff2.put("oracle", " as date) - date '1970-01-01')*24*60*60*1000) - ((cast(");
     databaseSpecificDateDiff3.put("oracle", " as date) - date '1970-01-01')*24*60*60*1000)");
-    addDatabaseSpecificStatement("oracle", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");      
-        
+    addDatabaseSpecificStatement("oracle", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
+
     // db2
     databaseSpecificLimitBeforeStatements.put("db2", "SELECT SUB.* FROM (");
     databaseSpecificLimitAfterStatements.put("db2", ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
@@ -142,7 +151,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBeforeNativeQueryStatements.put("db2", "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
     databaseSpecificBitAnd1.put("db2", "BITAND(");
     databaseSpecificBitAnd2.put("db2", ",");
-    databaseSpecificBitAnd3.put("db2", ")");  
+    databaseSpecificBitAnd3.put("db2", ")");
     databaseSpecificDateDiff1.put("db2", "");
     databaseSpecificDateDiff2.put("db2", "");
     databaseSpecificDateDiff3.put("db2", "");
@@ -152,11 +161,11 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("db2", "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
-    addDatabaseSpecificStatement("db2", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");      
+    addDatabaseSpecificStatement("db2", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_db2");
     addDatabaseSpecificStatement("db2", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_db2");
-    addDatabaseSpecificStatement("db2", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_db2"); 
-    
+    addDatabaseSpecificStatement("db2", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_db2");
+
     // mssql
     databaseSpecificLimitBeforeStatements.put("mssql", "SELECT SUB.* FROM (");
     databaseSpecificLimitAfterStatements.put("mssql", ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
@@ -165,7 +174,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBeforeNativeQueryStatements.put("mssql", "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
     databaseSpecificBitAnd1.put("mssql", "");
     databaseSpecificBitAnd2.put("mssql", " &");
-    databaseSpecificBitAnd3.put("mssql", "");  
+    databaseSpecificBitAnd3.put("mssql", "");
     databaseSpecificDateDiff1.put("mssql", "");
     databaseSpecificDateDiff2.put("mssql", "");
     databaseSpecificDateDiff3.put("mssql", "");
@@ -180,7 +189,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("mssql", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_mssql");
     addDatabaseSpecificStatement("mssql", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_mssql");
   }
-  
+
   protected String databaseType;
   protected String databaseTablePrefix = "";
   /**
@@ -207,9 +216,9 @@ public class DbSqlSessionFactory implements SessionFactory {
   public Session openSession() {
     return new DbSqlSession(this);
   }
-  
+
   // insert, update and delete statements /////////////////////////////////////
-  
+
   public String getInsertStatement(PersistentObject object) {
     return getStatement(object.getClass(), insertStatements, "insert");
   }
@@ -238,7 +247,7 @@ public class DbSqlSessionFactory implements SessionFactory {
   }
 
   // db specific mappings /////////////////////////////////////////////////////
-  
+
   protected static void addDatabaseSpecificStatement(String databaseType, String activitiStatement, String ibatisStatement) {
     Map<String, String> specificStatements = databaseSpecificStatements.get(databaseType);
     if (specificStatements == null) {
@@ -247,7 +256,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     }
     specificStatements.put(activitiStatement, ibatisStatement);
   }
-  
+
   public String mapStatement(String statement) {
     if (statementMappings==null) {
       return statement;
@@ -255,83 +264,83 @@ public class DbSqlSessionFactory implements SessionFactory {
     String mappedStatement = statementMappings.get(statement);
     return (mappedStatement!=null ? mappedStatement : statement);
   }
-  
+
   // customized getters and setters ///////////////////////////////////////////
-  
+
   public void setDatabaseType(String databaseType) {
     this.databaseType = databaseType;
     this.statementMappings = databaseSpecificStatements.get(databaseType);
   }
 
   // getters and setters //////////////////////////////////////////////////////
-  
+
   public SqlSessionFactory getSqlSessionFactory() {
     return sqlSessionFactory;
   }
-  
+
   public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
     this.sqlSessionFactory = sqlSessionFactory;
   }
-  
+
   public IdGenerator getIdGenerator() {
     return idGenerator;
   }
-  
+
   public void setIdGenerator(IdGenerator idGenerator) {
     this.idGenerator = idGenerator;
   }
 
-  
+
   public String getDatabaseType() {
     return databaseType;
   }
 
-  
+
   public Map<String, String> getStatementMappings() {
     return statementMappings;
   }
 
-  
+
   public void setStatementMappings(Map<String, String> statementMappings) {
     this.statementMappings = statementMappings;
   }
 
-  
+
   public Map<Class< ? >, String> getInsertStatements() {
     return insertStatements;
   }
 
-  
+
   public void setInsertStatements(Map<Class< ? >, String> insertStatements) {
     this.insertStatements = insertStatements;
   }
 
-  
+
   public Map<Class< ? >, String> getUpdateStatements() {
     return updateStatements;
   }
 
-  
+
   public void setUpdateStatements(Map<Class< ? >, String> updateStatements) {
     this.updateStatements = updateStatements;
   }
 
-  
+
   public Map<Class< ? >, String> getDeleteStatements() {
     return deleteStatements;
   }
 
-  
+
   public void setDeleteStatements(Map<Class< ? >, String> deleteStatements) {
     this.deleteStatements = deleteStatements;
   }
 
-  
+
   public Map<Class< ? >, String> getSelectStatements() {
     return selectStatements;
   }
 
-  
+
   public void setSelectStatements(Map<Class< ? >, String> selectStatements) {
     this.selectStatements = selectStatements;
   }
@@ -339,15 +348,15 @@ public class DbSqlSessionFactory implements SessionFactory {
   public boolean isDbIdentityUsed() {
     return isDbIdentityUsed;
   }
-  
+
   public void setDbIdentityUsed(boolean isDbIdentityUsed) {
     this.isDbIdentityUsed = isDbIdentityUsed;
   }
-  
+
   public boolean isDbHistoryUsed() {
     return isDbHistoryUsed;
   }
-  
+
   public void setDbHistoryUsed(boolean isDbHistoryUsed) {
     this.isDbHistoryUsed = isDbHistoryUsed;
   }
@@ -355,15 +364,15 @@ public class DbSqlSessionFactory implements SessionFactory {
   public void setDatabaseTablePrefix(String databaseTablePrefix) {
     this.databaseTablePrefix = databaseTablePrefix;
   }
-    
+
   public String getDatabaseTablePrefix() {
     return databaseTablePrefix;
   }
-  
+
   public String getDatabaseSchema() {
     return databaseSchema;
   }
-  
+
   public void setDatabaseSchema(String databaseSchema) {
     this.databaseSchema = databaseSchema;
   }
