@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,8 +11,6 @@
  * limitations under the License.
  */
 package org.camunda.bpm.qa.upgrade;
-
-import java.util.List;
 
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -22,24 +20,19 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.repository.Deployment;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
 /**
  * <p>Base class for db upgrade tests</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public abstract class AbstractDbUpgradeTestCase {
-  
-  protected static ProcessEngine cachedProcessEngine; 
+
+  protected static ProcessEngine cachedProcessEngine;
 
   protected ProcessEngine processEngine;
   protected RepositoryService repositoryService;
@@ -50,19 +43,19 @@ public abstract class AbstractDbUpgradeTestCase {
   protected IdentityService identityService;
   protected ManagementService managementService;
 
-  
+
   @BeforeClass
-  public static void initProcessEngine() {    
+  public static void initProcessEngine() {
     if(cachedProcessEngine == null) {
       cachedProcessEngine = ProcessEngineConfigurationImpl
         .createProcessEngineConfigurationFromResource("process-engine-config70.xml")
         .buildProcessEngine();
-    }    
+    }
   }
-  
+
   @Before
   public void initProcessEngineServices() {
-    
+
     processEngine = cachedProcessEngine;
     repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();

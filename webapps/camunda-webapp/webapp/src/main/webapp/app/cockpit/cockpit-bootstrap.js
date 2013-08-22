@@ -20,7 +20,7 @@
       'angular' : 'assets/vendor/angular/angular',
       'angular-resource' : 'assets/vendor/angular/angular-resource',
       'angular-sanitize' : 'assets/vendor/angular/angular-sanitize',
-      'angular-cookies' : 'assets/vendor/angular/angular-cookies',
+      'angular-ui' : 'assets/vendor/angular-ui/ui-bootstrap-dialog-tpls-0.5.0',
       'angular-data-depend' : 'assets/vendor/angular-data-depend/dataDepend'
     },
     shim: {
@@ -32,7 +32,7 @@
       'angular' : { deps: [ 'jquery' ], exports: 'angular' },
       'angular-resource': { deps: [ 'angular' ] },
       'angular-sanitize': { deps: [ 'angular' ] },
-      'angular-cookies': { deps: [ 'angular' ] }
+      'angular-ui': { deps: [ 'angular' ] }
     },
     packages: [
       { name: 'cockpit', location: 'app/cockpit', main: 'cockpit' },
@@ -74,7 +74,7 @@
     ensureScenarioCompatibility();
   }
 
-  require([ 'angular', 'angular-resource', 'angular-sanitize', 'angular-cookies', 'ngDefine', 'bootstrap', 'jquery-ui' ], function(angular) {
+  require([ 'angular', 'angular-resource', 'angular-sanitize', 'angular-ui', 'ngDefine', 'bootstrap', 'jquery-ui' ], function(angular) {
     require([ APP_NAME, 'domReady!' ], function() {
       bootstrapApp(angular);
     });

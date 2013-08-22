@@ -1,117 +1,97 @@
 'use strict';
 
-ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
+ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angular, require) {
   
-  var buttonTemplate =
-  '  <button ng-show="!activityInstanceTree.isOpen" type="button" ng-click="open(activityInstanceTree)" class="btn-link">' + 
-  '    <i class="icon-plus"></i>' +
-  '  </button>' +  
-  '  <button ng-show="activityInstanceTree.isOpen" type="button" ng-click="close(activityInstanceTree)" class="btn-link">' + 
-  '    <i class="icon-minus"></i>' +
-  '  </button>';
-  
-  var labelTemplate = '<span id="{{ activityInstanceTree.id }}" class="clickable-tree-node" ng-class="{\'activity-highlight\' : activityInstanceTree.isSelected}">{{ activityInstanceTree.name }}</span>';
-  var childrenTemplate = '<ul ng-show="activityInstanceTree.isOpen">' + 
-                            '<li ng-repeat="item in getChildren() | orderBy:\'name\'" class="none-list-style">' + 
-                               '<div activity-instance-tree="item" selection="selection" on-element-click="propogateSelection(id, activityId, $event)"/>' +
-                            '</li>' +
-                         '</ul>';
-  
-  
-  var Directive = function ($compile) {
+  var TEMPLATE_URL = require.toUrl('./activity-instance-tree.html');
+
+  var Directive = [ '$compile', '$http', '$templateCache', 
+            function ($compile, $http, $templateCache) {
+    
     return {
       restrict: 'EAC',
       scope: {
-        activityInstanceTree: '=',
+        node: '=activityInstanceTree',
         onElementClick: '&',
         selection: '='
       },
       link: function(scope, element, attrs, processDiagram) {
         
-        scope.$watch('activityInstanceTree', function (newValue) {
+        var $nodeElement = element;
+
+        function withTemplate(fn) {
+          $http.get(TEMPLATE_URL, { cache: $templateCache })
+            .success(function(content) {
+              fn(content);
+            }).error(function(response, code, headers, config) {
+              throw Error('Failed to load template: ' + config.url);
+            });
+        }
+
+        scope.$watch('node', function (newValue) {
           if (!newValue || newValue.$loaded === false) {
             return;
           }
-          createTree(newValue);
+
+          newValue.children = (newValue.childActivityInstances || []).concat(newValue.childTransitionInstances || []);
+
+          createTreeNode(newValue);
         });
 
         scope.$watch('selection.activityInstanceIds', function(newValue, oldValue) {
-          if (!scope.activityInstanceTree) {
+          var node = scope.node;
+
+          if (!node) {
             return;
           }
 
-          if (oldValue) {
-            if (oldValue.indexOf(scope.activityInstanceTree.id) != -1) {
-              scope.activityInstanceTree.isSelected = false;
-            }
+          if (oldValue && oldValue.indexOf(node.id) != -1) {
+            node.isSelected = false;
           }
-          if (newValue) {
-            if (newValue.indexOf(scope.activityInstanceTree.id) != -1) {
-              scope.activityInstanceTree.isSelected = true;
-            }
+
+          if (newValue && newValue.indexOf(node.id) != -1) {
+            node.isSelected = true;
           }
         });
         
-        var nodeHandler = function ($event) {
-          $event.stopPropagation();
-
-          var targetId = $($event.target).attr('id');
-
-          if (targetId !== scope.activityInstanceTree.id) {
-            return;
-          }
-
-          var ctrlKey = $event.ctrlKey,
-              selectedNode = $event.data;
-
-          scope.onElementClick({id: selectedNode.id, activityId: selectedNode.activityId || selectedNode.targetActivityId, $event: $event});
-          scope.$apply();
-
+        scope.deselect = function($event) {
+          $event.ctrlKey = true;
+          scope.select($event);
         };
 
-        function createTree (activityInstanceTree) {
-          var template = labelTemplate;
-          
-          if (angular.isArray(activityInstanceTree.childActivityInstances) ||
-              angular.isArray(activityInstanceTree.childTransitionInstances)) {
-            if (activityInstanceTree.childActivityInstances.length > 0 ||
-                activityInstanceTree.childTransitionInstances.length > 0 ) {
-              template = buttonTemplate + template;
-              template += childrenTemplate;
+        scope.select = function($event) {
 
-              // initially all nodes are open
-              activityInstanceTree.isOpen = true;
-            }
+          var node = scope.node;
 
-          }
-          
-          var newElement = angular.element(template);
-          $compile(newElement)(scope);
-          element.replaceWith(newElement);
-          
-          newElement.click(activityInstanceTree, nodeHandler);
-          
+          $event.stopPropagation();
+
+          var ctrlKey = $event.ctrlKey;
+
+          scope.onElementClick({ id: node.id, activityId: node.activityId || node.targetActivityId, $event: $event });
+        };
+
+        function createTreeNode(node) {
+
+          withTemplate(function(template) {
+            node.isOpen = true;
+
+            var newElement = angular.element(template);
+            $compile(newElement)(scope);
+            $nodeElement.replaceWith(newElement);
+            $nodeElement = newElement;
+          });
         }
 
         scope.propogateSelection = function (id, activityId, $event) {
           scope.onElementClick({id: id, activityId: activityId, $event: $event});
         }
-        
-        scope.getChildren = function () {
-          return scope.activityInstanceTree.childActivityInstances.concat(scope.activityInstanceTree.childTransitionInstances);
-        }
 
-        scope.open = function(node) {
-          node.isOpen = true;
+        scope.toggleOpen = function() {
+          var node = scope.node;
+          node.isOpen = !node.isOpen;
         };
-        
-        scope.close= function(node) {
-          node.isOpen = false;
-        };
-        
       }
     };
-  };
+  }];
   
   module
     .directive('activityInstanceTree', Directive);

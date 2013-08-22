@@ -1,11 +1,9 @@
-'use strict';
-
-define(['angular'], function(angular) {
+define([ 'angular', 'require' ], function(angular, require) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', '$routeParams', 'AuthorizationResource', 'Notifications', '$location', 
-    function ($scope, $routeParams, AuthorizationResource, Notifications, $location) {
+  var Controller = ['$scope', '$routeParams', '$dialog', 'AuthorizationResource', 'Notifications', '$location', 
+    function ($scope, $routeParams, $dialog, AuthorizationResource, Notifications, $location) {
 
     $scope.allPermissionsValue = 2147483647;
 
@@ -46,8 +44,6 @@ define(['angular'], function(angular) {
       }
     }
 
-    $scope.confirmDeleteAuthorizationDialog = new Dialog();
-
     var getType = $scope.getType = function(authorization) {
       return $scope.typeMap[authorization.type];
     }
@@ -78,20 +74,35 @@ define(['angular'], function(angular) {
           result += permissionsList[i];
         };
         return result;
-
       }
-    }
+    };
 
-    var deleteAuthorization = $scope.deleteAuthorization = function(authorization) {
-      $scope.authorizationToDelete = authorization;
-      $scope.confirmDeleteAuthorizationDialog.open();      
-    }
+    $scope.deleteAuthorization = function(authorization) {
+      
+      var dialog = $dialog.dialog({
+        controller: 'ConfirmDeleteAuthorizationController',
+        templateUrl: require.toUrl('./confirm-delete-authorization.html'),
+        resolve: {
+          authorizationToDelete: function() { return authorization; },
+          formatPermissions: function() { return formatPermissions; },
+          getResource: function() { return getResource; },
+          getType: function() { return getType; }
+        }
+      });
+
+      dialog.open().then(function(result) {
+
+        if (result == 'SUCCESS') {
+          loadAuthorizations();
+        }
+      });   
+    };
 
     var loadAuthorizations = $scope.loadAuthorizations = function() {
       AuthorizationResource.query({resourceType : $scope.selectedResourceType}).$then(function(response) {
         $scope.authorizations = response.data;
       });
-    }
+    };
 
     $scope.getPermissionsForResource = function() {
       if(!!$scope.selectedResourceType) {
@@ -99,7 +110,7 @@ define(['angular'], function(angular) {
       }else {
         return [];
       }
-    }
+    };
 
     // page controls ////////////////////////////////////
     

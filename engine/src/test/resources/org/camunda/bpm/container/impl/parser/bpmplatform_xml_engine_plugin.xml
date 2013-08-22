@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpm-platform xmlns="http://www.camunda.org/schema/1.0/BpmPlatform"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/BpmPlatform">
+
+  <job-executor>
+    <job-acquisition name="default" />
+  </job-executor>
+
+  <process-engine name="engine1">
+    <job-acquisition>default</job-acquisition>
+
+    <plugins>
+      <plugin>
+        <class>org.camunda.bpm.MyAwesomePlugin</class>
+        <properties>
+          <property name="prop1">val1</property>
+          <property name="prop2">val2</property>
+        </properties>
+      </plugin>
+    </plugins>
+
+  </process-engine>
+
+</bpm-platform>
+
+

@@ -18,9 +18,9 @@
               <xsd:element name="configuration" type="xsd:string" minOccurs="0" maxOccurs="1" />
               <xsd:element name="datasource" type="xsd:string" minOccurs="0" maxOccurs="1"/>
               <xsd:element name="properties" type="tns:Properties" minOccurs="0" maxOccurs="1" />
-              <xsd:element name="plugin" type="tns:Plugin" minOccurs="0" maxOccurs="unbounded" />
+              <xsd:element name="plugins" type="tns:Plugins" minOccurs="0" maxOccurs="1" />
             </xsd:sequence>
-            
+
             <xsd:attribute name="name" type="xsd:string" use="required" />
 
           </xsd:complexType>
@@ -35,7 +35,7 @@
               <xsd:element name="process" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
               <xsd:element name="properties" type="tns:Properties" minOccurs="0" maxOccurs="1" />
             </xsd:sequence>
-            <xsd:attribute name="name" type="xsd:string" use="required" />
+            <xsd:attribute name="name" type="xsd:string" use="optional" />
           </xsd:complexType>
 
         </xsd:element>
@@ -45,13 +45,19 @@
   </xsd:element>
 
 
+  <xsd:complexType name="Plugins">
+    <xsd:sequence>
+      <xsd:element name="plugin" type="tns:Plugin" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>
+
   <xsd:complexType name="Plugin">
     <xsd:sequence>
       <xsd:element name="class" type="xsd:string" minOccurs="1" maxOccurs="1" />
       <xsd:element name="properties" type="tns:Properties" minOccurs="0" maxOccurs="1" />
     </xsd:sequence>
   </xsd:complexType>
-  
+
   <xsd:complexType name="Properties">
     <xsd:sequence>
       <xsd:element name="property" type="tns:Property" minOccurs="0" maxOccurs="unbounded" />

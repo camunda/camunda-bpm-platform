@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,14 +47,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected Date finishedAfter;
   protected String processDefinitionKey;
   protected Set<String> processInstanceIds;
-  
+
   public HistoricProcessInstanceQueryImpl() {
   }
-  
+
   public HistoricProcessInstanceQueryImpl(CommandContext commandContext) {
     super(commandContext);
   }
-  
+
   public HistoricProcessInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
@@ -79,12 +79,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     this.processDefinitionId = processDefinitionId;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery processDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery processInstanceBusinessKey(String businessKey) {
     this.businessKey = businessKey;
     return this;
@@ -94,73 +94,73 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     this.finished = true;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery unfinished() {
     this.unfinished = true;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery startedBy(String userId) {
     this.startedBy = userId;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery processDefinitionKeyNotIn(List<String> processDefinitionKeys) {
     this.processKeyNotIn = processDefinitionKeys;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery startedAfter(Date date) {
     startedAfter = date;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery startedBefore(Date date) {
     startedBefore = date;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery finishedAfter(Date date) {
     finishedAfter = date;
     finished = true;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery finishedBefore(Date date) {
     finishedBefore = date;
     finished = true;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
 	 this.superProcessInstanceId = superProcessInstanceId;
 	 return this;
   }
-  
+
 	public HistoricProcessInstanceQuery orderByProcessInstanceBusinessKey() {
     return orderBy(HistoricProcessInstanceQueryProperty.BUSINESS_KEY);
   }
-  
+
   public HistoricProcessInstanceQuery orderByProcessInstanceDuration() {
     return orderBy(HistoricProcessInstanceQueryProperty.DURATION);
   }
-  
+
   public HistoricProcessInstanceQuery orderByProcessInstanceStartTime() {
     return orderBy(HistoricProcessInstanceQueryProperty.START_TIME);
   }
-  
+
   public HistoricProcessInstanceQuery orderByProcessInstanceEndTime() {
     return orderBy(HistoricProcessInstanceQueryProperty.END_TIME);
   }
-  
+
   public HistoricProcessInstanceQuery orderByProcessDefinitionId() {
     return orderBy(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_ID);
   }
-  
+
   public HistoricProcessInstanceQuery orderByProcessInstanceId() {
     return orderBy(HistoricProcessInstanceQueryProperty.PROCESS_INSTANCE_ID_);
   }
-  
+
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -176,7 +176,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
       .getHistoricProcessInstanceManager()
       .findHistoricProcessInstancesByQueryCriteria(this, page);
   }
-  
+
   public String getBusinessKey() {
     return businessKey;
   }
@@ -207,7 +207,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public void setSuperProcessInstanceId(String superProcessInstanceId) {
     this.superProcessInstanceId = superProcessInstanceId;
   }
-  
+
   public List<String> getProcessKeyNotIn() {
     return processKeyNotIn;
   }
@@ -223,10 +223,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public Date getFinishedBefore() {
     return finishedBefore;
   }
- 
-  
+
+
   // below is deprecated and to be removed in 5.12
-  
+
   protected Date startDateBy;
   protected Date startDateOn;
   protected Date finishDateBy;
@@ -263,16 +263,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     this.finishDateOnEnd = this.calculateBeforeMidnight(date);
     return this;
   }
-  
+
   @Deprecated
   private Date calculateBeforeMidnight(Date date){
     Calendar cal = Calendar.getInstance();
     cal.setTime(date);
     cal.add(Calendar.DAY_OF_MONTH, 1);
-    cal.add(Calendar.SECOND, -1);   
+    cal.add(Calendar.SECOND, -1);
     return cal.getTime();
   }
-  
+
   @Deprecated
   private Date calculateMidnight(Date date){
     Calendar cal = Calendar.getInstance();
@@ -280,7 +280,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     cal.set(Calendar.MILLISECOND, 0);
     cal.set(Calendar.SECOND, 0);
     cal.set(Calendar.MINUTE, 0);
-    cal.set(Calendar.HOUR, 0);    
+    cal.set(Calendar.HOUR, 0);
     return cal.getTime();
   }
 }

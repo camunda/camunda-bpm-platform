@@ -14,7 +14,7 @@
   <properties>
     <org.jboss.shrinkwrap.resolver.version>1.0.0-beta-5</org.jboss.shrinkwrap.resolver.version>
   </properties>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm.jboss</groupId>
@@ -28,7 +28,7 @@
         <exclusion>
           <groupId>org.springframework</groupId>
           <artifactId>spring-beans</artifactId>
-        </exclusion>       
+        </exclusion>
         <exclusion>
           <groupId>commons-lang</groupId>
           <artifactId>commons-lang</artifactId>
@@ -38,7 +38,11 @@
           <artifactId>joda-time</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>     	
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.identity</groupId>
+      <artifactId>camunda-identity-ldap</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

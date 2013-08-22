@@ -81,30 +81,72 @@ public class InvoiceDemoDataGenerator {
       engine.getIdentityService().createMembership("john", "sales");
       engine.getIdentityService().createMembership("mary", "accounting");
       engine.getIdentityService().createMembership("peter", "management");
-      
+
       // authorize groups for tasklist:
-      
+
       AuthorizationService authorizationService = engine.getAuthorizationService();
-      
+
       Authorization salesTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       salesTasklistAuth.setGroupId("sales");
       salesTasklistAuth.addPermission(ACCESS);
       salesTasklistAuth.setResourceId("tasklist");
       salesTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(salesTasklistAuth);
-      
+
       Authorization accountingTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       accountingTasklistAuth.setGroupId("accounting");
       accountingTasklistAuth.addPermission(ACCESS);
       accountingTasklistAuth.setResourceId("tasklist");
       accountingTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(accountingTasklistAuth);
-      
+
       Authorization managementTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       managementTasklistAuth.setGroupId("management");
       managementTasklistAuth.addPermission(ACCESS);
       managementTasklistAuth.setResourceId("tasklist");
       managementTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(managementTasklistAuth);
+
+      Authorization salesDemoAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      salesDemoAuth.setGroupId("sales");
+      salesDemoAuth.setResource(USER);
+      salesDemoAuth.setResourceId("demo");
+      salesDemoAuth.addPermission(READ);
+      authorizationService.saveAuthorization(salesDemoAuth);
+
+      Authorization salesJohnAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      salesJohnAuth.setGroupId("sales");
+      salesJohnAuth.setResource(USER);
+      salesJohnAuth.setResourceId("john");
+      salesJohnAuth.addPermission(READ);
+      authorizationService.saveAuthorization(salesJohnAuth);
+
+      Authorization manDemoAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      manDemoAuth.setGroupId("management");
+      manDemoAuth.setResource(USER);
+      manDemoAuth.setResourceId("demo");
+      manDemoAuth.addPermission(READ);
+      authorizationService.saveAuthorization(manDemoAuth);
+
+      Authorization manPeterAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      manPeterAuth.setGroupId("management");
+      manPeterAuth.setResource(USER);
+      manPeterAuth.setResourceId("peter");
+      manPeterAuth.addPermission(READ);
+      authorizationService.saveAuthorization(manPeterAuth);
+
+      Authorization accDemoAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      accDemoAuth.setGroupId("accounting");
+      accDemoAuth.setResource(USER);
+      accDemoAuth.setResourceId("demo");
+      accDemoAuth.addPermission(READ);
+      authorizationService.saveAuthorization(accDemoAuth);
+
+      Authorization accMaryAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      accMaryAuth.setGroupId("accounting");
+      accMaryAuth.setResource(USER);
+      accMaryAuth.setResourceId("mary");
+      accMaryAuth.addPermission(READ);
+      authorizationService.saveAuthorization(accMaryAuth);
     }
 }

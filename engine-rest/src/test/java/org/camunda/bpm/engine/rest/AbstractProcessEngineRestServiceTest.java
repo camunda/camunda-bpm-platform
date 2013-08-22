@@ -19,11 +19,18 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
@@ -61,7 +68,13 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String GROUP_URL = SINGLE_ENGINE_URL + "/group";
   protected static final String AUTHORIZATION_URL = SINGLE_ENGINE_URL + AuthorizationRestService.PATH;
   protected static final String AUTHORIZATION_CHECK_URL = AUTHORIZATION_URL + "/check";
-  
+
+  protected static final String HISTORY_URL = SINGLE_ENGINE_URL + "/history";
+  protected static final String HISTORY_ACTIVITY_INSTANCE_URL = HISTORY_URL + "/activity-instance";
+  protected static final String HISTORY_PROCESS_INSTANCE_URL = HISTORY_URL + "/process-instance";
+  protected static final String HISTORY_VARIABLE_INSTANCE_URL = HISTORY_URL + "/variable-instance";
+
+
   protected String EXAMPLE_ENGINE_NAME = "anEngineName";
 
   private ProcessEngine namedProcessEngine;
@@ -70,6 +83,8 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   private TaskService mockTaskService;
   private IdentityService mockIdentityService;
 
+  private HistoryService mockHistoryService;
+
   @Before
   public void setUpRuntimeData() {
     namedProcessEngine = getProcessEngine(EXAMPLE_ENGINE_NAME);
@@ -77,54 +92,62 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     mockRuntimeService = mock(RuntimeService.class);
     mockTaskService = mock(TaskService.class);
     mockIdentityService = mock(IdentityService.class);
-    
+
+    mockHistoryService = mock(HistoryService.class);
+
     when(namedProcessEngine.getRepositoryService()).thenReturn(mockRepoService);
     when(namedProcessEngine.getRuntimeService()).thenReturn(mockRuntimeService);
     when(namedProcessEngine.getTaskService()).thenReturn(mockTaskService);
     when(namedProcessEngine.getIdentityService()).thenReturn(mockIdentityService);
-    
+
+    when(namedProcessEngine.getHistoryService()).thenReturn(mockHistoryService);
+
     createProcessDefinitionMock();
     createProcessInstanceMock();
     createTaskMock();
     createIdentityMocks();
     createExecutionMock();
     createVariableInstanceMock();
+
+    createHistoricActivityInstanceMock();
+    createHistoricProcessInstanceMock();
+    createHistoricVariableInstanceMock();
   }
-  
+
 
   private void createProcessDefinitionMock() {
     ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
-    
+
     when(mockRepoService.getProcessDefinition(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(mockDefinition);
   }
-  
+
   private void createProcessInstanceMock() {
     ProcessInstance mockInstance = MockProvider.createMockInstance();
-    
+
     ProcessInstanceQuery mockInstanceQuery = mock(ProcessInstanceQuery.class);
     when(mockInstanceQuery.processInstanceId(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))).thenReturn(mockInstanceQuery);
     when(mockInstanceQuery.singleResult()).thenReturn(mockInstance);
     when(mockRuntimeService.createProcessInstanceQuery()).thenReturn(mockInstanceQuery);
   }
-  
+
   private void createExecutionMock() {
     Execution mockExecution = MockProvider.createMockExecution();
-    
+
     ExecutionQuery mockExecutionQuery = mock(ExecutionQuery.class);
     when(mockExecutionQuery.processInstanceId(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))).thenReturn(mockExecutionQuery);
     when(mockExecutionQuery.singleResult()).thenReturn(mockExecution);
     when(mockRuntimeService.createExecutionQuery()).thenReturn(mockExecutionQuery);
   }
-  
+
   private void createTaskMock() {
     Task mockTask = MockProvider.createMockTask();
-    
+
     TaskQuery mockTaskQuery = mock(TaskQuery.class);
     when(mockTaskQuery.taskId(eq(MockProvider.EXAMPLE_TASK_ID))).thenReturn(mockTaskQuery);
     when(mockTaskQuery.singleResult()).thenReturn(mockTask);
     when(mockTaskService.createTaskQuery()).thenReturn(mockTaskQuery);
   }
-  
+
   private void createIdentityMocks() {
     // identity
     UserQuery sampleUserQuery = mock(UserQuery.class);
@@ -132,32 +155,64 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     List<User> mockUsers = new ArrayList<User>();
     User mockUser = MockProvider.createMockUser();
     mockUsers.add(mockUser);
-    
+
     // user query
     when(sampleUserQuery.memberOfGroup(anyString())).thenReturn(sampleUserQuery);
     when(sampleUserQuery.list()).thenReturn(mockUsers);
-    
+
     // group query
     List<Group> mockGroups = MockProvider.createMockGroups();
     when(sampleGroupQuery.groupMember(anyString())).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.orderByGroupName()).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.asc()).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.list()).thenReturn(mockGroups);
-    
+
     when(mockIdentityService.createGroupQuery()).thenReturn(sampleGroupQuery);
     when(mockIdentityService.createUserQuery()).thenReturn(sampleUserQuery);
   }
-  
-  
+
+
   private void createVariableInstanceMock() {
     List<VariableInstance> variables = new ArrayList<VariableInstance>();
     VariableInstance mockInstance = MockProvider.createMockVariableInstance();
     variables.add(mockInstance);
-    
+
     VariableInstanceQuery mockVariableInstanceQuery = mock(VariableInstanceQuery.class);
     when(mockVariableInstanceQuery.list()).thenReturn(variables);
     when(mockRuntimeService.createVariableInstanceQuery()).thenReturn(mockVariableInstanceQuery);
   }
+
+  private void createHistoricActivityInstanceMock() {
+    List<HistoricActivityInstance> activities = new ArrayList<HistoricActivityInstance>();
+    HistoricActivityInstance mockInstance = MockProvider.createMockHistoricActivityInstance();
+    activities.add(mockInstance);
+
+    HistoricActivityInstanceQuery mockHistoricActivityInstanceQuery = mock(HistoricActivityInstanceQuery.class);
+    when(mockHistoricActivityInstanceQuery.list()).thenReturn(activities);
+    when(mockHistoryService.createHistoricActivityInstanceQuery()).thenReturn(mockHistoricActivityInstanceQuery);
+  }
+
+  private void createHistoricProcessInstanceMock() {
+    List<HistoricProcessInstance> processes = new ArrayList<HistoricProcessInstance>();
+    HistoricProcessInstance mockInstance = MockProvider.createMockHistoricProcessInstance();
+    processes.add(mockInstance);
+
+    HistoricProcessInstanceQuery mockHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
+    when(mockHistoricProcessInstanceQuery.list()).thenReturn(processes);
+    when(mockHistoryService.createHistoricProcessInstanceQuery()).thenReturn(mockHistoricProcessInstanceQuery);
+  }
+
+
+  private void createHistoricVariableInstanceMock() {
+    List<HistoricVariableInstance> variables = new ArrayList<HistoricVariableInstance>();
+    HistoricVariableInstance mockInstance = MockProvider.createMockHistoricVariableInstance();
+    variables.add(mockInstance);
+
+    HistoricVariableInstanceQuery mockHistoricVariableInstanceQuery = mock(HistoricVariableInstanceQuery.class);
+    when(mockHistoricVariableInstanceQuery.list()).thenReturn(variables);
+    when(mockHistoryService.createHistoricVariableInstanceQuery()).thenReturn(mockHistoricVariableInstanceQuery);
+  }
+
 
   @Test
   public void testNonExistingEngineAccess() {
@@ -169,7 +224,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
       .body("message", equalTo("No process engine available"))
     .when().get(PROCESS_DEFINITION_URL);
   }
-  
+
   @Test
   public void testEngineNamesList() {
     expect()
@@ -179,7 +234,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
       .body("[1].name", equalTo(MockProvider.ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME))
     .when().get(ENGINES_URL);
   }
-  
+
   @Test
   public void testProcessDefinitionServiceEngineAccess() {
     given().pathParam("name", EXAMPLE_ENGINE_NAME)
@@ -187,11 +242,11 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(PROCESS_DEFINITION_URL);
-    
+
     verify(mockRepoService).getProcessDefinition(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
     verifyZeroInteractions(processEngine);
   }
-  
+
   @Test
   public void testProcessInstanceServiceEngineAccess() {
     given().pathParam("name", EXAMPLE_ENGINE_NAME)
@@ -199,11 +254,11 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(PROCESS_INSTANCE_URL);
-    
+
     verify(mockRuntimeService).createProcessInstanceQuery();
     verifyZeroInteractions(processEngine);
   }
-  
+
   @Test
   public void testTaskServiceEngineAccess() {
     given().pathParam("name", EXAMPLE_ENGINE_NAME)
@@ -211,11 +266,11 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(TASK_URL);
-    
+
     verify(mockTaskService).createTaskQuery();
     verifyZeroInteractions(processEngine);
   }
-  
+
   @Test
   public void testIdentityServiceEngineAccess() {
     given().pathParam("name", EXAMPLE_ENGINE_NAME)
@@ -223,75 +278,117 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(IDENTITY_GROUPS_URL);
-    
+
     verify(mockIdentityService).createUserQuery();
     verifyZeroInteractions(processEngine);
   }
-  
+
   @Test
   public void testMessageServiceEngineAccess() {
     String messageName = "aMessage";
     Map<String, Object> messageParameters = new HashMap<String, Object>();
     messageParameters.put("messageName", messageName);
-    
+
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters).pathParam("name", EXAMPLE_ENGINE_NAME)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(MESSAGE_URL);
 
-    verify(mockRuntimeService).correlateMessage(eq(messageName), eq((String) null), 
+    verify(mockRuntimeService).correlateMessage(eq(messageName), eq((String) null),
         argThat(new EqualsMap(null)), argThat(new EqualsMap(null)));
     verifyZeroInteractions(processEngine);
   }
-  
+
   @Test
   public void testExecutionServiceEngineAccess() {
     given().pathParam("name", EXAMPLE_ENGINE_NAME)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(EXECUTION_URL);
-    
+
     verify(mockRuntimeService).createExecutionQuery();
     verifyZeroInteractions(processEngine);
   }
-  
+
   @Test
   public void testVariableInstanceServiceEngineAccess() {
     given().pathParam("name", EXAMPLE_ENGINE_NAME)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(VARIABLE_INSTANCE_URL);
-    
+
     verify(mockRuntimeService).createVariableInstanceQuery();
     verifyZeroInteractions(processEngine);
   }
-  
+
   @Test
   public void testUserServiceEngineAccess() {
     given().pathParam("name", EXAMPLE_ENGINE_NAME)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(USER_URL);
-    
+
     verify(mockIdentityService).createUserQuery();
     verifyZeroInteractions(processEngine);
   }
-  
+
   @Test
   public void testGroupServiceEngineAccess() {
     given().pathParam("name", EXAMPLE_ENGINE_NAME)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(GROUP_URL);
-    
+
     verify(mockIdentityService).createGroupQuery();
     verifyZeroInteractions(processEngine);
   }
-  
+
   @Test
   public void testAuthorizationServiceEngineAccess() {
     given().pathParam("name", EXAMPLE_ENGINE_NAME)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when().get(AUTHORIZATION_CHECK_URL);    
+    .when().get(AUTHORIZATION_CHECK_URL);
+  }
+
+  @Test
+  public void testHistoryServiceEngineAccess_HistoricActivityInstance() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORY_ACTIVITY_INSTANCE_URL);
+
+    verify(mockHistoryService).createHistoricActivityInstanceQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testHistoryServiceEngineAccess_HistoricProcessInstance() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORY_PROCESS_INSTANCE_URL);
+
+    verify(mockHistoryService).createHistoricProcessInstanceQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testHistoryServiceEngineAccess_HistoricVariableInstance() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORY_VARIABLE_INSTANCE_URL);
+
+    verify(mockHistoryService).createHistoricVariableInstanceQuery();
+    verifyZeroInteractions(processEngine);
   }
 }

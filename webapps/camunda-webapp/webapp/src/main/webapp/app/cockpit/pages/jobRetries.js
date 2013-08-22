@@ -1,8 +1,9 @@
 ngDefine('cockpit.pages', function(module, $) {
 
-  function JobRetriesController ($scope, $q, $location, Notifications, JobResource) {
+  var JobRetriesController = [ '$scope', '$q', '$location', 'Notifications','JobResource', 'dialog', 'processData', 'processInstance', 
+                      function ($scope, $q, $location, Notifications, JobResource, dialog, processData, processInstance) {
 
-    var jobRetriesData = $scope.processData.newChild($scope);
+    var jobRetriesData = processData.newChild($scope);
 
     var jobPages = $scope.jobPages = { size: 5, total: 0 };
     var summarizePages = $scope.summarizePages = { size: 5, total: 0 };
@@ -11,8 +12,6 @@ ngDefine('cockpit.pages', function(module, $) {
     var selectedFailedJobIds = $scope.selectedFailedJobIds = [];
 
     var finishedWithFailures = false;
-
-    var processInstance = $scope.processInstance;
 
     var retryFailed = false;
     $scope.allJobsSelected = false;
@@ -27,7 +26,7 @@ ngDefine('cockpit.pages', function(module, $) {
     });
 
     $scope.$on('$routeChangeStart', function () {
-      $scope.jobRetriesDialog.close();
+      dialog.close($scope.status);
     });
 
     $scope.$watch('jobPages.current', function(newValue, oldValue) {
@@ -127,9 +126,9 @@ ngDefine('cockpit.pages', function(module, $) {
 
       doRetry(selectedFailedJobIds).then(function () {
         if (!finishedWithFailures) {
-          Notifications.addMessage({'status': 'Finished', 'message': 'Incrementing the number of retries finished.', 'exclusive': true});  
+          Notifications.addMessage({ 'status': 'Finished', 'message': 'Incrementing the number of retries finished.', 'exclusive': true });  
         } else {
-          Notifications.addError({'status': 'Finished', 'message': 'Incrementing the number of retries finished with failures.', 'exclusive': true});  
+          Notifications.addError({ 'status': 'Finished', 'message': 'Incrementing the number of retries finished with failures.', 'exclusive': true });  
         }
         
         $scope.status = FINISHED;
@@ -179,15 +178,10 @@ ngDefine('cockpit.pages', function(module, $) {
 
 
     $scope.close = function (status) {
-      $scope.jobRetriesDialog.close();
+      dialog.close(status);
     };
+  }];
 
-  };
-  module.controller('JobRetriesController', [ '$scope',
-                                                         '$q',
-                                                         '$location',
-                                                         'Notifications',
-                                                         'JobResource',
-                                                         JobRetriesController ]);
+  module.controller('JobRetriesController', JobRetriesController);
 
 });

@@ -1,31 +1,13 @@
 ngDefine('cockpit.pages.processInstance', [
+  'require',
   'module:dataDepend:angular-data-depend'
-], function(module) {
+], function(module, require) {
 
-  function ProcessInstanceController ($scope, $rootScope, $location, $filter, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Transform, processInstance, dataDepend) {
+  function ProcessInstanceController ($scope, $rootScope, $location, $filter, $dialog, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Transform, processInstance, dataDepend) {
     
     $rootScope.clearBreadcrumbs();
 
     $scope.processInstance = processInstance;
-
-    $scope.cancelProcessInstanceDialog = new Dialog();
-    $scope.cancelProcessInstanceDialog.setAutoClosable(false);
-
-    $scope.jobRetriesDialog = new Dialog();
-    $scope.jobRetriesDialog.setAutoClosable(false);
-
-    $scope.addVariableDialog = new Dialog();
-    $scope.addVariableDialog.setAutoClosable(false);
-
-    $scope.variableTypes = [
-                          'String',
-                          'Boolean',
-                          'Short',
-                          'Integer',
-                          'Long',
-                          'Double',
-                          'Date'
-                        ];
 
     var currentFilter;
     var controllerInitialized = false;
@@ -361,11 +343,6 @@ ngDefine('cockpit.pages.processInstance', [
 
     processData.provide('filter', parseFilterFromUri());
 
-    // processData.provide('filter', [ 'instanceIdToInstanceMap', 'activityIdToInstancesMap', function (instanceIdToInstanceMap, activityIdToInstancesMap) {
-    //   var filter = completeFilter(parseFilterFromUri(), instanceIdToInstanceMap, activityIdToInstancesMap);
-    //   return filter;
-    // }]);
-
     // /////// End definition of process data 
 
 
@@ -498,19 +475,21 @@ ngDefine('cockpit.pages.processInstance', [
           var index = activityIds.indexOf(activityId);
           if (index === -1) {
             activityIds.push(activityId);
-          }       
+          }
         } else
 
         if (idx !== -1) {
           activityInstanceIds.splice(idx, 1);
 
           var foundAnotherActivityInstance = false;
-          for (var i = 0, instance; !!(instance = instanceList[i]); i++) {
-            var instanceId = instance.id,
-                index = activityInstanceIds.indexOf(instanceId);
+          if (instanceList) {
+            for (var i = 0, instance; !!(instance = instanceList[i]); i++) {
+              var instanceId = instance.id,
+                  index = activityInstanceIds.indexOf(instanceId);
 
-            if (index !== -1) {
-              foundAnotherActivityInstance = true;
+              if (index !== -1) {
+                foundAnotherActivityInstance = true;
+              }
             }
           }
 
@@ -528,20 +507,54 @@ ngDefine('cockpit.pages.processInstance', [
       processData.set('filter', filter);
     };
 
+    function createDialog(options) {
+
+      var resolve = angular.extend(options.resolve || {}, {
+        processData: function() { return $scope.processData; },
+        processInstance: function() { return $scope.processInstance; }
+      });
+
+      options.resolve = resolve;
+
+      return $dialog.dialog(options);
+    }
+
     $scope.openCancelProcessInstanceDialog = function () {
-      $scope.cancelProcessInstanceDialog.open();      
+      var dialog = createDialog({
+        controller: 'CancelProcessInstanceController',
+        templateUrl: require.toUrl('./cancel-process-instance.html')
+      });
+
+      dialog.open().then(function(result) {
+
+        // dialog closed. YEA!
+      });
     };
 
     $scope.openJobRetriesDialog = function () {
-      $scope.jobRetriesDialog.open();
+      var dialog = createDialog({
+        controller: 'JobRetriesController',
+        templateUrl: require.toUrl('./set-job-retries.html')
+      });
+
+      dialog.open().then(function(result) {
+
+        // dialog closed. YEA!
+      });
     };
     
     $scope.openAddVariableDialog = function () {
-      $scope.addVariableDialog.open();
-    };
+      var dialog = createDialog({
+        controller: 'AddVariableController',
+        templateUrl: require.toUrl('./add-variable.html')
+      });
 
-    $scope.newVariableAdded = function () {
-      processData.set('filter', angular.extend({}, $scope.filter));
+      dialog.open().then(function(result) {
+        if (result === "SUCCESS") {
+          // refresh filter and all views
+          processData.set('filter', angular.extend({}, $scope.filter));
+        }
+      });
     };
 
     $scope.$on('$routeChangeStart', function () {
@@ -595,6 +608,7 @@ ngDefine('cockpit.pages.processInstance', [
       if (!filterData || filterData.filter != filter) {
         var activityIds = filter.activityIds || [],
             activityInstanceIds = filter.activityInstanceIds || [];
+
         return {
           filter: filter,
           activityCount: activityIds.length || 0,
@@ -611,8 +625,11 @@ ngDefine('cockpit.pages.processInstance', [
 
     $scope.clearSelection = function () {
       // update cached filter
-      filterData = {};
-      filterData.filter = {};
+      filterData = {
+        activityCount: 0,
+        activityInstanceCount: 0,
+        filter: {}
+      };
 
       processData.set('filter', filterData.filter);
     };
@@ -624,6 +641,7 @@ ngDefine('cockpit.pages.processInstance', [
                                                '$rootScope',
                                                '$location',
                                                '$filter',
+                                               '$dialog',
                                                'search',
                                                'ProcessDefinitionResource',
                                                'ProcessInstanceResource',

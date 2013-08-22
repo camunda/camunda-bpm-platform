@@ -264,6 +264,7 @@
                 <exclude>**/rest/resteasy/**</exclude>
                 <exclude>**/rest/jersey/**</exclude>
                 <exclude>**/rest/wink/**</exclude>
+                <exclude>**/rest/history/**</exclude>
               </excludes>
             </configuration>
           </execution>
@@ -276,10 +277,13 @@
             <configuration>
               <includes>
                 <include>**/rest/resteasy/**</include>
+                <include>**/rest/history/resteasy/**</include>
               </includes>
               <excludes>
                 <exclude>**/rest/jersey/**</exclude>
+                <exclude>**/rest/history/jersey/**</exclude>
                 <exclude>**/rest/wink/**</exclude>
+                <exclude>**/rest/history/wink/**</exclude>
                 <exclude>**/rest/standalone/**</exclude>
               </excludes>
             </configuration>
@@ -293,10 +297,13 @@
             <configuration>
               <includes>
                 <include>**/rest/jersey/**</include>
+                <include>**/rest/history/jersey/**</include>
               </includes>
               <excludes>
                 <exclude>**/rest/resteasy/**</exclude>
+                <exclude>**/rest/history/resteasy/**</exclude>
                 <exclude>**/rest/wink/**</exclude>
+                <exclude>**/rest/history/wink/**</exclude>
                 <exclude>**/rest/standalone/**</exclude>
               </excludes>
             </configuration>
@@ -310,10 +317,13 @@
             <configuration>
               <includes>
                 <include>**/rest/wink/**</include>
+                <include>**/rest/history/wink/**</include>
               </includes>
               <excludes>
                 <exclude>**/rest/resteasy/**</exclude>
+                <exclude>**/rest/history/resteasy/**</exclude>
                 <exclude>**/rest/jersey/**</exclude>
+                <exclude>**/rest/history/jersey/**</exclude>
                 <exclude>**/rest/standalone/**</exclude>
               </excludes>
             </configuration>

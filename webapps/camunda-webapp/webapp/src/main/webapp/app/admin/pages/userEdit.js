@@ -1,11 +1,9 @@
-'use strict';
-
-define(['angular'], function(angular) {
+define([ 'angular', 'require' ], function(angular, require) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', 'AuthorizationResource',
-    function ($scope, $window, $routeParams, UserResource, GroupResource, GroupMembershipResource, Notifications, $location, AuthorizationResource) {
+  var Controller = ['$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$dialog', 'AuthorizationResource',
+    function ($scope, $window, $routeParams, UserResource, GroupResource, GroupMembershipResource, Notifications, $location, $dialog, AuthorizationResource) {
 
     $scope.userId = $routeParams.userId;
 
@@ -25,8 +23,6 @@ define(['angular'], function(angular) {
     // list of the user's groups
     $scope.groupList = null;
     $scope.groupIdList = null;
-
-    $scope.createGroupMembershipDialog = new Dialog();
 
     $scope.availableOperations = {};
 
@@ -128,7 +124,25 @@ define(['angular'], function(angular) {
     }
 
     $scope.openCreateGroupMembershipDialog = function() {
-      $scope.createGroupMembershipDialog.open();
+      var dialog = $dialog.dialog({
+        controller: 'GroupMembershipDialogController',
+        templateUrl: require.toUrl('./create-group-membership.html'),
+        resolve: {
+          user: function() {
+            return $scope.user;
+          },
+          groupIdList: function() {
+            return $scope.groupIdList;
+          }
+        }
+      });
+
+      dialog.open().then(function(result) {
+
+        if (result == "SUCCESS") {
+          $scope.loadGroups();
+        }
+      });
     }
 
     function checkRemoveGroupMembershipAuthorized() {

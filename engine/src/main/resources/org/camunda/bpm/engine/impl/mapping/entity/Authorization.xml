@@ -148,18 +148,18 @@
     
       <!-- User GRANT -->
       <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND USER_ID_ = #{authUserId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
+        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.USER_ID_ = #{authUserId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
             THEN 1
       </if>
-      WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND USER_ID_ = #{authUserId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
+      WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.USER_ID_ = #{authUserId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
           THEN 1
           
       <!-- User REVOKE -->
       <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND USER_ID_ = #{authUserId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
+        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.USER_ID_ = #{authUserId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
             THEN 0
       </if>
-      WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND USER_ID_ = #{authUserId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
+      WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.USER_ID_ = #{authUserId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
           THEN 0
           
       ELSE 
@@ -169,22 +169,22 @@
               <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
               
                 <!-- Group REVOKES -->
-                <foreach collection="authGroupIds" index="index" item="groupId">
+                <foreach collection="authGroupIds" index="index" item="authGroupId">
                   <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND GROUP_ID_ = #{groupId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
+                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.GROUP_ID_ = #{authGroupId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
                       THEN 0
                   </if>
-                  WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND GROUP_ID_ = #{groupId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
+                  WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.GROUP_ID_ = #{authGroupId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
                     THEN 0
                 </foreach> 
                 
                 <!-- Group GRANTS -->   
-                <foreach collection="authGroupIds" index="index" item="groupId">
+                <foreach collection="authGroupIds" index="index" item="authGroupId">
                   <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND GROUP_ID_ = #{groupId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
+                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.GROUP_ID_ = #{authGroupId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
                       THEN 1
                   </if>
-                  WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND GROUP_ID_ = #{groupId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
+                  WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.GROUP_ID_ = #{authGroupId} AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
                     THEN 1
                 </foreach> 
                 ELSE (
@@ -193,18 +193,18 @@
               </if>
                           <!-- GLOBAL GRANTS -->
                           <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
+                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
                                 THEN 1
                           </if>
-                          WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
+                          WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
                               THEN 1
                               
                           <!-- GLOBAL REVOKES -->
                           <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
+                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId}</if>   )
                                 THEN 0
                           </if>
-                          WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
+                          WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND A.RESOURCE_ID_ = '*')
                               THEN 0
                               
                           <!-- No matching authorization found: request is not authorized -->

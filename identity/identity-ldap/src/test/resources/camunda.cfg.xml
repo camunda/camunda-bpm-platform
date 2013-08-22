@@ -22,38 +22,35 @@
     
     <property name="createDiagramOnDeploy" value="true" />
     
-    <property name="identityProviderSessionFactory" ref="ldapIdentityProvider" />
+    <property name="processEnginePlugins">
+      <list>
+        <ref bean="ldapIdentityProviderPlugin" />
+      </list>
+    </property>
     
   </bean>
-
-  <bean id="ldapIdentityProvider" class="org.camunda.bpm.identity.impl.ldap.LdapIdentityProviderFactory">
-    <property name="ldapConfiguration">
-      <bean class="org.camunda.bpm.identity.impl.ldap.LdapConfiguration">
-      
-        <property name="serverUrl" value="ldap://localhost:${ldap.server.port}/" />
-        <property name="managerDn" value="uid=daniel,ou=office-berlin,o=camunda,c=org" />
-        <property name="managerPassword" value="daniel" />      
-        
-        <property name="baseDn" value="o=camunda,c=org" />
-        
-        <property name="userSearchBase" value="" />
-        <property name="userSearchFilter" value="(objectclass=person)" />
-               
-        <property name="userIdAttribute" value="uid" />
-        <property name="userFirstnameAttribute" value="cn" />
-        <property name="userLastnameAttribute" value="sn" />
-        <property name="userEmailAttribute" value="mail" />
-        <property name="userPasswordAttribute" value="userpassword" />
-        
-        <property name="groupSearchBase" value="" />
-        <property name="groupSearchFilter" value="(objectclass=groupOfNames)" />        
-        <property name="groupIdAttribute" value="ou" />
-        <property name="groupNameAttribute" value="cn" />
-        
-        <property name="groupMemberAttribute" value="member" />
-         
-      </bean>
-    </property>
+  
+  <bean id="ldapIdentityProviderPlugin" class="org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin">
+  
+    <property name="serverUrl" value="ldap://localhost:${ldap.server.port}/" />
+    <property name="managerDn" value="uid=daniel,ou=office-berlin,o=camunda,c=org" />
+    <property name="managerPassword" value="daniel" />    
+    <property name="baseDn" value="o=camunda,c=org" />
+    
+    <property name="userSearchBase" value="" />
+    <property name="userSearchFilter" value="(objectclass=person)" />
+    <property name="userIdAttribute" value="uid" />
+    <property name="userFirstnameAttribute" value="cn" />
+    <property name="userLastnameAttribute" value="sn" />
+    <property name="userEmailAttribute" value="mail" />
+    <property name="userPasswordAttribute" value="userpassword" />
+    
+    <property name="groupSearchBase" value="" />
+    <property name="groupSearchFilter" value="(objectclass=groupOfNames)" />
+    <property name="groupIdAttribute" value="ou" />
+    <property name="groupNameAttribute" value="cn" />
+    <property name="groupMemberAttribute" value="member" />
+    
   </bean>
 
 </beans>
