@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +32,7 @@ import org.camunda.bpm.engine.rest.ProcessEngineRestService;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
-import org.camunda.bpm.engine.rest.util.WinkTomcatServerBootstrap;
+import org.camunda.bpm.engine.rest.util.ResteasyTomcatServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -41,9 +40,10 @@ import org.junit.Test;
 
 import com.jayway.restassured.http.ContentType;
 
-public class AuthenticationFilterTest extends AbstractRestServiceTest {
+public abstract class AbstractAuthenticationFilterTest extends AbstractRestServiceTest {
 
-  protected static final String SERVICE_PATH = TEST_RESOURCE_ROOT_PATH + ProcessEngineRestService.PATH + "/{name}"+ ProcessDefinitionRestService.PATH;
+  protected static final String SERVLET_PATH = "/rest";
+  protected static final String SERVICE_PATH = TEST_RESOURCE_ROOT_PATH + SERVLET_PATH + ProcessEngineRestService.PATH + "/{name}"+ ProcessDefinitionRestService.PATH;
 
   protected static EmbeddedServerBootstrap serverBootstrap;
 
@@ -56,7 +56,7 @@ public class AuthenticationFilterTest extends AbstractRestServiceTest {
 
   @BeforeClass
   public static void setUpEmbeddedRuntime() {
-    serverBootstrap = new WinkTomcatServerBootstrap("runtime/wink/auth-filter-web.xml");
+    serverBootstrap = new ResteasyTomcatServerBootstrap("runtime/resteasy/auth-filter-no-servlet-web.xml");
     serverBootstrap.start();
   }
 
@@ -64,6 +64,7 @@ public class AuthenticationFilterTest extends AbstractRestServiceTest {
   public static void tearDownEmbeddedRuntime() {
     serverBootstrap.stop();
   }
+
 
   @Before
   public void setup() {
@@ -165,7 +166,7 @@ public class AuthenticationFilterTest extends AbstractRestServiceTest {
     given()
       .auth().basic(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)
       .pathParam("name", MockProvider.NON_EXISTING_PROCESS_ENGINE_NAME)
-    .then().expect().log().all()
+    .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Process engine " + MockProvider.NON_EXISTING_PROCESS_ENGINE_NAME + " not available"))
