@@ -410,6 +410,11 @@ div#myCarousel .carousel-control.left {
   left: 12%;
 }
 
+.popover {
+  /* placement above modal dialog */
+  z-index: 1060;
+}
+
 /** popover styles */
 .popover-inner {
   padding: 0px;

@@ -373,7 +373,12 @@ angular
         p = scope.$eval(attrs.helpPlacement);
       }
             
-      $(element).find(".help-toggle").popover({content: help, title: helpTitle, delay: { show: 0, hide: 0 }, placement: p});
+      $(element)
+        .find(".help-toggle")
+          .popover({ content: help, title: helpTitle, trigger: 'hover', placement: p, container: 'body' })
+          .on('hidden', function(event) {
+            event.stopPropagation();
+          });
     }
   };
 })
