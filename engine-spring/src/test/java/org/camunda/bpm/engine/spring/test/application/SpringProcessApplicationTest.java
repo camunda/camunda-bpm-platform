@@ -39,16 +39,16 @@ public class SpringProcessApplicationTest {
     AbstractApplicationContext applicationContext = new ClassPathXmlApplicationContext("org/camunda/bpm/engine/spring/test/application/SpringProcessApplicationDeploymentTest-context.xml");
     applicationContext.start();
 
-    // assert that there is a process application deployed with the name of the current application context.
+    // assert that there is a process application deployed with the name of the process application bean
     Assert.assertNotNull(BpmPlatform.getProcessApplicationService()
-      .getProcessApplicationInfo(applicationContext.getDisplayName()));
+      .getProcessApplicationInfo("myProcessApplication"));
 
     // close the spring application context
     applicationContext.close();
 
     // after closing the application context, the process application is undeployed.
     Assert.assertNull(BpmPlatform.getProcessApplicationService()
-      .getProcessApplicationInfo(applicationContext.getDisplayName()));
+      .getProcessApplicationInfo("myProcessApplication"));
 
   }
 

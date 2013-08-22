@@ -5,6 +5,6 @@
        xmlns:activiti="http://www.activiti.org/schema/spring/components"
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="org.camunda.bpm.engine.spring.application.SpringProcessApplication" />
+    <bean id="myProcessApplication" class="org.camunda.bpm.engine.spring.application.SpringProcessApplication" />
     
 </beans>
