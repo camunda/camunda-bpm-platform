@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.rest.security.auth;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,20 +51,23 @@ public class ProcessEngineAuthenticationFilter implements Filter {
 
   // regexes for urls that may be accessed unauthorized
   protected static final String[] WHITE_LISTED_URL_PATTERNS = new String[] {
-    ProcessEngineRestService.PATH + "/?"
+    "^" + ProcessEngineRestService.PATH + "/?"
   };
 
-  protected static final String ENGINE_REQUEST_URL_PATTERN = ProcessEngineRestService.PATH + "/(.*?)(/|$)";
+  protected static final String ENGINE_REQUEST_URL_PATTERN = "^" + ProcessEngineRestService.PATH + "/(.*?)(/|$)";
   protected static final String DEFAULT_ENGINE_NAME = "default";
 
   // init params
   public static final String AUTHENTICATION_PROVIDER_PARAM = "authentication-provider";
+  public static final String SERVLET_PATH_PREFIX = "rest-url-pattern-prefix";
 
   protected AuthenticationProvider authenticationProvider;
+  protected String servletPathPrefix;
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     String authenticationProviderClassName = filterConfig.getInitParameter(AUTHENTICATION_PROVIDER_PARAM);
+
     try {
       Class<?> authenticationProviderClass = Class.forName(authenticationProviderClassName);
       authenticationProvider = (AuthenticationProvider) authenticationProviderClass.newInstance();
@@ -76,6 +81,8 @@ public class ProcessEngineAuthenticationFilter implements Filter {
       new ServletException("Cannot instantiate authentication filter: authentication provider does not implement interface " +
           AuthenticationProvider.class.getName(), e);
     }
+
+    servletPathPrefix = filterConfig.getInitParameter(SERVLET_PATH_PREFIX);
   }
 
   @Override
@@ -85,7 +92,11 @@ public class ProcessEngineAuthenticationFilter implements Filter {
     HttpServletRequest req = (HttpServletRequest) request;
     HttpServletResponse resp = (HttpServletResponse) response;
 
-    String requestUrl = req.getRequestURI().substring(req.getContextPath().length());
+    String servletPath = servletPathPrefix;
+    if (servletPath == null) {
+      servletPath = req.getServletPath();
+    }
+    String requestUrl = req.getRequestURI().substring(req.getContextPath().length() + servletPath.length());
 
     boolean requiresEngineAuthentication = requiresEngineAuthentication(requestUrl);
 

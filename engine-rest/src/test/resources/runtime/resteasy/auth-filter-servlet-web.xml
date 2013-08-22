@@ -5,9 +5,14 @@
 
   <display-name>camunda rest api</display-name>
 
+  <context-param>
+	  <param-name>resteasy.servlet.mapping.prefix</param-name>
+	  <param-value>/rest</param-value>
+  </context-param>
+
   <servlet>
-    <servlet-name>Engine Api</servlet-name>
-    <servlet-class>org.apache.wink.server.internal.servlet.RestServlet</servlet-class>
+    <servlet-name>Resteasy</servlet-name>
+    <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
     <init-param>
       <param-name>javax.ws.rs.Application</param-name>
       <param-value>org.camunda.bpm.engine.rest.impl.application.DefaultApplication</param-value>
@@ -15,7 +20,7 @@
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>Engine Api</servlet-name>
+    <servlet-name>Resteasy</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
