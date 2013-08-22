@@ -205,6 +205,64 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().unfinished().count());
   }
 
+  public void testHistoricTaskInstanceAssignment() {
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    // task exists & has no assignee:
+    HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
+    assertNull(hti.getAssignee());
+
+    // assign task to jonny:
+    taskService.setAssignee(task.getId(), "jonny");
+
+    // should be reflected in history
+    hti = historyService.createHistoricTaskInstanceQuery().singleResult();
+    assertEquals("jonny", hti.getAssignee());
+    assertNull(hti.getOwner());
+
+    taskService.deleteTask(task.getId());
+    historyService.deleteHistoricTaskInstance(hti.getId());
+  }
+
+  public void testHistoricTaskInstanceOwner() {
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    // task exists & has no owner:
+    HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
+    assertNull(hti.getOwner());
+
+    // set owner to jonny:
+    taskService.setOwner(task.getId(), "jonny");
+
+    // should be reflected in history
+    hti = historyService.createHistoricTaskInstanceQuery().singleResult();
+    assertEquals("jonny", hti.getOwner());
+
+    taskService.deleteTask(task.getId());
+    historyService.deleteHistoricTaskInstance(hti.getId());
+  }
+
+  public void testHistoricTaskInstanceName() {
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    // task exists & has normal priority:
+    HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
+    assertEquals(Task.PRIORITY_NORMAL, hti.getPriority());
+
+    // set owner to jonny:
+    taskService.setPriority(task.getId(), Task.PRIORITY_MAXIMUM);
+
+    // should be reflected in history
+    hti = historyService.createHistoricTaskInstanceQuery().singleResult();
+    assertEquals(Task.PRIORITY_MAXIMUM, hti.getPriority());
+
+    taskService.deleteTask(task.getId());
+    historyService.deleteHistoricTaskInstance(hti.getId());
+  }
+
   @Deployment
   public void testHistoricTaskInstanceQueryProcessFinished() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoTaskHistoricTaskQueryTest");

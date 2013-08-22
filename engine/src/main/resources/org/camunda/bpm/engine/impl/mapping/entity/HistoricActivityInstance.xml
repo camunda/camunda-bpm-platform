@@ -157,17 +157,17 @@
       <if test="eventType == 'update'">
         , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR},
         TASK_ID_ = #{taskId, jdbcType=VARCHAR}
-      </if>      
+      </if>
       <if test="endTime!=null">
-        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}                          
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         <if test="startTime!=null">
             , DURATION_ = #{duration, jdbcType=TIMESTAMP}
         </if>
         <if test="startTime == null">
-          <!--   , DURATION_ = ((DAYS(DATE(#{endTime, jdbcType=TIMESTAMP})) - DAYS(HAI.START_TIME_)) * 86400000)
-            + ((MIDNIGHT_SECONDS(#{endTime, jdbcType=TIMESTAMP}) - MIDNIGHT_SECONDS(HAI.START_TIME_)) * 1000) -->
+          , DURATION_ = ((DAYS(DATE(#{endTime, jdbcType=TIMESTAMP})) - DAYS(HAI.START_TIME_)) * 86400000)
+            + ((MIDNIGHT_SECONDS(#{endTime, jdbcType=TIMESTAMP}) - MIDNIGHT_SECONDS(HAI.START_TIME_)) * 1000)
         </if>
-      </if>             
+      </if>
     WHERE 
       ID_ = #{id}
   </update>
