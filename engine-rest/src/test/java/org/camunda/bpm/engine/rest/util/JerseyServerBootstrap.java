@@ -19,15 +19,15 @@ import com.sun.jersey.api.core.ResourceConfig;
 public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
 
   private HttpServer server;
-  
+
   public JerseyServerBootstrap() {
     setupServer(new DefaultApplication());
   }
-  
+
   public JerseyServerBootstrap(Application application) {
     setupServer(application);
   }
-  
+
   @Override
   public void start() {
     try {
@@ -36,14 +36,14 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
       e.printStackTrace();
     }
   }
-  
+
   private void setupServer(Application application) {
     ResourceConfig rc = new ApplicationAdapter(application);
-    
+
     Map<String, Object> properties = new HashMap<String, Object>();
     properties.put(ResourceConfig.FEATURE_TRACE, "true");
     rc.setPropertiesAndFeatures(properties);
-    
+
     Properties serverProperties = readProperties();
     int port = Integer.parseInt(serverProperties.getProperty(PORT_PROPERTY));
     URI serverUri = UriBuilder.fromPath(ROOT_RESOURCE_PATH).scheme("http").host("localhost").port(port).build();

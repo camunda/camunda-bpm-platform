@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.webapp.impl.security.auth;
 
-import static org.camunda.bpm.engine.authorization.Permissions.*;
-import static org.camunda.bpm.engine.authorization.Resources.*;
+import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
+import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,7 +32,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;

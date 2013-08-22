@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.webapp.impl.security.auth.Authentication;
 import org.camunda.bpm.webapp.impl.security.filter.RequestMatcher.Match;
+import org.springframework.util.PathMatcher;
 
 /**
  * <p>A {@link SecurityFilterRule} that deleagates to a set of {@link PathMatcher}s</p>
