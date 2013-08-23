@@ -45,7 +45,7 @@
     <result property="firstName" column="FIRST_" jdbcType="VARCHAR" />
     <result property="lastName" column="LAST_" jdbcType="VARCHAR" />
     <result property="email" column="EMAIL_" jdbcType="VARCHAR" />
-    <result property="password" column="PWD_" jdbcType="VARCHAR" />
+    <result property="dbPassword" column="PWD_" jdbcType="VARCHAR" />
   </resultMap>
   
   <!-- USER SELECT -->

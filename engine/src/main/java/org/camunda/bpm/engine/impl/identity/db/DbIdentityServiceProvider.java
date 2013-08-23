@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,30 +29,30 @@ import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 
 /**
- * <p>{@link WritableIdentityProvider} implementation backed by a 
+ * <p>{@link WritableIdentityProvider} implementation backed by a
  * database. This implementation is used for the built-in user management.</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider implements WritableIdentityProvider {
-  
+
   // users ////////////////////////////////////////////////////////
-  
+
   public UserEntity createNewUser(String userId) {
     checkAuthorization(Permissions.CREATE, Resources.USER, null);
     return new UserEntity(userId);
   }
-  
+
   public User saveUser(User user) {
     UserEntity userEntity = (UserEntity) user;
-    
+
     // encrypt password
-    userEntity.setPassword(encryptPassword(userEntity.getPassword()));
-    
+    userEntity.encryptPassword();
+
     if(userEntity.getRevision() == 0) {
       checkAuthorization(Permissions.CREATE, Resources.USER, null);
-      getDbSqlSession().insert(userEntity);      
+      getDbSqlSession().insert(userEntity);
       createDefaultAuthorizations(userEntity);
     } else {
       checkAuthorization(Permissions.UPDATE, Resources.USER, user.getId());
@@ -61,7 +61,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
     return userEntity;
   }
-  
+
   public void deleteUser(String userId) {
     checkAuthorization(Permissions.DELETE, Resources.USER, userId);
     UserEntity user = findUserById(userId);
@@ -69,17 +69,17 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
       deleteMembershipsByUserId(userId);
       deleteAuthorizations(Resources.USER, userId);
       getDbSqlSession().delete(user);
-    }   
+    }
   }
-  
+
   // groups ////////////////////////////////////////////////////////
 
   public GroupEntity createNewGroup(String groupId) {
     checkAuthorization(Permissions.CREATE, Resources.GROUP, null);
     return new GroupEntity(groupId);
   }
-  
-  public GroupEntity saveGroup(Group group) {    
+
+  public GroupEntity saveGroup(Group group) {
     GroupEntity groupEntity = (GroupEntity) group;
     if(groupEntity.getRevision() == 0) {
       checkAuthorization(Permissions.CREATE, Resources.GROUP, null);
@@ -99,11 +99,11 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
       deleteMembershipsByGroupId(groupId);
       deleteAuthorizations(Resources.GROUP, groupId);
       getDbSqlSession().delete(group);
-    }   
+    }
   }
-  
+
   // membership //////////////////////////////////////////////////////
-  
+
   public void createMembership(String userId, String groupId) {
     checkAuthorization(Permissions.CREATE, Resources.GROUP_MEMBERSHIP, groupId);
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -122,17 +122,17 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     parameters.put("groupId", groupId);
     getDbSqlSession().delete("deleteMembership", parameters);
   }
-  
+
   protected void deleteMembershipsByUserId(String userId) {
     getDbSqlSession().delete("deleteMembershipsByUserId", userId);
   }
-  
+
   protected void deleteMembershipsByGroupId(String groupId) {
     getDbSqlSession().delete("deleteMembershipsByGroupId", groupId);
   }
-  
+
   // authorizations ////////////////////////////////////////////////////////////
-  
+
   protected void createDefaultAuthorizations(UserEntity userEntity) {
     if(Context.getProcessEngineConfiguration().isAuthorizationEnabled()) {
       saveDefaultAuthorizations(getResourceAuthorizationProvider().newUser(userEntity));
@@ -150,32 +150,32 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
       saveDefaultAuthorizations(getResourceAuthorizationProvider().groupMembershipCreated(groupId, userId));
     }
   }
-  
+
   protected ResourceAuthorizationProvider getResourceAuthorizationProvider() {
     return Context.getProcessEngineConfiguration()
         .getResourceAuthorizationProvider();
   }
-  
+
   protected void deleteAuthorizations(Resource resource, String resourceId) {
     Context.getCommandContext()
       .getAuthorizationManager()
       .deleteAuthorizationsByResourceId(resource, resourceId);
   }
-  
+
   protected void saveDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
     if(authorizations == null) {
       return;
-      
-    } else {     
+
+    } else {
       Context.getCommandContext().runWithoutAuthentication(new Runnable() {
         public void run() {
           AuthorizationManager authorizationManager = Context.getCommandContext()
-              .getAuthorizationManager();      
+              .getAuthorizationManager();
           for (AuthorizationEntity authorization : authorizations) {
-            authorizationManager.insert(authorization);      
+            authorizationManager.insert(authorization);
           }
         }
-      });      
+      });
     }
   }
 }

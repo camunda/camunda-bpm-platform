@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.variable.StringType;
@@ -467,6 +468,14 @@ public abstract class MockProvider {
     when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL);
     when(mockUser.getPassword()).thenReturn(EXAMPLE_USER_PASSWORD);
     return mockUser;
+  }
+
+  public static Authentication createMockAuthentication() {
+    Authentication mockAuthentication = mock(Authentication.class);
+
+    when(mockAuthentication.getUserId()).thenReturn(EXAMPLE_USER_ID);
+
+    return mockAuthentication;
   }
 
   // jobs

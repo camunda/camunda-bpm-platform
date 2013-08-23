@@ -25,7 +25,6 @@ import javax.xml.datatype.Duration;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.joda.time.DateTime;
 
 /**
  * helper class for parsing ISO8601 duration format (also recurring) and computing next timer date
@@ -59,13 +58,13 @@ public class DurationHelper {
 
     if (isDuration(expression.get(0))) {
       period = parsePeriod(expression.get(0));
-      end = expression.size() == 1 ? null : parseDate(expression.get(1));
+      end = expression.size() == 1 ? null : DateTimeUtil.parseDate(expression.get(1));
     } else {
-      start = parseDate(expression.get(0));
+      start = DateTimeUtil.parseDate(expression.get(0));
       if (isDuration(expression.get(1))) {
         period = parsePeriod(expression.get(1));
       } else {
-        end = parseDate(expression.get(1));
+        end = DateTimeUtil.parseDate(expression.get(1));
         period = datatypeFactory.newDuration(end.getTime()-start.getTime());
       }
     }
@@ -85,7 +84,7 @@ public class DurationHelper {
     }
     return add(start, period);
   }
-  
+
   public int getTimes() {
     return times;
   }
@@ -113,10 +112,6 @@ public class DurationHelper {
     calendar.setTime(date);
     duration.addTo(calendar);
     return calendar.getTime();
-  }
-
-  private Date parseDate(String date) throws Exception {
-      return DateTime.parse(date).toDate();
   }
 
   private Duration parsePeriod(String period) throws Exception {

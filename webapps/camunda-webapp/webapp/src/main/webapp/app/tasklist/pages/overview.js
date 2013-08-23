@@ -99,7 +99,7 @@ ngDefine('tasklist.pages', [
 
     $scope.claimTask = function(task) {
 
-      return EngineApi.getTaskList().claim({ id : task.id }, { userId: Authentication.username() }).$then(function () {
+      return EngineApi.getTaskList().claim({ id : task.id }, { userId: authenticatedUser }).$then(function () {
         var tasks = $scope.taskList.tasks,
             view = $scope.taskList.view;
 

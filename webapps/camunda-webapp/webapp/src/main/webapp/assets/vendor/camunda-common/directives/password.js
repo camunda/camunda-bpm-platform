@@ -12,7 +12,7 @@ ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
                
         model.$parsers.unshift(function(viewValue) {
         
-          if (viewValue.length >= 8) {
+          if (viewValue && viewValue.length >= 8) {
             model.$setValidity('password', true);
           } else {
             model.$setValidity('password', false);            

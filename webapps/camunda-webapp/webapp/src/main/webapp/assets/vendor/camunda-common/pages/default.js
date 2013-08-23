@@ -122,11 +122,12 @@ ngDefine('camunda.common.pages', function(module) {
   }];
 
   var AuthenticationController = [
-    '$scope', '$window', 'Notifications', 'AuthenticationService', 'Uri',
-    function($scope, $window, Notifications, AuthenticationService, Uri) {
+    '$scope', '$window', '$cacheFactory', 'Notifications', 'AuthenticationService', 'Uri',
+    function($scope, $window, $cacheFactory, Notifications, AuthenticationService, Uri) {
       
       $scope.logout = function() {
         AuthenticationService.logout().then(function() {
+          $cacheFactory.get('$http').removeAll();
           $window.location.href = Uri.appUri('app://#/login');
         });
       };
