@@ -103,14 +103,14 @@
 	  then EXECUTION.ACT_INST_ID_ 
 	
 	  when 
-	    EXECUTION.IS_SCOPE_ = 1 
-	    and ((EXECUTION.IS_ACTIVE_ = 1) or (EXECUTION.IS_ACTIVE_ = 0 and EXECUTION.ACT_ID_ is null)) 
+	    EXECUTION.IS_SCOPE_ = ${trueConstant} 
+	    and ((EXECUTION.IS_ACTIVE_ = ${trueConstant}) or (EXECUTION.IS_ACTIVE_ = ${falseConstant} and EXECUTION.ACT_ID_ is null)) 
 	    and EXECUTION.PARENT_ID_ is null 
 	  then EXECUTION.ID_
 	  
 	  when 
-	    EXECUTION.IS_SCOPE_ = 1 
-	    and ((EXECUTION.IS_ACTIVE_ = 1) or (EXECUTION.IS_ACTIVE_ = 0 and EXECUTION.ACT_ID_ is null)) 
+	    EXECUTION.IS_SCOPE_ = ${trueConstant} 
+	    and ((EXECUTION.IS_ACTIVE_ = ${trueConstant}) or (EXECUTION.IS_ACTIVE_ = ${falseConstant} and EXECUTION.ACT_ID_ is null)) 
 	    and EXECUTION.PARENT_ID_ is not null
 	  then PARENT_EXECUTION.ACT_INST_ID_
 	  
