@@ -49,7 +49,7 @@ define([], function () {
     var definitions = doc.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "definitions");
 
     if(definitions.length == 0) {
-      throw "A BPMN 2.0 XML file must contain at least one definitions element";
+      throw error("A BPMN 2.0 XML file must contain at least one definitions element");
     }
 
     // the generated Elements
@@ -159,7 +159,7 @@ define([], function () {
               if(!!sequenceFlow.condition) {
 
                 if(bpmnObject.defaultFlowId == sequenceFlow.id) {
-                  throw "Sequence flow with id '" + sequenceFlow.id + "' is configured to be the default flow but has a condition";
+                  throw error("Sequence flow with id '" + sequenceFlow.id + "' is configured to be the default flow but has a condition");
                 } else {
                   // if a default flow is configured, there needs to be at least one conditional flow:
                   conditionalFlowFound = true;
@@ -168,7 +168,7 @@ define([], function () {
             }
 
             if(!conditionalFlowFound) {
-              throw "Activity with id '"+bpmnObject.id+"' declares default flow with id '" + bpmnObject.default + "' but has no conditional flows.";
+              throw error("Activity with id '"+bpmnObject.id+"' declares default flow with id '" + bpmnObject.default + "' but has no conditional flows.");
             }
           }
         }
@@ -319,29 +319,46 @@ define([], function () {
 
       // custom handling of sequence flows for exclusive GW:
       if(!!sequenceFlows && isExecutable) {
+
         var outgoingFlows = sequenceFlows[bpmnObject.id];
+
         if(!!outgoingFlows) {
+
           bpmnObject.sequenceFlows = outgoingFlows;
-        }
-        if(!!outgoingFlows) {
+
           if(outgoingFlows.length == 1) {
+
             if(!!outgoingFlows[0].condition) {
-              throw "If an exclusive Gateway has a single outgoing sequence flow, the sequence flow is not allowed to have a condition.";
+              throw error("If an exclusive Gateway has a single outgoing sequence flow, the sequence flow is not allowed to have a condition.");
             }
-          } else if(outgoingFlows.length > 1) {
-            for (var i = 0; i < outgoingFlows.length; i++) {
-              var sequenceFlow = outgoingFlows[i];
 
-              if (!!sequenceFlow.condition) {
-                if (!!defaultFlowId && defaultFlowId == sequenceFlow.id) {
-                  throw "Sequence flow with id '" + sequenceFlow.id + "' is configured to be the default flow but has a condition";
-                }
+          } else
 
-              } else {
-                if(defaultFlowId != sequenceFlow.id) {
-                  throw "Sequence flow with id '" + sequenceFlow.id + "' has no conditions but it is not configured to be the default flow.";
-                }
+          if(outgoingFlows.length > 1) {
+            var flowsWithoutCondition = [];
+
+            for (var i = 0, sequenceFlow; !!(sequenceFlow = outgoingFlows[i]); i++) {
+
+              var hasCondition = !!sequenceFlow.condition,
+                  isDefaultFlow = (defaultFlowId === sequenceFlow.id);
+
+              if (!hasCondition && !isDefaultFlow) {
+                flowsWithoutCondition.push(sequenceFlow);
               }
+
+              if (hasCondition && isDefaultFlow) {
+                throw error("Sequence flow with id '" + sequenceFlow.id + "' is configured to be the default flow but has a condition.");
+              }
+            }
+
+            if (!!defaultFlowId || flowsWithoutCondition.length > 1) {
+              throw error("Exclusive Gateway '" + bpmnObject.id + "' has outgoing sequence flows without conditions which are not the default flow.");
+            }
+
+            if (flowsWithoutCondition.length === 1) {
+              // here will not be thrown an error to align it with the java engine: 
+              // in that case the java engine only log a warning!
+              console.log("[Transformer]: Sequence flow with id '" + flowsWithoutCondition[0].id + "' has no conditions but it is not configured to be the default flow.");              
             }
           }
         }
@@ -607,6 +624,10 @@ define([], function () {
 
     return transformDefinitions(definitions[0]);
   };
+
+  function error(message) {
+    return new Error(message);
+  }
 
   return Transformer;
 });
