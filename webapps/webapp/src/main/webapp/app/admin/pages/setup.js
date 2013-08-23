@@ -50,10 +50,7 @@ define(['angular'], function(angular) {
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/setup', {
       templateUrl: 'pages/setup.html',
-      controller: Controller,
-      resolve: {
-        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
-      }
+      controller: Controller
     });
   }];
 
