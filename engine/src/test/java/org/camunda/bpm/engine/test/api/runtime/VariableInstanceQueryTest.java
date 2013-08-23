@@ -2103,8 +2103,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     tree = runtimeService.getActivityInstance(processInstance.getId());
     assertEquals(2, tree.getChildActivityInstances().length);
     ActivityInstance task3Instance = tree.getChildActivityInstances()[0];
-    if (!task1Instance.getActivityId().equals("task3")) {
-      task1Instance = tree.getChildActivityInstances()[1];
+    if (!task3Instance.getActivityId().equals("task3")) {
+      task3Instance = tree.getChildActivityInstances()[1];
     }
 
     query = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(task3Instance.getId());

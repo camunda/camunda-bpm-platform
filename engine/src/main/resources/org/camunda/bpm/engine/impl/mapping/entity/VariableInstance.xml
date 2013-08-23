@@ -97,12 +97,39 @@
     <include refid="selectVariableInstanceByQueryCriteriaSql"/>
   </select>
   
+  <sql id="actInstIdColumn">
+  case
+	  when RES.TASK_ID_ is not null 
+	  then EXECUTION.ACT_INST_ID_ 
+	
+	  when 
+	    EXECUTION.IS_SCOPE_ = 1 
+	    and ((EXECUTION.IS_ACTIVE_ = 1) or (EXECUTION.IS_ACTIVE_ = 0 and EXECUTION.ACT_ID_ is null)) 
+	    and EXECUTION.PARENT_ID_ is null 
+	  then EXECUTION.ID_
+	  
+	  when 
+	    EXECUTION.IS_SCOPE_ = 1 
+	    and ((EXECUTION.IS_ACTIVE_ = 1) or (EXECUTION.IS_ACTIVE_ = 0 and EXECUTION.ACT_ID_ is null)) 
+	    and EXECUTION.PARENT_ID_ is not null
+	  then PARENT_EXECUTION.ACT_INST_ID_
+	  
+	  else EXECUTION.ACT_INST_ID_ 
+	end
+  </sql>
+  
   <sql id="selectVariableInstanceByQueryCriteriaSql">
     from (
-          select RES.*, EXECUTION.ACT_INST_ID_
+          select 
+            RES.*, 
+            (<include refid="actInstIdColumn"/>) ACT_INST_ID_
+            
           from ${prefix}ACT_RU_VARIABLE RES 
           left join ${prefix}ACT_RU_EXECUTION EXECUTION
           on RES.EXECUTION_ID_ = EXECUTION.ID_
+          left join ${prefix}ACT_RU_EXECUTION PARENT_EXECUTION
+          on EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
+          
           <where>
             <!-- variableName -->
             <if test="variableName != null">
@@ -143,7 +170,7 @@
             
             <!-- activityInstanceIds -->
             <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
-              and EXECUTION.ACT_INST_ID_ in
+              and <include refid="actInstIdColumn"/> in
               <foreach item="item" index="index" collection="activityInstanceIds"
                        open="(" separator="," close=")">
                 #{item}
