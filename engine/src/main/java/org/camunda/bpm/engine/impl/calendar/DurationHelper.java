@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
@@ -26,6 +27,8 @@ import javax.xml.datatype.Duration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * helper class for parsing ISO8601 duration format (also recurring) and computing next timer date
@@ -116,7 +119,9 @@ public class DurationHelper {
   }
 
   private Date parseDate(String date) throws Exception {
-      return DateTime.parse(date).toDate();
+    return DateTime.parse(date, 
+        // make sure we use JVM TimeZone (as we do when writing the String with SimpleDateFormat), see https://app.camunda.com/jira/browse/CAM-1170 
+        ISODateTimeFormat.dateTimeParser().withZone(DateTimeZone.forTimeZone(TimeZone.getDefault()))).toDate();
   }
 
   private Duration parsePeriod(String period) throws Exception {
