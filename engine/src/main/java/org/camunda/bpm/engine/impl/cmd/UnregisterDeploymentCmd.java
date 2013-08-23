@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -22,14 +25,18 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  */
 public class UnregisterDeploymentCmd implements Command<Void> {
 
-  protected String deploymentId;
-  
-  public UnregisterDeploymentCmd(String deploymentId) {
-    this.deploymentId = deploymentId;
+  protected Set<String> deploymentIds;
+
+  public UnregisterDeploymentCmd(Set<String> deploymentIds) {
+    this.deploymentIds = deploymentIds;
   }
-  
+
+  public UnregisterDeploymentCmd(String deploymentId) {
+    this(Collections.singleton(deploymentId));
+  }
+
   public Void execute(CommandContext commandContext) {
-    Context.getProcessEngineConfiguration().getRegisteredDeployments().remove(deploymentId);
+    Context.getProcessEngineConfiguration().getRegisteredDeployments().removeAll(deploymentIds);
     return null;
   }
 

@@ -12,20 +12,27 @@
  */
 package org.camunda.bpm.engine.impl.persistence.deploy;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cmd.UnregisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 public class DeploymentFailListener implements TransactionListener {
 
-  protected String deploymentId;
-  
+  protected Set<String> deploymentIds;
+
   public DeploymentFailListener(String deploymentId) {
-    this.deploymentId = deploymentId;
+    this.deploymentIds = Collections.singleton(deploymentId);
   }
-  
+
+  public DeploymentFailListener(Set<String> deploymentIds) {
+    this.deploymentIds = deploymentIds;
+  }
+
   public void execute(CommandContext commandContext) {
-    new UnregisterDeploymentCmd(deploymentId).execute(commandContext);
+    new UnregisterDeploymentCmd(deploymentIds).execute(commandContext);
   }
 
 }

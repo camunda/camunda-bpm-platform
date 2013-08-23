@@ -10,24 +10,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.application;
+package org.camunda.bpm.engine.impl.cfg;
+
+import org.camunda.bpm.engine.ProcessEngine;
 
 /**
- * <p>Object holding information about a deployment made by a process application.</p>
+ * <p>Adapter class for implementing process engine plugins</p>
  *
  * @author Daniel Meyer
  *
  */
-public interface ProcessApplicationDeploymentInfo {
+public class AbstractProcessEnginePlugin implements ProcessEnginePlugin {
 
-  /**
-   * @return the name of the process engine the deployment was made to
-   */
-  public String getProcessEngineName();
+  public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
 
-  /**
-   * @return the id of the deployment that was performed.
-   */
-  public String getDeploymentId();
+  }
+
+  public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+
+  }
+
+  public void postProcessEngineBuild(ProcessEngine processEngine) {
+
+  }
 
 }

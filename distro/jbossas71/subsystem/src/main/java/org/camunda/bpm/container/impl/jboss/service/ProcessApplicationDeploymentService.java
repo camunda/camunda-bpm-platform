@@ -15,6 +15,7 @@ package org.camunda.bpm.container.impl.jboss.service;
 import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,11 +24,10 @@ import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.naming.ManagedReference;
 import org.jboss.msc.service.Service;
@@ -66,10 +66,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   protected final ProcessArchiveXml processArchive;
 
   /** the deployment we create here */
-  protected Deployment deployment;
-  /** the registration we maintain with the process engine */
-  protected ProcessApplicationRegistration registration;
-
+  protected ProcessApplicationDeployment deployment;
 
   public ProcessApplicationDeploymentService(Map<String,byte[]> deploymentMap, ProcessArchiveXml processArchive) {
     this.deploymentMap = deploymentMap;
@@ -129,10 +126,15 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       // build the deployment
       final RepositoryService repositoryService = processEngine.getRepositoryService();
 
-      DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
+      ProcessApplicationDeploymentBuilder deploymentBuilder = repositoryService.createDeployment(processApplication.getReference());
 
       // enable duplicate filtering
       deploymentBuilder.enableDuplicateFiltering();
+
+      // enable resuming of previous versions:
+      if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_RESUME_PREVIOUS_VERSIONS, true)) {
+        deploymentBuilder.resumePreviousVersions();
+      }
 
       // set the name for the deployment
       String deploymentName = processArchive.getName();
@@ -152,16 +154,6 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
 
       // perform the actual deployment
       deployment = deploymentBuilder.deploy();
-
-      // log summary
-      LOGGER.log(Level.INFO,
-          "Process application '" + processApplicationName
-          + "' performed deployment '" + deploymentName
-          + "', dbId is '" + deployment.getId() + "'");
-
-      // register the deployment with the process engine.
-      ManagementService managementService = processEngine.getManagementService();
-      registration = managementService.registerProcessApplication(deployment.getId(), processApplication.getReference());
 
     } catch (Exception e) {
       throw new StartException("Could not register process application with shared process engine ",e);
@@ -203,20 +195,22 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
 
     try {
       // always unregister
-      processEngine.getManagementService().unregisterProcessApplication(deployment.getId(), true);
+      Set<String> deploymentIds = deployment.getProcessApplicationRegistration().getDeploymentIds();
+      processEngine.getManagementService().unregisterProcessApplication(deploymentIds, true);
     } catch(Exception e) {
       LOGGER.log(Level.SEVERE, "Exception while unregistering process application with the process engine.");
+
     }
 
     // delete the deployment only if requested in metadata
     if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {
-
       try {
         LOGGER.info("Deleting cascade deployment with name '"+deployment.getName()+"/"+deployment.getId()+"'.");
         processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
 
       } catch (Exception e) {
         LOGGER.log(Level.WARNING, "Exception while deleting process engine deployment", e);
+
       }
 
     }
@@ -238,11 +232,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     return paComponentViewInjector;
   }
 
-  public ProcessApplicationRegistration getRegistration() {
-    return registration;
-  }
-
-  public Deployment getDeployment() {
+  public ProcessApplicationDeployment getDeployment() {
     return deployment;
   }
 

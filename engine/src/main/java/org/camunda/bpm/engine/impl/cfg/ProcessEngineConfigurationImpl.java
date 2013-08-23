@@ -21,13 +21,13 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
@@ -101,7 +101,6 @@ import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
 import org.camunda.bpm.engine.impl.history.producer.CacheAwareHistoryEventProducer;
-import org.camunda.bpm.engine.impl.history.producer.DefaultHistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
@@ -130,7 +129,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.mail.MailScanner;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
-import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
@@ -342,11 +340,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected SessionFactory identityProviderSessionFactory;
 
   protected PasswordEncryptor passwordEncryptor;
-  
+
   protected Set<String> registeredDeployments;
-  
+
   protected ResourceAuthorizationProvider resourceAuthorizationProvider;
-  
+
   protected List<ProcessEnginePlugin> processEnginePlugins = new ArrayList<ProcessEnginePlugin>();
 
   protected HistoryEventProducer historyEventProducer;
@@ -404,20 +402,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void invokePreInit() {
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
+
+      log.log(Level.INFO, "PLUGIN {0} activated on process engine {1}",
+          new String[]{plugin.getClass().getSimpleName(),
+          getProcessEngineName()});
+
       plugin.preInit(this);
-    }    
+    }
   }
-  
+
   protected void invokePostInit() {
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
       plugin.postInit(this);
-    }    
+    }
   }
-  
+
   protected void invokePostProcessEngineBuild(ProcessEngine engine) {
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
       plugin.postProcessEngineBuild(engine);
-    }    
+    }
   }
 
   // failedJobCommandFactory ////////////////////////////////////////////////////////
@@ -682,15 +685,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           properties.put("limitBetween" , DbSqlSessionFactory.databaseSpecificLimitBetweenStatements.get(databaseType));
           properties.put("orderBy" , DbSqlSessionFactory.databaseSpecificOrderByStatements.get(databaseType));
           properties.put("limitBeforeNativeQuery" , DbSqlSessionFactory.databaseSpecificLimitBeforeNativeQueryStatements.get(databaseType));
-          
+
           properties.put("bitand1" , DbSqlSessionFactory.databaseSpecificBitAnd1.get(databaseType));
           properties.put("bitand2" , DbSqlSessionFactory.databaseSpecificBitAnd2.get(databaseType));
           properties.put("bitand3" , DbSqlSessionFactory.databaseSpecificBitAnd3.get(databaseType));
-          
+
           properties.put("dateDiff1" , DbSqlSessionFactory.databaseSpecificDateDiff1.get(databaseType));
           properties.put("dateDiff2" , DbSqlSessionFactory.databaseSpecificDateDiff2.get(databaseType));
           properties.put("dateDiff3" , DbSqlSessionFactory.databaseSpecificDateDiff3.get(databaseType));
-          
+
           properties.put("dbSpecificDummyTable" , DbSqlSessionFactory.databaseSpecificDummyTable.get(databaseType));
         }
         XMLConfigBuilder parser = new XMLConfigBuilder(reader,"", properties);
@@ -1114,15 +1117,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
   }
-  
+
   // history handlers /////////////////////////////////////////////////////
-  
+
   protected void initHistoryEventProducer() {
     if(historyEventProducer == null) {
       historyEventProducer = new CacheAwareHistoryEventProducer();
     }
   }
-  
+
   protected void initHistoryEventHandler() {
     if(historyEventHandler == null) {
       historyEventHandler = new DbHistoryEventHandler();
@@ -1136,16 +1139,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       passwordEncryptor = new ShaHashDigest();
     }
   }
-  
+
 
   protected void initDeploymentRegistration() {
     if (registeredDeployments == null) {
-      registeredDeployments = Collections.synchronizedSet(new HashSet<String>());
+      registeredDeployments = new CopyOnWriteArraySet<String>();
     }
   }
-  
+
   // resource authorization provider //////////////////////////////////////////
-  
+
   protected void initResourceAuthorizationProvider() {
     if(resourceAuthorizationProvider == null) {
       resourceAuthorizationProvider = new DefaultAuthorizationProvider();
@@ -1939,7 +1942,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.historyEventHandler = historyEventHandler;
     return this;
   }
-  
+
   public HistoryEventHandler getHistoryEventHandler() {
     return historyEventHandler;
   }
@@ -1986,19 +1989,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setRegisteredDeployments(Set<String> registeredDeployments) {
     this.registeredDeployments = registeredDeployments;
   }
-  
+
   public ResourceAuthorizationProvider getResourceAuthorizationProvider() {
     return resourceAuthorizationProvider;
   }
-  
+
   public void setResourceAuthorizationProvider(ResourceAuthorizationProvider resourceAuthorizationProvider) {
     this.resourceAuthorizationProvider = resourceAuthorizationProvider;
   }
-  
+
   public List<ProcessEnginePlugin> getProcessEnginePlugins() {
     return processEnginePlugins;
   }
-  
+
   public void setProcessEnginePlugins(List<ProcessEnginePlugin> processEnginePlugins) {
     this.processEnginePlugins = processEnginePlugins;
   }

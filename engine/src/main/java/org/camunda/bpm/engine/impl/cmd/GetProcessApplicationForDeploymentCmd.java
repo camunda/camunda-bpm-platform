@@ -21,11 +21,11 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  * @author Daniel Meyer
  *
  */
-public class GetProcessApplicationForDeployment implements Command<String> {
+public class GetProcessApplicationForDeploymentCmd implements Command<String> {
 
   protected String deploymentId;
 
-  public GetProcessApplicationForDeployment(String deploymentId) {
+  public GetProcessApplicationForDeploymentCmd(String deploymentId) {
     this.deploymentId = deploymentId;
   }
 

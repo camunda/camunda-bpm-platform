@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.application.impl.DefaultElResolverLookup;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -149,6 +150,10 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
 
     return DefaultElResolverLookup.lookupResolver(this);
 
+  }
+
+  public ExecutionListener getExecutionListener() {
+    return null;
   }
 
 }
