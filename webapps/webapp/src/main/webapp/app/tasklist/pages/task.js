@@ -112,9 +112,7 @@ ngDefine('tasklist.pages', [
   ResolveController.$inject = ["$scope", "$location", "Notifications"];
 
 
-  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, 
-
-AuthenticationServiceProvider) {
+  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
 
     $routeProvider.when("/task/:id", {
       templateUrl: "pages/task.html",
