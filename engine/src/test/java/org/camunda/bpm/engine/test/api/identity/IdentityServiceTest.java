@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
  * @author Frederik Heremans
  */
 public class IdentityServiceTest extends PluggableProcessEngineTestCase {
-  
+
   public void testIsReadOnly() {
     assertFalse(identityService.isReadOnly());
   }
@@ -39,29 +39,29 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
   public void testUserInfo() {
     User user = identityService.newUser("testuser");
     identityService.saveUser(user);
-    
+
     identityService.setUserInfo("testuser", "myinfo", "myvalue");
     assertEquals("myvalue", identityService.getUserInfo("testuser", "myinfo"));
-    
+
     identityService.setUserInfo("testuser", "myinfo", "myvalue2");
     assertEquals("myvalue2", identityService.getUserInfo("testuser", "myinfo"));
-    
+
     identityService.deleteUserInfo("testuser", "myinfo");
     assertNull(identityService.getUserInfo("testuser", "myinfo"));
-    
+
     identityService.deleteUser(user.getId());
   }
-  
+
   public void testUserAccount() {
     User user = identityService.newUser("testuser");
     identityService.saveUser(user);
-    
+
     identityService.setUserAccount("testuser", "123", "google", "mygoogleusername", "mygooglepwd", null);
     Account googleAccount = identityService.getUserAccount("testuser", "123", "google");
     assertEquals("google", googleAccount.getName());
     assertEquals("mygoogleusername", googleAccount.getUsername());
     assertEquals("mygooglepwd", googleAccount.getPassword());
-    
+
     identityService.setUserAccount("testuser", "123", "google", "mygoogleusername2", "mygooglepwd2", null);
     googleAccount = identityService.getUserAccount("testuser", "123", "google");
     assertEquals("google", googleAccount.getName());
@@ -77,17 +77,17 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     expectedUserAccountNames.add("alfresco");
     List<String> userAccountNames = identityService.getUserAccountNames("testuser");
     assertListElementsMatch(expectedUserAccountNames, userAccountNames);
-    
+
     identityService.deleteUserAccount("testuser", "google");
-    
+
     expectedUserAccountNames.remove("google");
-    
+
     userAccountNames = identityService.getUserAccountNames("testuser");
     assertListElementsMatch(expectedUserAccountNames, userAccountNames);
-    
+
     identityService.deleteUser(user.getId());
   }
-  
+
   private void assertListElementsMatch(List<String> list1, List<String> list2) {
     if(list1 != null) {
       assertNotNull(list2);
@@ -98,23 +98,23 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     } else {
       assertNull(list2);
     }
-    
+
   }
 
   public void testUserAccountDetails() {
     User user = identityService.newUser("testuser");
     identityService.saveUser(user);
-    
+
     Map<String, String> accountDetails = new HashMap<String, String>();
     accountDetails.put("server", "localhost");
     accountDetails.put("port", "35");
     identityService.setUserAccount("testuser", "123", "google", "mygoogleusername", "mygooglepwd", accountDetails);
     Account googleAccount = identityService.getUserAccount("testuser", "123", "google");
     assertEquals(accountDetails, googleAccount.getDetails());
-    
+
     identityService.deleteUser(user.getId());
   }
-  
+
   public void testCreateExistingUser() {
     User user = identityService.newUser("testuser");
     identityService.saveUser(user);
@@ -124,17 +124,18 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
       fail("Exception should have been thrown");
     } catch (RuntimeException re) {
       // Expected exception while saving new user with the same name as an existing one.
-    } 
-      
+    }
+
     identityService.deleteUser(user.getId());
   }
-  
+
   public void testUpdateUser() {
     // First, create a new user
     User user = identityService.newUser("johndoe");
     user.setFirstName("John");
     user.setLastName("Doe");
     user.setEmail("johndoe@alfresco.com");
+    user.setPassword("s3cret");
     identityService.saveUser(user);
 
     // Fetch and update the user
@@ -148,6 +149,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("Jane", user.getFirstName());
     assertEquals("Donnel", user.getLastName());
     assertEquals("updated@alfresco.com", user.getEmail());
+    assertTrue(identityService.checkPassword("johndoe", "s3cret"));
 
     identityService.deleteUser(user.getId());
   }
@@ -160,26 +162,26 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
 
     Picture picture = new Picture("niceface".getBytes(), "image/string");
     identityService.setUserPicture(userId, picture);
-    
+
     picture = identityService.getUserPicture(userId);
 
     // Fetch and update the user
     user = identityService.createUserQuery().userId("johndoe").singleResult();
     assertTrue("byte arrays differ", Arrays.equals("niceface".getBytes(), picture.getBytes()));
     assertEquals("image/string", picture.getMimeType());
-    
+
     identityService.deleteUserPicture("johndoe");
     // this is ignored
     identityService.deleteUserPicture("someone-else-we-dont-know");
-    
+
     // picture does not exist
     picture = identityService.getUserPicture("johndoe");
     assertNull(picture);
-    
+
     // add new picture
     picture = new Picture("niceface".getBytes(), "image/string");
     identityService.setUserPicture(userId, picture);
-    
+
     // makes the picture go away
     identityService.deleteUser(user.getId());
   }
@@ -214,46 +216,46 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
   public void testCreateMembershipUnexistingGroup() {
     User johndoe = identityService.newUser("johndoe");
     identityService.saveUser(johndoe);
-    
+
     try {
       identityService.createMembership(johndoe.getId(), "unexistinggroup");
       fail("Expected exception");
     } catch(RuntimeException re) {
       // Exception expected
     }
-    
+
     identityService.deleteUser(johndoe.getId());
   }
-  
+
   public void testCreateMembershipUnexistingUser() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
-    
+
     try {
       identityService.createMembership("unexistinguser", sales.getId());
       fail("Expected exception");
     } catch(RuntimeException re) {
       // Exception expected
     }
-    
+
     identityService.deleteGroup(sales.getId());
   }
-  
+
   public void testCreateMembershipAlreadyExisting() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
     User johndoe = identityService.newUser("johndoe");
     identityService.saveUser(johndoe);
-    
+
     // Create the membership
     identityService.createMembership(johndoe.getId(), sales.getId());
-    
+
     try {
-      identityService.createMembership(johndoe.getId(), sales.getId());      
+      identityService.createMembership(johndoe.getId(), sales.getId());
     } catch(RuntimeException re) {
      // Expected exception, membership already exists
     }
-    
+
     identityService.deleteGroup(sales.getId());
     identityService.deleteUser(johndoe.getId());
   }
@@ -275,7 +277,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("user is null", ae.getMessage());
     }
   }
-  
+
   public void testFindGroupByIdNullArgument() {
     try {
       identityService.createGroupQuery().groupId(null).singleResult();
@@ -346,21 +348,21 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteGroup("sales");
     identityService.deleteUser("johndoe");
   }
-  
+
   public void testDeleteMembershipWhenUserIsNoMember() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
 
     User johndoe = identityService.newUser("johndoe");
     identityService.saveUser(johndoe);
-    
+
     // Delete the membership when the user is no member
     identityService.deleteMembership(johndoe.getId(), sales.getId());
-    
+
     identityService.deleteGroup("sales");
     identityService.deleteUser("johndoe");
   }
-  
+
   public void testDeleteMembershipUnexistingGroup() {
     User johndoe = identityService.newUser("johndoe");
     identityService.saveUser(johndoe);
@@ -368,7 +370,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteMembership(johndoe.getId(), "unexistinggroup");
     identityService.deleteUser(johndoe.getId());
   }
-  
+
   public void testDeleteMembershipUnexistingUser() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
@@ -376,7 +378,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteMembership("unexistinguser", sales.getId());
     identityService.deleteGroup(sales.getId());
   }
-  
+
   public void testDeleteMemberschipNullArguments() {
     try {
       identityService.deleteMembership(null, "group");
@@ -401,25 +403,44 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("userId is null", ae.getMessage());
     }
   }
-  
+
   public void testDeleteUserUnexistingUserId() {
     // No exception should be thrown. Deleting an unexisting user should
     // be ignored silently
      identityService.deleteUser("unexistinguser");
   }
-  
+
   public void testCheckPassword() {
-    
+
     // store user with password
     User user = identityService.newUser("secureUser");
     user.setPassword("s3cret");
     identityService.saveUser(user);
-    
+
     assertTrue(identityService.checkPassword(user.getId(), "s3cret"));
     assertFalse(identityService.checkPassword(user.getId(), "wrong"));
-    
+
     identityService.deleteUser(user.getId());
-    
+
+  }
+
+  public void testUpdatePassword() {
+
+    // store user with password
+    User user = identityService.newUser("secureUser");
+    user.setPassword("s3cret");
+    identityService.saveUser(user);
+
+    assertTrue(identityService.checkPassword(user.getId(), "s3cret"));
+
+
+    user.setPassword("new-password");
+    identityService.saveUser(user);
+
+    assertTrue(identityService.checkPassword(user.getId(), "new-password"));
+
+    identityService.deleteUser(user.getId());
+
   }
 
   public void testCheckPasswordNullSafe() {
@@ -427,51 +448,51 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     assertFalse(identityService.checkPassword(null, "passwd"));
     assertFalse(identityService.checkPassword(null, null));
   }
-  
+
   public void testUserOptimisticLockingException() {
     User user = identityService.newUser("kermit");
     identityService.saveUser(user);
-    
+
     User user1 = identityService.createUserQuery().singleResult();
     User user2 = identityService.createUserQuery().singleResult();
-    
+
     user1.setFirstName("name one");
     identityService.saveUser(user1);
 
     try {
-      
+
       user2.setFirstName("name two");
       identityService.saveUser(user2);
-      
+
       fail("Expected an exception");
     } catch (OptimisticLockingException e) {
       // Expected an exception
     }
-    
+
     identityService.deleteUser(user.getId());
   }
-  
+
   public void testGroupOptimisticLockingException() {
     Group group = identityService.newGroup("group");
     identityService.saveGroup(group);
-    
+
     Group group1 = identityService.createGroupQuery().singleResult();
     Group group2 = identityService.createGroupQuery().singleResult();
-    
+
     group1.setName("name one");
     identityService.saveGroup(group1);
 
     try {
-      
+
       group2.setName("name two");
       identityService.saveGroup(group2);
-      
+
       fail("Expected an exception");
     } catch (OptimisticLockingException e) {
       // Expected an exception
     }
-    
+
     identityService.deleteGroup(group.getId());
   }
-  
+
 }
