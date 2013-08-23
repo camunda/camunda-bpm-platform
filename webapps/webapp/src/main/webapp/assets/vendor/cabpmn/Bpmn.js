@@ -8,7 +8,14 @@ define(['jquery', 'bpmn/Transformer', 'bpmn/Renderer'], function ($, Transformer
     var self = this;
 
     $.get(url).done(function(bpmnXml) {
-      deferred.resolve(self.render(bpmnXml, options));
+      var result;
+
+      try {
+        deferred.resolve(self.render(bpmnXml, options));
+      } catch (error) {
+        deferred.reject(error);
+      }
+      
     }).fail(function(error) {
       deferred.reject(error);
     });
