@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
@@ -2070,6 +2071,47 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertNotNull(taskVariable);
     assertEquals("taskVariable", taskVariable.getName());
     assertEquals("taskVariableValue", taskVariable.getValue());
+  }
+
+  @Test
+  @Deployment
+  public void testParallelGatewayVariables() {
+    // given
+    Map<String, Object> processVariables = new HashMap<String, Object>();
+    processVariables.put("processVariable", "aProcessVariable");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGatewayProcess", processVariables);
+
+    Execution execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+    runtimeService.setVariableLocal(execution.getId(), "aLocalVariable", "aLocalValue");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertEquals(2, tree.getChildActivityInstances().length);
+    ActivityInstance task1Instance = tree.getChildActivityInstances()[0];
+    if (!task1Instance.getActivityId().equals("task1")) {
+      task1Instance = tree.getChildActivityInstances()[1];
+    }
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(task1Instance.getId());
+    VariableInstance localVariable = query.singleResult();
+    assertNotNull(localVariable);
+    assertEquals("aLocalVariable", localVariable.getName());
+    assertEquals("aLocalValue", localVariable.getValue());
+
+    Task task = taskService.createTaskQuery().executionId(execution.getId()).singleResult();
+    taskService.complete(task.getId());
+
+    tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertEquals(2, tree.getChildActivityInstances().length);
+    ActivityInstance task3Instance = tree.getChildActivityInstances()[0];
+    if (!task1Instance.getActivityId().equals("task3")) {
+      task1Instance = tree.getChildActivityInstances()[1];
+    }
+
+    query = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(task3Instance.getId());
+    localVariable = query.singleResult();
+    assertNotNull(localVariable);
+    assertEquals("aLocalVariable", localVariable.getName());
+    assertEquals("aLocalValue", localVariable.getValue());
   }
 
 }
