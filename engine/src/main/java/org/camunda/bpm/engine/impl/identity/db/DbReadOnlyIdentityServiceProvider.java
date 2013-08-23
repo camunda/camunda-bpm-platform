@@ -80,16 +80,6 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
       .check(password, user.getPassword());
   }
 
-  protected String encryptPassword(String password) {
-    if (password == null) {
-      return null;
-    } else {
-      return Context.getProcessEngineConfiguration()
-        .getPasswordEncryptor()
-        .encrypt(password);
-    }
-  }
-
   // groups //////////////////////////////////////////
 
   public GroupEntity findGroupById(String groupId) {
@@ -114,14 +104,14 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
     configureQuery(query, Resources.GROUP);
     return getDbSqlSession().selectList("selectGroupByQueryCriteria", query);
   }
-  
-  
+
+
   //authorizations ////////////////////////////////////////////////////
-  
+
   protected void configureQuery(@SuppressWarnings("rawtypes") AbstractQuery query, Resource resource) {
     Context.getCommandContext()
       .getAuthorizationManager()
-      .configureQuery(query, resource);    
+      .configureQuery(query, resource);
   }
 
   protected void checkAuthorization(Permission permission, Resource resource, String resourceId) {

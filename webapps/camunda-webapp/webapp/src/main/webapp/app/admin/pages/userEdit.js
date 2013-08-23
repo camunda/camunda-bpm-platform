@@ -2,10 +2,11 @@ define([ 'angular', 'require' ], function(angular, require) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$dialog', 'AuthorizationResource',
-    function ($scope, $window, $routeParams, UserResource, GroupResource, GroupMembershipResource, Notifications, $location, $dialog, AuthorizationResource) {
+  var Controller = ['$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$dialog', 'AuthorizationResource', 'authenticatedUser',
+    function ($scope, $window, $routeParams, UserResource, GroupResource, GroupMembershipResource, Notifications, $location, $dialog, AuthorizationResource, authenticatedUser) {
 
     $scope.userId = $routeParams.userId;
+    $scope.authenticatedUser = authenticatedUser;
 
     // used to display information about the user
     $scope.profile = null;
@@ -16,8 +17,9 @@ define([ 'angular', 'require' ], function(angular, require) {
 
     // data model for the changePassword form
     $scope.credentials = {
-        password : "",
-        password2 : ""
+        authenticatedUserPassword: '',
+        password : '',
+        password2 : ''
     };
 
     // list of the user's groups
@@ -69,16 +71,34 @@ define([ 'angular', 'require' ], function(angular, require) {
     // update password form ////////////////////////////
 
     var resetCredentials = function() {
-      $scope.credentials.password = "";
-      $scope.credentials.password2 = "";
+      $scope.credentials.authenticatedUserPassword = '';
+      $scope.credentials.password = '';
+      $scope.credentials.password2 = '';
+
       $scope.updateCredentialsForm.$setPristine();
     }
 
     $scope.updateCredentials = function() {
-      UserResource.updateCredentials({ userId: $scope.user.id }, { password: $scope.credentials.password })
-        .$then(function() {
-          Notifications.addMessage({ type: "success", status: "Success", message: "Password changed." });
+      var pathParams = { userId: $scope.user.id },
+          params = {authenticatedUserPassword: $scope.credentials.authenticatedUserPassword, password: $scope.credentials.password };
+
+      UserResource.updateCredentials(pathParams, params).$then(
+
+        function() {
+          Notifications.addMessage({ type: "success", status: "Password", message: "Changed the password.", duration: 5000, exclusive: true });
           resetCredentials();
+        },
+
+        function(error) {
+          if (error.status === 400) {
+            if ($scope.userId === $scope.authenticatedUser) {
+              Notifications.addError({ status: "Password", message: "Old password is not valid.", exclusive: true });
+            } else {
+              Notifications.addError({ status: "Password", message: "Your password is not valid.", exclusive: true });
+            }
+          } else {
+            Notifications.addError({ status: "Password", message: "Could not change the password." });  
+          }
         });
     }
 
