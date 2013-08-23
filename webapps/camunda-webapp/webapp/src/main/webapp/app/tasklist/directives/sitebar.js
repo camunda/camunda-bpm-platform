@@ -4,27 +4,34 @@ ngDefine('tasklist.directives', [
 ], function(module, angular, require) {
 
   var SitebarController = [ 
-    "$scope", "$location", "EngineApi", "Authentication", 
+    '$scope', '$location', 'EngineApi', 'Authentication', 
     function($scope, $location, EngineApi, Authentication) {
-    
-    var currentUser = Authentication.username();
-
-    if (!currentUser) {
-      return;
-    }
 
     var tasks;
+    var authenticatedUser;
 
     $scope.colleagueCount = {};
     $scope.groupCount = {};
 
+    $scope.$watch(Authentication.username, function(newValue) {
+      if (newValue) {
+        authenticatedUser = newValue;
+        loadSitebar();
+      }
+    });
+
     function loadSitebar() {
+
+      if (!authenticatedUser) {
+        return;
+      }
+      
       tasks = $scope.tasks = {
-        mytasks: EngineApi.getTaskCount().get({ "assignee" : currentUser }),
-        unassigned: EngineApi.getTaskCount().get({ "candidateUser" : currentUser })
+        mytasks: EngineApi.getTaskCount().get({ 'assignee' : authenticatedUser }),
+        unassigned: EngineApi.getTaskCount().get({ 'candidateUser' : authenticatedUser })
       };
 
-      $scope.groupInfo = EngineApi.getGroups(currentUser);
+      $scope.groupInfo = EngineApi.getGroups(authenticatedUser);
 
       $scope.groupInfo.$then(function(data){
 
@@ -47,23 +54,20 @@ ngDefine('tasklist.directives', [
 
     $scope.isActive = function(filter, search) {
       var params = $location.search();
-      return (params.filter || "mytasks") == filter && params.search == search;
+      return (params.filter || 'mytasks') == filter && params.search == search;
     };
 
-    $scope.$on("tasklist.reload", function () {
+    $scope.$on('tasklist.reload', function () {
       loadSitebar();
     });
-
-    loadSitebar();
   }];
 
-  var SitebarDirective = function() {
+  var SitebarDirective = [ 'AuthenticationService', function(AuthenticationService) {
     return {
       templateUrl: require.toUrl('./sitebar.html'),
       controller: SitebarController
     };
-  };
+  }];
 
-  module
-    .directive('sitebar', SitebarDirective);
+  module.directive('sitebar', SitebarDirective);
 });

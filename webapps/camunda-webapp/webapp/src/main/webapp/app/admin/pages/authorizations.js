@@ -143,17 +143,13 @@ define([ 'angular', 'require' ], function(angular, require) {
 
   }];
 
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/authorization', {
       templateUrl: 'pages/authorizations.html',
       controller: Controller,
-      reloadOnSearch: false
-    });
-
-    // multi tenacy
-    $routeProvider.when('/:engine/authorization', {
-      templateUrl: 'pages/authorizations.html',
-      controller: Controller,
+      resolve: {
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
+      },
       reloadOnSearch: false
     });
   }];

@@ -57,13 +57,19 @@ public class AuthenticationFilterPathMatchingTest extends AbstractRestServiceTes
 
   protected Filter authenticationFilter;
 
+  protected String servletPath;
   protected String requestUrl;
   protected String engineName;
   protected boolean authenticationExpected;
 
   protected ProcessEngine currentEngine;
 
-  public AuthenticationFilterPathMatchingTest(String requestUrl, String engineName, boolean authenticationExpected) {
+  /**
+   * Makes a request against the url SERVICE_PATH + 'servletPath' + 'requestUrl' and depending on the 'authenticationExpected' value,
+   * asserts that authentication was carried out (or not) against the engine named 'engineName'
+   */
+  public AuthenticationFilterPathMatchingTest(String servletPath, String requestUrl, String engineName, boolean authenticationExpected) {
+    this.servletPath = servletPath;
     this.requestUrl = requestUrl;
     this.engineName = engineName;
     if (engineName == null) {
@@ -75,16 +81,18 @@ public class AuthenticationFilterPathMatchingTest extends AbstractRestServiceTes
   @Parameters
   public static Collection<Object[]> getRequestUrls() {
     return Arrays.asList(new Object[][]{
-        {"/engine/default/process-definition/and/a/longer/path", "default", true},
-        {"/engine/default/process-definition", "default", true},
-        {"/engine/someOtherEngine/process-definition", "someOtherEngine", true},
-        {"/engine/default/", "default", true},
-        {"/engine/default", "default", true},
-        {"/process-definition", "default", true},
-        {"/engine", null, false},
-        {"/engine/", null, false},
-        {"/", "default", true},
-        {"", "default", true}
+        {"", "/engine/default/process-definition/and/a/longer/path", "default", true},
+        {"", "/engine/default/process-definition/and/a/longer/path", "default", true},
+        {"", "/engine/default/process-definition", "default", true},
+        {"", "/engine/someOtherEngine/process-definition", "someOtherEngine", true},
+        {"", "/engine/default/", "default", true},
+        {"", "/engine/default", "default", true},
+        {"", "/process-definition", "default", true},
+        {"", "/engine", null, false},
+        {"", "/engine/", null, false},
+        {"", "/", "default", true},
+        {"", "", "default", true},
+        {"/someservlet", "/engine/someengine/process-definition", "someengine", true}
     });
   }
 
@@ -135,8 +143,9 @@ public class AuthenticationFilterPathMatchingTest extends AbstractRestServiceTes
 
     MockHttpServletResponse response = new MockHttpServletResponse();
     MockHttpServletRequest request = new MockHttpServletRequest();
-    request.setRequestURI(SERVICE_PATH + requestUrl);
+    request.setRequestURI(SERVICE_PATH + servletPath + requestUrl);
     request.setContextPath(SERVICE_PATH);
+    request.setServletPath(servletPath);
     applyFilter(request, response, MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD);
 
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());

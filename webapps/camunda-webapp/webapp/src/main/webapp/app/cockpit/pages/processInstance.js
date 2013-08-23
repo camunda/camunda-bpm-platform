@@ -652,11 +652,12 @@ ngDefine('cockpit.pages.processInstance', [
                                                'dataDepend', ProcessInstanceController ])
     .controller('ProcessInstanceFilterController', ['$scope', ProcessInstanceFilterController]);
 
-  var RouteConfig = function ($routeProvider) {
+  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/process-instance/:processInstanceId', {
       templateUrl: 'pages/process-instance.html',
       controller: 'ProcessInstanceController',
       resolve: {
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
         processInstance: ['ResourceResolver', 'ProcessInstanceResource',
           function(ResourceResolver, ProcessInstanceResource) {
             return ResourceResolver.getByRouteParam('processInstanceId', {
@@ -669,10 +670,7 @@ ngDefine('cockpit.pages.processInstance', [
       },
       reloadOnSearch: false
     });
-  };
+  }];
 
-  RouteConfig.$inject = ['$routeProvider'];
-
-  module
-    .config(RouteConfig);
+  module.config(RouteConfig);
 });

@@ -63,22 +63,26 @@ ngDefine('tasklist.pages', [
 
   CompleteController.$inject = ["$scope", "$location", "$routeParams", "Notifications", "EngineApi"];
 
-  var RouteConfig = function($routeProvider) {
+  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
 
     $routeProvider.when("/process-definition/:id", {
       templateUrl: "pages/start.html",
-      controller: Controller
+      controller: Controller,
+      resolve: {
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
+      }
     });
 
     // controller which handles process instance start completion
 
     $routeProvider.when("/process-definition/:id/complete", {
+      templateUrl: "pages/complete.html",
       controller: CompleteController,
-      templateUrl: "pages/complete.html"
+      resolve: {
+        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
+      }
     });
-  };
-
-  RouteConfig.$inject = [ "$routeProvider"];
+  }];
 
   module
     .config(RouteConfig)
