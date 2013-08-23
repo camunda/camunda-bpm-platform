@@ -23,8 +23,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
-import junit.framework.AssertionFailedError;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -39,7 +37,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
 
@@ -56,18 +53,14 @@ public abstract class TestHelper {
     "ACT_GE_PROPERTY"
   );
 
-  static Map<String, ProcessEngine> processEngines = new HashMap<String, ProcessEngine>(); 
+  static Map<String, ProcessEngine> processEngines = new HashMap<String, ProcessEngine>();
   
+  /**
+   * use {@link ProcessEngineAssert} instead.
+   */
+  @Deprecated  
   public static void assertProcessEnded(ProcessEngine processEngine, String processInstanceId) {
-    ProcessInstance processInstance = processEngine
-      .getRuntimeService()
-      .createProcessInstanceQuery()
-      .processInstanceId(processInstanceId)
-      .singleResult();
-    
-    if (processInstance!=null) {
-      throw new AssertionFailedError("expected finished process instance '"+processInstanceId+"' but it was still in the db"); 
-    }
+    ProcessEngineAssert.assertProcessEnded(processEngine, processInstanceId);
   }
   
   public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName) {
