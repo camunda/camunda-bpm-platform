@@ -270,16 +270,16 @@ footer .version {
 @media (min-width: 979px) {
   .ctn-wrapper > .notifications-panel {
     position: fixed;
-    top: 80px;
-    right: 50px;
+    bottom: 40px;
+    right: 20px;
     width: 400px;
     z-index: 10;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.3);
     border-radius: 10px;
   }
 
   .ctn-wrapper > .notifications-panel .alert {
-    margin: 20px;
+    margin: 10px;
   }
 
   .breadcrumb {

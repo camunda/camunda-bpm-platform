@@ -14,8 +14,6 @@ package org.camunda.bpm.engine.rest.security.auth;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,20 +39,34 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * <p>
- * Servlet filter to plug in authentication. Expects an init-param {@link ProcessEngineAuthenticationFilter#AUTHENTICATION_PROVIDER_PARAM} that
- * provides a class that implements {@link AuthenticationProvider}.
+ * Servlet filter to plug in authentication.
  * </p>
+ *
+ * <p>Valid init-params:</p>
+ * <table>
+ * <thead>
+ *   <tr><th>Parameter</th><th>Required</th><th>Expected value</th></tr>
+ * <thead>
+ * <tbody>
+ *    <tr><td>{@value #AUTHENTICATION_PROVIDER_PARAM}</td><td>yes</td><td>An implementation of {@link AuthenticationProvider}</td></tr>
+ *    <tr>
+ *      <td>{@value #SERVLET_PATH_PREFIX}</td>
+ *      <td>no</td>
+ *      <td>The expected servlet path. Should only be set, if the underlying JAX-RS application is not deployed as a servlet (e.g. Resteasy allows deployments
+ *      as a servlet filter). Value has to match what would be the {@link HttpServletRequest#getServletPath()} if it was deployed as a servlet.</td></tr>
+ * </tbody>
+ * </table>
  *
  * @author Thorben Lindhauer
  */
 public class ProcessEngineAuthenticationFilter implements Filter {
 
   // regexes for urls that may be accessed unauthorized
-  protected static final String[] WHITE_LISTED_URL_PATTERNS = new String[] {
-    "^" + ProcessEngineRestService.PATH + "/?"
+  protected static final Pattern[] WHITE_LISTED_URL_PATTERNS = new Pattern[] {
+    Pattern.compile("^" + ProcessEngineRestService.PATH + "/?")
   };
 
-  protected static final String ENGINE_REQUEST_URL_PATTERN = "^" + ProcessEngineRestService.PATH + "/(.*?)(/|$)";
+  protected static final Pattern ENGINE_REQUEST_URL_PATTERN = Pattern.compile("^" + ProcessEngineRestService.PATH + "/(.*?)(/|$)");
   protected static final String DEFAULT_ENGINE_NAME = "default";
 
   // init params
@@ -67,6 +79,10 @@ public class ProcessEngineAuthenticationFilter implements Filter {
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     String authenticationProviderClassName = filterConfig.getInitParameter(AUTHENTICATION_PROVIDER_PARAM);
+
+    if (authenticationProviderClassName == null) {
+      throw new ServletException("Cannot instantiate authentication filter: no authentication provider set. init-param " + AUTHENTICATION_PROVIDER_PARAM + " missing");
+    }
 
     try {
       Class<?> authenticationProviderClass = Class.forName(authenticationProviderClassName);
@@ -125,8 +141,8 @@ public class ProcessEngineAuthenticationFilter implements Filter {
     AuthenticationResult authenticationResult = authenticationProvider.extractAuthenticatedUser(req, engine);
 
     if (authenticationResult.isAuthenticated()) {
-      setAuthenticatedUser(engine, authenticationResult.getAuthenticatedUser());
       try {
+        setAuthenticatedUser(engine, authenticationResult.getAuthenticatedUser());
         chain.doFilter(request, response);
       } finally {
         clearAuthentication(engine);
@@ -164,9 +180,8 @@ public class ProcessEngineAuthenticationFilter implements Filter {
   }
 
   protected boolean requiresEngineAuthentication(String requestUrl) {
-    for (String whiteListedUrlPattern : WHITE_LISTED_URL_PATTERNS) {
-      Pattern pattern = Pattern.compile(whiteListedUrlPattern);
-      Matcher matcher = pattern.matcher(requestUrl);
+    for (Pattern whiteListedUrlPattern : WHITE_LISTED_URL_PATTERNS) {
+      Matcher matcher = whiteListedUrlPattern.matcher(requestUrl);
       if (matcher.matches()) {
         return false;
       }
@@ -180,8 +195,7 @@ public class ProcessEngineAuthenticationFilter implements Filter {
    */
   protected String extractEngineName(String requestUrl) {
 
-    Pattern pattern = Pattern.compile(ENGINE_REQUEST_URL_PATTERN);
-    Matcher matcher = pattern.matcher(requestUrl);
+    Matcher matcher = ENGINE_REQUEST_URL_PATTERN.matcher(requestUrl);
 
     if (matcher.find()) {
       return matcher.group(1);
