@@ -325,6 +325,12 @@ footer .version {
 
 /** signin form */
 
+@media(min-width: 976px) {
+  .form-signin-container {
+    padding: 20px;
+  }
+}
+
 .form-signin {
   max-width: 300px;
   padding: 19px 29px 29px;
