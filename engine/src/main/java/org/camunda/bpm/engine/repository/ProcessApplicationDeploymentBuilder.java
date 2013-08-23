@@ -22,24 +22,23 @@ import org.camunda.bpm.application.ProcessApplicationInterface;
 /**
  * <p>Builder for a {@link ProcessApplication} deployment</p>
  *
- * <p>A process application is different from a regular deployment.
+ * <p>A process application deployment is different from a regular deployment.
  * Besides deploying a set of process definitions to the database,
- * the process application has a set of non-database side effects which do not
- * survive an application server restart. These side effects are:
- * <ul>
- * <li>The process engine will exeute all process definitions contained in the deployment
- * in the context of the process application (by calling the process application's
- * {@link ProcessApplicationInterface#execute(java.util.concurrent.Callable)} method.</li>
- * <li>
- * </ul>
- *
- * <p>
+ * this deployment has the additional side effect that the process application
+ * is registered for the deployment. This means that the process engine will exeute
+ * all process definitions contained in the deployment in the context of the process
+ * application (by calling the process application's
+ * {@link ProcessApplicationInterface#execute(java.util.concurrent.Callable)} method.<p>
  *
  * @author Daniel Meyer
  *
  */
 public interface ProcessApplicationDeploymentBuilder extends DeploymentBuilder {
 
+  /**
+   * <p>If this method is called, additional registrations will be created for
+   * previous versions of the deployment.</p>
+   */
   ProcessApplicationDeploymentBuilder resumePreviousVersions();
 
   /* {@inheritDoc} */
