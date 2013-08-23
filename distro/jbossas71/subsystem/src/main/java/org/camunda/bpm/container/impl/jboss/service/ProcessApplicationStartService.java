@@ -33,6 +33,7 @@ import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
 import org.camunda.bpm.container.impl.jmx.deployment.util.InjectionUtil;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.naming.ManagedReference;
 import org.jboss.jandex.AnnotationInstance;
@@ -124,12 +125,13 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
         ProcessApplicationDeploymentService value = getDeploymentService(context, deploymentServiceName);
         referencedProcessEngines.add(value.getProcessEngineInjector().getValue());
 
-        ProcessApplicationDeploymentInfoImpl deploymentInfo = new ProcessApplicationDeploymentInfoImpl();
-        deploymentInfo.setDeploymentId(value.getDeployment().getId());
-        deploymentInfo.setProcessEngineName(value.getProcessEngineName());
-        deploymentInfo.setDeploymentName(value.getDeployment().getName());
-
-        deploymentInfos.add(deploymentInfo);
+        ProcessApplicationDeployment deployment = value.getDeployment();
+        for (String deploymentId : deployment.getProcessApplicationRegistration().getDeploymentIds()) {
+          ProcessApplicationDeploymentInfoImpl deploymentInfo = new ProcessApplicationDeploymentInfoImpl();
+          deploymentInfo.setDeploymentId(deploymentId);
+          deploymentInfo.setProcessEngineName(value.getProcessEngineName());
+          deploymentInfos.add(deploymentInfo);
+        }
 
       }
       processApplicationInfo.setDeploymentInfo(deploymentInfos);

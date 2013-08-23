@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,26 +17,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
-import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
+import org.camunda.bpm.container.impl.jmx.deployment.util.DeployedProcessArchive;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 
 /**
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public class JmxManagedProcessApplication implements MBeanService<JmxManagedProcessApplication>, JmxManagedProcessApplicationMBean {
-  
+
   protected final ProcessApplicationInfoImpl processApplicationInfo;
   protected final ProcessApplicationReference processApplicationReference;
 
   protected List<ProcessesXml> processesXmls;
-  protected Map<String, ProcessApplicationRegistration> deploymentMap;
+  protected Map<String, DeployedProcessArchive> deploymentMap;
 
-	
 	public JmxManagedProcessApplication(ProcessApplicationInfoImpl processApplicationInfo, ProcessApplicationReference processApplicationReference) {
     this.processApplicationInfo = processApplicationInfo;
     this.processApplicationReference = processApplicationReference;
@@ -49,7 +48,7 @@ public class JmxManagedProcessApplication implements MBeanService<JmxManagedProc
 	public void start(MBeanServiceContainer mBeanServiceContainer) {
 	}
 
-	public void stop(MBeanServiceContainer mBeanServiceContainer) {	  
+	public void stop(MBeanServiceContainer mBeanServiceContainer) {
 	}
 
 	public JmxManagedProcessApplication getValue() {
@@ -59,23 +58,23 @@ public class JmxManagedProcessApplication implements MBeanService<JmxManagedProc
   public void setProcessesXmls(List<ProcessesXml> processesXmls) {
     this.processesXmls = processesXmls;
   }
-  
+
   public List<ProcessesXml> getProcessesXmls() {
     return processesXmls;
   }
 
-  public void setDeploymentMap(Map<String, ProcessApplicationRegistration> processArchiveDeploymentMap) {
+  public void setDeploymentMap(Map<String, DeployedProcessArchive> processArchiveDeploymentMap) {
     this.deploymentMap = processArchiveDeploymentMap;
   }
-  
-  public Map<String, ProcessApplicationRegistration> getProcessArchiveDeploymentMap() {
+
+  public Map<String, DeployedProcessArchive> getProcessArchiveDeploymentMap() {
     return deploymentMap;
   }
 
   public List<String> getDeploymentIds() {
     List<String> deploymentIds = new ArrayList<String>();
-    for (ProcessApplicationRegistration registration : deploymentMap.values()) {
-      deploymentIds.add(registration.getDeploymentId());
+    for (DeployedProcessArchive registration : deploymentMap.values()) {
+      deploymentIds.addAll(registration.getAllDeploymentIds());
     }
     return deploymentIds;
   }
@@ -83,11 +82,11 @@ public class JmxManagedProcessApplication implements MBeanService<JmxManagedProc
   public List<String> getDeploymentNames() {
     return new ArrayList<String>(deploymentMap.keySet());
   }
-  
+
   public ProcessApplicationInfoImpl getProcessApplicationInfo() {
     return processApplicationInfo;
   }
-  
+
   public ProcessApplicationReference getProcessApplicationReference() {
     return processApplicationReference;
   }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,9 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.impl.cmd;
+
+import java.util.Collections;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -21,26 +24,32 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  * @author Daniel Meyer
  *
  */
-public class UnregisterProcessApplication implements Command<Boolean> {
+public class UnregisterProcessApplicationCmd implements Command<Void> {
 
   protected boolean removeProcessesFromCache;
-  protected String deploymentId;
+  protected Set<String> deploymentIds;
 
-  public UnregisterProcessApplication(String deploymentId, boolean removeProcessesFromCache) {
-    this.deploymentId = deploymentId;
+  public UnregisterProcessApplicationCmd(String deploymentId, boolean removeProcessesFromCache) {
+    this(Collections.singleton(deploymentId), removeProcessesFromCache);
+  }
+
+  public UnregisterProcessApplicationCmd(Set<String> deploymentIds, boolean removeProcessesFromCache) {
+    this.deploymentIds = deploymentIds;
     this.removeProcessesFromCache = removeProcessesFromCache;
   }
 
-  public Boolean execute(CommandContext commandContext) {
-    
-    if(deploymentId == null) {
-      throw new ProcessEngineException("Deployment Id cannot be null.");
+  public Void execute(CommandContext commandContext) {
+
+    if(deploymentIds == null) {
+      throw new ProcessEngineException("Deployment Ids cannot be null.");
     }
 
-    return Context.getProcessEngineConfiguration()
+    Context.getProcessEngineConfiguration()
       .getProcessApplicationManager()
-      .unregisterProcessApplicationForDeployment(deploymentId, removeProcessesFromCache);
-    
+      .unregisterProcessApplicationForDeployments(deploymentIds, removeProcessesFromCache);
+
+    return null;
+
   }
 
 }

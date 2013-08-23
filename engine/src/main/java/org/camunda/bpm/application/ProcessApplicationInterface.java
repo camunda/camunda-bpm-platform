@@ -19,6 +19,7 @@ import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.impl.EjbProcessApplication;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 
@@ -171,5 +172,16 @@ public interface ProcessApplicationInterface {
    * @param processArchiveName the name of the processArchive which is currently being deployed.
    */
   public void createDeployment(String processArchiveName, DeploymentBuilder deploymentBuilder);
+
+
+  /**
+   * <p>Allows the process application to provide an {@link ExecutionListener} which is notified about
+   * all execution events in all of the process instances deployed by this process application.</p>
+   *
+   * <p>If this method returns 'null', the process application is not notified about execution events.</p>
+   *
+   * @return an {@link ExecutionListener} or null.
+   */
+  public ExecutionListener getExecutionListener();
 
 }

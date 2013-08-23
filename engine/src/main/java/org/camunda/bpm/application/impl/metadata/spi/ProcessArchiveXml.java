@@ -30,6 +30,10 @@ public interface ProcessArchiveXml {
   /** Indicates whether the classloader should be scanned for process definitions. */
   public static final String PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS = "isScanForProcessDefinitions";
 
+  /** Indicates whether old versions of the deployment should be resumed.
+   * If this property is not set, the default value is used: true. */
+  public static final String PROP_IS_RESUME_PREVIOUS_VERSIONS = "isResumePreviousVersions";
+
   /**
    * <p> The resource root of the proccess archive. This property is used when scanning for process definitions
    * (if {@link #PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS} is set to true).</p>

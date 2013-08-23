@@ -21,10 +21,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.deployment.scanning.ProcessApplicationScanningUtil;
+import org.camunda.bpm.container.impl.jmx.deployment.util.DeployedProcessArchive;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
@@ -33,8 +33,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 
 
 /**
@@ -47,8 +47,7 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
 
   protected final ProcessArchiveXml processArchive;
   protected URL metaFileUrl;
-  protected Deployment deployment;
-  protected ProcessApplicationRegistration registration;
+  protected ProcessApplicationDeployment deployment;
 
   public DeployProcessArchiveStep(ProcessArchiveXml parsedProcessArchive, URL url) {
     processArchive = parsedProcessArchive;
@@ -91,7 +90,7 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
 
     // perform process engine deployment
     RepositoryService repositoryService = processEngine.getRepositoryService();
-    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
+    ProcessApplicationDeploymentBuilder deploymentBuilder = repositoryService.createDeployment(processApplication.getReference());
 
     // set the name for the deployment
     String deploymentName = processArchive.getName();
@@ -104,6 +103,11 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     // enable duplicate filtering
     deploymentBuilder.enableDuplicateFiltering();
 
+    // enable resuming of previous versions:
+    if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_RESUME_PREVIOUS_VERSIONS, true)) {
+      deploymentBuilder.resumePreviousVersions();
+    }
+
     // add all resources obtained through the processes.xml and through scanning
     for (Entry<String, byte[]> deploymentResource : deploymentMap.entrySet()) {
       deploymentBuilder.addInputStream(deploymentResource.getKey(), new ByteArrayInputStream(deploymentResource.getValue()));
@@ -115,23 +119,13 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     // perform the process engine deployment
     deployment = deploymentBuilder.deploy();
 
-    // log summary
-    LOGGER.log(Level.INFO,
-        "Process application '" + processApplication.getName()
-        + "' performed deployment '" + deploymentName
-        + "', dbId is '" + deployment.getId() + "'");
-
-    // register the deployment
-    // TODO: think about turning the registration into a separate step.
-    registration = processEngine.getManagementService().registerProcessApplication(deployment.getId(), processApplication.getReference());
-
     // add attachment
-    Map<String, ProcessApplicationRegistration> processArchiveDeploymentMap = operationContext.getAttachment(Attachments.PROCESS_ARCHIVE_DEPLOYMENT_MAP);
+    Map<String, DeployedProcessArchive> processArchiveDeploymentMap = operationContext.getAttachment(Attachments.PROCESS_ARCHIVE_DEPLOYMENT_MAP);
     if(processArchiveDeploymentMap == null) {
-      processArchiveDeploymentMap = new HashMap<String, ProcessApplicationRegistration>();
+      processArchiveDeploymentMap = new HashMap<String, DeployedProcessArchive>();
       operationContext.addAttachment(Attachments.PROCESS_ARCHIVE_DEPLOYMENT_MAP, processArchiveDeploymentMap);
     }
-    processArchiveDeploymentMap.put(processArchive.getName(), registration);
+    processArchiveDeploymentMap.put(processArchive.getName(), new DeployedProcessArchive(deployment));
   }
 
   protected void logDeploymentSummary(Map<String, byte[]> deploymentMap, String deploymentName) {
@@ -152,8 +146,8 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     ProcessEngine processEngine = getProcessEngine(serviceContainer);
 
     // if a registration was performed, remove it.
-    if(registration != null) {
-      processEngine.getManagementService().unregisterProcessApplication(deployment.getId(), true);
+    if(deployment != null && deployment.getProcessApplicationRegistration() != null) {
+      processEngine.getManagementService().unregisterProcessApplication(deployment.getProcessApplicationRegistration().getDeploymentIds(), true);
     }
 
     // delete deployment if we were able to create one AND if isDeleteUponUndeploy is set.

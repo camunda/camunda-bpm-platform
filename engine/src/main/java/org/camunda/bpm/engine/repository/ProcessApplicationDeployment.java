@@ -10,24 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.application;
+package org.camunda.bpm.engine.repository;
+
+import org.camunda.bpm.application.ProcessApplicationRegistration;
 
 /**
- * <p>Object holding information about a deployment made by a process application.</p>
- *
  * @author Daniel Meyer
  *
  */
-public interface ProcessApplicationDeploymentInfo {
+public interface ProcessApplicationDeployment extends Deployment {
 
   /**
-   * @return the name of the process engine the deployment was made to
+   * @return the {@link ProcessApplicationRegistration} performed for this process application deployment.
    */
-  public String getProcessEngineName();
-
-  /**
-   * @return the id of the deployment that was performed.
-   */
-  public String getDeploymentId();
+  ProcessApplicationRegistration getProcessApplicationRegistration();
 
 }
