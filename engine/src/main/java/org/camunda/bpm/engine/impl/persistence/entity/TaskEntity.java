@@ -238,10 +238,6 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   @Override
   protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
     variableInstance.setTaskId(id);
-    ExecutionEntity execution = getExecution();
-    if (execution != null) {
-      variableInstance.setActivityInstanceId(execution.getActivityInstanceId());
-    }
     variableInstance.setExecutionId(executionId);
     variableInstance.setProcessInstanceId(processInstanceId);
   }

@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -47,10 +46,32 @@ public class TestActivityInstanceUpgrade extends AbstractDbUpgradeTestCase {
            .activity("waitHere")
          .done());
 
-    assertHasVariable(actualTree.getId(), "processVariable", "processVariableValue");
+    // assert that the process instance can be completed:
+    Task task = taskService
+      .createTaskQuery()
+      .processDefinitionKey(processDefinitionKey)
+      .singleResult();
 
-    ActivityInstance taskInstance = actualTree.getChildActivityInstances()[0];
-    assertHasVariable(taskInstance.getId(), "taskVariable", "taskVariableValue");
+    taskService.complete(task.getId());
+  }
+
+  @Test
+  public void testNestedSingleTaskProcess() {
+    String processDefinitionKey = "TestFixture62.nestedSingleTaskProcess";
+
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey(processDefinitionKey)
+        .singleResult();
+    Assert.assertNotNull(processInstance);
+
+    // validate tree
+    ActivityInstance actualTree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(actualTree).hasStructure(
+        describeActivityInstanceTree()
+          .beginScope("outerProcess")
+            .activity("waitHere")
+          .endScope()
+        .done());
 
     // assert that the process instance can be completed:
     Task task = taskService
@@ -77,16 +98,6 @@ public class TestActivityInstanceUpgrade extends AbstractDbUpgradeTestCase {
           .activity("task1")
           .activity("task2")
         .done());
-
-    assertHasVariable(actualTree.getId(), "processVariable", "processVariableValue");
-
-    ActivityInstance task1Instance = actualTree.getChildActivityInstances()[0];
-    assertHasVariable(task1Instance.getId(), "localVariable1", "localVariableValue1");
-    assertHasVariable(task1Instance.getId(), "taskVariable1", "taskVariableValue1");
-
-    ActivityInstance task2Instance = actualTree.getChildActivityInstances()[1];
-    assertHasVariable(task2Instance.getId(), "localVariable2", "localVariableValue2");
-    assertHasVariable(task2Instance.getId(), "taskVariable2", "taskVariableValue2");
 
     // complete first task
     Task firstTask = taskService
@@ -280,19 +291,6 @@ public class TestActivityInstanceUpgrade extends AbstractDbUpgradeTestCase {
             .activity("waitInside1")
           .endScope()
         .done());
-
-    // validate variables
-    // validate process variable
-    ActivityInstance processActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
-    assertHasVariable(processActivityInstance.getId(), "processVariable", "processVariableValue");
-
-    // validate subprocess variable
-    ActivityInstance subProcessActivityInstance = processActivityInstance.getChildActivityInstances()[0];
-    assertHasVariable(subProcessActivityInstance.getId(), "subProcessVariable", "subProcessVariableValue");
-
-    // validate task variable
-    ActivityInstance taskActivityInstance = subProcessActivityInstance.getChildActivityInstances()[0];
-    assertHasVariable(taskActivityInstance.getId(), "taskVariable", "taskVariableValue");
 
     // assert that the process instance can be completed:
     List<Task> tasks = taskService
@@ -540,19 +538,6 @@ public class TestActivityInstanceUpgrade extends AbstractDbUpgradeTestCase {
             .activity("waitInside1")
           .endScope()
         .done());
-
-    // validate variables
-    // validate process variable
-    ActivityInstance processActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
-    assertHasVariable(processActivityInstance.getId(), "processVariable", "processVariableValue");
-
-    // validate subprocess variable
-    ActivityInstance subProcessActivityInstance = processActivityInstance.getChildActivityInstances()[0];
-    assertHasVariable(subProcessActivityInstance.getId(), "subProcessVariable", "subProcessVariableValue");
-
-    // validate task variable
-    ActivityInstance taskActivityInstance = subProcessActivityInstance.getChildActivityInstances()[0];
-    assertHasVariable(taskActivityInstance.getId(), "taskVariable", "taskVariableValue");
 
     // complete first task
     Task task = taskService
@@ -1108,14 +1093,6 @@ public class TestActivityInstanceUpgrade extends AbstractDbUpgradeTestCase {
     taskService.complete(lastTask.getId());
 
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).count());
-  }
-
-  protected void assertHasVariable(String activityInstanceId, String variableName, Object variableValue) {
-    VariableInstance variableInstance =
-        runtimeService.createVariableInstanceQuery().activityInstanceIdIn(activityInstanceId).variableName(variableName).singleResult();
-    Assert.assertNotNull(variableInstance);
-    Assert.assertEquals(variableName, variableInstance.getName());
-    Assert.assertEquals(variableValue, variableInstance.getValue());
   }
 
 }
