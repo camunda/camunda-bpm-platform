@@ -7,7 +7,7 @@
   <!-- VARIABLE INSTANCE INSERT -->
   
   <insert id="insertVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
-    insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
+    insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, TASK_ID_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
     values (
       #{id, jdbcType=VARCHAR},
       1,
@@ -15,6 +15,7 @@
       #{name, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
+      #{activityInstanceId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
       #{byteArrayValueId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
@@ -99,10 +100,8 @@
   
   <sql id="selectVariableInstanceByQueryCriteriaSql">
     from (
-          select RES.*, EXECUTION.ACT_INST_ID_
+          select RES.*
           from ${prefix}ACT_RU_VARIABLE RES 
-          left join ${prefix}ACT_RU_EXECUTION EXECUTION
-          on RES.EXECUTION_ID_ = EXECUTION.ID_
           <where>
             <!-- variableName -->
             <if test="variableName != null">
@@ -143,7 +142,7 @@
             
             <!-- activityInstanceIds -->
             <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
-              and EXECUTION.ACT_INST_ID_ in
+              and RES.ACT_INST_ID_ in
               <foreach item="item" index="index" collection="activityInstanceIds"
                        open="(" separator="," close=")">
                 #{item}

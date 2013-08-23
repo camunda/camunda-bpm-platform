@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_WQF40OPpEeK3Tvv6A1zV4A">
+  <bpmn2:process id="processWithSubProcess" name="Process with SubProcess" isExecutable="true">
+    <bpmn2:startEvent id="StartEvent_1" name="Start Event"/>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="SubProcess_1"/>
+    <bpmn2:subProcess id="SubProcess_1" name="Sub Process">
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+      <bpmn2:multiInstanceLoopCharacteristics isSequential="true">
+        <bpmn2:loopCardinality xsi:type="bpmn2:tFormalExpression">2</bpmn2:loopCardinality>
+      </bpmn2:multiInstanceLoopCharacteristics>
+      <bpmn2:startEvent id="StartEvent_2" name="Start Event"/>
+      <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="StartEvent_2" targetRef="ServiceTask_1"/>
+      <bpmn2:serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.engine.test.api.runtime.AddVariablesService" name="Service Task"/>
+      
+      <bpmn2:sequenceFlow id="SequenceFlow_5" sourceRef="ServiceTask_1" targetRef="UserTask_1"/>
+      <bpmn2:userTask id="UserTask_1" name="User Task"/>
+      
+      <bpmn2:sequenceFlow id="SequenceFlow_7" sourceRef="UserTask_1" targetRef="EndEvent_2"/>
+      <bpmn2:endEvent id="EndEvent_2" name="End Event"/>
+    </bpmn2:subProcess>
+    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="SubProcess_1" targetRef="EndEvent_1"/>
+    <bpmn2:endEvent id="EndEvent_1" name="End Event"/>
+  </bpmn2:process>
+</bpmn2:definitions>
