@@ -15,21 +15,20 @@ package org.camunda.bpm.engine.impl.calendar;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 
 public class DueDateBusinessCalendar implements BusinessCalendar {
 
   public static final String NAME = "dueDate";
-  
+
   public Date resolveDuedate(String duedate) {
     try {
-      if(duedate.startsWith("P")){
-        return DateTime.now().plus(Period.parse(duedate)).toDate();
+      if (duedate.startsWith("P")){
+        return DateTimeUtil.now().plus(Period.parse(duedate)).toDate();
       }
-      
-      return DateTime.parse(duedate).toDate();
+
+      return DateTimeUtil.parseDateTime(duedate).toDate();
 
     } catch (Exception e) {
       throw new ProcessEngineException("couldn't resolve duedate: " + e.getMessage(), e);
