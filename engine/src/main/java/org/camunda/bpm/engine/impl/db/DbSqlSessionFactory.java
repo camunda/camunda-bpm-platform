@@ -47,6 +47,9 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   public static final Map<String, String> databaseSpecificDummyTable = new HashMap<String, String>();
 
+  public static final Map<String, String> databaseSpecificTrueConstant = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificFalseConstant = new HashMap<String, String>();
+
   static {
 
     String defaultOrderBy = " order by ${orderBy} ";
@@ -64,6 +67,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDateDiff2.put("h2", ",");
     databaseSpecificDateDiff3.put("h2", ")");
     databaseSpecificDummyTable.put("h2", "");
+    databaseSpecificTrueConstant.put("h2", "1");
+    databaseSpecificFalseConstant.put("h2", "0");
     addDatabaseSpecificStatement("h2", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_nativeDateDiff");
     addDatabaseSpecificStatement("h2", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_nativeDateDiff");
     addDatabaseSpecificStatement("h2", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_nativeDateDiff");
@@ -81,6 +86,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDateDiff1.put("mysql", "TIMESTAMPDIFF(SECOND,");
     databaseSpecificDateDiff2.put("mysql", ",");
     databaseSpecificDateDiff3.put("mysql", ")*1000");
+    databaseSpecificTrueConstant.put("h2", "1");
+    databaseSpecificFalseConstant.put("h2", "0");
     addDatabaseSpecificStatement("mysql", "selectNextJobsToExecute", "selectNextJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
@@ -105,6 +112,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDateDiff2.put("postgres", " AT TIME ZONE 'UTC') * 1000) - (EXTRACT(EPOCH FROM ");
     databaseSpecificDateDiff3.put("postgres", " AT TIME ZONE 'UTC') * 1000)");
     databaseSpecificDummyTable.put("postgres", "");
+    databaseSpecificTrueConstant.put("postgres", "true");
+    databaseSpecificFalseConstant.put("postgres", "false");
     addDatabaseSpecificStatement("postgres", "insertByteArray", "insertByteArray_postgres");
     addDatabaseSpecificStatement("postgres", "updateByteArray", "updateByteArray_postgres");
     addDatabaseSpecificStatement("postgres", "selectByteArray", "selectByteArray_postgres");
@@ -141,6 +150,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDateDiff1.put("oracle", "((cast(");
     databaseSpecificDateDiff2.put("oracle", " as date) - date '1970-01-01')*24*60*60*1000) - ((cast(");
     databaseSpecificDateDiff3.put("oracle", " as date) - date '1970-01-01')*24*60*60*1000)");
+    databaseSpecificTrueConstant.put("oracle", "1");
+    databaseSpecificFalseConstant.put("oracle", "0");
     addDatabaseSpecificStatement("oracle", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
 
     // db2
@@ -156,6 +167,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDateDiff2.put("db2", "");
     databaseSpecificDateDiff3.put("db2", "");
     databaseSpecificDummyTable.put("db2", "FROM SYSIBM.SYSDUMMY1");
+    databaseSpecificTrueConstant.put("db2", "1");
+    databaseSpecificFalseConstant.put("db2", "0");
     addDatabaseSpecificStatement("db2", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
     addDatabaseSpecificStatement("db2", "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
@@ -179,6 +192,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDateDiff2.put("mssql", "");
     databaseSpecificDateDiff3.put("mssql", "");
     databaseSpecificDummyTable.put("mssql", "");
+    databaseSpecificTrueConstant.put("mssql", "1");
+    databaseSpecificFalseConstant.put("mssql", "0");
     addDatabaseSpecificStatement("mssql", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
     addDatabaseSpecificStatement("mssql", "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
