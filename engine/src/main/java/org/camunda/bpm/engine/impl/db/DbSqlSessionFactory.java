@@ -86,8 +86,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDateDiff1.put("mysql", "TIMESTAMPDIFF(SECOND,");
     databaseSpecificDateDiff2.put("mysql", ",");
     databaseSpecificDateDiff3.put("mysql", ")*1000");
-    databaseSpecificTrueConstant.put("h2", "1");
-    databaseSpecificFalseConstant.put("h2", "0");
+    databaseSpecificTrueConstant.put("mysql", "1");
+    databaseSpecificFalseConstant.put("mysql", "0");
     addDatabaseSpecificStatement("mysql", "selectNextJobsToExecute", "selectNextJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
