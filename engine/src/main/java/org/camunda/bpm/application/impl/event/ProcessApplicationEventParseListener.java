@@ -10,34 +10,57 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.impl.event;
+package org.camunda.bpm.application.impl.event;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
+import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 
 /**
- * {@link BpmnParseListener} registering the {@link CdiExecutionListener} for
- * distributing execution events using the cdi event infrastructure
  *
  * @author Daniel Meyer
+ *
  */
-public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
+public class ProcessApplicationEventParseListener implements BpmnParseListener {
+
+  public final static ExecutionListener EXECUTION_LISTENER = new ProcessApplicationEventListenerDelegate();
+  public final static TaskListener TASK_LISTENER = new ProcessApplicationEventListenerDelegate();
 
   protected void addEndEventListener(ActivityImpl activity) {
-    activity.addExecutionListener(ExecutionListener.EVENTNAME_END, new CdiExecutionListener());
+    activity.addExecutionListener(ExecutionListener.EVENTNAME_END, EXECUTION_LISTENER);
   }
 
   protected void addStartEventListener(ActivityImpl activity) {
-    activity.addExecutionListener(ExecutionListener.EVENTNAME_START, new CdiExecutionListener());
+    activity.addExecutionListener(ExecutionListener.EVENTNAME_START, EXECUTION_LISTENER);
   }
+
+  protected void addTakeEventListener(TransitionImpl transition) {
+    transition.addExecutionListener(EXECUTION_LISTENER);
+  }
+
+  protected void addTaskAssignmentListeners(TaskDefinition taskDefinition) {
+    taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, TASK_LISTENER);
+  }
+
+  protected void addTaskCreateListeners(TaskDefinition taskDefinition) {
+    taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, TASK_LISTENER);
+  }
+
+  protected void addTaskCompleteListeners(TaskDefinition taskDefinition) {
+    taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, TASK_LISTENER);
+  }
+
+  // BpmnParseListener implementation /////////////////////////////////////////////////////////
 
   @Override
   public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
@@ -101,6 +124,9 @@ public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
   public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
     addStartEventListener(activity);
     addEndEventListener(activity);
+    UserTaskActivityBehavior activityBehavior = (UserTaskActivityBehavior) activity.getActivityBehavior();
+    TaskDefinition taskDefinition = activityBehavior.getTaskDefinition();
+    addTaskAssignmentListeners(taskDefinition);
   }
 
   @Override
@@ -139,7 +165,7 @@ public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
 
   @Override
   public void parseSequenceFlow(Element sequenceFlowElement, ScopeImpl scopeElement, TransitionImpl transition) {
-    transition.addExecutionListener(new CdiExecutionListener());
+    addTakeEventListener(transition);
   }
 
   @Override
@@ -205,10 +231,14 @@ public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
 
   @Override
   public void parseIntermediateCatchEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
+    addStartEventListener(activity);
+    addEndEventListener(activity);
   }
 
   @Override
-  public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl nestedActivity) {
+  public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl activity) {
+    addStartEventListener(activity);
+    addEndEventListener(activity);
   }
 
   @Override

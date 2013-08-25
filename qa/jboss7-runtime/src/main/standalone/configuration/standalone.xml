@@ -306,6 +306,11 @@
                         <property name="isAutoSchemaUpdate">true</property>
                         <property name="authorizationEnabled">true</property>
                     </properties>
+                    <plugins>
+                      <plugin>
+                        <class>org.camunda.bpm.application.impl.event.ProcessApplicationEventListenerPlugin</class>
+                      </plugin>
+                    </plugins>
                 </process-engine>
             </process-engines>
             <job-executor>

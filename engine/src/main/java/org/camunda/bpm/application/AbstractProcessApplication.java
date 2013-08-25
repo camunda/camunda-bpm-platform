@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import org.camunda.bpm.application.impl.DefaultElResolverLookup;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -140,9 +141,7 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
    *
    * <p>If you want to provide a custom implementation in your application, place a file named
    * <code>META-INF/org.camunda.bpm.application.ProcessApplicationElResolver</code> inside your application
-   * which contains the fully qualified classname of your implementation.</p>
-   *
-   * <p>Override this method in order to implement a custom resolving scheme.</p>
+   * which contains the fully qualified classname of your implementation. Or simply override this method.</p>
    *
    * @return the process application ElResolver.
    */
@@ -153,6 +152,10 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   }
 
   public ExecutionListener getExecutionListener() {
+    return null;
+  }
+
+  public TaskListener getTaskListener() {
     return null;
   }
 
