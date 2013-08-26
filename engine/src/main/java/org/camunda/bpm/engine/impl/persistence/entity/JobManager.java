@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,9 +42,9 @@ public class JobManager extends AbstractManager {
 
   public void send(MessageEntity message) {
     message.insert();
-    hintJobExecutor(message);    
+    hintJobExecutor(message);
   }
- 
+
   public void schedule(TimerEntity timer) {
     Date duedate = timer.getDuedate();
     if (duedate==null) {
@@ -53,45 +52,45 @@ public class JobManager extends AbstractManager {
     }
 
     timer.insert();
-    
+
     // Check if this timer fires before the next time the job executor will check for new timers to fire.
     // This is highly unlikely because normally waitTimeInMillis is 5000 (5 seconds)
     // and timers are usually set further in the future
-    
+
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
     int waitTimeInMillis = jobExecutor.getWaitTimeInMillis();
     if (duedate.getTime() < (ClockUtil.getCurrentTime().getTime()+waitTimeInMillis)) {
       hintJobExecutor(timer);
     }
   }
-  
-  protected void hintJobExecutor(JobEntity job) {  
+
+  protected void hintJobExecutor(JobEntity job) {
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
     JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
     TransactionListener transactionListener = null;
-    if(job.isExclusive() 
-            && jobExecutorContext != null 
+    if(job.isExclusive()
+            && jobExecutorContext != null
             && jobExecutorContext.isExecutingExclusiveJob()) {
       // lock job & add to the queue of the current processor
       Date currentTime = ClockUtil.getCurrentTime();
       job.setLockExpirationTime(new Date(currentTime.getTime() + jobExecutor.getLockTimeInMillis()));
       job.setLockOwner(jobExecutor.getLockOwner());
-      transactionListener = new ExclusiveJobAddedNotification(job.getId());      
+      transactionListener = new ExclusiveJobAddedNotification(job.getId());
     } else {
-      // notify job executor:      
+      // notify job executor:
       transactionListener = new MessageAddedNotification(jobExecutor);
     }
     Context.getCommandContext()
     .getTransactionContext()
     .addTransactionListener(TransactionState.COMMITTED, transactionListener);
   }
- 
+
   public void cancelTimers(ExecutionEntity execution) {
     List<TimerEntity> timers = Context
       .getCommandContext()
       .getJobManager()
       .findTimersByExecutionId(execution.getId());
-    
+
     for (TimerEntity timer: timers) {
       timer.delete();
     }
@@ -100,7 +99,7 @@ public class JobManager extends AbstractManager {
   public JobEntity findJobById(String jobId) {
     return (JobEntity) getDbSqlSession().selectOne("selectJob", jobId);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<JobEntity> findNextJobsToExecute(Page page) {
     Map<String,Object> params = new HashMap<String, Object>();
@@ -109,20 +108,18 @@ public class JobManager extends AbstractManager {
     params.put("deploymentAware", Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware());
     if (Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware()) {
       Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
-      synchronized (registeredDeployments) {
-        if (!registeredDeployments.isEmpty()) {
-          params.put("deploymentIds", new HashSet<String>(registeredDeployments));
-        }
+      if (!registeredDeployments.isEmpty()) {
+        params.put("deploymentIds", registeredDeployments);
       }
     }
     return getDbSqlSession().selectList("selectNextJobsToExecute", params, page);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<Job> findJobsByExecutionId(String executionId) {
     return getDbSqlSession().selectList("selectJobsByExecutionId", executionId);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<JobEntity> findExclusiveJobsToExecute(String processInstanceId) {
     Map<String,Object> params = new HashMap<String, Object>();

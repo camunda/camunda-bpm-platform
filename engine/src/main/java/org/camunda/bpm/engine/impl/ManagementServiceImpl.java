@@ -143,9 +143,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     return commandExecutor.execute(new Command<Set<String>>() {
       public Set<String> execute(CommandContext commandContext) {
         Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
-        synchronized (registeredDeployments) {
-          return new HashSet<String>(registeredDeployments);
-        }
+        return new HashSet<String>(registeredDeployments);
       }
     });
   }
