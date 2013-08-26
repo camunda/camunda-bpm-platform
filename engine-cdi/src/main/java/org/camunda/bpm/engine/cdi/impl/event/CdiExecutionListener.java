@@ -14,10 +14,11 @@ package org.camunda.bpm.engine.cdi.impl.event;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+
 import javax.enterprise.inject.spi.BeanManager;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
 import org.camunda.bpm.engine.cdi.BusinessProcessEventType;
 import org.camunda.bpm.engine.cdi.annotation.event.BusinessProcessLiteral;

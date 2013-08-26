@@ -20,8 +20,8 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
-import org.camunda.bpm.engine.cdi.ProcessEngineCdiException;
 import org.camunda.bpm.engine.cdi.BusinessProcess;
+import org.camunda.bpm.engine.cdi.ProcessEngineCdiException;
 import org.camunda.bpm.engine.cdi.annotation.CompleteTask;
 
 /**

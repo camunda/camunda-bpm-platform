@@ -15,7 +15,7 @@ package org.camunda.bpm.integrationtest.functional.event;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.functional.event.beans.CdiEventSupportProcessApplication;
 import org.camunda.bpm.integrationtest.functional.event.beans.EventObserverCdiBean;
-import org.camunda.bpm.integrationtest.functional.event.beans.EventSupportProcessApplication;
+import org.camunda.bpm.integrationtest.functional.event.beans.ExecutionListenerProcessApplication;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.camunda.bpm.integrationtest.util.TestContainer;
@@ -57,7 +57,7 @@ public class CdiProcessApplicationEventSupportTest extends AbstractFoxPlatformIn
   public void testEventListener() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
-    Integer listenerInvocationCount = (Integer) runtimeService.getVariable(processInstance.getId(), EventSupportProcessApplication.LISTENER_INVOCATION_COUNT);
+    Integer listenerInvocationCount = (Integer) runtimeService.getVariable(processInstance.getId(), ExecutionListenerProcessApplication.LISTENER_INVOCATION_COUNT);
     Assert.assertNotNull(listenerInvocationCount);
     Assert.assertEquals(4, listenerInvocationCount.intValue());
   }

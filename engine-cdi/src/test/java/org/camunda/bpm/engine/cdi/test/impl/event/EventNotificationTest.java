@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.event;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class EventNotificationTest extends CdiProcessEngineTestCase {
 

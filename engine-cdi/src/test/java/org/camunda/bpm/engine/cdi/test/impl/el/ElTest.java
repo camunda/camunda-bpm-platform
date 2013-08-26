@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.cdi.test.impl.beans.MessageBean;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 

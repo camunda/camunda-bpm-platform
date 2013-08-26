@@ -12,12 +12,13 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.context;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.cdi.test.impl.beans.ProcessScopedMessageBean;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * 

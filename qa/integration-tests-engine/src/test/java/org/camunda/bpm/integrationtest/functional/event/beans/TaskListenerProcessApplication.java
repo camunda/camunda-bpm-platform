@@ -14,31 +14,22 @@ package org.camunda.bpm.integrationtest.functional.event.beans;
 
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.TaskListener;
 
 /**
  * @author Daniel Meyer
  *
  */
 @ProcessApplication
-public class EventSupportProcessApplication extends ServletProcessApplication {
+public class TaskListenerProcessApplication extends ServletProcessApplication {
 
   public static final String LISTENER_INVOCATION_COUNT = "listenerInvocationCount";
 
-  public ExecutionListener getExecutionListener() {
-    return new ExecutionListener() {
-      public void notify(DelegateExecution execution) throws Exception {
-
-        int listenerInvocationCount = 0;
-
-        if(execution.hasVariable(LISTENER_INVOCATION_COUNT)) {
-          listenerInvocationCount = (Integer) execution.getVariable(LISTENER_INVOCATION_COUNT);
-        }
-
-        listenerInvocationCount += 1;
-
-        execution.setVariable(LISTENER_INVOCATION_COUNT, listenerInvocationCount);
+  public TaskListener getTaskListener() {
+    return new TaskListener() {
+      public void notify(DelegateTask delegateTask) {
+        delegateTask.setVariable(delegateTask.getEventName(), true);
       }
     };
   }
