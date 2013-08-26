@@ -685,6 +685,11 @@
           <artifactId>cargo-maven2-plugin</artifactId>
           <version>1.3.3</version>
         </plugin>
+        <plugin>
+          <groupId>net.kennychua</groupId>
+          <artifactId>maven-urlpoller-plugin</artifactId>
+          <version>1.0.3</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     
