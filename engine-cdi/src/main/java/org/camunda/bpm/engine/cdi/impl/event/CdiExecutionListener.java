@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
 import org.camunda.bpm.engine.cdi.BusinessProcessEventType;
-import org.camunda.bpm.engine.cdi.annotation.event.BusinessProcessLiteral;
+import org.camunda.bpm.engine.cdi.annotation.event.BusinessProcessDefinitionLiteral;
 import org.camunda.bpm.engine.cdi.annotation.event.EndActivityLiteral;
 import org.camunda.bpm.engine.cdi.annotation.event.StartActivityLiteral;
 import org.camunda.bpm.engine.cdi.annotation.event.TakeTransitionLiteral;
@@ -82,7 +82,7 @@ public class CdiExecutionListener implements ExecutionListener, Serializable {
   }
 
   protected Annotation[] getQualifiers(BusinessProcessEvent event) {
-    Annotation businessProcessQualifier = new BusinessProcessLiteral(event.getProcessDefinition().getKey());
+    Annotation businessProcessQualifier = new BusinessProcessDefinitionLiteral(event.getProcessDefinition().getKey());
     if (event.getType() == BusinessProcessEventType.TAKE) {
       return new Annotation[] {businessProcessQualifier, new TakeTransitionLiteral(event.getTransitionName()) };
     }
