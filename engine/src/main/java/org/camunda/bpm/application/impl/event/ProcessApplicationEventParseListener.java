@@ -126,7 +126,9 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
     addEndEventListener(activity);
     UserTaskActivityBehavior activityBehavior = (UserTaskActivityBehavior) activity.getActivityBehavior();
     TaskDefinition taskDefinition = activityBehavior.getTaskDefinition();
+    addTaskCreateListeners(taskDefinition);
     addTaskAssignmentListeners(taskDefinition);
+    addTaskCompleteListeners(taskDefinition);
   }
 
   @Override
