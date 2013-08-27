@@ -57,17 +57,16 @@ public interface RuntimeService {
    * {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business
    * key is definitely a best practice.
    * 
-   * Note that a business key MUST be unique for the given process definition.
-   * Process instance from different process definition are allowed to have the
-   * same business key.
-   * 
-   * The combination of processdefinitionKey-businessKey must be unique.
+   * Note that a business key MUST be unique for the given process definition WHEN you have added
+   * a database constraint for it.
+   * In this case, only Process instance from different process definition are allowed to have the
+   * same business key and the combination of processdefinitionKey-businessKey must be unique.
    * 
    * @param processDefinitionKey
    *          key of process definition, cannot be null.
    * @param businessKey
    *          a key that uniquely identifies the process instance in the context
-   *          or the given process definition.
+   *          of the given process definition.
    * @throws ProcessEngineException
    *           when no process definition is deployed with the given key.
    */
@@ -89,15 +88,16 @@ public interface RuntimeService {
    * then be used to easily look up that process instance , see
    * {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business
    * key is definitely a best practice.
-   * 
-   * Note that a business key MUST be unique for the given process definition.
-   * Process instance from different process definition are allowed to have the
-   * same business key.
+   *
+   * Note that a business key MUST be unique for the given process definition WHEN you have added a
+   * database constraint for it.
+   * In this case, only Process instance from different process definition are allowed to have the
+   * same business key and the combination of processdefinitionKey-businessKey must be unique.
    * 
    * The combination of processdefinitionKey-businessKey must be unique.
    * @param processDefinitionKey key of process definition, cannot be null.
    * @param variables the variables to pass, can be null.
-   * @param businessKey a key that uniquely identifies the process instance in the context or the
+   * @param businessKey a key that uniquely identifies the process instance in the context of the
    *                    given process definition.
    * @throws ProcessEngineException when no process definition is deployed with the given key.
    */
@@ -118,13 +118,14 @@ public interface RuntimeService {
    * then be used to easily look up that process instance , see
    * {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business
    * key is definitely a best practice.
-   * 
-   * Note that a business key MUST be unique for the given process definition.
-   * Process instance from different process definition are allowed to have the
-   * same business key.
+   *
+   * Note that a business key MUST be unique for the given process definition WHEN you have added
+   * a database constraint for it.
+   * In this case, only Process instance from different process definition are allowed to have the
+   * same business key and the combination of processdefinitionKey-businessKey must be unique.
    * 
    * @param processDefinitionId the id of the process definition, cannot be null.
-   * @param businessKey a key that uniquely identifies the process instance in the context or the
+   * @param businessKey a key that uniquely identifies the process instance in the context of the
    *                    given process definition.
    * @throws ProcessEngineException when no process definition is deployed with the given key. 
    */
@@ -146,12 +147,15 @@ public interface RuntimeService {
    * then be used to easily look up that process instance , see
    * {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business
    * key is definitely a best practice.
-   * 
-   * Note that a business key MUST be unique for the given process definition.
-   * Process instance from different process definition are allowed to have the
-   * same business key.
+   *
+   * Note that a business key MUST be unique for the given process definition WHEN you have added
+   * a database constraint for it.
+   * In this case, only Process instance from different process definition are allowed to have the
+   * same business key and the combination of processdefinitionKey-businessKey must be unique.
    * 
    * @param processDefinitionId the id of the process definition, cannot be null.
+   * @param businessKey a key that uniquely identifies the process instance in the context of the
+   *                    given process definition.
    * @param variables variables to be passed, can be null
    * @throws ProcessEngineException when no process definition is deployed with the given key. 
    */
