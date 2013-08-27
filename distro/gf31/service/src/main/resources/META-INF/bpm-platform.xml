@@ -17,6 +17,7 @@
       <property name="databaseSchemaUpdate">true</property>
       <property name="transactionManagerJndiName">java:appserver/TransactionManager</property>
       <property name="authorizationEnabled">true</property>
+      <property name="jobExecutorDeploymentAware">true</property>
     </properties>
 
     <plugins>
