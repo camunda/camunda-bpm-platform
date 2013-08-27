@@ -1,8 +1,5 @@
 package org.camunda.bpm.integrationtest.jobexecutor;
 
-import java.util.List;
-import java.util.Set;
-
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
@@ -21,11 +18,17 @@ import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.protocol.servlet.arq514hack.descriptors.api.web.WebAppDescriptor;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.List;
+import java.util.Set;
 
 @RunWith(Arquillian.class)
 public class IndependentJobExecutionTest extends AbstractFoxPlatformIntegrationTest {
@@ -44,7 +47,8 @@ public class IndependentJobExecutionTest extends AbstractFoxPlatformIntegrationT
   public static WebArchive processArchive1() {
 
     WebArchive deployment = initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.pa1.xml")
-        .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.process1.bpmn20.xml");
+        .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.process1.bpmn20.xml")
+        .setWebXML(new StringAsset(Descriptors.create(WebAppDescriptor.class).version("3.0").exportAsString()));
 
     TestContainer.addContainerSpecificProcessEngineConfigurationClass(deployment);
 
@@ -56,7 +60,8 @@ public class IndependentJobExecutionTest extends AbstractFoxPlatformIntegrationT
   public static WebArchive processArchive2() {
 
     return initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.pa2.xml")
-        .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.process2.bpmn20.xml");
+        .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.process2.bpmn20.xml")
+        .setWebXML(new StringAsset(Descriptors.create(WebAppDescriptor.class).version("3.0").exportAsString()));
   }
 
   @OperateOnDeployment("pa1")
