@@ -13,7 +13,7 @@
 package org.camunda.bpm.integrationtest.functional.event;
 
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.integrationtest.functional.event.beans.EventSupportProcessApplication;
+import org.camunda.bpm.integrationtest.functional.event.beans.ExecutionListenerProcessApplication;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.camunda.bpm.integrationtest.util.TestContainer;
@@ -31,18 +31,18 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(Arquillian.class)
-public class ProcessApplicationEventSupportTest extends AbstractFoxPlatformIntegrationTest {
+public class ProcessApplicationExecutionListenerTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
   public static WebArchive createDeployment() {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
-        .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-        .addAsLibraries(DeploymentHelper.getEngineCdi())
-        .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
-        .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
-        .addClass(EventSupportProcessApplication.class)
-        .addAsResource("org/camunda/bpm/integrationtest/functional/event/ProcessApplicationEventSupportTest.testExecutionListener.bpmn20.xml");
+      .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+      .addAsLibraries(DeploymentHelper.getEngineCdi())
+      .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
+      .addClass(AbstractFoxPlatformIntegrationTest.class)
+      .addClass(TestContainer.class)
+      .addClass(ExecutionListenerProcessApplication.class)
+      .addAsResource("org/camunda/bpm/integrationtest/functional/event/ProcessApplicationEventSupportTest.testExecutionListener.bpmn20.xml");
 
     TestContainer.addContainerSpecificResourcesForNonPa(archive);
 
@@ -51,10 +51,10 @@ public class ProcessApplicationEventSupportTest extends AbstractFoxPlatformInteg
   }
 
   @Test
-  public void testEventListener() {
+  public void testExecutionListener() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
-    Integer listenerInvocationCount = (Integer) runtimeService.getVariable(processInstance.getId(), EventSupportProcessApplication.LISTENER_INVOCATION_COUNT);
+    Integer listenerInvocationCount = (Integer) runtimeService.getVariable(processInstance.getId(), ExecutionListenerProcessApplication.LISTENER_INVOCATION_COUNT);
     Assert.assertNotNull(listenerInvocationCount);
     Assert.assertEquals(4, listenerInvocationCount.intValue());
   }

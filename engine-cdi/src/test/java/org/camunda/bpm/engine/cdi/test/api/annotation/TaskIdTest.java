@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.cdi.test.api.annotation;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * 
