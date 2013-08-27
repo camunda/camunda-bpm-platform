@@ -33,14 +33,14 @@ ngDefine('cockpit.services', function(module) {
       lteq : '<=',
       like: ' like '
     };
-
+    
     var SYM_TO_OPS = reverse(OPS);
     
     function operatorName(op) {
       return OPS[op];
     }
 
-    var PATTERN = new RegExp('^(\\S+)\\s*(' + keys(SYM_TO_OPS).join('|') + ')\\s*(.+)$');
+    var PATTERN = new RegExp('^(\\w+)\\s*(' + keys(SYM_TO_OPS).join('|') + ')\\s*([^!=<>]+)$');
 
     /**
      * Tries to guess the type of the input string
