@@ -2114,4 +2114,39 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("aLocalValue", localVariable.getValue());
   }
 
+  @Deployment
+  public void testSimpleSubProcessVariables() {
+    // given
+    Map<String, Object> processVariables = new HashMap<String, Object>();
+    processVariables.put("processVariable", "aProcessVariable");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processWithSubProcess", processVariables);
+
+    Task task = taskService.createTaskQuery().taskDefinitionKey("UserTask_1").singleResult();
+    runtimeService.setVariableLocal(task.getExecutionId(), "aLocalVariable", "aLocalValue");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertEquals(1, tree.getChildActivityInstances().length);
+    ActivityInstance task1Instance = tree.getChildActivityInstances()[0];
+    if (!task1Instance.getActivityId().equals("UserTask_1")) {
+      task1Instance = tree.getChildActivityInstances()[0];
+    }
+
+    // then the local variable has activity instance Id of the subprocess
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(task1Instance.getId());
+    VariableInstance localVariable = query.singleResult();
+    assertNotNull(localVariable);
+    assertEquals("aLocalVariable", localVariable.getName());
+    assertEquals("aLocalValue", localVariable.getValue());
+
+    // and the global variable has the activity instance Id of the process instance:
+    query = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(processInstance.getId());
+    VariableInstance globalVariable = query.singleResult();
+    assertNotNull(localVariable);
+    assertEquals("processVariable", globalVariable.getName());
+    assertEquals("aProcessVariable", globalVariable.getValue());
+
+    taskService.complete(task.getId());
+
+  }
+
 }
