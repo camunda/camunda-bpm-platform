@@ -21,9 +21,13 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.camunda.bpm.cycle.http.conn.ssl.X509HostnameVerifier;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -384,6 +388,21 @@ public class SignavioClient {
       SSLContext.setDefault(sslContext);
       
       SSLSocketFactory sslSF = new SSLSocketFactory(sslContext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+      // set up an own X509HostnameVerifier because default one is still too strict.
+      sslSF.setHostnameVerifier(new X509HostnameVerifier() {
+        @Override
+        public void verify(String s, SSLSocket sslSocket) throws IOException {}
+        @Override
+        public void verify(String s, X509Certificate x509Certificate) throws SSLException {}
+        @Override
+        public void verify(String s, String[] strings, String[] strings2) throws SSLException {}
+        @Override
+        public boolean verify(String s, SSLSession sslSession) {
+          return true;
+        }
+      });
+
       schemeRegistry.register(new Scheme("https", 443, sslSF));
     } catch (Exception e) {
       logger.log(Level.SEVERE, "Unable to modify SSLSocketFactory to allow self-signed certificates.", e);
