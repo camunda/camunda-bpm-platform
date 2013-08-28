@@ -6,11 +6,13 @@
     <userTask id="usertask" name="First User Task">
 	    <extensionElements>
 			  <camunda:taskListener event="complete" class="org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleTaskListener" ></camunda:taskListener>
+			  <camunda:taskListener event="assignment" class="org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleTaskListener" ></camunda:taskListener>
 			</extensionElements>
     </userTask>
     <userTask id="usertask2" name="Second User Task">
 	    <extensionElements>
 	      <camunda:taskListener event="complete" delegateExpression="${taskListener}" ></camunda:taskListener>
+	      <camunda:taskListener event="assignment" delegateExpression="${taskListener}" ></camunda:taskListener>
 	    </extensionElements>
     </userTask>
     

@@ -18,26 +18,26 @@ import org.junit.runner.RunWith;
 public class TaskListenerResolutionTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive createProcessArchiveDeplyoment() {    
+  public static WebArchive createProcessArchiveDeplyoment() {
     return initWebArchiveDeployment()
-            .addClass(ExampleTaskListener.class)            
-            .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/TaskListenerResolutionTest.testResolveClassOnTaskComplete.bpmn20.xml");
+            .addClass(ExampleTaskListener.class)
+            .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/TaskListenerResolutionTest.bpmn20.xml");
   }
-  
+
   @Deployment(name="clientDeployment")
-  public static WebArchive clientDeployment() {    
+  public static WebArchive clientDeployment() {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "client.war")
             .addClass(AbstractFoxPlatformIntegrationTest.class);
-    
+
     TestContainer.addContainerSpecificResources(webArchive);
-    
+
     return webArchive;
-            
+
   }
-  
+
   @Test
   @OperateOnDeployment("clientDeployment")
-  public void testResolveClassOnTaskComplete() {   
+  public void testResolveClassOnTaskComplete() {
     // assert that we cannot load the delegate here:
     try {
       Class.forName("org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleTaskListener");
@@ -45,23 +45,34 @@ public class TaskListenerResolutionTest extends AbstractFoxPlatformIntegrationTe
     }catch (ClassNotFoundException e) {
       // expected
     }
-    
-    runtimeService.startProcessInstanceByKey("testTaskListenerProcess");    
-    
+
+    runtimeService.startProcessInstanceByKey("testTaskListenerProcess");
+
     // the listener should execute successfully
     Task task = taskService.createTaskQuery().singleResult();
-    taskService.complete(task.getId());
-    
+    taskService.setAssignee(task.getId(), "john doe");
+
     Execution execution = runtimeService.createExecutionQuery().singleResult();
     Assert.assertNotNull(runtimeService.getVariable(execution.getId(), "listener"));
-    
+    runtimeService.removeVariable(execution.getId(), "listener");
+
+    taskService.complete(task.getId());
+
+    Assert.assertNotNull(runtimeService.getVariable(execution.getId(), "listener"));
+
     // the delegate expression listener should execute successfully
     runtimeService.removeVariable(execution.getId(), "listener");
-    
+
     task = taskService.createTaskQuery().singleResult();
-    taskService.complete(task.getId());
-    
+
+    taskService.setAssignee(task.getId(), "john doe");
     Assert.assertNotNull(runtimeService.getVariable(execution.getId(), "listener"));
-    
+    runtimeService.removeVariable(execution.getId(), "listener");
+
+    taskService.complete(task.getId());
+
+    Assert.assertNotNull(runtimeService.getVariable(execution.getId(), "listener"));
+
   }
+
 }
