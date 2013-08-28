@@ -23,8 +23,8 @@ import org.camunda.bpm.pa.demo.InvoiceDemoDataGenerator;
 public class DevProcessApplication extends ServletProcessApplication {
 
   @PostDeploy
-  public void startProcesses(ProcessEngine engine) throws Exception {    
-    createAdminDemoData(engine);    
+  public void startProcesses(ProcessEngine engine) throws Exception {
+    createAdminDemoData(engine);
     createTasklistDemoData(engine);
     createCockpitDemoData(engine);
   }
@@ -35,13 +35,13 @@ public class DevProcessApplication extends ServletProcessApplication {
     Map<String, Object> vars1 = new HashMap<String, Object>();
     vars1.put("booleanVar", true);
     runtimeService.startProcessInstanceByKey("ProcessWithExclusiveGateway", "secondUserTask", vars1);
-    
+
     Map<String, Object> vars2 = new HashMap<String, Object>();
     vars2.put("booleanVar", false);
     runtimeService.startProcessInstanceByKey("ProcessWithExclusiveGateway", "firstUserTask", vars2);
-    
+
     runtimeService.startProcessInstanceByKey("multipleFailingServiceTasks", "aBusinessKey");
-    
+
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
@@ -50,7 +50,7 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
-    
+
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
@@ -58,7 +58,7 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
-    
+
     runtimeService.startProcessInstanceByKey("OrderProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
@@ -82,7 +82,7 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
     runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
     runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
-    
+
     runtimeService.startProcessInstanceByKey("CallActivity");
     runtimeService.startProcessInstanceByKey("CallActivity");
     runtimeService.startProcessInstanceByKey("CallActivity");
@@ -114,6 +114,8 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("executionProcess");
 
 
+    runtimeService.startProcessInstanceByKey("exclusiveGatewayProcess");
+
     ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
   }
 
@@ -127,7 +129,7 @@ public class DevProcessApplication extends ServletProcessApplication {
     credentials.setPassword("jonny1");
     user.setProfile(profile);
     user.setCredentials(credentials);
-        
+
     // manually perform setup
     new SetupResource().createInitialUser(engine.getName(), user);
   }
