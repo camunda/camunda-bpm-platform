@@ -146,8 +146,7 @@
           <choose>
             <when test="queryVariableValue.type.equals('integer') &#124;&#124;
                         queryVariableValue.type.equals('short') &#124;&#124;
-                        queryVariableValue.type.equals('long') &#124;&#124;
-                        queryVariableValue.type.equals('double')">
+                        queryVariableValue.type.equals('long')">
               and (TYPE_ = 'integer' or TYPE_ = 'short' or TYPE_ = 'long' or TYPE_ = 'double')
             </when>
             <otherwise>
@@ -182,14 +181,23 @@
           #{queryVariableValue.longValue})
         </if>
         
-        <!-- Have a look in both columns -->
+        <!-- CAM-1192
+        
+          Have a look in both columns 
+          <if test="queryVariableValue.doubleValue != null">
+            and (DOUBLE_
+            <include refid="executionVariableOperator" />
+            #{queryVariableValue.doubleValue}
+            or LONG_
+            <include refid="executionVariableOperator" />
+            #{queryVariableValue.doubleValue})
+          </if>
+        -->
+        
         <if test="queryVariableValue.doubleValue != null">
-          and (DOUBLE_
+          and DOUBLE_
           <include refid="executionVariableOperator" />
           #{queryVariableValue.doubleValue}
-          or LONG_
-          <include refid="executionVariableOperator" />
-          #{queryVariableValue.doubleValue})
         </if>
         
         <!-- Null variable type -->
