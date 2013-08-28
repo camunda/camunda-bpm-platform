@@ -71,7 +71,7 @@ public interface DelegateExecution extends VariableScope {
   /** return the Id of the parent activity instance currently executed by this execution */
   String getParentActivityInstanceId();
 
-  /** return te Id of the current transition */
+  /** return the Id of the current transition */
   String getCurrentTransitionId();
 
 }

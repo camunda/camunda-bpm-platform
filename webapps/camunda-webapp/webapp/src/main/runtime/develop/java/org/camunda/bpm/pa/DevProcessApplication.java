@@ -113,9 +113,6 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("executionProcess");
     runtimeService.startProcessInstanceByKey("executionProcess");
 
-
-    runtimeService.startProcessInstanceByKey("exclusiveGatewayProcess");
-
     ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
   }
 
