@@ -77,8 +77,8 @@ public interface ManagementService {
    * between the process engine and the process application and optionally removes the associated
    * process definitions from the cache.
    *
-   * @param deploymentId
-   *          the Id of the deployment to deactivate
+   * @param deploymentIds
+   *          the Ids of the deployments to deactivate
    * @param removeProcessDefinitionsFromCache
    *          indicates whether the process definitions should be removed from the deployment cache
    * @return true if the registration was cleared
