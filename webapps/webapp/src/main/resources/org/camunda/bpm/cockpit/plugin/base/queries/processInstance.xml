@@ -143,7 +143,17 @@
 
         <if test="!queryVariableValue.type.equals('null')">
         <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
-          and TYPE_ = #{queryVariableValue.type}
+          <choose>
+            <when test="queryVariableValue.type.equals('integer') &#124;&#124;
+                        queryVariableValue.type.equals('short') &#124;&#124;
+                        queryVariableValue.type.equals('long') &#124;&#124;
+                        queryVariableValue.type.equals('double')">
+              and (TYPE_ = 'integer' or TYPE_ = 'short' or TYPE_ = 'long' or TYPE_ = 'double')
+            </when>
+            <otherwise>
+              and TYPE_ = #{queryVariableValue.type}  
+            </otherwise>
+          </choose>
         </if>
         <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
           and TEXT_
@@ -161,16 +171,27 @@
         </choose>
           #{queryVariableValue.textValue2}
         </if>
+        
+        <!-- Have a look in both columns -->
         <if test="queryVariableValue.longValue != null">
-          and LONG_
-        <include refid="executionVariableOperator" />
-        #{queryVariableValue.longValue}
+          and (LONG_
+          <include refid="executionVariableOperator" />
+          #{queryVariableValue.longValue}
+          or DOUBLE_
+          <include refid="executionVariableOperator" />
+          #{queryVariableValue.longValue})
         </if>
+        
+        <!-- Have a look in both columns -->
         <if test="queryVariableValue.doubleValue != null">
-        and DOUBLE_
-        <include refid="executionVariableOperator" />
-        #{queryVariableValue.doubleValue}
+          and (DOUBLE_
+          <include refid="executionVariableOperator" />
+          #{queryVariableValue.doubleValue}
+          or LONG_
+          <include refid="executionVariableOperator" />
+          #{queryVariableValue.doubleValue})
         </if>
+        
         <!-- Null variable type -->
         <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
           <choose>
