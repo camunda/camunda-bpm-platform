@@ -44,10 +44,10 @@ public class DurationHelper {
 
   DatatypeFactory datatypeFactory;
 
-  public DurationHelper(String expressionS) throws Exception {
+  public DurationHelper(String expressions) throws Exception {
     List<String> expression = new ArrayList<String>();
-    if(expressionS != null) {
-      expression = Arrays.asList(expressionS.split("/"));
+    if(expressions != null) {
+      expression = Arrays.asList(expressions.split("/"));
     }
     datatypeFactory = DatatypeFactory.newInstance();
 
