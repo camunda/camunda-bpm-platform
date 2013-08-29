@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="org.camunda.bpm.identity.camunda-identity-ldap">
   <resources>
-    <resource-root path="camunda-identity-ldap-7.0.0-SNAPSHOT.jar" />
+    <resource-root path="camunda-identity-ldap-@project.version@.jar" />
   </resources>
 
   <dependencies>
