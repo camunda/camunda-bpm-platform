@@ -71,6 +71,7 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
   $scope.currentPicture = 'leftHandSide';
   
   $scope.diagramDetailsDialog = new Dialog();
+  $scope.diagramDetailsDialog.setCenter(true);
   
   $scope.syncDialog = new Dialog();
   $scope.syncDialog.setAutoClosable(false);
