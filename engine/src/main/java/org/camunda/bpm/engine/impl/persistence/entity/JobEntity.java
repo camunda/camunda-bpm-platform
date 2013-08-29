@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.HasRevision;
@@ -63,12 +64,12 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
 
   protected String jobHandlerType = null;
   protected String jobHandlerConfiguration = null;
-  
+
   protected ByteArrayEntity exceptionByteArray;
   protected String exceptionByteArrayId;
-  
+
   protected String exceptionMessage;
-  
+
   protected String deploymentId;
 
   public void execute(CommandContext commandContext) {
@@ -82,14 +83,14 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
 
     jobHandler.execute(jobHandlerConfiguration, execution, commandContext);
   }
-  
+
   public void insert() {
     DbSqlSession dbSqlSession = Context
       .getCommandContext()
       .getDbSqlSession();
-    
+
     dbSqlSession.insert(this);
-    
+
     // add link to execution and deployment
     if(executionId != null) {
       ExecutionEntity execution = Context.getCommandContext()
@@ -99,7 +100,7 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
       this.deploymentId = execution.getProcessDefinition().getDeploymentId();
     }
   }
-  
+
   public void delete() {
     DbSqlSession dbSqlSession = Context
       .getCommandContext()
@@ -111,15 +112,15 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     if (exceptionByteArrayId != null) {
       Context.getCommandContext().getByteArrayManager().deleteByteArrayById(exceptionByteArrayId);
     }
-    
+
     // remove link to execution
     if(executionId != null) {
       ExecutionEntity execution = Context.getCommandContext()
         .getExecutionManager()
         .findExecutionById(executionId);
-      execution.removeJob(this);    
+      execution.removeJob(this);
     }
-    
+
     // if a job with retries == 0 is deleted this means that the corresponding incident is resolved.
     if (retries == 0) {
       removeFailedJobIncident();
@@ -134,11 +135,11 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     persistentState.put("duedate", duedate);
     persistentState.put("exceptionMessage", exceptionMessage);
     if(exceptionByteArrayId != null) {
-      persistentState.put("exceptionByteArrayId", exceptionByteArrayId);      
+      persistentState.put("exceptionByteArrayId", exceptionByteArrayId);
     }
     return persistentState;
   }
-  
+
   public int getRevisionNext() {
     return revision+1;
   }
@@ -164,15 +165,41 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     if (this.retries == 0 && retries > 0) {
       removeFailedJobIncident();
     }
+    if(retries == 0) {
+      createFailedJobIncident();
+    }
     this.retries = retries;
   }
-  
-  private void removeFailedJobIncident() {
+
+  // special setter for MyBatis which does not influence incidents
+  public void setRetriesFromPersistence(int retries) {
+    this.retries = retries;
+  }
+
+  protected void createFailedJobIncident() {
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+
+    if (processEngineConfiguration
+        .isCreateIncidentOnFailedJobEnabled()) {
+      // make sure job has an ID set:
+      if(id == null) {
+        id = processEngineConfiguration
+            .getIdGenerator()
+            .getNextId();
+      }
+      processEngineConfiguration
+        .getIncidentHandler(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE)
+        .handleIncident(null, null, executionId, id, exceptionMessage);
+
+    }
+  }
+
+  protected void removeFailedJobIncident() {
     IncidentHandler handler = Context
         .getProcessEngineConfiguration()
         .getIncidentHandler(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE);
-            
-    handler.resolveIncident(null, null, executionId, id); 
+
+    handler.resolveIncident(null, null, executionId, id);
   }
 
   public String getExceptionStacktrace() {
@@ -187,7 +214,7 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     }
     return exception;
   }
-  
+
   public String getLockOwner() {
     return lockOwner;
   }
@@ -224,20 +251,20 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
   public void setDuedate(Date duedate) {
     this.duedate = duedate;
   }
-  
+
   public void setExceptionStacktrace(String exception) {
     byte[] exceptionBytes = null;
     if(exception == null) {
-      exceptionBytes = null;      
+      exceptionBytes = null;
     } else {
-      
+
       try {
         exceptionBytes = exception.getBytes("UTF-8");
       } catch (UnsupportedEncodingException e) {
         throw new ProcessEngineException("UTF-8 is not a supported encoding");
       }
-    }   
-    
+    }
+
     ByteArrayEntity byteArray = getExceptionByteArray();
     if(byteArray == null) {
       byteArray = new ByteArrayEntity("job.exceptionByteArray", exceptionBytes);
@@ -251,7 +278,7 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
       byteArray.setBytes(exceptionBytes);
     }
   }
-  
+
   public String getJobHandlerType() {
     return jobHandlerType;
   }
@@ -270,7 +297,7 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
   public void setRevision(int revision) {
     this.revision = revision;
   }
-  
+
   public String getExceptionMessage() {
     return exceptionMessage;
   }
@@ -279,10 +306,10 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     if(exceptionMessage != null && exceptionMessage.length() > MAX_EXCEPTION_MESSAGE_LENGTH) {
       this.exceptionMessage = exceptionMessage.substring(0, MAX_EXCEPTION_MESSAGE_LENGTH);
     } else {
-      this.exceptionMessage = exceptionMessage;      
+      this.exceptionMessage = exceptionMessage;
     }
   }
-  
+
   public String getExceptionByteArrayId() {
     return exceptionByteArrayId;
   }

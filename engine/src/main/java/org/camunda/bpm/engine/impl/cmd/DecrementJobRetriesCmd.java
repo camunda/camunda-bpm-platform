@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,6 @@ import java.io.StringWriter;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -45,35 +44,24 @@ public class DecrementJobRetriesCmd implements Command<Object> {
       .getCommandContext()
       .getJobManager()
       .findJobById(jobId);
-    job.setRetries(job.getRetries() - 1);
     job.setLockOwner(null);
     job.setLockExpirationTime(null);
-    
+
     if(exception != null) {
       job.setExceptionMessage(exception.getMessage());
       job.setExceptionStacktrace(getExceptionStacktrace());
     }
-    
-    if (job.getRetries() == 0) {
-      if (Context
-          .getProcessEngineConfiguration()
-          .isCreateIncidentOnFailedJobEnabled()) {
-        
-        Context
-          .getProcessEngineConfiguration()
-          .getIncidentHandler(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE)
-          .handleIncident(null, null, job.getExecutionId(), job.getId(), exception.getMessage());
-      }
-    }
-    
+
+    job.setRetries(job.getRetries() - 1);
+
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
     MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
     TransactionContext transactionContext = commandContext.getTransactionContext();
     transactionContext.addTransactionListener(TransactionState.COMMITTED, messageAddedNotification);
-    
+
     return null;
   }
-  
+
   private String getExceptionStacktrace() {
     StringWriter stringWriter = new StringWriter();
     exception.printStackTrace(new PrintWriter(stringWriter));
