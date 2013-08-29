@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,7 +43,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     TableMetaData metaData = managementService.getTableMetaData("unexistingtable");
     assertNull(metaData);
   }
-  
+
   public void testGetMetaDataNullTableName() {
     try {
       managementService.getTableMetaData(null);
@@ -52,7 +52,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("tableName is null", re.getMessage());
     }
   }
-  
+
   public void testExecuteJobNullJobId() {
     try {
       managementService.executeJob(null);
@@ -61,7 +61,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("jobId is null", re.getMessage());
     }
   }
-  
+
   public void testExecuteJobUnexistingJob() {
     try {
       managementService.executeJob("unexistingjob");
@@ -70,42 +70,42 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("No job found with id", ae.getMessage());
     }
   }
-  
-  
+
+
   @Deployment
   public void testGetJobExceptionStacktrace() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
-    
+
     // The execution is waiting in the first usertask. This contains a boundry
     // timer event which we will execute manual for testing purposes.
     Job timerJob = managementService.createJobQuery()
       .processInstanceId(processInstance.getId())
       .singleResult();
-    
+
     assertNotNull("No job found for process instance", timerJob);
-    
+
     try {
       managementService.executeJob(timerJob.getId());
       fail("RuntimeException from within the script task expected");
     } catch(RuntimeException re) {
       assertTextPresent("This is an exception thrown from scriptTask", re.getMessage());
     }
-    
+
     // Fetch the task to see that the exception that occurred is persisted
     timerJob = managementService.createJobQuery()
     .processInstanceId(processInstance.getId())
     .singleResult();
-    
+
     Assert.assertNotNull(timerJob);
     Assert.assertNotNull(timerJob.getExceptionMessage());
     assertTextPresent("This is an exception thrown from scriptTask", timerJob.getExceptionMessage());
-    
+
     // Get the full stacktrace using the managementService
     String exceptionStack = managementService.getJobExceptionStacktrace(timerJob.getId());
     Assert.assertNotNull(exceptionStack);
-    assertTextPresent("This is an exception thrown from scriptTask", exceptionStack);    
+    assertTextPresent("This is an exception thrown from scriptTask", exceptionStack);
   }
-  
+
   public void testgetJobExceptionStacktraceUnexistingJobId() {
     try {
       managementService.getJobExceptionStacktrace("unexistingjob");
@@ -114,7 +114,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("No job found with id unexistingjob", re.getMessage());
     }
   }
-  
+
   public void testgetJobExceptionStacktraceNullJobId() {
     try {
       managementService.getJobExceptionStacktrace(null);
@@ -123,7 +123,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("jobId is null", re.getMessage());
     }
   }
-  
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
   public void testSetJobRetries() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
@@ -133,7 +133,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     Job timerJob = managementService.createJobQuery()
       .processInstanceId(processInstance.getId())
       .singleResult();
-    
+
     assertNotNull("No job found for process instance", timerJob);
     assertEquals(JobEntity.DEFAULT_RETRIES, timerJob.getRetries());
 
@@ -144,7 +144,35 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       .singleResult();
     assertEquals(5, timerJob.getRetries());
   }
-  
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testSetJobRetriesNullCreatesIncident() {
+
+    // initially there is no incident
+    assertEquals(0, runtimeService.createIncidentQuery().count());
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    // The execution is waiting in the first usertask. This contains a boundary
+    // timer event.
+    Job timerJob = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult();
+
+    assertNotNull("No job found for process instance", timerJob);
+    assertEquals(JobEntity.DEFAULT_RETRIES, timerJob.getRetries());
+
+    managementService.setJobRetries(timerJob.getId(), 0);
+
+    timerJob = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult();
+    assertEquals(0, timerJob.getRetries());
+
+    assertEquals(1, runtimeService.createIncidentQuery().count());
+
+  }
+
   public void testSetJobRetriesUnexistingJobId() {
     try {
       managementService.setJobRetries("unexistingjob", 5);
@@ -153,7 +181,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("No job found with id 'unexistingjob'.", re.getMessage());
     }
   }
-  
+
   public void testSetJobRetriesEmptyJobId() {
     try {
       managementService.setJobRetries("", 5);
@@ -162,7 +190,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("The job id is mandatory, but '' has been provided.", re.getMessage());
     }
   }
-  
+
   public void testSetJobRetriesJobIdNull() {
     try {
       managementService.setJobRetries(null, 5);
@@ -206,18 +234,18 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
     assertNotNull("Task timer should be there", timerJob);
     managementService.deleteJob(timerJob.getId());
-    
+
     timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNull("There should be no job now. It was deleted", timerJob);
   }
-  
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/timerOnTask.bpmn20.xml" })
   public void testDeleteJobThatWasAlreadyAcquired() {
     ClockUtil.setCurrentTime(new Date());
-    
+
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerOnTask");
     Job timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    
+
     // We need to move time at least one hour to make the timer executable
     ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 7200000L));
 
@@ -226,7 +254,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     AcquireJobsCmd acquireJobsCmd = new AcquireJobsCmd(processEngineImpl.getProcessEngineConfiguration().getJobExecutor());
     CommandExecutor commandExecutor = processEngineImpl.getProcessEngineConfiguration().getCommandExecutorTxRequired();
     commandExecutor.execute(acquireJobsCmd);
-    
+
     // Try to delete the job. This should fail.
     try {
       managementService.deleteJob(timerJob.getId());
@@ -234,11 +262,11 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       // Exception is expected
     }
-    
+
     // Clean up
     managementService.executeJob(timerJob.getId());
   }
-  
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
   public void testSetJobDuedate() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
@@ -248,7 +276,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     Job timerJob = managementService.createJobQuery()
       .processInstanceId(processInstance.getId())
       .singleResult();
-    
+
     assertNotNull("No job found for process instance", timerJob);
     assertNotNull(timerJob.getDuedate());
 
@@ -266,7 +294,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     assertEquals((cal.getTime().getTime() / SECOND) * SECOND,
                  (newTimerJob.getDuedate().getTime() / SECOND) * SECOND);
   }
-  
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
   public void testSetJobDuedateDateNull() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
@@ -276,7 +304,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     Job timerJob = managementService.createJobQuery()
       .processInstanceId(processInstance.getId())
       .singleResult();
-    
+
     assertNotNull("No job found for process instance", timerJob);
     assertNotNull(timerJob.getDuedate());
 
@@ -285,11 +313,11 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     timerJob = managementService.createJobQuery()
       .processInstanceId(processInstance.getId())
       .singleResult();
-    
+
     assertNull(timerJob.getDuedate());
-  }  
-  
-  
+  }
+
+
   public void testSetJobDuedateJobIdNull() {
     try {
       managementService.setJobDuedate(null, new Date());
@@ -298,7 +326,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("The job id is mandatory, but 'null' has been provided.", re.getMessage());
     }
   }
-  
+
   public void testSetJobDuedateEmptyJobId() {
     try {
       managementService.setJobDuedate("", new Date());
@@ -307,7 +335,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("The job id is mandatory, but '' has been provided.", re.getMessage());
     }
   }
-  
+
   public void testSetJobDuedateUnexistingJobId() {
     try {
       managementService.setJobDuedate("unexistingjob", new Date());
@@ -316,5 +344,5 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("No job found with id 'unexistingjob'.", re.getMessage());
     }
   }
-  
+
 }

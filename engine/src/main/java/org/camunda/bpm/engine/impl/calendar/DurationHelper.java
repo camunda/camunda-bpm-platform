@@ -14,6 +14,7 @@
 
 package org.camunda.bpm.engine.impl.calendar;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -44,7 +45,10 @@ public class DurationHelper {
   DatatypeFactory datatypeFactory;
 
   public DurationHelper(String expressionS) throws Exception {
-    List<String> expression = Arrays.asList(expressionS.split("/"));
+    List<String> expression = new ArrayList<String>();
+    if(expressionS != null) {
+      expression = Arrays.asList(expressionS.split("/"));
+    }
     datatypeFactory = DatatypeFactory.newInstance();
 
     if (expression.size() > 3 || expression.isEmpty()) {
