@@ -233,7 +233,9 @@ ngDefine('cockpit.pages.processInstance', [
 
             child.name = getActivityName(bpmnElement);
             activityIdToInstancesMap[activityId] = instances;
-            instanceIdToInstanceMap[child.id] = child;            
+            if(!instanceIdToInstanceMap[child.id]) {
+              instanceIdToInstanceMap[child.id] = child;
+            }
             instances.push(child);
 
             decorateActivityInstanceTree(child);
@@ -250,7 +252,9 @@ ngDefine('cockpit.pages.processInstance', [
 
             transition.name = getActivityName(bpmnElement);
             activityIdToInstancesMap[activityId] = instances;
-            instanceIdToInstanceMap[transition.id] = transition;     
+            if(!instanceIdToInstanceMap[transition.id]) {
+              instanceIdToInstanceMap[transition.id] = transition;
+            }
             instances.push(transition);
           }  
         }
