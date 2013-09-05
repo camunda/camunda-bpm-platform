@@ -173,7 +173,7 @@ public class ExecutionImpl implements
     return new ExecutionImpl();
   }
 
-  public PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition) {
+  public PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
     ExecutionImpl subProcessInstance = newExecution();
 
     // manage bidirectional super-subprocess relation
@@ -183,6 +183,7 @@ public class ExecutionImpl implements
     // Initialize the new execution
     subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
     subProcessInstance.setProcessInstance(subProcessInstance);
+    subProcessInstance.setBusinessKey(businessKey);
 
     return subProcessInstance;
   }

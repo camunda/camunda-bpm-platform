@@ -69,7 +69,7 @@ public interface ActivityExecution extends DelegateExecution {
    * 
    * @param processDefinition The {@link PvmProcessDefinition} of the subprocess.
    */
-  PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition);
+  PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey);
   
   /**
    * returns the parent of this execution, or null if there no parent.

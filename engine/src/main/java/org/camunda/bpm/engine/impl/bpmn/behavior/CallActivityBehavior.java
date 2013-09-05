@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.juel.NumberOperations;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
@@ -115,37 +117,40 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         .getDeploymentCache()
         .findDeployedProcessDefinitionByKeyAndVersion(processDefinitionKey, version);
     }
-    
-    PvmProcessInstance subProcessInstance = execution.createSubProcessInstance(processDefinition);
 
     // copy process variables / businessKey
     String businessKey = null;
+    Map<String, Object> callActivityVariables = new HashMap<String, Object>();
+
     for (AbstractDataAssociation dataInputAssociation : dataInputAssociations) {
       Object value = null;
-        if (dataInputAssociation.getBusinessKeyExpression() != null) {
-          businessKey = (String) dataInputAssociation.getBusinessKeyExpression().getValue(execution);
-        }
-        else if (dataInputAssociation.getVariables() != null) {
-          Map<String, Object> variables = execution.getVariables();
-          if (variables != null && !variables.isEmpty()) {
-            Set<String> variableKeys = variables.keySet();
-            for (String variableKey : variableKeys) {
-              subProcessInstance.setVariable(variableKey, variables.get(variableKey));
-            }
+
+      if (dataInputAssociation.getBusinessKeyExpression() != null) {
+        businessKey = (String) dataInputAssociation.getBusinessKeyExpression().getValue(execution);
+      }
+      else if (dataInputAssociation.getVariables() != null) {
+        Map<String, Object> variables = execution.getVariables();
+        if (variables != null && !variables.isEmpty()) {
+          Set<String> variableKeys = variables.keySet();
+          for (String variableKey : variableKeys) {
+            callActivityVariables.put(variableKey, variables.get(variableKey));
           }
         }
-        else if (dataInputAssociation.getSourceExpression()!=null) {
-          value = dataInputAssociation.getSourceExpression().getValue(execution);
-        }
-        else {
-          value = execution.getVariable(dataInputAssociation.getSource());
-        }
+      }
+      else if (dataInputAssociation.getSourceExpression()!=null) {
+        value = dataInputAssociation.getSourceExpression().getValue(execution);
+      }
+      else {
+        value = execution.getVariable(dataInputAssociation.getSource());
+      }
 
-        if (value != null) {
-          subProcessInstance.setVariable(dataInputAssociation.getTarget(), value);
-        }
+      if (value != null) {
+        callActivityVariables.put(dataInputAssociation.getTarget(), value);
+      }
     }
-    subProcessInstance.start(businessKey);
+
+    PvmProcessInstance subProcessInstance = execution.createSubProcessInstance(processDefinition, businessKey);
+    subProcessInstance.start(businessKey, callActivityVariables);
   }
   
   public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
