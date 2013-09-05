@@ -351,11 +351,11 @@ define([], function () {
               }
             }
 
-            if (!!defaultFlowId || flowsWithoutCondition.length > 1) {
+            if ((!!defaultFlowId && flowsWithoutCondition.length > 0) || flowsWithoutCondition.length > 1) {
               throw error("Exclusive Gateway '" + bpmnObject.id + "' has outgoing sequence flows without conditions which are not the default flow.");
             }
 
-            if (flowsWithoutCondition.length === 1) {
+            if (!defaultFlowId && flowsWithoutCondition.length === 1) {
               // here will not be thrown an error to align it with the java engine: 
               // in that case the java engine only log a warning!
               console.log("[Transformer]: Sequence flow with id '" + flowsWithoutCondition[0].id + "' has no conditions but it is not configured to be the default flow.");              
