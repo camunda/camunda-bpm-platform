@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -24,6 +26,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
+import org.camunda.bpm.engine.rest.dto.task.IdentityLinkDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -31,6 +34,7 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 import org.camunda.bpm.engine.rest.util.DtoUtil;
+import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
 
 public class TaskResourceImpl implements TaskResource {
@@ -153,6 +157,39 @@ public class TaskResourceImpl implements TaskResource {
   public void setAssignee(UserIdDto dto) {
     TaskService taskService = engine.getTaskService();
     taskService.setAssignee(taskId, dto.getUserId());
+  }
+
+  public List<IdentityLinkDto> getIdentityLinks(String type) {
+    TaskService taskService = engine.getTaskService();
+    List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
+
+    List<IdentityLinkDto> result = new ArrayList<IdentityLinkDto>();
+    for (IdentityLink link : identityLinks) {
+      if (type == null || type.equals(link.getType())) {
+        result.add(IdentityLinkDto.fromIdentityLink(link));
+      }
+    }
+
+    return result;
+  }
+
+  public void addIdentityLink(IdentityLinkDto identityLink) {
+    TaskService taskService = engine.getTaskService();
+
+    if (identityLink.getUserId() != null && identityLink.getGroupId() != null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Identity Link requires userId or groupId, but not both.");
+    }
+
+    if (identityLink.getUserId() == null && identityLink.getGroupId() == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Identity Link requires userId or groupId.");
+    }
+
+    if (identityLink.getUserId() != null) {
+      taskService.addUserIdentityLink(taskId, identityLink.getUserId(), identityLink.getType());
+    } else if (identityLink.getGroupId() != null) {
+      taskService.addGroupIdentityLink(taskId, identityLink.getGroupId(), identityLink.getType());
+    }
+
   }
 
 }

@@ -1,8 +1,10 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -10,11 +12,13 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.never;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -34,6 +38,8 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
+import org.camunda.bpm.engine.task.IdentityLink;
+import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Before;
@@ -41,6 +47,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 public abstract class AbstractTaskRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -54,6 +61,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   protected static final String DELEGATE_TASK_URL = SINGLE_TASK_URL + "/delegate";
   protected static final String TASK_FORM_URL = SINGLE_TASK_URL + "/form";
   protected static final String ASSIGNEE_TASK_URL = SINGLE_TASK_URL + "/assignee";
+  protected static final String TASK_IDENTITY_LINKS_URL = SINGLE_TASK_URL + "/identity-links";
 
   private Task mockTask;
   private TaskService taskServiceMock;
@@ -61,6 +69,10 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   private FormService formServiceMock;
   private ManagementService managementServiceMock;
   private RepositoryService repositoryServiceMock;
+
+  private IdentityLink mockUserAssigneeIdentityLink;
+  private IdentityLink mockCandidateGroupIdentityLink;
+  private IdentityLink mockCandidateGroup2IdentityLink;
 
   @Before
   public void setUpRuntimeData() {
@@ -72,6 +84,15 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(mockQuery.taskId(anyString())).thenReturn(mockQuery);
     when(mockQuery.singleResult()).thenReturn(mockTask);
     when(taskServiceMock.createTaskQuery()).thenReturn(mockQuery);
+
+    List<IdentityLink> identityLinks = new ArrayList<IdentityLink>();
+    mockUserAssigneeIdentityLink = MockProvider.createMockUserAssigneeIdentityLink();
+    identityLinks.add(mockUserAssigneeIdentityLink);
+    mockCandidateGroupIdentityLink = MockProvider.createMockCandidateGroupIdentityLink();
+    identityLinks.add(mockCandidateGroupIdentityLink);
+    mockCandidateGroup2IdentityLink = MockProvider.createAnotherMockCandidateGroupIdentityLink();
+    identityLinks.add(mockCandidateGroup2IdentityLink);
+    when(taskServiceMock.getIdentityLinksForTask(MockProvider.EXAMPLE_TASK_ID)).thenReturn(identityLinks);
 
     formServiceMock = mock(FormService.class);
     when(processEngine.getFormService()).thenReturn(formServiceMock);
@@ -260,6 +281,141 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
         .body("message", equalTo("expected exception"))
       .when().post(ASSIGNEE_TASK_URL);
+  }
+
+  protected Map<String, Object> toExpectedJsonMap(IdentityLink identityLink) {
+    Map<String, Object> result = new HashMap<String, Object>();
+    result.put("userId", identityLink.getUserId());
+    result.put("groupId", identityLink.getGroupId());
+    result.put("type", identityLink.getType());
+    return result;
+  }
+
+  @Test
+  public void testGetIdentityLinks() {
+    Map<String, Object> expectedUserIdentityLink = toExpectedJsonMap(mockUserAssigneeIdentityLink);
+    Map<String, Object> expectedGroupIdentityLink = toExpectedJsonMap(mockCandidateGroupIdentityLink);
+    Map<String, Object> expectedGroupIdentityLink2 = toExpectedJsonMap(mockCandidateGroup2IdentityLink);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+      .body("$.size()", equalTo(3))
+      .body("$", hasItem(expectedUserIdentityLink))
+      .body("$", hasItem(expectedGroupIdentityLink))
+      .body("$", hasItem(expectedGroupIdentityLink2))
+    .when().get(TASK_IDENTITY_LINKS_URL);
+
+    verify(taskServiceMock).getIdentityLinksForTask(MockProvider.EXAMPLE_TASK_ID);
+  }
+
+  @Test
+  public void testGetIdentityLinksByType() {
+    Map<String, Object> expectedGroupIdentityLink = toExpectedJsonMap(mockCandidateGroupIdentityLink);
+    Map<String, Object> expectedGroupIdentityLink2 = toExpectedJsonMap(mockCandidateGroup2IdentityLink);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID).queryParam("type", IdentityLinkType.CANDIDATE)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+      .body("$.size()", equalTo(2))
+      .body("$", hasItem(expectedGroupIdentityLink))
+      .body("$", hasItem(expectedGroupIdentityLink2))
+    .when().get(TASK_IDENTITY_LINKS_URL);
+
+    verify(taskServiceMock).getIdentityLinksForTask(MockProvider.EXAMPLE_TASK_ID);
+  }
+
+  @Test
+  public void testAddUserIdentityLink() {
+    String userId = "someUserId";
+    String taskId = MockProvider.EXAMPLE_TASK_ID;
+    String type = "someType";
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("userId", userId);
+    json.put("taskId", taskId);
+    json.put("type", type);
+
+    given().pathParam("id", taskId)
+    .contentType(POST_JSON_CONTENT_TYPE).body(json)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().post(TASK_IDENTITY_LINKS_URL);
+
+    verify(taskServiceMock).addUserIdentityLink(taskId, userId, type);
+  }
+
+  @Test
+  public void testAddGroupIdentityLink() {
+    String groupId = "someGroupId";
+    String taskId = MockProvider.EXAMPLE_TASK_ID;
+    String type = "someType";
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("groupId", groupId);
+    json.put("taskId", taskId);
+    json.put("type", type);
+
+    given().pathParam("id", taskId)
+    .contentType(POST_JSON_CONTENT_TYPE).body(json)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().post(TASK_IDENTITY_LINKS_URL);
+
+    verify(taskServiceMock).addGroupIdentityLink(taskId, groupId, type);
+  }
+
+  @Test
+  public void testInvalidAddIdentityLink() {
+    String groupId = "someGroupId";
+    String userId = "someUserId";
+    String taskId = MockProvider.EXAMPLE_TASK_ID;
+    String type = "someType";
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("groupId", groupId);
+    json.put("userId", userId);
+    json.put("taskId", taskId);
+    json.put("type", type);
+
+    given().pathParam("id", taskId)
+    .contentType(POST_JSON_CONTENT_TYPE).body(json)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Identity Link requires userId or groupId, but not both"))
+    .when().post(TASK_IDENTITY_LINKS_URL);
+
+    verify(taskServiceMock, never()).addGroupIdentityLink(anyString(), anyString(), anyString());
+    verify(taskServiceMock, never()).addGroupIdentityLink(anyString(), anyString(), anyString());
+  }
+
+  @Test
+  public void testUnderspecifiedAddIdentityLink() {
+    String taskId = MockProvider.EXAMPLE_TASK_ID;
+    String type = "someType";
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("taskId", taskId);
+    json.put("type", type);
+
+    given().pathParam("id", taskId)
+    .contentType(POST_JSON_CONTENT_TYPE).body(json)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Identity Link requires userId or groupId"))
+    .when().post(TASK_IDENTITY_LINKS_URL);
+
+    verify(taskServiceMock, never()).addGroupIdentityLink(anyString(), anyString(), anyString());
+    verify(taskServiceMock, never()).addGroupIdentityLink(anyString(), anyString(), anyString());
+  }
+
+  @Test
+  public void testDeleteIdentityLink() {
+
   }
 
   @Test

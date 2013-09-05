@@ -48,6 +48,8 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.DelegationState;
+import org.camunda.bpm.engine.task.IdentityLink;
+import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.joda.time.DateTime;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
@@ -228,6 +230,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME = "2013-04-23T13:42:43";
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME = "2013-04-23T18:42:43";
   public static final long EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION = 2000l;
+
 
   // tasks
   public static Task createMockTask() {
@@ -700,27 +703,54 @@ public abstract class MockProvider {
     return mock;
   }
   public static List<ProcessInstance> createAnotherMockProcessInstanceList() {
-	List<ProcessInstance> mockProcessInstanceList = new ArrayList<ProcessInstance>();
-	mockProcessInstanceList.add(createMockInstance());
-	mockProcessInstanceList.add(createAnotherMockInstance());
-	return mockProcessInstanceList;
+  	List<ProcessInstance> mockProcessInstanceList = new ArrayList<ProcessInstance>();
+  	mockProcessInstanceList.add(createMockInstance());
+  	mockProcessInstanceList.add(createAnotherMockInstance());
+  	return mockProcessInstanceList;
   }
 
   public static ProcessInstance createAnotherMockInstance() {
-	ProcessInstance mock = mock(ProcessInstance.class);
+  	ProcessInstance mock = mock(ProcessInstance.class);
 
-	when(mock.getId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
-	when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
-	when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
-	when(mock.getProcessInstanceId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
-	when(mock.isSuspended()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED);
-	when(mock.isEnded()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_ENDED);
+  	when(mock.getId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+  	when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
+  	when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+  	when(mock.getProcessInstanceId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+  	when(mock.isSuspended()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED);
+  	when(mock.isEnded()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_ENDED);
 
-	return mock;
+  	return mock;
   }
 
   public static Set<String> createMockSetFromList(String list){
 	  return new HashSet<String>(Arrays.asList(list.split(",")));
+  }
+
+  public static IdentityLink createMockUserAssigneeIdentityLink() {
+    IdentityLink identityLink = mock(IdentityLink.class);
+    when(identityLink.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
+    when(identityLink.getType()).thenReturn(IdentityLinkType.ASSIGNEE);
+    when(identityLink.getUserId()).thenReturn(EXAMPLE_USER_ID);
+
+    return identityLink;
+  }
+
+  public static IdentityLink createMockCandidateGroupIdentityLink() {
+    IdentityLink identityLink = mock(IdentityLink.class);
+    when(identityLink.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
+    when(identityLink.getType()).thenReturn(IdentityLinkType.CANDIDATE);
+    when(identityLink.getGroupId()).thenReturn(EXAMPLE_GROUP_ID);
+
+    return identityLink;
+  }
+
+  public static IdentityLink createAnotherMockCandidateGroupIdentityLink() {
+    IdentityLink identityLink = mock(IdentityLink.class);
+    when(identityLink.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
+    when(identityLink.getType()).thenReturn(IdentityLinkType.CANDIDATE);
+    when(identityLink.getGroupId()).thenReturn(EXAMPLE_GROUP_ID2);
+
+    return identityLink;
   }
 
 }
