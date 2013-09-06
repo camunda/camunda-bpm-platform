@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.rest.dto.task;
 
+import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.task.IdentityLink;
 
 public class IdentityLinkDto {
@@ -53,4 +56,15 @@ public class IdentityLinkDto {
 
     return dto;
   }
+
+  public void validate() {
+    if (userId != null && groupId != null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Identity Link requires userId or groupId, but not both.");
+    }
+
+    if (userId == null && groupId == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Identity Link requires userId or groupId.");
+    }
+  }
+
 }

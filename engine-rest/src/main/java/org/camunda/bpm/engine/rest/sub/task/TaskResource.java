@@ -77,4 +77,9 @@ public interface TaskResource {
   @Path("/identity-links")
   @Consumes(MediaType.APPLICATION_JSON)
   void addIdentityLink(IdentityLinkDto identityLink);
+
+  @POST
+  @Path("/identity-links/delete")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void deleteIdentityLink(IdentityLinkDto identityLink);
 }
