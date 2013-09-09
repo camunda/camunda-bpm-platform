@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -371,7 +372,8 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessBusinessKeyInput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testSubProcessBusinessKeyInput() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessBusinessKeyInput", "myBusinessKey");
+    String businessKey = "myBusinessKey";
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessBusinessKeyInput", businessKey);
 
     // one task in the super process should be active after starting the process instance
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -380,6 +382,12 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     assertEquals("myBusinessKey", processInstance.getBusinessKey());
 
     taskService.complete(taskBeforeSubProcess.getId());
+
+    // called process started so businesskey should be written in history
+    HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+    assertEquals(businessKey, hpi.getBusinessKey());
+
+    assertEquals(2, historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey(businessKey).list().size());
 
     // one task in sub process should be active after starting sub process instance
     taskQuery = taskService.createTaskQuery();
@@ -399,6 +407,12 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
+
+
+    hpi = historyService.createHistoricProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).finished().singleResult();
+    assertEquals(businessKey, hpi.getBusinessKey());
+
+    assertEquals(2, historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey(businessKey).finished().list().size());
   }
 
 }
