@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.juel.NumberOperations;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
@@ -33,44 +32,44 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 /**
  * Implementation of the BPMN 2.0 call activity
  * (limited currently to calling a subprocess and not (yet) a global task).
- * 
+ *
  * @author Joram Barrez
  */
 public class CallActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
-  
+
   protected String processDefinitionKey;
   protected String binding;
   protected Integer version;
   private List<AbstractDataAssociation> dataInputAssociations = new ArrayList<AbstractDataAssociation>();
   private List<AbstractDataAssociation> dataOutputAssociations = new ArrayList<AbstractDataAssociation>();
   private Expression processDefinitionExpression;
-  
+
   public enum CalledElementBinding {
     LATEST("latest"),
     DEPLOYMENT("deployment"),
     VERSION("version");
-    
+
     private String value;
-    
+
     private CalledElementBinding(String value) {
       this.value = value;
     }
-    
+
     public String getValue() {
       return value;
     }
-    
+
   }
 
   public CallActivityBehavior(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
   }
-  
+
   public CallActivityBehavior(Expression processDefinitionExpression) {
     super();
     this.processDefinitionExpression = processDefinitionExpression;
   }
-  
+
   public CallActivityBehavior(String processDefinitionKey, String binding, Integer version) {
     this.processDefinitionKey = processDefinitionKey;
     this.binding = binding;
@@ -82,7 +81,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     this.binding = binding;
     this.version = version;
   }
-  
+
   public void addDataInputAssociation(AbstractDataAssociation dataInputAssociation) {
     this.dataInputAssociations.add(dataInputAssociation);
   }
@@ -92,14 +91,14 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
   }
 
   public void execute(ActivityExecution execution) throws Exception {
-    
+
 	String processDefinitionKey = this.processDefinitionKey;
 	String binding = this.binding;
 	Integer version = this.version;
     if (processDefinitionExpression != null) {
       processDefinitionKey = (String) processDefinitionExpression.getValue(execution);
     }
-    
+
     ProcessDefinitionImpl processDefinition = null;
     if (binding == null || CalledElementBinding.LATEST.getValue().equals(binding)) {
       processDefinition = Context
@@ -150,9 +149,9 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     }
 
     PvmProcessInstance subProcessInstance = execution.createSubProcessInstance(processDefinition, businessKey);
-    subProcessInstance.start(businessKey, callActivityVariables);
+    subProcessInstance.start(callActivityVariables);
   }
-  
+
   public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
     // only data.  no control flow available on this execution.
 

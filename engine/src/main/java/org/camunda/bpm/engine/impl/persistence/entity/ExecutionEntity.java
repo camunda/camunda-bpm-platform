@@ -257,6 +257,10 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     return createdExecution;
   }
 
+  public PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition) {
+    return createSubProcessInstance(processDefinition, null);
+  }
+
   public PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
     ExecutionEntity subProcessInstance = newExecution();
 
@@ -267,7 +271,10 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     // Initialize the new execution
     subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
     subProcessInstance.setProcessInstance(subProcessInstance);
-    subProcessInstance.setBusinessKey(businessKey);
+
+    if(businessKey != null) {
+      subProcessInstance.setBusinessKey(businessKey);
+    }
 
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     int historyLevel = configuration.getHistoryLevel();
