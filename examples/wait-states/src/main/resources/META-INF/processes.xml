@@ -4,7 +4,7 @@
   xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-  <process-archive name="pa">
+  <process-archive>
     <process-engine>default</process-engine>
     <properties>
       <property name="isDeleteUponUndeploy">false</property>
