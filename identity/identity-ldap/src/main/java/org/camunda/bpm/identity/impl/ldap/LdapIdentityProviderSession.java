@@ -157,7 +157,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     String baseDn = getDnForGroup(query.getGroupId());
 
     // compose group search filter
-    String groupSearchFilter = "(& "+ldapConfiguration.getGroupSearchFilter()+")"; new StringWriter();
+    String groupSearchFilter = "(& "+ldapConfiguration.getGroupSearchFilter()+")";
 
     NamingEnumeration<SearchResult> enumeration = null;
     try {
