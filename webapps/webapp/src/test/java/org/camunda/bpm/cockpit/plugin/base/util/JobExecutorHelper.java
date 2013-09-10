@@ -1,4 +1,4 @@
-package org.camunda.bpm.cockpit.plugin.base;
+package org.camunda.bpm.cockpit.plugin.base.util;
 
 import java.util.List;
 import java.util.Timer;

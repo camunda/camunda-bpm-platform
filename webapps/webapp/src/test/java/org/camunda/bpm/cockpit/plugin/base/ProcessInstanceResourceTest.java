@@ -21,6 +21,7 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessInstanceResource;
+import org.camunda.bpm.cockpit.plugin.base.util.JobExecutorHelper;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
