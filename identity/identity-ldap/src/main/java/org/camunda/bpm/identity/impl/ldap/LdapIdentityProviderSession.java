@@ -215,7 +215,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
         if(resultCount >= query.getFirstResult()) {
           UserEntity user = transformUser(result);
-          if(isAuthorized(READ, USER, user.getId())) {
+          if(isAuthenticatedUser(user) || isAuthorized(READ, USER, user.getId())) {
             userList.add(user);
           }
         }
@@ -509,6 +509,17 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       resultDn.write(part);
     }
     return resultDn.toString();
+  }
+
+
+  /**
+   * @return true if the passed-in user is currently authenticated
+   */
+  protected boolean isAuthenticatedUser(UserEntity user) {
+    if(user.getId() == null) {
+      return false;
+    }
+    return user.getId().equals(org.camunda.bpm.engine.impl.context.Context.getCommandContext().getAuthenticatedUserId());
   }
 
   protected boolean isAuthorized(Permission permission, Resource resource, String resourceId) {

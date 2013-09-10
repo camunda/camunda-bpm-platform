@@ -137,4 +137,20 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
     assertEquals(3, result.size());
   }
 
+  public void testAuthenticatedUserSeesHimself() {
+    try {
+      processEngineConfiguration.setAuthorizationEnabled(true);
+
+      identityService.setAuthenticatedUserId("non-existing");
+      assertEquals(0, identityService.createUserQuery().count());
+
+      identityService.setAuthenticatedUserId("oscar");
+      assertEquals(1, identityService.createUserQuery().count());
+
+    } finally {
+      processEngineConfiguration.setAuthorizationEnabled(false);
+      identityService.clearAuthentication();
+    }
+  }
+
 }
