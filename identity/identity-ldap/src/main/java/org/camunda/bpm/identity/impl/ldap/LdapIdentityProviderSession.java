@@ -92,7 +92,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     env.put(Context.PROVIDER_URL, ldapConfiguration.getServerUrl());
     env.put(Context.SECURITY_PRINCIPAL, userDn);
     env.put(Context.SECURITY_CREDENTIALS, password);
-    
+
     if(ldapConfiguration.isUseSsl()) {
       env.put(Context.SECURITY_PROTOCOL, "ssl");
     }
@@ -144,8 +144,58 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
   public List<User> findUserByQueryCriteria(LdapUserQueryImpl query) {
     ensureContextInitialized();
+    if(query.getGroupId() != null) {
+      // if restriction on groupId is provided, we need to seach in group tree first, look for the group and then further restrict on the members
+      return findUsersByGroupId(query);
+    } else {
+      String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
+      return findUsersWithoutGroupId(query, userBaseDn);
+    }
+  }
 
-    String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
+  protected List<User> findUsersByGroupId(LdapUserQueryImpl query) {
+    String baseDn = getDnForGroup(query.getGroupId());
+
+    // compose group search filter
+    String groupSearchFilter = "(& "+ldapConfiguration.getGroupSearchFilter()+")"; new StringWriter();
+
+    NamingEnumeration<SearchResult> enumeration = null;
+    try {
+      enumeration = initialContext.search(baseDn, groupSearchFilter, ldapConfiguration.getSearchControls());
+
+      List<User> userList = new ArrayList<User>();
+
+      // first find group
+      while (enumeration.hasMoreElements()) {
+        SearchResult result = (SearchResult) enumeration.nextElement();
+        Attribute memberAttribute = result.getAttributes().get("member");
+        NamingEnumeration<?> allMembers = memberAttribute.getAll();
+
+        // iterate group members
+        while (allMembers.hasMoreElements() && userList.size() < query.getMaxResults()) {
+          String userDn = (String) allMembers.nextElement();
+          userList.addAll(findUsersWithoutGroupId(query, userDn));
+        }
+
+      }
+
+      return userList;
+
+    } catch (NamingException e) {
+      throw new IdentityProviderException("Could not query for users", e);
+
+    } finally {
+      try {
+        if (enumeration != null) {
+          enumeration.close();
+        }
+      } catch (Exception e) {
+        // ignore silently
+      }
+    }
+  }
+
+  public List<User> findUsersWithoutGroupId(LdapUserQueryImpl query, String userBaseDn) {
 
     if(ldapConfiguration.isSortControlSupported()) {
       applyRequestControls(query);
@@ -172,7 +222,6 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
         resultCount ++;
       }
-      enumeration.close();
 
       return userList;
 
@@ -247,9 +296,6 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     }
     if(query.getLastNameLike() != null) {
       addFilter(ldapConfiguration.getUserLastnameAttribute(), query.getLastNameLike(), search);
-    }
-    if(query.getGroupId() != null) {
-      addFilter(ldapConfiguration.getGroupMemberAttribute(), getDnForGroup(query.getGroupId()), search);
     }
 
     search.write(")");
@@ -443,15 +489,15 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     }
   }
 
-  protected String composeDn(String... parts) {   
+  protected String composeDn(String... parts) {
     StringWriter resultDn = new StringWriter();
-    for (int i = 0; i < parts.length; i++) {     
-      String part = parts[i];      
+    for (int i = 0; i < parts.length; i++) {
+      String part = parts[i];
       if(part == null || part.length()==0) {
         continue;
       }
       if(part.endsWith(",")) {
-        part = part.substring(part.length()-2, part.length()-1);                
+        part = part.substring(part.length()-2, part.length()-1);
       }
       if(part.startsWith(",")) {
         part = part.substring(1);
@@ -461,7 +507,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         resultDn.write(",");
       }
       resultDn.write(part);
-    }       
+    }
     return resultDn.toString();
   }
 
