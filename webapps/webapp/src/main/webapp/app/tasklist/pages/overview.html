@@ -1,9 +1,12 @@
 <div notifications-panel></div>
 
 <!-- task list -->
-<table class="table table-hover task-table" multi-select="taskList.selection">
+<table class="table table-hover task-table">
   <thead>
     <tr sortable="taskList.sort">
+      <th class="row-select">
+        <input type="checkbox" title="Select/Deselect all" ng-model="allTasksSelected" ng-click="selectAllTasks(allTasksSelected)">
+      </th>      
       <th><span sort-by="name">Name</span></th>
       <th><span>Process</span></th>
       <th><span sort-by="created">Created</span></th>
@@ -11,24 +14,28 @@
       <th style="width: 120px">Actions</th>
     </tr>
   </thead>
-  <tbody ngm-if="!taskList.tasks.length">
+  <tbody ng-if="!taskList.tasks.length">
     <tr>
+      <td></td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-    </tr>
+    </tr>    
   </tbody>
-  <tbody class="task" ng-repeat="task in taskList.tasks" ng-class="{ selected: isSelected(task) }" select="task">
+  <tbody class="task" ng-repeat="task in taskList.tasks" ng-class="{ selected: isSelected(task) }">
     <tr class="entry">
+      <td class="row-select">
+        <input type="checkbox" ng-model="task.selected" ng-click="selectTask(task)">
+      </td>      
       <td>{{ task.name }}</td>
       <td>{{ processDefinitions[task.processDefinitionId].name }}</td>
       <td>{{ task.created | date:'medium' }}</td>
       <td>{{ task.due | date:'medium' }}</td>
 
       <td>
-        <div class="btn-group" ngm-if="taskList.view.filter != 'colleague'">
+        <div class="btn-group" ng-if="taskList.view.filter != 'colleague'">
           <a class="btn btn-small" title="Start to work on task" href="#/task/{{task.id}}"><i class="icon-play"></i> </a>
           <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
@@ -53,7 +60,7 @@
         <button class="btn btn-small" ng-class="{ 'btn-info': isDiagramActive(task)}" data-ng-click="toggleShowDiagram(task, $index)" title="Display BPMN Diagram"><i class="icon-search"></i></button>
       </td>
     </tr>
-    <tr ngm-if="isDiagramActive(task)">
+    <tr ng-if="isDiagramActive(task)">
       <td colspan="6">
         <div id="diagram" class="bpmn-diagram">
         </div>
@@ -62,23 +69,24 @@
   </tbody>
   <tfoot>
     <tr>
-      <td colspan="4">
-        <small>
-          <a href ng-click="selectAllTasks()">select all</a> / <a href ng-click="deselectAllTasks()">deselect all</a> tasks or use <code>ctrl + click</code> to select multiple.
-        </small>
-      </td>
+      <td colspan="5"></td>
       <td>
-        <div class="btn-group" ngm-if="taskList.view.filter != 'colleague'" ng-show="taskList.selection.length">
+        <div class="btn-group" ng-if="taskList.view.filter != 'colleague'" ng-show="taskList.selection.length">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             All Selected
             <span class="caret"></span>
           </a>
-          <ul class="dropdown-menu">
-            <li ng-show="taskList.view.filter == 'mytasks'">
-              <a href ng-click="delegateTasks(taskList.selection)" title="Delegate selected tasks">Delegate</a>
+          <ul class="dropdown-menu pull-right">
+            <li class="dropdown-submenu pull-left" ng-show="taskList.view.filter == 'mytasks'">
+              <a href tabindex="-1" title="Delegate selected tasks">Delegate</a>
+              <ul class="dropdown-menu">
+                <li data-ng-repeat="user in groupInfo.groupUsers">
+                  <a href ng-click="delegateTasks(taskList.selection, user)" title="Delegate task to someone else">{{ user.displayName }}</a>
+                </li>
+              </ul>
             </li>
             <li ng-show="taskList.view.filter == 'mytasks'">
-              <a href ng-click="unassignTasks(taskList.selection)" title="Unassign selected tasks">Unassign</a>
+              <a href ng-click="unclaimTasks(taskList.selection)" title="Unclaim selected tasks">Unclaim</a>
             </li>
             <li ng-show="taskList.view.filter != 'mytasks'">
               <a href title="Claim selected tasks to work on them later" ng-click="claimTasks(taskList.selection)">Claim</a>

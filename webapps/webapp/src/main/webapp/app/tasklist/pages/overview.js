@@ -40,6 +40,8 @@ ngDefine('tasklist.pages', [
       selection: []
     };
 
+    $scope.allTasksSelected = false;
+
     $scope.$on('sortChanged', function() {
       reloadTasks();
     });
@@ -136,6 +138,16 @@ ngDefine('tasklist.pages', [
       if (idx != -1) {
         tasks.splice(idx, 1);
       }
+
+      var selectionIdx = $scope.taskList.selection.indexOf(task);
+      if (selectionIdx !== -1) {
+        $scope.taskList.selection.splice(selectionIdx, 1);
+      }
+
+      if (!$scope.taskList.selection.length) {
+        $scope.allTasksSelected = false;
+      }
+
     };
 
     $scope.delegateTask = function(task, user) {
@@ -156,10 +168,18 @@ ngDefine('tasklist.pages', [
       notifyScopeChange('Claimed ' + selection.length + ' tasks');
     };
 
-    $scope.delegateTasks = function (selection) {
+    $scope.unclaimTasks = function (selection) {
+      for (var i = 0, task; !!(task = selection[i]); i++) {
+        $scope.unclaimTask(task);
+      }
+
+      notifyScopeChange('Unclaimed ' + selection.length + ' tasks');
+    };
+
+    $scope.delegateTasks = function (selection, user) {
       for (var index in selection) {
         var task = selection[index];
-        $scope.delegateTask(task);
+        $scope.delegateTask(task, user);
       }
 
       notifyScopeChange('Delegated ' + selection.length + ' tasks');
@@ -169,25 +189,31 @@ ngDefine('tasklist.pages', [
       return $scope.taskList.selection.indexOf(task) != -1;
     };
 
-    $scope.select = function (task) {
-      $scope.taskList.selection = [];
-      $scope.taskList.selection.push(task);
+    $scope.selectTask = function (task) {
+      var index = $scope.taskList.selection.indexOf(task);
+
+      if (task.selected === true) {
+        if (index === -1) {
+          $scope.taskList.selection.push(task);
+        }
+        return;
+      }
+
+      if (task.selected === false) {      
+        $scope.taskList.selection.splice(index, 1);
+
+        if ($scope.allTasksSelected === true) {
+          $scope.allTasksSelected = false;  
+        }
+        return;
+      }
     };
 
-    $scope.selectAllTasks = function() {
-
-      $scope.deselectAllTasks();
-
-      var selection = $scope.taskList.selection,
-          tasks = $scope.taskList.tasks;
-
-      angular.forEach(tasks, function(task) {
-        selection.push(task);
+    $scope.selectAllTasks = function(allTasksSelected) {
+      angular.forEach($scope.taskList.tasks, function (task) {
+        task.selected = allTasksSelected;
+        $scope.selectTask(task);
       });
-    };
-
-    $scope.deselectAllTasks = function() {
-      return $scope.taskList.selection = [];
     };
 
     $scope.bpmn = { };
