@@ -18,12 +18,18 @@ ngDefine('cockpit.directives', [ 'angular', 'bpmn/Bpmn' ], function(module, angu
             .getBpmn20Xml({ id : processDefinitionId })
               .$then(function(response) {
                 var xml = response.data.bpmn20Xml;
-                new Bpmn().render(xml, {
-                  diagramElement : element.attr('id'),
-                  width : parseInt(element.parent().css("min-width")),
-                  height : element.parent().height(),
-                  skipOverlays: true
-                });
+
+                try {
+                  new Bpmn().render(xml, {
+                    diagramElement : element.attr('id'),
+                    width : parseInt(element.parent().css("min-width")),
+                    height : element.parent().height(),
+                    skipOverlays: true
+                  });
+                } catch (exception) {
+                  console.log('Unable to render diagram for process definition ' + processDefinitionId + ', reason: ' + exception.message)
+                  element.html('<p style="text-align: center;margin-top: 100px;">Unable to render process diagram.</p>')
+                }
               });
           }
         });
