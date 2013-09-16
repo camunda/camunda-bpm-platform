@@ -14,8 +14,8 @@
   </parent>
 
   <modules>
-    <module>test-fixture-62</module>
     <module>test-fixture-70</module>
+    <module>test-fixture-71</module>
   </modules>
 
   <profiles>
@@ -139,13 +139,5 @@
     </profile>
 
   </profiles>
-
-  <repositories>
-    <repository>
-      <id>camunda-fox-ee</id>
-      <url>https://app.camunda.com/nexus/content/repositories/fox-ee/</url>
-      <!-- you will need credentials to access this repository! See https://app.camunda.com/confluence/display/foxUserGuide/Maven+configuration -->
-    </repository>
-  </repositories>
 
 </project>
