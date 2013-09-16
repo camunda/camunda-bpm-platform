@@ -16,6 +16,8 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import static junit.framework.Assert.assertNotNull;
+
 
 /**
  * @author drobisch
@@ -55,7 +57,9 @@ public class TasklistIT {
     WebElement submit = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("button[type=\"submit\"]")));
     submit.submit();
 
-    boolean found = wait.until(ExpectedConditions.textToBePresentInElement(By.cssSelector("td"), "Assign Approver"));
+    String xpathExpression = "//td[contains(text(),'Assign Approver')]";
+    WebElement found = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpathExpression)));
+    assertNotNull(found);
   }
 
   @After

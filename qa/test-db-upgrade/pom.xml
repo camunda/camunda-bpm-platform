@@ -12,8 +12,8 @@
   </parent>
 
   <properties>
-    <test.version.old>6.2.4</test.version.old>
-    <test.version.old.major>6.2</test.version.old.major>
+    <test.version.old>7.0.0-Final</test.version.old>
+    <test.version.old.major>7.0</test.version.old.major>
     <test.version.current>${project.version}</test.version.current>
     <mail.server.port>5025</mail.server.port>
   </properties>
@@ -54,10 +54,10 @@
       </build>
     </profile>
     <profile>
-      <id>70</id>
+      <id>71</id>
       <properties>
         <test.version.current>${project.version}</test.version.current>
-        <test.version.current.major>7.0</test.version.current.major>
+        <test.version.current.major>7.1</test.version.current.major>
       </properties>
       <dependencies>
         <dependency>    
@@ -152,8 +152,8 @@
                 <configuration>
                   <artifactItems>
                     <artifactItem>
-                      <groupId>com.camunda.fox.platform</groupId>
-                      <artifactId>fox-platform-sql-script</artifactId>
+                      <groupId>org.camunda.bpm.distro</groupId>
+                      <artifactId>camunda-sql-scripts</artifactId>
                       <version>${test.version.old}</version>
                       <outputDirectory>${project.build.directory}/scripts-old</outputDirectory>
                       <overWrite>true</overWrite>
