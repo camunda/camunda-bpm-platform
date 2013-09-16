@@ -164,6 +164,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       enumeration = initialContext.search(baseDn, groupSearchFilter, ldapConfiguration.getSearchControls());
 
       List<User> userList = new ArrayList<User>();
+      List<String> userDnList = new ArrayList<String>();
 
       // first find group
       while (enumeration.hasMoreElements()) {
@@ -173,10 +174,21 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
         // iterate group members
         while (allMembers.hasMoreElements() && userList.size() < query.getMaxResults()) {
-          String userDn = (String) allMembers.nextElement();
-          userList.addAll(findUsersWithoutGroupId(query, userDn));
+          userDnList.add((String) allMembers.nextElement());
         }
 
+      }
+
+      String queriedUserId  = query.getId();
+      String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
+      for (String userDn : userDnList) {
+        String userId = userDn.substring(userDn.indexOf("=")+1, userDn.indexOf(","));
+        if(queriedUserId == null) {
+          query.userId(userId);
+        }
+        if(queriedUserId == null || queriedUserId.equals(userId)) {
+          userList.addAll(findUsersWithoutGroupId(query, userBaseDn));
+        }
       }
 
       return userList;
