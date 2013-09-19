@@ -33,16 +33,21 @@ ngDefine('cockpit.directives', [
      */
     $scope.$watch('processDiagram', function(newValue, oldValue) {
       if (newValue && newValue.$loaded !== false) {
-        bpmnElements = newValue.bpmnElements;
-        bpmnRenderer = new Bpmn();
-        renderDiagram();
-        initializeScrollAndZoomFunctions();
+        try {
+          bpmnElements = newValue.bpmnElements;
+          bpmnRenderer = new Bpmn();
+          renderDiagram();
+          initializeScrollAndZoomFunctions();
 
-        // update selection in case it has been provided earlier
-        updateSelection(selection);
+          // update selection in case it has been provided earlier
+          updateSelection(selection);
 
-        // update scroll to in case it has been provided earlier
-        scrollToBpmnElement(scrollToBpmnElementId);
+          // update scroll to in case it has been provided earlier
+          scrollToBpmnElement(scrollToBpmnElementId);
+        } catch (exception) {
+          console.log('Unable to render diagram for process definition ' + $scope.processDiagram.processDefinition.id + ', reason: ' + exception.message)
+          element.html('<p style="text-align: center;margin-top: 100px;">Unable to render process diagram.</p>')
+        }
       }
     });
     

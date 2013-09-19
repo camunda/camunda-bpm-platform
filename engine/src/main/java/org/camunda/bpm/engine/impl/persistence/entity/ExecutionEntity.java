@@ -258,6 +258,10 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
 
   public PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition) {
+    return createSubProcessInstance(processDefinition, null);
+  }
+
+  public PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
     ExecutionEntity subProcessInstance = newExecution();
 
     // manage bidirectional super-subprocess relation
@@ -267,6 +271,10 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     // Initialize the new execution
     subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
     subProcessInstance.setProcessInstance(subProcessInstance);
+
+    if(businessKey != null) {
+      subProcessInstance.setBusinessKey(businessKey);
+    }
 
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     int historyLevel = configuration.getHistoryLevel();

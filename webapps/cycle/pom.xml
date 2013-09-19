@@ -16,7 +16,7 @@
   <properties>
     <!-- versions -->
     <version.springframework>3.1.2.RELEASE</version.springframework>
-    <version.hibernate>4.0.1.Final</version.hibernate>
+    <version.hibernate>4.2.0.SP1</version.hibernate>
     <version.jersey>1.11</version.jersey>
     <version.apache.httpclient>4.2.2</version.apache.httpclient>
     <version.saxon>9.1.0.8</version.saxon>

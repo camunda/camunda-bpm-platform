@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+
+  <process id="TestFixture70.singleEmbeddedSubprocess">
+    <startEvent id="theStart" />
+    <sequenceFlow  sourceRef="theStart" targetRef="scope1" />
+    <subProcess id="scope1">
+    
+        <startEvent id="startInside1" />
+        <sequenceFlow sourceRef="startInside1" targetRef="waitInside1" />
+        
+        <userTask id="waitInside1" />
+        
+        <sequenceFlow sourceRef="waitInside1" targetRef="endInside1" />
+        <endEvent id="endInside1" />
+    
+    </subProcess>
+    <sequenceFlow sourceRef="scope1" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>

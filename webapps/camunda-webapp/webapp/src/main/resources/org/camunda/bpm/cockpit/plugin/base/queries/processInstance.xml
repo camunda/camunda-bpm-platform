@@ -61,7 +61,7 @@
         select
           INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_, count(INCIDENT.ID_) INCIDENT_COUNT_
         from
-          ACT_RU_INCIDENT INCIDENT
+          ${prefix}ACT_RU_INCIDENT INCIDENT
         <if test="processDefinitionId != null">
         where
           INCIDENT.PROC_DEF_ID_ = #{processDefinitionId}
