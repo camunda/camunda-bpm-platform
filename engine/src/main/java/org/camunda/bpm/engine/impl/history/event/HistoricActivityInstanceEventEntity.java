@@ -73,7 +73,7 @@ public class HistoricActivityInstanceEventEntity extends HistoryEvent {
   }
 
   public Long getDurationInMillis() {
-    if(endTime != null) {
+    if(endTime != null && startTime != null) {
         return endTime.getTime() - startTime.getTime();
     } else {
       return durationInMillis;
