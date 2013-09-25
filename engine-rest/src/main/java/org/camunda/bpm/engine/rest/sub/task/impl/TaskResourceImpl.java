@@ -159,6 +159,7 @@ public class TaskResourceImpl implements TaskResource {
     taskService.setAssignee(taskId, dto.getUserId());
   }
 
+  @Override
   public List<IdentityLinkDto> getIdentityLinks(String type) {
     TaskService taskService = engine.getTaskService();
     List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
@@ -173,21 +174,30 @@ public class TaskResourceImpl implements TaskResource {
     return result;
   }
 
+  @Override
   public void addIdentityLink(IdentityLinkDto identityLink) {
     TaskService taskService = engine.getTaskService();
 
-    if (identityLink.getUserId() != null && identityLink.getGroupId() != null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Identity Link requires userId or groupId, but not both.");
-    }
-
-    if (identityLink.getUserId() == null && identityLink.getGroupId() == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Identity Link requires userId or groupId.");
-    }
+    identityLink.validate();
 
     if (identityLink.getUserId() != null) {
       taskService.addUserIdentityLink(taskId, identityLink.getUserId(), identityLink.getType());
     } else if (identityLink.getGroupId() != null) {
       taskService.addGroupIdentityLink(taskId, identityLink.getGroupId(), identityLink.getType());
+    }
+
+  }
+
+  @Override
+  public void deleteIdentityLink(IdentityLinkDto identityLink) {
+    TaskService taskService = engine.getTaskService();
+
+    identityLink.validate();
+
+    if (identityLink.getUserId() != null) {
+      taskService.deleteUserIdentityLink(taskId, identityLink.getUserId(), identityLink.getType());
+    } else if (identityLink.getGroupId() != null) {
+      taskService.deleteGroupIdentityLink(taskId, identityLink.getGroupId(), identityLink.getType());
     }
 
   }

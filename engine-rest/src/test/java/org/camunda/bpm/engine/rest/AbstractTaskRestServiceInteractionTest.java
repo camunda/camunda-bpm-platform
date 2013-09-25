@@ -414,8 +414,47 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testDeleteIdentityLink() {
+  public void testDeleteUserIdentityLink() {
+    String deleteIdentityLinkUrl = TASK_IDENTITY_LINKS_URL + "/delete";
 
+    String taskId = MockProvider.EXAMPLE_TASK_ID;
+    String userId = MockProvider.EXAMPLE_USER_ID;
+    String type = "someIdentityLinkType";
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("userId", userId);
+    json.put("type", type);
+
+    given().pathParam("id", taskId)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().post(deleteIdentityLinkUrl);
+
+    verify(taskServiceMock).deleteUserIdentityLink(taskId, userId, type);
+    verify(taskServiceMock, never()).deleteGroupIdentityLink(anyString(), anyString(), anyString());
+  }
+
+  @Test
+  public void testDeleteGroupIdentityLink() {
+    String deleteIdentityLinkUrl = TASK_IDENTITY_LINKS_URL + "/delete";
+
+    String taskId = MockProvider.EXAMPLE_TASK_ID;
+    String groupId = MockProvider.EXAMPLE_GROUP_ID;
+    String type = "someIdentityLinkType";
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("groupId", groupId);
+    json.put("type", type);
+
+    given().pathParam("id", taskId)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().post(deleteIdentityLinkUrl);
+
+    verify(taskServiceMock).deleteGroupIdentityLink(taskId, groupId, type);
+    verify(taskServiceMock, never()).deleteUserIdentityLink(anyString(), anyString(), anyString());
   }
 
   @Test

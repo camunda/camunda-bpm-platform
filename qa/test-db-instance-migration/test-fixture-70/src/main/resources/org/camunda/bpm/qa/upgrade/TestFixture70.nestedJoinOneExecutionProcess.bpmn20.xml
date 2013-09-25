@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+
+  <process id="TestFixture70.nestedJoinOneExecutionProcess">
+    <startEvent id="outerStart" />
+    <sequenceFlow sourceRef="outerStart" targetRef="outerProcess" />
+    <subProcess id="outerProcess">
+
+      <startEvent id="theStart" />
+      <sequenceFlow sourceRef="theStart" targetRef="fork" />
+
+      <parallelGateway id="fork" />
+      <sequenceFlow sourceRef="fork" targetRef="task1" />
+      <sequenceFlow sourceRef="fork" targetRef="join" />
+
+      <userTask id="task1" />
+      <sequenceFlow sourceRef="task1" targetRef="join" />
+
+      <parallelGateway id="join" />
+      <sequenceFlow sourceRef="join" targetRef="end1" />
+
+      <endEvent id="end1" />
+
+    </subProcess>
+    <sequenceFlow sourceRef="outerProcess" targetRef="outerEnd" />
+    <endEvent id="outerEnd" />
+
+
+  </process>
+
+</definitions>

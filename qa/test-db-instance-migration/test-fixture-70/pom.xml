@@ -2,7 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-qa-upgrade-test-fixture-70</artifactId>
-
   <packaging>jar</packaging>
 
   <parent>
@@ -13,181 +12,11 @@
 
   <name>camunda BPM - QA - upgrade - instance migration - 70 test fixture</name>
 
-  <properties>
-    <mail.server.port>5025</mail.server.port>
-  </properties>
-
   <dependencies>
-
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>${project.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.qa.upgrade</groupId>
-      <artifactId>camunda-qa-upgrade-test-fixture-62</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-    </dependency>
-
   </dependencies>
-
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-      </testResource>
-    </testResources>
-  </build>
-
-  <profiles>
-    <profile>
-      <id>distro</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skipTests>true</skipTests>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>upgrade</id>
-      <build>
-        <plugins>
-        
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/*Test.java</include>
-                <include>**/Test*.java</include>
-              </includes>
-            </configuration>
-          </plugin>
-        
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-		          <skip>true</skip>
-		        </configuration>
-          </plugin>
-            
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-
-            <executions>
-              <execution>
-                <id>unpack-old-scripts</id>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.camunda.bpm.distro</groupId>
-                      <artifactId>camunda-sql-scripts</artifactId>
-                      <version>${project.version}</version>
-                      <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
-                      <overWrite>true</overWrite>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.2.1</version>
-            <executions>
-              <execution>
-                <id>Create 6.2 test fixture</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <phase>process-test-classes</phase>
-                <configuration>
-                  <includeProjectDependencies>true</includeProjectDependencies>
-                  <includePluginDependencies>true</includePluginDependencies>
-                  <classpathScope>test</classpathScope>
-                  <mainClass>org.camunda.bpm.qa.upgrade.TestFixture62</mainClass>
-                </configuration>
-              </execution>
-              <execution>
-                <id>Perform DB upgrade</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <phase>process-test-classes</phase>
-                <configuration>
-                  <includeProjectDependencies>true</includeProjectDependencies>
-                  <includePluginDependencies>false</includePluginDependencies>
-                  <mainClass>org.camunda.bpm.engine.impl.db.DbSchemaExecuteFile</mainClass>
-                  <classpathScope>test</classpathScope>
-                  <arguments>
-                    <argument>process-engine-config70.xml</argument>
-                    <argument>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_6.2_to_7.0.sql</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>Drop upgraded DB</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <phase>post-integration-test</phase>
-                <configuration>
-                  <includeProjectDependencies>true</includeProjectDependencies>
-                  <includePluginDependencies>true</includePluginDependencies>
-                  <classpathScope>test</classpathScope>
-                  <mainClass>org.camunda.bpm.qa.upgrade.DB70Dropper</mainClass>
-                </configuration>
-              </execution>
-            </executions>
-            <dependencies>
-              <dependency>
-                <groupId>com.camunda.fox.engine</groupId>
-                <artifactId>fox-engine</artifactId>
-                <version>6.2.4</version>
-              </dependency>          
-            </dependencies>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>    
-  </profiles>
-
 
 </project>
