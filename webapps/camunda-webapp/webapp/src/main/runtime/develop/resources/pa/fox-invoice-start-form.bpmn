@@ -26,7 +26,7 @@
         <flowNodeRef>invoiceProcessed</flowNodeRef>
       </lane>
     </laneSet>
-    <userTask id="approveInvoice" activiti:formKey="embedded:http://localhost:8080/tasklist/develop/invoice/approve.html" activiti:assignee="${approver}" activiti:candidateGroups="management" name="approve invoice">
+    <userTask id="approveInvoice" activiti:formKey="embedded:http://localhost:8080/camunda/develop/invoice/approve.html" activiti:assignee="${approver}" activiti:candidateGroups="management" name="approve invoice">
       <incoming>sequenceFlow_178</incoming>
       <incoming>reviewSuccessful</incoming>
       <outgoing>sequenceFlow_180</outgoing>
@@ -76,12 +76,12 @@
     <endEvent id="invoiceProcessed" name="invoice processed">
       <incoming>SequenceFlow_1</incoming>
     </endEvent>
-    <userTask id="assignApprover" activiti:formKey="embedded:http://localhost:8080/tasklist/develop/invoice/assign-approver.html" activiti:candidateGroups="management" name="assign approver">
+    <userTask id="assignApprover" activiti:formKey="embedded:http://localhost:8080/camunda/develop/invoice/assign-approver.html" activiti:candidateGroups="management" name="assign approver">
       <incoming>SequenceFlow_2</incoming>
       <outgoing>sequenceFlow_178</outgoing>
     </userTask>
     <sequenceFlow id="sequenceFlow_178" isImmediate="true" sourceRef="assignApprover" targetRef="approveInvoice"/>
-    <startEvent id="StartEvent_1" activiti:formKey="embedded:http://localhost:8080/tasklist/develop/invoice/start.html" name="Start Event">
+    <startEvent id="StartEvent_1" activiti:formKey="embedded:http://localhost:8080/camunda/develop/invoice/start.html" name="Start Event">
       <outgoing>SequenceFlow_2</outgoing>
     </startEvent>
     <sequenceFlow id="SequenceFlow_2" name="" sourceRef="StartEvent_1" targetRef="assignApprover"/>
