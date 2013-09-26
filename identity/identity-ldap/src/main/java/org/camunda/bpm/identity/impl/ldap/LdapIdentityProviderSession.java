@@ -169,7 +169,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       // first find group
       while (enumeration.hasMoreElements()) {
         SearchResult result = (SearchResult) enumeration.nextElement();
-        Attribute memberAttribute = result.getAttributes().get("member");
+        Attribute memberAttribute = result.getAttributes().get(ldapConfiguration.getGroupMemberAttribute());
         NamingEnumeration<?> allMembers = memberAttribute.getAll();
 
         // iterate group members
