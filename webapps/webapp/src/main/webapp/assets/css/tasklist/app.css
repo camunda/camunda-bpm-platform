@@ -70,6 +70,7 @@ table .selected tr > td {
   -moz-box-shadow: 0px 0px 4px 4px rgba(30, 144, 255, 1); /* Firefox */
   box-shadow: 0px 0px 4px 4px rgb(30, 144, 255); /* Standard */
   border-radius: 5px;
+  border-collapse: separate;
 }
 
 .bpmn-diagram {
