@@ -30,7 +30,7 @@ ngDefine('tasklist.pages', [
 
         Forms.parseFormData(data, form);
 
-        if (form.external) {
+        if (form.external && !form.generic) {
           var action = "/complete";
           if (task.delegationState === 'PENDING') {
             action = "/resolve";
@@ -74,6 +74,10 @@ ngDefine('tasklist.pages', [
     };
 
     $scope.submit = function() {
+      if ($scope.variablesForm.$invalid) {
+        return;
+      }
+
       var variablesMap = Forms.variablesToMap(variables);
 
       var taskList = EngineApi.getTaskList();

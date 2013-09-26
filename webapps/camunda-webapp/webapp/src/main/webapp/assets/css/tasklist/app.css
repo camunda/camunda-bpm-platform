@@ -83,3 +83,16 @@ table .selected tr > td {
     margin-top: 30px;
   }
 }
+
+label.label-checkbox {
+  display: inline-block;
+  position: relative;
+  margin-bottom: 0;
+  vertical-align: top;
+  line-height: 30px;
+}
+
+label.label-checkbox input[type="checkbox"] {
+  margin: 8px 0 8px 10px;
+  padding-top: 0;
+}
