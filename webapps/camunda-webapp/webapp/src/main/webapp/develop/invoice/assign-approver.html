@@ -1,6 +1,23 @@
 <strong>Who should approve that damn thing?</strong>
 
-<input form-field type="string" required ng-pattern="/^(demo|john|mary|peter)$/" name="approver" />
+<script form-script type="text/form-script">
+
+  // may use $scope to bind against the current scope directly
+  // or use #inject (see below) to obtain application services
+  
+  inject([ '$scope', '$http', function($scope, $http) {
+
+    $scope.$watch('variablesForm.approver.$valid', function(newValue) {
+      console.log('Form', newValue ? 'valid' : 'invalid');
+    });
+
+    $scope.inputChanged = function() {
+      console.log('Input changed to', $scope.variablesForm.approver.$modelValue);
+    };
+  }]);
+</script>
+
+<input form-field type="string" required ng-pattern="/^(demo|john|mary|peter)$/" ng-change="inputChanged()" name="approver" />
 
 <p style="color: red" ng-if="variablesForm.approver.$invalid">
   Not a valid user!
