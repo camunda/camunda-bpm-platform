@@ -1,5 +1,5 @@
 language: java
-script: mvn clean install -Pengine-integration,webapps-integration,clean-db,jboss,h2 -am -pl qa/integration-tests-engine,qa/integration-tests-webapps
+script: mvn clean install -Pengine-integration,webapps-integration,jboss,h2 -am -pl qa/integration-tests-engine,qa/integration-tests-webapps
   -B -U -q
 jdk:
 - oraclejdk7
