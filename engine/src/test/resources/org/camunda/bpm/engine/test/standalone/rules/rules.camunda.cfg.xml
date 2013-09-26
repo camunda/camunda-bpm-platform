@@ -10,7 +10,7 @@
 
     <property name="jdbcUrl" value="jdbc:h2:mem:RulesDeployerTest;DB_CLOSE_DELAY=1000" />  
     <!-- Database configurations -->
-    <property name="history" value="audit" />
+    <property name="history" value="${history.level}" />
     <property name="databaseSchemaUpdate" value="create-drop" />
     
     <!-- job executor configurations -->

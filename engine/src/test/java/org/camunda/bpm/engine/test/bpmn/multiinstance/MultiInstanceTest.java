@@ -92,14 +92,6 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     }
     
     if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-    
-      List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
-      assertEquals(4, historicTaskInstances.size());
-      for (HistoricTaskInstance ht : historicTaskInstances) {
-        assertNotNull(ht.getAssignee());
-        assertNotNull(ht.getStartTime());
-        assertNotNull(ht.getEndTime());
-      }
       
       List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("userTask").list();
       assertEquals(4, historicActivityInstances.size());
@@ -111,6 +103,18 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
         assertNotNull(hai.getAssignee());
       }
       
+    }
+
+    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+
+      List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
+      assertEquals(4, historicTaskInstances.size());
+      for (HistoricTaskInstance ht : historicTaskInstances) {
+        assertNotNull(ht.getAssignee());
+        assertNotNull(ht.getStartTime());
+        assertNotNull(ht.getEndTime());
+      }
+
     }
   }
   
@@ -824,6 +828,16 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
         assertNotNull(hpi.getEndTime());
       }
       
+      // Validate historic activities
+      List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("callActivity").list();
+      assertEquals(6, historicActivityInstances.size());
+      for (HistoricActivityInstance hai : historicActivityInstances) {
+        assertNotNull(hai.getStartTime());
+        assertNotNull(hai.getEndTime());
+      }
+    }
+
+    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       // Validate historic tasks
       List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
       assertEquals(12, historicTaskInstances.size());
@@ -832,14 +846,6 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
         assertNotNull(hti.getEndTime());
         assertNotNull(hti.getAssignee());
         assertEquals("completed", hti.getDeleteReason());
-      }
-      
-      // Validate historic activities
-      List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("callActivity").list();
-      assertEquals(6, historicActivityInstances.size());
-      for (HistoricActivityInstance hai : historicActivityInstances) {
-        assertNotNull(hai.getStartTime());
-        assertNotNull(hai.getEndTime());
       }
     }
   }

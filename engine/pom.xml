@@ -157,6 +157,7 @@
   </dependencies>
   
   <properties>
+      <history.level>full</history.level>
       <mail.server.port>5025</mail.server.port>
   
       <activiti.artifact>
@@ -204,10 +205,7 @@
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <excludes>
             <exclude>**/*TestCase.java</exclude>
-            
-            <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-            <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-            <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
+
             <exclude>**/RepeatingServiceTaskTest.java</exclude>
           </excludes>
         </configuration>
@@ -395,41 +393,20 @@
       </build>
     </profile>
 
-    <!--  check history full -->
+    <!--  check history audit -->
     <profile>
-      <id>cfghistoryfull</id>
+      <id>cfghistoryaudit</id>
+      <properties>
+        <history.level>audit</history.level>
+      </properties>
       <build>
         <plugins>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
-            <executions>
-              <execution>
-                <id>database-test-create-schema</id>
-                <phase>process-test-classes</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <tasks>
-                    <echo message="updating activiti configuration to qa/cfg/historyfull.camunda.cfg.xml" />
-                    <copy file="${basedir}/../../qa/cfg/historyfull.camunda.cfg.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true" />
-                  </tasks>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <excludes>
                 <exclude>**/*TestCase.java</exclude>
-                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
-                <exclude>org/activiti/standalone/**</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -437,41 +414,23 @@
       </build>
     </profile>
 
-    <!--  check history full -->
+    <!--  check history activity -->
     <profile>
-      <id>cfghistoryaudit</id>
+      <id>cfghistoryactivity</id>
+      <properties>
+        <history.level>activity</history.level>
+      </properties>
       <build>
         <plugins>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
-            <executions>
-              <execution>
-                <id>database-test-create-schema</id>
-                <phase>process-test-classes</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <tasks>
-                    <echo message="updating activiti configuration to qa/cfg/historyaudit.camunda.cfg.xml" />
-                    <copy file="${basedir}/../../qa/cfg/historyaudit.camunda.cfg.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true" />
-                  </tasks>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <excludes>
                 <exclude>**/*TestCase.java</exclude>
-                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
+                <exclude>**/Historic*InstanceTest.java</exclude>
+                <exclude>**/HistoryServiceTest.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
-                <exclude>org/activiti/standalone/**</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -482,41 +441,20 @@
     <!--  check history none -->
     <profile>
       <id>cfghistorynone</id>
+      <properties>
+        <history.level>none</history.level>
+      </properties>
       <build>
         <plugins>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
-            <executions>
-              <execution>
-                <id>database-test-create-schema</id>
-                <phase>process-test-classes</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <tasks>
-                    <echo message="updating activiti configuration to qa/cfg/historynone.camunda.cfg.xml" />
-                    <copy file="${basedir}/../../qa/cfg/historynone.camunda.cfg.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true" />
-                  </tasks>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <excludes>
                 <exclude>**/*TestCase.java</exclude>
-                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
-                
                 <exclude>**/Historic*InstanceTest.java</exclude>
                 <exclude>**/HistoryServiceTest.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
-                <exclude>org/activiti/standalone/**</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -632,12 +570,7 @@
                 <exclude>**/ManagementServiceTest.java</exclude>    
                                 
                 <exclude>**/*TestCase.java</exclude>
-                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
-                <exclude>org/activiti/standalone/**</exclude>
               </excludes>
             </configuration>
           </plugin>

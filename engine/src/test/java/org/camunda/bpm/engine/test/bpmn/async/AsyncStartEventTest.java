@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.test.bpmn.async;
 
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -40,13 +41,15 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncStartEvent.bpmn20.xml")
   public void testAsyncStartEventHistory() {
-    runtimeService.startProcessInstanceByKey("asyncStartEvent");
-    
-    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
-    Assert.assertNotNull(historicInstance);
-    Assert.assertNotNull(historicInstance.getStartTime());
-    
-    HistoricActivityInstance historicStartEvent = historyService.createHistoricActivityInstanceQuery().singleResult();
-    Assert.assertNull(historicStartEvent);
+    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      runtimeService.startProcessInstanceByKey("asyncStartEvent");
+
+      HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+      Assert.assertNotNull(historicInstance);
+      Assert.assertNotNull(historicInstance.getStartTime());
+
+      HistoricActivityInstance historicStartEvent = historyService.createHistoricActivityInstanceQuery().singleResult();
+      Assert.assertNull(historicStartEvent);
+    }
   }
 }

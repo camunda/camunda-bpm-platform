@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -564,18 +565,23 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (SuspendedEntityInteractionException e) {
       fail("should be allowed");
     }
-    
-    try {
-      taskService.addComment(task.getId(), processInstance.getId(), "test comment");
-    } catch (SuspendedEntityInteractionException e) {
-      fail("should be allowed");
+
+    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+
+      try {
+        taskService.addComment(task.getId(), processInstance.getId(), "test comment");
+      } catch (SuspendedEntityInteractionException e) {
+        fail("should be allowed");
+      }
+
+      try {
+        taskService.createAttachment("text", task.getId(), processInstance.getId(), "tesTastName", "testDescription", "http://test.com");
+      } catch (SuspendedEntityInteractionException e) {
+        fail("should be allowed");
+      }
+
     }
-    
-    try {
-      taskService.createAttachment("text", task.getId(), processInstance.getId(), "testName", "testDescription", "http://test.com");
-    } catch (SuspendedEntityInteractionException e) {
-      fail("should be allowed");
-    }
+
 
     try {
       taskService.setPriority(task.getId(), 99);

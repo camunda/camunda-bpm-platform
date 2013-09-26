@@ -23,7 +23,7 @@
     <property name="mailServerPort" value="${mail.server.port}" />    
     
     <!-- history level -->
-    <property name="history" value="full" />
+    <property name="history" value="${history.level}" />
     
     <!-- Expose beans to expressions -->
     <property name="beans">
