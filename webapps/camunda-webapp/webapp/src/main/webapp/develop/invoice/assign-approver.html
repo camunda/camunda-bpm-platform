@@ -1,5 +1,14 @@
 <strong>Who should approve that damn thing?</strong>
 
-<input form-field type="string" name="approver" />
+<input form-field type="string" required ng-pattern="/^(demo|john|mary|peter)$/" name="approver" />
 
-<small>*must be a valid user</small>
+<p style="color: red" ng-if="variablesForm.approver.$invalid">
+  Not a valid user!
+</p>
+
+<p>
+  <small>
+    * must be a valid user, i.e. one of 
+    <code>demo, john, mary, peter</code>
+  </small>
+</p>
