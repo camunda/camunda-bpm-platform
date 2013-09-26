@@ -34,6 +34,10 @@ ngDefine('tasklist.pages', [
     };
 
     $scope.submit = function() {
+      if ($scope.variablesForm.$invalid) {
+        return;
+      }
+      
       var variablesMap = Forms.variablesToMap(variables);
 
       EngineApi.getProcessDefinitions().startInstance({ id: processDefinitionId }, { variables : variablesMap }).$then(function() {

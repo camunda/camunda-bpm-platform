@@ -13,7 +13,7 @@
   </div>
   <span ng-switch="variable.type">
     <input ng-switch-when="number" ng-readonly="variable.readOnly" ng-model="variable.value" type="number" placeholder="value" />
-    <label ng-switch-when="boolean" class="checkbox inline"><input ng-readonly="variable.readOnly" style="margin-left: 10px; margin-right: 5px;" name="variable.name" ng-model="variable.value" type="checkbox" /> {{ variable.name }}</label>
+    <label ng-switch-when="boolean" class="label-checkbox"><input ng-readonly="variable.readOnly" name="variable.name" ng-model="variable.value" type="checkbox" /> {{ variable.name }}</label>
     <input ng-switch-when="date" ng-readonly="variable.readOnly" ng-model="variable.value" type="datetime" placeholder="value" />
     <input ng-switch-default ng-readonly="variable.readOnly" ng-model="variable.value" type="text" placeholder="value" />
   </span>

@@ -1,10 +1,10 @@
-<div class="control-group" ngm-if="form.loaded">
+<div class="control-group" ng-show="form.loaded">
   <h5>Start Process Instance</h5>
   <h3>{{ processDefinition.name }}</h3>
 
   <hr />
 
-  <form ng-submit="submit()">
+  <form ng-submit="submit()" name="variablesForm">
     <div ngm-if="!form.key && !form.generic">
       <p>
         It looks as if no form has been defined to start the process.
@@ -27,7 +27,7 @@
     </div>
 
     <div ngm-if="form.key || form.generic">
-      <button class="btn btn-primary" type="submit">Start Process</button>
+      <button class="btn btn-primary" ng-disabled="variablesForm.$invalid" type="submit">Start Process</button>
       <button class="btn" ng-click="cancel()">Cancel</button>
     </div>
   </form>

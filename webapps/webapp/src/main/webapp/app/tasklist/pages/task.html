@@ -1,4 +1,4 @@
-<div class="control-group" ngm-if="form.loaded">
+<div class="control-group" ng-show="form.loaded">
   <h5>Complete Task</h5>
   <h3>{{ task.name }}</h3>
 
@@ -8,7 +8,7 @@
 
   <hr />
 
-  <form ng-submit="submit()">
+  <form ng-submit="submit()" name="variablesForm">
     <div ngm-if="!form.key && !form.generic">
       <p>
         It looks as if no form has been defined for the task.
@@ -26,13 +26,15 @@
       <div ng-include="'common/form/generic-variables.html'"></div>
     </div>
 
-    <div ngm-if="form.embedded && !form.generic">
+    <div ng-if="form.embedded && !form.generic">
       <div style="margin: 20px 0 20px 0" ng-include="form.key" task-variables="variables"></div>
     </div>
 
-    <div ngm-if="form.embedded || form.generic">
-      <button ng-show="!task.delegationState || (task.delegationState && task.delegationState === 'RESOLVED')" class="btn btn-primary" type="submit">Complete Task</button>
-      <button ng-hide="!task.delegationState || (task.delegationState && task.delegationState === 'RESOLVED')" class="btn btn-primary" type="submit">Resolve Task</button>
+    <div ng-if="form.embedded || form.generic">
+      <button class="btn btn-primary" 
+              ng-disabled="variablesForm.$invalid"
+              type="submit">{{ !task.delegationState || task.delegationState == 'RESOLVED' ? 'Complete Task' : 'Resolve Task' }}</button>
+      
       <button class="btn" ng-click="cancel()">Cancel</button>
     </div>
   </form>
