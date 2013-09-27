@@ -8,9 +8,9 @@ before_install:
 - sh -e /etc/init.d/xvfb start
 env:
   global:
-  - secure: QExaONYPMHrKHdKI0fNSR0M+waFmx7jwH8bm9DyhdcZ8DlD+tS9fBJbma/nGBwnRlWDPutS7hv1SAR98jXmOEk+OjvKrHhVdbtVtiKoPdQSWiDd+wGl4Y6+n4CoBA52H7VhFpRx+jctxxjIHFQ7jlIUQCgGDpWrgfQhodN1jKUQ=
-  - secure: w7CT463sfgTlyLHuWBPv/Q0u0MUvfJQWbzRt/fN0NodqMVJHcM5+xZy6wk+1AfTvB9/fO6gVLjt7okUEffZ2gU95GyGkLdDkWaZ8aai0yzDYKVv5sz9QFXXdUJdXvzkcjyDE80LCRfLZOu/MVzuJtyBk/tmslBxXDqha6iqkm1o=
-  - secure: lnqNQF+SVCX180+xQ/2rt0xTreGuXRzn0jL9T7XdZvhHQzE6iiwh83ub1+54eBK16PjfNNKShNSvbenQoSuZQHEGAMIB1B7G7l0NMvSz7f54o/fZtv/zffGoZDcvXNpY0tG9G/QXp+WAW5/5Y/r5dpvDU7mX842XZmBOMh2Qw0o=
+  - secure: g+VLuyoGH05gFiosgt/quTpuwcPUxbFdUQucn4NzNGXjeAMvVp8cl1TUjw3QVh+XRsK4udkCqqu2I+gouNes3/SuBgKsdcWO6TX6zteSr5a+oPpDMUrZ48zHJoAj5AsmV6o56/Khpy0NgbPoxo46W71wWlUAvl+aEkCeO/5mAM0=
+  - secure: vPlYFkqxY/h7oqicRAEG7okEhspnjjiKqc5VB5krFwLuroLt1eg9/BewGL7YvBAmLejxcjndl4nDy+5A4s/z3SQSwsX4ICxF9qANjZy6wO31Sfwx1dTip7Stg4yRziUk+IDpaC8iyqQYOxpOVvF7QBhcf95Cto58hnj8kTcIpxM=
+  - secure: rY8dcLoKpQJ6R3oIdsNjhrtZm9lmtf47Vt+WvVG+5/uK4vc968tYIcj1yQzMJdIYOBlrrupeYyOLakrY4zwSmXCJKbCAgPo3s3/dpgdmqI2yXTic9/FsOxnb2hVBULf+IdYN153H3O4xivFPu766PuzHMrrpQC2uHm04rCsgs4s=
 notifications:
   email:
     - cl@camunda.com
