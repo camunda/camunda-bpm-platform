@@ -1,6 +1,6 @@
 language: java
 script: mvn clean install -Pengine-integration,webapps-integration,jboss,h2 -am -pl qa/integration-tests-engine,qa/integration-tests-webapps
-  -B -U -q
+  -B -U -q -Dsignavio.globaluser=${globaluser} -Dsignavio.globalpassword=${globalpassword} -Dsignavio.baseurl=${baseurl}
 jdk:
 - oraclejdk7
 before_install:
