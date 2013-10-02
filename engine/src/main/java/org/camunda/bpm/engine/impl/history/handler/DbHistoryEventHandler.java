@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,14 +23,14 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEn
 /**
  * <p>History event handler that writes history events to the process engine
  * database using the DbSqlSession.</p>
- * 
+ *
  * @author Daniel Meyer
- * 
+ *
  */
 public class DbHistoryEventHandler implements HistoryEventHandler {
 
   public void handleEvent(HistoryEvent historyEvent) {
-    
+
     if (historyEvent instanceof HistoricVariableUpdateEventEntity) {
       insertHistoricVariableUpdateEntity((HistoricVariableUpdateEventEntity) historyEvent);
     } else {
@@ -41,27 +41,27 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
   /** general history event insert behavior */
   protected void insertOrUpdate(HistoryEvent historyEvent) {
-   
+
     final DbSqlSession dbSqlSession = getDbSqlSession();
-    
+
     String eventType = historyEvent.getEventType();
     if(isInitialEvent(eventType)) {
-      dbSqlSession.insert(historyEvent);      
+      dbSqlSession.insert(historyEvent);
     } else {
       if(dbSqlSession.findInCache(historyEvent.getClass(), historyEvent.getId()) == null) {
         dbSqlSession.update(historyEvent);
       }
-    }        
+    }
   }
 
   /** customized insert behavior for HistoricVariableUpdateEventEntity */
   protected void insertHistoricVariableUpdateEntity(HistoricVariableUpdateEventEntity historyEvent) {
     DbSqlSession dbSqlSession = getDbSqlSession();
-    
+
     // insert update only if history level = FULL
     int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    if(historyLevel == ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {      
-      
+    if(historyLevel == ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+
       // insert byte array entity (if applicable)
       byte[] byteValue = historyEvent.getByteValue();
       if(byteValue != null) {
@@ -71,36 +71,46 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
         .getDbSqlSession()
         .insert(byteArrayEntity);
         historyEvent.setByteArrayId(byteArrayEntity.getId());
-        
+
       }
-      dbSqlSession.insert(historyEvent);      
+      dbSqlSession.insert(historyEvent);
     }
-    
+
     // always insert/update HistoricProcessVariableInstance
     if(HistoryEvent.VARIABLE_EVENT_TYPE_CREATE.equals(historyEvent.getEventType())) {
       HistoricVariableInstanceEntity persistentObject = new HistoricVariableInstanceEntity(historyEvent);
-      dbSqlSession.insert(persistentObject);      
-      
+      dbSqlSession.insert(persistentObject);
+
     } else if(HistoryEvent.VARIABLE_EVENT_TYPE_UPDATE.equals(historyEvent.getEventType())) {
       HistoricVariableInstanceEntity historicVariableInstanceEntity = dbSqlSession.selectById(HistoricVariableInstanceEntity.class, historyEvent.getVariableInstanceId());
-      historicVariableInstanceEntity.updateFromEvent(historyEvent);
-      
+      if(historicVariableInstanceEntity != null) {
+        historicVariableInstanceEntity.updateFromEvent(historyEvent);
+
+      } else {
+        // #CAM-1344 / #SUPPORT-688
+        // this is a FIX for process instances which were started in camunda fox 6.1 and migrated to camunda BPM 7.0.
+        // in fox 6.1 the HistoricVariable instances were flushed to the DB when the process instance completed.
+        // Since fox 6.2 we populate the HistoricVariable table as we go.
+        HistoricVariableInstanceEntity persistentObject = new HistoricVariableInstanceEntity(historyEvent);
+        dbSqlSession.insert(persistentObject);
+      }
+
     } else if(HistoryEvent.VARIABLE_EVENT_TYPE_DELETE.equals(historyEvent.getEventType())) {
       HistoricVariableInstanceEntity historicVariableInstanceEntity = dbSqlSession.selectById(HistoricVariableInstanceEntity.class, historyEvent.getVariableInstanceId());
       if(historicVariableInstanceEntity != null) {
-        historicVariableInstanceEntity.delete();        
-      }      
+        historicVariableInstanceEntity.delete();
+      }
     }
-    
+
   }
-  
+
 
   protected boolean isInitialEvent(String eventType) {
-    return HistoryEvent.ACTIVITY_EVENT_TYPE_START.equals(eventType) 
+    return HistoryEvent.ACTIVITY_EVENT_TYPE_START.equals(eventType)
         || HistoryEvent.TASK_EVENT_TYPE_CREATE.equals(eventType)
         || HistoryEvent.FORM_PROPERTY_UPDATE.equals(eventType);
   }
-  
+
   protected DbSqlSession getDbSqlSession() {
     return Context.getCommandContext().getDbSqlSession();
   }
