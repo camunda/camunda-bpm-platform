@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,13 +20,16 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
 
 /**
  * @author Thorben Lindhauer
+ * @author Daniel Meyer
  */
 public class CorrelateMessageCmd implements Command<Void> {
 
@@ -34,7 +37,7 @@ public class CorrelateMessageCmd implements Command<Void> {
   protected final String businessKey;
   protected final Map<String, Object> correlationKeys;
   protected final Map<String, Object> processVariables;
-  
+
   public CorrelateMessageCmd(String messageName, String businessKey,
       Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
     this.messageName = messageName;
@@ -49,36 +52,33 @@ public class CorrelateMessageCmd implements Command<Void> {
     }
 
     CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
-    
+
     CorrelationSet correlationSet = new CorrelationSet(businessKey, correlationKeys);
-    Execution matchingExecution = correlationHandler.correlateMessageToExecution(commandContext, messageName, correlationSet);
-    ProcessDefinition matchingDefinition = correlationHandler.correlateMessageToProcessDefinition(commandContext, messageName);
-    
-    if (matchingExecution != null && matchingDefinition != null) {
-      throw new MismatchingMessageCorrelationException(messageName, businessKey, 
-          correlationKeys, "An execution and a process definition match the correlation.");
+    MessageCorrelationResult correlationResult = correlationHandler.correlateMessage(commandContext, messageName, correlationSet);
+
+    if(correlationResult == null) {
+      throw new MismatchingMessageCorrelationException(messageName, "No process definition or execution matches the parameters");
+
+    } else if(MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
+      triggerExecution(commandContext, correlationResult);
+
+    } else {
+      instantiateProcess(commandContext, correlationResult);
+
     }
-    
-    if (matchingExecution != null) {
-      triggerExecution(commandContext, matchingExecution);
-      return null;
-    }
-    
-    if (matchingDefinition != null) {
-      instantiateProcess(commandContext, matchingDefinition);
-      return null;
-    }
-    
-    throw new MismatchingMessageCorrelationException(messageName, "No process definition or execution matches the parameters");
+
+    return null;
   }
 
-  private void triggerExecution(CommandContext commandContext, Execution matchingExecution) {
-    new MessageEventReceivedCmd(messageName, matchingExecution.getId(), processVariables).execute(commandContext);
+  protected void triggerExecution(CommandContext commandContext, MessageCorrelationResult correlationResult) {
+    new MessageEventReceivedCmd(messageName, correlationResult.getExecutionEntity().getId(), processVariables).execute(commandContext);
   }
-  
-  private void instantiateProcess(CommandContext commandContext,
-      ProcessDefinition matchingDefinition) {
-    new StartProcessInstanceCmd(null, matchingDefinition.getId(), null, processVariables).execute(commandContext);
+
+  protected void instantiateProcess(CommandContext commandContext, MessageCorrelationResult correlationResult) {
+    ProcessDefinitionEntity processDefinitionEntity = correlationResult.getProcessDefinitionEntity();
+    ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
+    ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(businessKey, messageStartEvent);
+    processInstance.start(businessKey, processVariables);
   }
-  
+
 }

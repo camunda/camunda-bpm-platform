@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,19 +36,19 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
   protected String processDefinitionId;
   protected Map<String, Object> variables;
   protected String businessKey;
-  
+
   public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, Map<String, Object> variables) {
     this.processDefinitionKey = processDefinitionKey;
     this.processDefinitionId = processDefinitionId;
     this.businessKey = businessKey;
     this.variables = variables;
   }
-  
+
   public ProcessInstance execute(CommandContext commandContext) {
     DeploymentCache deploymentCache = Context
       .getProcessEngineConfiguration()
       .getDeploymentCache();
-    
+
     // Find the process definition
     ProcessDefinitionEntity processDefinition = null;
     if (processDefinitionId!=null) {
@@ -64,7 +64,7 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
     } else {
       throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
     }
-    
+
     // Start the process instance
     ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey);
     processInstance.start(variables);
