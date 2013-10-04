@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,9 +18,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
  * @author Tom Baeyens
  */
 public class ByteArrayType implements VariableType {
-  
+
   public static final String TYPE_NAME = "bytes";
-  
+
   public String getTypeName() {
     return TYPE_NAME;
   }
@@ -41,7 +41,7 @@ public class ByteArrayType implements VariableType {
     byte[] bytes = (byte[]) value;
     if (byteArray==null) {
       valueFields.setByteArrayValue(bytes);
-   
+
     } else {
       byteArray.setBytes(bytes);
     }
@@ -55,6 +55,6 @@ public class ByteArrayType implements VariableType {
   }
 
   public String getTypeNameForValue(Object value) {
-    return value.getClass().getSimpleName();
+    return byte[].class.getSimpleName();
   }
 }

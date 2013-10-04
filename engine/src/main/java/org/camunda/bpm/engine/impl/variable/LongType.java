@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@ package org.camunda.bpm.engine.impl.variable;
 public class LongType implements VariableType {
 
   public static final String TYPE_NAME = "long";
-  
+
   public String getTypeName() {
     return TYPE_NAME;
   }
@@ -49,8 +49,9 @@ public class LongType implements VariableType {
     return Long.class.isAssignableFrom(value.getClass())
            || long.class.isAssignableFrom(value.getClass());
   }
-  
+
   public String getTypeNameForValue(Object value) {
-    return value.getClass().getSimpleName();
+    // typename independent of value
+    return Long.class.getSimpleName();
   }
 }
