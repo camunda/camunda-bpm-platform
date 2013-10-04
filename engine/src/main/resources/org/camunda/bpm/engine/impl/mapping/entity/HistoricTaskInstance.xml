@@ -78,14 +78,14 @@
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
       </if>  
              
-    where ID_ = #{id}
+    where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   
   <!-- HISTORIC TASK INSTANCE SELECT -->
   
   <select id="selectHistoricTaskInstanceEvent" parameterType="java.lang.String" resultMap="historicTaskInstanceResultMap">
     select HTI.START_TIME_ from ${prefix}ACT_HI_TASKINST HTI              
-    where HTI.ID_ = #{id}
+    where HTI.ID_ = #{id, jdbcType=VARCHAR}
   </select>
     
   <!-- HISTORIC TASK INSTANCE DELETE -->

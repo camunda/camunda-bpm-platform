@@ -70,14 +70,14 @@
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
       </if>
     WHERE 
-      ID_ = #{id}
+      ID_ = #{id, jdbcType=VARCHAR}
   </update>
   
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->
   
   <select id="selectHistoricActivityInstanceEvent" parameterType="java.lang.String" resultMap="historicActivityInstanceResultMap">
     select HAI.START_TIME_ from ${prefix}ACT_HI_ACTINST HAI              
-    where HAI.ID_ = #{id}
+    where HAI.ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
   <!-- HISTORIC ACTIVITY INSTANCE DELETE -->
