@@ -190,8 +190,14 @@
             , DURATION_ = #{duration, jdbcType=TIMESTAMP}
         </if>
         <if test="startTime == null">
-          , DURATION_ = ((DAYS(CAST(#{endTime, jdbcType=TIMESTAMP} AS TIMESTAMP)) - DAYS(HTI.START_TIME_)) * 86400000)
-            + ((MIDNIGHT_SECONDS(CAST(#{endTime, jdbcType=TIMESTAMP} AS TIMESTAMP)) - MIDNIGHT_SECONDS(HTI.START_TIME_)) * 1000)
+          , DURATION_ =
+          (CAST(
+            ((DAYS(CAST(#{endTime, jdbcType=TIMESTAMP} AS TIMESTAMP)) - DAYS(HTI.START_TIME_)) * 86400000)
+          AS BIGINT))
+            +
+          (CAST(
+            ((MIDNIGHT_SECONDS(CAST(#{endTime, jdbcType=TIMESTAMP} AS TIMESTAMP)) - MIDNIGHT_SECONDS(HTI.START_TIME_)) * 1000)
+          AS BIGINT))
         </if>
       </if>      
              
