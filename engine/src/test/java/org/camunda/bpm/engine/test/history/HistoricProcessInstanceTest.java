@@ -93,7 +93,11 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   public void testLongRunningHistoricDataCreatedForProcessExecution() {
     final long ONE_YEAR = 1000 * 60 * 60 * 24 * 365;
 
-    Date now = new Date();
+    Calendar cal = Calendar.getInstance();
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+
+    Date now = cal.getTime();
     ClockUtil.setCurrentTime(now);
 
     final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "myBusinessKey");
@@ -109,8 +113,6 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
     // in this test scenario we assume that one year after the process start, the
     // user completes the task (incredible speedy!)
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(now);
     cal.add(Calendar.YEAR, 1);
     Date oneYearLater = cal.getTime();
     ClockUtil.setCurrentTime(oneYearLater);

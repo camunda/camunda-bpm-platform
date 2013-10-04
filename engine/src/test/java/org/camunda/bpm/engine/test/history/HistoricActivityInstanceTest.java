@@ -88,6 +88,12 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
   public void testLongRunningHistoricActivityInstanceReceive() {
     final long ONE_YEAR = 1000 * 60 * 60 * 24 * 365;
 
+    Calendar cal = Calendar.getInstance();
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+
+    ClockUtil.setCurrentTime(cal.getTime());
+
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("receiveProcess");
 
     HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult();
@@ -102,9 +108,6 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertNotNull(historicActivityInstance.getStartTime());
 
     // move clock by 1 year
-    Date now = ClockUtil.getCurrentTime();
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(now);
     cal.add(Calendar.YEAR, 1);
     ClockUtil.setCurrentTime(cal.getTime());
 
