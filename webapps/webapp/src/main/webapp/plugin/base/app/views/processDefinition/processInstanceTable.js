@@ -45,7 +45,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         firstResult: firstResult,
         maxResults: count,
         sortBy: 'startTime',
-        sortOrder: 'asc'
+        sortOrder: 'desc'
       };
 
       var countParams = angular.extend({}, filter, defaultParams);
