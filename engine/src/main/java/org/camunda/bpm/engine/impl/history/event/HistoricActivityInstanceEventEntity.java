@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.history.event;
 
-import java.util.Date;
 
 /**
  * <p>{@link HistoryEvent} implementation for events that happen in an activity.</p>
@@ -21,7 +20,7 @@ import java.util.Date;
  * @author Marcel Wieczorek
  *
  */
-public class HistoricActivityInstanceEventEntity extends HistoryEvent {
+public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEvent {
 
   private static final long serialVersionUID = 1L;
 
@@ -46,43 +45,12 @@ public class HistoricActivityInstanceEventEntity extends HistoryEvent {
   protected String taskId;
   protected String taskAssignee;
 
-  protected Long durationInMillis;
-  protected Date startTime;
-  protected Date endTime;
-
   // getters and setters //////////////////////////////////////////////////////
-
-  public Date getEndTime() {
-    return endTime;
-  }
-
-  public void setEndTime(Date endTime) {
-    this.endTime = endTime;
-  }
-
-  public Date getStartTime() {
-    return startTime;
-  }
-
-  public void setStartTime(Date startTime) {
-    this.startTime = startTime;
-  }
 
   public String getAssignee() {
     return taskAssignee;
   }
 
-  public Long getDurationInMillis() {
-    if(endTime != null && startTime != null) {
-        return endTime.getTime() - startTime.getTime();
-    } else {
-      return durationInMillis;
-    }
-  }
-
-  public void setDurationInMillis(Long durationInMillis) {
-    this.durationInMillis = durationInMillis;
-  }
 
   public String getActivityId() {
     return activityId;
@@ -146,10 +114,6 @@ public class HistoricActivityInstanceEventEntity extends HistoryEvent {
 
   public void setTaskAssignee(String taskAssignee) {
     this.taskAssignee = taskAssignee;
-  }
-
-  public Long getDurationRaw() {
-    return durationInMillis;
   }
 
   @Override

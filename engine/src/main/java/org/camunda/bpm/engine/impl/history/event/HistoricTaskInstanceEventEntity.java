@@ -17,7 +17,7 @@ import java.util.Date;
 /**
  * @author Marcel Wieczorek
  */
-public class HistoricTaskInstanceEventEntity extends HistoryEvent {
+public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent {
 
   private static final long serialVersionUID = 1L;
 
@@ -31,39 +31,8 @@ public class HistoricTaskInstanceEventEntity extends HistoryEvent {
   protected String parentTaskId;
   protected String deleteReason;
   protected String taskDefinitionKey;
-  protected Long durationInMillis;
-  protected Date startTime;
-  protected Date endTime;
 
   // getters and setters //////////////////////////////////////////////////////
-
-  public Long getDurationInMillis() {
-    if(endTime != null && startTime != null) {
-      return endTime.getTime() - startTime.getTime();
-    } else {
-      return durationInMillis;
-    }
-  }
-
-  public void setDurationInMillis(Long durationInMillis) {
-    this.durationInMillis = durationInMillis;
-  }
-
-  public Date getStartTime() {
-    return startTime;
-  }
-
-  public void setStartTime(Date startTime) {
-    this.startTime = startTime;
-  }
-
-  public Date getEndTime() {
-    return endTime;
-  }
-
-  public void setEndTime(Date endTime) {
-    this.endTime = endTime;
-  }
 
   public String getDeleteReason() {
     return deleteReason;
@@ -143,10 +112,6 @@ public class HistoricTaskInstanceEventEntity extends HistoryEvent {
 
   public void setTaskDefinitionKey(String taskDefinitionKey) {
     this.taskDefinitionKey = taskDefinitionKey;
-  }
-
-  public Long getDurationRaw() {
-    return durationInMillis;
   }
 
   @Override

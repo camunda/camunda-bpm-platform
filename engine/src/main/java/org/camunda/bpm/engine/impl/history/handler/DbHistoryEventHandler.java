@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.history.handler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.history.event.HistoricScopeInstanceEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -49,10 +50,19 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
       dbSqlSession.insert(historyEvent);
     } else {
       if(dbSqlSession.findInCache(historyEvent.getClass(), historyEvent.getId()) == null) {
+        if (historyEvent instanceof HistoricScopeInstanceEvent) {
+          // if this is a scope, get start time from existing event in DB
+          HistoricScopeInstanceEvent existingEvent = (HistoricScopeInstanceEvent) dbSqlSession.selectById(historyEvent.getClass(), historyEvent.getId());
+          if(existingEvent != null) {
+            HistoricScopeInstanceEvent historicScopeInstanceEvent = (HistoricScopeInstanceEvent) historyEvent;
+            historicScopeInstanceEvent.setStartTime(existingEvent.getStartTime());
+          }
+        }
         dbSqlSession.update(historyEvent);
       }
     }
   }
+
 
   /** customized insert behavior for HistoricVariableUpdateEventEntity */
   protected void insertHistoricVariableUpdateEntity(HistoricVariableUpdateEventEntity historyEvent) {

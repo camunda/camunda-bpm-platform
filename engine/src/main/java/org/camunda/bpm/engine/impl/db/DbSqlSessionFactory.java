@@ -69,9 +69,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDummyTable.put("h2", "");
     databaseSpecificTrueConstant.put("h2", "1");
     databaseSpecificFalseConstant.put("h2", "0");
-    addDatabaseSpecificStatement("h2", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_nativeDateDiff");
-    addDatabaseSpecificStatement("h2", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_nativeDateDiff");
-    addDatabaseSpecificStatement("h2", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_nativeDateDiff");
 
 	  //mysql specific
     databaseSpecificLimitBeforeStatements.put("mysql", "");
@@ -94,9 +91,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("mysql", "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
     addDatabaseSpecificStatement("mysql", "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
     addDatabaseSpecificStatement("mysql", "selectDeploymentCountByQueryCriteria", "selectDeploymentCountByQueryCriteria_mysql");
-    addDatabaseSpecificStatement("mysql", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_nativeDateDiff");
-    addDatabaseSpecificStatement("mysql", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_nativeDateDiff");
-    addDatabaseSpecificStatement("mysql", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_nativeDateDiff");
 
 
     //postgres specific
@@ -133,9 +127,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("postgres", "selectActivityStatistics", "selectActivityStatistics_postgres");
     addDatabaseSpecificStatement("postgres", "selectActivityStatisticsCount", "selectActivityStatisticsCount_postgres");
     addDatabaseSpecificStatement("postgres", "selectHistoricVariableInstanceByQueryCriteria", "selectHistoricVariableInstanceByQueryCriteria_postgres");
-    addDatabaseSpecificStatement("postgres", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_postgres");
-    addDatabaseSpecificStatement("postgres", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_postgres");
-    addDatabaseSpecificStatement("postgres", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_postgres");
 
     // oracle
     databaseSpecificLimitBeforeStatements.put("oracle", "select * from ( select a.*, ROWNUM rnum from (");
@@ -175,10 +166,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("db2", "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
-    addDatabaseSpecificStatement("db2", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_db2");
-    addDatabaseSpecificStatement("db2", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_db2");
-    addDatabaseSpecificStatement("db2", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_db2");
-
     // mssql
     databaseSpecificLimitBeforeStatements.put("mssql", "SELECT SUB.* FROM (");
     databaseSpecificLimitAfterStatements.put("mssql", ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
@@ -200,9 +187,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("mssql", "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
-    addDatabaseSpecificStatement("mssql", "updateHistoricProcessInstanceEvent", "updateHistoricProcessInstanceEvent_mssql");
-    addDatabaseSpecificStatement("mssql", "updateHistoricTaskInstanceEvent", "updateHistoricTaskInstanceEvent_mssql");
-    addDatabaseSpecificStatement("mssql", "updateHistoricActivityInstanceEvent", "updateHistoricActivityInstanceEvent_mssql");
   }
 
   protected String databaseType;

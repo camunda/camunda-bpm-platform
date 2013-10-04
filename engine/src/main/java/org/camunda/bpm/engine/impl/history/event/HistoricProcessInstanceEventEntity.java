@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.history.event;
 
-import java.util.Date;
-
 /**
  * <p>{@link HistoryEvent} signifying a top-level event in a process instance.</p>
  *
@@ -21,7 +19,7 @@ import java.util.Date;
  * @author Marcel Wieczorek
  *
  */
-public class HistoricProcessInstanceEventEntity extends HistoryEvent {
+public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEvent {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,13 +35,6 @@ public class HistoricProcessInstanceEventEntity extends HistoryEvent {
   /** the reason why this process instance was cancelled (deleted) */
   protected String deleteReason;
 
-  /** duration in millis */
-  protected Long durationInMillis;
-
-  protected Date startTime;
-
-  protected Date endTime;
-
   /** id of the activity which started the process instance */
   protected String endActivityId;
 
@@ -51,34 +42,6 @@ public class HistoricProcessInstanceEventEntity extends HistoryEvent {
   protected String startActivityId;
 
   // getters / setters ////////////////////////////////////////
-
-  public Long getDurationInMillis() {
-    if(endTime != null && startTime != null) {
-      return endTime.getTime() - startTime.getTime();
-    } else {
-      return durationInMillis;
-    }
-  }
-
-  public void setDurationInMillis(Long durationInMillis) {
-    this.durationInMillis = durationInMillis;
-  }
-
-  public Date getStartTime() {
-    return startTime;
-  }
-
-  public void setStartTime(Date startTime) {
-    this.startTime = startTime;
-  }
-
-  public Date getEndTime() {
-    return endTime;
-  }
-
-  public void setEndTime(Date endTime) {
-    this.endTime = endTime;
-  }
 
   public String getEndActivityId() {
     return endActivityId;
@@ -126,10 +89,6 @@ public class HistoricProcessInstanceEventEntity extends HistoryEvent {
 
   public void setDeleteReason(String deleteReason) {
     this.deleteReason = deleteReason;
-  }
-
-  public Long getDurationRaw() {
-    return durationInMillis;
   }
 
   @Override
