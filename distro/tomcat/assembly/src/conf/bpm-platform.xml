@@ -26,7 +26,7 @@
 
     <!-- LDAP CONFIGURATION -->
     <!-- Uncomment this section in order to enable LDAP support for this process engine -->
-    <!-- Adjust configuration, see ( http://docs.camunda.com/guides/user-guide/#!/#bpmplatform/engine/identity/ldap ) -->
+    <!-- Adjust configuration, see ( http://docs.camunda.org/latest/guides/user-guide/#process-engine-identity-service-the-ldap-identity-service ) -->
     <!-- 
       <plugin>
         <class>org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin</class>
