@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.test.history;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -25,6 +23,9 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author Tom Baeyens
@@ -81,6 +82,45 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertNotNull(historicActivityInstance.getStartTime());
     assertTrue(historicActivityInstance.getDurationInMillis() >= 1000);
     assertTrue(((HistoricActivityInstanceEventEntity)historicActivityInstance).getDurationRaw() >= 1000);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceReceive.bpmn20.xml" })
+  public void testLongRunningHistoricActivityInstanceReceive() {
+    final long ONE_YEAR = 1000 * 60 * 60 * 24 * 365;
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("receiveProcess");
+
+    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult();
+
+    assertEquals("receive", historicActivityInstance.getActivityId());
+    assertEquals("receiveTask", historicActivityInstance.getActivityType());
+    assertNull(historicActivityInstance.getEndTime());
+    assertNull(historicActivityInstance.getDurationInMillis());
+    assertNotNull(historicActivityInstance.getProcessDefinitionId());
+    assertEquals(processInstance.getId(), historicActivityInstance.getProcessInstanceId());
+    assertEquals(processInstance.getId(), historicActivityInstance.getExecutionId());
+    assertNotNull(historicActivityInstance.getStartTime());
+
+    // move clock by 1 year
+    Date now = ClockUtil.getCurrentTime();
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(now);
+    cal.add(Calendar.YEAR, 1);
+    ClockUtil.setCurrentTime(cal.getTime());
+
+    runtimeService.signal(processInstance.getId());
+
+    historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult();
+
+    assertEquals("receive", historicActivityInstance.getActivityId());
+    assertEquals("receiveTask", historicActivityInstance.getActivityType());
+    assertNotNull(historicActivityInstance.getEndTime());
+    assertNotNull(historicActivityInstance.getProcessDefinitionId());
+    assertEquals(processInstance.getId(), historicActivityInstance.getProcessInstanceId());
+    assertEquals(processInstance.getId(), historicActivityInstance.getExecutionId());
+    assertNotNull(historicActivityInstance.getStartTime());
+    assertTrue(historicActivityInstance.getDurationInMillis() >= ONE_YEAR);
+    assertTrue(((HistoricActivityInstanceEventEntity)historicActivityInstance).getDurationRaw() >= ONE_YEAR);
   }
 
   @Deployment
