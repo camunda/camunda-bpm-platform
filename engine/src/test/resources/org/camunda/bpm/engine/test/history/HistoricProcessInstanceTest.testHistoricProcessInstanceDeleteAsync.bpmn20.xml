@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions targetNamespace="http://activiti.org/bpmn" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:activiti="http://activiti.org/bpmn" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" 
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI" 
+  xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_VIXssCXdEeOmxvF1pYp2YA">
+  
+  <process id="failing" name="Failing" isExecutable="true">
+    <startEvent id="StartEvent_1" name="Start Event">
+      <outgoing>SequenceFlow_1</outgoing>
+    </startEvent>
+    <serviceTask id="ServiceTask_1" activiti:async="true" activiti:class="some.nonexisting.Delegate" name="Service Task">
+      <incoming>SequenceFlow_1</incoming>
+      <outgoing>SequenceFlow_2</outgoing>
+    </serviceTask>
+    <endEvent id="EndEvent_1" name="End Event">
+      <incoming>SequenceFlow_2</incoming>
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>
+    <sequenceFlow id="SequenceFlow_2" name="" sourceRef="ServiceTask_1" targetRef="EndEvent_1"/>
+  </process> 
+  
+</definitions>
