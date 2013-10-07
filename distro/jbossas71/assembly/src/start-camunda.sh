@@ -15,4 +15,4 @@ else
   (sleep 15; $BROWSER "http://localhost:8080/camunda-welcome/index.html";) &
 fi
 
-/bin/sh "$(dirname "$0")/server/jboss-as-7.1.3.Final/bin/standalone.sh"
+/bin/sh "$(dirname "$0")/server/jboss-as-${version.jboss.as}/bin/standalone.sh"
