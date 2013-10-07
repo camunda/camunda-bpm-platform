@@ -87,7 +87,7 @@ ngDefine('tasklist.directives', [
           var inject = function(extensions) {
             // if result is an array or function we expect
             // an injectable service
-            if (angular.isArray(extensions) || angular.isArray(extensions)) {
+            if (angular.isFunction(extensions) || angular.isArray(extensions)) {
               $injector.instantiate(extensions, { $scope: scope });
             } else {
               throw new Error('Must call inject(array|fn)');
