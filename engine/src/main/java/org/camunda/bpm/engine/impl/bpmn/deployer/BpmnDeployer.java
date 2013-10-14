@@ -127,7 +127,7 @@ public class BpmnDeployer implements Deployer {
     List<String> keyList = new ArrayList<String>();
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
       if (keyList.contains(processDefinition.getKey())) {
-        throw new ProcessEngineException("The deployment contains process definitions with the same key (process id atrribute), this is not allowed");
+        throw new ProcessEngineException("The deployment contains process definitions with the same key '" + processDefinition.getKey() + "' (process id attribute), this is not allowed");
       }
       keyList.add(processDefinition.getKey());
     }

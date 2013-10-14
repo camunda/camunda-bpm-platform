@@ -66,7 +66,7 @@ public class ExecuteJobsRunnable implements Runnable {
         try {
           executeJob(nextJobId, commandExecutor);        
         } catch(Throwable t) {
-          LOGG.log(Level.WARNING, "Execption while executing job with id "+nextJobId, t);
+          LOGG.log(Level.WARNING, "Exception while executing job with id "+nextJobId, t);
         }
         
       }      

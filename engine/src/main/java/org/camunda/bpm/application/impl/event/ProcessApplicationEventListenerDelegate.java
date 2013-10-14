@@ -75,7 +75,7 @@ public class ProcessApplicationEventListenerDelegate implements ExecutionListene
       try {
         performNotification(execution, notification);
       } catch(Exception e) {
-        throw new ProcessEngineException("Execption while notifying process application task listener.", e);
+        throw new ProcessEngineException("Exception while notifying process application task listener.", e);
       }
     }
   }

@@ -497,7 +497,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       initialContext.setRequestControls(controls.toArray(new Control[0]));
 
     } catch (Exception e) {
-      throw new IdentityProviderException("Execption while setting paging settings", e);
+      throw new IdentityProviderException("Exception while setting paging settings", e);
     }
   }
 
