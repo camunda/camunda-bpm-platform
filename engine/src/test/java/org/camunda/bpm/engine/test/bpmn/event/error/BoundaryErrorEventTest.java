@@ -517,4 +517,13 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     assertThatExceptionHasBeenCaught(procId);
   }
 
+  // SEE: https://app.camunda.com/jira/browse/CAM-1374
+  @Deployment
+  public void FAILING_testCatchSpecializedExceptionThrownByDelegate() {
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("bpmnErrorBean", new BpmnErrorBean());
+    String procId = runtimeService.startProcessInstanceByKey("testCatchSpecializedExceptionThrownByDelegate", variables).getId();
+    assertThatExceptionHasBeenCaught(procId);
+  }
+
 }
