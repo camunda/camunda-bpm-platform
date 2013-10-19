@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +15,6 @@ package org.camunda.bpm.engine.impl.bpmn.helper;
 
 import java.util.List;
 import java.util.logging.Logger;
-
-import javax.script.ScriptException;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
@@ -38,10 +36,10 @@ import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 /**
  * This class is responsible for finding and executing error handlers for BPMN
  * Errors.
- * 
+ *
  * Possible error handlers include Error Intermediate Events and Error Event
  * Sub-Processes.
- * 
+ *
  * @author Falko Menge
  * @author Daniel Meyer
  */
@@ -53,23 +51,17 @@ public class ErrorPropagation {
     if (ex instanceof ProcessEngineException && ex.getCause() == null) {
       throw ex;
     } else {
-      Exception origExeption = ex;
-      String errorCode = ex.getClass().getName();
-      while ((ex instanceof ProcessEngineException || ex instanceof ScriptException) && ex.getCause() != null) {
-          errorCode = ex.getCause().getClass().getName();
-          ex = (Exception) ex.getCause();
-      }
-      propagateError(errorCode, origExeption, execution);
+      propagateError(null, ex, execution);
     }
   }
-  
-  public static void propagateError(BpmnError error, ActivityExecution execution) throws Exception {    
+
+  public static void propagateError(BpmnError error, ActivityExecution execution) throws Exception {
     propagateError(error.getErrorCode(), null, execution);
   }
-  
+
   public static void propagateError(String errorCode, Exception origException, ActivityExecution execution) throws Exception {
     // find local error handler
-    String eventHandlerId = findLocalErrorEventHandler(execution, errorCode);  
+    String eventHandlerId = findLocalErrorEventHandler(execution, errorCode, origException);
 
     // TODO: merge two approaches (super process / regular process approach)
     if(eventHandlerId != null) {
@@ -91,22 +83,26 @@ public class ErrorPropagation {
     }
   }
 
-  private static String findLocalErrorEventHandler(ActivityExecution execution, String errorCode) {
+  private static String findLocalErrorEventHandler(ActivityExecution execution, String errorCode, Exception origException) {
     PvmScope scope = execution.getActivity();
     while (scope != null) {
-      
+
       @SuppressWarnings("unchecked")
       List<ErrorEventDefinition> definitions = (List<ErrorEventDefinition>) scope.getProperty(BpmnParse.PROPERTYNAME_ERROR_EVENT_DEFINITIONS);
-      if(definitions != null) {      
-        // definitions are sorted by precedence, ie. event subprocesses first.      
+      if(definitions != null) {
+        // definitions are sorted by precedence, ie. event subprocesses first.
         for (ErrorEventDefinition errorEventDefinition : definitions) {
-          if(errorEventDefinition.catches(errorCode)) {
-            return scope.findActivity(errorEventDefinition.getHandlerActivityId()).getId();
+          if(origException != null) {
+            if(errorEventDefinition.catchesException(origException)) {
+              return errorEventDefinition.getHandlerActivityId();
+            }
+          } else if(errorEventDefinition.catchesError(errorCode)) {
+            return errorEventDefinition.getHandlerActivityId();
           }
         }
       }
-      
-      // search for error handlers in parent scopes 
+
+      // search for error handlers in parent scopes
       if (scope instanceof PvmActivity) {
         scope = ((PvmActivity) scope).getParent();
       } else {
@@ -117,7 +113,7 @@ public class ErrorPropagation {
   }
 
   private static void executeCatchInSuperProcess(String errorCode, Exception origException, ActivityExecution superExecution) throws Exception {
-    String errorHandlerId = findLocalErrorEventHandler(superExecution, errorCode);
+    String errorHandlerId = findLocalErrorEventHandler(superExecution, errorCode, origException);
     if (errorHandlerId != null) {
       executeCatch(errorHandlerId, superExecution);
     } else { // no matching catch found, going one level up in process hierarchy
@@ -126,7 +122,7 @@ public class ErrorPropagation {
         executeCatchInSuperProcess(errorCode, origException, superSuperExecution);
       } else {
         if (origException == null) {
-          throw new BpmnError(errorCode, "No catching boundary event found for error with errorCode '" 
+          throw new BpmnError(errorCode, "No catching boundary event found for error with errorCode '"
                   + errorCode + "', neither in same process nor in parent process");
         } else {
           // throw original exception
@@ -135,7 +131,7 @@ public class ErrorPropagation {
       }
     }
   }
-  
+
   private static ActivityExecution getSuperExecution(ActivityExecution execution) {
     ExecutionEntity executionEntity = (ExecutionEntity) execution;
     ExecutionEntity superExecution = executionEntity.getProcessInstance().getSuperExecution();
@@ -144,36 +140,36 @@ public class ErrorPropagation {
     }
     return superExecution;
   }
-  
+
   private static void executeCatch(String errorHandlerId, ActivityExecution execution) {
     ProcessDefinitionImpl processDefinition = ((ExecutionEntity) execution).getProcessDefinition();
     ActivityImpl errorHandler = processDefinition.findActivity(errorHandlerId);
     if (errorHandler == null) {
       throw new ProcessEngineException(errorHandlerId + " not found in process definition");
     }
-    
+
     boolean matchingParentFound = false;
     ActivityExecution leavingExecution = execution;
-    ActivityImpl currentActivity = (ActivityImpl) execution.getActivity();    
-    
+    ActivityImpl currentActivity = (ActivityImpl) execution.getActivity();
+
     ScopeImpl catchingScope = errorHandler.getParent();
-    if(catchingScope instanceof ActivityImpl) { 
+    if(catchingScope instanceof ActivityImpl) {
       ActivityImpl catchingScopeActivity = (ActivityImpl) catchingScope;
       if(!catchingScopeActivity.isScope()) { // event subprocesses
         catchingScope = catchingScopeActivity.getParent();
       }
     }
-    
+
     if(catchingScope instanceof PvmProcessDefinition) {
       executeEventHandler(errorHandler, ((ExecutionEntity)execution).getProcessInstance());
-      
-    } else {      
+
+    } else {
       if (currentActivity.getId().equals(catchingScope.getId())) {
         matchingParentFound = true;
       } else {
         currentActivity = (ActivityImpl) currentActivity.getParent();
-      
-        // Traverse parents until one is found that is a scope 
+
+        // Traverse parents until one is found that is a scope
         // and matches the activity the boundary event is defined on
         while(!matchingParentFound && leavingExecution != null && currentActivity != null) {
           if (!leavingExecution.isConcurrent() && currentActivity.getId().equals(catchingScope.getId())) {
@@ -183,28 +179,28 @@ public class ErrorPropagation {
           } else {
             currentActivity = currentActivity.getParentActivity();
             leavingExecution = leavingExecution.getParent();
-          } 
+          }
         }
-        
+
         // Follow parents up until matching scope can't be found anymore (needed to support for multi-instance)
         while (leavingExecution != null
-                && leavingExecution.getParent() != null 
+                && leavingExecution.getParent() != null
                 && leavingExecution.getParent().getActivity() != null
                 && leavingExecution.getParent().getActivity().getId().equals(catchingScope.getId())) {
           leavingExecution = leavingExecution.getParent();
         }
       }
-      
+
       if (matchingParentFound && leavingExecution != null) {
         executeEventHandler(errorHandler, leavingExecution);
       } else {
         throw new ProcessEngineException("No matching parent execution for activity " + errorHandlerId + " found");
       }
     }
-        
+
   }
 
-  private static void executeEventHandler(ActivityImpl borderEventActivity, ActivityExecution leavingExecution) {  
+  private static void executeEventHandler(ActivityImpl borderEventActivity, ActivityExecution leavingExecution) {
     if(borderEventActivity.getActivityBehavior() instanceof EventSubProcessStartEventActivityBehavior) {
       InterpretableExecution execution = (InterpretableExecution) leavingExecution;
       execution.setActivity(borderEventActivity.getParentActivity());
@@ -213,5 +209,5 @@ public class ErrorPropagation {
       leavingExecution.executeActivity(borderEventActivity);
     }
   }
-  
+
 }

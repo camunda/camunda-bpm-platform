@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,15 +16,19 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import javax.script.ScriptException;
+
+import org.camunda.bpm.engine.ProcessEngineException;
+
 /**
  * @author Daniel Meyer
  */
 public class ErrorEventDefinition implements Serializable {
-  
+
   public static Comparator<ErrorEventDefinition> comparator = new Comparator<ErrorEventDefinition>() {
     public int compare(ErrorEventDefinition o1, ErrorEventDefinition o2) {
       return o2.getPrecedence().compareTo(o1.getPrecedence());
-    }    
+    }
   };
 
   private static final long serialVersionUID = 1L;
@@ -58,8 +62,33 @@ public class ErrorEventDefinition implements Serializable {
     this.precedence = precedence;
   }
 
-  public boolean catches(String errorCode) {
+  public boolean catchesError(String errorCode) {
     return errorCode == null || this.errorCode == null || this.errorCode.equals(errorCode) ;
+  }
+
+  public boolean catchesException(Exception ex) {
+
+    if(this.errorCode == null) {
+      return false;
+
+    } else {
+
+      // unbox exception
+      while ((ex instanceof ProcessEngineException || ex instanceof ScriptException) && ex.getCause() != null) {
+        ex = (Exception) ex.getCause();
+      }
+
+      // check exception hierarchy
+      Class<?> exceptionClass = ex.getClass();
+      do {
+        if(this.errorCode.equals(exceptionClass.getName())) {
+          return true;
+        }
+        exceptionClass = exceptionClass.getSuperclass();
+      } while(exceptionClass != null);
+
+      return false;
+    }
   }
 
 }
