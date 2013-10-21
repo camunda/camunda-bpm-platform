@@ -157,6 +157,18 @@
       <if test="finished">
        and RES.END_TIME_ is not null
       </if>
+      <if test="startedBefore != null">
+        and RES.START_TIME_ &lt;= #{startedBefore}
+      </if>
+      <if test="startedAfter != null">
+        and RES.START_TIME_ &gt;= #{startedAfter}
+      </if>
+      <if test="finishedBefore != null">
+        and RES.END_TIME_ &lt;= #{finishedBefore}
+      </if>
+      <if test="finishedAfter != null">
+        and RES.END_TIME_ &gt;= #{finishedAfter}
+      </if>
     </where>
   </sql>
   

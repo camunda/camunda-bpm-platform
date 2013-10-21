@@ -308,4 +308,35 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
     }
   }
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testHistoricActivityInstanceQueryStartFinishAfterBefore() {
+    Calendar startTime = Calendar.getInstance();
+
+    ClockUtil.setCurrentTime(startTime.getTime());
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey123");
+
+    Calendar hourAgo = Calendar.getInstance();
+    hourAgo.add(Calendar.HOUR_OF_DAY, -1);
+    Calendar hourFromNow = Calendar.getInstance();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+       
+    // Start/end dates
+    assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourFromNow.getTime()).count());
+    assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedAfter(hourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedAfter(hourFromNow.getTime()).count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").startedBefore(hourFromNow.getTime()).count());
+    assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").startedBefore(hourAgo.getTime()).count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").startedAfter(hourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").startedAfter(hourFromNow.getTime()).count());
+  
+    // After finishing process
+    taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finished().count());
+    assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourAgo.getTime()).count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourFromNow.getTime()).count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedAfter(hourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedAfter(hourFromNow.getTime()).count());
+  }
+
 }
