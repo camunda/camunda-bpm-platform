@@ -13,10 +13,12 @@
 
 package org.camunda.bpm.engine.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -38,6 +40,10 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   protected String assignee;
   protected boolean finished;
   protected boolean unfinished;
+  protected Date startedBefore;
+  protected Date startedAfter;
+  protected Date finishedBefore;
+  protected Date finishedAfter;
 
   public HistoricActivityInstanceQueryImpl() {
   }
@@ -110,6 +116,28 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     this.unfinished = true;
     return this;
   }
+  
+  public HistoricActivityInstanceQueryImpl startedAfter(Date date) {
+    startedAfter = date;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl startedBefore(Date date) {
+    startedBefore = date;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl finishedAfter(Date date) {
+    finishedAfter = date;
+    finished = true;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl finishedBefore(Date date) {
+    finishedBefore = date;
+    finished = true;
+    return this;
+  }
 
   // ordering /////////////////////////////////////////////////////////////////
 
@@ -162,7 +190,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     orderBy(HistoricActivityInstanceQueryProperty.ACTIVITY_TYPE);
     return this;
   }
-
+  
   public HistoricActivityInstanceQueryImpl activityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
     return this;
@@ -200,5 +228,17 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   }
   public String getActivityInstanceId() {
     return activityInstanceId;
+  }
+  public Date getStartedAfter() {
+    return startedAfter;
+  }
+  public Date getStartedBefore() {
+    return startedBefore;
+  }
+  public Date getFinishedAfter() {
+    return finishedAfter;
+  }
+  public Date getFinishedBefore() {
+    return finishedBefore;
   }
 }
