@@ -1023,6 +1023,23 @@ public class BpmnParse extends Parse {
       }
 
     } else { // "regular" subprocess
+      Element conditionalEventDefinition = startEventElement.element("conditionalEventDefinition");
+      Element timerEventDefinition = startEventElement.element("timerEventDefinition");
+      Element escalationEventDefinition = startEventElement.element("escalationEventDefinition");
+      Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
+
+      if (conditionalEventDefinition != null) {
+        addError("conditionalEventDefinition is not allowed on start event within a subprocess", conditionalEventDefinition);
+      }
+      if (timerEventDefinition != null) {
+        addError("timerEventDefinition is not allowed on start event within a subprocess", timerEventDefinition);
+      }
+      if (escalationEventDefinition != null) {
+        addError("escalationEventDefinition is not allowed on start event within a subprocess", escalationEventDefinition);
+      }
+      if (compensateEventDefinition != null) {
+        addError("compensateEventDefinition is not allowed on start event within a subprocess", compensateEventDefinition);
+      }
       if(errorEventDefinition != null) {
         addError("errorEventDefinition only allowed on start event if subprocess is an event subprocess", errorEventDefinition);
       }
