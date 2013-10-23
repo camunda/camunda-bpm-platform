@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -115,6 +116,28 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     this.unfinished = true;
     return this;
   }
+  
+  public HistoricActivityInstanceQueryImpl startedAfter(Date date) {
+    startedAfter = date;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl startedBefore(Date date) {
+    startedBefore = date;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl finishedAfter(Date date) {
+    finishedAfter = date;
+    finished = true;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl finishedBefore(Date date) {
+    finishedBefore = date;
+    finished = true;
+    return this;
+  }
 
   public HistoricActivityInstanceQueryImpl startedAfter(Date date) {
     startedAfter = date;
@@ -187,7 +210,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     orderBy(HistoricActivityInstanceQueryProperty.ACTIVITY_TYPE);
     return this;
   }
-
+  
   public HistoricActivityInstanceQueryImpl activityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
     return this;
