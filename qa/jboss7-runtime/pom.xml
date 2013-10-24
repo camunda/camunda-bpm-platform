@@ -7,7 +7,7 @@
   <name>camunda BPM - QA jBoss7 Test Runtime</name>
 
   <properties>
-    <jboss.assembly.location>../../distro/jbossas71/assembly/target/assembly-${project.version}/assembly-${project.version}/server</jboss.assembly.location>
+    <jboss.assembly.location>../../distro/jbossas7/assembly/target/assembly-${project.version}/assembly-${project.version}/server</jboss.assembly.location>
   </properties>
 
   <parent>

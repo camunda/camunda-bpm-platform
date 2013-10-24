@@ -73,19 +73,19 @@
       <outputDirectory></outputDirectory>
     </file>
     <file>
-      <source>src/jboss71/standalone.xml</source>
+      <source>src/jboss7/standalone.xml</source>
       <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/configuration</outputDirectory>
     </file>
     <file>
-      <source>src/jboss71/standalone-full.xml</source>
+      <source>src/jboss7/standalone-full.xml</source>
       <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/configuration</outputDirectory>
     </file>
     <file>
-      <source>src/jboss71/standalone.conf</source>
+      <source>src/jboss7/standalone.conf</source>
       <outputDirectory>server/jboss-as-${version.jboss.as}/bin/</outputDirectory>
     </file>
     <file>
-      <source>src/jboss71/standalone.conf.bat</source>
+      <source>src/jboss7/standalone.conf.bat</source>
       <outputDirectory>server/jboss-as-${version.jboss.as}/bin/</outputDirectory>
     </file>
   </files>

@@ -109,7 +109,7 @@
         <module>examples/invoice</module>
         <module>examples/wait-states</module>
     
-        <module>distro/jbossas71</module>
+        <module>distro/jbossas7</module>
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
@@ -683,7 +683,7 @@
         <plugin>                    
           <groupId>org.codehaus.cargo</groupId>
           <artifactId>cargo-maven2-plugin</artifactId>
-          <version>1.3.3</version>
+          <version>1.4.5</version>
         </plugin>
         <plugin>
           <groupId>net.kennychua</groupId>

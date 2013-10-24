@@ -242,7 +242,7 @@
               <!-- Container configuration -->
               <container>
                 <type>installed</type>
-                <containerId>jboss71x</containerId>
+                <containerId>jboss72x</containerId>
                 <append>false</append>
                 <home>${jboss.runtime}</home>
                 <timeout>60000</timeout>

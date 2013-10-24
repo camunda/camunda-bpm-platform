@@ -59,7 +59,7 @@ This will build all the modules that make up the camunda BPM platform but will n
 
     distro/tomcat/distro/target     (Apache Tomcat 7 Distribution)
     distro/gf31/distro/target       (Glassfish 3 Distribution)
-    distro/jbossas71/distro/target  (JBoss AS 7 Distribution)
+    distro/jbossas7/distro/target  (JBoss AS 7 Distribution)
 
 Running Integration Tests
 ----------
