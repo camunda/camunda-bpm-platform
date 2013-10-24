@@ -46,7 +46,7 @@ public class BpmPlatformExtension implements Extension {
   /** The parser used for parsing our subsystem */
   private final BpmPlatformParser parser = new BpmPlatformParser();
   
-  private static final String RESOURCE_NAME = BpmPlatformExtension.class.getPackage().getName() + ".LocalDescriptions";
+  public static final String RESOURCE_NAME = BpmPlatformExtension.class.getPackage().getName() + ".LocalDescriptions";
 
   public void initialize(ExtensionContext context) {
     // Register the subsystem and operation handlers

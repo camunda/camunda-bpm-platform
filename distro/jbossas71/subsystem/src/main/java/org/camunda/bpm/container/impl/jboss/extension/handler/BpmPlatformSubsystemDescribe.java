@@ -20,8 +20,16 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 
-import java.util.Locale;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HEAD_COMMENT_ALLOWED;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TAIL_COMMENT_ALLOWED;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAMESPACE;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension;
+import org.camunda.bpm.container.impl.jboss.extension.Namespace;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.OperationStepHandler;
@@ -29,6 +37,7 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.descriptions.DescriptionProvider;
 import org.jboss.as.controller.descriptions.common.CommonDescriptions;
+import org.jboss.as.controller.descriptions.common.ControllerResolver;
 import org.jboss.as.controller.registry.Resource;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
@@ -45,7 +54,31 @@ public class BpmPlatformSubsystemDescribe implements OperationStepHandler, Descr
   /** {@inheritDoc} */
   @Override
   public ModelNode getModelDescription(Locale locale) {
-    return CommonDescriptions.getSubsystemDescribeOperation(locale);
+    final ResourceBundle bundle = getResourceBundle(locale);
+
+    final ModelNode subsystem = new ModelNode();
+
+    subsystem.get(DESCRIPTION).set(bundle.getString("switchyard"));
+    subsystem.get(HEAD_COMMENT_ALLOWED).set(true);
+    subsystem.get(TAIL_COMMENT_ALLOWED).set(true);
+    subsystem.get(NAMESPACE).set(Namespace.CURRENT.getUriString());
+
+//    subsystem.get(ATTRIBUTES, CommonAttributes.SOCKET_BINDING, DESCRIPTION).set(bundle.getString("switchyard.socket-binding"));
+//    subsystem.get(ATTRIBUTES, CommonAttributes.SOCKET_BINDING, TYPE).set(ModelType.STRING);
+//    subsystem.get(ATTRIBUTES, CommonAttributes.SOCKET_BINDING, REQUIRED).set(false);
+//    subsystem.get(ATTRIBUTES, CommonAttributes.SOCKET_BINDING, NILLABLE).set(false);
+//
+//    subsystem.get(ATTRIBUTES, CommonAttributes.PROPERTIES, DESCRIPTION).set(bundle.getString("switchyard.properties"));
+//    subsystem.get(ATTRIBUTES, CommonAttributes.PROPERTIES, TYPE).set(ModelType.STRING);
+//    subsystem.get(ATTRIBUTES, CommonAttributes.PROPERTIES, REQUIRED).set(false);
+//    subsystem.get(ATTRIBUTES, CommonAttributes.PROPERTIES, NILLABLE).set(false);
+//
+//    subsystem.get(CHILDREN, CommonAttributes.MODULE, DESCRIPTION).set(bundle.getString("switchyard.modules"));
+//    subsystem.get(CHILDREN, CommonAttributes.MODULE, MIN_OCCURS).set(0);
+//    subsystem.get(CHILDREN, CommonAttributes.MODULE, MAX_OCCURS).set(Integer.MAX_VALUE);
+//    subsystem.get(CHILDREN, CommonAttributes.MODULE, MODEL_DESCRIPTION);
+    
+    return subsystem;
   }
 
   /** {@inheritDoc} */
@@ -140,5 +173,12 @@ public class BpmPlatformSubsystemDescribe implements OperationStepHandler, Descr
     
     result.add(jobAcquisitionAdd);
   }
+  
+  private static ResourceBundle getResourceBundle(Locale locale) {
+    if (locale == null) {
+        locale = Locale.getDefault();
+    }
+    return ResourceBundle.getBundle(BpmPlatformExtension.RESOURCE_NAME, locale);
+}
   
 }

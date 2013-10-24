@@ -167,7 +167,7 @@
         <database.type>h2</database.type>
         <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
         <database.user>sa</database.user>
-        <database.password />
+        <database.password>sa</database.password>
         <database.driver>org.h2.Driver</database.driver>
         <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
         <!-- This url has to consistent for the subprojects: {server}-runtime and webapp-integration-tests -->
