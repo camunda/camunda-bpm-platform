@@ -41,4 +41,16 @@
       </map>
     </property>
   </bean>
+  
+  <bean name="gitConnectorDefinition" class="org.camunda.bpm.cycle.entity.ConnectorConfiguration">
+    <property name="name" value="Git Connector"/>
+    <property name="connectorClass" value="org.camunda.bpm.cycle.connector.git.GitConnector"/>
+    <property name="loginMode" value="LOGIN_NOT_REQUIRED" />
+    <property name="properties">
+      <map>
+        <entry key="repositoryPath" value=""></entry>
+        <entry key="branchname" value="cycle"></entry>
+      </map>
+    </property>
+  </bean>
 </beans>
