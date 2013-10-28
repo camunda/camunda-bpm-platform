@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 
 public class ProcessDefinitionStatisticsResultDto extends StatisticsResultDto {
 
-  private ProcessDefinitionDto definition;
+  protected ProcessDefinitionDto definition;
 
   public ProcessDefinitionDto getDefinition() {
     return definition;

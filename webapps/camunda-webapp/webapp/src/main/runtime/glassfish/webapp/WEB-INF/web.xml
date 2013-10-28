@@ -76,7 +76,7 @@
   <!-- cockpit rest api -->
   <servlet>
     <servlet-name>Cockpit Api</servlet-name>
-    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
     <init-param>
       <param-name>javax.ws.rs.Application</param-name>
       <param-value>org.camunda.bpm.cockpit.impl.web.CockpitApplication</param-value>
@@ -90,7 +90,7 @@
   <!-- admin rest api -->
   <servlet>
     <servlet-name>Admin Api</servlet-name>
-    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
     <init-param>
       <param-name>javax.ws.rs.Application</param-name>
       <param-value>org.camunda.bpm.admin.impl.web.AdminApplication</param-value>
@@ -104,7 +104,7 @@
   <!-- engine rest api (embedded) -->
   <servlet>
     <servlet-name>Engine Api</servlet-name>
-    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
     <init-param>
       <param-name>javax.ws.rs.Application</param-name>
       <param-value>org.camunda.bpm.webapp.impl.engine.EngineRestApplication</param-value>
