@@ -392,7 +392,7 @@
                 <home>${glassfish.runtime}/glassfish/domains</home>
                 <properties>
                   <cargo.servlet.port>${http.port}</cargo.servlet.port>
-                  <cargo.glassfish.adminPort>${glassfish.admin.port}</cargo.glassfish.adminPort>
+                  <cargo.glassfish.admin.port>${glassfish.admin.port}</cargo.glassfish.admin.port>
                   <cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
                   <cargo.remote.username>admin</cargo.remote.username>
                   <cargo.remote.password />

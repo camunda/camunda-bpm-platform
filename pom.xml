@@ -27,7 +27,7 @@
     <version.glassfish>3.1.2</version.glassfish>
     <version.tomcat>7.0.33</version.tomcat>
 
-    <version.arquillian>1.0.4.Final</version.arquillian>
+    <version.arquillian>1.0.0.Final</version.arquillian>
     <version.arquillian.drone>1.0.0.Final</version.arquillian.drone>
 
     <version.ejb>3.1</version.ejb>

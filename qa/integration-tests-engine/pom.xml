@@ -17,6 +17,14 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-depchain</artifactId>
+      <version>2.0.0</version>
+      <scope>test</scope>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -285,29 +293,16 @@
           <scope>provided</scope>
           <type>pom</type>
         </dependency>
-        <!-- see we can upgrade this to latest arquillian -->
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-glassfish-managed-3.1</artifactId>
-          <version>1.0.0.CR3</version>
+          <version>1.0.0.CR4</version>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>1.0.0.CR7</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.shrinkwrap.resolver</groupId>
-          <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-          <version>1.0.0-beta-6</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.shrinkwrap</groupId>
-          <artifactId>shrinkwrap-api</artifactId>
-          <version>1.0.0-cr-3</version>
+          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
