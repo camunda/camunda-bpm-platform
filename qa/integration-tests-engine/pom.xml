@@ -127,9 +127,6 @@
             </goals>
             <configuration>
               <forceCreate>true</forceCreate>
-            <!--  <includes>
-                <include>**/com/camunda/fox/platform/test/util/**/*.class</include>
-              </includes> -->
             </configuration>
           </execution>
         </executions>
@@ -373,7 +370,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
-            <version>1.5</version>
             <dependencies>
               <dependency>
                 <groupId>mysql</groupId>
@@ -514,7 +510,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
-            <version>1.5</version>
             <dependencies>
               <dependency>
                 <groupId>mysql</groupId>
@@ -832,7 +827,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
-            <version>1.5</version>
             <dependencies>
               <dependency>
                 <groupId>mysql</groupId>
