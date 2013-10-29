@@ -22,6 +22,11 @@ public class GroupInfoDto {
   private final List<GroupDto> groups;
   private Set<UserDto> groupUsers;
 
+  public GroupInfoDto() {
+    this.groupUsers = null;
+    this.groups = null;
+  }
+
   public GroupInfoDto(List<GroupDto> groups, Set<UserDto> groupUsers) {
     this.groupUsers = groupUsers;
     this.groups = groups;
