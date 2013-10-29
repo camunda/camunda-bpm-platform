@@ -33,7 +33,6 @@
       <artifactId>jboss-javaee-web-6.0</artifactId>
       <type>pom</type>
       <scope>provided</scope>
-      <version>3.0.0.Final</version>
       <exclusions>
         <exclusion>
           <artifactId>xalan</artifactId>

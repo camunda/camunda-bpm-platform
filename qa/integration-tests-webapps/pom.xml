@@ -13,7 +13,9 @@
   <properties>
     <signavio.globaluser>${env.signavio.globaluser}</signavio.globaluser>
     <signavio.globalpassword>${env.signavio.globalpassword}</signavio.globalpassword>
-    <signavio.baseurl>${env.signavio.baseurl}</signavio.baseurl>    
+    <signavio.baseurl>${env.signavio.baseurl}</signavio.baseurl>
+
+    <cargo.timeout>60000</cargo.timeout>
   </properties>
 
   <dependencies>
@@ -22,7 +24,6 @@
       <artifactId>jboss-javaee-6.0</artifactId>
       <type>pom</type>
       <scope>provided</scope>
-      <version>3.0.0.Beta1</version>
       <exclusions>
         <exclusion>
           <artifactId>xalan</artifactId>
@@ -245,7 +246,7 @@
                 <containerId>jboss72x</containerId>
                 <append>false</append>
                 <home>${jboss.runtime}</home>
-                <timeout>60000</timeout>
+                <timeout>${cargo.timeout}</timeout>
               </container>
               <configuration>
                 <type>standalone</type>
@@ -386,6 +387,7 @@
                 <containerId>glassfish3x</containerId>
                 <append>false</append>
                 <home>${glassfish.runtime}</home>
+                <timeout>${cargo.timeout}</timeout>
               </container>
               <configuration>
                 <type>existing</type>
@@ -502,6 +504,7 @@
                 <containerId>tomcat7x</containerId>
                 <append>false</append>
                 <home>${tomcat.runtime}</home>
+                <timeout>${cargo.timeout}</timeout>
               </container>
               <configuration>
                 <type>standalone</type>
