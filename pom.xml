@@ -27,8 +27,11 @@
     <version.glassfish>3.1.2</version.glassfish>
     <version.tomcat>7.0.33</version.tomcat>
 
-    <version.arquillian>1.0.4.Final</version.arquillian>
+    <version.arquillian>1.0.0.Final</version.arquillian>
     <version.arquillian.drone>1.0.0.Final</version.arquillian.drone>
+    <version.shrinkwrap.resolvers>2.0.0</version.shrinkwrap.resolvers>
+
+    <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
 
     <version.ejb>3.1</version.ejb>
     <version.java>1.6</version.java>
@@ -77,6 +80,7 @@
       <activiti.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</activiti.osgi.remove.headers>
       <activiti.osgi.include.resource>{maven-resources}</activiti.osgi.include.resource>
       <activiti.osgi.embed />
+    <version.resteasy>2.3.5.Final</version.resteasy>
   </properties>
     
   <profiles>
@@ -492,18 +496,19 @@
         <artifactId>camunda-identity-ldap</artifactId>
         <version>${project.version}</version>
       </dependency>
-           
+
+      <dependency>
+        <groupId>org.jboss.spec</groupId>
+        <artifactId>jboss-javaee-6.0</artifactId>
+        <version>${version.jboss-javaee-spec}</version>
+        <type>pom</type>
+      </dependency>
+
       <dependency>
         <groupId>org.jboss.spec</groupId>
         <artifactId>jboss-javaee-web-6.0</artifactId>
-        <version>2.0.0.Final</version>
+        <version>${version.jboss-javaee-spec}</version>
         <type>pom</type>
-        <exclusions>
-          <exclusion>
-            <artifactId>xalan</artifactId>
-            <groupId>org.apache.xalan</groupId>
-          </exclusion>
-        </exclusions>
       </dependency>
       
       <dependency>
@@ -538,7 +543,7 @@
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-jaxrs</artifactId>
-        <version>2.3.5.Final</version>
+        <version>${version.resteasy}</version>
         <exclusions>
           <exclusion>
             <artifactId>httpclient</artifactId>
@@ -550,7 +555,7 @@
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>tjws</artifactId>
-        <version>2.3.5.Final</version>
+        <version>${version.resteasy}</version>
       </dependency>
       
       <dependency>

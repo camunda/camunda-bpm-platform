@@ -17,6 +17,14 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-depchain</artifactId>
+      <version>${version.shrinkwrap.resolvers}</version>
+      <scope>test</scope>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -27,7 +35,6 @@
       <artifactId>jboss-javaee-6.0</artifactId>
       <type>pom</type>
       <scope>provided</scope>
-      <version>3.0.0.Beta1</version>
       <exclusions>
         <exclusion>
           <artifactId>xalan</artifactId>
@@ -219,8 +226,6 @@
             <configuration>
               <excludes>
                 <!-- HEMERA-2453 -->
-                <exclude>**/JobExecutorRequestContextRemoteInvocationTest.java</exclude>
-                <!-- HEMERA-2453 -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
                 <exclude>**_OTHERS.java</exclude>
                 <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
@@ -285,29 +290,16 @@
           <scope>provided</scope>
           <type>pom</type>
         </dependency>
-        <!-- see we can upgrade this to latest arquillian -->
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-glassfish-managed-3.1</artifactId>
-          <version>1.0.0.CR3</version>
+          <version>1.0.0.CR4</version>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>1.0.0.CR7</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.shrinkwrap.resolver</groupId>
-          <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-          <version>1.0.0-beta-6</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.shrinkwrap</groupId>
-          <artifactId>shrinkwrap-api</artifactId>
-          <version>1.0.0-cr-3</version>
+          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -595,6 +587,14 @@
       <dependencyManagement>
         <dependencies>
           <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-bom</artifactId>
+            <version>${version.shrinkwrap.resolvers}</version>
+            <scope>import</scope>
+            <type>pom</type>
+          </dependency>
+
+          <dependency>
             <groupId>org.jboss.bom</groupId>
             <artifactId>jboss-javaee-6.0-with-tools</artifactId>
             <version>1.0.4.Final</version>
@@ -622,19 +622,13 @@
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-tomcat-managed-7</artifactId>
-          <version>1.0.0.CR4</version>
+          <version>1.0.0.CR5</version>
           <scope>test</scope>
         </dependency>
 
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <scope>test</scope>
-        </dependency>
-
-        <dependency>
-          <groupId>org.jboss.shrinkwrap.resolver</groupId>
-          <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
           <scope>test</scope>
         </dependency>
 

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-qa-jboss-runtime</artifactId>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
   <name>camunda BPM - QA jBoss7 Test Runtime</name>
 
@@ -104,10 +104,8 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <target unless="maven.test.skip">   
-                    <!-- processing of src/main/standalone replaced by resource filtering 
-                      (see below) -->
-                    <copy todir="target/server/jboss-as-${version.jboss.as}/modules" overwrite="true">
+                  <target unless="maven.test.skip">
+                    <copy todir="${jboss.runtime.location}/modules" overwrite="true">
                       <fileset dir="src/main/modules" />
                     </copy>
 
@@ -124,13 +122,9 @@
                   <target unless="maven.test.skip">
                     <dependencyfilesets scopes="test" />
 
-                    <copy todir="target/server/jboss-as-${version.jboss.as}/modules" flatten="false">
+                    <copy todir="${jboss.runtime.location}/modules" flatten="false">
                       <fileset refid="maven.project.dependencies" />
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                    </copy>
-
-                    <copy todir="target/server/jboss-as-${version.jboss.as}/modules" flatten="false">
-                      <fileset dir="src/main/modules" />
                     </copy>
 
                   </target>
@@ -157,7 +151,53 @@
                 </goals>
                 <configuration>
                   <override>true</override>
-                  <outputDirectory>target/server/jboss-as-${version.jboss.as}/standalone</outputDirectory>
+                  <outputDirectory>${jboss.runtime.location}/standalone</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- create sources to be used by camunda-bpm-platform-ee -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-resources</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>add-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>src/main</directory>
+                      <includes>
+                        <include>**/*.xml</include>
+                      </includes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+                <configuration>
+                  <forceCreation>true</forceCreation>
+                  <!-- exclude otherwise there would be duplicates in -sources.jar -->
+                  <excludes>
+                    <exclude>deployments/**/*</exclude>
+                    <exclude>configuration/**/*</exclude>
+                    <exclude>**/configuration/**/*</exclude>
+                  </excludes>
                 </configuration>
               </execution>
             </executions>
@@ -165,6 +205,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>install-test-runtime</id>
       <build>

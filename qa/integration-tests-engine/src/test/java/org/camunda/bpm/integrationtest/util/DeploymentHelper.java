@@ -15,11 +15,10 @@
  */
 package org.camunda.bpm.integrationtest.util;
 
-import java.util.Collection;
-
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
+import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenDependencies;
 
 
 public class DeploymentHelper {
@@ -30,24 +29,25 @@ public class DeploymentHelper {
   
   private static JavaArchive CACHED_CLIENT_ASSET;
   private static JavaArchive CACHED_ENGINE_CDI_ASSET;
-  private static Collection<JavaArchive> CACHED_WELD_ASSETS;
-  private static Collection<JavaArchive> CACHED_SPRING_ASSETS;
+  private static JavaArchive[] CACHED_WELD_ASSETS;
+  private static JavaArchive[] CACHED_SPRING_ASSETS;
 
   public static JavaArchive getEjbClient() {
     if(CACHED_CLIENT_ASSET != null) {
       return CACHED_CLIENT_ASSET;
     } else {
       
-      Collection<JavaArchive> resolvedArchives = DependencyResolvers
-          .use(MavenDependencyResolver.class)
-          .goOffline()
-          .loadMetadataFromPom("pom.xml")
-          .artifact(CAMUNDA_EJB_CLIENT).resolveAs(JavaArchive.class);
+      JavaArchive[] resolvedArchives = Maven.resolver()
+          .offline()
+          .loadPomFromFile("pom.xml")
+          .resolve(CAMUNDA_EJB_CLIENT)
+          .withTransitivity()
+          .as(JavaArchive.class);
       
-      if(resolvedArchives.size() != 1) {
+      if(resolvedArchives.length != 1) {
         throw new RuntimeException("could not resolve "+CAMUNDA_EJB_CLIENT);
       } else {    
-        CACHED_CLIENT_ASSET = resolvedArchives.iterator().next();
+        CACHED_CLIENT_ASSET = resolvedArchives[0];
         return CACHED_CLIENT_ASSET;
       }
     }
@@ -58,35 +58,36 @@ public class DeploymentHelper {
     if(CACHED_ENGINE_CDI_ASSET != null) {
       return CACHED_ENGINE_CDI_ASSET;
     } else {
+
+      JavaArchive[] resolvedArchives = Maven.resolver()
+          .offline()
+          .loadPomFromFile("pom.xml")
+          .resolve(CAMUNDA_ENGINE_CDI)
+          .withTransitivity()
+          .as(JavaArchive.class);
       
-      Collection<JavaArchive> resolvedArchives = DependencyResolvers
-          .use(MavenDependencyResolver.class)
-          .goOffline()
-          .loadMetadataFromPom("pom.xml")
-          .artifact(CAMUNDA_ENGINE_CDI).resolveAs(JavaArchive.class);
-      
-      if(resolvedArchives.size() != 1) {
+      if(resolvedArchives.length != 1) {
         throw new RuntimeException("could not resolve "+CAMUNDA_ENGINE_CDI);
       } else {    
-        CACHED_ENGINE_CDI_ASSET = resolvedArchives.iterator().next();
+        CACHED_ENGINE_CDI_ASSET = resolvedArchives[0];
         return CACHED_ENGINE_CDI_ASSET;
       }
     }    
   }
   
-  public static Collection<JavaArchive> getWeld() {
+  public static JavaArchive[] getWeld() {
     if(CACHED_WELD_ASSETS != null) {
       return CACHED_WELD_ASSETS;
-    } else { 
+    } else {
+
+      JavaArchive[] resolvedArchives = Maven.resolver()
+          .offline()
+          .loadPomFromFile("pom.xml")
+          .resolve(CAMUNDA_ENGINE_CDI, "org.jboss.weld.servlet:weld-servlet")
+          .withTransitivity()
+          .as(JavaArchive.class);
       
-      Collection<JavaArchive> resolvedArchives = DependencyResolvers
-          .use(MavenDependencyResolver.class)
-          .goOffline()
-          .loadMetadataFromPom("pom.xml")
-          .artifact(CAMUNDA_ENGINE_CDI)
-          .artifact("org.jboss.weld.servlet:weld-servlet").resolveAs(JavaArchive.class);
-      
-      if(resolvedArchives.size()==0) {
+      if(resolvedArchives.length == 0) {
         throw new RuntimeException("could not resolve org.jboss.weld.servlet:weld-servlet");
       } else {    
         CACHED_WELD_ASSETS = resolvedArchives;
@@ -96,20 +97,23 @@ public class DeploymentHelper {
     
   }
   
-  public static Collection<JavaArchive> getEngineSpring() {
+  public static JavaArchive[] getEngineSpring() {
     if(CACHED_SPRING_ASSETS != null) {
       return CACHED_SPRING_ASSETS;
-    } else { 
+    } else {
+
+      JavaArchive[] resolvedArchives = Maven.resolver()
+          .offline()
+          .loadPomFromFile("pom.xml")
+          .addDependencies(
+              MavenDependencies.createDependency("org.camunda.bpm:camunda-engine-spring", ScopeType.COMPILE, false,
+                  MavenDependencies.createExclusion("org.camunda.bpm:camunda-engine")),
+                  MavenDependencies.createDependency("org.springframework:spring-web", ScopeType.COMPILE, false))
+          .resolve()
+          .withTransitivity()
+          .as(JavaArchive.class);
       
-      Collection<JavaArchive> resolvedArchives = DependencyResolvers
-          .use(MavenDependencyResolver.class)
-          .goOffline()
-          .loadMetadataFromPom("pom.xml")
-          .artifacts("org.camunda.bpm:camunda-engine-spring", "org.springframework:spring-web")
-          .exclusion("org.camunda.bpm:camunda-engine")          
-          .resolveAs(JavaArchive.class);
-      
-      if(resolvedArchives.size()==0) {
+      if(resolvedArchives.length == 0) {
         throw new RuntimeException("could not resolve org.camunda.bpm:camunda-engine-spring");
       } else {    
         CACHED_SPRING_ASSETS = resolvedArchives;
