@@ -53,7 +53,7 @@ public class FormFieldImpl implements FormField {
     this.name = name;
   }
 
-  public Object getType() {
+  public FormType getType() {
     return type;
   }
 

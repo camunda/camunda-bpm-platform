@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.impl.form.engine;
 
 import java.io.StringWriter;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -34,7 +34,7 @@ public class HtmlElementWriter {
    * inline */
   protected boolean isSelfClosing;
   protected String textContent;
-  protected Map<String, String> attributes = new HashMap<String, String>();
+  protected Map<String, String> attributes = new LinkedHashMap<String, String>();
 
   public HtmlElementWriter(String tagName) {
     this.tagName = tagName;

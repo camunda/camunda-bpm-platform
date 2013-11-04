@@ -38,7 +38,7 @@ public interface FormField {
   /**
    * @return the type of this form field.
    */
-  public Object getType();
+  public FormType getType();
 
   /**
    * @return the name of the type of this form field

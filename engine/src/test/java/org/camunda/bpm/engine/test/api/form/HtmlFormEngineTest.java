@@ -148,6 +148,54 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment
+  public void testLegacyFormPropertySupport() {
+
+    runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupport");
+
+    Task t = taskService.createTaskQuery()
+      .singleResult();
+
+    String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
+
+    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupport.html");
+
+    assertHtmlEquals(expectedForm, renderedForm);
+
+  }
+
+  @Deployment
+  public void testLegacyFormPropertySupportReadOnly() {
+
+    runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupportReadOnly");
+
+    Task t = taskService.createTaskQuery()
+      .singleResult();
+
+    String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
+
+    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupportReadOnly.html");
+
+    assertHtmlEquals(expectedForm, renderedForm);
+
+  }
+
+  @Deployment
+  public void testLegacyFormPropertySupportRequired() {
+
+    runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupportRequired");
+
+    Task t = taskService.createTaskQuery()
+      .singleResult();
+
+    String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
+
+    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupportRequired.html");
+
+    assertHtmlEquals(expectedForm, renderedForm);
+
+  }
+
   public void assertHtmlEquals(String expected, String actual) {
     assertEquals(filterWhitespace(expected), filterWhitespace(actual));
   }

@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.form.engine;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
+import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 
@@ -43,7 +44,9 @@ public class HtmlFormEngine implements FormEngine {
 
   protected String renderFormData(FormData formData) {
 
-    if(formData == null || formData.getFormFields() == null || formData.getFormFields().isEmpty()) {
+    if(formData == null
+        || (formData.getFormFields() == null || formData.getFormFields().isEmpty())
+        && (formData.getFormProperties() == null || formData.getFormProperties().isEmpty())) {
       return null;
 
     } else {
@@ -52,6 +55,11 @@ public class HtmlFormEngine implements FormEngine {
       // render fields
       for (FormField formField : formData.getFormFields()) {
         renderFormField(formField, documentBuilder);
+      }
+
+      // render deprecated form properties
+      for (FormProperty formProperty : formData.getFormProperties()) {
+        renderFormField(new FormPropertyAdapter(formProperty), documentBuilder);
       }
 
       // end document element
