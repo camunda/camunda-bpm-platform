@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,8 +53,8 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 /**
  * {@link Deployer} responsible to parse BPMN 2.0 XML files and create the proper
  * {@link ProcessDefinitionEntity}s. Overwrite this class if you want to gain some control over
- * this mechanism, e.g. setting different version numbers, or you want to use your own {@link BpmnParser}. 
- * 
+ * this mechanism, e.g. setting different version numbers, or you want to use your own {@link BpmnParser}.
+ *
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Bernd Ruecker
@@ -72,7 +72,7 @@ public class BpmnDeployer implements Deployer {
 
   public void deploy(DeploymentEntity deployment) {
     LOG.fine("Processing deployment " + deployment.getName());
-    
+
     List<ProcessDefinitionEntity> processDefinitions = new ArrayList<ProcessDefinitionEntity>();
     Map<String, ResourceEntity> resources = deployment.getResources();
 
@@ -83,25 +83,25 @@ public class BpmnDeployer implements Deployer {
         ResourceEntity resource = resources.get(resourceName);
         byte[] bytes = resource.getBytes();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-        
+
         BpmnParse bpmnParse = bpmnParser
           .createParse()
           .sourceInputStream(inputStream)
           .deployment(deployment)
           .name(resourceName);
-        
+
         if (!deployment.isValidatingSchema()) {
           bpmnParse.setSchemaResource(null);
         }
-        
+
         bpmnParse.execute();
-        
+
         for (ProcessDefinitionEntity processDefinition: bpmnParse.getProcessDefinitions()) {
           processDefinition.setResourceName(resourceName);
-          
+
           String diagramResourceName = getDiagramResourceForProcess(resourceName, processDefinition.getKey(), resources);
-                   
-          // Only generate the resource when deployment is new to prevent modification of deployment resources 
+
+          // Only generate the resource when deployment is new to prevent modification of deployment resources
           // after the process-definition is actually deployed. Also to prevent resource-generation failure every
           // time the process definition is added to the deployment-cache when diagram-generation has failed the first time.
           if(deployment.isNew()) {
@@ -114,15 +114,15 @@ public class BpmnDeployer implements Deployer {
               } catch (Throwable t) { // if anything goes wrong, we don't store the image (the process will still be executable).
                 LOG.log(Level.WARNING, "Error while generating process diagram, image will not be stored in repository", t);
               }
-            } 
+            }
           }
-          
+
           processDefinition.setDiagramResourceName(diagramResourceName);
           processDefinitions.add(processDefinition);
         }
       }
     }
-    
+
     // check if there are process definitions with the same process key to prevent database unique index violation
     List<String> keyList = new ArrayList<String>();
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
@@ -131,7 +131,7 @@ public class BpmnDeployer implements Deployer {
       }
       keyList.add(processDefinition.getKey());
     }
-    
+
     CommandContext commandContext = Context.getCommandContext();
     ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
@@ -139,7 +139,7 @@ public class BpmnDeployer implements Deployer {
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
       if (deployment.isNew()) {
         ProcessDefinitionEntity latestProcessDefinition = processDefinitionManager.findLatestProcessDefinitionByKey(processDefinition.getKey());
-        
+
         processDefinition.setDeploymentId(deployment.getId());
         processDefinition.setVersion(getVersionForNewProcessDefinition(deployment, processDefinition, latestProcessDefinition));
         processDefinition.setId(getProcessDefinitionId(deployment, processDefinition));
@@ -149,19 +149,19 @@ public class BpmnDeployer implements Deployer {
         dbSqlSession.insert(processDefinition);
         deploymentCache.addProcessDefinition(processDefinition);
         addAuthorizations(processDefinition);
-        
+
       } else {
-    	  
+
         String deploymentId = deployment.getId();
         processDefinition.setDeploymentId(deploymentId);
         ProcessDefinitionEntity persistedProcessDefinition = processDefinitionManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinition.getKey());
         processDefinition.setId(persistedProcessDefinition.getId());
         processDefinition.setVersion(persistedProcessDefinition.getVersion());
         processDefinition.setSuspensionState(persistedProcessDefinition.getSuspensionState());
-        
+
         deploymentCache.addProcessDefinition(processDefinition);
         addAuthorizations(processDefinition);
-        
+
       }
 
       // Add to cache
@@ -169,7 +169,7 @@ public class BpmnDeployer implements Deployer {
         .getProcessEngineConfiguration()
         .getDeploymentCache()
         .addProcessDefinition(processDefinition);
-      
+
       // Add to deployment for further usage
       deployment.addDeployedArtifact(processDefinition);
     }
@@ -183,7 +183,7 @@ public class BpmnDeployer implements Deployer {
   protected void adjustStartEventSubscriptions(ProcessDefinitionEntity newLatestProcessDefinition, ProcessDefinitionEntity oldLatestProcessDefinition) {
 	removeObsoleteTimers(newLatestProcessDefinition);
 	addTimerDeclarations(newLatestProcessDefinition);
-	
+
 	removeObsoleteMessageEventSubscriptions(newLatestProcessDefinition, oldLatestProcessDefinition);
 	addMessageEventSubscriptions(newLatestProcessDefinition);
   }
@@ -192,23 +192,23 @@ public class BpmnDeployer implements Deployer {
    * create an id for the process definition. The default is to ask the {@link IdGenerator}
    * and add the process definition key and version if that does not exceed 64 characters.
    * You might want to hook in your own implemenation here.
- * @param deployment 
+ * @param deployment
    */
   protected String getProcessDefinitionId(DeploymentEntity deployment, ProcessDefinitionEntity processDefinition) {
 	String nextId = idGenerator.getNextId();
-	String processDefinitionId = processDefinition.getKey() 
+	String processDefinitionId = processDefinition.getKey()
 	  + ":" + processDefinition.getVersion()
 	  + ":" + nextId; // ACT-505
-	           
+
 	// ACT-115: maximum id length is 64 charcaters
-	if (processDefinitionId.length() > 64) {          
-	  processDefinitionId = nextId; 
+	if (processDefinitionId.length() > 64) {
+	  processDefinitionId = nextId;
 	}
 	return processDefinitionId;
   }
 
   /**
-   * per default we increment the latest process definition by one - but you 
+   * per default we increment the latest process definition by one - but you
    * might want to hook in some own logic here, e.g. to align process definition
    * versions with deployment / build versions.
    */
@@ -226,6 +226,7 @@ public class BpmnDeployer implements Deployer {
     if (timerDeclarations!=null) {
       for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
         TimerEntity timer = timerDeclaration.prepareTimerEntity(null);
+        timer.setDeploymentId(processDefinition.getDeploymentId());
         Context
           .getCommandContext()
           .getJobManager()
@@ -239,33 +240,33 @@ public class BpmnDeployer implements Deployer {
       .getCommandContext()
       .getJobManager()
       .findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
-    
+
     for (Job job :jobsToDelete) {
         new DeleteJobsCmd(job.getId()).execute(Context.getCommandContext());
     }
   }
-  
+
   protected void removeObsoleteMessageEventSubscriptions(ProcessDefinitionEntity processDefinition, ProcessDefinitionEntity latestProcessDefinition) {
-    // remove all subscriptions for the previous version    
+    // remove all subscriptions for the previous version
     if(latestProcessDefinition != null) {
       CommandContext commandContext = Context.getCommandContext();
-      
+
       List<EventSubscriptionEntity> subscriptionsToDelete = commandContext
         .getEventSubscriptionManager()
         .findEventSubscriptionsByConfiguration(MessageEventHandler.EVENT_HANDLER_TYPE, latestProcessDefinition.getId());
-      
+
       for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsToDelete) {
-        eventSubscriptionEntity.delete();        
-      } 
-      
+        eventSubscriptionEntity.delete();
+      }
+
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   protected void addMessageEventSubscriptions(ProcessDefinitionEntity processDefinition) {
     CommandContext commandContext = Context.getCommandContext();
     List<EventSubscriptionDeclaration> messageEventDefinitions = (List<EventSubscriptionDeclaration>) processDefinition.getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
-    if(messageEventDefinitions != null) {     
+    if(messageEventDefinitions != null) {
       for (EventSubscriptionDeclaration messageEventDefinition : messageEventDefinitions) {
         if(messageEventDefinition.isStartEvent()) {
           // look for subscriptions for the same name in db:
@@ -281,32 +282,32 @@ public class BpmnDeployer implements Deployer {
                     && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
               subscriptionsForSameMessageName.add(cachedSubscription);
             }
-          }      
+          }
           // remove subscriptions deleted in the same command
           subscriptionsForSameMessageName = commandContext
                   .getDbSqlSession()
                   .pruneDeletedEntities(subscriptionsForSameMessageName);
-                
+
           if(!subscriptionsForSameMessageName.isEmpty()) {
             throw new ProcessEngineException("Cannot deploy process definition '" + processDefinition.getResourceName()
                     + "': there already is a message event subscription for the message with name '" + messageEventDefinition.getEventName() + "'.");
           }
-          
+
           MessageEventSubscriptionEntity newSubscription = new MessageEventSubscriptionEntity();
           newSubscription.setEventName(messageEventDefinition.getEventName());
           newSubscription.setActivityId(messageEventDefinition.getActivityId());
           newSubscription.setConfiguration(processDefinition.getId());
-          
+
           newSubscription.insert();
         }
       }
-    }      
+    }
   }
-  
+
   enum ExprType {
 	  USER, GROUP
   }
-  
+
   private void addAuthorizationsFromIterator(Set<Expression> exprSet, ProcessDefinitionEntity processDefinition, ExprType exprType) {
     CommandContext commandContext = Context.getCommandContext();
     if (exprSet != null) {
@@ -333,23 +334,23 @@ public class BpmnDeployer implements Deployer {
 
   /**
    * Returns the default name of the image resource for a certain process.
-   * 
+   *
    * It will first look for an image resource which matches the process
    * specifically, before resorting to an image resource which matches the BPMN
    * 2.0 xml file resource.
-   * 
+   *
    * Example: if the deployment contains a BPMN 2.0 xml resource called
    * 'abc.bpmn20.xml' containing only one process with key 'myProcess', then
    * this method will look for an image resources called 'abc.myProcess.png'
    * (or .jpg, or .gif, etc.) or 'abc.png' if the previous one wasn't found.
-   * 
-   * Example 2: if the deployment contains a BPMN 2.0 xml resource called 
+   *
+   * Example 2: if the deployment contains a BPMN 2.0 xml resource called
    * 'abc.bpmn20.xml' containing three processes (with keys a, b and c),
-   * then this method will first look for an image resource called 'abc.a.png' 
+   * then this method will first look for an image resource called 'abc.a.png'
    * before looking for 'abc.png' (likewise for b and c).
    * Note that if abc.a.png, abc.b.png and abc.c.png don't exist, all
    * processes will have the same image: abc.png.
-   * 
+   *
    * @return null if no matching image resource is found.
    */
   protected String getDiagramResourceForProcess(String bpmnFileResource, String processKey, Map<String, ResourceEntity> resources) {
@@ -364,7 +365,7 @@ public class BpmnDeployer implements Deployer {
     }
     return null;
   }
-  
+
   protected String getBpmnFileImageResourceName(String bpmnFileResource, String diagramSuffix) {
     String bpmnFileResourceBase = stripBpmnFileSuffix(bpmnFileResource);
     return bpmnFileResourceBase + diagramSuffix;
@@ -389,16 +390,16 @@ public class BpmnDeployer implements Deployer {
     resource.setName(name);
     resource.setBytes(bytes);
     resource.setDeploymentId(deploymentEntity.getId());
-    
+
     // Mark the resource as 'generated'
     resource.setGenerated(true);
-    
+
     Context
       .getCommandContext()
       .getDbSqlSession()
       .insert(resource);
   }
-  
+
   protected boolean isBpmnResource(String resourceName) {
     for (String suffix : BPMN_RESOURCE_SUFFIXES) {
       if (resourceName.endsWith(suffix)) {
@@ -407,29 +408,29 @@ public class BpmnDeployer implements Deployer {
     }
     return false;
   }
-  
+
   public ExpressionManager getExpressionManager() {
     return expressionManager;
   }
-  
+
   public void setExpressionManager(ExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
   }
-  
+
   public BpmnParser getBpmnParser() {
     return bpmnParser;
   }
-  
+
   public void setBpmnParser(BpmnParser bpmnParser) {
     this.bpmnParser = bpmnParser;
   }
-  
+
   public IdGenerator getIdGenerator() {
     return idGenerator;
   }
-  
+
   public void setIdGenerator(IdGenerator idGenerator) {
     this.idGenerator = idGenerator;
   }
-  
+
 }

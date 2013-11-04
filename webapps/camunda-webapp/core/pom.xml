@@ -33,7 +33,6 @@
       <artifactId>jboss-javaee-6.0</artifactId>
       <type>pom</type>
       <scope>provided</scope>
-      <version>3.0.2.Final</version>
     </dependency>
 
     <dependency>
@@ -127,7 +126,7 @@
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-tomcat-embedded-7</artifactId>
-          <version>1.0.0.CR4</version>
+          <version>1.0.0.CR5</version>
           <scope>test</scope>
         </dependency>
 
