@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.impl.form.TaskFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 
 /**
  * Container for task definition information gathered at parsing time.

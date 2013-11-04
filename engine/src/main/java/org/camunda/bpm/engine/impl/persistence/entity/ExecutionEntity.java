@@ -383,7 +383,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     performOperation(AtomicOperation.PROCESS_START);
   }
 
-   public void startWithFormProperties(Map<String, String> properties) {
+   public void startWithFormProperties(Map<String, Object> properties) {
      if(isProcessInstance()) {
        ActivityImpl initial = processDefinition.getInitial();
        if(processInstanceStartContext != null) {

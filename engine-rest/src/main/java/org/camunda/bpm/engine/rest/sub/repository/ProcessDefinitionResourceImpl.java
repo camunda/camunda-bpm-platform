@@ -116,6 +116,45 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     return result;
   }
 
+  @Override
+  public ProcessInstanceDto submitForm(UriInfo context, StartProcessInstanceDto parameters) {
+    FormService formService = engine.getFormService();
+
+    ProcessInstance instance = null;
+    try {
+      Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
+      instance = formService.submitStartForm(processDefinitionId, variables);
+
+    } catch (ProcessEngineException e) {
+      String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
+
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot instantiate process definition %s due to number format exception: %s", processDefinitionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot instantiate process definition %s due to parse exception: %s", processDefinitionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);
+    }
+
+    ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
+
+    URI uri = context.getBaseUriBuilder()
+      .path(rootResourcePath)
+      .path(ProcessInstanceRestService.class)
+      .path(instance.getId())
+      .build();
+
+    result.addReflexiveLink(uri, HttpMethod.GET, "self");
+
+    return result;
+  }
+
 
   @Override
   public List<StatisticsResultDto> getActivityStatistics(Boolean includeFailedJobs, Boolean includeIncidents, String includeIncidentsForType) {
@@ -174,8 +213,24 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot get start form data for process definition " + processDefinitionId);
     }
     FormDto dto = FormDto.fromFormData(formData);
+    if(dto.getKey() == null || dto.getKey().isEmpty()) {
+      if(formData.getFormFieldGroups() != null && !formData.getFormFieldGroups().isEmpty()) {
+        dto.setKey("embedded:engine://engine/:engine/process-definition/"+processDefinitionId+"/rendered-form");
+      }
+    }
     dto.setContextPath(ApplicationContextPathUtil.getApplicationPath(engine, processDefinitionId));
 
     return dto;
+  }
+
+  public String getRenderedForm() {
+    FormService formService = engine.getFormService();
+
+    Object startForm = formService.getRenderedStartForm(processDefinitionId);
+    if(startForm != null) {
+      return startForm.toString();
+    } else {
+      return null;
+    }
   }
 }

@@ -3,9 +3,10 @@ ngDefine('tasklist.services', [
 ], function(module, angular) {
 
   var EMBEDDED_KEY = "embedded:",
-      APP_KEY = "app:";
+      APP_KEY = "app:",
+      ENGINE_KEY = "engine:";
 
-  var FormsProducer = function() {
+  var FormsProducer = function(Uri) {
 
     var Forms = {
       /**
@@ -40,7 +41,7 @@ ngDefine('tasklist.services', [
       },
 
       /**
-       * Parses the form date into the given form
+       * Parses the form data into the given form
        *
        * @param data {object}
        * @param form {object} optional
@@ -70,6 +71,11 @@ ngDefine('tasklist.services', [
           }
         }
 
+        if(key.indexOf(ENGINE_KEY) == 0) {
+          // resolve relative prefix
+          key = Uri.appUri(key);
+        }
+
         form.key = key;
 
         return form;
@@ -78,6 +84,9 @@ ngDefine('tasklist.services', [
 
     return Forms;
   };
+
+
+  FormsProducer.$inject = ["Uri"];
 
   module.factory("Forms", FormsProducer);
 });

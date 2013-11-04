@@ -40,6 +40,16 @@ public interface TaskResource {
   FormDto getForm();
 
   @POST
+  @Path("/submit-form")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void submit(CompleteTaskDto dto);
+
+  @GET
+  @Path("/rendered-form")
+  @Produces(MediaType.APPLICATION_XHTML_XML)
+  String getRenderedForm();
+
+  @POST
   @Path("/claim")
   @Consumes(MediaType.APPLICATION_JSON)
   void claim(UserIdDto dto);

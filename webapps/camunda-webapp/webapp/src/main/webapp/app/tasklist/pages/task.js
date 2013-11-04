@@ -27,6 +27,7 @@ ngDefine('tasklist.pages', [
     task.$then(function() {
       form.data = EngineApi.getTaskList().getForm({ id: taskId }).$then(function(response) {
         var data = response.resource;
+        data.taskId = taskId;
 
         Forms.parseFormData(data, form);
 
@@ -81,11 +82,8 @@ ngDefine('tasklist.pages', [
       var variablesMap = Forms.variablesToMap(variables);
 
       var taskList = EngineApi.getTaskList();
-      
-      var action = "complete";
-      if (task.delegationState === 'PENDING') {
-        action = "resolve";
-      }
+
+      var action = "submitTaskForm";
 
       taskList[action]({ id: taskId }, { variables : variablesMap }).$then(function() {
         $rootScope.$broadcast("tasklist.reload");

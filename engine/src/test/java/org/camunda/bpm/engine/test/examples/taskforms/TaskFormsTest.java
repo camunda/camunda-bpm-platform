@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,18 +38,18 @@ public class TaskFormsTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser("fozzie");
   }
 
-  @Deployment(resources = { 
-    "org/camunda/bpm/engine/test/examples/taskforms/VacationRequest_deprecated_forms.bpmn20.xml", 
-    "org/camunda/bpm/engine/test/examples/taskforms/approve.form", 
-    "org/camunda/bpm/engine/test/examples/taskforms/request.form", 
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/examples/taskforms/VacationRequest_deprecated_forms.bpmn20.xml",
+    "org/camunda/bpm/engine/test/examples/taskforms/approve.form",
+    "org/camunda/bpm/engine/test/examples/taskforms/request.form",
     "org/camunda/bpm/engine/test/examples/taskforms/adjustRequest.form" })
   public void testTaskFormsWithVacationRequestProcess() {
 
     // Get start form
     String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
-    Object startForm = formService.getRenderedStartForm(procDefId);
+    Object startForm = formService.getRenderedStartForm(procDefId, "juel");
     assertNotNull(startForm);
-    
+
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     String processDefinitionId = processDefinition.getId();
     assertEquals("org/camunda/bpm/engine/test/examples/taskforms/request.form", formService.getStartFormData(processDefinitionId).getFormKey());
@@ -64,7 +64,7 @@ public class TaskFormsTest extends PluggableProcessEngineTestCase {
     // Management should now have a task assigned to them
     Task task = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
     assertEquals("Vacation request by kermit", task.getDescription());
-    Object taskForm = formService.getRenderedTaskForm(task.getId());
+    Object taskForm = formService.getRenderedTaskForm(task.getId(), "juel");
     assertNotNull(taskForm);
 
     // Rejecting the task should put the process back to first task
