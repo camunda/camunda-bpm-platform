@@ -139,7 +139,7 @@ public class TaskResourceImpl implements TaskResource {
 
     FormDto dto = FormDto.fromFormData(formData);
     if(dto.getKey() == null || dto.getKey().isEmpty()) {
-      if(formData.getFormFieldGroups() != null && !formData.getFormFieldGroups().isEmpty()) {
+      if(formData.getFormFields() != null && !formData.getFormFields().isEmpty()) {
         dto.setKey("embedded:engine://engine/:engine/task/"+taskId+"/rendered-form");
       }
     }

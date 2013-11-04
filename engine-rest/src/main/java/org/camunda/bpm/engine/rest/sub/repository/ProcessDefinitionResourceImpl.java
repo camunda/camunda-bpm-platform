@@ -214,7 +214,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     }
     FormDto dto = FormDto.fromFormData(formData);
     if(dto.getKey() == null || dto.getKey().isEmpty()) {
-      if(formData.getFormFieldGroups() != null && !formData.getFormFieldGroups().isEmpty()) {
+      if(formData.getFormFields() != null && !formData.getFormFields().isEmpty()) {
         dto.setKey("embedded:engine://engine/:engine/process-definition/"+processDefinitionId+"/rendered-form");
       }
     }
