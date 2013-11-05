@@ -163,12 +163,12 @@
         </dependency>
       </dependencies>
       <build>
-        <resources>
-          <resource>
+        <testResources>
+          <testResource>
             <directory>src/test/resources-jboss</directory>
             <filtering>true</filtering>
-          </resource>
-        </resources>
+          </testResource>
+        </testResources>
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -197,25 +197,6 @@
               </delimiters>
               <useDefaultDelimiters>false</useDefaultDelimiters>
             </configuration>
-            <executions>
-              <execution>
-                <id>configure-jboss</id>
-                <phase>process-test-resources</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>${jboss.runtime.location}/standalone/configuration/blueprint</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <outputDirectory>${jboss.runtime.location}/standalone/configuration</outputDirectory>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-            </executions>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -629,12 +610,12 @@
 
       </dependencies>
       <build>
-        <resources>
-          <resource>
+        <testResources>
+          <testResource>
             <directory>src/test/resources-tomcat</directory>
             <filtering>true</filtering>
-          </resource>
-        </resources>
+          </testResource>
+        </testResources>
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -722,8 +703,22 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-glassfish</source>
+                    <source>src/test/java-jboss</source>
                   </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-test-resource</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>add-test-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>src/test/resources-jboss</directory>
+                    </resource>
+                  </resources>
                 </configuration>
               </execution>
             </executions>
