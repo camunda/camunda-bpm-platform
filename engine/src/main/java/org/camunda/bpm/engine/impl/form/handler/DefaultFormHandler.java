@@ -101,10 +101,10 @@ public class DefaultFormHandler implements FormHandler {
     }
 
     // parse name
-    String name = formField.attribute("name");
+    String name = formField.attribute("label");
     if (name != null) {
       Expression nameExpression = expressionManager.createExpression(name);
-      formFieldHandler.setName(nameExpression);
+      formFieldHandler.setLabel(nameExpression);
     }
 
     // parse properties

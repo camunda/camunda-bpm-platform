@@ -279,7 +279,7 @@ public abstract class MockProvider {
   public static TaskFormData createMockTaskFormDataUsingFormFieldsWithoutFormKey() {
     FormField mockFormField = mock(FormField.class);
     when(mockFormField.getId()).thenReturn(EXAMPLE_FORM_PROPERTY_ID);
-    when(mockFormField.getName()).thenReturn(EXAMPLE_FORM_PROPERTY_NAME);
+    when(mockFormField.getLabel()).thenReturn(EXAMPLE_FORM_PROPERTY_NAME);
     when(mockFormField.getDefaultValue()).thenReturn(EXAMPLE_FORM_PROPERTY_VALUE);
 
     FormType mockFormType = mock(FormType.class);
@@ -323,7 +323,7 @@ public abstract class MockProvider {
   public static StartFormData createMockStartFormDataUsingFormFieldsWithoutFormKey(ProcessDefinition definition) {
     FormField mockFormField = mock(FormField.class);
     when(mockFormField.getId()).thenReturn(EXAMPLE_FORM_PROPERTY_ID);
-    when(mockFormField.getName()).thenReturn(EXAMPLE_FORM_PROPERTY_NAME);
+    when(mockFormField.getLabel()).thenReturn(EXAMPLE_FORM_PROPERTY_NAME);
     when(mockFormField.getDefaultValue()).thenReturn(EXAMPLE_FORM_PROPERTY_VALUE);
 
     FormType mockFormType = mock(FormType.class);

@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 public class FormFieldHandler {
 
   protected String id;
-  protected Expression name;
+  protected Expression label;
   protected AbstractFormFieldType type;
   protected Expression defaultValue;
   protected Map<String, String> properties = new HashMap<String, String>();
@@ -46,11 +46,11 @@ public class FormFieldHandler {
     // set id
     formField.setId(id);
 
-    // set name (evaluate expression)
+    // set label (evaluate expression)
     VariableScope variableScope = executionEntity != null ? executionEntity : StartProcessVariableScope.getSharedInstance();
-    Object nameValueObject = name.getValue(variableScope);
-    if(nameValueObject != null) {
-      formField.setName(nameValueObject.toString());
+    Object labelValueObject = label.getValue(variableScope);
+    if(labelValueObject != null) {
+      formField.setLabel(labelValueObject.toString());
     }
 
     // set type
@@ -121,12 +121,12 @@ public class FormFieldHandler {
     this.id = id;
   }
 
-  public Expression getName() {
-    return name;
+  public Expression getLabel() {
+    return label;
   }
 
-  public void setName(Expression name) {
-    this.name = name;
+  public void setLabel(Expression name) {
+    this.label = name;
   }
 
   public void setType(AbstractFormFieldType formType) {

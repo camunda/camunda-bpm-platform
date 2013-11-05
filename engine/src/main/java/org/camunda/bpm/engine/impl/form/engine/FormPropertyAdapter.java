@@ -49,7 +49,7 @@ public class FormPropertyAdapter implements FormField {
     return formProperty.getId();
   }
 
-  public String getName() {
+  public String getLabel() {
     return formProperty.getName();
   }
   public FormType getType() {

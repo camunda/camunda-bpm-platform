@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.form.FormType;
 public class FormFieldImpl implements FormField {
 
   protected String id;
-  protected String name;
+  protected String label;
   protected FormType type;
   protected Object defaultValue;
   protected List<FormFieldValidationConstraint> validationConstraints = new ArrayList<FormFieldValidationConstraint>();
@@ -45,12 +45,12 @@ public class FormFieldImpl implements FormField {
     this.id = id;
   }
 
-  public String getName() {
-    return name;
+  public String getLabel() {
+    return label;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public FormType getType() {

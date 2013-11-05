@@ -33,7 +33,7 @@ public interface FormField {
   /**
    * @return the human-readable display name of a form property.
    */
-  public String getName();
+  public String getLabel();
 
   /**
    * @return the type of this form field.

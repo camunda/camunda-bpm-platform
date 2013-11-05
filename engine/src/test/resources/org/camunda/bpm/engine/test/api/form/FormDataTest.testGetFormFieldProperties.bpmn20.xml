@@ -19,7 +19,7 @@
       <extensionElements>
         <camunda:formData>
             <camunda:formField 
-                id="stringField" name="String Field" type="string"
+                id="stringField" label="String Field" type="string"
                 defaultValue="someString">
               <camunda:properties>
                 <camunda:property id="p1" value="property1"/>

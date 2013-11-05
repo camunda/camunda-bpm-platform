@@ -16,19 +16,19 @@
     <userTask id="usertask" name="Task" camunda:candidateGroups="dummy">
       <extensionElements>
         <camunda:formData>
-          <camunda:formField id="stringField" name="String Field" type="string" defaultValue="someString">
+          <camunda:formField id="stringField" label="String Field" type="string" defaultValue="someString">
             <camunda:validation>
               <camunda:constraint name="maxlength" config="10" />
               <camunda:constraint name="minlength" config="5" />
             </camunda:validation>
           </camunda:formField>
-          <camunda:formField id="longField" name="Long Field" type="long" defaultValue="5">
+          <camunda:formField id="longField" label="Long Field" type="long" defaultValue="5">
             <camunda:validation>
               <camunda:constraint name="max" config="10" />
               <camunda:constraint name="min" config="3" />
             </camunda:validation>
           </camunda:formField>
-          <camunda:formField id="customField" name="Custom Field" type="string">
+          <camunda:formField id="customField" label="Custom Field" type="string">
             <camunda:validation>
               <camunda:constraint name="validator" config="org.camunda.bpm.engine.test.api.form.CustomValidator" />
             </camunda:validation>

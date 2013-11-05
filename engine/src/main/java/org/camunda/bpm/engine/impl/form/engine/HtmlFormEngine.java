@@ -75,7 +75,7 @@ public class HtmlFormEngine implements FormEngine {
     documentBuilder.startElement(new HtmlElementWriter("div").attribute("class", "control-group"));
 
     // write label
-    documentBuilder.startElement(new HtmlElementWriter("label").attribute("class", "control-label").textContent(formField.getName()))
+    documentBuilder.startElement(new HtmlElementWriter("label").attribute("class", "control-label").textContent(formField.getLabel()))
       .endElement();
 
     // start controls

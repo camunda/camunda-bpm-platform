@@ -51,7 +51,7 @@ public class FormDataTest extends ProcessEngineTestCase {
     FormField formField1 = formFields.get(0);
     assertNotNull(formField1);
     assertEquals(formField1.getId(), "formField1");
-    assertEquals(formField1.getName(), "Form Field 1");
+    assertEquals(formField1.getLabel(), "Form Field 1");
     assertEquals("string", formField1.getTypeName());
     assertNotNull(formField1.getType());
 
@@ -59,7 +59,7 @@ public class FormDataTest extends ProcessEngineTestCase {
     FormField formField2 = formFields.get(1);
     assertNotNull(formField2);
     assertEquals(formField2.getId(), "formField2");
-    assertEquals(formField2.getName(), "Form Field 2");
+    assertEquals(formField2.getLabel(), "Form Field 2");
     assertEquals("boolean", formField2.getTypeName());
     assertNotNull(formField1.getType());
 

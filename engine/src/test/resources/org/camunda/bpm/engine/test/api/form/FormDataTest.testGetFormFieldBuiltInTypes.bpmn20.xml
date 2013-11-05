@@ -19,21 +19,21 @@
       <extensionElements>
         <camunda:formData>
             <camunda:formField 
-                id="stringField" name="String Field" type="string"
+                id="stringField" label="String Field" type="string"
                 defaultValue="someString">
             </camunda:formField>
             <camunda:formField 
-                id="longField" name="Long Field" type="long"
+                id="longField" label="Long Field" type="long"
                 defaultValue="1" />
             <camunda:formField 
-                id="booleanField" name="Boolean Field" type="boolean"
+                id="booleanField" label="Boolean Field" type="boolean"
                 defaultValue="true" />
             <camunda:formField 
-                id="dateField" name="Date Field" type="date"
+                id="dateField" label="Date Field" type="date"
                 defaultValue="10-JAN-2013">
             </camunda:formField>
             <camunda:formField 
-                id="enumField" name="Enum Field" type="enum" 
+                id="enumField" label="Enum Field" type="enum" 
                 defaultValue="a">
                 <camunda:value id="a" name="A"/>
                 <camunda:value id="b" name="B"/>
