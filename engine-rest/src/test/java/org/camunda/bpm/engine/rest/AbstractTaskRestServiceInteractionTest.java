@@ -1,7 +1,6 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -42,6 +41,7 @@ import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.fest.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -59,9 +59,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   protected static final String COMPLETE_TASK_URL = SINGLE_TASK_URL + "/complete";
   protected static final String RESOLVE_TASK_URL = SINGLE_TASK_URL + "/resolve";
   protected static final String DELEGATE_TASK_URL = SINGLE_TASK_URL + "/delegate";
-  protected static final String TASK_FORM_URL = SINGLE_TASK_URL + "/form";
   protected static final String ASSIGNEE_TASK_URL = SINGLE_TASK_URL + "/assignee";
   protected static final String TASK_IDENTITY_LINKS_URL = SINGLE_TASK_URL + "/identity-links";
+
+  protected static final String TASK_FORM_URL = SINGLE_TASK_URL + "/form";
+  protected static final String RENDERED_FORM_URL = SINGLE_TASK_URL + "/rendered-form";
+  protected static final String SUBMIT_FORM_URL = SINGLE_TASK_URL + "/submit-form";
 
   private Task mockTask;
   private TaskService taskServiceMock;
@@ -177,6 +180,221 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().get(TASK_FORM_URL);
 
     verify(repositoryServiceMock, never()).getProcessDefinition(null);
+  }
+
+  @Test
+  public void testGetForm_shouldReturnKeyContainingTaskId() {
+    TaskFormData mockTaskFormData = MockProvider.createMockTaskFormDataUsingFormFieldsWithoutFormKey();
+    when(formServiceMock.getTaskFormData(MockProvider.EXAMPLE_TASK_ID)).thenReturn(mockTaskFormData);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("key", equalTo("embedded:engine://engine/:engine/task/" + MockProvider.EXAMPLE_TASK_ID + "/rendered-form"))
+      .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
+      .when().get(TASK_FORM_URL);
+  }
+
+  @Test
+  public void testGetRenderedForm() {
+    String expectedResult = "<formField>anyContent</formField>";
+
+    when(formServiceMock.getRenderedTaskForm(MockProvider.EXAMPLE_TASK_ID)).thenReturn(expectedResult);
+
+    Response response = given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(XHTML_XML_CONTENT_TYPE)
+      .when()
+        .get(RENDERED_FORM_URL);
+
+    String responseContent = response.asString();
+    System.out.println(responseContent);
+    Assertions.assertThat(responseContent).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testGetRenderedFormReturnsNotFound() {
+    when(formServiceMock.getRenderedTaskForm(anyString(), anyString())).thenReturn(null);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .then()
+        .expect()
+          .statusCode(Status.NOT_FOUND.getStatusCode())
+          .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+          .body("message", equalTo("No matching rendered form for task with the id " + MockProvider.EXAMPLE_TASK_ID + " found."))
+      .when()
+        .get(RENDERED_FORM_URL);
+  }
+
+  @Test
+  public void testSubmitForm() {
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().post(SUBMIT_FORM_URL);
+
+    verify(formServiceMock).submitTaskForm(MockProvider.EXAMPLE_TASK_ID, null);
+  }
+
+  @Test
+  public void testSubmitFormWithParameters() {
+    Map<String, Object> variables = VariablesBuilder.create()
+        .variable("aVariable", "aStringValue")
+        .variable("anotherVariable", 42)
+        .variable("aThirdValue", Boolean.TRUE).getVariables();
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(SUBMIT_FORM_URL);
+
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("aVariable", "aStringValue");
+    expectedVariables.put("anotherVariable", 42);
+    expectedVariables.put("aThirdValue", Boolean.TRUE);
+
+    verify(formServiceMock).submitTaskForm(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedVariables)));
+  }
+
+  @Test
+  public void testSubmitFormWithUnparseableIntegerVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Integer";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+    .when().post(SUBMIT_FORM_URL);
+  }
+
+  @Test
+  public void testSubmitFormWithUnparseableShortVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Short";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+    .when().post(SUBMIT_FORM_URL);
+  }
+
+  @Test
+  public void testSubmitFormWithUnparseableLongVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Long";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+    .when().post(SUBMIT_FORM_URL);
+  }
+
+  @Test
+  public void testSubmitFormWithUnparseableDoubleVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Double";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+    .when().post(SUBMIT_FORM_URL);
+  }
+
+  @Test
+  public void testSubmitFormWithUnparseableDateVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Date";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot submit task form anId due to parse exception: Unparseable date: \"1abc\""))
+    .when().post(SUBMIT_FORM_URL);
+  }
+
+  @Test
+  public void testSubmitFormWithNotSupportedVariableType() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "X";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot submit task form anId: The variable type 'X' is not supported."))
+    .when().post(SUBMIT_FORM_URL);
+  }
+
+  @Test
+  public void testUnsuccessfulSubmitForm() {
+    doThrow(new ProcessEngineException("expected exception")).when(formServiceMock).submitTaskForm(any(String.class), Matchers.<Map<String, Object>>any());
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot submit task form " + MockProvider.EXAMPLE_TASK_ID + ": expected exception"))
+      .when().post(SUBMIT_FORM_URL);
   }
 
   @Test

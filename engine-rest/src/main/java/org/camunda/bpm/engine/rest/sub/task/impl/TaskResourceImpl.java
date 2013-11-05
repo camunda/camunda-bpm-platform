@@ -153,14 +153,11 @@ public class TaskResourceImpl implements TaskResource {
 
   public String getRenderedForm() {
     FormService formService = engine.getFormService();
-    Object renderedTaskForm = formService.getRenderedTaskForm(taskId, "html");
+    Object renderedTaskForm = formService.getRenderedTaskForm(taskId);
     if(renderedTaskForm != null) {
       return renderedTaskForm.toString();
-
-    } else{
-      return "";
-
     }
+    throw new InvalidRequestException(Status.NOT_FOUND, "No matching rendered form for task with the id " + taskId + " found.");
   }
 
   @Override

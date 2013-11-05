@@ -229,8 +229,8 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     Object startForm = formService.getRenderedStartForm(processDefinitionId);
     if(startForm != null) {
       return startForm.toString();
-    } else {
-      return null;
     }
+
+    throw new InvalidRequestException(Status.NOT_FOUND, "No matching rendered start form for process definition with the id " + processDefinitionId + " found.");
   }
 }
