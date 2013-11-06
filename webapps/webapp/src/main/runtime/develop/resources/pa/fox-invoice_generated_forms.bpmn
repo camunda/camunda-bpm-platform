@@ -102,13 +102,14 @@
       <incoming>SequenceFlow_1</incoming>
     </endEvent>
     <userTask id="assignApprover" camunda:candidateGroups="management" name="assign approver">
-
       <extensionElements>
         <camunda:formData>
-          <camunda:formFieldGroup id="group1">
             <camunda:formField
                 id="stringField" label="String Field" type="string"
                 defaultValue="someString">
+                <camunda:validation>
+                  <camunda:constraint name="readonly" />
+                </camunda:validation>
             </camunda:formField>
             <camunda:formField
                 id="longField" label="Long Field" type="long"
@@ -127,7 +128,6 @@
                 <camunda:value id="b" name="B"/>
                 <camunda:value id="c" name="C"/>
             </camunda:formField>
-          </camunda:formFieldGroup>
         </camunda:formData>
       </extensionElements>
       <incoming>sequenceFlow_187</incoming>

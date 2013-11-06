@@ -17,15 +17,20 @@ ngDefine('tasklist.services', [
         var variablesMap = {};
 
         for (var i = 0, variable; !!(variable = variables[i]); i++) {
-          var name = variable.name,
-              value = variable.value,
-              type = variable.type;
 
-          if (!value && type == "boolean") {
-            value = false;
+          // read-only variables should not be submitted.
+          if(!variable.readOnly) {
+
+            var name = variable.name,
+                value = variable.value,
+                type = variable.type;
+
+            if (!value && type == "boolean") {
+              value = false;
+            }
+
+            variablesMap[name] = {"value" : value};
           }
-
-          variablesMap[name] = {"value" : value};
         }
         return variablesMap;
       },
