@@ -105,6 +105,7 @@ import org.camunda.bpm.engine.impl.form.validator.MaxLengthValidator;
 import org.camunda.bpm.engine.impl.form.validator.MaxValidator;
 import org.camunda.bpm.engine.impl.form.validator.MinLengthValidator;
 import org.camunda.bpm.engine.impl.form.validator.MinValidator;
+import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
 import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
@@ -1048,6 +1049,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       formValidators.addValidator("minlength", MinLengthValidator.class);
       formValidators.addValidator("maxlength", MaxLengthValidator.class);
       formValidators.addValidator("required", RequiredValidator.class);
+      formValidators.addValidator("readonly", ReadOnlyValidator.class);
     }
     if(customFormFieldValidators != null) {
       for (Entry<String, Class<? extends FormFieldValidator>> validator : customFormFieldValidators.entrySet()) {

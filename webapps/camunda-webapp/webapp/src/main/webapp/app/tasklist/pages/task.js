@@ -85,7 +85,7 @@ ngDefine('tasklist.pages', [
 
       var action = "submitTaskForm";
 
-      taskList[action]({ id: taskId }, { variables : variablesMap }).$then(function() {
+      taskList[action]({ id: taskId }, { 'variables' : variablesMap }).$then(function() {
         $rootScope.$broadcast("tasklist.reload");
         $location.url("/task/" + taskId + "/" + action);
       });

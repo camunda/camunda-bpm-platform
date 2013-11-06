@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.form.validator.MaxLengthValidator;
 import org.camunda.bpm.engine.impl.form.validator.MaxValidator;
 import org.camunda.bpm.engine.impl.form.validator.MinLengthValidator;
 import org.camunda.bpm.engine.impl.form.validator.MinValidator;
+import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
 import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
@@ -40,6 +41,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
 
     Map<String, Class<? extends FormFieldValidator>> validators = formValidators.getValidators();
     assertEquals(RequiredValidator.class, validators.get("required"));
+    assertEquals(ReadOnlyValidator.class, validators.get("readonly"));
     assertEquals(MinValidator.class, validators.get("min"));
     assertEquals(MaxValidator.class, validators.get("max"));
     assertEquals(MaxLengthValidator.class, validators.get("maxlength"));
@@ -57,6 +59,16 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     // empty string and 'null' are invalid
     assertFalse(validator.validate("", null));
     assertFalse(validator.validate(null, null));
+  }
+
+  public void testReadOnlyValidator() {
+    ReadOnlyValidator validator = new ReadOnlyValidator();
+
+    assertFalse(validator.validate("", null));
+    assertFalse(validator.validate("aaa", null));
+    assertFalse(validator.validate(11, null));
+    assertFalse(validator.validate(2d, null));
+    assertTrue(validator.validate(null, null));
   }
 
   public void testMinValidator() {
