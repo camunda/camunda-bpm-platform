@@ -52,48 +52,99 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/standalone</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>configuration/standalone.xml</include>
+          <include>deployments/${jboss.datasource.filename}</include>
+        </includes>
+      </resource>
+    </resources>
+    <plugins>
+      <!-- create sources to be used by camunda-bpm-platform-ee -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-resources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>src/main</directory>
+                  <includes>
+                    <include>**/*.xml</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+            <configuration>
+              <forceCreation>true</forceCreation>
+              <!-- exclude otherwise there would be duplicates in -sources.jar -->
+              <excludes>
+                <exclude>deployments/**/*</exclude>
+                <exclude>configuration/**/*</exclude>
+                <exclude>**/configuration/**/*</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>jboss</id>
       <build>
-        <resources>
-          <resource>
-            <directory>src/main/standalone</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>configuration/standalone.xml</include>
-              <include>deployments/${jboss.datasource.filename}</include>
-            </includes>
-          </resource>
-        </resources>
         <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>unpack-server</id>
-              <phase>generate-resources</phase>
-              <goals>
-                <goal>unpack</goal>
-              </goals>
-              <inherited>false</inherited>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>org.camunda.bpm.jboss</groupId>
-                    <artifactId>camunda-jboss-assembly</artifactId>
-                    <version>${project.version}</version>
-                    <type>tar.gz</type>
-                    <overWrite>true</overWrite>                    
-                    <outputDirectory>target/</outputDirectory>
-                  </artifactItem>
-                </artifactItems>                
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-server</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.jboss</groupId>
+                      <artifactId>camunda-jboss-assembly</artifactId>
+                      <version>${project.version}</version>
+                      <type>tar.gz</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>target/</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
@@ -152,52 +203,6 @@
                 <configuration>
                   <override>true</override>
                   <outputDirectory>${jboss.runtime.location}/standalone</outputDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <!-- create sources to be used by camunda-bpm-platform-ee -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-resources</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>add-resource</goal>
-                </goals>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>src/main</directory>
-                      <includes>
-                        <include>**/*.xml</include>
-                      </includes>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-                <configuration>
-                  <forceCreation>true</forceCreation>
-                  <!-- exclude otherwise there would be duplicates in -sources.jar -->
-                  <excludes>
-                    <exclude>deployments/**/*</exclude>
-                    <exclude>configuration/**/*</exclude>
-                    <exclude>**/configuration/**/*</exclude>
-                  </excludes>
                 </configuration>
               </execution>
             </executions>
