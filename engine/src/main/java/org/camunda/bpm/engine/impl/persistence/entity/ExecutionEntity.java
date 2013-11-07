@@ -315,7 +315,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   public void initialize() {
     log.fine("initializing "+this);
 
-    ScopeImpl scope = getScope();
+    ScopeImpl scope = getScopeActivity();
     ensureParentInitialized();
 
     List<VariableDeclaration> variableDeclarations = (List<VariableDeclaration>) scope.getProperty(BpmnParse.PROPERTYNAME_VARIABLE_DECLARATIONS);
@@ -985,7 +985,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
   // scopes ///////////////////////////////////////////////////////////////////
 
-  protected ScopeImpl getScope() {
+  protected ScopeImpl getScopeActivity() {
     ScopeImpl scope = null;
     if (isProcessInstance()) {
       scope = getProcessDefinition();
