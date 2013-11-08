@@ -348,6 +348,17 @@ public class BusinessProcess implements Serializable {
       conversationInstance.get().end();
     }
   }
+  
+  public void flushTask() {
+    assertTaskAssociated();
+    processEngine.getTaskService().saveTask(associationManager.getTask());
+    processEngine.getRuntimeService().setVariables(associationManager.getExecutionId(), getAndClearCachedVariables());
+  }
+  
+  public void stopTask() {
+    flushTask();
+    associationManager.disAssociate();
+  }
 
   public boolean isTaskAssociated() {
     return associationManager.getTask() != null;
