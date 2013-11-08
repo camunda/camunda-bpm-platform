@@ -13,8 +13,13 @@
 package org.camunda.bpm.engine.cdi.test.api;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collections;
 
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
@@ -114,5 +119,44 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
     assertEquals(taskId, getBeanInstance("taskId"));
 
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  public void testFlushAndStopTask() {
+      BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+
+      // start the process
+      String processInstanceId = businessProcess.startProcessByKey("businessProcessBeanTest", Collections.singletonMap("key", (Object)"value")).getId();
+      assertEquals("value", runtimeService.getVariable(processInstanceId, "key"));
+
+      String taskId = processEngine.getTaskService().createTaskQuery().singleResult().getId();
+      Task task = businessProcess.startTask(taskId);
+
+      // Update the variable within the process - should not yet be flushed to the DB
+      businessProcess.setVariable("key", "1");
+      assertEquals("value", runtimeService.getVariable(processInstanceId, "key"));
+
+      // Update a task attribute - should not yet be flushed to the DB
+      task.setPriority(100);
+      assertNotEquals(100, processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getPriority());
+      
+      // Flush the task - this should update the variable and the changed attribute - the task itself is still active
+      businessProcess.flushTask();
+      assertTrue(businessProcess.isTaskAssociated());
+      assertNotNull(processEngine.getTaskService().createTaskQuery().singleResult());
+      assertEquals("1", runtimeService.getVariable(processInstanceId, "key"));
+      assertEquals(100, processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getPriority());
+
+      
+      // Make more modifications and stop the task work - this should update everything and disassociate the task so that we can call again startTask()
+      businessProcess.setVariable("key", "2");
+      task.setPriority(99);
+
+      businessProcess.stopTask();
+      assertFalse(businessProcess.isTaskAssociated());
+      assertNotNull(processEngine.getTaskService().createTaskQuery().singleResult());
+      assertEquals("2", runtimeService.getVariable(processInstanceId, "key"));
+      assertEquals(99, processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getPriority());
   }
 }

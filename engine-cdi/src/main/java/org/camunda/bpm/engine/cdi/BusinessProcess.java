@@ -351,8 +351,8 @@ public class BusinessProcess implements Serializable {
   
   public void flushTask() {
     assertTaskAssociated();
-    processEngine.getTaskService().saveTask(associationManager.getTask());
-    processEngine.getRuntimeService().setVariables(associationManager.getExecutionId(), getAndClearCachedVariables());
+    processEngine.getTaskService().saveTask(getTask());
+    processEngine.getTaskService().setVariables(getTask().getId(), getAndClearCachedVariables());
   }
   
   public void stopTask() {
