@@ -18,15 +18,18 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 
+import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -123,7 +126,7 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
   
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
-  public void testFlushAndStopTask() {
+  public void testAdvancedTaskOperations() {
       BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
       // start the process
@@ -133,7 +136,23 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
       String taskId = processEngine.getTaskService().createTaskQuery().singleResult().getId();
       Task task = businessProcess.startTask(taskId);
 
-      // Update the variable within the process - should not yet be flushed to the DB
+      // Set task assignee
+      businessProcess.setTaskAssignee(null);
+      assertNull(task.getAssignee());
+      assertNull(processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getAssignee());
+      
+      // Claim task
+      businessProcess.claimTask("miss piggy");
+      assertEquals("miss piggy", task.getAssignee());
+      assertEquals("miss piggy", processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getAssignee());
+      
+      // Reclaim with another user should throw an Exception
+      try {
+    	businessProcess.claimTask("kermit");
+    	fail(TaskAlreadyClaimedException.class.getSimpleName() + " expected!");
+      } catch (TaskAlreadyClaimedException ignorable) {}
+      
+      // Update the "key" variable within the process - should not yet be flushed to the DB
       businessProcess.setVariable("key", "1");
       assertEquals("value", runtimeService.getVariable(processInstanceId, "key"));
 
@@ -142,13 +161,12 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
       assertNotEquals(100, processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getPriority());
       
       // Flush the task - this should update the variable and the changed attribute - the task itself is still active
-      businessProcess.flushTask();
+      businessProcess.saveTask();
       assertTrue(businessProcess.isTaskAssociated());
       assertNotNull(processEngine.getTaskService().createTaskQuery().singleResult());
       assertEquals("1", runtimeService.getVariable(processInstanceId, "key"));
       assertEquals(100, processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getPriority());
 
-      
       // Make more modifications and stop the task work - this should update everything and disassociate the task so that we can call again startTask()
       businessProcess.setVariable("key", "2");
       task.setPriority(99);

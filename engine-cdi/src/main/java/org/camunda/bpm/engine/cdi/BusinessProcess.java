@@ -25,6 +25,7 @@ import javax.inject.Named;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.cdi.annotation.BusinessProcessScoped;
 import org.camunda.bpm.engine.cdi.impl.context.ContextAssociationManager;
@@ -349,15 +350,36 @@ public class BusinessProcess implements Serializable {
     }
   }
   
-  public void flushTask() {
+  public void saveTask() {
     assertTaskAssociated();
     processEngine.getTaskService().saveTask(getTask());
     processEngine.getTaskService().setVariables(getTask().getId(), getAndClearCachedVariables());
   }
   
   public void stopTask() {
-    flushTask();
+    saveTask();
     associationManager.disAssociate();
+  }
+  
+  public void setTaskAssignee(String userId) {
+	assertTaskAssociated();
+	
+	// Using TaskService.setAssignee() would update the DB, but then a manual update of the associated task would be necessary.
+	// That - on the other hand - causes an Exception when calling this.saveTask() later
+	getTask().setAssignee(userId);
+    processEngine.getTaskService().saveTask(getTask());
+  }
+  
+  public void claimTask(String userId) {
+	assertTaskAssociated();
+	
+	String assignee = getTask().getAssignee();
+	if(assignee != null && userId != null && !userId.equals(assignee)) {
+      throw new TaskAlreadyClaimedException(getTaskId(), assignee);
+	}
+	
+	getTask().setAssignee(userId);
+    processEngine.getTaskService().saveTask(getTask());
   }
 
   public boolean isTaskAssociated() {
