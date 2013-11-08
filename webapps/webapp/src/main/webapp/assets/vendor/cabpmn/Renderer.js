@@ -319,6 +319,10 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
     for (var i= 0; i<textLines.length; i++, alignIndex++) {
       var currentLine = textLines[i];
 
+      if (/^[\n\r]+$/.test(currentLine)) {
+        currentLine = currentLine.replace(/\n|\r/g, "");
+      }
+
       var tempWordGroup = renderText(currentLine);
 
       if (tempWordGroup.getTextWidth() > maxWidth) {
