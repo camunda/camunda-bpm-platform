@@ -17,14 +17,14 @@ ngDefine('camunda.common.services.uri', [ 'angular' ], function(module, angular)
      *
      * In addition to a plain replacement string, a function may be specified that provides the replacement.
      *
-       <pre>
-         module.config(function(UriProvider, $routeParams) {
-           UriProvider.register(':foo', 'bar');
-           UriProvider.register('asdf://', function() {
-             return $routeParams.bar;
-           });
-         });
-       </pre>
+     *  <pre>
+     *    module.config(function(UriProvider, $routeParams) {
+     *      UriProvider.register(':foo', 'bar');
+     *      UriProvider.register('asdf://', function() {
+     *        return $routeParams.bar;
+     *      });
+     *    });
+     *  </pre>
      *
      * @param {string} pattern
      * @param {string|Function} replacement string or function

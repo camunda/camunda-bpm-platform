@@ -12,12 +12,16 @@
     });
 
     $scope.inputChanged = function() {
-      console.log('Input changed to', $scope.variablesForm.approver.$modelValue);
+      var value = $scope.variablesForm.approver.$modelValue;
+      var allowed = [ "demo", "john", "mary", "peter" ];
+
+      $scope.variablesForm.approver.$setValidity("name", allowed.indexOf(value) != -1);
     };
   }]);
 </script>
 
-<input form-field type="string" required ng-pattern="/^(demo|john|mary|peter)$/" ng-change="inputChanged()" name="approver" />
+<input form-field type="string" required
+       ng-change="inputChanged()" name="approver" />
 
 <p style="color: red" ng-if="variablesForm.approver.$invalid">
   Not a valid user!
