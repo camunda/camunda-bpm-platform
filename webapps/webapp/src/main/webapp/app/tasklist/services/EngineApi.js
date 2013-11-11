@@ -11,7 +11,8 @@ ngDefine('tasklist.services', [
         unclaim : { method: 'POST', params : { operation: "unclaim" }},
         delegate : { method: 'POST', params : { operation: "delegate" }},
         resolve : { method: 'POST', params : { operation: "resolve" }},
-        complete : { method: 'POST', params : { operation: "complete" }}
+        complete : { method: 'POST', params : { operation: "complete" }},
+        submitTaskForm : { method: 'POST', params : { operation: "submit-form" }}
       });
 
       var forms = $resource(Uri.appUri("engine://engine/:engine/:context/:id/:action"), { id: "@id" } , {
@@ -33,7 +34,7 @@ ngDefine('tasklist.services', [
       };
 
       this.processDefinitions.startInstance = function(data, fn) {
-        data = angular.extend(data, { operation : "start" });
+        data = angular.extend(data, { operation : "submit-form" });
 
         return this.save(data, fn);
       };
