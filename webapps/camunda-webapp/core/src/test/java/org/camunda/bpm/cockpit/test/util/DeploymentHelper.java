@@ -18,7 +18,7 @@ import java.io.File;
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.core.test.util.TestContainer;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.application.TestProcessEngineProvider;
+import org.camunda.bpm.cockpit.plugin.test.application.TestProcessEngineProvider;
 import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
