@@ -244,6 +244,7 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
     "dataOutputAssociation" : dataAssociationStyle,
     "dataStoreReference" : dataObjectStyle,
     "dataObject" : dataObjectStyle,
+    "dataObjectReference" : dataObjectStyle,
     "dataInput" : dataObjectStyle,
     "dataOutput" : dataObjectStyle
   };
@@ -962,6 +963,10 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
       var style = elementRenderer.getStyle();
       var bounds = elementRenderer.getBounds();
 
+      if (!bounds) {
+        return;
+      }
+
       var x = +bounds.x;
       var y = +bounds.y;
 
@@ -1004,7 +1009,6 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
       var font = { family: textStyle["font-family"], size: textStyle["font-size"], weight: "normal" };
 
       var path = dataRefGroup.createPath(pathInfo.path).setStroke(style.stroke);
-
 
       renderLabel(elementRenderer, gfxGroup, defaultBounds, "middle");
       return path;
