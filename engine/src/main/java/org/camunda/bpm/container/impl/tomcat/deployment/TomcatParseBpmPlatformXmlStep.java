@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.container.impl.tomcat.deployment;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.engine.ProcessEngineException;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * <p>This deployment operation step is responsible for parsing and attaching the bpm-platform.xml file on tomcat.</p>
@@ -32,8 +32,12 @@ public class TomcatParseBpmPlatformXmlStep extends AbstractParseBpmPlatformXmlSt
 
   protected URL getBpmPlatformXmlStream(MBeanDeploymentOperation operationcontext) {
     
-    // read file from CATALINA_HOME directory.
-    String catalinaHome = System.getProperty("catalina.home");
+    // read file from CATALINA_BASE if set, otherwise CATALINA_HOME directory.
+    String catalinaHome = System.getProperty("catalina.base");
+    if (catalinaHome == null) {
+      catalinaHome = System.getProperty("catalina.home");
+    }
+
     String bpmPlatformFileLocation = catalinaHome + File.separator + "conf" + File.separator + "bpm-platform.xml";
     
     File bpmPlatformFile = new File(bpmPlatformFileLocation);

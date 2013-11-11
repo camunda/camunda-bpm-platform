@@ -17,4 +17,4 @@ else
   (sleep 5; $BROWSER "http://localhost:8080/camunda-welcome/index.html";) &
 fi
 
-./server/apache-tomcat-${version.tomcat}/bin/startup.sh
+$(dirname "$0")/server/apache-tomcat-${version.tomcat}/bin/startup.sh

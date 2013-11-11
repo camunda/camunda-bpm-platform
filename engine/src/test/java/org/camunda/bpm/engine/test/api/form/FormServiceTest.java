@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,16 +40,16 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class FormServiceTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/examples/taskforms/VacationRequest_deprecated_forms.bpmn20.xml", 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/examples/taskforms/VacationRequest_deprecated_forms.bpmn20.xml",
       "org/camunda/bpm/engine/test/examples/taskforms/approve.form",
-      "org/camunda/bpm/engine/test/examples/taskforms/request.form", 
+      "org/camunda/bpm/engine/test/examples/taskforms/request.form",
       "org/camunda/bpm/engine/test/examples/taskforms/adjustRequest.form" })
   public void testGetStartFormByProcessDefinitionId() {
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
     assertEquals(1, processDefinitions.size());
     ProcessDefinition processDefinition = processDefinitions.get(0);
 
-    Object startForm = formService.getRenderedStartForm(processDefinition.getId());
+    Object startForm = formService.getRenderedStartForm(processDefinition.getId(), "juel");
     assertNotNull(startForm);
   }
 
@@ -108,7 +108,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml", 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/start.form",
       "org/camunda/bpm/engine/test/api/form/task.form" })
   public void testTaskFormPropertyDefaultsAndFormRendering() {
@@ -120,7 +120,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(new ArrayList<FormProperty>(), startForm.getFormProperties());
     assertEquals(procDefId, startForm.getProcessDefinition().getId());
 
-    Object renderedStartForm = formService.getRenderedStartForm(procDefId);
+    Object renderedStartForm = formService.getRenderedStartForm(procDefId, "juel");
     assertEquals("start form content", renderedStartForm);
 
     Map<String, String> properties = new HashMap<String, String>();
@@ -143,7 +143,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(new ArrayList<FormProperty>(), taskForm.getFormProperties());
     assertEquals(taskId, taskForm.getTask().getId());
 
-    assertEquals("Mike is speaking in room 5b", formService.getRenderedTaskForm(taskId));
+    assertEquals("Mike is speaking in room 5b", formService.getRenderedTaskForm(taskId, "juel"));
 
     properties = new HashMap<String, String>();
     properties.put("room", "3f");
@@ -158,7 +158,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testFormPropertyHandling() {
+  public void testFormPropertyHandlingDeprecated() {
     Map<String, String> properties = new HashMap<String, String>();
     properties.put("room", "5b"); // default
     properties.put("speaker", "Mike"); // variable name mapping
@@ -200,7 +200,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     FormProperty propertyStreet = formProperties.get(3);
     assertEquals("street", propertyStreet.getId());
     assertEquals("broadway", propertyStreet.getValue());
-    
+
     FormProperty propertyFree = formProperties.get(4);
     assertEquals("free", propertyFree.getId());
     assertEquals("true", propertyFree.getValue());
@@ -226,6 +226,88 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     properties = new HashMap<String, String>();
     properties.put("street", "rubensstraat");
     formService.submitTaskFormData(taskId, properties);
+
+    expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("room", "5b");
+    expectedVariables.put("SpeakerName", "Mike");
+    expectedVariables.put("duration", new Long(45));
+    expectedVariables.put("free", Boolean.TRUE);
+
+    variables = runtimeService.getVariables(processInstanceId);
+    address = (Address) variables.remove("address");
+    assertEquals("rubensstraat", address.getStreet());
+    assertEquals(expectedVariables, variables);
+  }
+
+  @Deployment
+  public void testFormPropertyHandling() {
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("room", "5b"); // default
+    properties.put("speaker", "Mike"); // variable name mapping
+    properties.put("duration", 45L); // type conversion
+    properties.put("free", "true"); // type conversion
+
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+    String processInstanceId = formService.submitStartForm(procDefId, properties).getId();
+
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("room", "5b");
+    expectedVariables.put("SpeakerName", "Mike");
+    expectedVariables.put("duration", new Long(45));
+    expectedVariables.put("free", Boolean.TRUE);
+
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
+    assertEquals(expectedVariables, variables);
+
+    Address address = new Address();
+    address.setStreet("broadway");
+    runtimeService.setVariable(processInstanceId, "address", address);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    TaskFormData taskFormData = formService.getTaskFormData(taskId);
+
+    List<FormProperty> formProperties = taskFormData.getFormProperties();
+    FormProperty propertyRoom = formProperties.get(0);
+    assertEquals("room", propertyRoom.getId());
+    assertEquals("5b", propertyRoom.getValue());
+
+    FormProperty propertyDuration = formProperties.get(1);
+    assertEquals("duration", propertyDuration.getId());
+    assertEquals("45", propertyDuration.getValue());
+
+    FormProperty propertySpeaker = formProperties.get(2);
+    assertEquals("speaker", propertySpeaker.getId());
+    assertEquals("Mike", propertySpeaker.getValue());
+
+    FormProperty propertyStreet = formProperties.get(3);
+    assertEquals("street", propertyStreet.getId());
+    assertEquals("broadway", propertyStreet.getValue());
+
+    FormProperty propertyFree = formProperties.get(4);
+    assertEquals("free", propertyFree.getId());
+    assertEquals("true", propertyFree.getValue());
+
+    assertEquals(5, formProperties.size());
+
+    try {
+      formService.submitTaskForm(taskId, new HashMap<String, Object>());
+      fail("expected exception about required form property 'street'");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+
+    try {
+      properties = new HashMap<String, Object>();
+      properties.put("speaker", "its not allowed to update speaker!");
+      formService.submitTaskForm(taskId, properties);
+      fail("expected exception about a non writable form property 'speaker'");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+
+    properties = new HashMap<String, Object>();
+    properties.put("street", "rubensstraat");
+    formService.submitTaskForm(taskId, properties);
 
     expectedVariables = new HashMap<String, Object>();
     expectedVariables.put("room", "5b");
@@ -275,7 +357,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     expectedValues.put("right", "Go Right");
     expectedValues.put("up", "Go Up");
     expectedValues.put("down", "Go Down");
-    
+
     // ACT-1023: check if ordering is retained
     Iterator<Entry<String, String>> expectedValuesIterator = expectedValues.entrySet().iterator();
     for(Entry<String, String> entry : values.entrySet()) {
@@ -285,17 +367,17 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     }
     assertEquals(expectedValues, values);
   }
-  
+
   @Deployment
   public void testInvalidFormKeyReference() {
     try {
-      formService.getRenderedStartForm(repositoryService.createProcessDefinitionQuery().singleResult().getId());
+      formService.getRenderedStartForm(repositoryService.createProcessDefinitionQuery().singleResult().getId(), "juel");
       fail();
     } catch (ProcessEngineException e) {
       assertTextPresent("Form with formKey 'IDoNotExist' does not exist", e.getMessage());
     }
   }
-  
+
   @Deployment
   public void testSubmitStartFormDataWithBusinessKey() {
     Map<String, String> properties = new HashMap<String, String>();
@@ -307,6 +389,38 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("123", processInstance.getBusinessKey());
 
     assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").singleResult().getId());
+  }
+
+  @Deployment
+  public void testSubmitStartFormWithBusinessKey() {
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("duration", 45L);
+    properties.put("speaker", "Mike");
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    ProcessInstance processInstance = formService.submitStartForm(procDefId, "123", properties);
+    assertEquals("123", processInstance.getBusinessKey());
+
+    assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").singleResult().getId());
+    Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals("Mike", variables.get("SpeakerName"));
+    assertEquals(45L, variables.get("duration"));
+  }
+
+  @Deployment
+  public void testSubmitStartFormWithoutProperties() {
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("duration", 45L);
+    properties.put("speaker", "Mike");
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    ProcessInstance processInstance = formService.submitStartForm(procDefId, "123", properties);
+    assertEquals("123", processInstance.getBusinessKey());
+
+    assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").singleResult().getId());
+    Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals("Mike", variables.get("speaker"));
+    assertEquals(45L, variables.get("duration"));
   }
 
   public void testGetStartFormKeyEmptyArgument() {
@@ -373,7 +487,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     String actualFormKey = formService.getTaskFormKey(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
     assertEquals(expectedFormKey, actualFormKey);
   }
-  
+
   @Deployment
   public void testGetTaskFormKeyWithExpression() {
     runtimeService.startProcessInstanceByKey("FormsProcess", CollectionUtil.singletonMap("dynamicKey", "test"));

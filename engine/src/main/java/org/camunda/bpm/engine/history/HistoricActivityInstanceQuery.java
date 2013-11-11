@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.history;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.query.Query;
 
 
@@ -53,6 +55,18 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
 
   /** Only select historic activity instances that are not finished yet. */
   HistoricActivityInstanceQuery unfinished();
+  
+  /** Only select historic activity instances that were started before the given date. */
+  HistoricActivityInstanceQuery startedBefore(Date date);
+
+  /** Only select historic activity instances that were started after the given date. */
+  HistoricActivityInstanceQuery startedAfter(Date date);
+
+  /** Only select historic activity instances that were started before the given date. */
+  HistoricActivityInstanceQuery finishedBefore(Date date);
+
+  /** Only select historic activity instances that were started after the given date. */
+  HistoricActivityInstanceQuery finishedAfter(Date date);
 
   // ordering /////////////////////////////////////////////////////////////////
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -84,4 +98,5 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
   
   /** Order by processDefinitionId (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricActivityInstanceQuery orderByProcessDefinitionId();
+  
 }

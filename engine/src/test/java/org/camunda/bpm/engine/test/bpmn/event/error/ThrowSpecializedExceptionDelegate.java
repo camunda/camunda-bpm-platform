@@ -23,7 +23,7 @@ public class ThrowSpecializedExceptionDelegate implements JavaDelegate {
 
   public void execute(DelegateExecution execution) throws Exception {
 
-    throw new MySpecializedException("This should be caught!");
+    throw new MySpecializedException("Business Exception");
 
   }
 

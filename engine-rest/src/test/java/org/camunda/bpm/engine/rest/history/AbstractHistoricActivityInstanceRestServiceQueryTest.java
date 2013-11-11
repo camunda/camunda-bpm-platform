@@ -551,4 +551,100 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
     Assert.assertNull(returnedActivityEndTime);
   }
+  
+  @Test
+  public void testHistoricBeforeAndAfterStartTimeQuery() {
+    given()
+      .queryParam("startedBefore", MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_BEFORE)
+      .queryParam("startedAfter", MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_AFTER)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_ACTIVITY_INSTANCE_RESOURCE_URL);
+
+    verifyStartParameterQueryInvocations();
+  }
+
+  @Test
+  public void testHistoricBeforeAndAfterStartTimeQueryAsPost() {
+    Map<String, Date> parameters = getCompleteStartDateQueryParameters();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(HISTORIC_ACTIVITY_INSTANCE_RESOURCE_URL);
+
+    verifyStartParameterQueryInvocations();
+  }
+
+  private Map<String, Date> getCompleteStartDateQueryParameters() {
+    Map<String, Date> parameters = new HashMap<String, Date>();
+
+    parameters.put("startedAfter", DateTime.parse(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_AFTER).toDate());
+    parameters.put("startedBefore", DateTime.parse(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_BEFORE).toDate());
+
+    return parameters;
+  }
+
+  private void verifyStartParameterQueryInvocations() {
+    Map<String, Date> startDateParameters = getCompleteStartDateQueryParameters();
+
+    verify(mockedQuery).startedBefore(startDateParameters.get("startedBefore"));
+    verify(mockedQuery).startedAfter(startDateParameters.get("startedAfter"));
+
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testHistoricAfterAndBeforeFinishTimeQuery() {
+    given()
+      .queryParam("finishedAfter", MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_AFTER)
+      .queryParam("finishedBefore", MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_BEFORE)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_ACTIVITY_INSTANCE_RESOURCE_URL);
+
+    verifyFinishedParameterQueryInvocations();
+  }
+
+  @Test
+  public void testHistoricAfterAndBeforeFinishTimeQueryAsPost() {
+    Map<String, Date> parameters = getCompleteFinishedDateQueryParameters();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(HISTORIC_ACTIVITY_INSTANCE_RESOURCE_URL);
+
+    verifyFinishedParameterQueryInvocations();
+  }
+
+  private Map<String, Date> getCompleteFinishedDateQueryParameters() {
+    Map<String, Date> parameters = new HashMap<String, Date>();
+
+    parameters.put("finishedAfter", DateTime.parse(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_AFTER).toDate());
+    parameters.put("finishedBefore", DateTime.parse(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_BEFORE).toDate());
+
+    return parameters;
+  }
+
+  private void verifyFinishedParameterQueryInvocations() {
+    Map<String, Date> finishedDateParameters = getCompleteFinishedDateQueryParameters();
+
+    verify(mockedQuery).finishedAfter(finishedDateParameters.get("finishedAfter"));
+    verify(mockedQuery).finishedBefore(finishedDateParameters.get("finishedBefore"));
+
+    verify(mockedQuery).list();
+  }
 }

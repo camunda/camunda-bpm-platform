@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:camunda="http://activiti.org/bpmn" 
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+    xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+    xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+    typeLanguage="http://www.w3.org/2001/XMLSchema" 
+    expressionLanguage="http://www.w3.org/1999/XPath"
+    targetNamespace="test">
+
+  <process id="FormDataTest.testGetFormFieldBuiltInTypes">
+
+    <startEvent id="start" />
+
+    <sequenceFlow sourceRef="start" targetRef="usertask" />
+
+    <userTask id="usertask" name="Task" camunda:candidateGroups="dummy">
+      <extensionElements>
+        <camunda:formData>
+            <camunda:formField 
+                id="stringField" label="String Field" type="string"
+                defaultValue="someString">
+            </camunda:formField>
+            <camunda:formField 
+                id="longField" label="Long Field" type="long"
+                defaultValue="1" />
+            <camunda:formField 
+                id="booleanField" label="Boolean Field" type="boolean"
+                defaultValue="true" />
+            <camunda:formField 
+                id="dateField" label="Date Field" type="date"
+                defaultValue="10-JAN-2013">
+            </camunda:formField>
+            <camunda:formField 
+                id="enumField" label="Enum Field" type="enum" 
+                defaultValue="a">
+                <camunda:value id="a" name="A"/>
+                <camunda:value id="b" name="B"/>
+                <camunda:value id="c" name="C"/>
+            </camunda:formField> 
+        </camunda:formData>
+      </extensionElements>
+    </userTask>
+
+  </process>
+
+</definitions>

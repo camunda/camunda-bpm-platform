@@ -17,6 +17,14 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-depchain</artifactId>
+      <version>${version.shrinkwrap.resolvers}</version>
+      <scope>test</scope>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -27,7 +35,6 @@
       <artifactId>jboss-javaee-6.0</artifactId>
       <type>pom</type>
       <scope>provided</scope>
-      <version>3.0.0.Beta1</version>
       <exclusions>
         <exclusion>
           <artifactId>xalan</artifactId>
@@ -120,9 +127,6 @@
             </goals>
             <configuration>
               <forceCreate>true</forceCreate>
-            <!--  <includes>
-                <include>**/com/camunda/fox/platform/test/util/**/*.class</include>
-              </includes> -->
             </configuration>
           </execution>
         </executions>
@@ -159,12 +163,12 @@
         </dependency>
       </dependencies>
       <build>
-        <resources>
-          <resource>
+        <testResources>
+          <testResource>
             <directory>src/test/resources-jboss</directory>
             <filtering>true</filtering>
-          </resource>
-        </resources>
+          </testResource>
+        </testResources>
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -193,33 +197,12 @@
               </delimiters>
               <useDefaultDelimiters>false</useDefaultDelimiters>
             </configuration>
-            <executions>
-              <execution>
-                <id>configure-jboss</id>
-                <phase>process-test-resources</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>${jboss.runtime.location}/standalone/configuration/blueprint</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <outputDirectory>${jboss.runtime.location}/standalone/configuration</outputDirectory>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-            </executions>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <excludes>
-                <!-- HEMERA-2453 -->
-                <exclude>**/JobExecutorRequestContextRemoteInvocationTest.java</exclude>
                 <!-- HEMERA-2453 -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
                 <exclude>**_OTHERS.java</exclude>
@@ -285,29 +268,16 @@
           <scope>provided</scope>
           <type>pom</type>
         </dependency>
-        <!-- see we can upgrade this to latest arquillian -->
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-glassfish-managed-3.1</artifactId>
-          <version>1.0.0.CR3</version>
+          <version>1.0.0.CR4</version>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>1.0.0.CR7</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.shrinkwrap.resolver</groupId>
-          <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-          <version>1.0.0-beta-6</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.shrinkwrap</groupId>
-          <artifactId>shrinkwrap-api</artifactId>
-          <version>1.0.0-cr-3</version>
+          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -381,7 +351,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
-            <version>1.5</version>
             <dependencies>
               <dependency>
                 <groupId>mysql</groupId>
@@ -522,7 +491,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
-            <version>1.5</version>
             <dependencies>
               <dependency>
                 <groupId>mysql</groupId>
@@ -595,6 +563,14 @@
       <dependencyManagement>
         <dependencies>
           <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-bom</artifactId>
+            <version>${version.shrinkwrap.resolvers}</version>
+            <scope>import</scope>
+            <type>pom</type>
+          </dependency>
+
+          <dependency>
             <groupId>org.jboss.bom</groupId>
             <artifactId>jboss-javaee-6.0-with-tools</artifactId>
             <version>1.0.4.Final</version>
@@ -622,7 +598,7 @@
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-tomcat-managed-7</artifactId>
-          <version>1.0.0.CR4</version>
+          <version>1.0.0.CR5</version>
           <scope>test</scope>
         </dependency>
 
@@ -632,20 +608,14 @@
           <scope>test</scope>
         </dependency>
 
-        <dependency>
-          <groupId>org.jboss.shrinkwrap.resolver</groupId>
-          <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-          <scope>test</scope>
-        </dependency>
-
       </dependencies>
       <build>
-        <resources>
-          <resource>
+        <testResources>
+          <testResource>
             <directory>src/test/resources-tomcat</directory>
             <filtering>true</filtering>
-          </resource>
-        </resources>
+          </testResource>
+        </testResources>
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -733,8 +703,22 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-glassfish</source>
+                    <source>src/test/java-jboss</source>
                   </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-test-resource</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>add-test-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>src/test/resources-jboss</directory>
+                    </resource>
+                  </resources>
                 </configuration>
               </execution>
             </executions>
@@ -838,7 +822,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
-            <version>1.5</version>
             <dependencies>
               <dependency>
                 <groupId>mysql</groupId>

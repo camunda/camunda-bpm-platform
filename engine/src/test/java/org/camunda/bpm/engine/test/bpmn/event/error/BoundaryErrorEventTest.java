@@ -221,16 +221,6 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  // SEE: https://app.camunda.com/jira/browse/CAM-1373
-  @Deployment
-  public void FAILING_testUncaughtRuntimeException() {
-    try {
-      runtimeService.startProcessInstanceByKey("testUncaughtRuntimeException");
-      fail("error should not be caught");
-    } catch (RuntimeException e) {
-      assertEquals("This should not be caught!", e.getMessage());
-    }
-  }
 
   @Deployment(resources = {
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testUncaughtErrorOnCallActivity-parent.bpmn20.xml",
@@ -517,13 +507,31 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     assertThatExceptionHasBeenCaught(procId);
   }
 
-  // SEE: https://app.camunda.com/jira/browse/CAM-1374
   @Deployment
-  public void FAILING_testCatchSpecializedExceptionThrownByDelegate() {
+  public void testCatchSpecializedExceptionThrownByDelegate() {
     HashMap<String, Object> variables = new HashMap<String, Object>();
     variables.put("bpmnErrorBean", new BpmnErrorBean());
     String procId = runtimeService.startProcessInstanceByKey("testCatchSpecializedExceptionThrownByDelegate", variables).getId();
     assertThatExceptionHasBeenCaught(procId);
   }
 
+  @Deployment
+  public void testUncaughtRuntimeException() {
+    try {
+      runtimeService.startProcessInstanceByKey("testUncaughtRuntimeException");
+      fail("error should not be caught");
+    } catch (RuntimeException e) {
+      assertEquals("This should not be caught!", e.getMessage());
+    }
+  }
+
+  @Deployment
+  public void testUncaughtBusinessExceptionWrongErrorCode() {
+    try {
+      runtimeService.startProcessInstanceByKey("testUncaughtBusinessExceptionWrongErrorCode");
+      fail("error should not be caught");
+    } catch (RuntimeException e) {
+      assertEquals("couldn't execute activity <serviceTask id=\"serviceTask\" ...>: Business Exception", e.getMessage());
+    }
+  }
 }

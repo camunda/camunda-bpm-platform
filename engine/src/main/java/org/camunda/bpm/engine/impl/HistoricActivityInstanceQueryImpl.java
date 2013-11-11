@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
@@ -24,9 +25,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 /**
  * @author Tom Baeyens
  */
-public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricActivityInstanceQuery, HistoricActivityInstance> 
+public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricActivityInstanceQuery, HistoricActivityInstance>
     implements HistoricActivityInstanceQuery {
-  
+
   private static final long serialVersionUID = 1L;
   protected String activityInstanceId;
   protected String processInstanceId;
@@ -38,14 +39,18 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   protected String assignee;
   protected boolean finished;
   protected boolean unfinished;
+  protected Date startedBefore;
+  protected Date startedAfter;
+  protected Date finishedBefore;
+  protected Date finishedAfter;
 
   public HistoricActivityInstanceQueryImpl() {
   }
-  
+
   public HistoricActivityInstanceQueryImpl(CommandContext commandContext) {
     super(commandContext);
   }
-  
+
   public HistoricActivityInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
@@ -65,7 +70,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
       .getHistoricActivityInstanceManager()
       .findHistoricActivityInstancesByQueryCriteria(this, page);
   }
-  
+
   public HistoricActivityInstanceQueryImpl processInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
     return this;
@@ -95,19 +100,39 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     this.activityType = activityType;
     return this;
   }
-  
+
   public HistoricActivityInstanceQueryImpl taskAssignee(String assignee) {
     this.assignee = assignee;
     return this;
   }
-  
+
   public HistoricActivityInstanceQueryImpl finished() {
     this.finished = true;
     return this;
   }
-  
+
   public HistoricActivityInstanceQueryImpl unfinished() {
     this.unfinished = true;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl startedAfter(Date date) {
+    startedAfter = date;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl startedBefore(Date date) {
+    startedBefore = date;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl finishedAfter(Date date) {
+    finishedAfter = date;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl finishedBefore(Date date) {
+    finishedBefore = date;
     return this;
   }
 
@@ -167,10 +192,10 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     this.activityInstanceId = activityInstanceId;
     return this;
   }
-  
+
 
   // getters and setters //////////////////////////////////////////////////////
-  
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
@@ -200,5 +225,17 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   }
   public String getActivityInstanceId() {
     return activityInstanceId;
+  }
+  public Date getStartedAfter() {
+    return startedAfter;
+  }
+  public Date getStartedBefore() {
+    return startedBefore;
+  }
+  public Date getFinishedAfter() {
+    return finishedAfter;
+  }
+  public Date getFinishedBefore() {
+    return finishedBefore;
   }
 }

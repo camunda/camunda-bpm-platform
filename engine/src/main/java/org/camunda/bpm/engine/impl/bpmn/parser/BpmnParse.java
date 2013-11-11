@@ -90,10 +90,10 @@ import org.camunda.bpm.engine.impl.bpmn.webservice.OperationImplementation;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
-import org.camunda.bpm.engine.impl.form.DefaultStartFormHandler;
-import org.camunda.bpm.engine.impl.form.DefaultTaskFormHandler;
-import org.camunda.bpm.engine.impl.form.StartFormHandler;
-import org.camunda.bpm.engine.impl.form.TaskFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationType;
@@ -1023,6 +1023,23 @@ public class BpmnParse extends Parse {
       }
 
     } else { // "regular" subprocess
+      Element conditionalEventDefinition = startEventElement.element("conditionalEventDefinition");
+      Element timerEventDefinition = startEventElement.element("timerEventDefinition");
+      Element escalationEventDefinition = startEventElement.element("escalationEventDefinition");
+      Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
+
+      if (conditionalEventDefinition != null) {
+        addError("conditionalEventDefinition is not allowed on start event within a subprocess", conditionalEventDefinition);
+      }
+      if (timerEventDefinition != null) {
+        addError("timerEventDefinition is not allowed on start event within a subprocess", timerEventDefinition);
+      }
+      if (escalationEventDefinition != null) {
+        addError("escalationEventDefinition is not allowed on start event within a subprocess", escalationEventDefinition);
+      }
+      if (compensateEventDefinition != null) {
+        addError("compensateEventDefinition is not allowed on start event within a subprocess", compensateEventDefinition);
+      }
       if(errorEventDefinition != null) {
         addError("errorEventDefinition only allowed on start event if subprocess is an event subprocess", errorEventDefinition);
       }

@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.dto.history;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -22,6 +23,7 @@ import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 
 public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricActivityInstanceQuery> {
 
@@ -61,6 +63,10 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
   private String taskAssignee;
   private Boolean finished;
   private Boolean unfinished;
+  private Date startedBefore;
+  private Date startedAfter;
+  private Date finishedBefore;
+  private Date finishedAfter;
 
   public HistoricActivityInstanceQueryDto() {
   }
@@ -119,6 +125,26 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     this.unfinished = unfinished;
   }
 
+  @CamundaQueryParam(value = "startedBefore", converter = DateConverter.class)
+  public void setStartedBefore(Date startedBefore) {
+    this.startedBefore = startedBefore;
+  }
+
+  @CamundaQueryParam(value = "startedAfter", converter = DateConverter.class)
+  public void setStartedAfter(Date startedAfter) {
+    this.startedAfter = startedAfter;
+  }
+
+  @CamundaQueryParam(value = "finishedBefore", converter = DateConverter.class)
+  public void setFinishedBefore(Date finishedBefore) {
+    this.finishedBefore = finishedBefore;
+  }
+
+  @CamundaQueryParam(value = "finishedAfter", converter = DateConverter.class)
+  public void setFinishedAfter(Date finishedAfter) {
+    this.finishedAfter = finishedAfter;
+  }  
+  
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -160,6 +186,18 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     }
     if (unfinished != null && unfinished) {
       query.unfinished();
+    }
+    if (startedBefore != null) {
+      query.startedBefore(startedBefore);
+    }
+    if (startedAfter != null) {
+      query.startedAfter(startedAfter);
+    }
+    if (finishedBefore != null) {
+      query.finishedBefore(finishedBefore);
+    }
+    if (finishedAfter != null) {
+      query.finishedAfter(finishedAfter);
     }
   }
 

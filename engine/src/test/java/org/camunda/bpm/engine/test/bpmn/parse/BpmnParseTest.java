@@ -34,6 +34,145 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Joram Barrez
  */
 public class BpmnParseTest extends PluggableProcessEngineTestCase {
+  public void testInvalidSubProcessWithTimerStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSubProcessWithTimerStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a timer start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("timerEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+    }
+  }
+  
+  public void testInvalidSubProcessWithMessageStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSubProcessWithMessageStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process definition could be parsed, although the sub process contains not a blanco start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("messageEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidSubProcessWithConditionalStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSubProcessWithConditionalStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a conditional start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("conditionalEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidSubProcessWithSignalStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSubProcessWithSignalStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a signal start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("signalEventDefintion only allowed on start event if subprocess is an event subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidSubProcessWithErrorStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSubProcessWithErrorStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a error start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("errorEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidSubProcessWithEscalationStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSubProcessWithEscalationStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a escalation start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("escalationEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidSubProcessWithCompensationStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSubProcessWithCompensationStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a compensation start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("compensateEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidTransactionWithMessageStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidTransactionWithMessageStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process definition could be parsed, although the sub process contains not a blanco start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("messageEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidTransactionWithTimerStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidTransactionWithTimerStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a timer start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("timerEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidTransactionWithConditionalStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidTransactionWithConditionalStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a conditional start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("conditionalEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidTransactionWithSignalStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidTransactionWithSignalStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a signal start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("signalEventDefintion only allowed on start event if subprocess is an event subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidTransactionWithErrorStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidTransactionWithErrorStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a error start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("errorEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidTransactionWithEscalationStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidTransactionWithEscalationStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a escalation start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("escalationEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+    }
+  }
+
+  public void testInvalidTransactionWithCompensationStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidTransactionWithCompensationStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process contains a compensation start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("compensateEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+    }
+  }
   
   public void testInvalidProcessDefinition() {
     try {

@@ -2,12 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-qa-jboss-runtime</artifactId>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
   <name>camunda BPM - QA jBoss7 Test Runtime</name>
 
   <properties>
-    <jboss.assembly.location>../../distro/jbossas71/assembly/target/assembly-${project.version}/assembly-${project.version}/server</jboss.assembly.location>
+    <jboss.assembly.location>../../distro/jbossas7/assembly/target/assembly-${project.version}/assembly-${project.version}/server</jboss.assembly.location>
   </properties>
 
   <parent>
@@ -52,48 +52,99 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/standalone</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>configuration/standalone.xml</include>
+          <include>deployments/${jboss.datasource.filename}</include>
+        </includes>
+      </resource>
+    </resources>
+    <plugins>
+      <!-- create sources to be used by camunda-bpm-platform-ee -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-resources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>src/main</directory>
+                  <includes>
+                    <include>**/*.xml</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+            <configuration>
+              <forceCreation>true</forceCreation>
+              <!-- exclude otherwise there would be duplicates in -sources.jar -->
+              <excludes>
+                <exclude>deployments/**/*</exclude>
+                <exclude>configuration/**/*</exclude>
+                <exclude>**/configuration/**/*</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>jboss</id>
       <build>
-        <resources>
-          <resource>
-            <directory>src/main/standalone</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>configuration/standalone.xml</include>
-              <include>deployments/${jboss.datasource.filename}</include>
-            </includes>
-          </resource>
-        </resources>
         <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>unpack-server</id>
-              <phase>generate-resources</phase>
-              <goals>
-                <goal>unpack</goal>
-              </goals>
-              <inherited>false</inherited>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>org.camunda.bpm.jboss</groupId>
-                    <artifactId>camunda-jboss-assembly</artifactId>
-                    <version>${project.version}</version>
-                    <type>tar.gz</type>
-                    <overWrite>true</overWrite>                    
-                    <outputDirectory>target/</outputDirectory>
-                  </artifactItem>
-                </artifactItems>                
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-server</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.jboss</groupId>
+                      <artifactId>camunda-jboss-assembly</artifactId>
+                      <version>${project.version}</version>
+                      <type>tar.gz</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>target/</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
@@ -104,10 +155,8 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <target unless="maven.test.skip">   
-                    <!-- processing of src/main/standalone replaced by resource filtering 
-                      (see below) -->
-                    <copy todir="target/server/jboss-as-${version.jboss.as}/modules" overwrite="true">
+                  <target unless="maven.test.skip">
+                    <copy todir="${jboss.runtime.location}/modules" overwrite="true">
                       <fileset dir="src/main/modules" />
                     </copy>
 
@@ -124,13 +173,9 @@
                   <target unless="maven.test.skip">
                     <dependencyfilesets scopes="test" />
 
-                    <copy todir="target/server/jboss-as-${version.jboss.as}/modules" flatten="false">
+                    <copy todir="${jboss.runtime.location}/modules" flatten="false">
                       <fileset refid="maven.project.dependencies" />
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                    </copy>
-
-                    <copy todir="target/server/jboss-as-${version.jboss.as}/modules" flatten="false">
-                      <fileset dir="src/main/modules" />
                     </copy>
 
                   </target>
@@ -157,7 +202,7 @@
                 </goals>
                 <configuration>
                   <override>true</override>
-                  <outputDirectory>target/server/jboss-as-${version.jboss.as}/standalone</outputDirectory>
+                  <outputDirectory>${jboss.runtime.location}/standalone</outputDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -165,6 +210,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>install-test-runtime</id>
       <build>

@@ -28,6 +28,7 @@ import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.form.StartFormData;
@@ -230,6 +231,10 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME = "2013-04-23T13:42:43";
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME = "2013-04-23T18:42:43";
   public static final long EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION = 2000l;
+  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_AFTER = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_BEFORE = "2013-01-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_AFTER = "2013-01-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_BEFORE = "2013-04-23T13:42:43";
 
 
   // tasks
@@ -271,6 +276,25 @@ public abstract class MockProvider {
     return mockFormData;
   }
 
+  public static TaskFormData createMockTaskFormDataUsingFormFieldsWithoutFormKey() {
+    FormField mockFormField = mock(FormField.class);
+    when(mockFormField.getId()).thenReturn(EXAMPLE_FORM_PROPERTY_ID);
+    when(mockFormField.getLabel()).thenReturn(EXAMPLE_FORM_PROPERTY_NAME);
+    when(mockFormField.getDefaultValue()).thenReturn(EXAMPLE_FORM_PROPERTY_VALUE);
+
+    FormType mockFormType = mock(FormType.class);
+    when(mockFormType.getName()).thenReturn(EXAMPLE_FORM_PROPERTY_TYPE_NAME);
+    when(mockFormField.getType()).thenReturn(mockFormType);
+
+    TaskFormData mockFormData = mock(TaskFormData.class);
+    when(mockFormData.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
+
+    List<FormField> mockFormFields = new ArrayList<FormField>();
+    mockFormFields.add(mockFormField);
+    when(mockFormData.getFormFields()).thenReturn(mockFormFields);
+    return mockFormData;
+  }
+
   // form data
   public static StartFormData createMockStartFormData(ProcessDefinition definition) {
     FormProperty mockFormProperty = mock(FormProperty.class);
@@ -293,6 +317,27 @@ public abstract class MockProvider {
     List<FormProperty> mockFormProperties = new ArrayList<FormProperty>();
     mockFormProperties.add(mockFormProperty);
     when(mockFormData.getFormProperties()).thenReturn(mockFormProperties);
+    return mockFormData;
+  }
+
+  public static StartFormData createMockStartFormDataUsingFormFieldsWithoutFormKey(ProcessDefinition definition) {
+    FormField mockFormField = mock(FormField.class);
+    when(mockFormField.getId()).thenReturn(EXAMPLE_FORM_PROPERTY_ID);
+    when(mockFormField.getLabel()).thenReturn(EXAMPLE_FORM_PROPERTY_NAME);
+    when(mockFormField.getDefaultValue()).thenReturn(EXAMPLE_FORM_PROPERTY_VALUE);
+
+    FormType mockFormType = mock(FormType.class);
+    when(mockFormType.getName()).thenReturn(EXAMPLE_FORM_PROPERTY_TYPE_NAME);
+    when(mockFormField.getType()).thenReturn(mockFormType);
+
+    StartFormData mockFormData = mock(StartFormData.class);
+    when(mockFormData.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
+    when(mockFormData.getProcessDefinition()).thenReturn(definition);
+
+    List<FormField> mockFormFields = new ArrayList<FormField>();
+    mockFormFields.add(mockFormField);
+    when(mockFormData.getFormFields()).thenReturn(mockFormFields);
+
     return mockFormData;
   }
 

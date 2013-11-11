@@ -89,4 +89,41 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
     taskService.complete(task.getId());
   }
 
+  public void testIntermediateMessageEventRedeployment() {
+
+    // deploy version 1
+    repositoryService.createDeployment()
+      .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
+      .deploy();
+    // now there is one process deployed
+    assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(pi.getId());
+    assertNotNull(activeActivityIds);
+    assertEquals(1, activeActivityIds.size());
+    assertTrue(activeActivityIds.contains("messageCatch"));
+
+    // deploy version 2
+    repositoryService.createDeployment()
+      .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
+      .deploy();
+
+    // now there are two versions deployed:
+    assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
+
+    // assert process is still waiting in message event:
+    activeActivityIds = runtimeService.getActiveActivityIds(pi.getId());
+    assertNotNull(activeActivityIds);
+    assertEquals(1, activeActivityIds.size());
+    assertTrue(activeActivityIds.contains("messageCatch"));
+
+    // delete both versions:
+    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+      repositoryService.deleteDeployment(deployment.getId(), true);
+    }
+
+  }
+
 }
