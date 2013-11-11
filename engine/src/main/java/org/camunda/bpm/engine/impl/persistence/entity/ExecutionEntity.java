@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
@@ -33,7 +34,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.util.FormPropertyStartContext;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -338,7 +339,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
     if (timerDeclarations!=null) {
       for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
-        TimerEntity timer = timerDeclaration.prepareTimerEntity(this);
+        TimerEntity timer = timerDeclaration.createJobInstance(this);
         Context
           .getCommandContext()
           .getJobManager()
@@ -642,16 +643,22 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
 
   protected void scheduleAtomicOperationAsync(AtomicOperation executionOperation) {
-    MessageEntity message = new MessageEntity();
-    message.setExecution(this);
-    message.setExclusive(getActivity().isExclusive());
-    message.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
-    message.setJobHandlerConfiguration(executionOperation.getCanonicalName());
 
-    Context
-      .getCommandContext()
-      .getJobManager()
-      .send(message);
+    final MessageJobDeclaration messageJobDeclaration = (MessageJobDeclaration) getActivity().getProperty(BpmnParse.PROPERTYNAME_MESSAGE_JOB_DECLARATION);
+
+    if(messageJobDeclaration != null) {
+      MessageEntity message = messageJobDeclaration.createJobInstance(this);
+      message.setJobHandlerConfiguration(executionOperation.getCanonicalName());
+
+      Context
+        .getCommandContext()
+        .getJobManager()
+        .send(message);
+
+    } else {
+      throw new ProcessEngineException("Asynchronous continuation requires a message job declaration.");
+
+    }
   }
 
   public boolean isActive(String activityId) {

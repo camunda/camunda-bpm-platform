@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,16 +44,16 @@ public class ProcessDefinitionManager extends AbstractManager {
   public ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
     return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectProcessDefinitionById", processDefinitionId);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery, Page page) {
-//    List<ProcessDefinition> processDefinitions = 
+//    List<ProcessDefinition> processDefinitions =
     return getDbSqlSession().selectList("selectProcessDefinitionsByQueryCriteria", processDefinitionQuery, page);
 
     //skipped this after discussion within the team
 //    // retrieve process definitions from cache (http://jira.codehaus.org/browse/ACT-1020) to have all available information
 //    ArrayList<ProcessDefinition> result = new ArrayList<ProcessDefinition>();
-//    for (ProcessDefinition processDefinitionEntity : processDefinitions) {      
+//    for (ProcessDefinition processDefinitionEntity : processDefinitions) {
 //      ProcessDefinitionEntity fullProcessDefinition = Context
 //              .getProcessEngineConfiguration()
 //              .getDeploymentCache().resolveProcessDefinition((ProcessDefinitionEntity)processDefinitionEntity);
@@ -65,7 +65,7 @@ public class ProcessDefinitionManager extends AbstractManager {
   public long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
     return (Long) getDbSqlSession().selectOne("selectProcessDefinitionCountByQueryCriteria", processDefinitionQuery);
   }
-  
+
   public ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("deploymentId", deploymentId);
@@ -83,20 +83,34 @@ public class ProcessDefinitionManager extends AbstractManager {
     } else if (results.size() > 1) {
       throw new ProcessEngineException("There are " + results.size() + " process definitions with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + "'.");
     }
-    return null; 
+    return null;
   }
-  
+
   public List<ProcessDefinition> findProcessDefinitionsStartableByUser(String user) {
     return   new ProcessDefinitionQueryImpl().startableByUser(user).list();
   }
-  
+
   public List<User> findProcessDefinitionPotentialStarterUsers() {
     return null;
   }
-  
+
   public List<Group> findProcessDefinitionPotentialStarterGroups() {
     return null;
   }
 
- 
+  public void updateProcessDefinitionSuspensionStateById(String processDefinitionId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionId", processDefinitionId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateProcessDefinitionSuspensionStateByParameters", parameters);
+  }
+
+  public void updateProcessDefinitionSuspensionStateByKey(String processDefinitionKey, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateProcessDefinitionSuspensionStateByParameters", parameters);
+  }
+
+
 }

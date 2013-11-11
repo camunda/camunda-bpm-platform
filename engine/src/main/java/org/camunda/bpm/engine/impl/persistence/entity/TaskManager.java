@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,9 +37,9 @@ public class TaskManager extends AbstractManager {
       .createTaskQuery()
       .processInstanceId(processInstanceId)
       .list();
-  
+
     String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
-    
+
     for (TaskEntity task: tasks) {
       deleteTask(task, reason, cascade);
     }
@@ -48,15 +48,15 @@ public class TaskManager extends AbstractManager {
   public void deleteTask(TaskEntity task, String deleteReason, boolean cascade) {
     if (!task.isDeleted()) {
       task.setDeleted(true);
-      
+
       CommandContext commandContext = Context.getCommandContext();
       String taskId = task.getId();
-      
+
       List<Task> subTasks = findTasksByParentTaskId(taskId);
       for (Task subTask: subTasks) {
         deleteTask((TaskEntity) subTask, deleteReason, cascade);
       }
-      
+
       commandContext
         .getIdentityLinkManager()
         .deleteIdentityLinksByTaskId(taskId);
@@ -74,7 +74,7 @@ public class TaskManager extends AbstractManager {
           .getHistoricTaskInstanceManager()
           .markTaskInstanceEnded(taskId, deleteReason);
       }
-        
+
       getDbSqlSession().delete(task);
     }
   }
@@ -91,20 +91,20 @@ public class TaskManager extends AbstractManager {
   public List<TaskEntity> findTasksByExecutionId(String executionId) {
     return getDbSqlSession().selectList("selectTasksByExecutionId", executionId);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId) {
     return getDbSqlSession().selectList("selectTasksByProcessInstanceId", processInstanceId);
   }
-  
-  
+
+
   @Deprecated
   public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery, Page page) {
     taskQuery.setFirstResult(page.getFirstResult());
     taskQuery.setMaxResults(page.getMaxResults());
     return findTasksByQueryCriteria(taskQuery);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery) {
     final String query = "selectTaskByQueryCriteria";
@@ -114,7 +114,7 @@ public class TaskManager extends AbstractManager {
   public long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery) {
     return (Long) getDbSqlSession().selectOne("selectTaskCountByQueryCriteria", taskQuery);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
     return getDbSqlSession().selectListWithRawParameter("selectTaskByNativeQuery", parameterMap, firstResult, maxResults);
@@ -134,12 +134,12 @@ public class TaskManager extends AbstractManager {
       .getCommandContext()
       .getTaskManager()
       .findTaskById(taskId);
-    
+
     if (task!=null) {
       if(task.getExecutionId() != null) {
         throw new ProcessEngineException("The task cannot be deleted because is part of a running process");
       }
-      
+
       String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
       deleteTask(task, reason, cascade);
     } else if (cascade) {
@@ -149,18 +149,26 @@ public class TaskManager extends AbstractManager {
         .deleteHistoricTaskInstanceById(taskId);
     }
   }
-  
+
   public void updateTaskSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
   }
-  
+
   public void updateTaskSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
+  }
+
+  public void updateTaskSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
+
   }
 }

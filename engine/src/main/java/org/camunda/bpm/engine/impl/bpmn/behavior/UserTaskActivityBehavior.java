@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.DueDateBusinessCalendar;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -29,7 +30,7 @@ import org.camunda.bpm.engine.impl.task.TaskDefinition;
 
 /**
  * activity implementation for the user task.
- * 
+ *
  * @author Joram Barrez
  */
 public class UserTaskActivityBehavior extends TaskActivityBehavior {
@@ -56,16 +57,20 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
       String description = (String) taskDefinition.getDescriptionExpression().getValue(execution);
       task.setDescription(description);
     }
-    
+
     if(taskDefinition.getDueDateExpression() != null) {
       Object dueDate = taskDefinition.getDueDateExpression().getValue(execution);
       if(dueDate != null) {
         if (dueDate instanceof Date) {
           task.setDueDate((Date) dueDate);
         } else if (dueDate instanceof String) {
-          task.setDueDate(new DueDateBusinessCalendar().resolveDuedate((String) dueDate)); 
+          BusinessCalendar businessCalendar = Context
+            .getProcessEngineConfiguration()
+            .getBusinessCalendarManager()
+            .getBusinessCalendar(DueDateBusinessCalendar.NAME);
+          task.setDueDate(businessCalendar.resolveDuedate((String) dueDate));
         } else {
-          throw new ProcessEngineException("Due date expression does not resolve to a Date or Date string: " + 
+          throw new ProcessEngineException("Due date expression does not resolve to a Date or Date string: " +
               taskDefinition.getDueDateExpression().getExpressionText());
         }
       }
@@ -83,18 +88,18 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         } else if (priority instanceof Number) {
           task.setPriority(((Number) priority).intValue());
         } else {
-          throw new ProcessEngineException("Priority expression does not resolve to a number: " + 
+          throw new ProcessEngineException("Priority expression does not resolve to a number: " +
                   taskDefinition.getPriorityExpression().getExpressionText());
         }
       }
     }
-    
+
     handleAssignments(task, execution);
-    
+
     Context.getCommandContext()
       .getHistoricTaskInstanceManager()
       .createHistoricTask(task);
-   
+
     // All properties set, now firing 'create' event
     task.fireEvent(TaskListener.EVENTNAME_CREATE);
   }
@@ -139,21 +144,21 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
   }
 
   /**
-   * Extract a candidate list from a string. 
-   * 
+   * Extract a candidate list from a string.
+   *
    * @param str
-   * @return 
+   * @return
    */
   protected List<String> extractCandidates(String str) {
     return Arrays.asList(str.split("[\\s]*,[\\s]*"));
   }
-  
+
   // getters and setters //////////////////////////////////////////////////////
-  
+
   public TaskDefinition getTaskDefinition() {
     return taskDefinition;
   }
-  
+
   public ExpressionManager getExpressionManager() {
     return expressionManager;
   }

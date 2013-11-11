@@ -132,10 +132,12 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.RejectedJobsHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.mail.MailScanner;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
@@ -156,6 +158,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceMa
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
@@ -766,6 +769,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(IdentityInfoManager.class));
       addSessionFactory(new GenericManagerFactory(IdentityLinkManager.class));
       addSessionFactory(new GenericManagerFactory(JobManager.class));
+      addSessionFactory(new GenericManagerFactory(JobDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(ProcessDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(PropertyManager.class));
       addSessionFactory(new GenericManagerFactory(ResourceManager.class));
@@ -889,6 +893,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     TimerActivateProcessDefinitionHandler activateProcessDefinitionHandler = new TimerActivateProcessDefinitionHandler();
     jobHandlers.put(activateProcessDefinitionHandler.getType(), activateProcessDefinitionHandler);
+
+    TimerSuspendJobDefinitionHandler suspendJobDefinitionHandler = new TimerSuspendJobDefinitionHandler();
+    jobHandlers.put(suspendJobDefinitionHandler.getType(), suspendJobDefinitionHandler);
+
+    TimerActivateJobDefinitionHandler activateJobDefinitionHandler = new TimerActivateJobDefinitionHandler();
+    jobHandlers.put(activateJobDefinitionHandler.getType(), activateJobDefinitionHandler);
 
     // if we have custom job handlers, register them
     if (getCustomJobHandlers()!=null) {

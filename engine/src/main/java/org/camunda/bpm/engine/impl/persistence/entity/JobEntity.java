@@ -58,9 +58,15 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
   protected String executionId = null;
   protected String processInstanceId = null;
 
+  protected String processDefinitionId = null;
+  protected String processDefinitionKey = null;
+
   protected boolean isExclusive = DEFAULT_EXCLUSIVE;
 
   protected int retries = DEFAULT_RETRIES;
+
+  // entity is active by default
+  protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
   protected String jobHandlerType = null;
   protected String jobHandlerConfiguration = null;
@@ -71,6 +77,8 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
   protected String exceptionMessage;
 
   protected String deploymentId;
+
+  protected String jobDefinitionId;
 
   public void execute(CommandContext commandContext) {
     ExecutionEntity execution = null;
@@ -134,6 +142,7 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     persistentState.put("retries", retries);
     persistentState.put("duedate", duedate);
     persistentState.put("exceptionMessage", exceptionMessage);
+    persistentState.put("suspensionState", suspensionState);
     if(exceptionByteArrayId != null) {
       persistentState.put("exceptionByteArrayId", exceptionByteArrayId);
     }
@@ -155,12 +164,15 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
   public String getExecutionId() {
     return executionId;
   }
+
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
   }
+
   public int getRetries() {
     return retries;
   }
+
   public void setRetries(int retries) {
     if (this.retries == 0 && retries > 0) {
       removeFailedJobIncident();
@@ -215,6 +227,18 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     return exception;
   }
 
+  public void setSuspensionState(int state) {
+    this.suspensionState = state;
+  }
+
+  public int getSuspensionState() {
+    return suspensionState;
+  }
+
+  public boolean isSuspended() {
+    return suspensionState == SuspensionState.SUSPENDED.getStateCode();
+  }
+
   public String getLockOwner() {
     return lockOwner;
   }
@@ -232,6 +256,18 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
   }
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+  }
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
   }
   public boolean isExclusive() {
     return isExclusive;
@@ -302,6 +338,14 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     return exceptionMessage;
   }
 
+  public String getJobDefinitionId() {
+    return jobDefinitionId;
+  }
+
+  public void setJobDefinitionId(String jobDefinitionId) {
+    this.jobDefinitionId = jobDefinitionId;
+  }
+
   public void setExceptionMessage(String exceptionMessage) {
     if(exceptionMessage != null && exceptionMessage.length() > MAX_EXCEPTION_MESSAGE_LENGTH) {
       this.exceptionMessage = exceptionMessage.substring(0, MAX_EXCEPTION_MESSAGE_LENGTH);
@@ -343,7 +387,8 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
            + ", executionId=" + executionId
            + ", processInstanceId=" + processInstanceId
            + ", isExclusive=" + isExclusive
-           + ", retries=" + retries
+           + ", isExclusive=" + isExclusive
+           + ", jobDefinitionId=" + jobDefinitionId
            + ", jobHandlerType=" + jobHandlerType
            + ", jobHandlerConfiguration=" + jobHandlerConfiguration
            + ", exceptionByteArray=" + exceptionByteArray

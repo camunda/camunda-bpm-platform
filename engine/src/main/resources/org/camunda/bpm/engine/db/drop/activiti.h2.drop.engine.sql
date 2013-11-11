@@ -82,6 +82,7 @@ drop table ACT_GE_BYTEARRAY if exists;
 drop table ACT_RE_DEPLOYMENT if exists;
 drop table ACT_RU_EXECUTION if exists;
 drop table ACT_RU_JOB if exists;
+drop table ACT_RU_JOBDEF if exists;
 drop table ACT_RE_PROCDEF if exists;
 drop table ACT_RU_TASK if exists;
 drop table ACT_RU_IDENTITYLINK if exists;

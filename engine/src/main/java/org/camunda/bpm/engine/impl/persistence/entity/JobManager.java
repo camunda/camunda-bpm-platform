@@ -158,4 +158,39 @@ public class JobManager extends AbstractManager {
     return (Long) getDbSqlSession().selectOne("selectJobCountByQueryCriteria", jobQuery);
   }
 
+  public void updateJobSuspensionStateById(String jobId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("jobId", jobId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+  }
+
+  public void updateJobSuspensionStateByJobDefinitionId(String jobDefinitionId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("jobDefinitionId", jobDefinitionId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+  }
+
+  public void updateJobSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+  }
+
+  public void updateJobSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionId", processDefinitionId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+  }
+
+  public void updateJobSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+  }
+
 }

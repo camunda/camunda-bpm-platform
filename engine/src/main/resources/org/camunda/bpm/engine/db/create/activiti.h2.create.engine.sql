@@ -59,6 +59,8 @@ create table ACT_RU_JOB (
     EXCLUSIVE_ boolean,
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
+    PROCESS_DEF_ID_ varchar(64),
+    PROCESS_DEF_KEY_ varchar(64),
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
@@ -67,6 +69,20 @@ create table ACT_RU_JOB (
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
     DEPLOYMENT_ID_ varchar(64),
+    SUSPENSION_STATE_ integer,
+    JOB_DEF_ID_ varchar(64),
+    primary key (ID_)
+);
+
+create table ACT_RU_JOBDEF (
+    ID_ varchar(64) NOT NULL,
+    REV_ integer,
+    PROC_DEF_ID_ varchar(64) NOT NULL,
+    PROC_DEF_KEY_ varchar(255) NOT NULL,
+    ACT_ID_ varchar(255) NOT NULL,
+    JOB_TYPE_ varchar(255) NOT NULL,
+    JOB_CONFIGURATION_ varchar(255),
+    SUSPENSION_STATE_ integer,
     primary key (ID_)
 );
 
@@ -181,6 +197,11 @@ create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_)
 create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT(CONFIGURATION_);
+create index ACT_IDX_JOBDEF_ACT_ID on ACT_RU_JOBDEF(ACT_ID_);
+create index ACT_IDX_JOBDEF_PROC_DEF_ID on ACT_RU_JOBDEF(PROC_DEF_ID_);
+create index ACT_IDX_JOBDEF_PROC_DEF_KEY on ACT_RU_JOBDEF(PROC_DEF_KEY_);
+create index ACT_IDX_JOB_PROC_DEF_ID on ACT_RU_JOB(PROCESS_DEF_ID_);
+create index ACT_IDX_JOB_PROC_DEF_KEY on ACT_RU_JOB(PROCESS_DEF_KEY_);
 
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL

@@ -94,6 +94,8 @@ import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationType;
@@ -145,6 +147,7 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_CONDITION_TEXT = "conditionText";
   public static final String PROPERTYNAME_VARIABLE_DECLARATIONS = "variableDeclarations";
   public static final String PROPERTYNAME_TIMER_DECLARATION = "timerDeclarations";
+  public static final String PROPERTYNAME_MESSAGE_JOB_DECLARATION = "messageJobDeclaration";
   public static final String PROPERTYNAME_ISEXPANDED = "isExpanded";
   public static final String PROPERTYNAME_START_TIMER = "timerStart";
   public static final String PROPERTYNAME_COMPENSATION_HANDLER_ID = "compensationHandler";
@@ -167,6 +170,9 @@ public class BpmnParse extends Parse {
 
   /** Mapping of found errors in BPMN 2.0 file */
   protected Map<String, Error> errors = new HashMap<String, Error>();
+
+  /** Mapping from a process definition key to his containing list of job declarations **/
+  protected Map<String, List<JobDeclaration<?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?>>>();
 
   /** A map for storing sequence flow based on their id during parsing. */
   protected Map<String, TransitionImpl> sequenceFlows;
@@ -209,6 +215,7 @@ public class BpmnParse extends Parse {
 
   /**
    * Constructor to be called by the {@link BpmnParser}.
+   * @param deploymentContext
    */
   public BpmnParse(BpmnParser parser) {
     super(parser);
@@ -247,7 +254,7 @@ public class BpmnParse extends Parse {
         logWarnings();
       }
       if (hasErrors()) {
-        throwActivitiExceptionForErrors();
+        throwExceptionForErrors();
       }
     }
 
@@ -884,7 +891,7 @@ public class BpmnParse extends Parse {
     for (Element startEventElement : startEventElements) {
 
       ActivityImpl startEventActivity = createActivityOnScope(startEventElement, scope);
-      startEventActivity.setAsync(isAsync(startEventElement));
+      parseAsynchronousContinuation(startEventElement, startEventActivity);
 
       if (scope instanceof ProcessDefinitionEntity) {
         parseProcessDefinitionStartEvent(startEventActivity, startEventElement, parentElement, scope);
@@ -1675,8 +1682,7 @@ public class BpmnParse extends Parse {
       }
     }
 
-    activity.setAsync(isAsync(scriptTaskElement));
-    activity.setExclusive(isExclusive(scriptTaskElement));
+    parseAsynchronousContinuation(scriptTaskElement, activity);
 
     activity.setActivityBehavior(new ScriptTaskActivityBehavior(script, language, resultVariableName));
 
@@ -1710,8 +1716,7 @@ public class BpmnParse extends Parse {
     String implementation = serviceTaskElement.attribute("implementation");
     String operationRef = this.resolveName(serviceTaskElement.attribute("operationRef"));
 
-    activity.setAsync(isAsync(serviceTaskElement));
-    activity.setExclusive(isExclusive(serviceTaskElement));
+    parseAsynchronousContinuation(serviceTaskElement, activity);
 
     if (type != null) {
       if (type.equalsIgnoreCase("mail")) {
@@ -1794,8 +1799,7 @@ public class BpmnParse extends Parse {
       String excludeString = businessRuleTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "exclude");
       String resultVariableNameString = businessRuleTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariable");
 
-      activity.setAsync(isAsync(businessRuleTaskElement));
-      activity.setExclusive(isExclusive(businessRuleTaskElement));
+      parseAsynchronousContinuation(businessRuleTaskElement, activity);
 
       if (resultVariableNameString == null) {
         resultVariableNameString = businessRuleTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariableName");
@@ -1851,6 +1855,33 @@ public class BpmnParse extends Parse {
     }
   }
 
+  protected void parseAsynchronousContinuation(Element element, ActivityImpl activity) {
+    if(isAsync(element)) {
+      activity.setAsync(true);
+      // create message event declaration:
+      MessageJobDeclaration messageJobDecl = new MessageJobDeclaration();
+      boolean exclusive = isExclusive(element);
+      activity.setExclusive(exclusive);
+      messageJobDecl.setExclusive(exclusive);
+      messageJobDecl.setActivityId(activity.getId());
+      activity.setProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION, messageJobDecl);
+      addJobDeclaration(messageJobDecl, activity.getProcessDefinition());
+    }
+  }
+
+  protected void addJobDeclaration(JobDeclaration<?> jobDeclaration, ProcessDefinitionImpl processDefinition) {
+    ProcessDefinition definition = (ProcessDefinition) processDefinition;
+    String key = definition.getKey();
+
+    List<JobDeclaration<?>> containingJobDeclarations = jobDeclarations.get(key);
+    if (containingJobDeclarations == null) {
+      containingJobDeclarations = new ArrayList<JobDeclaration<?>>();
+      jobDeclarations.put(key, containingJobDeclarations);
+    }
+
+    containingJobDeclarations.add(jobDeclaration);
+  }
+
   /**
    * Parses a sendTask declaration.
    */
@@ -1862,8 +1893,7 @@ public class BpmnParse extends Parse {
     } else {
       ActivityImpl activity = createActivityOnScope(sendTaskElement, scope);
 
-      activity.setAsync(isAsync(sendTaskElement));
-      activity.setExclusive(isExclusive(sendTaskElement));
+      parseAsynchronousContinuation(sendTaskElement, activity);
 
       // for e-mail
       String type = sendTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "type");
@@ -2102,8 +2132,7 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(taskElement, scope);
     activity.setActivityBehavior(new TaskActivityBehavior());
 
-    activity.setAsync(isAsync(taskElement));
-    activity.setExclusive(isExclusive(taskElement));
+    parseAsynchronousContinuation(taskElement, activity);
 
     parseExecutionListenersOnScope(taskElement, activity);
 
@@ -2135,8 +2164,7 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(receiveTaskElement, scope);
     activity.setActivityBehavior(new ReceiveTaskActivityBehavior());
 
-    activity.setAsync(isAsync(receiveTaskElement));
-    activity.setExclusive(isExclusive(receiveTaskElement));
+    parseAsynchronousContinuation(receiveTaskElement, activity);
 
     parseExecutionListenersOnScope(receiveTaskElement, activity);
 
@@ -2169,8 +2197,7 @@ public class BpmnParse extends Parse {
   public ActivityImpl parseUserTask(Element userTaskElement, ScopeImpl scope) {
     ActivityImpl activity = createActivityOnScope(userTaskElement, scope);
 
-    activity.setAsync(isAsync(userTaskElement));
-    activity.setExclusive(isExclusive(userTaskElement));
+    parseAsynchronousContinuation(userTaskElement, activity);
 
     TaskDefinition taskDefinition = parseTaskDefinition(userTaskElement, activity.getId(), (ProcessDefinitionEntity) scope.getProcessDefinition());
 
@@ -2718,6 +2745,13 @@ public class BpmnParse extends Parse {
     TimerDeclarationImpl timerDeclaration = new TimerDeclarationImpl(expression, type, jobHandlerType);
     timerDeclaration.setJobHandlerConfiguration(timerActivity.getId());
     timerDeclaration.setExclusive("true".equals(timerEventDefinition.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "exclusive", String.valueOf(JobEntity.DEFAULT_EXCLUSIVE))));
+    if(timerActivity.getId() == null) {
+      addError("Attribute \"id\" is required!",timerEventDefinition);
+    }
+    timerDeclaration.setActivityId(timerActivity.getId());
+    timerDeclaration.setJobConfiguration(type.toString() + ": " +expression.getExpressionText());
+    addJobDeclaration(timerDeclaration, timerActivity.getProcessDefinition());
+
     return timerDeclaration;
   }
 
@@ -2817,8 +2851,7 @@ public class BpmnParse extends Parse {
   public ActivityImpl parseSubProcess(Element subProcessElement, ScopeImpl scope) {
     ActivityImpl activity = createActivityOnScope(subProcessElement, scope);
 
-    activity.setAsync(isAsync(subProcessElement));
-    activity.setExclusive(isExclusive(subProcessElement));
+    parseAsynchronousContinuation(subProcessElement, activity);
 
     Boolean isTriggeredByEvent = parseBooleanAttribute(subProcessElement.attribute("triggeredByEvent"), false);
     activity.setProperty("triggeredByEvent", isTriggeredByEvent);
@@ -2837,8 +2870,7 @@ public class BpmnParse extends Parse {
   protected ActivityImpl parseTransaction(Element transactionElement, ScopeImpl scope) {
     ActivityImpl activity = createActivityOnScope(transactionElement, scope);
 
-    activity.setAsync(isAsync(transactionElement));
-    activity.setExclusive(isExclusive(transactionElement));
+    parseAsynchronousContinuation(transactionElement, activity);
 
     activity.setScope(true);
     activity.setActivityBehavior(new TransactionActivityBehavior());
@@ -2861,8 +2893,7 @@ public class BpmnParse extends Parse {
   public ActivityImpl parseCallActivity(Element callActivityElement, ScopeImpl scope) {
     ActivityImpl activity = createActivityOnScope(callActivityElement, scope);
 
-    activity.setAsync(isAsync(callActivityElement));
-    activity.setExclusive(isExclusive(callActivityElement));
+    parseAsynchronousContinuation(callActivityElement, activity);
 
     String calledElement = callActivityElement.attribute("calledElement");
     String calledElementBinding = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "calledElementBinding");
@@ -3376,7 +3407,7 @@ public class BpmnParse extends Parse {
     }
   }
 
-  // Getters, setters and Parser overriden operations
+  // Getters, setters and Parser overridden operations
   // ////////////////////////////////////////
 
   public List<ProcessDefinitionEntity> getProcessDefinitions() {
@@ -3491,5 +3522,9 @@ public class BpmnParse extends Parse {
     return element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "class") != null
         || element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "expression") != null
         || element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "delegateExpression") != null;
+  }
+
+  public List<JobDeclaration<?>> getJobDeclarationsByKey(String processDefinitionKey) {
+    return jobDeclarations.get(processDefinitionKey);
   }
 }

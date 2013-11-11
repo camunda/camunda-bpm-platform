@@ -97,6 +97,7 @@ drop table ACT_RE_DEPLOYMENT;
 drop table ACT_RE_PROCDEF;
 drop table ACT_RU_EXECUTION;
 drop table ACT_RU_JOB;
+drop table ACT_RU_JOBDEF;
 drop table ACT_RU_TASK;
 drop table ACT_RU_IDENTITYLINK;
 drop table ACT_RU_VARIABLE;

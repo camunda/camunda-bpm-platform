@@ -94,6 +94,7 @@ drop table  ACT_RU_VARIABLE;
 drop table  ACT_RU_TASK;
 drop table  ACT_RU_EXECUTION;
 drop table  ACT_RU_JOB;
+drop table  ACT_RU_JOBDEF;
 drop table  ACT_RU_EVENT_SUBSCR;
 drop table  ACT_RU_INCIDENT;
 drop table  ACT_RU_AUTHORIZATION;
