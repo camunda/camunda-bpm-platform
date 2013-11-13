@@ -1,24 +1,6 @@
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.Response.Status;
-
+import com.jayway.restassured.http.ContentType;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -50,7 +32,21 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jayway.restassured.http.ContentType;
+import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.matchers.JUnitMatchers.hasItems;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 public abstract class AbstractProcessEngineRestServiceTest extends
     AbstractRestServiceTest {
@@ -230,8 +226,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     expect()
       .statusCode(Status.OK.getStatusCode())
       .body("$.size()", is(2))
-      .body("[0].name", equalTo(MockProvider.EXAMPLE_PROCESS_ENGINE_NAME))
-      .body("[1].name", equalTo(MockProvider.ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME))
+      .body("name", hasItems(MockProvider.EXAMPLE_PROCESS_ENGINE_NAME, MockProvider.ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME))
     .when().get(ENGINES_URL);
   }
 
