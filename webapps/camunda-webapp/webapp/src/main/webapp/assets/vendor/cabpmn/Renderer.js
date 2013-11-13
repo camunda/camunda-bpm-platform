@@ -321,7 +321,7 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
       var currentLine = textLines[i];
 
       if (/^[\n\r]+$/.test(currentLine)) {
-        currentLine = currentLine.replace(/\n|\r/g, "");
+        currentLine = '';
       }
 
       var tempWordGroup = renderText(currentLine);
