@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,23 +13,16 @@
 package org.camunda.bpm.engine.cdi.test.api;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import static org.junit.Assert.*;
 import java.util.Collections;
 
-import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.cdi.BusinessProcess;
+import org.camunda.bpm.engine.cdi.ProcessEngineCdiException;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -69,7 +62,7 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
     assertNull(processEngine.getRuntimeService().createProcessInstanceQuery().singleResult());
 
   }
-  
+
   @Test
   @Deployment
   public void testProcessWithoutWatestate() {
@@ -110,11 +103,11 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
     assertNull(getBeanInstance(Task.class));
     assertNull(getBeanInstance("taskId"));
-    
+
 
     businessProcess.startProcessByKey("businessProcessBeanTest");
     String taskId = taskService.createTaskQuery().singleResult().getId();
-    
+
     businessProcess.startTask(taskId);
 
     // assert that now we can resolve the Task-bean
@@ -123,58 +116,169 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
   }
-  
+
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
-  public void testAdvancedTaskOperations() {
-      BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+  public void testGetVariableCache() {
+    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
-      // start the process
-      String processInstanceId = businessProcess.startProcessByKey("businessProcessBeanTest", Collections.singletonMap("key", (Object)"value")).getId();
-      assertEquals("value", runtimeService.getVariable(processInstanceId, "key"));
+    // initially the variable cache is empty
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getVariableCache());
 
-      String taskId = processEngine.getTaskService().createTaskQuery().singleResult().getId();
-      Task task = businessProcess.startTask(taskId);
+    // set a variable
+    businessProcess.setVariable("aVariableName", "aVariableValue");
 
-      // Set task assignee
-      businessProcess.setTaskAssignee(null);
-      assertNull(task.getAssignee());
-      assertNull(processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getAssignee());
-      
-      // Claim task
-      businessProcess.claimTask("miss piggy");
-      assertEquals("miss piggy", task.getAssignee());
-      assertEquals("miss piggy", processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getAssignee());
-      
-      // Reclaim with another user should throw an Exception
-      try {
-    	businessProcess.claimTask("kermit");
-    	fail(TaskAlreadyClaimedException.class.getSimpleName() + " expected!");
-      } catch (TaskAlreadyClaimedException ignorable) {}
-      
-      // Update the "key" variable within the process - should not yet be flushed to the DB
-      businessProcess.setVariable("key", "1");
-      assertEquals("value", runtimeService.getVariable(processInstanceId, "key"));
+    // now the variable is set
+    assertEquals(Collections.singletonMap("aVariableName", "aVariableValue"), businessProcess.getVariableCache());
 
-      // Update a task attribute - should not yet be flushed to the DB
-      task.setPriority(100);
-      assertNotEquals(100, processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getPriority());
-      
-      // Flush the task - this should update the variable and the changed attribute - the task itself is still active
-      businessProcess.saveTask();
-      assertTrue(businessProcess.isTaskAssociated());
-      assertNotNull(processEngine.getTaskService().createTaskQuery().singleResult());
-      assertEquals("1", runtimeService.getVariable(processInstanceId, "key"));
-      assertEquals(100, processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getPriority());
+    // getting the variable cache does not empty it:
+    assertEquals(Collections.singletonMap("aVariableName", "aVariableValue"), businessProcess.getVariableCache());
 
-      // Make more modifications and stop the task work - this should update everything and disassociate the task so that we can call again startTask()
-      businessProcess.setVariable("key", "2");
-      task.setPriority(99);
+    businessProcess.startProcessByKey("businessProcessBeanTest");
 
-      businessProcess.stopTask();
-      assertFalse(businessProcess.isTaskAssociated());
-      assertNotNull(processEngine.getTaskService().createTaskQuery().singleResult());
-      assertEquals("2", runtimeService.getVariable(processInstanceId, "key"));
-      assertEquals(99, processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult().getPriority());
+    // now the variable cache is empty again:
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getVariableCache());
+
+    // set a variable
+    businessProcess.setVariable("anotherVariableName", "aVariableValue");
+
+    // now the variable is set
+    assertEquals(Collections.singletonMap("anotherVariableName", "aVariableValue"), businessProcess.getVariableCache());
   }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  public void testGetAndClearVariableCache() {
+    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+
+    // initially the variable cache is empty
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getAndClearVariableCache());
+
+    // set a variable
+    businessProcess.setVariable("aVariableName", "aVariableValue");
+
+    // now the variable is set
+    assertEquals(Collections.singletonMap("aVariableName", "aVariableValue"), businessProcess.getAndClearVariableCache());
+
+    // now the variable cache is empty
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getAndClearVariableCache());
+
+    businessProcess.startProcessByKey("businessProcessBeanTest");
+
+    // now the variable cache is empty again:
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getVariableCache());
+
+    // set a variable
+    businessProcess.setVariable("anotherVariableName", "aVariableValue");
+
+    // now the variable is set
+    assertEquals(Collections.singletonMap("anotherVariableName", "aVariableValue"), businessProcess.getVariableCache());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  public void testFlushVariableCache() {
+    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+
+    // cannot flush variable cache in absence of an association:
+    try {
+      businessProcess.flushVariableCache();
+      fail("exception expected!");
+
+    } catch (ProcessEngineCdiException e) {
+      assertEquals("Cannot flush variable cache: neither a Task nor an Execution is associated.", e.getMessage());
+
+    }
+
+    businessProcess.startProcessByKey("businessProcessBeanTest");
+
+    // set a variable
+    businessProcess.setVariable("aVariableName", "aVariable");
+
+    // the variable is not yet present in the execution:
+    assertNull(runtimeService.getVariable(businessProcess.getExecutionId(), "aVariableName"));
+
+    // flush the cache
+    businessProcess.flushVariableCache();
+
+    // the variable is flushed to the execution
+    assertNotNull(runtimeService.getVariable(businessProcess.getExecutionId(), "aVariableName"));
+
+    // the cache is empty
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getVariableCache());
+
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  public void testSaveTask() {
+    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+
+    // cannot save task in absence of an association:
+    try {
+      businessProcess.saveTask();
+      fail();
+    } catch (ProcessEngineCdiException e) {
+      assertEquals("No task associated. Call businessProcess.startTask() first.", e.getMessage());
+    }
+
+    // start the process
+    String processInstanceId = businessProcess.startProcessByKey("businessProcessBeanTest", Collections.singletonMap("key", (Object) "value")).getId();
+    assertEquals("value", runtimeService.getVariable(processInstanceId, "key"));
+
+    businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
+
+    // assignee is not set to jonny
+    assertNull(taskService.createTaskQuery().taskAssignee("jonny").singleResult());
+    Task task = businessProcess.getTask();
+    task.setAssignee("jonny");
+
+    assertNull(taskService.createTaskQuery().taskAssignee("jonny").singleResult());
+
+    // if we save the task
+    businessProcess.saveTask();
+
+    // THEN
+
+    // assignee is now set to jonny
+    assertNotNull(taskService.createTaskQuery().taskAssignee("jonny").singleResult());
+    // business process is still associated with task:
+    assertTrue(businessProcess.isTaskAssociated());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  public void testStopTask() {
+    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+
+    // cannot stop task in absence of an association:
+    try {
+      businessProcess.stopTask();
+      fail();
+    } catch (ProcessEngineCdiException e) {
+      assertEquals("No task associated. Call businessProcess.startTask() first.", e.getMessage());
+    }
+
+    // start the process
+    String processInstanceId = businessProcess.startProcessByKey("businessProcessBeanTest", Collections.singletonMap("key", (Object) "value")).getId();
+    assertEquals("value", runtimeService.getVariable(processInstanceId, "key"));
+
+    businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
+
+    // assignee is not set to jonny
+    assertNull(taskService.createTaskQuery().taskAssignee("jonny").singleResult());
+    Task task = businessProcess.getTask();
+    task.setAssignee("jonny");
+
+    // if we stop the task
+    businessProcess.stopTask();
+
+    // THEN
+
+    // assignee is not set to jonny
+    assertNull(taskService.createTaskQuery().taskAssignee("jonny").singleResult());
+    // business process is not associated with task:
+    assertFalse(businessProcess.isTaskAssociated());
+  }
+
 }

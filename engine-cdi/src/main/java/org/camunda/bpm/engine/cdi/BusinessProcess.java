@@ -25,7 +25,6 @@ import javax.inject.Named;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.cdi.annotation.BusinessProcessScoped;
 import org.camunda.bpm.engine.cdi.impl.context.ContextAssociationManager;
@@ -70,7 +69,7 @@ import org.camunda.bpm.engine.task.Task;
  * JAX-WS, JMS, remote EJB or plain Servlet requests), the {@link BusinessProcess} bean associates with the
  * current Request (see {@link RequestScoped @RequestScoped}).
  * <p />
- * <strong>NOTE:</strong> in the absence of a request, ie. when the activiti JobExecutor accesses
+ * <strong>NOTE:</strong> in the absence of a request, ie. when the JobExecutor accesses
  * {@link BusinessProcessScoped @BusinessProcessScoped} beans, the execution is associated with the
  * current thread.
  *
@@ -88,16 +87,10 @@ public class BusinessProcess implements Serializable {
 
   @Inject private Instance<Conversation> conversationInstance;
 
-  protected void validateValidUsage() {
-    if(Context.getCommandContext() != null) {
-      throw new ProcessEngineCdiException("Cannot use this method of the BusinessProcess bean within an activiti command.");
-    }
-  }
-
   public ProcessInstance startProcessById(String processDefinitionId) {
-    validateValidUsage();
+    assertCommandContextNotActive();
 
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, getAndClearCachedVariables());
+    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, getAndClearVariableCache());
     if (!instance.isEnded()) {
       setExecution(instance);
     }
@@ -105,9 +98,9 @@ public class BusinessProcess implements Serializable {
   }
 
   public ProcessInstance startProcessById(String processDefinitionId, String businessKey) {
-    validateValidUsage();
+    assertCommandContextNotActive();
 
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, businessKey, getAndClearCachedVariables());
+    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, businessKey, getAndClearVariableCache());
     if (!instance.isEnded()) {
       setExecution(instance);
     }
@@ -115,9 +108,9 @@ public class BusinessProcess implements Serializable {
   }
 
   public ProcessInstance startProcessById(String processDefinitionId, Map<String, Object> variables) {
-    validateValidUsage();
+    assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearCachedVariables();
+    Map<String, Object> cachedVariables = getAndClearVariableCache();
     cachedVariables.putAll(variables);
     ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, cachedVariables);
     if (!instance.isEnded()) {
@@ -127,9 +120,9 @@ public class BusinessProcess implements Serializable {
   }
 
   public ProcessInstance startProcessById(String processDefinitionId, String businessKey, Map<String, Object> variables) {
-    validateValidUsage();
+    assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearCachedVariables();
+    Map<String, Object> cachedVariables = getAndClearVariableCache();
     cachedVariables.putAll(variables);
     ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, businessKey, cachedVariables);
     if (!instance.isEnded()) {
@@ -139,9 +132,9 @@ public class BusinessProcess implements Serializable {
   }
 
   public ProcessInstance startProcessByKey(String key) {
-    validateValidUsage();
+    assertCommandContextNotActive();
 
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, getAndClearCachedVariables());
+    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, getAndClearVariableCache());
     if (!instance.isEnded()) {
       setExecution(instance);
     }
@@ -149,9 +142,9 @@ public class BusinessProcess implements Serializable {
   }
 
   public ProcessInstance startProcessByKey(String key, String businessKey) {
-    validateValidUsage();
+    assertCommandContextNotActive();
 
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, businessKey, getAndClearCachedVariables());
+    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, businessKey, getAndClearVariableCache());
     if (!instance.isEnded()) {
       setExecution(instance);
     }
@@ -159,9 +152,9 @@ public class BusinessProcess implements Serializable {
   }
 
   public ProcessInstance startProcessByKey(String key, Map<String, Object> variables) {
-    validateValidUsage();
+    assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearCachedVariables();
+    Map<String, Object> cachedVariables = getAndClearVariableCache();
     cachedVariables.putAll(variables);
     ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, cachedVariables);
     if (!instance.isEnded()) {
@@ -171,9 +164,9 @@ public class BusinessProcess implements Serializable {
   }
 
   public ProcessInstance startProcessByKey(String key, String businessKey, Map<String, Object> variables) {
-    validateValidUsage();
+    assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearCachedVariables();
+    Map<String, Object> cachedVariables = getAndClearVariableCache();
     cachedVariables.putAll(variables);
     ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, businessKey, cachedVariables);
     if (!instance.isEnded()) {
@@ -183,9 +176,9 @@ public class BusinessProcess implements Serializable {
   }
 
   public ProcessInstance startProcessByMessage(String messageName) {
-    validateValidUsage();
+    assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearCachedVariables();
+    Map<String, Object> cachedVariables = getAndClearVariableCache();
     ProcessInstance instance =  processEngine.getRuntimeService().startProcessInstanceByMessage(messageName, cachedVariables);
     if (!instance.isEnded()) {
       setExecution(instance);
@@ -194,9 +187,9 @@ public class BusinessProcess implements Serializable {
   }
 
   public ProcessInstance startProcessByMessage(String messageName, Map<String, Object> processVariables) {
-    validateValidUsage();
+    assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearCachedVariables();
+    Map<String, Object> cachedVariables = getAndClearVariableCache();
     cachedVariables.putAll(processVariables);
     ProcessInstance instance =  processEngine.getRuntimeService().startProcessInstanceByMessage(messageName, cachedVariables);
     if (!instance.isEnded()) {
@@ -206,9 +199,9 @@ public class BusinessProcess implements Serializable {
   }
 
   public ProcessInstance startProcessByMessage(String messageName, String businessKey, Map<String, Object> processVariables) {
-    validateValidUsage();
+    assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearCachedVariables();
+    Map<String, Object> cachedVariables = getAndClearVariableCache();
     cachedVariables.putAll(processVariables);
     ProcessInstance instance =  processEngine.getRuntimeService().startProcessInstanceByMessage(messageName, businessKey, cachedVariables);
     if (!instance.isEnded()) {
@@ -259,8 +252,8 @@ public class BusinessProcess implements Serializable {
    *           if the activiti command fails
    */
   public void signalExecution() {
-    assertAssociated();
-    processEngine.getRuntimeService().signal(associationManager.getExecutionId(), getAndClearCachedVariables());
+    assertExecutionAssociated();
+    processEngine.getRuntimeService().signal(associationManager.getExecutionId(), getAndClearVariableCache());
     associationManager.disAssociate();
   }
 
@@ -333,7 +326,7 @@ public class BusinessProcess implements Serializable {
    */
   public void completeTask() {
     assertTaskAssociated();
-    processEngine.getTaskService().complete(getTask().getId(), getAndClearCachedVariables());
+    processEngine.getTaskService().complete(getTask().getId(), getAndClearVariableCache());
     associationManager.disAssociate();
   }
 
@@ -349,41 +342,62 @@ public class BusinessProcess implements Serializable {
       conversationInstance.get().end();
     }
   }
-  
-  public void saveTask() {
-    assertTaskAssociated();
-    processEngine.getTaskService().saveTask(getTask());
-    processEngine.getTaskService().setVariables(getTask().getId(), getAndClearCachedVariables());
-  }
-  
-  public void stopTask() {
-    saveTask();
-    associationManager.disAssociate();
-  }
-  
-  public void setTaskAssignee(String userId) {
-	assertTaskAssociated();
-	
-	// Using TaskService.setAssignee() would update the DB, but then a manual update of the associated task would be necessary.
-	// That - on the other hand - causes an Exception when calling this.saveTask() later
-	getTask().setAssignee(userId);
-    processEngine.getTaskService().saveTask(getTask());
-  }
-  
-  public void claimTask(String userId) {
-	assertTaskAssociated();
-	
-	String assignee = getTask().getAssignee();
-	if(assignee != null && userId != null && !userId.equals(assignee)) {
-      throw new TaskAlreadyClaimedException(getTaskId(), assignee);
-	}
-	
-	getTask().setAssignee(userId);
-    processEngine.getTaskService().saveTask(getTask());
-  }
 
   public boolean isTaskAssociated() {
     return associationManager.getTask() != null;
+  }
+
+  /**
+   * Save the currently associated task.
+   *
+   * @throws ProcessEngineCdiException if called from a process engine command or if no Task is currently associated.
+   *
+   */
+  public void saveTask() {
+    assertCommandContextNotActive();
+    assertTaskAssociated();
+
+    final Task task = getTask();
+    // save the task
+    processEngine.getTaskService().saveTask(task);
+  }
+
+  /**
+   * <p>Stop working on a task. Clears the current association.</p>
+   *
+   * <p>NOTE: this method does not flush any changes.</p>
+   * <ul>
+   *  <li>If you want to flush changes to process variables, call {@link #flushVariableCache()} prior to calling this method,</li>
+   *  <li>If you need to flush changes to the task object, use {@link #saveTask()} prior to calling this method.</li>
+   * </ul>
+   *
+   * @throws ProcessEngineCdiException if called from a process engine command or if no Task is currently associated.
+   */
+  public void stopTask() {
+    assertCommandContextNotActive();
+    assertTaskAssociated();
+    associationManager.setTask(null);
+  }
+
+  /**
+   * <p>Stop working on a task. Clears the current association.</p>
+   *
+   * <p>NOTE: this method does not flush any changes.</p>
+   * <ul>
+   *  <li>If you want to flush changes to process variables, call {@link #flushVariableCache()} prior to calling this method,</li>
+   *  <li>If you need to flush changes to the task object, use {@link #saveTask()} prior to calling this method.</li>
+   * </ul>
+   *
+   * <p>This method allows you to optionally end the current conversation</p>
+   *
+   * @param endConversation if true, end current conversation.
+   * @throws ProcessEngineCdiException if called from a process engine command or if no Task is currently associated.
+   */
+  public void stopTask(boolean endConversation) {
+    stopTask();
+    if(endConversation) {
+      conversationInstance.get().end();
+    }
   }
 
   // -------------------------------------------------
@@ -422,6 +436,50 @@ public class BusinessProcess implements Serializable {
    */
   public void setVariable(String variableName, Object value) {
     associationManager.setVariable(variableName, value);
+  }
+
+  /**
+   * Get the map of cached variables and clear the internal variable cache.
+   *
+   * @return the map of cached variables
+   */
+  public Map<String, Object> getAndClearVariableCache() {
+    Map<String, Object> cachedVariables = associationManager.getCachedVariables();
+    Map<String, Object> copy = new HashMap<String, Object>(cachedVariables);
+    cachedVariables.clear();
+    return copy;
+  }
+
+  /**
+   * Get a copy of the map of cached variables.
+   *
+   * @return a copy of the map of cached variables.
+   */
+  public Map<String, Object> getVariableCache() {
+    return new HashMap<String, Object>(associationManager.getCachedVariables());
+  }
+
+  /**
+   * <p>This method allows to flush the cached variables to the Task or Execution.<p>
+   *
+   * <ul>
+   *   <li>If a Task instance is currently associated,
+   *       the variables will be flushed using {@link TaskService#setVariables(String, Map)}</li>
+   *   <li>If an Execution instance is currently associated,
+   *       the variables will be flushed using {@link RuntimeService#setVariables(String, Map)}</li>
+   *   <li>If neither a Task nor an Execution is currently associated,
+   *       ProcessEngineCdiException is thrown.</li>
+   * </ul>
+   *
+   * <p>A successful invocation of this method will empty the variable cache.</p>
+   *
+   * <p>If this method is called from an active command (ie. from inside a Java Delegate).
+   * {@link ProcessEngineCdiException} is thrown.</p>
+   *
+   * @throws ProcessEngineCdiException if called from a process engine command or if neither a Task nor an Execution is associated.
+   */
+  public void flushVariableCache() {
+    associationManager.flushVariableCache();
   }
 
   // ----------------------------------- Getters / Setters
@@ -523,7 +581,7 @@ public class BusinessProcess implements Serializable {
 
   // internal implementation //////////////////////////////////////////////////////////
 
-  protected void assertAssociated() {
+  protected void assertExecutionAssociated() {
     if (associationManager.getExecution() == null) {
       throw new ProcessEngineCdiException("No execution associated. Call busniessProcess.associateExecutionById() or businessProcess.startTask() first.");
     }
@@ -535,15 +593,10 @@ public class BusinessProcess implements Serializable {
     }
   }
 
-  protected Map<String, Object> getCachedVariables() {
-   return associationManager.getCachedVariables();
-  }
-
-  protected Map<String, Object> getAndClearCachedVariables() {
-    Map<String, Object> beanStore = getCachedVariables();
-    Map<String, Object> copy = new HashMap<String, Object>(beanStore);
-    beanStore.clear();
-    return copy;
+  protected void assertCommandContextNotActive() {
+    if(Context.getCommandContext() != null) {
+      throw new ProcessEngineCdiException("Cannot use this method of the BusinessProcess bean from an active command context.");
+    }
   }
 
 }
