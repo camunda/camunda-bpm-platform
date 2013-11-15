@@ -447,7 +447,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/PRocessInstanceSuspensionTest.testChildExecutionsSuspendedAfterProcessInstanceSuspend.bpmn20.xml"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testChildExecutionsSuspendedAfterProcessInstanceSuspend.bpmn20.xml"})
   public void testChildExecutionsSuspendedAfterProcessInstanceSuspendByProcessDefinitionId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testChildExecutionsSuspended");
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
@@ -473,7 +473,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/PRocessInstanceSuspensionTest.testChildExecutionsSuspendedAfterProcessInstanceSuspend.bpmn20.xml"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testChildExecutionsSuspendedAfterProcessInstanceSuspend.bpmn20.xml"})
   public void testChildExecutionsSuspendedAfterProcessInstanceSuspendByProcessDefinitionKey() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testChildExecutionsSuspended");
     runtimeService.suspendProcessInstanceByProcessDefinitionKey("testChildExecutionsSuspended");
