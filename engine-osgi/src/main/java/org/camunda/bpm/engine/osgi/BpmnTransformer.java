@@ -12,7 +12,8 @@
  */
 package org.camunda.bpm.engine.osgi;
 
-import static org.camunda.bpm.engine.osgi.Constants.BUNDLE_ACTIVITI_HEADER;
+import static org.camunda.bpm.engine.osgi.Constants.BUNDLE_PROCESS_DEFINITIONS_HEADER;
+import static org.camunda.bpm.engine.osgi.Constants.BUNDLE_PROCESS_DEFINTIONS_DEFAULT;
 import static org.osgi.framework.Constants.BUNDLE_MANIFESTVERSION;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.BUNDLE_VERSION;
@@ -66,7 +67,7 @@ public class BpmnTransformer {
         m.getMainAttributes().putValue(BUNDLE_MANIFESTVERSION, "2");
         m.getMainAttributes().putValue(BUNDLE_SYMBOLICNAME, str[0]);
         m.getMainAttributes().putValue(BUNDLE_VERSION, str[1]);
-        m.getMainAttributes().putValue(BUNDLE_ACTIVITI_HEADER, "OSGI-INF/activiti/");
+        m.getMainAttributes().putValue(BUNDLE_PROCESS_DEFINITIONS_HEADER,  BUNDLE_PROCESS_DEFINTIONS_DEFAULT);
         // Extract manifest entries from the DOM
         NodeList l = doc.getElementsByTagName("manifest");
         if (l != null) {
@@ -92,10 +93,10 @@ public class BpmnTransformer {
         out.closeEntry();
         e = new ZipEntry("OSGI-INF/");
         out.putNextEntry(e);
-        e = new ZipEntry("OSGI-INF/activiti/");
+        e = new ZipEntry(BUNDLE_PROCESS_DEFINTIONS_DEFAULT);
         out.putNextEntry(e);
         out.closeEntry();
-        e = new ZipEntry("OSGI-INF/activiti/" + name);
+        e = new ZipEntry(BUNDLE_PROCESS_DEFINTIONS_DEFAULT + name);
         out.putNextEntry(e);
         // Copy the new DOM
         if (tf == null) {

@@ -27,27 +27,27 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
-          <excludeDependencies>${activiti.osgi.exclude.dependencies}</excludeDependencies>
+          <excludeDependencies>${camunda.osgi.exclude.dependencies}</excludeDependencies>
           <instructions>
             <Bundle-Name>${project.name}</Bundle-Name>
-            <Bundle-SymbolicName>${activiti.osgi.symbolic.name}</Bundle-SymbolicName>
-            <Bundle-Activator>${activiti.osgi.activator}</Bundle-Activator>
-            <Export-Package>${activiti.osgi.export}</Export-Package>
-            <Import-Package>org.camunda.bpm.engine.osgi*;resolution:=optional, ${activiti.osgi.import}</Import-Package>
-            <DynamicImport-Package>${activiti.osgi.dynamic}</DynamicImport-Package>
-            <Private-Package>${activiti.osgi.private.pkg}</Private-Package>
-            <Implementation-Title>Activiti</Implementation-Title>
+            <Bundle-SymbolicName>${camunda.osgi.symbolic.name}</Bundle-SymbolicName>
+            <Bundle-Activator>${camunda.osgi.activator}</Bundle-Activator>
+            <Export-Package>${camunda.osgi.export}</Export-Package>
+            <Import-Package>org.camunda.bpm.engine.osgi*;resolution:=optional, ${camunda.osgi.import}</Import-Package>
+            <DynamicImport-Package>${camunda.osgi.dynamic}</DynamicImport-Package>
+            <Private-Package>${camunda.osgi.private.pkg}</Private-Package>
+            <Implementation-Title>camunda</Implementation-Title>
             <Implementation-Version>${project.version}</Implementation-Version>
-            <Include-Resource>${activiti.osgi.include.resource}</Include-Resource>
-            <_versionpolicy>${activiti.osgi.import.default.version}</_versionpolicy>
-            <_removeheaders>${activiti.osgi.remove.headers}</_removeheaders>
-            <_failok>${activiti.osgi.failok}</_failok>
-            <Export-Service>${activiti.osgi.export.service}</Export-Service>
-            <Import-Service>${activiti.osgi.import.service}</Import-Service>
-            <Embed-Dependency>${activiti.osgi.embed}</Embed-Dependency>
+            <Include-Resource>${camunda.osgi.include.resource}</Include-Resource>
+            <_versionpolicy>${camunda.osgi.import.default.version}</_versionpolicy>
+            <_removeheaders>${camunda.osgi.remove.headers}</_removeheaders>
+            <_failok>${camunda.osgi.failok}</_failok>
+            <Export-Service>${camunda.osgi.export.service}</Export-Service>
+            <Import-Service>${camunda.osgi.import.service}</Import-Service>
+            <Embed-Dependency>${camunda.osgi.embed}</Embed-Dependency>
           </instructions>
           <versions>
-            <activiti.osgi.version.clean>${project.version}</activiti.osgi.version.clean>
+            <camunda.osgi.version.clean>${project.version}</camunda.osgi.version.clean>
           </versions>
         </configuration>
       </plugin>
@@ -80,15 +80,15 @@
   </dependencies>
 
     <properties>
-        <activiti.osgi.activator>
+        <camunda.osgi.activator>
             org.camunda.bpm.engine.osgi.Activator
-        </activiti.osgi.activator>
-        <activiti.osgi.import.pkg>
+        </camunda.osgi.activator>
+        <camunda.osgi.import.pkg>
             org.apache.felix.fileinstall*;resolution:=optional,*
-        </activiti.osgi.import.pkg>
-        <activiti.artifact>
+        </camunda.osgi.import.pkg>
+        <camunda.artifact>
             org.camunda.bpm.engine.osgi
-        </activiti.artifact>
+        </camunda.artifact>
     </properties>
 
   <profiles>

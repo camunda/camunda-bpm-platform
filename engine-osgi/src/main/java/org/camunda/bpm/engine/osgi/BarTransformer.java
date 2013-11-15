@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 
-import static org.camunda.bpm.engine.osgi.Constants.BUNDLE_ACTIVITI_HEADER;
+import static org.camunda.bpm.engine.osgi.Constants.BUNDLE_PROCESS_DEFINITIONS_HEADER;
 import static org.osgi.framework.Constants.*;
 
 /**
@@ -88,7 +88,7 @@ public class BarTransformer {
             if (m.getMainAttributes().getValue(BUNDLE_VERSION) == null) {
                 m.getMainAttributes().putValue(BUNDLE_VERSION, str[1]);
             }
-            m.getMainAttributes().putValue(BUNDLE_ACTIVITI_HEADER, pathHeader);
+            m.getMainAttributes().putValue(BUNDLE_PROCESS_DEFINITIONS_HEADER, pathHeader);
             // Write manifest
             ZipEntry e = new ZipEntry(JarFile.MANIFEST_NAME);
             jos.putNextEntry(e);

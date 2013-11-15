@@ -17,6 +17,7 @@ package org.camunda.bpm.engine.osgi;
  */
 public class Constants {
 
-    public static final String BUNDLE_ACTIVITI_HEADER = "Activiti-Bundle";
+    public static final String BUNDLE_PROCESS_DEFINITIONS_HEADER = "Process-Definitions";
 
+    public static final String BUNDLE_PROCESS_DEFINTIONS_DEFAULT = "OSGI-INF/processes/";
 }
