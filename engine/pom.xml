@@ -160,11 +160,11 @@
       <history.level>full</history.level>
       <mail.server.port>5025</mail.server.port>
   
-      <activiti.artifact>
+      <camunda.artifact>
         org.camunda.bpm.engine.db.mapping.entity,
         org.camunda.bpm.engine
-      </activiti.artifact>
-      <activiti.osgi.import.additional>
+      </camunda.artifact>
+      <camunda.osgi.import.additional>
           junit*;resolution:=optional,
           org.junit*;resolution:=optional,
           com.sun*;resolution:=optional,
@@ -176,7 +176,7 @@
           org.springframework*;resolution:=optional,
           org.drools*;resolution:=optional,
           com.fasterxml*;resolution:=optional,
-      </activiti.osgi.import.additional>
+      </camunda.osgi.import.additional>
   </properties>
 
   <build>
@@ -364,7 +364,7 @@
                 </goals>
                 <configuration>
                   <tasks>                                     
-                    <echo message="updating activiti configuration to db ${database}" />
+                    <echo message="updating configuration to db ${database}" />
                     <copy file="target/test-classes/camunda.cfg.db.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true">
                       <filterset filtersfile="${db.properties.file}" />
                     </copy>
@@ -497,7 +497,7 @@
                       <property name="test_classpath" refid="maven.test.classpath" />
                       <property name="database" value="${metadatabase}" />
                     </ant>
-                    <echo message="updating activiti cfg to ${metadatabase}" />
+                    <echo message="updating cfg to ${metadatabase}" />
                     <ant antfile="${basedir}/../../qa/db/build.xml" target="create.activiti.cfg">
                       <property name="database" value="${metadatabase}" />
                     </ant>

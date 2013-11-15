@@ -47,39 +47,39 @@
     <version.postgre>9.1-901-1.jdbc4</version.postgre>
 
       <!-- OSGi bundles properties -->
-      <activiti.artifact />
-      <activiti.osgi.import.activiti.version>version="[$(version;==;${activiti.osgi.version.clean}),$(version;=+;${activiti.osgi.version.clean}))"</activiti.osgi.import.activiti.version>
-      <activiti.osgi.import.strict.version>version="[$(version;===;${activiti.osgi.version.clean}),$(version;==+;${activiti.osgi.version.clean}))"</activiti.osgi.import.strict.version>
-      <activiti.osgi.import.default.version>[$(version;==;$(@)),$(version;+;$(@)))</activiti.osgi.import.default.version>
-      <activiti.osgi.import.defaults>
-      </activiti.osgi.import.defaults>
-      <activiti.osgi.import.before.defaults />
-      <activiti.osgi.import.additional />
-      <activiti.osgi.import.pkg>
-        org.activiti.*;${activiti.osgi.import.activiti.version},
-        ${activiti.osgi.import.before.defaults},
-        ${activiti.osgi.import.defaults},
-        ${activiti.osgi.import.additional},
+      <camunda.artifact />
+      <camunda.osgi.import.camunda.version>version="[$(version;==;${camunda.osgi.version.clean}),$(version;=+;${camunda.osgi.version.clean}))"</camunda.osgi.import.camunda.version>
+      <camunda.osgi.import.strict.version>version="[$(version;===;${camunda.osgi.version.clean}),$(version;==+;${camunda.osgi.version.clean}))"</camunda.osgi.import.strict.version>
+      <camunda.osgi.import.default.version>[$(version;==;$(@)),$(version;+;$(@)))</camunda.osgi.import.default.version>
+      <camunda.osgi.import.defaults>
+      </camunda.osgi.import.defaults>
+      <camunda.osgi.import.before.defaults />
+      <camunda.osgi.import.additional />
+      <camunda.osgi.import.pkg>
+        org.camunda.*;${camunda.osgi.import.camunda.version},
+        ${camunda.osgi.import.before.defaults},
+        ${camunda.osgi.import.defaults},
+        ${camunda.osgi.import.additional},
         *
-      </activiti.osgi.import.pkg>
-      <activiti.osgi.activator />
-      <activiti.osgi.failok>false</activiti.osgi.failok>
-      <activiti.osgi.export>${activiti.osgi.export.pkg};${activiti.osgi.version};-noimport:=true</activiti.osgi.export>
+      </camunda.osgi.import.pkg>
+      <camunda.osgi.activator />
+      <camunda.osgi.failok>false</camunda.osgi.failok>
+      <camunda.osgi.export>${camunda.osgi.export.pkg};${camunda.osgi.version};-noimport:=true</camunda.osgi.export>
       <!--
-      <activiti.osgi.export.pkg>!*.impl;${activiti.artifact}*</activiti.osgi.export.pkg>
-      <activiti.osgi.private.pkg>${activiti.artifact}*.impl</activiti.osgi.private.pkg>
+      <camunda.osgi.export.pkg>!*.impl;${camunda.artifact}*</camunda.osgi.export.pkg>
+      <camunda.osgi.private.pkg>${camunda.artifact}*.impl</camunda.osgi.private.pkg>
       -->
-      <activiti.osgi.export.pkg>${activiti.artifact}*</activiti.osgi.export.pkg>
-      <activiti.osgi.private.pkg />
-      <activiti.osgi.version>version=${project.version}</activiti.osgi.version>
-      <activiti.osgi.split.pkg>-split-package:=first</activiti.osgi.split.pkg>
-      <activiti.osgi.import>${activiti.osgi.import.pkg}</activiti.osgi.import>
-      <activiti.osgi.dynamic />
-      <activiti.osgi.symbolic.name>${activiti.artifact}</activiti.osgi.symbolic.name>
-      <activiti.osgi.exclude.dependencies>false</activiti.osgi.exclude.dependencies>
-      <activiti.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</activiti.osgi.remove.headers>
-      <activiti.osgi.include.resource>{maven-resources}</activiti.osgi.include.resource>
-      <activiti.osgi.embed />
+      <camunda.osgi.export.pkg>${camunda.artifact}*</camunda.osgi.export.pkg>
+      <camunda.osgi.private.pkg />
+      <camunda.osgi.version>version=${project.version}</camunda.osgi.version>
+      <camunda.osgi.split.pkg>-split-package:=first</camunda.osgi.split.pkg>
+      <camunda.osgi.import>${camunda.osgi.import.pkg}</camunda.osgi.import>
+      <camunda.osgi.dynamic />
+      <camunda.osgi.symbolic.name>${camunda.artifact}</camunda.osgi.symbolic.name>
+      <camunda.osgi.exclude.dependencies>false</camunda.osgi.exclude.dependencies>
+      <camunda.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</camunda.osgi.remove.headers>
+      <camunda.osgi.include.resource>{maven-resources}</camunda.osgi.include.resource>
+      <camunda.osgi.embed />
     <version.resteasy>2.3.5.Final</version.resteasy>
   </properties>
     
