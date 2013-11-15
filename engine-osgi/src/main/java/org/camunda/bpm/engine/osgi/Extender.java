@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.osgi;
 
-import static org.camunda.bpm.engine.osgi.Constants.BUNDLE_ACTIVITI_HEADER;
-
+import static org.camunda.bpm.engine.osgi.Constants.BUNDLE_PROCESS_DEFINITIONS_HEADER;
+import static org.camunda.bpm.engine.osgi.Constants.BUNDLE_PROCESS_DEFINTIONS_DEFAULT;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -161,14 +161,14 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
   }
 
   private void checkBundle(Bundle bundle) {
-    LOGGER.log(Level.FINE, "Scanning bundle {} for activiti process", bundle.getSymbolicName());
+    LOGGER.log(Level.FINE, "Scanning bundle {} for process", bundle.getSymbolicName());
     try {
       List<URL> pathList = new ArrayList<URL>();
-      String activitiHeader = (String) bundle.getHeaders().get(BUNDLE_ACTIVITI_HEADER);
-      if (activitiHeader == null) {
-        activitiHeader = "OSGI-INF/activiti/";
+      String processDefHeader = (String) bundle.getHeaders().get(BUNDLE_PROCESS_DEFINITIONS_HEADER);
+      if (processDefHeader == null) {
+        processDefHeader = BUNDLE_PROCESS_DEFINTIONS_DEFAULT;
       }
-      List<PathElement> paths = HeaderParser.parseHeader(activitiHeader);
+      List<PathElement> paths = HeaderParser.parseHeader(processDefHeader);
       for (PathElement path : paths) {
         String name = path.getName();
         if (name.endsWith("/")) {
@@ -193,7 +193,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
       }
 
       if (!pathList.isEmpty()) {
-        LOGGER.log(Level.FINE, "Found activiti process in bundle " + bundle.getSymbolicName()
+        LOGGER.log(Level.FINE, "Found process in bundle " + bundle.getSymbolicName()
                 + " with paths: " +  pathList);
 
         ProcessEngine engine = (ProcessEngine) engineServiceTracker.waitForService(timeout);
@@ -218,10 +218,10 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
         builder.enableDuplicateFiltering();
         builder.deploy();
       } else {
-        LOGGER.log(Level.FINE, "No activiti process found in bundle {}", bundle.getSymbolicName());
+        LOGGER.log(Level.FINE, "No process found in bundle {}", bundle.getSymbolicName());
       }
     } catch (Throwable t) {
-      LOGGER.log(Level.SEVERE, "Unable to deploy activiti bundle", t);
+      LOGGER.log(Level.SEVERE, "Unable to deploy bundle", t);
     }
   }
 

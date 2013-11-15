@@ -36,7 +36,7 @@ public class BlueprintELResolver extends ELResolver {
 	public void bindService(JavaDelegate delegate, Map props) {
     String name = (String) props.get("osgi.service.blueprint.compname");
     delegateMap.put(name, delegate);
-    LOGGER.info("added Activiti service to delegate cache " + name);
+    LOGGER.info("added service to delegate cache " + name);
 	}
 
 	public void unbindService(JavaDelegate delegate, Map props) {
@@ -44,7 +44,7 @@ public class BlueprintELResolver extends ELResolver {
     if(delegateMap.containsKey(name)) {
     	delegateMap.remove(name);
     }
-    LOGGER.info("removed Activiti service from delegate cache " + name);
+    LOGGER.info("removed service from delegate cache " + name);
 	}
 
 	public boolean isReadOnly(ELContext context, Object base, Object property) {
