@@ -62,7 +62,7 @@ public class UserAuthenticationResource {
     if (allAuthentications == null) {
       return notFound();
     }
-    
+
     Authentication engineAuth = allAuthentications.getAuthenticationForProcessEngine(engineName);
 
     if (engineAuth == null) {
@@ -84,6 +84,9 @@ public class UserAuthenticationResource {
     if(processEngine == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Process engine with name "+engineName+" does not exisist");
     }
+
+    // make sure authentication is executed without authentication :)
+    processEngine.getIdentityService().clearAuthentication();
 
     // check password / username
     boolean isPasswordValid = processEngine.getIdentityService().checkPassword(username, password);
