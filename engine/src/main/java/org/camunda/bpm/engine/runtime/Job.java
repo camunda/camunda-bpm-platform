@@ -43,6 +43,16 @@ public interface Job {
   String getProcessInstanceId();
 
   /**
+   * Returns the id of the process definition which created the job.
+   */
+  String getProcessDefinitionId();
+
+  /**
+   * Returns the key of the process definition which created the job.
+   */
+  String getProcessDefinitionKey();
+
+  /**
    * Returns the specific execution on which the job was created.
    */
   String getExecutionId();

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +60,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 
 	private JobQuery setUpMockJobQuery(List<Job> mockedJobs) {
 		JobQuery sampleJobQuery = mock(JobQuery.class);
-		
+
 		when(sampleJobQuery.list()).thenReturn(mockedJobs);
 		when(sampleJobQuery.count()).thenReturn((long) mockedJobs.size());
 
@@ -132,13 +133,23 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 
 		String returnedJobId = from(content).getString("[0].id");
 		String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
-		String returendExecutionId = from(content).getString("[0].executionId");
+		String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
+		String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
+		String returnedExecutionId = from(content).getString("[0].executionId");
 		String returnedExceptionMessage = from(content).getString("[0].exceptionMessage");
+		int returnedRetries = from(content).getInt("[0].retries");
+		Date returnedDueDate = DateTime.parse(from(content).getString("[0].dueDate")).toDate();
+		boolean returnedSuspended = from(content).getBoolean("[0].suspended");
 
 		Assert.assertEquals(MockProvider.EXAMPLE_JOB_ID, returnedJobId);
 		Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
-		Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returendExecutionId);
+		Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
+		Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedProcessDefinitionKey);
+		Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
 		Assert.assertEquals(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE, returnedExceptionMessage);
+		Assert.assertEquals(MockProvider.EXAMPLE_JOB_RETRIES, returnedRetries);
+		Assert.assertEquals(DateTime.parse(MockProvider.EXAMPLE_DUE_DATE).toDate(), returnedDueDate);
+		Assert.assertEquals(MockProvider.EXAMPLE_JOB_IS_SUSPENDED, returnedSuspended);
 	}
 
 	@Test
@@ -157,11 +168,11 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 				.body("message", equalTo("Invalid due date comparator specified: " + invalidComparator))
 				.when().get(JOBS_RESOURCE_URL);
 	}
-	
+
   @Test
   public void testInvalidDueDatComperatoreAsPost() {
     String invalidComparator = "bt";
-    
+
     Map<String, Object> conditionJson = new HashMap<String, Object>();
     conditionJson.put("operator", invalidComparator);
     conditionJson.put("value", "2013-05-05");
@@ -178,7 +189,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     .body("message", equalTo("Invalid due date comparator specified: " + invalidComparator))
     .when().post(JOBS_RESOURCE_URL);
   }
-	
+
   @Test
   public void testInvalidDueDate() {
 
@@ -192,7 +203,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     .body("message", equalTo("Invalid due date format: Invalid format: \"invalidValue\""))
     .when().get(JOBS_RESOURCE_URL);
   }
-  
+
   @Test
   public void testInvalidDueDateAsPost() {
     Map<String, Object> conditionJson = new HashMap<String, Object>();
@@ -211,7 +222,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     .body("message", equalTo("Invalid due date format: Invalid format: \"invalidValue\""))
     .when().post(JOBS_RESOURCE_URL);
   }
-	
+
 
 	@Test
 	public void testAdditionalParametersExcludingDueDates() {
@@ -224,7 +235,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 		verifyStringParameterQueryInvocations();
 		verify(mockQuery).list();
 	}
-	
+
   @Test
   public void testMessagesParameter() {
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -248,10 +259,10 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
     .contentType(ContentType.JSON)
     .body("type",equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo("Parameter timers cannot be used together with parameter messages."))    
+    .body("message", equalTo("Parameter timers cannot be used together with parameter messages."))
     .when().get(JOBS_RESOURCE_URL);
   }
-  
+
   @Test
   public void testMessagesTimersParameterAsPost() {
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -262,10 +273,10 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
     .contentType(ContentType.JSON)
     .body("type",equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo("Parameter timers cannot be used together with parameter messages."))    
+    .body("message", equalTo("Parameter timers cannot be used together with parameter messages."))
     .when().post(JOBS_RESOURCE_URL);
   }
-  
+
   @Test
   public void testMessagesParameterAsPost() {
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -278,12 +289,14 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     verify(mockQuery).messages();
     verify(mockQuery).list();
   }
-	 
+
   private Map<String, Object> getCompleteParameters() {
     Map<String, Object> parameters = new HashMap<String, Object>();
 
     parameters.put("jobId", MockProvider.EXAMPLE_JOB_ID);
     parameters.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    parameters.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    parameters.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     parameters.put("executionId", MockProvider.EXAMPLE_EXECUTION_ID);
     parameters.put("withRetriesLeft", MockProvider.EXAMPLE_WITH_RETRIES_LEFT);
     parameters.put("executable", MockProvider.EXAMPLE_EXECUTABLE);
@@ -291,9 +304,11 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     parameters.put("withException", MockProvider.EXAMPLE_WITH_EXCEPTION);
     parameters.put("exceptionMessage", MockProvider.EXAMPLE_EXCEPTION_MESSAGE);
     parameters.put("noRetriesLeft", MockProvider.EXAMPLE_NO_RETRIES_LEFT);
+    parameters.put("active", true);
+    parameters.put("suspended", true);
     return parameters;
   }
-	
+
   @Test
   public void testAdditionalParametersExcludingDueDatesAsPost() {
     Map<String, Object> parameters = getCompleteParameters();
@@ -312,6 +327,8 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 
 		verify(mockQuery).jobId((String) parameters.get("jobId"));
 		verify(mockQuery).processInstanceId((String) parameters.get("processInstanceId"));
+		verify(mockQuery).processDefinitionId((String) parameters.get("processDefinitionId"));
+		verify(mockQuery).processDefinitionKey((String) parameters.get("processDefinitionKey"));
 		verify(mockQuery).executionId((String) parameters.get("executionId"));
 		verify(mockQuery).withRetriesLeft();
 		verify(mockQuery).executable();
@@ -319,12 +336,14 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 		verify(mockQuery).withException();
 		verify(mockQuery).exceptionMessage((String) parameters.get("exceptionMessage"));
 		verify(mockQuery).noRetriesLeft();
+		verify(mockQuery).active();
+		verify(mockQuery).suspended();
 	}
 
 	@Test
 	public void testDueDateParameters() {
 		String variableValue = "2013-05-05";
-		
+
 		DateConverter converter = new DateConverter();
 		Date date = converter.convertQueryParameterToType(variableValue);
 
@@ -336,7 +355,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 		InOrder inOrder = inOrder(mockQuery);
 		inOrder.verify(mockQuery).duedateLowerThan(date);
 		inOrder.verify(mockQuery).list();
-		
+
 		queryValue = "gt_" + variableValue;
 		given().queryParam("dueDates", queryValue).then().expect()
 				.statusCode(Status.OK.getStatusCode()).when()
@@ -351,7 +370,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
   public void testDueDateParametersAsPost() {
     String value = "2013-05-18";
     String anotherValue = "2013-05-05";
-    
+
     DateConverter converter = new DateConverter();
     Date date = converter.convertQueryParameterToType(value);
     Date anotherDate = converter.convertQueryParameterToType(anotherValue);
@@ -378,7 +397,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     verify(mockQuery).duedateHigherThan(anotherDate);
     verify(mockQuery).duedateLowerThan(date);
   }
-	
+
 	@Test
 	public void testMultipleDueDateParameters() {
 		String variableValue1 =  "2012-05-05";
@@ -386,7 +405,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 
 		String variableValue2 = "2013-02-02";
 		String variableParameter2 = "lt_" + variableValue2;
-		
+
     DateConverter converter = new DateConverter();
     Date date = converter.convertQueryParameterToType(variableValue1);
     Date anotherDate = converter.convertQueryParameterToType(variableValue2);

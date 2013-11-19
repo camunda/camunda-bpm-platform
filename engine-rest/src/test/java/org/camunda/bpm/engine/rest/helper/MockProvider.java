@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -33,6 +34,9 @@ import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -53,9 +57,6 @@ import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.joda.time.DateTime;
-import org.camunda.bpm.engine.history.HistoricActivityInstance;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
 
 /**
  * Provides mocks for the basic engine entities, such as
@@ -186,13 +187,14 @@ public abstract class MockProvider {
   public static final String EXAMPLE_JOB_NO_EXCEPTION_MESSAGE = "";
   public static final String EXAMPLE_EXCEPTION_MESSAGE = "aExceptionMessage";
   public static final String EXAMPLE_EMPTY_JOB_ID = "";
-  public static final Date EXAMPLE_DUE_DATE = DateTime.now().toDate();
+  public static final String EXAMPLE_DUE_DATE =  "2013-04-23T13:42:43";
   public static final Boolean EXAMPLE_WITH_RETRIES_LEFT = true;
   public static final Boolean EXAMPLE_EXECUTABLE = true;
   public static final Boolean EXAMPLE_TIMERS = true;
   public static final Boolean EXAMPLE_MESSAGES = true;
   public static final Boolean EXAMPLE_WITH_EXCEPTION = true;
   public static final Boolean EXAMPLE_NO_RETRIES_LEFT = true;
+  public static final Boolean EXAMPLE_JOB_IS_SUSPENDED = true;
 
   public static final String EXAMPLE_RESOURCE_TYPE_NAME = "exampleResource";
   public static final int EXAMPLE_RESOURCE_TYPE_ID = 12345678;
@@ -528,8 +530,17 @@ public abstract class MockProvider {
 
   // jobs
   public static Job createMockJob() {
-    Job mock = new MockJobBuilder().id(EXAMPLE_JOB_ID).processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID).executionId(EXAMPLE_EXECUTION_ID)
-        .retries(EXAMPLE_JOB_RETRIES).exceptionMessage(EXAMPLE_JOB_NO_EXCEPTION_MESSAGE).dueDate(EXAMPLE_DUE_DATE).build();
+    Job mock = new MockJobBuilder()
+      .id(EXAMPLE_JOB_ID)
+      .processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID)
+      .executionId(EXAMPLE_EXECUTION_ID)
+      .processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
+      .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
+      .retries(EXAMPLE_JOB_RETRIES)
+      .exceptionMessage(EXAMPLE_JOB_NO_EXCEPTION_MESSAGE)
+      .dueDate(DateTime.parse(EXAMPLE_DUE_DATE).toDate())
+      .suspended(EXAMPLE_JOB_IS_SUSPENDED)
+      .build();
     return mock;
   }
 
