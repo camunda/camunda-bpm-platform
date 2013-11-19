@@ -58,17 +58,26 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
   public void testQueryByActivityId() {
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery().activityId("ServiceTask_1");
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery().activityIdIn("ServiceTask_1");
     verifyQueryResults(query, 1);
+
+    query = managementService.createJobDefinitionQuery().activityIdIn("ServiceTask_1", "BoundaryEvent_1");
+    verifyQueryResults(query, 2);
+
+    query = managementService.createJobDefinitionQuery().activityIdIn("ServiceTask_1", "BoundaryEvent_1", "StartEvent_1");
+    verifyQueryResults(query, 3);
+
+    query = managementService.createJobDefinitionQuery().activityIdIn("ServiceTask_1", "BoundaryEvent_1", "StartEvent_1", "IntermediateCatchEvent_1");
+    verifyQueryResults(query, 4);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
   public void testQueryByInvalidActivityId() {
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery().activityId("invalid");
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery().activityIdIn("invalid");
     verifyQueryResults(query, 0);
 
     try {
-      managementService.createJobDefinitionQuery().activityId(null);
+      managementService.createJobDefinitionQuery().activityIdIn(null);
       fail("A ProcessEngineExcpetion was expected.");
     } catch (ProcessEngineException e) {}
   }

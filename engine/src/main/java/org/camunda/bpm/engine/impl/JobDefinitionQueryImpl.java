@@ -30,7 +30,7 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   private static final long serialVersionUID = 1L;
 
   protected String id;
-  protected String activityId;
+  protected String[] activityIds;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String jobType;
@@ -57,12 +57,12 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
     return this;
   }
 
-  public JobDefinitionQuery activityId(String activityId) {
-    if (activityId == null) {
+  public JobDefinitionQuery activityIdIn(String... activityIds) {
+    if (activityIds == null) {
       throw new ProcessEngineException("Activity id is null");
     }
 
-    this.activityId = activityId;
+    this.activityIds = activityIds;
     return this;
   }
 
@@ -161,8 +161,8 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
     return id;
   }
 
-  public String getActivityId() {
-    return activityId;
+  public String[] getActivityIds() {
+    return activityIds;
   }
 
   public String getProcessDefinitionId() {

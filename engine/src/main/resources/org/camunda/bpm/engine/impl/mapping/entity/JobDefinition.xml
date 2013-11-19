@@ -119,8 +119,12 @@
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
-      <if test="activityId != null">
-        and RES.ACT_ID_ = #{activityId}
+      <if test="activityIds != null &amp;&amp; activityIds.length > 0">
+        and RES.ACT_ID_ in
+        <foreach item="item" index="index" collection="activityIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
       </if>
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
