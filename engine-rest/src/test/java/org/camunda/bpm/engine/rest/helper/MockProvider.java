@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.variable.StringType;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -178,6 +179,12 @@ public abstract class MockProvider {
   public static final String EXAMPLE_USER_FIRST_NAME_UPDATE = "firstNameUpdate";
   public static final String EXAMPLE_USER_LAST_NAME_UPDATE = "lastNameUpdate";
   public static final String EXAMPLE_USER_EMAIL_UPDATE = "testUpdate@example.org";
+
+  // Job Definitions
+  public static final String EXAMPLE_JOB_DEFINITION_ID = "aJobDefId";
+  public static final String EXAMPLE_JOB_TYPE = "aJobType";
+  public static final String EXAMPLE_JOB_CONFIG = "aJobConfig";
+  public static final boolean EXAMPLE_JOB_DEFINITION_IS_SUSPENDED = true;
 
   // Jobs
   public static final String EXAMPLE_JOB_ID = "aJobId";
@@ -809,4 +816,24 @@ public abstract class MockProvider {
     return identityLink;
   }
 
+  // job definition
+  public static List<JobDefinition> createMockJobDefinitions() {
+    List<JobDefinition> mocks = new ArrayList<JobDefinition>();
+    mocks.add(createMockJobDefinition());
+    return mocks;
+  }
+
+  public static JobDefinition createMockJobDefinition() {
+    JobDefinition jobDefinition = mock(JobDefinition.class);
+
+    when(jobDefinition.getId()).thenReturn(EXAMPLE_JOB_DEFINITION_ID);
+    when(jobDefinition.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+    when(jobDefinition.getProcessDefinitionKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
+    when(jobDefinition.getJobType()).thenReturn(EXAMPLE_JOB_TYPE);
+    when(jobDefinition.getJobConfiguration()).thenReturn(EXAMPLE_JOB_CONFIG);
+    when(jobDefinition.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+    when(jobDefinition.isSuspended()).thenReturn(EXAMPLE_JOB_DEFINITION_IS_SUSPENDED);
+
+    return jobDefinition;
+  }
 }

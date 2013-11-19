@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.rest.AuthorizationRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.GroupRestService;
 import org.camunda.bpm.engine.rest.IdentityRestService;
+import org.camunda.bpm.engine.rest.JobDefinitionRestService;
 import org.camunda.bpm.engine.rest.JobRestService;
 import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
@@ -99,12 +100,19 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
     return subResource;
   }
 
+  public JobDefinitionRestService getJobDefinitionRestService(String engineName) {
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    JobDefinitionRestServiceImpl subResource = new JobDefinitionRestServiceImpl(engineName);
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
+  }
+
   @Override
   public JobRestService getJobRestService(String engineName) {
-	String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
-	JobRestServiceImpl subResource = new JobRestServiceImpl(engineName);
-	subResource.setRelativeRootResourceUri(rootResourcePath);
-	return subResource;
+  	String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+  	JobRestServiceImpl subResource = new JobRestServiceImpl(engineName);
+  	subResource.setRelativeRootResourceUri(rootResourcePath);
+  	return subResource;
   }
 
   public GroupRestService getGroupRestService(String engineName) {
