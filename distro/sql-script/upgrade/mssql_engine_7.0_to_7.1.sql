@@ -26,7 +26,7 @@ alter table ACT_RU_JOB
 -- update job table with values from execution table --
 
 UPDATE
-    ACT_RU_JOB J
+    ACT_RU_JOB
 SET
     PROCESS_DEF_ID_  = (
         SELECT
@@ -34,7 +34,7 @@ SET
         FROM
             ACT_RU_EXECUTION PI
         WHERE
-            PI.ID_ = J.PROCESS_INSTANCE_ID_
+            PI.ID_ = PROCESS_INSTANCE_ID_
     ),
     SUSPENSION_STATE_  = (
         SELECT
@@ -42,11 +42,11 @@ SET
         FROM
             ACT_RU_EXECUTION PI
         WHERE
-            PI.ID_ = J.PROCESS_INSTANCE_ID_
+            PI.ID_ = PROCESS_INSTANCE_ID_
     );
 
 UPDATE
-    ACT_RU_JOB J
+    ACT_RU_JOB
 SET
     PROCESS_DEF_KEY_  = (
         SELECT
@@ -54,5 +54,5 @@ SET
         FROM
             ACT_RE_PROCDEF PD
         WHERE
-            PD.ID_ = J.PROCESS_DEF_ID_
+            PD.ID_ = PROCESS_DEF_ID_
     );
