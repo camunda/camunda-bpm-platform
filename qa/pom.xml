@@ -93,6 +93,13 @@
         <module>jboss7-runtime</module>
       </modules>
     </profile>  
+    
+    <profile>      
+      <id>jboss-domain</id> 
+      <modules>       
+        <module>jboss7-runtime</module>
+      </modules>
+    </profile>  
 	
 	<profile>
       <id>tomcat</id>       

@@ -39,32 +39,31 @@ import org.jboss.msc.service.ServiceController.Mode;
 
 /**
  * Provides the description and the implementation of the subsystem#add operation.
- * 
+ *
  * @author Daniel Meyer
  */
 public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
-  
+
   public static final BpmPlatformSubsystemAdd INSTANCE = new BpmPlatformSubsystemAdd();
-  
+
   private BpmPlatformSubsystemAdd() {
   }
-  
+
   /** {@inheritDoc} */
   @Override
   protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
     model.get(ModelConstants.PROCESS_ENGINES);
   }
-  
+
   /** {@inheritDoc} */
   @Override
   protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler,
           List<ServiceController< ? >> newControllers) throws OperationFailedException {
-    
+
     // add deployment processors
     context.addStep(new AbstractDeploymentChainStep() {
       public void execute(DeploymentProcessorTarget processorTarget) {
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessApplicationProcessor.PRIORITY, new ProcessApplicationProcessor());
-//        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessApplicationComponentAddProcessor.PRIORITY, new ProcessApplicationComponentAddProcessor(false));
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.DEPENDENCIES, ModuleDependencyProcessor.PRIORITY, new ModuleDependencyProcessor());
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.POST_MODULE, ProcessesXmlProcessor.PRIORITY, new ProcessesXmlProcessor());
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.INSTALL, ProcessEngineStartProcessor.PRIORITY, new ProcessEngineStartProcessor());
@@ -74,13 +73,13 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     // create and register the MSC container delegate.
     final MscRuntimeContainerDelegate processEngineService = new MscRuntimeContainerDelegate();
-    
-    final ServiceController<MscRuntimeContainerDelegate> controller = context.getServiceTarget()           
+
+    final ServiceController<MscRuntimeContainerDelegate> controller = context.getServiceTarget()
             .addService(ServiceNames.forMscRuntimeContainerDelegate(), processEngineService)
             .addListener(verificationHandler)
             .setInitialMode(Mode.ACTIVE)
             .install();
-    
+
     newControllers.add(controller);
   }
 
