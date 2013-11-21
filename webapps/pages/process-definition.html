@@ -2,6 +2,12 @@
 
   <!-- tool bar -->
   <div class="ctn-toolbar">
+
+    <!-- Toolbar actions are provided by plugins -->
+    <span ng-repeat="viewProvider in processDefinitionActions">
+      <view provider="viewProvider" vars="processDefinitionVars" />
+    </span>
+
   </div>
 
   <!-- sitebar -->
@@ -114,7 +120,7 @@
                      name="variableFilter{{$index}}"
                      placeholder="Filter Variable"
                      ng-model="variable.value"
-                     ng-change="filterChanged()" 
+                     ng-change="filterChanged()"
                      process-variable />
 
               <div class="note note-error note-small" ng-show="filterForm['variableFilter' + $index].$invalid">
@@ -139,7 +145,7 @@
               </div>
               <div>
                 Filters on variables must be specified as
-                <code>variableName OPERATOR value</code> where <code>OPERATOR</code> may be any of 
+                <code>variableName OPERATOR value</code> where <code>OPERATOR</code> may be any of
                 <span ng-repeat="op in operators"><span ng-show="$index > 0">, </span><code>{{ op }}</code></span>.
                 All variable filters are applied using the logical <code>AND</code>.
                 Strings must be properly enclosed in <code>""</code>.
@@ -165,7 +171,7 @@
           </li>
         </ul>
       </form>
-      
+
       <div class="footer" ng-show="filterChanged.$loading">
         <span>
           <i class="icon-loading"></i> refreshing...
@@ -204,12 +210,12 @@
             <a href ng-click="selectView(viewProvider)">{{ viewProvider.label }}</a>
           </li>
         </ul>
-  
+
         <div class="ctn-tabbed-content ctn-scroll">
           <view provider="selectedView" vars="processDefinitionVars" />
         </div>
       </div>
-    </div>    
+    </div>
 
     <a class="show-collapsable"></a>
   </div>

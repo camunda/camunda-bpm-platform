@@ -1,4 +1,4 @@
-ngDefine('cockpit.pages.processDefinition', [ 
+ngDefine('cockpit.pages.processDefinition', [
   'angular',
   'module:dataDepend:angular-data-depend'
 ], function(module, angular) {
@@ -11,7 +11,7 @@ ngDefine('cockpit.pages.processDefinition', [
 
 
     // utilities ///////////////////////
-    
+
     var internalUpdateLocation;
 
     $scope.$on('$routeChanged', function() {
@@ -62,9 +62,9 @@ ngDefine('cockpit.pages.processDefinition', [
       }
 
       currentFilter = {
-        activityIds: activityIds, 
+        activityIds: activityIds,
         parentProcessDefinitionId: params.parentProcessDefinitionId,
-        businessKey: params.businessKey, 
+        businessKey: params.businessKey,
         variables: parseVariables(parseArray(params.variables)),
         scrollToBpmnElement: scrollToBpmnElement,
         page: parseInt(params.page) || undefined
@@ -135,7 +135,7 @@ ngDefine('cockpit.pages.processDefinition', [
     }]);
 
     // processDiagram /////////////////////
-    
+
     processData.provide('processDiagram', [ 'semantic', 'processDefinition', 'bpmnElements', function (semantic, processDefinition, bpmnElements) {
       var diagram = $scope.processDiagram = $scope.processDiagram || {};
 
@@ -161,11 +161,11 @@ ngDefine('cockpit.pages.processDefinition', [
 
           activityStatistics.push(stats);
           clickableElements.push(id);
-          
+
           var incident = { id: id, incidents: currentStats.incidents };
           incidentStatistics.push(incident);
         });
-        
+
         return [ activityStatistics, incidentStatistics, clickableElements ];
       });
     }]);
@@ -190,7 +190,7 @@ ngDefine('cockpit.pages.processDefinition', [
         $rootScope.addBreadcrumb({ type: 'processDefinition', processDefinition: parent });
       }
 
-      $rootScope.addBreadcrumb({ type: 'processDefinition', processDefinition: definition });  
+      $rootScope.addBreadcrumb({ type: 'processDefinition', processDefinition: definition });
     });
 
     $scope.instanceStatistics = processData.observe([ 'instances.all', 'instances.current' ], function(allCount, currentCount) {
@@ -251,7 +251,7 @@ ngDefine('cockpit.pages.processDefinition', [
       for (var i = 0; i < semantic.length; i++) {
         var currentDiagram = semantic[i];
         if (currentDiagram.type === 'process') {
-          
+
           if (currentDiagram.id === key) {
             diagram = currentDiagram;
             break;
@@ -278,6 +278,8 @@ ngDefine('cockpit.pages.processDefinition', [
 
     $scope.processDefinitionVars = { read: [ 'processDefinition', 'selection', 'processData' ] };
     $scope.processDefinitionViews = Views.getProviders({ component: 'cockpit.processDefinition.view' });
+    $scope.processDefinitionActions = Views.getProviders({ component: 'cockpit.processDefinition.action' });
+
 
     $scope.selectView = function(view) {
       $scope.selectedView = view;
@@ -311,7 +313,7 @@ ngDefine('cockpit.pages.processDefinition', [
 
     setDefaultTab($scope.processDefinitionViews);
   }];
-  
+
   var ProcessDefinitionFilterController = [ '$scope', 'debounce', 'Variables', function($scope, debounce, Variables) {
 
     var processData = $scope.processData.newChild($scope),
@@ -347,7 +349,7 @@ ngDefine('cockpit.pages.processDefinition', [
           definition: definition,
           allDefinitions: allDefinitions,
           businessKey: filter.businessKey ? { value: filter.businessKey } : null,
-          parent: parent, 
+          parent: parent,
           filter: filter,
           variables: createRefs(filter.variables),
           activities: createActivities(filter.activityIds, bpmnElements)
@@ -373,8 +375,8 @@ ngDefine('cockpit.pages.processDefinition', [
           activities = filterData.activities,
           parent = filterData.parent,
           businessKey = filterData.businessKey,
-          newFilterVariables = [], 
-          newFilterActivityIds = [], 
+          newFilterVariables = [],
+          newFilterActivityIds = [],
           newFilter = {};
 
       // business key
@@ -416,7 +418,7 @@ ngDefine('cockpit.pages.processDefinition', [
     $scope.toggleVariableFilterHelp = function() {
       $scope.showVariableFilterHelp = !$scope.showVariableFilterHelp;
     }
-    
+
     $scope.addVariableFilter = function() {
       filterData.variables.push({});
     };

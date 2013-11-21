@@ -4,14 +4,14 @@ ngDefine('cockpit.pages.processInstance', [
 ], function(module, require) {
 
   function ProcessInstanceController ($scope, $rootScope, $location, $filter, $dialog, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Transform, processInstance, dataDepend) {
-    
+
     $rootScope.clearBreadcrumbs();
 
     $scope.processInstance = processInstance;
 
     var currentFilter;
     var controllerInitialized = false;
-    
+
     var processData = $scope.processData = dataDepend.create($scope);
 
     // utilities ///////////////////////
@@ -145,7 +145,7 @@ ngDefine('cockpit.pages.processInstance', [
 
     // end utilities ///////////////////////
 
-    // /////// Begin definition of process data 
+    // /////// Begin definition of process data
 
     // processInstance
     processData.provide('processInstance', processInstance);
@@ -190,7 +190,7 @@ ngDefine('cockpit.pages.processInstance', [
       }
 
       collectBpmnElements(model, bpmnElements);
-      
+
       return bpmnElements;
 
     }]);
@@ -201,7 +201,7 @@ ngDefine('cockpit.pages.processInstance', [
     }]);
 
     // activityInstanceTree, activityIdToInstancesMap, instanceIdToInstanceMap
-    processData.provide([ 'activityInstanceTree', 'activityIdToInstancesMap', 'instanceIdToInstanceMap' ], 
+    processData.provide([ 'activityInstanceTree', 'activityIdToInstancesMap', 'instanceIdToInstanceMap' ],
       [ 'activityInstances',
         'processDefinition',
         'bpmnElements', function (activityInstances, processDefinition, bpmnElements) {
@@ -256,14 +256,14 @@ ngDefine('cockpit.pages.processInstance', [
               instanceIdToInstanceMap[transition.id] = transition;
             }
             instances.push(transition);
-          }  
+          }
         }
       }
 
       activityInstances.name = getActivityName(model);
       // add initially the root to the map
       instanceIdToInstanceMap[activityInstances.id] = activityInstances;
-     
+
       decorateActivityInstanceTree(activityInstances);
 
       return [ activityInstances, activityIdToInstancesMap, instanceIdToInstanceMap ];
@@ -347,10 +347,10 @@ ngDefine('cockpit.pages.processInstance', [
 
     processData.provide('filter', parseFilterFromUri());
 
-    // /////// End definition of process data 
+    // /////// End definition of process data
 
 
-    // /////// Begin usage of definied process data 
+    // /////// Begin usage of definied process data
 
     processData.observe([ 'filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'], function (filter, instanceIdToInstanceMap, activityIdToInstancesMap) {
       if (!controllerInitialized) {
@@ -397,7 +397,7 @@ ngDefine('cockpit.pages.processInstance', [
       $scope.activityIdToInstancesMap = activityIdToInstancesMap;
     });
 
-    // /////// End of usage of definied process data 
+    // /////// End of usage of definied process data
 
     $scope.handleBpmnElementSelection = function (id, $event) {
       if (!id) {
@@ -427,7 +427,7 @@ ngDefine('cockpit.pages.processInstance', [
           activityIds.push(id);
           angular.forEach(instanceList, function (instance) {
             activityInstanceIds.push(instance.id);
-          });        
+          });
         } else
 
         if (idx !== -1) {
@@ -441,7 +441,7 @@ ngDefine('cockpit.pages.processInstance', [
               activityInstanceIds.splice(index, 1);
             }
           });
-          
+
         }
       }
 
@@ -449,7 +449,7 @@ ngDefine('cockpit.pages.processInstance', [
       filter['activityInstanceIds'] = activityInstanceIds;
 
       processData.set('filter', filter);
-    }; 
+    };
 
     $scope.handleActivityInstanceSelection = function (id, activityId, $event) {
       if (!id) {
@@ -500,7 +500,7 @@ ngDefine('cockpit.pages.processInstance', [
           if (!foundAnotherActivityInstance) {
             var index = activityIds.indexOf(activityId);
             activityIds.splice(index, 1);
-          }         
+          }
         }
       }
 
@@ -511,62 +511,14 @@ ngDefine('cockpit.pages.processInstance', [
       processData.set('filter', filter);
     };
 
-    function createDialog(options) {
-
-      var resolve = angular.extend(options.resolve || {}, {
-        processData: function() { return $scope.processData; },
-        processInstance: function() { return $scope.processInstance; }
-      });
-
-      options.resolve = resolve;
-
-      return $dialog.dialog(options);
-    }
-
-    $scope.openCancelProcessInstanceDialog = function () {
-      var dialog = createDialog({
-        controller: 'CancelProcessInstanceController',
-        templateUrl: require.toUrl('./cancel-process-instance.html')
-      });
-
-      dialog.open().then(function(result) {
-
-        // dialog closed. YEA!
-      });
-    };
-
-    $scope.openJobRetriesDialog = function () {
-      var dialog = createDialog({
-        controller: 'JobRetriesController',
-        templateUrl: require.toUrl('./set-job-retries.html')
-      });
-
-      dialog.open().then(function(result) {
-
-        // dialog closed. YEA!
-      });
-    };
-    
-    $scope.openAddVariableDialog = function () {
-      var dialog = createDialog({
-        controller: 'AddVariableController',
-        templateUrl: require.toUrl('./add-variable.html')
-      });
-
-      dialog.open().then(function(result) {
-        if (result === "SUCCESS") {
-          // refresh filter and all views
-          processData.set('filter', angular.extend({}, $scope.filter));
-        }
-      });
-    };
-
     $scope.$on('$routeChangeStart', function () {
       $rootScope.clearBreadcrumbs();
     });
 
     $scope.processInstanceVars = { read: [ 'processInstance', 'processData' ] };
-    $scope.processInstanceTabs = Views.getProviders({ component: 'cockpit.processInstance.instanceDetails' });
+    $scope.processInstanceTabs = Views.getProviders({ component: 'cockpit.processInstance.view' })
+                         .concat(Views.getProviders({ component: 'cockpit.processInstance.instanceDetails' })); // backwards compatibility
+    $scope.processInstanceActions = Views.getProviders({ component: 'cockpit.processInstance.action' });
 
     $scope.selectView = function(view) {
       $scope.selectedView = view;
