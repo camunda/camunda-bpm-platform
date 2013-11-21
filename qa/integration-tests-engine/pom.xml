@@ -10,11 +10,6 @@
     <version>7.1.0-SNAPSHOT</version>
   </parent>
 
-  <!--  <properties>
-    <WAS8_HOME>C:\Program Files (x86)\IBM\WebSphere85\AppServer</WAS8_HOME>
-    <WAS8_REMOTE_SERVER_SOAP_PORT>8882</WAS8_REMOTE_SERVER_SOAP_PORT>
-  </properties> -->
-
   <dependencies>
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
@@ -127,9 +122,6 @@
             </goals>
             <configuration>
               <forceCreate>true</forceCreate>
-            <!--  <includes>
-                <include>**/com/camunda/fox/platform/test/util/**/*.class</include>
-              </includes> -->
             </configuration>
           </execution>
         </executions>
@@ -166,12 +158,12 @@
         </dependency>
       </dependencies>
       <build>
-        <resources>
-          <resource>
+        <testResources>
+          <testResource>
             <directory>src/test/resources-jboss</directory>
             <filtering>true</filtering>
-          </resource>
-        </resources>
+          </testResource>
+        </testResources>
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -200,25 +192,6 @@
               </delimiters>
               <useDefaultDelimiters>false</useDefaultDelimiters>
             </configuration>
-            <executions>
-              <execution>
-                <id>configure-jboss</id>
-                <phase>process-test-resources</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>${jboss.runtime.location}/standalone/configuration/blueprint</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <outputDirectory>${jboss.runtime.location}/standalone/configuration</outputDirectory>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-            </executions>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -230,7 +203,83 @@
                 <exclude>**_OTHERS.java</exclude>
                 <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
                 <excludes>**/SpringServletPALifecycleTest.java</excludes>
+                <excludes>**/ManagedDomainTestCase_JBOSS.java</excludes>
               </excludes>
+             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    
+    <profile>
+      <id>jboss-domain</id>
+      <dependencies>
+        <dependency>
+          <!-- make sure this comes after runtime in the reactor build -->
+          <groupId>org.camunda.bpm.qa</groupId>
+          <artifactId>camunda-qa-jboss-runtime</artifactId>
+          <version>${project.version}</version>
+          <scope>provided</scope>
+          <type>pom</type>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.as</groupId>
+          <artifactId>jboss-as-arquillian-container-domain-managed</artifactId>
+          <version>${version.jboss.as}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.arquillian.protocol</groupId>
+          <artifactId>arquillian-protocol-servlet</artifactId>
+          <version>${version.arquillian}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources-jboss-domain</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-test-source</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/test/java-jboss</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <configuration>
+              <delimiters>
+                <delimiter>${*}</delimiter>
+              </delimiters>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/ManagedDomainTestCase_JBOSS.java</include>
+              </includes>
              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
@@ -270,6 +319,7 @@
                 <exclude>**/ejb/**</exclude>
                 <exclude>**/context/**</exclude>
                 <exclude>**/jar/**</exclude>
+                <excludes>**/jboss/**</excludes>
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
@@ -341,7 +391,7 @@
                 <excludes>**/TestDeploymentWithDroolsTaskFails.java</excludes>
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
                 <exclude>**/*_JBOSS.java</exclude>
-                <exclude>**/jar/**</exclude>                
+                <exclude>**/jar/**</exclude>
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
@@ -373,7 +423,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
-            <version>1.5</version>
             <dependencies>
               <dependency>
                 <groupId>mysql</groupId>
@@ -514,7 +563,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
-            <version>1.5</version>
             <dependencies>
               <dependency>
                 <groupId>mysql</groupId>
@@ -634,12 +682,12 @@
 
       </dependencies>
       <build>
-        <resources>
-          <resource>
+        <testResources>
+          <testResource>
             <directory>src/test/resources-tomcat</directory>
             <filtering>true</filtering>
-          </resource>
-        </resources>
+          </testResource>
+        </testResources>
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -727,8 +775,22 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-glassfish</source>
+                    <source>src/test/java-jboss</source>
                   </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-test-resource</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>add-test-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>src/test/resources-jboss</directory>
+                    </resource>
+                  </resources>
                 </configuration>
               </execution>
             </executions>
@@ -832,7 +894,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
-            <version>1.5</version>
             <dependencies>
               <dependency>
                 <groupId>mysql</groupId>

@@ -19,12 +19,16 @@ import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
+import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.management.TablePageQuery;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
 
@@ -122,7 +126,13 @@ public interface ManagementService {
   JobQuery createJobQuery();
 
   /**
-   * Forced synchronous execution of a job (eg. for administation or testing)
+   * Returns a new {@link JobDefinitionQuery} implementation, that can be used
+   * to dynamically query the job definitions.
+   */
+  JobDefinitionQuery createJobDefinitionQuery();
+
+  /**
+   * Forced synchronous execution of a job (eg. for administration or testing)
    * The job will be executed, even if the process definition and/or the process instance
    * is in suspended state.
    *
@@ -137,6 +147,334 @@ public interface ManagementService {
    * @throws ProcessEngineException when there is no job with the given id.
    */
   void deleteJob(String jobId);
+
+  /**
+   * <p>Activates the {@link JobDefinition} with the given id immediately.</p>
+   *
+   * <p>
+   * <strong>Note:</strong> All {@link Job}s of the provided job definition
+   * will be <strong>not</strong> activated.
+   * </p>
+   *
+   * @throws ProcessEngineException if the job definition id is equal null.
+   *
+   * @see #activateJobById(String)
+   * @see #activateJobByJobDefinitionId(String)
+   */
+  void activateJobDefinitionById(String jobDefinitionId);
+
+  /**
+   * <p>Activates all {@link JobDefinition}s of the provided process definition id immediately.</p>
+   *
+   * <p>
+   * <strong>Note:</strong> All {@link Job}s of the provided job definition
+   * will be <strong>not</strong> activated.
+   * </p>
+   *
+   * @throws ProcessEngineException if the process definition id is equal null.
+   *
+   * @see #activateJobByProcessDefinitionId(String)
+   */
+  void activateJobDefinitionByProcessDefinitionId(String processDefinitionId);
+
+  /**
+   * <p>Activates all {@link JobDefinition}s of the provided process definition key immediately.</p>
+   *
+   * <p>
+   * <strong>Note:</strong> All {@link Job}s of the provided job definition
+   * will be <strong>not</strong> activated.
+   * </p>
+   *
+   * @throws ProcessEngineException if the process definition key is equal null.
+   *
+   * @see #activateJobByProcessDefinitionKey(String)
+   */
+  void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey);
+
+  /**
+   * <p>Activates the {@link JobDefinition} with the given id immediately.</p>
+   *
+   * @param activateJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be activated too.
+   *
+   * @throws ProcessEngineException if the job definition id is equal null.
+   *
+   * @see #activateJobById(String)
+   * @see #activateJobByJobDefinitionId(String)
+   */
+  void activateJobDefinitionById(String jobDefinitionId, boolean activateJobs);
+
+  /**
+   * <p>Activates all {@link JobDefinition}s of the provided process definition id immediately.</p>
+   *
+   * @param activateJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be activated too.
+   *
+   * @throws ProcessEngineException if the process definition id is equal null.
+   *
+   * @see #activateJobByProcessDefinitionId(String)
+   */
+  void activateJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean activateJobs);
+
+  /**
+   * <p>Activates all {@link JobDefinition}s of the provided process definition key immediately.</p>
+   *
+   * @param activateJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be activated too.
+   *
+   * @throws ProcessEngineException if the process definition key is equal null.
+   *
+   * @see #activateJobByProcessDefinitionKey(String)
+   */
+  void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean activateJobs);
+
+  /**
+   * Activates the {@link JobDefinition} with the given id.
+   *
+   * @param activateJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be activated too.
+   *
+   * @param activationDate The date on which the job definition will be activated. If null, the
+   *                       job definition is activated immediately.
+   *                       Note: The {@link JobExecutor} needs to be active to use this!
+   *
+   * @throws ProcessEngineException if the job definition id is equal null.
+   *
+   * @see #activateJobById(String)
+   * @see #activateJobByJobDefinitionId(String)
+   */
+  void activateJobDefinitionById(String jobDefinitionId, boolean activateJobs, Date activationDate);
+
+  /**
+   * <p>Activates all {@link JobDefinition}s of the provided process definition id.</p>
+   *
+   * @param activateJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be activated too.
+   *
+   * @param activationDate The date on which the job definition will be activated. If null, the
+   *                       job definition is activated immediately.
+   *                       Note: The {@link JobExecutor} needs to be active to use this!
+   *
+   * @throws ProcessEngineException if the process definition id is equal null.
+   *
+   * @see #activateJobByProcessDefinitionId(String)
+   */
+  void activateJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean activateJobs, Date activationDate);
+
+  /**
+   * <p>Activates all {@link JobDefinition}s of the provided process definition key.</p>
+   *
+   * @param activateJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be activated too.
+   *
+   * @param activationDate The date on which the job definition will be activated. If null, the
+   *                       job definition is activated immediately.
+   *                       Note: The {@link JobExecutor} needs to be active to use this!
+   *
+   * @throws ProcessEngineException if the process definition key is equal null.
+   *
+   * @see #activateJobByProcessDefinitionKey(String)
+   */
+  void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean activateJobs, Date activationDate);
+
+  /**
+   * <p>Suspends the {@link JobDefinition} with the given id immediately.</p>
+   *
+   * <p>
+   * <strong>Note:</strong> All {@link Job}s of the provided job definition
+   * will be <strong>not</strong> suspended.
+   * </p>
+   *
+   * @throws ProcessEngineException if no such job definition can be found.
+   *
+   * @see #suspendJobById(String)
+   * @see #suspendJobByJobDefinitionId(String)
+   */
+  void suspendJobDefinitionById(String jobDefinitionId);
+
+  /**
+   * <p>Suspends all {@link JobDefinition} of the provided process definition id immediately.</p>
+   *
+   * <p>
+   * <strong>Note:</strong> All {@link Job}s of the provided job definition
+   * will be <strong>not</strong> suspended.
+   * </p>
+   *
+   * @throws ProcessEngineException if the process definition id is equal null.
+   *
+   * @see #suspendJobByProcessDefinitionId(String)
+   */
+  void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId);
+
+  /**
+   * <p>Suspends all {@link JobDefinition} of the provided process definition key immediately.</p>
+   *
+   * <p>
+   * <strong>Note:</strong> All {@link Job}s of the provided job definition
+   * will be <strong>not</strong> suspended.
+   * </p>
+   *
+   * @throws ProcessEngineException if the process definition key is equal null.
+   *
+   * @see #suspendJobByProcessDefinitionKey(String)
+   */
+  void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey);
+
+  /**
+   * Suspends the {@link JobDefinition} with the given id immediately.
+   *
+   * @param suspendJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be suspended too.
+   *
+   * @throws ProcessEngineException if the job definition id is equal null.
+   *
+   * @see #suspendJobById(String)
+   * @see #suspendJobByJobDefinitionId(String)
+   */
+  void suspendJobDefinitionById(String jobDefinitionId, boolean suspendJobs);
+
+  /**
+   * Suspends all {@link JobDefinition}s of the provided process definition id immediately.
+   *
+   * @param suspendJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be suspended too.
+   *
+   * @throws ProcessEngineException if the process definition id is equal null.
+   *
+   * @see #suspendJobByProcessDefinitionId(String)
+   */
+  void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean suspendJobs);
+
+  /**
+   * Suspends all {@link JobDefinition}s of the provided process definition key immediately.
+   *
+   * @param suspendJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be suspended too.
+   *
+   * @throws ProcessEngineException if the process definition key is equal null.
+   *
+   * @see #suspendJobByProcessDefinitionKey(String)
+   */
+  void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean suspendJobs);
+
+  /**
+   * Suspends the {@link JobDefinition} with the given id.
+   *
+   * @param suspendJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be suspended too.
+   *
+   * @param suspensionDate The date on which the job definition will be suspended. If null, the
+   *                       job definition is suspended immediately.
+   *                       Note: The {@link JobExecutor} needs to be active to use this!
+   *
+   * @throws ProcessEngineException if the job definition id is equal null.
+   *
+   * @see #suspendJobById(String)
+   * @see #suspendJobByJobDefinitionId(String)
+   */
+  void suspendJobDefinitionById(String jobDefinitionId, boolean suspendJobs, Date suspensionDate);
+
+  /**
+   * Suspends all {@link JobDefinition}s of the provided process definition id.
+   *
+   * @param suspendJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be suspended too.
+   *
+   * @param suspensionDate The date on which the job definition will be suspended. If null, the
+   *                       job definition is suspended immediately.
+   *                       Note: The {@link JobExecutor} needs to be active to use this!
+   *
+   * @throws ProcessEngineException if the process definition id is equal null.
+   *
+   * @see #suspendJobByProcessDefinitionId(String)
+   */
+  void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean suspendJobs, Date suspensionDate);
+
+  /**
+   * Suspends all {@link JobDefinition}s of the provided process definition key.
+   *
+   * @param suspendJobs If true, all the {@link Job}s of the provided job definition
+   *                     will be suspended too.
+   *
+   * @param suspensionDate The date on which the job definition will be suspended. If null, the
+   *                       job definition is suspended immediately.
+   *                       Note: The {@link JobExecutor} needs to be active to use this!
+   *
+   * @throws ProcessEngineException if the process definition key is equal null.
+   *
+   * @see #suspendJobByProcessDefinitionKey(String)
+   */
+  void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean suspendJobs, Date suspensionDate);
+
+  /**
+   * <p>Activates the {@link Job} with the given id.</p>
+   *
+   * @throws ProcessEngineException if the job id is equal null.
+   */
+  void activateJobById(String jobId);
+
+  /**
+   * <p>Activates all {@link Job}s of the provided job definition id.</p>
+   *
+   * @throws ProcessEngineException if the job definition id is equal null.
+   */
+  void activateJobByJobDefinitionId(String jobDefinitionId);
+
+  /**
+   * <p>Activates all {@link Job}s of the provided process instance id.</p>
+   *
+   * @throws ProcessEngineException if the process instance id is equal null.
+   */
+  void activateJobByProcessInstanceId(String processInstanceId);
+
+  /**
+   * <p>Activates all {@link Job}s of the provided process definition id.</p>
+   *
+   * @throws ProcessEngineException if the process definition id is equal null.
+   */
+  void activateJobByProcessDefinitionId(String processDefinitionId);
+
+  /**
+   * <p>Activates {@link Job}s of the provided process definition key.</p>
+   *
+   * @throws ProcessEngineException if the process definition key is equal null.
+   */
+  void activateJobByProcessDefinitionKey(String processDefinitionKey);
+
+  /**
+   * <p>Suspends the {@link Job} with the given id.</p>
+   *
+   * @throws ProcessEngineException if the job id is equal null.
+   */
+  void suspendJobById(String jobId);
+
+  /**
+   * <p>Suspends all {@link Job}s of the provided job definition id.</p>
+   *
+   * @throws ProcessEngineException if the job definition id is equal null.
+   */
+  void suspendJobByJobDefinitionId(String jobDefinitionId);
+
+  /**
+   * <p>Suspends all {@link Job}s of the provided process instance id.</p>
+   *
+   * @throws ProcessEngineException if the process instance id is equal null.
+   */
+  void suspendJobByProcessInstanceId(String processInstanceId);
+
+  /**
+   * <p>Suspends all {@link Job}s of the provided process definition id.</p>
+   *
+   * @throws ProcessEngineException if the process definition id is equal null.
+   */
+  void suspendJobByProcessDefinitionId(String processDefinitionId);
+
+  /**
+   * <p>Activates {@link Job}s of the provided process definition key.</p>
+   *
+   * @throws ProcessEngineException if the process definition key is equal null.
+   */
+  void suspendJobByProcessDefinitionKey(String processDefinitionKey);
 
   /**
    * Sets the number of retries that a job has left.

@@ -71,15 +71,8 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
-      <version>4.8.1</version>
+      <version>4.11</version>
       <scope>test</scope>
-      <exclusions>
-        <!-- collides with rest-assured -->
-        <exclusion>
-          <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest-core</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- Wink test dependencies -->
@@ -151,7 +144,7 @@
     <dependency>
       <groupId>com.jayway.restassured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>1.7.2</version>
+      <version>1.8.1</version>
       <scope>test</scope>
     </dependency>
     
@@ -166,14 +159,6 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy</artifactId>
-      <!-- override version -->
-      <version>1.8.4</version>
       <scope>test</scope>
     </dependency>
 

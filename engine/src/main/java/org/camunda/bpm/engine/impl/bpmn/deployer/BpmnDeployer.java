@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
@@ -41,12 +42,16 @@ import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
@@ -75,6 +80,7 @@ public class BpmnDeployer implements Deployer {
 
     List<ProcessDefinitionEntity> processDefinitions = new ArrayList<ProcessDefinitionEntity>();
     Map<String, ResourceEntity> resources = deployment.getResources();
+    BpmnParse bpmnParse = null;
 
     for (String resourceName : resources.keySet()) {
 
@@ -84,7 +90,8 @@ public class BpmnDeployer implements Deployer {
         byte[] bytes = resource.getBytes();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 
-        BpmnParse bpmnParse = bpmnParser
+
+        bpmnParse = bpmnParser
           .createParse()
           .sourceInputStream(inputStream)
           .deployment(deployment)
@@ -137,6 +144,7 @@ public class BpmnDeployer implements Deployer {
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
     DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
+
       if (deployment.isNew()) {
         ProcessDefinitionEntity latestProcessDefinition = processDefinitionManager.findLatestProcessDefinitionByKey(processDefinition.getKey());
 
@@ -144,6 +152,8 @@ public class BpmnDeployer implements Deployer {
         processDefinition.setVersion(getVersionForNewProcessDefinition(deployment, processDefinition, latestProcessDefinition));
         processDefinition.setId(getProcessDefinitionId(deployment, processDefinition));
 
+        List<JobDeclaration<?>> jobDeclarations = bpmnParse.getJobDeclarationsByKey(processDefinition.getKey());
+        updateJobDeclarations(jobDeclarations, processDefinition, deployment.isNew());
         adjustStartEventSubscriptions(processDefinition, latestProcessDefinition);
 
         dbSqlSession.insert(processDefinition);
@@ -158,6 +168,9 @@ public class BpmnDeployer implements Deployer {
         processDefinition.setId(persistedProcessDefinition.getId());
         processDefinition.setVersion(persistedProcessDefinition.getVersion());
         processDefinition.setSuspensionState(persistedProcessDefinition.getSuspensionState());
+
+        List<JobDeclaration<?>> jobDeclarations = bpmnParse.getJobDeclarationsByKey(processDefinition.getKey());
+        updateJobDeclarations(jobDeclarations, processDefinition, deployment.isNew());
 
         deploymentCache.addProcessDefinition(processDefinition);
         addAuthorizations(processDefinition);
@@ -175,17 +188,67 @@ public class BpmnDeployer implements Deployer {
     }
   }
 
+  protected void updateJobDeclarations(List<JobDeclaration<?>> jobDeclarations, ProcessDefinition processDefinition, boolean isNewDeployment) {
+
+    if(jobDeclarations == null || jobDeclarations.isEmpty()) {
+      return;
+    }
+
+    final JobDefinitionManager jobDefinitionManager = Context.getCommandContext().getJobDefinitionManager();
+
+    if(isNewDeployment) {
+      // create new job definitions:
+      for (JobDeclaration<?> jobDeclaration : jobDeclarations) {
+        createJobDefinition(processDefinition, jobDeclaration);
+      }
+
+    } else {
+      // query all job definitions and update the declarations with their Ids
+      List<JobDefinitionEntity> existingDefinitions = jobDefinitionManager.findByProcessDefinitionId(processDefinition.getId());
+      for (JobDeclaration<?> jobDeclaration : jobDeclarations) {
+        boolean jobDefinitionExists = false;
+        for (JobDefinition jobDefinitionEntity : existingDefinitions) {
+
+          // <!> Assumption: there can be only one job definition per activity and type
+          if(jobDeclaration.getActivityId().equals(jobDefinitionEntity.getActivityId()) &&
+              jobDeclaration.getJobHandlerType().equals(jobDefinitionEntity.getJobType())) {
+            jobDeclaration.setJobDefinitionId(jobDefinitionEntity.getId());
+            jobDefinitionExists = true;
+            break;
+          }
+        }
+
+        if(!jobDefinitionExists) {
+          // not found: create new definition
+          createJobDefinition(processDefinition, jobDeclaration);
+        }
+
+      }
+    }
+
+  }
+
+  protected void createJobDefinition(ProcessDefinition processDefinition, JobDeclaration<?> jobDeclaration) {
+    final JobDefinitionManager jobDefinitionManager = Context.getCommandContext().getJobDefinitionManager();
+
+    JobDefinitionEntity jobDefinitionEntity = new JobDefinitionEntity(jobDeclaration);
+    jobDefinitionEntity.setProcessDefinitionId(processDefinition.getId());
+    jobDefinitionEntity.setProcessDefinitionKey(processDefinition.getKey());
+    jobDefinitionManager.insert(jobDefinitionEntity);
+    jobDeclaration.setJobDefinitionId(jobDefinitionEntity.getId());
+  }
+
   /**
    * adjust all event subscriptions responsible to start process instances
    * (timer start event, message start event). The default behavior is to remove the old
    * subscriptions and add new ones for the new deployed process definitions.
    */
   protected void adjustStartEventSubscriptions(ProcessDefinitionEntity newLatestProcessDefinition, ProcessDefinitionEntity oldLatestProcessDefinition) {
-	removeObsoleteTimers(newLatestProcessDefinition);
-	addTimerDeclarations(newLatestProcessDefinition);
+  	removeObsoleteTimers(newLatestProcessDefinition);
+  	addTimerDeclarations(newLatestProcessDefinition);
 
-	removeObsoleteMessageEventSubscriptions(newLatestProcessDefinition, oldLatestProcessDefinition);
-	addMessageEventSubscriptions(newLatestProcessDefinition);
+  	removeObsoleteMessageEventSubscriptions(newLatestProcessDefinition, oldLatestProcessDefinition);
+  	addMessageEventSubscriptions(newLatestProcessDefinition);
   }
 
   /**
@@ -195,16 +258,16 @@ public class BpmnDeployer implements Deployer {
  * @param deployment
    */
   protected String getProcessDefinitionId(DeploymentEntity deployment, ProcessDefinitionEntity processDefinition) {
-	String nextId = idGenerator.getNextId();
-	String processDefinitionId = processDefinition.getKey()
-	  + ":" + processDefinition.getVersion()
-	  + ":" + nextId; // ACT-505
+  	String nextId = idGenerator.getNextId();
+  	String processDefinitionId = processDefinition.getKey()
+  	  + ":" + processDefinition.getVersion()
+  	  + ":" + nextId; // ACT-505
 
-	// ACT-115: maximum id length is 64 charcaters
-	if (processDefinitionId.length() > 64) {
-	  processDefinitionId = nextId;
-	}
-	return processDefinitionId;
+  	// ACT-115: maximum id length is 64 charcaters
+  	if (processDefinitionId.length() > 64) {
+  	  processDefinitionId = nextId;
+  	}
+  	return processDefinitionId;
   }
 
   /**
@@ -213,11 +276,11 @@ public class BpmnDeployer implements Deployer {
    * versions with deployment / build versions.
    */
   protected int getVersionForNewProcessDefinition(DeploymentEntity deployment, ProcessDefinitionEntity newProcessDefinition, ProcessDefinitionEntity latestProcessDefinition) {
-	if (latestProcessDefinition != null) {
-	  return latestProcessDefinition.getVersion() + 1;
-	} else {
-	  return 1;
-	}
+  	if (latestProcessDefinition != null) {
+  	  return latestProcessDefinition.getVersion() + 1;
+  	} else {
+  	  return 1;
+  	}
   }
 
   @SuppressWarnings("unchecked")
@@ -225,7 +288,7 @@ public class BpmnDeployer implements Deployer {
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) processDefinition.getProperty(BpmnParse.PROPERTYNAME_START_TIMER);
     if (timerDeclarations!=null) {
       for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
-        TimerEntity timer = timerDeclaration.prepareTimerEntity(null);
+        TimerEntity timer = timerDeclaration.createJobInstance(null);
         timer.setDeploymentId(processDefinition.getDeploymentId());
         Context
           .getCommandContext()

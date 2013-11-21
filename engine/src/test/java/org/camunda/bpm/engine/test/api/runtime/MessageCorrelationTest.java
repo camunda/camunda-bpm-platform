@@ -128,6 +128,17 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     assertEquals(1, instances);
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml"})
+  public void testMessageStartEventCorrelationBusKey() {
+    final String businessKey = "aBusinessKey";
+
+    runtimeService.correlateMessage("newInvoiceMessage", businessKey);
+
+    // assert that the business key is set correctly
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertEquals(businessKey, processInstance.getBusinessKey());
+  }
+
   /**
    * this test assures the right start event is selected
    */

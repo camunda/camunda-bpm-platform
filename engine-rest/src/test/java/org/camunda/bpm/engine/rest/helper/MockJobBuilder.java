@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,10 @@ public class MockJobBuilder {
 	private String exceptionMessage;
 	private String executionId;
 	private String processInstanceId;
+	private String processDefinitionId;
+	private String processDefinitionKey;
 	private int retries;
+	private boolean suspended;
 
 	public MockJobBuilder id(String id) {
 		this.id = id;
@@ -53,6 +56,21 @@ public class MockJobBuilder {
 		return this;
 	}
 
+  public MockJobBuilder processDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
+  public MockJobBuilder processDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
+  public MockJobBuilder suspended(boolean suspended) {
+    this.suspended = suspended;
+    return this;
+  }
+
 	public MockJobBuilder retries(int retries) {
 		this.retries = retries;
 		return this;
@@ -65,7 +83,10 @@ public class MockJobBuilder {
 		when(mockJob.getExceptionMessage()).thenReturn(exceptionMessage);
 		when(mockJob.getExecutionId()).thenReturn(executionId);
 		when(mockJob.getProcessInstanceId()).thenReturn(processInstanceId);
+		when(mockJob.getProcessDefinitionId()).thenReturn(processDefinitionId);
+		when(mockJob.getProcessDefinitionKey()).thenReturn(processDefinitionKey);
 		when(mockJob.getRetries()).thenReturn(retries);
+		when(mockJob.isSuspended()).thenReturn(suspended);
 		return mockJob;
 	}
 

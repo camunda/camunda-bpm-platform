@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,13 +38,13 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   protected boolean isScope;
   protected boolean isAsync;
   protected boolean isExclusive;
-  
+
   // Graphical information
   protected int x = -1;
   protected int y = -1;
   protected int width = -1;
   protected int height = -1;
-  
+
   public ActivityImpl(String id, ProcessDefinitionImpl processDefinition) {
     super(id, processDefinition);
   }
@@ -57,25 +57,25 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     TransitionImpl transition = new TransitionImpl(transitionId, processDefinition);
     transition.setSource(this);
     outgoingTransitions.add(transition);
-    
+
     if (transitionId!=null) {
       if (namedOutgoingTransitions.containsKey(transitionId)) {
         throw new PvmException("activity '"+id+" has duplicate transition '"+transitionId+"'");
       }
       namedOutgoingTransitions.put(transitionId, transition);
     }
-    
+
     return transition;
   }
-  
+
   public TransitionImpl findOutgoingTransition(String transitionId) {
     return namedOutgoingTransitions.get(transitionId);
   }
-  
+
   public String toString() {
     return "Activity("+id+")";
   }
-  
+
   public ActivityImpl getParentActivity() {
     if (parent instanceof ActivityImpl) {
       return (ActivityImpl) parent;
@@ -85,7 +85,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
 
   // restricted setters ///////////////////////////////////////////////////////
-  
+
   protected void setOutgoingTransitions(List<TransitionImpl> outgoingTransitions) {
     this.outgoingTransitions = outgoingTransitions;
   }
@@ -133,7 +133,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   public int getX() {
     return x;
   }
-  
+
   public void setX(int x) {
     this.x = x;
   }
@@ -161,25 +161,26 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   public void setHeight(int height) {
     this.height = height;
   }
-  
+
   public boolean isAsync() {
     return isAsync;
   }
-  
+
   public void setAsync(boolean isAsync) {
     this.isAsync = isAsync;
   }
-  
+
   public boolean isExclusive() {
     return isExclusive;
   }
-    
+
+  @Deprecated
   public void setExclusive(boolean isExclusive) {
     this.isExclusive = isExclusive;
   }
-  
+
   public String getActivityId() {
     return super.getId();
   }
-  
+
 }

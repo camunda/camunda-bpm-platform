@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+  <process id="testProcess">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="gw1" />
+
+    <eventBasedGateway id="gw1" />
+    <sequenceFlow sourceRef="gw1" targetRef="timer1" />
+    <sequenceFlow sourceRef="gw1" targetRef="timer2" />
+
+
+    <intermediateCatchEvent id="timer1">
+        <timerEventDefinition>
+            <timeDuration>PT5M</timeDuration>
+        </timerEventDefinition>
+    </intermediateCatchEvent>   
+
+    <intermediateCatchEvent id="timer2">
+        <timerEventDefinition>
+            <timeDuration>PT10M</timeDuration>
+        </timerEventDefinition>
+    </intermediateCatchEvent>   
+
+  </process>
+</definitions>

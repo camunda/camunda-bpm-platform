@@ -67,7 +67,7 @@ public abstract class DeploymentMetadataParse extends Parse {
         logWarnings();
       }
       if (hasErrors()) {
-        throwActivitiExceptionForErrors();
+        throwExceptionForErrors();
       }
     }
 

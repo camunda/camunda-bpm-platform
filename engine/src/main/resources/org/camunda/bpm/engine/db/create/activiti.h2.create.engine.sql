@@ -59,6 +59,8 @@ create table ACT_RU_JOB (
     EXCLUSIVE_ boolean,
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
+    PROCESS_DEF_ID_ varchar(64),
+    PROCESS_DEF_KEY_ varchar(64),
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
@@ -67,6 +69,20 @@ create table ACT_RU_JOB (
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
     DEPLOYMENT_ID_ varchar(64),
+    SUSPENSION_STATE_ integer,
+    JOB_DEF_ID_ varchar(64),
+    primary key (ID_)
+);
+
+create table ACT_RU_JOBDEF (
+    ID_ varchar(64) NOT NULL,
+    REV_ integer,
+    PROC_DEF_ID_ varchar(64) NOT NULL,
+    PROC_DEF_KEY_ varchar(255) NOT NULL,
+    ACT_ID_ varchar(255) NOT NULL,
+    JOB_TYPE_ varchar(255) NOT NULL,
+    JOB_CONFIGURATION_ varchar(255),
+    SUSPENSION_STATE_ integer,
     primary key (ID_)
 );
 

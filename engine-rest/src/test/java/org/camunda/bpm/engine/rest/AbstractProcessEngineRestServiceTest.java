@@ -4,6 +4,7 @@ import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.matchers.JUnitMatchers.hasItems;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
@@ -21,6 +22,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -35,6 +37,8 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
@@ -69,6 +73,8 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String AUTHORIZATION_URL = SINGLE_ENGINE_URL + AuthorizationRestService.PATH;
   protected static final String AUTHORIZATION_CHECK_URL = AUTHORIZATION_URL + "/check";
 
+  protected static final String JOB_DEFINITION_URL = SINGLE_ENGINE_URL + "/job-definition";
+
   protected static final String HISTORY_URL = SINGLE_ENGINE_URL + "/history";
   protected static final String HISTORY_ACTIVITY_INSTANCE_URL = HISTORY_URL + "/activity-instance";
   protected static final String HISTORY_PROCESS_INSTANCE_URL = HISTORY_URL + "/process-instance";
@@ -82,6 +88,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   private RuntimeService mockRuntimeService;
   private TaskService mockTaskService;
   private IdentityService mockIdentityService;
+  private ManagementService mockManagementService;
 
   private HistoryService mockHistoryService;
 
@@ -92,6 +99,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     mockRuntimeService = mock(RuntimeService.class);
     mockTaskService = mock(TaskService.class);
     mockIdentityService = mock(IdentityService.class);
+    mockManagementService = mock(ManagementService.class);
 
     mockHistoryService = mock(HistoryService.class);
 
@@ -99,6 +107,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(namedProcessEngine.getRuntimeService()).thenReturn(mockRuntimeService);
     when(namedProcessEngine.getTaskService()).thenReturn(mockTaskService);
     when(namedProcessEngine.getIdentityService()).thenReturn(mockIdentityService);
+    when(namedProcessEngine.getManagementService()).thenReturn(mockManagementService);
 
     when(namedProcessEngine.getHistoryService()).thenReturn(mockHistoryService);
 
@@ -108,6 +117,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createIdentityMocks();
     createExecutionMock();
     createVariableInstanceMock();
+    createJobDefinitionMock();
 
     createHistoricActivityInstanceMock();
     createHistoricProcessInstanceMock();
@@ -182,6 +192,16 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(mockRuntimeService.createVariableInstanceQuery()).thenReturn(mockVariableInstanceQuery);
   }
 
+  private void createJobDefinitionMock() {
+    List<JobDefinition> jobDefinitions = new ArrayList<JobDefinition>();
+    JobDefinition mockJobDefinition = MockProvider.createMockJobDefinition();
+    jobDefinitions.add(mockJobDefinition);
+
+    JobDefinitionQuery mockJobDefinitionQuery = mock(JobDefinitionQuery.class);
+    when(mockJobDefinitionQuery.list()).thenReturn(jobDefinitions);
+    when(mockManagementService.createJobDefinitionQuery()).thenReturn(mockJobDefinitionQuery);
+  }
+
   private void createHistoricActivityInstanceMock() {
     List<HistoricActivityInstance> activities = new ArrayList<HistoricActivityInstance>();
     HistoricActivityInstance mockInstance = MockProvider.createMockHistoricActivityInstance();
@@ -230,8 +250,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     expect()
       .statusCode(Status.OK.getStatusCode())
       .body("$.size()", is(2))
-      .body("[0].name", equalTo(MockProvider.EXAMPLE_PROCESS_ENGINE_NAME))
-      .body("[1].name", equalTo(MockProvider.ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME))
+      .body("name", hasItems(MockProvider.EXAMPLE_PROCESS_ENGINE_NAME, MockProvider.ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME))
     .when().get(ENGINES_URL);
   }
 
@@ -389,6 +408,20 @@ public abstract class AbstractProcessEngineRestServiceTest extends
         .get(HISTORY_VARIABLE_INSTANCE_URL);
 
     verify(mockHistoryService).createHistoricVariableInstanceQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testJobDefinitionAccess() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(JOB_DEFINITION_URL);
+
+    verify(mockManagementService).createJobDefinitionQuery();
     verifyZeroInteractions(processEngine);
   }
 }

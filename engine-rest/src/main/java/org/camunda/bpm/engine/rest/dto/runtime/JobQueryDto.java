@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,9 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
 	private static final String SORT_BY_JOB_ID_VALUE = "jobId";
 	private static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
-	private static final String SORT_BY_PROCESSINSTANCE_ID_VALUE = "processInstanceId";
+	private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "processInstanceId";
+	private static final String SORT_BY_PROCESS_DEFINITION_ID_VALUE = "processDefinitionId";
+	private static final String SORT_BY_PROCESS_DEFINITION_KEY_VALUE = "processDefinitionKey";
 	private static final String SORT_BY_JOB_RETRIES_VALUE = "jobRetries";
 	private static final String SORT_BY_JOB_DUEDATE_VALUE = "jobDueDate";
 
@@ -42,14 +44,18 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 		VALID_SORT_BY_VALUES = new ArrayList<String>();
 		VALID_SORT_BY_VALUES.add(SORT_BY_JOB_ID_VALUE);
 		VALID_SORT_BY_VALUES.add(SORT_BY_EXECUTION_ID_VALUE);
-		VALID_SORT_BY_VALUES.add(SORT_BY_PROCESSINSTANCE_ID_VALUE);
+		VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID_VALUE);
+		VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID_VALUE);
+		VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY_VALUE);
 		VALID_SORT_BY_VALUES.add(SORT_BY_JOB_RETRIES_VALUE);
 		VALID_SORT_BY_VALUES.add(SORT_BY_JOB_DUEDATE_VALUE);
 	}
 
 	private String jobId;
-	private String processInstanceId;
 	private String executionId;
+	private String processInstanceId;
+	private String processDefinitionId;
+	private String processDefinitionKey;
 	private Boolean withRetriesLeft;
 	private Boolean executable;
 	private Boolean timers;
@@ -57,9 +63,11 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 	private Boolean withException;
 	private String exceptionMessage;
 	private Boolean noRetriesLeft;
+	private Boolean active;
+	private Boolean suspended;
 
 	private List<ConditionQueryParameterDto> dueDates;
-	
+
   public JobQueryDto() {}
 
 	public JobQueryDto(MultivaluedMap<String, String> queryParameters) {
@@ -71,21 +79,31 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 		this.jobId = jobId;
 	}
 
+	@CamundaQueryParam("executionId")
+	public void setExecutionId(String executionId) {
+	  this.executionId = executionId;
+	}
+
 	@CamundaQueryParam("processInstanceId")
 	public void setProcessInstanceId(String processInstanceId) {
 		this.processInstanceId = processInstanceId;
 	}
 
-	@CamundaQueryParam("executionId")
-	public void setExecutionId(String executionId) {
-		this.executionId = executionId;
-	}
-	
+	@CamundaQueryParam("processDefinitionId")
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+  }
+
+	@CamundaQueryParam("processDefinitionKey")
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+
   @CamundaQueryParam(value="withRetriesLeft", converter = BooleanConverter.class)
   public void setWithRetriesLeft(Boolean withRetriesLeft) {
     this.withRetriesLeft = withRetriesLeft;
   }
-  
+
   @CamundaQueryParam(value="executable", converter = BooleanConverter.class)
   public void setExecutable(Boolean executable) {
     this.executable = executable;
@@ -95,17 +113,17 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   public void setTimers(Boolean timers) {
     this.timers = timers;
   }
-  
+
   @CamundaQueryParam(value="withException", converter = BooleanConverter.class)
   public void setWithException(Boolean withException) {
     this.withException = withException;
   }
-  
+
   @CamundaQueryParam(value="messages", converter = BooleanConverter.class)
   public void setMessages(Boolean messages) {
     this.messages = messages;
   }
-  
+
 	@CamundaQueryParam("exceptionMessage")
 	public void setExceptionMessage(String exceptionMessage) {
 		this.exceptionMessage = exceptionMessage;
@@ -119,6 +137,16 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   @CamundaQueryParam(value="noRetriesLeft", converter = BooleanConverter.class)
   public void setNoRetriesLeft(Boolean noRetriesLeft) {
     this.noRetriesLeft = noRetriesLeft;
+  }
+
+  @CamundaQueryParam(value="active", converter = BooleanConverter.class)
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
+
+  @CamundaQueryParam(value="suspended", converter = BooleanConverter.class)
+  public void setSuspended(Boolean suspended) {
+    this.suspended = suspended;
   }
 
 	@Override
@@ -136,23 +164,31 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 		if (jobId != null) {
 			query.jobId(jobId);
 		}
-		
+
+		if (executionId != null) {
+		  query.executionId(executionId);
+		}
+
 		if (processInstanceId != null) {
 			query.processInstanceId(processInstanceId);
 		}
-		
-		if (executionId != null) {
-			query.executionId(executionId);
-		}
-		
+
+    if (processDefinitionId != null) {
+      query.processDefinitionId(processDefinitionId);
+    }
+
+    if (processDefinitionKey != null) {
+      query.processDefinitionKey(processDefinitionKey);
+    }
+
 		if (withRetriesLeft != null && withRetriesLeft) {
 		  query.withRetriesLeft();
 		}
-		
+
     if (executable != null && executable) {
       query.executable();
     }
-		
+
     if (timers != null && timers) {
       if (messages != null && messages) {
         throw new InvalidRequestException(Status.BAD_REQUEST, "Parameter timers cannot be used together with parameter messages.");
@@ -166,11 +202,11 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       }
       query.messages();
     }
-    
+
     if (withException != null && withException) {
       query.withException();
     }
-    
+
 		if (exceptionMessage != null) {
 			query.exceptionMessage(exceptionMessage);
 		}
@@ -179,13 +215,21 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.noRetriesLeft();
     }
 
+    if (active != null && active) {
+      query.active();
+    }
+
+    if (suspended != null && suspended) {
+      query.suspended();
+    }
+
 		if (dueDates != null) {
 			DateConverter dateConverter = new DateConverter();
-			
+
 			for (ConditionQueryParameterDto conditionQueryParam : dueDates) {
 				String op = conditionQueryParam.getOperator();
 				Date dueDate = null;
-				
+
 				try {
 				  dueDate = dateConverter.convertQueryParameterToType((String)conditionQueryParam.getValue());
 				} catch (IllegalArgumentException e) {
@@ -210,8 +254,12 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 				query.orderByJobId();
 			} else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
 				query.orderByExecutionId();
-			} else if (sortBy.equals(SORT_BY_PROCESSINSTANCE_ID_VALUE)) {
+			} else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
 				query.orderByProcessInstanceId();
+      } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID_VALUE)) {
+        query.orderByProcessDefinitionId();
+      } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_KEY_VALUE)) {
+        query.orderByProcessDefinitionKey();
 			} else if (sortBy.equals(SORT_BY_JOB_RETRIES_VALUE)) {
 				query.orderByJobRetries();
 			} else if (sortBy.equals(SORT_BY_JOB_DUEDATE_VALUE)) {

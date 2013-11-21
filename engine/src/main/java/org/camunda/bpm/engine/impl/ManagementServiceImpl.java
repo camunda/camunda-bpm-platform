@@ -21,7 +21,8 @@ import java.util.Set;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.impl.cmd.RegisterProcessApplicationCmd;
+import org.camunda.bpm.engine.impl.cmd.ActivateJobCmd;
+import org.camunda.bpm.engine.impl.cmd.ActivateJobDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobCmd;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetJobExceptionStacktraceCmd;
@@ -31,10 +32,13 @@ import org.camunda.bpm.engine.impl.cmd.GetTableCountCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTableMetaDataCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTableNameCmd;
 import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
+import org.camunda.bpm.engine.impl.cmd.RegisterProcessApplicationCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
+import org.camunda.bpm.engine.impl.cmd.SuspendJobCmd;
+import org.camunda.bpm.engine.impl.cmd.SuspendJobDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.UnregisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.UnregisterProcessApplicationCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
@@ -42,6 +46,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
+import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePageQuery;
@@ -108,6 +113,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     return new JobQueryImpl(commandExecutor);
   }
 
+  public JobDefinitionQuery createJobDefinitionQuery() {
+    return new JobDefinitionQueryImpl(commandExecutor);
+  }
+
   public String getJobExceptionStacktrace(String jobId) {
     return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId));
   }
@@ -154,6 +163,119 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void unregisterDeploymentForJobExecutor(final String deploymentId) {
     commandExecutor.execute(new UnregisterDeploymentCmd(deploymentId));
+  }
+
+
+  public void activateJobDefinitionById(String jobDefinitionId) {
+    activateJobDefinitionById(jobDefinitionId, false);
+  }
+
+  public void activateJobDefinitionById(String jobDefinitionId, boolean activateJobs) {
+    activateJobDefinitionById(jobDefinitionId, activateJobs, null);
+  }
+
+  public void activateJobDefinitionById(String jobDefinitionId, boolean activateJobs, Date activationDate) {
+    commandExecutor.execute(new ActivateJobDefinitionCmd(jobDefinitionId, null, null, activateJobs, activationDate));
+  }
+
+  public void suspendJobDefinitionById(String jobDefinitionId) {
+    suspendJobDefinitionById(jobDefinitionId, false);
+  }
+
+  public void suspendJobDefinitionById(String jobDefinitionId, boolean suspendJobs) {
+    suspendJobDefinitionById(jobDefinitionId, suspendJobs, null);
+  }
+
+  public void suspendJobDefinitionById(String jobDefinitionId, boolean suspendJobs, Date suspensionDate) {
+    commandExecutor.execute(new SuspendJobDefinitionCmd(jobDefinitionId, null, null, suspendJobs, suspensionDate));
+  }
+
+
+  public void activateJobDefinitionByProcessDefinitionId(String processDefinitionId) {
+    activateJobDefinitionByProcessDefinitionId(processDefinitionId, false);
+  }
+
+  public void activateJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean activateJobs) {
+    activateJobDefinitionByProcessDefinitionId(processDefinitionId, activateJobs, null);
+  }
+
+  public void activateJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean activateJobs, Date activationDate) {
+    commandExecutor.execute(new ActivateJobDefinitionCmd(null, processDefinitionId, null, activateJobs, activationDate));
+  }
+
+  public void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId) {
+    suspendJobDefinitionByProcessDefinitionId(processDefinitionId, false);
+  }
+
+  public void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean suspendJobs) {
+    suspendJobDefinitionByProcessDefinitionId(processDefinitionId, suspendJobs, null);
+  }
+  public void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean suspendJobs, Date suspensionDate) {
+    commandExecutor.execute(new SuspendJobDefinitionCmd(null, processDefinitionId, null, suspendJobs, suspensionDate));
+  }
+
+  public void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey) {
+    activateJobDefinitionByProcessDefinitionKey(processDefinitionKey, false);
+  }
+
+  public void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean activateJobs) {
+    activateJobDefinitionByProcessDefinitionKey(processDefinitionKey, activateJobs, null);
+  }
+
+  public void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean activateJobs, Date activationDate) {
+    commandExecutor.execute(new ActivateJobDefinitionCmd(null, null, processDefinitionKey, activateJobs, activationDate));
+  }
+
+  public void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey) {
+    suspendJobDefinitionByProcessDefinitionKey(processDefinitionKey, false);
+  }
+
+  public void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean suspendJobs) {
+    suspendJobDefinitionByProcessDefinitionKey(processDefinitionKey, suspendJobs, null);
+  }
+
+  public void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean suspendJobs, Date suspensionDate) {
+    commandExecutor.execute(new SuspendJobDefinitionCmd(null, null, processDefinitionKey, suspendJobs, suspensionDate));
+  }
+
+  public void activateJobById(String jobId) {
+    commandExecutor.execute(new ActivateJobCmd(jobId, null, null, null, null));
+  }
+
+  public void activateJobByProcessInstanceId(String processInstanceId) {
+    commandExecutor.execute(new ActivateJobCmd(null, null, processInstanceId, null, null));
+  }
+
+  public void activateJobByJobDefinitionId(String jobDefinitionId) {
+    commandExecutor.execute(new ActivateJobCmd(null, jobDefinitionId, null, null, null));
+  }
+
+  public void activateJobByProcessDefinitionId(String processDefinitionId) {
+    commandExecutor.execute(new ActivateJobCmd(null, null, null, processDefinitionId, null));
+  }
+
+  public void activateJobByProcessDefinitionKey(String processDefinitionKey) {
+    commandExecutor.execute(new ActivateJobCmd(null, null, null, null, processDefinitionKey));
+  }
+
+  public void suspendJobById(String jobId) {
+    commandExecutor.execute(new SuspendJobCmd(jobId, null, null, null, null));
+  }
+
+  public void suspendJobByJobDefinitionId(String jobDefinitionId) {
+    commandExecutor.execute(new SuspendJobCmd(null, jobDefinitionId, null, null, null));
+  }
+
+  public void suspendJobByProcessInstanceId(String processInstanceId) {
+    commandExecutor.execute(new SuspendJobCmd(null, null, processInstanceId, null, null));
+  }
+
+  public void suspendJobByProcessDefinitionId(String processDefinitionId) {
+    commandExecutor.execute(new SuspendJobCmd(null, null, null, processDefinitionId, null));
+  }
+
+  public void suspendJobByProcessDefinitionKey(String processDefinitionKey) {
+    commandExecutor.execute(new SuspendJobCmd(null, null, null, null, processDefinitionKey));
   }
 
 }

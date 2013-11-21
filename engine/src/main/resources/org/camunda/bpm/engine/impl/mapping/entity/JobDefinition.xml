@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity">
+
+  <!-- JOB DEFINITION INSERT -->
+  <insert id="insertJobDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity">
+    insert into ${prefix}ACT_RU_JOBDEF (
+      ID_,
+      REV_,
+      PROC_DEF_ID_,
+      PROC_DEF_KEY_,
+      ACT_ID_,
+      JOB_TYPE_,
+      JOB_CONFIGURATION_,
+      SUSPENSION_STATE_
+      )
+    values (
+      #{id ,jdbcType=VARCHAR},
+      1,
+      #{processDefinitionId, jdbcType=VARCHAR},
+      #{processDefinitionKey, jdbcType=VARCHAR},
+      #{activityId, jdbcType=VARCHAR},
+      #{jobType, jdbcType=VARCHAR},
+      #{jobConfiguration, jdbcType=VARCHAR},
+      #{suspensionState, jdbcType=INTEGER}
+    )
+  </insert>
+
+  <!-- JOB DEFINITION UPDATE -->
+  
+  <update id="updateJobDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity">
+    update ${prefix}ACT_RU_JOBDEF set
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+      ACT_ID_ = #{activityId, jdbcType=VARCHAR},
+      JOB_TYPE_ = #{jobType, jdbcType=VARCHAR},
+      JOB_CONFIGURATION_ = #{jobConfiguration, jdbcType=VARCHAR},
+      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+    where ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <update id="updateJobDefinitionSuspensionStateByParameters" parameterType="java.util.Map">
+    update ${prefix}ACT_RU_JOBDEF set
+      REV_ = REV_ + 1,
+      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+    <where>
+      <if test="jobDefinitionId != null">
+        ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
+      </if>    
+      <if test="processDefinitionId != null">
+        and PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+      </if>
+      <if test="processDefinitionKey != null">
+        and PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
+      </if>
+    </where>
+  </update>
+  
+  <!-- JOB DEFINITION DELETE -->
+  
+  <delete id="deleteJobDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity">
+    DELETE FROM 
+        ${prefix}ACT_RU_JOBDEF 
+    where  
+        ID_ = #{id}  
+        and REV_ = #{revision}
+  </delete>
+  
+  <delete id="deleteJobDefinitionsByProcessDefinitionId" parameterType="string">
+    DELETE FROM 
+        ${prefix}ACT_RU_JOBDEF 
+    where  
+        PROC_DEF_ID_ = #{id}
+  </delete>
+
+  <!-- JOB DEFINITION RESULTMAP -->
+
+  <resultMap id="jobDefinitionResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="jobType" column="JOB_TYPE_" jdbcType="VARCHAR" />
+    <result property="jobConfiguration" column="JOB_CONFIGURATION_" jdbcType="VARCHAR" />
+    <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
+  </resultMap>
+
+  <!-- SELECTS -->
+
+  <select id="selectJobDefinition" parameterType="string" resultMap="jobDefinitionResultMap">
+    select * from ${prefix}ACT_RU_JOBDEF where ID_ = #{id}
+  </select>
+
+  <select id="selectJobDefinitionsByProcessDefinitionId" resultMap="jobDefinitionResultMap">
+    select * from ${prefix}ACT_RU_JOBDEF where PROC_DEF_ID_ = #{parameter}
+  </select>
+  
+  <select id="selectJobDefinitionByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobDefinitionQueryImpl" resultMap="jobDefinitionResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectJobDefinitionByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectJobDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobDefinitionQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectJobDefinitionByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectJobDefinitionByQueryCriteriaSql">
+    from ${prefix}ACT_RU_JOBDEF RES
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="activityIds != null &amp;&amp; activityIds.length > 0">
+        and RES.ACT_ID_ in
+        <foreach item="item" index="index" collection="activityIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="processDefinitionKey != null">
+        and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
+      </if>      
+      <if test="jobType != null">
+        and RES.JOB_TYPE_ = #{jobType}
+      </if>
+      <if test="jobConfiguration != null">
+        and RES.JOB_CONFIGURATION_ = #{jobConfiguration}
+      </if>
+      <if test="suspensionState != null">
+        and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
+      </if>
+    </where>
+  </sql>
+
+</mapper>

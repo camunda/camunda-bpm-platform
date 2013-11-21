@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,13 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
@@ -27,28 +22,32 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Daniel Meyer
  * @author Joram Barrez
+ * @author roman.smirnov
  */
 public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Void> {
-  
+
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected ProcessDefinitionEntity processDefinitionEntity;
   protected boolean includeProcessInstances = false;
   protected Date executionDate;
 
-  public AbstractSetProcessDefinitionStateCmd(ProcessDefinitionEntity processDefinitionEntity, 
+  public AbstractSetProcessDefinitionStateCmd(ProcessDefinitionEntity processDefinitionEntity,
           boolean includeProcessInstances, Date executionDate) {
+    // If process definition is already provided (eg. when command is called through the DeployCmd),
+    // we can simply use the id of the entity and set is as processDefinitionId.
     this.processDefinitionEntity = processDefinitionEntity;
+    this.processDefinitionId = processDefinitionEntity.getId();
     this.includeProcessInstances = includeProcessInstances;
     this.executionDate = executionDate;
   }
-  
+
   public AbstractSetProcessDefinitionStateCmd(String processDefinitionId, String processDefinitionKey,
             boolean includeProcessInstances, Date executionDate) {
     this.processDefinitionId = processDefinitionId;
@@ -56,105 +55,90 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     this.includeProcessInstances = includeProcessInstances;
     this.executionDate = executionDate;
   }
-  
+
   public Void execute(CommandContext commandContext) {
-    
-    List<ProcessDefinitionEntity> processDefinitions = findProcessDefinition(commandContext);
-    
-    if (executionDate != null) { // Process definition state change is delayed
-      createTimerForDelayedExecution(commandContext, processDefinitions);
-    } else { // Process definition state is changed now
-      changeProcessDefinitionState(commandContext, processDefinitions);
+
+    // Validation of input parameters
+    if(processDefinitionId == null && processDefinitionKey == null) {
+      throw new ProcessEngineException("Process definition id / key cannot be null");
+    }
+
+    if (executionDate == null) {
+      // Process definition state is changed now
+      updateSuspensionState(commandContext);
+    } else {
+      // Process definition state change is delayed
+      scheduleSuspensionStateUpdate(commandContext);
     }
 
     return null;
   }
 
-  protected List<ProcessDefinitionEntity> findProcessDefinition(CommandContext commandContext) {
-    
-    // If process definition is already provided (eg. when command is called through the DeployCmd) 
-    // we don't need to do an extra database fetch and we can simply return it, wrapped in a list
-    if (processDefinitionEntity != null) {
-      return Arrays.asList(processDefinitionEntity);
+  protected void scheduleSuspensionStateUpdate(CommandContext commandContext) {
+    TimerEntity timer = new TimerEntity();
+
+    timer.setDuedate(executionDate);
+    timer.setJobHandlerType(getDelayedExecutionJobHandlerType());
+
+    String jobConfiguration = null;
+
+    if (processDefinitionId != null) {
+      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
+          .createJobHandlerConfigurationByProcessDefinitionId(processDefinitionId, includeProcessInstances);
+    } else
+
+    if (processDefinitionKey != null) {
+      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
+          .createJobHandlerConfigurationByProcessDefinitionKey(processDefinitionKey, includeProcessInstances);
     }
-    
-    // Validation of input parameters
-    if(processDefinitionId == null && processDefinitionKey == null) {
-      throw new ProcessEngineException("Process definition id / key cannot be null");
-    }
-    
-    List<ProcessDefinitionEntity> processDefinitionEntities = new ArrayList<ProcessDefinitionEntity>();
+
+    timer.setJobHandlerConfiguration(jobConfiguration);
+
+    commandContext.getJobManager().schedule(timer);
+  }
+
+  protected void updateSuspensionState(CommandContext commandContext) {
     ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
-    
-    if(processDefinitionId != null) {
-      
-      ProcessDefinitionEntity processDefinitionEntity = processDefinitionManager.findLatestProcessDefinitionById(processDefinitionId);
-      if(processDefinitionEntity == null) {
-        throw new ProcessEngineException("Cannot find process definition for id '"+processDefinitionId+"'");
-      }
-      processDefinitionEntities.add(processDefinitionEntity);
-      
-    } else {
 
-      List<ProcessDefinition> processDefinitions = new ProcessDefinitionQueryImpl(commandContext)
-        .processDefinitionKey(processDefinitionKey)
-        .list();
+    SuspensionState suspensionState = getProcessDefinitionSuspensionState();
 
-      if(processDefinitions.size() == 0) {
-        throw new ProcessEngineException("Cannot find process definition for key '"+processDefinitionKey+"'");
-      }
-      
-      for (ProcessDefinition processDefinition : processDefinitions) {
-        processDefinitionEntities.add((ProcessDefinitionEntity) processDefinition);
-      }
-      
+    if (processDefinitionId != null) {
+      processDefinitionManager.updateProcessDefinitionSuspensionStateById(processDefinitionId, suspensionState);
+    } else
+
+    if (processDefinitionKey != null) {
+      processDefinitionManager.updateProcessDefinitionSuspensionStateByKey(processDefinitionKey, suspensionState);
     }
-    return processDefinitionEntities;
-  }
-  
-  protected void createTimerForDelayedExecution(CommandContext commandContext, List<ProcessDefinitionEntity> processDefinitions) {
-    for (ProcessDefinitionEntity processDefinition : processDefinitions) {
-      TimerEntity timer = new TimerEntity();
-      timer.setDuedate(executionDate);
-      timer.setJobHandlerType(getDelayedExecutionJobHandlerType());
-      timer.setJobHandlerConfiguration(TimerChangeProcessDefinitionSuspensionStateJobHandler
-              .createJobHandlerConfiguration(processDefinition.getId(), includeProcessInstances));
-      commandContext.getJobManager().schedule(timer);
+
+    getSetJobDefinitionStateCmd().execute(commandContext);
+    if (includeProcessInstances) {
+      getSetProcessInstanceStateCmd().execute(commandContext);
     }
   }
-  
-  protected void changeProcessDefinitionState(CommandContext commandContext, List<ProcessDefinitionEntity> processDefinitions) {
-    for (ProcessDefinitionEntity processDefinition : processDefinitions) {
-    
-      processDefinition.setSuspensionState(getProcessDefinitionSuspensionState().getStateCode());
-      
-      // Suspend process instances and child executions and their tasks (if needed)
-      if (includeProcessInstances) {
-        commandContext.getExecutionManager().updateExecutionSuspensionStateByProcessDefinitionId(processDefinitionId, getProcessDefinitionSuspensionState());
-        commandContext.getTaskManager().updateTaskSuspensionStateByProcessDefinitionId(processDefinitionId, getProcessDefinitionSuspensionState());
-      }
-      
-    }
-  }
-  
-  
+
   // ABSTRACT METHODS ////////////////////////////////////////////////////////////////////
 
   /**
    * Subclasses should return the wanted {@link SuspensionState} here.
    */
   protected abstract SuspensionState getProcessDefinitionSuspensionState();
-  
+
   /**
    * Subclasses should return the type of the {@link JobHandler} here. it will be used when
    * the user provides an execution date on which the actual state change will happen.
    */
   protected abstract String getDelayedExecutionJobHandlerType();
-  
+
   /**
-   * Subclasses should return a {@link Command} implementation that matches the process definition
-   * state change.
+   * Subclasses should return the type of the {@link AbstractSetJobDefinitionStateCmd} here.
+   * It will be used to suspend or activate the {@link JobDefinition}s.
    */
-  protected abstract AbstractSetProcessInstanceStateCmd getProcessInstanceChangeStateCmd(ProcessInstance processInstance); 
-  
+  protected abstract AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd();
+
+  /**
+   * Subclasses should return the type of the {@link AbstractSetProcessInstanceStateCmd} here.
+   * It will be used to suspend or activate the {@link ProcessInstance}s.
+   */
+  protected abstract AbstractSetProcessInstanceStateCmd getSetProcessInstanceStateCmd();
+
 }

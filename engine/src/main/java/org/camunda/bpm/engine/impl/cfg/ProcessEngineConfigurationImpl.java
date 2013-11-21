@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -89,14 +90,23 @@ import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.event.EventHandler;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.event.SignalEventHandler;
-import org.camunda.bpm.engine.impl.form.AbstractFormType;
-import org.camunda.bpm.engine.impl.form.BooleanFormType;
-import org.camunda.bpm.engine.impl.form.DateFormType;
-import org.camunda.bpm.engine.impl.form.FormEngine;
-import org.camunda.bpm.engine.impl.form.FormTypes;
-import org.camunda.bpm.engine.impl.form.JuelFormEngine;
-import org.camunda.bpm.engine.impl.form.LongFormType;
-import org.camunda.bpm.engine.impl.form.StringFormType;
+import org.camunda.bpm.engine.impl.form.engine.FormEngine;
+import org.camunda.bpm.engine.impl.form.engine.HtmlFormEngine;
+import org.camunda.bpm.engine.impl.form.engine.JuelFormEngine;
+import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
+import org.camunda.bpm.engine.impl.form.type.BooleanFormType;
+import org.camunda.bpm.engine.impl.form.type.DateFormType;
+import org.camunda.bpm.engine.impl.form.type.FormTypes;
+import org.camunda.bpm.engine.impl.form.type.LongFormType;
+import org.camunda.bpm.engine.impl.form.type.StringFormType;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
+import org.camunda.bpm.engine.impl.form.validator.FormValidators;
+import org.camunda.bpm.engine.impl.form.validator.MaxLengthValidator;
+import org.camunda.bpm.engine.impl.form.validator.MaxValidator;
+import org.camunda.bpm.engine.impl.form.validator.MinLengthValidator;
+import org.camunda.bpm.engine.impl.form.validator.MinValidator;
+import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
+import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
@@ -122,10 +132,12 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.RejectedJobsHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.mail.MailScanner;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
@@ -146,6 +158,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceMa
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
@@ -280,8 +293,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<FormEngine> customFormEngines;
   protected Map<String, FormEngine> formEngines;
 
-  protected List<AbstractFormType> customFormTypes;
+  protected List<AbstractFormFieldType> customFormTypes;
   protected FormTypes formTypes;
+  protected FormValidators formValidators;
+  protected Map<String, Class<? extends FormFieldValidator>> customFormFieldValidators;
 
   protected List<VariableType> customPreVariableTypes;
   protected List<VariableType> customPostVariableTypes;
@@ -372,6 +387,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initBeans();
     initFormEngines();
     initFormTypes();
+    initFormFieldValidators();
     initScriptingEngines();
     initBusinessCalendarManager();
     initCommandContextFactory();
@@ -753,6 +769,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(IdentityInfoManager.class));
       addSessionFactory(new GenericManagerFactory(IdentityLinkManager.class));
       addSessionFactory(new GenericManagerFactory(JobManager.class));
+      addSessionFactory(new GenericManagerFactory(JobDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(ProcessDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(PropertyManager.class));
       addSessionFactory(new GenericManagerFactory(ResourceManager.class));
@@ -877,6 +894,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     TimerActivateProcessDefinitionHandler activateProcessDefinitionHandler = new TimerActivateProcessDefinitionHandler();
     jobHandlers.put(activateProcessDefinitionHandler.getType(), activateProcessDefinitionHandler);
 
+    TimerSuspendJobDefinitionHandler suspendJobDefinitionHandler = new TimerSuspendJobDefinitionHandler();
+    jobHandlers.put(suspendJobDefinitionHandler.getType(), suspendJobDefinitionHandler);
+
+    TimerActivateJobDefinitionHandler activateJobDefinitionHandler = new TimerActivateJobDefinitionHandler();
+    jobHandlers.put(activateJobDefinitionHandler.getType(), activateJobDefinitionHandler);
+
     // if we have custom job handlers, register them
     if (getCustomJobHandlers()!=null) {
       for (JobHandler customJobHandler : getCustomJobHandlers()) {
@@ -998,9 +1021,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initFormEngines() {
     if (formEngines==null) {
       formEngines = new HashMap<String, FormEngine>();
-      FormEngine defaultFormEngine = new JuelFormEngine();
+      // html form engine = default form engine
+      FormEngine defaultFormEngine = new HtmlFormEngine();
       formEngines.put(null, defaultFormEngine); // default form engine is looked up with null
       formEngines.put(defaultFormEngine.getName(), defaultFormEngine);
+      FormEngine juelFormEngine = new JuelFormEngine();
+      formEngines.put(juelFormEngine.getName(), juelFormEngine);
+
     }
     if (customFormEngines!=null) {
       for (FormEngine formEngine: customFormEngines) {
@@ -1018,10 +1045,28 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       formTypes.addFormType(new BooleanFormType());
     }
     if (customFormTypes!=null) {
-      for (AbstractFormType customFormType: customFormTypes) {
+      for (AbstractFormFieldType customFormType: customFormTypes) {
         formTypes.addFormType(customFormType);
       }
     }
+  }
+
+  protected void initFormFieldValidators() {
+    if(formValidators == null) {
+      formValidators = new FormValidators();
+      formValidators.addValidator("min", MinValidator.class);
+      formValidators.addValidator("max", MaxValidator.class);
+      formValidators.addValidator("minlength", MinLengthValidator.class);
+      formValidators.addValidator("maxlength", MaxLengthValidator.class);
+      formValidators.addValidator("required", RequiredValidator.class);
+      formValidators.addValidator("readonly", ReadOnlyValidator.class);
+    }
+    if(customFormFieldValidators != null) {
+      for (Entry<String, Class<? extends FormFieldValidator>> validator : customFormFieldValidators.entrySet()) {
+        formValidators.addValidator(validator.getKey(), validator.getValue());
+      }
+    }
+
   }
 
   protected void initScriptingEngines() {
@@ -1523,12 +1568,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public List<AbstractFormType> getCustomFormTypes() {
+  public List<AbstractFormFieldType> getCustomFormTypes() {
     return customFormTypes;
   }
 
 
-  public ProcessEngineConfigurationImpl setCustomFormTypes(List<AbstractFormType> customFormTypes) {
+  public ProcessEngineConfigurationImpl setCustomFormTypes(List<AbstractFormFieldType> customFormTypes) {
     this.customFormTypes = customFormTypes;
     return this;
   }
@@ -2016,6 +2061,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public HistoryEventProducer getHistoryEventProducer() {
     return historyEventProducer;
+  }
+
+  public Map<String, Class<? extends FormFieldValidator>> getCustomFormFieldValidators() {
+    return customFormFieldValidators;
+  }
+
+  public void setCustomFormFieldValidators(Map<String, Class<? extends FormFieldValidator>> customFormFieldValidators) {
+    this.customFormFieldValidators = customFormFieldValidators;
+  }
+
+  public void setFormValidators(FormValidators formValidators) {
+    this.formValidators = formValidators;
+  }
+
+  public FormValidators getFormValidators() {
+    return formValidators;
   }
 
 }

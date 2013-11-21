@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,14 +59,26 @@ public class FormServiceImpl extends ServiceImpl implements FormService {
   }
 
   public ProcessInstance submitStartFormData(String processDefinitionId, Map<String, String> properties) {
+    return commandExecutor.execute(new SubmitStartFormCmd(processDefinitionId, null, (Map) properties));
+  }
+
+  public ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, String> properties) {
+	  return commandExecutor.execute(new SubmitStartFormCmd(processDefinitionId, businessKey, (Map) properties));
+  }
+
+  public ProcessInstance submitStartForm(String processDefinitionId, Map<String, Object> properties) {
     return commandExecutor.execute(new SubmitStartFormCmd(processDefinitionId, null, properties));
   }
-  
-  public ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, String> properties) {
-	  return commandExecutor.execute(new SubmitStartFormCmd(processDefinitionId, businessKey, properties));
+
+  public ProcessInstance submitStartForm(String processDefinitionId, String businessKey, Map<String, Object> properties) {
+    return commandExecutor.execute(new SubmitStartFormCmd(processDefinitionId, businessKey, properties));
   }
 
   public void submitTaskFormData(String taskId, Map<String, String> properties) {
+    commandExecutor.execute(new SubmitTaskFormCmd(taskId, (Map)properties));
+  }
+
+  public void submitTaskForm(String taskId, Map<String, Object> properties) {
     commandExecutor.execute(new SubmitTaskFormCmd(taskId, properties));
   }
 

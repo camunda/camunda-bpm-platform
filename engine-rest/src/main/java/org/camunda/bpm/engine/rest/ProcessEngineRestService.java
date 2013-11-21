@@ -46,6 +46,9 @@ public interface ProcessEngineRestService {
   @Path("/{name}" + MessageRestService.PATH)
   MessageRestService getMessageRestService(@PathParam("name") String engineName);
 
+  @Path("/{name}" + JobDefinitionRestService.PATH)
+  JobDefinitionRestService getJobDefinitionRestService(@PathParam("name") String engineName);
+
   @Path("/{name}" + JobRestService.PATH)
   JobRestService getJobRestService(@PathParam("name") String engineName);
 

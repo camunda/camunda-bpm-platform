@@ -77,6 +77,7 @@ drop table if exists ACT_RU_TASK;
 drop table if exists ACT_RE_PROCDEF;
 drop table if exists ACT_RU_EXECUTION;
 drop table if exists ACT_RU_JOB; 
+drop table if exists ACT_RU_JOBDEF;
 drop table if exists ACT_RU_EVENT_SUBSCR;
 drop table if exists ACT_RU_INCIDENT;
 drop table if exists ACT_RU_AUTHORIZATION;

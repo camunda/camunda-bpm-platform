@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.form;
 
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.FormType;
+import org.camunda.bpm.engine.impl.form.handler.FormPropertyHandler;
 
 
 /**

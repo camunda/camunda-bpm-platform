@@ -85,6 +85,32 @@ public class TaskResourceImpl implements TaskResource {
     }
   }
 
+  public void submit(CompleteTaskDto dto) {
+    FormService formService = engine.getFormService();
+
+    try {
+      Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
+      formService.submitTaskForm(taskId, variables);
+
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot submit task form %s due to number format exception: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot submit task form %s due to parse exception: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);
+
+    } catch (ProcessEngineException e) {
+      String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
+    }
+
+  }
+
   @Override
   public void delegate(UserIdDto delegatedUser) {
     engine.getTaskService().delegateTask(taskId, delegatedUser.getUserId());
@@ -112,12 +138,26 @@ public class TaskResourceImpl implements TaskResource {
     }
 
     FormDto dto = FormDto.fromFormData(formData);
+    if(dto.getKey() == null || dto.getKey().isEmpty()) {
+      if(formData.getFormFields() != null && !formData.getFormFields().isEmpty()) {
+        dto.setKey("embedded:engine://engine/:engine/task/"+taskId+"/rendered-form");
+      }
+    }
     String processDefinitionId = task.getProcessDefinitionId();
     if (processDefinitionId != null) {
       dto.setContextPath(ApplicationContextPathUtil.getApplicationPath(engine, task.getProcessDefinitionId()));
     }
 
     return dto;
+  }
+
+  public String getRenderedForm() {
+    FormService formService = engine.getFormService();
+    Object renderedTaskForm = formService.getRenderedTaskForm(taskId);
+    if(renderedTaskForm != null) {
+      return renderedTaskForm.toString();
+    }
+    throw new InvalidRequestException(Status.NOT_FOUND, "No matching rendered form for task with the id " + taskId + " found.");
   }
 
   @Override

@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 package org.camunda.bpm.integrationtest.deployment.war;
-import java.util.List;
-import java.util.Set;
-
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -27,6 +24,11 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -48,10 +50,6 @@ public class TestWarDeploymentEmptyProcessesXml extends AbstractFoxPlatformInteg
     Assert.assertNotNull(processEngine);
     RepositoryService repositoryService = processEngine.getRepositoryService();
 
-    Set<String> registeredProcessApplications = BpmPlatform.getProcessApplicationService().getProcessApplicationNames();
-    Assert.assertEquals(1, registeredProcessApplications.size());
-    String appName = registeredProcessApplications.iterator().next();
-
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
       .processDefinitionKey("testDeployProcessArchive")
       .list();
@@ -61,8 +59,18 @@ public class TestWarDeploymentEmptyProcessesXml extends AbstractFoxPlatformInteg
       .deploymentId(processDefinitions.get(0).getDeploymentId())
       .singleResult();
 
+    Set<String> registeredProcessApplications = BpmPlatform.getProcessApplicationService().getProcessApplicationNames();
+
+    boolean containsProcessApplication = false;
+
     // the process application name is used as name for the db deployment
-    Assert.assertEquals(appName, deployment.getName());
+    for (String appName : registeredProcessApplications) {
+      if (appName.equals(deployment.getName())) {
+        containsProcessApplication = true;
+      }
+    }
+    assertTrue(containsProcessApplication);
+
 
     // manually delete process definition here (to clean up)
     repositoryService.deleteDeployment(deployment.getId(), true);

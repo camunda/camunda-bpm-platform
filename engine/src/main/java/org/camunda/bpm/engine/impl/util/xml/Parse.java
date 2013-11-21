@@ -174,7 +174,7 @@ public class Parse extends DefaultHandler {
     }
   }
   
-  public void throwActivitiExceptionForErrors() {
+  public void throwExceptionForErrors() {
     StringBuilder strb = new StringBuilder();
     for (Problem error : errors) {
       strb.append(error.toString());
