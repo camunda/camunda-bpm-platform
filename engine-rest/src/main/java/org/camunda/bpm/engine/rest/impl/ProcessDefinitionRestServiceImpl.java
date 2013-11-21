@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResourceImpl;
@@ -87,7 +88,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 	@Override
   public CountResultDto getProcessDefinitionsCount(UriInfo uriInfo) {
 	  ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
-	  
+
 	  ProcessEngine engine = getProcessEngine();
     ProcessDefinitionQuery query = queryDto.toQuery(engine);
 
@@ -97,20 +98,20 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     return result;
   }
 
-  
+
   @Override
   public List<StatisticsResultDto> getStatistics(Boolean includeFailedJobs, Boolean includeIncidents, String includeIncidentsForType) {
     if (includeIncidents != null && includeIncidentsForType != null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Only one of the query parameter includeIncidents or includeIncidentsForType can be set.");
     }
-    
+
     ManagementService mgmtService = getProcessEngine().getManagementService();
     ProcessDefinitionStatisticsQuery query = mgmtService.createProcessDefinitionStatisticsQuery();
-    
+
     if (includeFailedJobs != null && includeFailedJobs) {
       query.includeFailedJobs();
     }
-    
+
     if (includeIncidents != null && includeIncidents) {
       query.includeIncidents();
     } else if (includeIncidentsForType != null) {
@@ -127,7 +128,20 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
     return results;
   }
-	
-	
+
+  public void updateSuspensionState(ProcessDefinitionSuspensionStateDto dto) {
+    if (dto.getProcessDefinitionId() != null) {
+      String message = "Only processDefinitionKey can be set to update the suspension state.";
+      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    }
+
+    try {
+      dto.updateSuspensionState(getProcessEngine());
+
+    } catch (IllegalArgumentException e) {
+      String message = String.format("Could not update the suspension state of Process Definitions due to: %s", e.getMessage()) ;
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, message);
+    }
+  }
 
 }

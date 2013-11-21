@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
@@ -232,5 +233,16 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     }
 
     throw new InvalidRequestException(Status.NOT_FOUND, "No matching rendered start form for process definition with the id " + processDefinitionId + " found.");
+  }
+
+  public void updateSuspensionState(ProcessDefinitionSuspensionStateDto dto) {
+    try {
+      dto.setProcessDefinitionId(processDefinitionId);
+      dto.updateSuspensionState(engine);
+
+    } catch (IllegalArgumentException e) {
+      String message = String.format("The suspension state of Process Definition with id %s could not be updated due to: %s", processDefinitionId, e.getMessage());
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, message);
+    }
   }
 }

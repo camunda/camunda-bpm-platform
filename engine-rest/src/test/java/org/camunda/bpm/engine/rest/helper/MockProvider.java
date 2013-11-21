@@ -133,6 +133,7 @@ public abstract class MockProvider {
 
   // process definition
   public static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcDefId";
+  public static final String NON_EXISTING_PROCESS_DEFINITION_ID = "aNonExistingProcDefId";
   public static final String EXAMPLE_PROCESS_DEFINITION_NAME = "aName";
   public static final String EXAMPLE_PROCESS_DEFINITION_KEY = "aKey";
   public static final String EXAMPLE_PROCESS_DEFINITION_CATEGORY = "aCategory";
@@ -148,6 +149,7 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_ACTIVITY_ID = "anotherActivity";
   public static final String EXAMPLE_ACTIVITY_NAME = "anActivityName";
   public static final String EXAMPLE_ACTIVITY_TYPE = "anActivityType";
+  public static final String EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION = "2013-04-23T13:42:43";
 
   // statistics
   public static final int EXAMPLE_FAILED_JOBS = 42;
@@ -182,9 +184,11 @@ public abstract class MockProvider {
 
   // Job Definitions
   public static final String EXAMPLE_JOB_DEFINITION_ID = "aJobDefId";
+  public static final String NON_EXISTING_JOB_DEFINITION_ID = "aNonExistingJobDefId";
   public static final String EXAMPLE_JOB_TYPE = "aJobType";
   public static final String EXAMPLE_JOB_CONFIG = "aJobConfig";
   public static final boolean EXAMPLE_JOB_DEFINITION_IS_SUSPENDED = true;
+  public static final String EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION = "2013-04-23T13:42:43";
 
   // Jobs
   public static final String EXAMPLE_JOB_ID = "aJobId";

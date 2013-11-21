@@ -1,12 +1,12 @@
 package org.camunda.bpm.engine.rest.jersey;
 
-import org.camunda.bpm.engine.rest.AbstractJobDefinitionRestServiceQueryTest;
+import org.camunda.bpm.engine.rest.AbstractJobDefinitionRestServiceInteractionTest;
 import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
 import org.camunda.bpm.engine.rest.util.JerseyServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-public class JobDefinitionRestServiceQueryTest extends AbstractJobDefinitionRestServiceQueryTest {
+public class JobDefinitionRestServiceInteractionTest extends AbstractJobDefinitionRestServiceInteractionTest {
 
   protected static EmbeddedServerBootstrap serverBootstrap;
 
@@ -20,5 +20,4 @@ public class JobDefinitionRestServiceQueryTest extends AbstractJobDefinitionRest
   public static void tearDownEmbeddedRuntime() {
     serverBootstrap.stop();
   }
-
 }
