@@ -17,7 +17,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
                           'Long',
                           'Double',
                           'Date'
-                        ];    
+                        ];
 
     var sequencer = 0;
 
@@ -40,7 +40,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
       updateView(newFilter, instanceIdToInstanceMap);
     });
-    
+
     function updateView(newFilter, instanceIdToInstanceMap) {
       filter = angular.copy(newFilter);
 
@@ -223,7 +223,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.instanceDetails', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
       id: 'variables-tab',
       label: 'Variables',
       url: 'plugin://base/static/app/views/processInstance/variable-instances-tab.html',

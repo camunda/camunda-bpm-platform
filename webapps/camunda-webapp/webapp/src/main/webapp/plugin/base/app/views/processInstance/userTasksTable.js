@@ -21,7 +21,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       }
 
       search('page', !newValue || newValue == 1 ? null : newValue);
-    });     
+    });
 
     userTaskData.observe([ 'filter', 'executionIdToInstanceMap' ], function (newFilter, executionIdToInstanceMap) {
       pages.current = newFilter.page || 1;
@@ -61,7 +61,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       taskIdIdToExceptionMessageMap = {};
       taskCopies = {};
 
-      TaskResource.count(params).$then(function (response) {      
+      TaskResource.count(params).$then(function (response) {
         pages.total = Math.ceil(response.data.count / pages.size);
       });
 
@@ -150,7 +150,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.instanceDetails', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
       id: 'user-tasks-tab',
       label: 'User Tasks',
       url: 'plugin://base/static/app/views/processInstance/user-tasks-table.html',

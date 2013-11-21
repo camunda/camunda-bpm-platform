@@ -61,7 +61,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       });
 
       // get the incidents
-      $http.post(Uri.appUri('plugin://base/:engine/incident'), params, {params: pagingParams }).success(function(data) { 
+      $http.post(Uri.appUri('plugin://base/:engine/incident'), params, {params: pagingParams }).success(function(data) {
         angular.forEach(data, function (incident) {
           var activityId = incident.activityId;
           var bpmnElement = bpmnElements[activityId];
@@ -71,7 +71,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
         $scope.incidents = data;
       });
-    };    
+    };
 
     $scope.getIncidentType = function (incident) {
       if (incident.incidentType === 'failedJob') {
@@ -91,7 +91,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.instanceDetails', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
       id: 'incidents-tab',
       label: 'Incidents',
       url: 'plugin://base/static/app/views/processInstance/incidents-tab.html',
