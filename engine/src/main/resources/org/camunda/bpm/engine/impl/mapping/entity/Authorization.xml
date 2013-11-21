@@ -148,7 +148,7 @@
     
       <!-- User GRANT -->
       <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}=#{authPerms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam, jdbcType=VARCHAR}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
+        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}=#{authPerms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
             THEN 1
       </if>
       WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}=#{authPerms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
@@ -156,7 +156,7 @@
           
       <!-- User REVOKE -->
       <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}!=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam, jdbcType=VARCHAR}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
+        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}!=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
             THEN 0
       </if>
       WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}!=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
@@ -171,7 +171,7 @@
                 <!-- Group REVOKES -->
                 <foreach collection="authGroupIds" index="index" item="authGroupId">
                   <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}!=#{authPerms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam, jdbcType=VARCHAR}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
+                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}!=#{authPerms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
                       THEN 0
                   </if>
                   WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}!=#{authPerms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
@@ -181,7 +181,7 @@
                 <!-- Group GRANTS -->   
                 <foreach collection="authGroupIds" index="index" item="authGroupId">
                   <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam, jdbcType=VARCHAR}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
+                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
                       THEN 1
                   </if>
                   WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
@@ -193,7 +193,7 @@
               </if>
                           <!-- GLOBAL GRANTS -->
                           <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms,  jdbcType=INTEGER}${bitand3}=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam, jdbcType=VARCHAR}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
+                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms,  jdbcType=INTEGER}${bitand3}=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
                                 THEN 1
                           </if>
                           WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms,  jdbcType=INTEGER}${bitand3}=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
@@ -201,7 +201,7 @@
                               
                           <!-- GLOBAL REVOKES -->
                           <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms,  jdbcType=INTEGER}${bitand3}!=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam, jdbcType=VARCHAR}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
+                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms,  jdbcType=INTEGER}${bitand3}!=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
                                 THEN 0
                           </if>
                           WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms,  jdbcType=INTEGER}${bitand3}!=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')

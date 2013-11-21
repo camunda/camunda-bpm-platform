@@ -757,7 +757,6 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
   public void testNullAuthorizationCheck() {
 
     TestResource resource1 = new TestResource("resource1", 100);
-
     assertFalse(authorizationService.isUserAuthorized(null, null, UPDATE, resource1));
 
   }
