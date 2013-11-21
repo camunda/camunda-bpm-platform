@@ -1,6 +1,6 @@
-ngDefine('cockpit.pages', function(module, $) {
+ngDefine('cockpit.plugin.base.views', function(module, $) {
 
-  var AddVariableController = [ '$scope', '$http', 'Uri', 'Notifications', 'dialog', 'processInstance', 'processData', 
+  var AddVariableController = [ '$scope', '$http', 'Uri', 'Notifications', 'dialog', 'processInstance', 'processData',
                         function($scope, $http, Uri, Notifications, dialog, processInstance, processData) {
 
     $scope.variableTypes = [
@@ -50,7 +50,7 @@ ngDefine('cockpit.pages', function(module, $) {
       $http.put(Uri.appUri('engine://engine/:engine/process-instance/' + processInstance.id + '/variables/' + name), data).success(function (data) {
         $scope.status = SUCCESS;
 
-        Notifications.addMessage({'status': 'Finished', 'message': 'Added the variable', 'exclusive': true }); 
+        Notifications.addMessage({'status': 'Finished', 'message': 'Added the variable', 'exclusive': true });
 
       }).error(function (data) {
         $scope.status = FAIL;

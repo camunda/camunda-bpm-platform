@@ -1,6 +1,6 @@
-ngDefine('cockpit.pages', function(module, $) {
+ngDefine('cockpit.plugin.base.views', function(module, $) {
 
-  var CancelProcessInstanceController = [ '$scope', '$location', 'Notifications', 'ProcessInstanceResource', 'dialog', 'processInstance', 'processData', 
+  var CancelProcessInstanceController = [ '$scope', '$location', 'Notifications', 'ProcessInstanceResource', 'dialog', 'processInstance', 'processData',
                                   function($scope, $location, Notifications, ProcessInstanceResource, dialog, processInstance, processData) {
 
     var BEFORE_CANCEL = 'beforeCancellation',
@@ -28,7 +28,7 @@ ngDefine('cockpit.pages', function(module, $) {
     cancelProcessInstanceData.observe([ 'subProcessInstancesCount', 'subProcessInstances' ], function (subProcessInstancesCount, subProcessInstances) {
       $scope.subProcessInstancesCount = subProcessInstancesCount.count;
       $scope.subProcessInstances = subProcessInstances;
-      
+
       $scope.status = BEFORE_CANCEL;
     });
 
