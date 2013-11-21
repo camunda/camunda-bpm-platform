@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -29,6 +31,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.MockJobBuilder;
@@ -45,11 +48,14 @@ import com.jayway.restassured.response.Response;
 
 public abstract class AbstractJobRestServiceInteractionTest extends AbstractRestServiceTest {
 
-  protected static final String JOB_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/job/{id}";
-  protected static final String JOB_RESOURCE_SET_RETRIES_URL = JOB_RESOURCE_URL + "/retries";
-  protected static final String JOB_RESOURCE_EXECUTE_JOB_URL = JOB_RESOURCE_URL + "/execute";
-  protected static final String JOB_RESOURCE_GET_STACKTRACE_URL = JOB_RESOURCE_URL + "/stacktrace";
-  protected static final String JOB_RESOURCE_SET_DUEDATE_URL = JOB_RESOURCE_URL + "/duedate";
+  protected static final String JOB_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/job";
+  protected static final String SINGLE_JOB_RESOURCE_URL = JOB_RESOURCE_URL + "/{id}";
+  protected static final String JOB_RESOURCE_SET_RETRIES_URL = SINGLE_JOB_RESOURCE_URL + "/retries";
+  protected static final String JOB_RESOURCE_EXECUTE_JOB_URL = SINGLE_JOB_RESOURCE_URL + "/execute";
+  protected static final String JOB_RESOURCE_GET_STACKTRACE_URL = SINGLE_JOB_RESOURCE_URL + "/stacktrace";
+  protected static final String JOB_RESOURCE_SET_DUEDATE_URL = SINGLE_JOB_RESOURCE_URL + "/duedate";
+  protected static final String SINGLE_JOB_SUSPENDED_URL = SINGLE_JOB_RESOURCE_URL + "/suspended";
+  protected static final String JOB_SUSPENDED_URL = JOB_RESOURCE_URL + "/suspended";
 
   private ProcessEngine namedProcessEngine;
   private ManagementService mockManagementService;
@@ -133,7 +139,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
     .body("id", equalTo(MockProvider.EXAMPLE_JOB_ID))
     .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
     .body("exceptionMessage", equalTo(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE))
-    .when().get(JOB_RESOURCE_URL);
+    .when().get(SINGLE_JOB_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockQuery);
     inOrder.verify(mockQuery).jobId(MockProvider.EXAMPLE_JOB_ID);
@@ -152,7 +158,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
     given().pathParam("id", jobId).then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Job with id " + jobId + " does not exist")).when()
-    .get(JOB_RESOURCE_URL);
+    .get(SINGLE_JOB_RESOURCE_URL);
   }
 
   @Test
@@ -189,25 +195,25 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
     .body("type", equalTo(RestException.class.getSimpleName())).body("message", equalTo("Runtime exception"))
     .when().post(JOB_RESOURCE_EXECUTE_JOB_URL);
   }
-  
+
   @Test
   public void testGetStacktrace() {
     String stacktrace = "aStacktrace";
     when(mockManagementService.getJobExceptionStacktrace(MockProvider.EXAMPLE_JOB_ID)).thenReturn(stacktrace);
-    
+
     Response response = given().pathParam("id", MockProvider.EXAMPLE_JOB_ID)
     .then().expect().statusCode(Status.OK.getStatusCode()).contentType(ContentType.TEXT)
     .when().get(JOB_RESOURCE_GET_STACKTRACE_URL);
-    
+
     String content = response.asString();
     Assert.assertEquals(stacktrace, content);
   }
-  
+
   @Test
   public void testGetStacktraceJobNotFound() {
     String exceptionMessage = "job not found";
     doThrow(new ProcessEngineException(exceptionMessage)).when(mockManagementService).getJobExceptionStacktrace(MockProvider.EXAMPLE_JOB_ID);
-    
+
     given().pathParam("id", MockProvider.EXAMPLE_JOB_ID)
     .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
@@ -246,7 +252,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
   public void testSetJobDuedateNonExistentJob() {
     Date newDuedate = MockProvider.createMockDuedate();
     String expectedMessage = "No job found with id '" + MockProvider.NON_EXISTING_JOB_ID + "'.";
-  
+
     doThrow(new ProcessEngineException(expectedMessage)).when(mockManagementService).setJobDuedate(MockProvider.NON_EXISTING_JOB_ID,
         newDuedate);
 
@@ -261,6 +267,455 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
     .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
 
     verify(mockManagementService).setJobDuedate(MockProvider.NON_EXISTING_JOB_ID, newDuedate);
+  }
+
+  @Test
+  public void testActivateJob() {
+    JobSuspensionStateDto dto = new JobSuspensionStateDto();
+    dto.setState(false);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(dto)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(SINGLE_JOB_SUSPENDED_URL);
+
+    verify(mockManagementService).activateJobById(MockProvider.EXAMPLE_JOB_ID);
+  }
+
+  @Test
+  public void testActivateThrowsProcessEngineException() {
+    JobSuspensionStateDto dto = new JobSuspensionStateDto();
+    dto.setState(false);
+
+    String expectedMessage = "expectedMessage";
+
+    doThrow(new ProcessEngineException(expectedMessage))
+      .when(mockManagementService)
+      .activateJobById(eq(MockProvider.NON_EXISTING_JOB_ID));
+
+    given()
+      .pathParam("id", MockProvider.NON_EXISTING_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(dto)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedMessage))
+      .when()
+        .put(SINGLE_JOB_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendJob() {
+    JobSuspensionStateDto dto = new JobSuspensionStateDto();
+    dto.setState(true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(dto)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(SINGLE_JOB_SUSPENDED_URL);
+
+    verify(mockManagementService).suspendJobById(MockProvider.EXAMPLE_JOB_ID);
+  }
+
+  @Test
+  public void testSuspendedThrowsProcessEngineException() {
+    JobSuspensionStateDto dto = new JobSuspensionStateDto();
+    dto.setState(true);
+
+    String expectedMessage = "expectedMessage";
+
+    doThrow(new ProcessEngineException(expectedMessage))
+      .when(mockManagementService)
+      .suspendJobById(eq(MockProvider.NON_EXISTING_JOB_ID));
+
+    given()
+      .pathParam("id", MockProvider.NON_EXISTING_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(dto)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedMessage))
+      .when()
+        .put(SINGLE_JOB_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendWithMultipleByParameters() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("jobDefinitionId", MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    String message = "Only one of jobId, jobDefinitionId, processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", is(message))
+      .when()
+        .put(SINGLE_JOB_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateJobByProcessDefinitionKey() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_SUSPENDED_URL);
+
+    verify(mockManagementService).activateJobByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+  }
+
+  @Test
+  public void testActivateJobByProcessDefinitionKeyWithException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    String expectedException = "expectedException";
+    doThrow(new ProcessEngineException(expectedException))
+      .when(mockManagementService)
+      .activateJobByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(JOB_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendJobByProcessDefinitionKey() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_SUSPENDED_URL);
+
+    verify(mockManagementService).suspendJobByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+  }
+
+  @Test
+  public void testSuspendJobByProcessDefinitionKeyWithException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    String expectedException = "expectedException";
+    doThrow(new ProcessEngineException(expectedException))
+      .when(mockManagementService)
+      .suspendJobByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(JOB_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateJobByProcessDefinitionId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_SUSPENDED_URL);
+
+    verify(mockManagementService).activateJobByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
+  public void testActivateJobByProcessDefinitionIdWithException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    String expectedException = "expectedException";
+    doThrow(new ProcessEngineException(expectedException))
+      .when(mockManagementService)
+      .activateJobByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(JOB_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendJobByProcessDefinitionId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_SUSPENDED_URL);
+
+    verify(mockManagementService).suspendJobByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
+  public void testSuspendJobByProcessDefinitionIdWithException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    String expectedException = "expectedException";
+    doThrow(new ProcessEngineException(expectedException))
+      .when(mockManagementService)
+      .suspendJobByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(JOB_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateJobByProcessInstanceId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_SUSPENDED_URL);
+
+    verify(mockManagementService).activateJobByProcessInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+
+  @Test
+  public void testActivateJobByProcessInstanceIdWithException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    String expectedException = "expectedException";
+    doThrow(new ProcessEngineException(expectedException))
+      .when(mockManagementService)
+      .activateJobByProcessInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(JOB_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendJobByProcessInstanceId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_SUSPENDED_URL);
+
+    verify(mockManagementService).suspendJobByProcessInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+
+  @Test
+  public void testSuspendJobByProcessInstanceIdWithException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    String expectedException = "expectedException";
+    doThrow(new ProcessEngineException(expectedException))
+      .when(mockManagementService)
+      .suspendJobByProcessInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(JOB_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateJobByJobDefinitionId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("jobDefinitionId", MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_SUSPENDED_URL);
+
+    verify(mockManagementService).activateJobByJobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+  }
+
+  @Test
+  public void testSuspendJobByJobDefinitionId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("jobDefinitionId", MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_SUSPENDED_URL);
+
+    verify(mockManagementService).suspendJobByJobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+  }
+
+  @Test
+  public void testActivateJobByIdShouldThrowException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("jobId", MockProvider.EXAMPLE_JOB_ID);
+
+    String message = "Either jobDefinitionId, processInstanceId, processDefinitionId or processDefinitionKey can be set to update the suspension state.";
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", is(message))
+      .when()
+        .put(JOB_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendJobByIdShouldThrowException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("jobId", MockProvider.EXAMPLE_JOB_ID);
+
+    String message = "Either jobDefinitionId, processInstanceId, processDefinitionId or processDefinitionKey can be set to update the suspension state.";
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", is(message))
+      .when()
+        .put(JOB_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendJobByNothing() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+
+    String message = "Either jobId, jobDefinitionId, processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", is(message))
+      .when()
+        .put(JOB_SUSPENDED_URL);
   }
 
 }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
@@ -23,6 +24,10 @@ import org.camunda.bpm.engine.rest.JobDefinitionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionQueryDto;
+import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.sub.management.JobDefinitionResource;
+import org.camunda.bpm.engine.rest.sub.management.JobDefinitionResourceImpl;
 
 /**
  * @author roman.smirnov
@@ -35,6 +40,10 @@ public class JobDefinitionRestServiceImpl extends AbstractRestProcessEngineAware
 
   public JobDefinitionRestServiceImpl(String engineName) {
     super(engineName);
+  }
+
+  public JobDefinitionResource getJobDefinition(String jobDefinitionId) {
+    return new JobDefinitionResourceImpl(getProcessEngine(), jobDefinitionId);
   }
 
   public List<JobDefinitionDto> getJobDefinitions(UriInfo uriInfo, Integer firstResult,
@@ -86,6 +95,21 @@ public class JobDefinitionRestServiceImpl extends AbstractRestProcessEngineAware
       maxResults = Integer.MAX_VALUE;
     }
     return query.listPage(firstResult, maxResults);
+  }
+
+  public void updateSuspensionState(JobDefinitionSuspensionStateDto dto) {
+    if (dto.getJobDefinitionId() != null) {
+      String message = "Either processDefinitionId or processDefinitionKey can be set to update the suspension state.";
+      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    }
+
+    try {
+      dto.updateSuspensionState(getProcessEngine());
+
+    } catch (IllegalArgumentException e) {
+      String message = String.format("Could not update the suspension state of Job Definitions due to: %s", e.getMessage()) ;
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, message);
+    }
   }
 
 }

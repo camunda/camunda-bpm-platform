@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,12 +17,15 @@ import java.util.List;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.JobRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.JobResourceImpl;
 import org.camunda.bpm.engine.runtime.Job;
@@ -71,7 +74,7 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
 		}
 		return jobResults;
 	}
-	
+
   @Override
   public CountResultDto getJobsCount(@Context UriInfo uriInfo) {
     JobQueryDto queryDto = new JobQueryDto(uriInfo.getQueryParameters());
@@ -82,11 +85,11 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
   public CountResultDto queryJobsCount(JobQueryDto queryDto) {
     ProcessEngine engine = getProcessEngine();
     JobQuery query = queryDto.toQuery(engine);
-    
+
     long count = query.count();
     CountResultDto result = new CountResultDto();
     result.setCount(count);
-    
+
     return result;
   }
 
@@ -100,5 +103,14 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
 		}
 		return query.listPage(firstResult, maxResults);
 	}
+
+  public void updateSuspensionState(JobSuspensionStateDto dto) {
+    if (dto.getJobId() != null) {
+      String message = "Either jobDefinitionId, processInstanceId, processDefinitionId or processDefinitionKey can be set to update the suspension state.";
+      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    }
+
+    dto.updateSuspensionState(getProcessEngine());
+  }
 
 }

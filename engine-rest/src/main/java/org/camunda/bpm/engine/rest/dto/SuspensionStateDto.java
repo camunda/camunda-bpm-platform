@@ -10,7 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.dto.runtime;
+package org.camunda.bpm.engine.rest.dto;
+
+import org.camunda.bpm.engine.ProcessEngine;
 
 public class SuspensionStateDto {
 
@@ -29,4 +31,6 @@ public class SuspensionStateDto {
     dto.suspended = suspended;
     return dto;
   }
+
+  public void updateSuspensionState(ProcessEngine engine) {};
 }

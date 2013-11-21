@@ -17,6 +17,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -27,6 +28,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
@@ -68,5 +70,10 @@ public interface ProcessDefinitionResource {
   @Path("/rendered-form")
   @Produces(MediaType.APPLICATION_XHTML_XML)
   String getRenderedForm();
+
+  @PUT
+  @Path("/suspended")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void updateSuspensionState(ProcessDefinitionSuspensionStateDto dto);
 
 }

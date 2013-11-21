@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.runtime.SuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
@@ -85,18 +85,8 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
     return result;
   }
 
-  @Override
-  public void updateSuspensionState(SuspensionStateDto dto) {
-    RuntimeService runtimeService = engine.getRuntimeService();
-
-    try {
-      if (dto.getSuspended()) {
-        runtimeService.suspendProcessInstanceById(processInstanceId);
-      } else {
-        runtimeService.activateProcessInstanceById(processInstanceId);
-      }
-    } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
-    }
+  public void updateSuspensionState(ProcessInstanceSuspensionStateDto dto) {
+    dto.setProcessInstanceId(processInstanceId);
+    dto.updateSuspensionState(engine);
   }
 }

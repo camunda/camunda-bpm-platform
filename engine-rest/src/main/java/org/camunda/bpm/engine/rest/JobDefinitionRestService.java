@@ -17,7 +17,9 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -28,6 +30,8 @@ import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionQueryDto;
+import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDto;
+import org.camunda.bpm.engine.rest.sub.management.JobDefinitionResource;
 
 /**
  * @author roman.smirnov
@@ -37,6 +41,9 @@ import org.camunda.bpm.engine.rest.dto.management.JobDefinitionQueryDto;
 public interface JobDefinitionRestService {
 
   public static final String PATH = "/job-definition";
+
+  @Path("/{id}")
+  JobDefinitionResource getJobDefinition(@PathParam("id") String jobDefinitionId);
 
   /**
    * Exposes the {@link JobDefinitionQuery} interface as a REST service.
@@ -67,5 +74,10 @@ public interface JobDefinitionRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto queryJobDefinitionsCount(JobDefinitionQueryDto queryDto);
+
+  @PUT
+  @Path("/suspended")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void updateSuspensionState(JobDefinitionSuspensionStateDto dto);
 
 }
