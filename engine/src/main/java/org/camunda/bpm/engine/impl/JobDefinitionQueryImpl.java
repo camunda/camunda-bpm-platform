@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl;
 import java.io.Serializable;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -49,55 +48,37 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   }
 
   public JobDefinitionQuery jobDefinitionId(String jobDefinitionId) {
-    if (jobDefinitionId == null) {
-      throw new ProcessEngineException("Job definition id is null");
-    }
-
+    assertParamNotNull("Job definition id", jobDefinitionId);
     this.id = jobDefinitionId;
     return this;
   }
 
   public JobDefinitionQuery activityIdIn(String... activityIds) {
-    if (activityIds == null) {
-      throw new ProcessEngineException("Activity id is null");
-    }
-
+    assertParamNotNull("Activity ids", activityIds);
     this.activityIds = activityIds;
     return this;
   }
 
   public JobDefinitionQuery processDefinitionId(String processDefinitionId) {
-    if (processDefinitionId == null) {
-      throw new ProcessEngineException("Process definition id is null");
-    }
-
+    assertParamNotNull("Process definition id", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   public JobDefinitionQuery processDefinitionKey(String processDefinitionKey) {
-    if (processDefinitionKey == null) {
-      throw new ProcessEngineException("Process definition key is null");
-    }
-
+    assertParamNotNull("Process definition key", processDefinitionKey);
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
   public JobDefinitionQuery jobType(String jobType) {
-    if (jobType == null) {
-      throw new ProcessEngineException("Job type is null");
-    }
-
+    assertParamNotNull("Job type", jobType);
     this.jobType = jobType;
     return this;
   }
 
   public JobDefinitionQuery jobConfiguration(String jobConfiguration) {
-    if (jobConfiguration == null) {
-      throw new ProcessEngineException("Job configuration is null");
-    }
-
+    assertParamNotNull("Job configuration", jobConfiguration);
     this.jobConfiguration = jobConfiguration;
     return this;
   }
@@ -113,7 +94,6 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   }
 
   // order by ///////////////////////////////////////////
-
 
   public JobDefinitionQuery orderByJobDefinitionId() {
     return orderBy(JobDefinitionQueryProperty.JOB_DEFINITION_ID);

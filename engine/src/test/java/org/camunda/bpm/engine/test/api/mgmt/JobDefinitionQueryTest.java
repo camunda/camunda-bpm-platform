@@ -80,6 +80,11 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
       managementService.createJobDefinitionQuery().activityIdIn(null);
       fail("A ProcessEngineExcpetion was expected.");
     } catch (ProcessEngineException e) {}
+
+    try {
+      managementService.createJobDefinitionQuery().activityIdIn((String)null);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (ProcessEngineException e) {}
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,24 +27,24 @@ import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
  * Abstract superclass for all query types.
- *  
+ *
  * @author Joram Barrez
  */
 public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryParameterObject implements Command<Object>, Query<T,U>, Serializable {
-      
+
   private static final long serialVersionUID = 1L;
-  
+
   public static final String SORTORDER_ASC = "asc";
   public static final String SORTORDER_DESC = "desc";
-  
+
   private static enum ResultType {
     LIST, LIST_PAGE, SINGLE_RESULT, COUNT
   }
-    
+
   protected transient CommandExecutor commandExecutor;
   protected transient CommandContext commandContext;
   protected String orderBy;
-  
+
   protected ResultType resultType;
 
   protected QueryProperty orderProperty;
@@ -53,13 +53,13 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   }
 
   protected AbstractQuery(CommandExecutor commandExecutor) {
-    this.commandExecutor = commandExecutor;    
+    this.commandExecutor = commandExecutor;
   }
-  
+
   public AbstractQuery(CommandContext commandContext) {
     this.commandContext = commandContext;
   }
-  
+
   public AbstractQuery<T, U> setCommandExecutor(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
     return this;
@@ -70,15 +70,15 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     this.orderProperty = property;
     return (T) this;
   }
-  
+
   public T asc() {
     return direction(Direction.ASCENDING);
   }
-  
+
   public T desc() {
     return direction(Direction.DESCENDING);
   }
-  
+
   @SuppressWarnings("unchecked")
   public T direction(Direction direction) {
     if (orderProperty==null) {
@@ -88,13 +88,13 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     orderProperty = null;
     return (T) this;
   }
-  
+
   protected void checkQueryOk() {
     if (orderProperty != null) {
       throw new ProcessEngineException("Invalid query: call asc() or desc() after using orderByXX()");
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   public U singleResult() {
     this.resultType = ResultType.SINGLE_RESULT;
@@ -112,7 +112,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     }
     return executeList(Context.getCommandContext(), null);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<U> listPage(int firstResult, int maxResults) {
     this.firstResult = firstResult;
@@ -123,7 +123,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     }
     return executeList(Context.getCommandContext(), new Page(firstResult, maxResults));
   }
-  
+
   public long count() {
     this.resultType = ResultType.COUNT;
     if (commandExecutor!=null) {
@@ -131,7 +131,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     }
     return executeCount(Context.getCommandContext());
   }
-  
+
   public Object execute(CommandContext commandContext) {
     if (resultType==ResultType.LIST) {
       return executeList(commandContext, null);
@@ -145,20 +145,20 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   }
 
   public abstract long executeCount(CommandContext commandContext);
-  
+
   /**
    * Executes the actual query to retrieve the list of results.
-   * @param page used if the results must be paged. If null, no paging will be applied. 
+   * @param page used if the results must be paged. If null, no paging will be applied.
    */
   public abstract List<U> executeList(CommandContext commandContext, Page page);
-  
+
   public U executeSingleResult(CommandContext commandContext) {
     List<U> results = executeList(commandContext, null);
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
      throw new ProcessEngineException("Query return "+results.size()+" results instead of max 1");
-    } 
+    }
     return null;
   }
 
@@ -176,6 +176,25 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
       return super.getOrderBy();
     } else {
       return orderBy;
+    }
+  }
+
+  // helper methods /////////////////////////////////////////
+
+  protected void assertParamNotNull(String paramName, String[] values) {
+    if(values == null) {
+      throw new ProcessEngineException(paramName +" is null");
+    }
+    for (String value : values) {
+      if(value == null) {
+        throw new ProcessEngineException(paramName +" contains null value");
+      }
+    }
+  }
+
+  protected void assertParamNotNull(String paramName, String value) {
+    if(value == null) {
+      throw new ProcessEngineException(paramName +" is null");
     }
   }
 }

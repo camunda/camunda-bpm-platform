@@ -24,7 +24,7 @@ public interface JobDefinitionQuery extends Query<JobDefinitionQuery, JobDefinit
   /** Only select job definitions with the given id */
   JobDefinitionQuery jobDefinitionId(String jobDefinitionId);
 
-  /** Only select job definitions which exist for the given activity id */
+  /** Only select job definitions which exist for the listed activity ids */
   JobDefinitionQuery activityIdIn(String... activityIds);
 
   /** Only select job definitions which exist for the given process definition id. **/
