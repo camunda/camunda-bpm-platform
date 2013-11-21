@@ -1,6 +1,6 @@
-ngDefine('cockpit.pages', function(module, $) {
+ngDefine('cockpit.plugin.base.views', function(module, $) {
 
-  var JobRetriesController = [ '$scope', '$q', '$location', 'Notifications','JobResource', 'dialog', 'processData', 'processInstance', 
+  var JobRetriesController = [ '$scope', '$q', '$location', 'Notifications','JobResource', 'dialog', 'processData', 'processInstance',
                       function ($scope, $q, $location, Notifications, JobResource, dialog, processData, processInstance) {
 
     var jobRetriesData = processData.newChild($scope);
@@ -31,7 +31,7 @@ ngDefine('cockpit.pages', function(module, $) {
 
     $scope.$watch('jobPages.current', function(newValue, oldValue) {
       if (!newValue) {
-        jobPages.current = 1;        
+        jobPages.current = 1;
         return;
       }
 
@@ -65,7 +65,7 @@ ngDefine('cockpit.pages', function(module, $) {
       JobResource.count({'processInstanceId': processInstance.id, 'withException': true}).$then(function(data) {
         jobPages.total = (Math.ceil(data.data.count / jobPages.size));
       });
-    }    
+    }
 
     $scope.$watch('summarizePages.current', function(newValue) {
       if (!newValue) {
@@ -86,9 +86,9 @@ ngDefine('cockpit.pages', function(module, $) {
         var jobId = selectedFailedJobIds[i + firstResult];
         var job = jobIdToFailedJobMap[jobId];
         if (job) {
-          showJobsRetried.push(job);  
+          showJobsRetried.push(job);
         }
-      }      
+      }
     }
 
     $scope.selectAllJobs = function (allJobsSelected) {
@@ -97,7 +97,7 @@ ngDefine('cockpit.pages', function(module, $) {
         job.selected = allJobsSelected;
         selectFailedJob(job);
       });
-    };    
+    };
 
     var selectFailedJob = $scope.selectFailedJob = function (failedJob) {
       var index = selectedFailedJobIds.indexOf(failedJob.id);
@@ -112,11 +112,11 @@ ngDefine('cockpit.pages', function(module, $) {
       if (failedJob.selected === false) {
         selectedFailedJobIds.splice(index, 1);
         if ($scope.allJobsSelected === true) {
-          $scope.allJobsSelected = false;  
+          $scope.allJobsSelected = false;
         }
         return;
       }
-    };   
+    };
 
     $scope.retryFailedJobs = function (selectedFailedJobIds) {
       $scope.status = PERFORM;
@@ -126,11 +126,11 @@ ngDefine('cockpit.pages', function(module, $) {
 
       doRetry(selectedFailedJobIds).then(function () {
         if (!finishedWithFailures) {
-          Notifications.addMessage({ 'status': 'Finished', 'message': 'Incrementing the number of retries finished.', 'exclusive': true });  
+          Notifications.addMessage({ 'status': 'Finished', 'message': 'Incrementing the number of retries finished.', 'exclusive': true });
         } else {
-          Notifications.addError({ 'status': 'Finished', 'message': 'Incrementing the number of retries finished with failures.', 'exclusive': true });  
+          Notifications.addError({ 'status': 'Finished', 'message': 'Incrementing the number of retries finished with failures.', 'exclusive': true });
         }
-        
+
         $scope.status = FINISHED;
        });
     };
@@ -170,7 +170,7 @@ ngDefine('cockpit.pages', function(module, $) {
 
       for (var i = 0, jobId; !!(jobId = selectedFailedJobIds[i]); i++) {
         var job = jobIdToFailedJobMap[jobId];
-        retryJob(job);  
+        retryJob(job);
       }
 
       return deferred.promise;

@@ -34,7 +34,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         });
 
         $scope.calledProcessInstances = response.data;
-      });      
+      });
     }
   };
 
@@ -42,7 +42,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.instanceDetails', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
       id: 'called-process-instances-tab',
       label: 'Called Process Instances',
       url: 'plugin://base/static/app/views/processInstance/called-process-instance-table.html',

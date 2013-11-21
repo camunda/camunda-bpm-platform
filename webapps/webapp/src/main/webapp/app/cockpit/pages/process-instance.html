@@ -2,27 +2,12 @@
 
   <!-- toolbar -->
   <div class="ctn-toolbar">
-    <a class="btn btn-toolbar" href ng-click="openCancelProcessInstanceDialog()"
-       help
-       help-text="Cancel running process instance"
-       help-placement="'left'">
-      
-      <i class="icon-remove-circle"></i>
-    </a>
 
-    <a class="btn btn-toolbar" href ng-click="openJobRetriesDialog()"
-       help
-       help-text="Increment Number of Retries of Failed Jobs"
-       help-placement="'left'">
-      <i class="icon-repeat"></i>
-    </a>
+    <!-- Toolbar actions are provided by plugins -->
+    <span ng-repeat="viewProvider in processInstanceActions">
+      <view provider="viewProvider" vars="processInstanceVars" />
+    </span>
 
-    <a class="btn btn-toolbar" href ng-click="openAddVariableDialog()"
-       help
-       help-text="Add a new variable to Process Instance"
-       help-placement="'left'">
-      <i class="icon-plus"></i>
-    </a>
   </div>
 
   <!-- sitebar -->
@@ -52,9 +37,9 @@
                 ng-click="clearSelection()">
           <i class="icon-remove"></i>
         </button>
-        
+
         <ng-pluralize count="filterData.activityInstanceCount"
-                    when="{ 'null' : 'Nothing', 
+                    when="{ 'null' : 'Nothing',
                             '0': 'Nothing',
                             'one': '1 activity instance',
                             'other': '{{ filterData.activityInstanceCount }} activity instances'}">
@@ -65,7 +50,7 @@
 
 
       <div class="filter instance-tree">
-        <div activity-instance-tree="activityInstanceTree" 
+        <div activity-instance-tree="activityInstanceTree"
              selection="filter"
              on-element-click="handleActivityInstanceSelection(id, activityId, $event)">
         </div>
@@ -90,13 +75,13 @@
             <a href ng-click="selectView(viewProvider)">{{ viewProvider.label }}</a>
           </li>
         </ul>
-  
+
         <div class="ctn-tabbed-content ctn-scroll">
           <view provider="selectedView" vars="processInstanceVars" />
         </div>
       </div>
     </div>
-    
+
     <a class="show-collapsable"></a>
   </div>
 </div>
