@@ -97,8 +97,8 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-		          <skip>true</skip>
-		        </configuration>
+	          <skip>true</skip>
+	        </configuration>
           </plugin>
             
           <plugin>
@@ -170,7 +170,7 @@
                 <phase>post-integration-test</phase>
                 <configuration>
                   <includeProjectDependencies>true</includeProjectDependencies>
-                  <includePluginDependencies>true</includePluginDependencies>
+                  <includePluginDependencies>false</includePluginDependencies>
                   <classpathScope>test</classpathScope>
                   <mainClass>org.camunda.bpm.qa.upgrade.DB71Dropper</mainClass>
                 </configuration>
