@@ -320,6 +320,8 @@
                 <exclude>**/context/**</exclude>
                 <exclude>**/jar/**</exclude>
                 <excludes>**/jboss/**</excludes>
+                <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
+                <excludes>**/SpringServletPALifecycleTest.java</excludes>
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
