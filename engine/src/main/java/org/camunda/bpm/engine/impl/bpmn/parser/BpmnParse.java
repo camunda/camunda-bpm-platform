@@ -3524,6 +3524,10 @@ public class BpmnParse extends Parse {
         || element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "delegateExpression") != null;
   }
 
+  public Map<String, List<JobDeclaration<?>>> getJobDeclarations() {
+    return jobDeclarations;
+  }
+
   public List<JobDeclaration<?>> getJobDeclarationsByKey(String processDefinitionKey) {
     return jobDeclarations.get(processDefinitionKey);
   }

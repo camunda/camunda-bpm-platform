@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHand
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
@@ -349,6 +350,17 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
 
     // delete the deployment
     repositoryService.deleteDeployment(deploymentId, true);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testAsyncContinuation.bpmn20.xml",
+      "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testMultipleProcessesWithinDeployment.bpmn20.xml"})
+  public void testMultipleProcessDeployment() {
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    List<JobDefinition> jobDefinitions = query.list();
+    assertEquals(3, jobDefinitions.size());
+
+    assertEquals(1, query.processDefinitionKey("testProcess").list().size());
+    assertEquals(2, query.processDefinitionKey("anotherTestProcess").list().size());
   }
 
   protected Set<String> getJobDefinitionIds(List<JobDefinition> jobDefinitions) {

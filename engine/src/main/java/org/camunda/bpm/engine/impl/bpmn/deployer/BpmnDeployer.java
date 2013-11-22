@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.bpmn.deployer;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -78,11 +79,12 @@ public class BpmnDeployer implements Deployer {
   public void deploy(DeploymentEntity deployment) {
     LOG.fine("Processing deployment " + deployment.getName());
 
+    Map<String, List<JobDeclaration<?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?>>>();
     List<ProcessDefinitionEntity> processDefinitions = new ArrayList<ProcessDefinitionEntity>();
     Map<String, ResourceEntity> resources = deployment.getResources();
-    BpmnParse bpmnParse = null;
 
     for (String resourceName : resources.keySet()) {
+      BpmnParse bpmnParse = null;
 
       LOG.info("Processing resource " + resourceName);
       if (isBpmnResource(resourceName)) {
@@ -127,6 +129,8 @@ public class BpmnDeployer implements Deployer {
           processDefinition.setDiagramResourceName(diagramResourceName);
           processDefinitions.add(processDefinition);
         }
+
+        jobDeclarations.putAll(bpmnParse.getJobDeclarations());
       }
     }
 
@@ -152,8 +156,8 @@ public class BpmnDeployer implements Deployer {
         processDefinition.setVersion(getVersionForNewProcessDefinition(deployment, processDefinition, latestProcessDefinition));
         processDefinition.setId(getProcessDefinitionId(deployment, processDefinition));
 
-        List<JobDeclaration<?>> jobDeclarations = bpmnParse.getJobDeclarationsByKey(processDefinition.getKey());
-        updateJobDeclarations(jobDeclarations, processDefinition, deployment.isNew());
+        List<JobDeclaration<?>> declarations = jobDeclarations.get(processDefinition.getKey());
+        updateJobDeclarations(declarations, processDefinition, deployment.isNew());
         adjustStartEventSubscriptions(processDefinition, latestProcessDefinition);
 
         dbSqlSession.insert(processDefinition);
@@ -169,8 +173,8 @@ public class BpmnDeployer implements Deployer {
         processDefinition.setVersion(persistedProcessDefinition.getVersion());
         processDefinition.setSuspensionState(persistedProcessDefinition.getSuspensionState());
 
-        List<JobDeclaration<?>> jobDeclarations = bpmnParse.getJobDeclarationsByKey(processDefinition.getKey());
-        updateJobDeclarations(jobDeclarations, processDefinition, deployment.isNew());
+        List<JobDeclaration<?>> declarations = jobDeclarations.get(processDefinition.getKey());
+        updateJobDeclarations(declarations, processDefinition, deployment.isNew());
 
         deploymentCache.addProcessDefinition(processDefinition);
         addAuthorizations(processDefinition);
