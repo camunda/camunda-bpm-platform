@@ -1,0 +1,31 @@
+<table class="table table-bordered table-hover table-condensed table-filter">
+  <thead>
+    <tr>
+      <th>Activity</th>
+      <th>Type</th>
+      <th>Configuration</th>
+      <th>State</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="jobDefinition in jobDefinitions">
+      <td>
+        <a href="#/process-definition/{{ processDefinition.id }}?activityIds={{ jobDefinition.activityId }}">
+          {{ jobDefinition.activityName }}
+        </a>
+      </td>
+      <td>
+        {{ jobDefinition.jobType }}
+      </td>
+      <td>
+        {{ jobDefinition.jobConfiguration }}
+      </td>      
+      <td>
+        {{ jobDefinition.state }}
+      </td> 
+    </tr>
+
+  </tbody>
+</table>
+
+<div paginator total-pages="pages.total" current-page="pages.current"></div>

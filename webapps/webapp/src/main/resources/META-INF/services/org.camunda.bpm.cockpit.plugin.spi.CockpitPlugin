@@ -1,1 +1,2 @@
 org.camunda.bpm.cockpit.impl.plugin.base.BasePlugin
+org.camunda.bpm.cockpit.impl.plugin.jobdefinition.JobDefinitionPlugin
