@@ -9,7 +9,11 @@
     <artifactId>camunda-root</artifactId>
     <version>7.1.0-SNAPSHOT</version>
   </parent>
-
+  <properties>
+  	      <camunda.artifact>
+        org.camunda.bpm.engine.spring
+      </camunda.artifact>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
@@ -103,6 +107,33 @@
 
   <build>
     <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+  	  <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>cleanVersions</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
