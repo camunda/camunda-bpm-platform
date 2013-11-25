@@ -12,18 +12,20 @@
  */
 package org.camunda.bpm.engine.spring.application;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.impl.ProcessApplicationReferenceImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>Process Application implementation to be used in a Spring Application.</p>
@@ -43,7 +45,7 @@ import org.springframework.context.ApplicationContextAware;
  * @author Daniel Meyer
  *
  */
-public class SpringProcessApplication extends AbstractProcessApplication implements ApplicationContextAware, InitializingBean, DisposableBean, BeanNameAware {
+public class SpringProcessApplication extends AbstractProcessApplication implements ApplicationContextAware, ApplicationListener, BeanNameAware {
 
   protected Map<String, String> properties = new HashMap<String, String>();
   protected ApplicationContext applicationContext;
@@ -59,16 +61,6 @@ public class SpringProcessApplication extends AbstractProcessApplication impleme
 
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
     this.applicationContext = applicationContext;
-  }
-
-  public void afterPropertiesSet() throws Exception {
-    // deploy the process application
-    deploy();
-  }
-
-  public void destroy() throws Exception {
-    // undeploy the process application
-    undeploy();
   }
 
   public void setBeanName(String name) {
@@ -88,4 +80,24 @@ public class SpringProcessApplication extends AbstractProcessApplication impleme
     return applicationContext;
   }
 
+  public void start() {
+    deploy();
+  }
+
+  public void stop() {
+    undeploy();
+  }
+
+  @Override
+  public void onApplicationEvent(ApplicationEvent event) {
+    if (event instanceof ContextRefreshedEvent) {
+      // deploy the process application
+      start();
+    } else if (event instanceof ContextClosedEvent) {
+      // undeploy the process application
+      stop();
+    } else {
+      // ignore
+    }
+  }
 }

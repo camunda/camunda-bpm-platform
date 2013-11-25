@@ -37,16 +37,16 @@ public class CustomSpringServletProcessApplication extends SpringServletProcessA
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void start() {
     Assert.assertFalse(isPostDeployInvoked);
-    super.afterPropertiesSet();
+    super.start();
     Assert.assertTrue("@PostDeploy Method not invoked", isPostDeployInvoked);
   }
 
   @Override
-  public void destroy() throws Exception {
+  public void stop() {
     Assert.assertFalse(isPreUndeployInvoked);
-    super.destroy();
+    super.stop();
     Assert.assertTrue("@PreUndeploy Method not invoked", isPreUndeployInvoked);
   }
 

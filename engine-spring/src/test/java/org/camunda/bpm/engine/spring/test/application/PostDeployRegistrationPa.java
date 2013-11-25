@@ -12,14 +12,14 @@
  */
 package org.camunda.bpm.engine.spring.test.application;
 
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.PreUndeploy;
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.spring.application.SpringProcessApplication;
+
+import java.util.concurrent.Callable;
 
 /**
  * @author Daniel Meyer
@@ -52,7 +52,7 @@ public class PostDeployRegistrationPa extends SpringProcessApplication {
   }
 
   @PreUndeploy
-  public void unregisterProcessApplicaiton(ProcessEngine processEngine) {
+  public void unregisterProcessApplication(ProcessEngine processEngine) {
 
     // unregister with the process engine
     processEngine.getManagementService()
@@ -67,7 +67,8 @@ public class PostDeployRegistrationPa extends SpringProcessApplication {
 
   protected boolean isInvoked = false;
 
-  public void afterPropertiesSet() throws Exception {
+  @Override
+  public void start() {
     // do not auto-deploy the process application : we want to manually deploy from the testcase
   }
 
