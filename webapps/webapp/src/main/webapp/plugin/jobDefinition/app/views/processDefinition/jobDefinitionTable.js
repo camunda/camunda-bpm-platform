@@ -88,8 +88,8 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
 
       dialog.open().then(function(result) {
         if (result === "SUCCESS") {
-          // refresh filter and all views
-          $scope.processData.set('filter', angular.extend({}, $scope.filter));
+          // update job definition tab
+          processData.set('filter', angular.extend({}, $scope.filter));
         }
       });
 
