@@ -1,0 +1,89 @@
+<div class="modal-header">
+  <h3 ng-show="jobDefinition.suspended">Activate Job Definition</h3>
+  <h3 ng-hide="jobDefinition.suspended">Suspend Job Definition</h3>
+</div>
+
+<div class="modal-body">
+  <div notifications-panel></div>
+
+  <form class="form-horizontal" name="updateSuspensionStateForm" novalidate ng-hide="status === 'SUCCESS' || status === 'FAIL'" request-aware ng-submit="updateSuspensionState()">
+    <fieldset>
+      <div class="control-group">
+        <label class="control-label" for="includeJobsValue">Include Existing Jobs</label>
+        <div class="controls">
+          <input id="includeJobsValueId" name="includeJobsValue" type="checkbox" ng-model="includeJobs">
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="executeImmediately">Execute</label>
+        <div class="controls">
+          <label class="radio">
+            <input ng-model="executeImmediately" ng-value="true" type="radio" name="execute">
+            Immediately
+          </label>
+          <label class="radio">
+            <input ng-model="executeImmediately" ng-value="false" type="radio" name="execute">
+            Delayed
+          </label>
+        </div>
+        <label class="control-label" for="executionDateValue" ng-show="!executeImmediately">Schedule at</label>
+        <div class="controls" ng-show="!executeImmediately">
+          <input date name="executionDateValue" ng-model="executionDate" type="text" required>
+
+          <p class="invalid" ng-show="this.updateSuspensionStateForm.executionDateValue.$error.date">
+            Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
+          </p>
+        </div>
+      </div>
+
+    </fieldset>
+  </form>
+
+  <div ng-show="status === 'SUCCESS'">
+    <p ng-show="jobDefinition.suspended && executeImmediately">
+      The suspension state of the Job Definition has been updated to "active" successfully.
+    </p>
+    <p ng-show="jobDefinition.suspended && !executeImmediately">
+      The activation of the Job Definition has been scheduled to {{ executionDate }} successfully.
+    </p>
+    <p ng-show="!jobDefinition.suspended && executeImmediately">
+      The suspension state of the Job Definition has been updated to "suspended" successfully.
+    </p>
+    <p ng-show="!jobDefinition.suspended && !executeImmediately">
+      The suspension of the Job Definition has been scheduled to {{ executionDate }} successfully.
+    </p>    
+  </div>
+
+  <div ng-show="status === 'FAIL'">
+    <p ng-show="jobDefinition.suspended && executeImmediately">
+      The suspension state of the Job Definition could not be updated to "active" successfully.
+    </p>
+    <p ng-show="jobDefinition.suspended && !executeImmediately">
+      The activation of the Job Definition could not be scheduled to {{ executionDate }} successfully.
+    </p>
+    <p ng-show="!jobDefinition.suspended && executeImmediately">
+      The suspension state of the Job Definition could not be updated to "suspended" successfully.
+    </p>
+    <p ng-show="!jobDefinition.suspended && !executeImmediately">
+      The suspension of the Job Definition could not be scheduled to {{ executionDate }} successfully.
+    </p> 
+  </div>
+
+</div>
+<div class="modal-footer">
+  <button class="btn" ng-click="close(status)"
+          ng-disabled="status === 'PERFORM_UDPATE'"
+          ng-hide="status === 'SUCCESS' || status === 'FAIL'">Close</button>
+
+  <button type="submit" class="btn btn-primary" ng-click="updateSuspensionState()"
+          ng-hide="status === 'SUCCESS' || status === 'FAIL'"
+          ng-disabled="!isValid() || status === 'PERFORM_UDPATE'">
+    <span ng-hide="jobDefinition.suspended">Suspend</span>
+    <span ng-show="jobDefinition.suspended">Activate</span>
+    <span></span>
+  </button>
+
+  <button class="btn btn-primary" ng-click="close(status)"
+          ng-show="status === 'SUCCESS' || status === 'FAIL'">OK</button>
+</div>

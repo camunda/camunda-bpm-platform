@@ -16,6 +16,18 @@
   opacity: 1.0;
 }
 
+/** suspended icon integration */
+.icon-suspended {
+  background-image: url(../img/suspended.png);
+  width: 18px;
+  height: 14px;
+  background-position: 0px 0px;
+}
+
+.icon-suspended-white {
+  background-image: url(../img/suspended-white.png);
+}
+
 /* apply a natural box layout model to box elements */
 div, textarea, .inline-edit input {
   -webkit-box-sizing: border-box;
@@ -356,3 +368,17 @@ footer .version {
   padding: 7px 9px;
 }
 
+/*-----------action button-----------*/
+
+.action-button {
+  opacity: 0.7;
+  padding: 0px 6px;
+}
+
+.action-button:hover {
+  opacity: 1.0;
+}
+
+.btn.action-button:first-child {
+  padding: 0px 8px;
+}
