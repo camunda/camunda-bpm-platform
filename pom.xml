@@ -1,6 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- Required for OSS maven repository deployment -->
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
   <version>7.1.0-SNAPSHOT</version>
@@ -18,6 +25,7 @@
     <spring.framework.version>3.1.2.RELEASE</spring.framework.version>
     <cxf.version>2.6.1</cxf.version>
     <junit.version>4.11</junit.version>
+    <version.resteasy>2.3.5.Final</version.resteasy>
 
     <version.commonj>1.1.0</version.commonj>
     <version.bouncycastle>1.47</version.bouncycastle>
@@ -80,9 +88,8 @@
       <camunda.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</camunda.osgi.remove.headers>
       <camunda.osgi.include.resource>{maven-resources}</camunda.osgi.include.resource>
       <camunda.osgi.embed />
-    <version.resteasy>2.3.5.Final</version.resteasy>
   </properties>
-    
+
   <profiles>
     <!-- distro profile is default and builds the complete distribution. 
          Does not run integration tests. -->
@@ -139,7 +146,52 @@
         <module>webapps/cycle</module>
         <module>webapps/camunda-webapp</module>    
       </modules>
-    </profile>  
+    </profile>
+    <profile>
+      <id>sonatype-oss-release</id>
+      <modules>
+        <module>javaee/ejb-service</module>
+        <module>javaee/ejb-client</module>
+        <module>javaee/jobexecutor-ra</module>
+        <module>javaee/jobexecutor-rar</module>
+
+        <module>engine</module>
+        <module>engine-cdi</module>
+        <!--<module>engine-osgi</module>-->
+        <module>engine-spring</module>
+        <module>engine-rest</module>
+
+        <module>identity/identity-ldap</module>
+      </modules>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.4.4</version>
+          </plugin>
+        </plugins>
+      </build>
+      <repositories>
+        <repository>
+          <id>jboss</id>
+          <name>jboss</name>
+          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+        </repository>
+        <!--<repository>-->
+          <!--<id>jboss-public</id>-->
+          <!--<name>jboss public</name>-->
+          <!--<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>-->
+        <!--</repository>-->
+        <!--&lt;!&ndash; required for commonJ dependency &ndash;&gt;-->
+        <repository>
+          <id>com.springsource.repository.bundles.external</id>
+          <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+          <url>http://repository.springsource.com/maven/bundles/external</url>
+        </repository>
+      </repositories>
+    </profile>
   </profiles>
   
   <dependencyManagement>
@@ -155,7 +207,7 @@
         <version>1.4</version>
       </dependency>
       <dependency>
-        <!-- required by Apache commons httpclient, required by restlet -->
+        <!-- required by Apache commons httpclient -->
         <groupId>commons-logging</groupId>
         <artifactId>commons-logging</artifactId>
         <version>1.1.1</version>
@@ -714,19 +766,74 @@
     </plugins>
   </build>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>maven central</id>
-      <url>http://repo1.maven.org/</url>
-    </pluginRepository>
-  </pluginRepositories>
-  
-  <repositories>
-    <repository>
-      <id>camunda-bpm-nexus</id>
-      <name>camunda-bpm-nexus</name>
-      <url>https://app.camunda.com/nexus/content/groups/public</url>
-    </repository>
-  </repositories>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>camunda services GmbH</name>
+    <url>http://www.camunda.com</url>
+  </organization>
+
+  <url>http://www.camunda.org</url>
+
+  <developers>
+    <developer>
+      <id>meyerdan</id>
+      <name>Daniel Meyer</name>
+      <email>daniel.meyer@camunda.com</email>
+      <organization>camunda services GmbH</organization>
+      <roles><role>Project Lead</role></roles>
+    </developer>
+    <developer>
+      <id>Nikku</id>
+      <name>Nico Rehwaldt</name>
+      <email>nico.rehwaldt@camunda.com</email>
+      <organization>camunda services GmbH</organization>
+      <roles><role>Webapp Lead</role></roles>
+    </developer>
+    <developer>
+      <id>romansmirnov</id>
+      <name>Roman Smirnov</name>
+      <email>roman.smirnov@camunda.com</email>
+      <organization>camunda services GmbH</organization>
+      <roles><role>Core Developer</role></roles>
+    </developer>
+    <developer>
+      <id>hawky-4s-</id>
+      <name>Christian Lipphardt</name>
+      <email>christian.lipphardt@camunda.com</email>
+      <organization>camunda services GmbH</organization>
+      <roles><role>Developer / CI</role></roles>
+    </developer>
+    <developer>
+      <id>polenz</id>
+      <name>Kristin Polenz</name>
+      <email>kristin.polenz@camunda.com</email>
+      <organization>camunda services GmbH</organization>
+      <roles><role>Application Developer</role></roles>
+    </developer>
+    <developer>
+      <id>mschoe</id>
+      <name>Michael Schoettes</name>
+      <email>michael.schoettes@camunda.com</email>
+      <organization>camunda services GmbH</organization>
+      <roles><role>QA Engineer</role></roles>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/camunda/camunda-bpm-platform</url>
+    <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
+  </scm>
+
+  <issueManagement>
+    <system>Jira</system>
+    <url>https://app.camunda.com/jira/browse/CAM/</url>
+  </issueManagement>
   
 </project>
