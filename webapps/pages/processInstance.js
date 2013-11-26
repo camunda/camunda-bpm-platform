@@ -515,7 +515,7 @@ ngDefine('cockpit.pages.processInstance', [
       $rootScope.clearBreadcrumbs();
     });
 
-    $scope.processInstanceVars = { read: [ 'processInstance', 'processData' ] };
+    $scope.processInstanceVars = { read: [ 'processInstance', 'processData', 'filter' ] };
     $scope.processInstanceTabs = Views.getProviders({ component: 'cockpit.processInstance.view' })
                          .concat(Views.getProviders({ component: 'cockpit.processInstance.instanceDetails' })); // backwards compatibility
     $scope.processInstanceActions = Views.getProviders({ component: 'cockpit.processInstance.action' });
