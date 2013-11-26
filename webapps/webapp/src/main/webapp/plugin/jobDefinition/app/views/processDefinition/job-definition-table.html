@@ -5,6 +5,7 @@
       <th>Type</th>
       <th>Configuration</th>
       <th>State</th>
+      <th>Action</th>
     </tr>
   </thead>
   <tbody>
@@ -22,7 +23,15 @@
       </td>      
       <td>
         {{ jobDefinition.state }}
-      </td> 
+      </td>
+      <td>
+        <a class="btn action-button" ng-click="openSuspensionStateDialog(jobDefinition)" ng-show="jobDefinition.suspended" title="Activate Job Definition">
+          <i class="icon-play"></i>
+        </a>
+        <a class="btn action-button" ng-click="openSuspensionStateDialog(jobDefinition)" ng-hide="jobDefinition.suspended" title="Suspend Job Definition">
+          <i class="icon-suspended"></i>
+        </a>        
+      </td>
     </tr>
 
   </tbody>

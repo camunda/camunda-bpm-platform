@@ -1,7 +1,7 @@
-ngDefine('cockpit.plugin.jobDefinition.views', function(module) {
+ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, require) {
 
-  var Controller = [ '$scope', 'search', 'JobDefinitionResource',
-      function ($scope, search, JobDefinitionResource) {
+  var Controller = [ '$scope', 'search', 'JobDefinitionResource', '$dialog', 
+      function ($scope, search, JobDefinitionResource, $dialog) {
 
     var processData = $scope.processData.newChild($scope);
 
@@ -76,6 +76,26 @@ ngDefine('cockpit.plugin.jobDefinition.views', function(module) {
         pages.total = Math.ceil(data.data.count / pages.size);
       });
     };
+
+    $scope.openSuspensionStateDialog = function (jobDefinition) {
+      var dialog = $dialog.dialog({
+        resolve: {
+          jobDefinition: function() { return jobDefinition; }
+        },
+        controller: 'JobDefinitionSuspensionStateController',
+        templateUrl: require.toUrl('./job-definition-suspension-state-dialog.html')
+      });
+
+      dialog.open().then(function(result) {
+        if (result === "SUCCESS") {
+          // refresh filter and all views
+          $scope.processData.set('filter', angular.extend({}, $scope.filter));
+        }
+      });
+
+
+    };
+
   }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
