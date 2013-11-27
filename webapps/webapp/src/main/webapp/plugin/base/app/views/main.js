@@ -14,7 +14,9 @@ ngDefine('cockpit.plugin.base.views', [
   './processInstance/cancelProcessInstanceAction',
   './processInstance/cancelProcessInstanceDialog',
   './processInstance/addVariableAction',
-  './processInstance/addVariableDialog'
+  './processInstance/addVariableDialog',
+  './processInstance/updateSuspensionStateAction',
+  './processInstance/updateSuspensionStateDialog'  
 ], function(module) {
 
 });
