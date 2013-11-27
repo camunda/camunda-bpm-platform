@@ -34,7 +34,7 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
       label: 'Update Suspension State',
       url: 'plugin://base/static/app/views/processInstance/update-suspension-state-action.html',
       controller: Controller,
-      priority: 50
+      priority: 5
     });
   };
 
