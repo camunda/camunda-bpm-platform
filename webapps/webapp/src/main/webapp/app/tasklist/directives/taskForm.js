@@ -53,7 +53,7 @@ ngDefine('tasklist.directives', [
         scope.$watch(attributes['taskVariables'], function(newValue) {
           controller.variables = newValue;
         });
-        
+
         controller.variables = scope.$eval(attributes['taskVariables']);
 
         scope.removeVariable = function(variable) {
@@ -73,7 +73,7 @@ ngDefine('tasklist.directives', [
       require: '^taskVariables',
       terminal: true,
       link: function(scope, element, attr) {
-        
+
         if (attr.type != 'text/form-script') {
           return;
         }
@@ -104,7 +104,7 @@ ngDefine('tasklist.directives', [
   }];
 
   var FormFieldDirective = [
-       '$http', '$templateCache', '$compile', '$controller', '$animator',
+       '$http', '$templateCache', '$compile', '$controller',
        function($http, $templateCache, $compile, $controller) {
 
     return {
@@ -114,6 +114,65 @@ ngDefine('tasklist.directives', [
       require: '^taskVariables',
 
       compile: function(element, attr) {
+
+        /** this function is used to parse the values provided as
+         * child <OPTION> elements of a <SELECT> element:
+         *
+         * <select ...>
+         *   <option value="value1">label1</option>
+         *   <option value="value2">label2</option>
+         *   <option value="value3" label="label3">
+         *   <option>valueLabel4</option>
+         * </select>
+         *
+         * retuns a list of value / label objects.
+         */
+        function parseOptions(element) {
+          var options=[];
+
+          angular.forEach($("option", element), function(option) {
+
+            var value = $(option).attr("value")
+            if(!value) {
+              value = $(option).text()
+            }
+
+            var label = $(option).attr("label")
+            if(!label) {
+              label = $(option).text()
+            }
+
+            options.push({
+              'value': value,
+              'label': label
+            });
+          });
+
+          return options;
+        };
+
+        function parseOptionsObject(optionsObject) {
+          var result = [];
+          for(prop in optionsObject) {
+            result.push({'label': optionsObject[prop], 'value': prop});
+          }
+          return result;
+        };
+
+        function parseOptionsList(optionsList) {
+          var result = [];
+          angular.forEach(optionsList, function(option) {
+            var label, value;
+            if (typeof option === 'string') {
+              result.push({'label':option, 'value':option});
+
+            } else {
+              console.log('Could not map '+option+' to option object. Not a string');
+
+            }
+          });
+          return result;
+        };
 
         function parseAttributes(element) {
           var attributes = { };
@@ -142,7 +201,14 @@ ngDefine('tasklist.directives', [
           return attributes;
         }
 
+        var controlType = element.prop("tagName");
+        if("INPUT"==controlType) {
+          controlType += "-" + element.attr("type");
+        }
+        controlType = controlType.toUpperCase();
+
         var elementAttr = parseAttributes(element);
+        var options = parseOptions(element);
 
         return function(scope, element, attr, taskVariables) {
 
@@ -156,7 +222,7 @@ ngDefine('tasklist.directives', [
 
           withTemplate(function(tpl) {
             var newElement = $(tpl);
-            var inputs = newElement.find('input');
+            var inputs = newElement.find('input, select, textarea');
 
             // add attributes to element
             angular.forEach(elementAttr, function(val, key) {
@@ -172,13 +238,14 @@ ngDefine('tasklist.directives', [
 
           var type = attr['type'],
               name = attr['name'],
+              formValues = attr['formValues'],
               readOnly = (attr['readonly'] == 'readonly' || attr['readonly'] === true),
               variable = scope.$eval(attr['variable']);
 
           if (variable) {
             taskVariables.addVariable(variable);
           } else {
-            if (!name || !type) {
+            if ((!name || !type) && controlType != "TEXTAREA") {
               throw new Error('name or type not defined for form field');
             }
 
@@ -196,6 +263,27 @@ ngDefine('tasklist.directives', [
           scope.typeSwitch = attr['typeSwitch'];
           scope.variable = variable;
 
+          // the type of control which should be used.
+          scope.controlType = controlType;
+
+          // options for select boxes
+          scope.options = options;
+
+          // bind additional options from process variable
+          if(!!formValues) {
+            // wath value of variable since variables are loaded async to form processing
+            scope.$watch(function() {return taskVariables.getVariable(formValues);}, function(additionalOptions) {
+              if(!!additionalOptions) {
+                if($.isArray(additionalOptions.value)) {
+                  scope.options = scope.options.concat(parseOptionsList(additionalOptions.value));
+                } else {
+                  scope.options = scope.options.concat(parseOptionsObject(additionalOptions.value));
+                }
+              }
+            });
+          }
+
+          // the type of the value provided by the control
           scope.inputType = function() {
             var mapping = {
               'date': 'datetime',

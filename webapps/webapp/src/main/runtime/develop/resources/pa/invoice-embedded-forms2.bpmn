@@ -3,22 +3,21 @@
   <dataStore id="FinancialAccountingSystem" isUnlimited="false" name="Financial Accounting System">
     <dataState id="DataState_1"/>
   </dataStore>
-  <message id="foxMessage_en" name="foxMessage_generated_start_forms"/>
   <collaboration id="collaboration_3">
-    <participant id="Process_Engine_1" name="invoice receipt (fox)" processRef="fox-invoice_en"/>
+    <participant id="Process_Engine_1" name="invoice processing" processRef="invoice-embedded-forms2"/>
   </collaboration>
-  <process id="fox-invoice_generated_forms" name="invoice receipt Generated Forms" isExecutable="true">
+  <process id="invoice-embedded-forms2" name="invoice (embdedded forms) 2" isExecutable="true">
     <laneSet id="laneSet_5">
       <lane id="Approver" name="approver">
         <flowNodeRef>approveInvoice</flowNodeRef>
         <flowNodeRef>invoice_approved</flowNodeRef>
       </lane>
       <lane id="teamAssistant" name="team assistant">
-        <flowNodeRef>invoiceReceived</flowNodeRef>
         <flowNodeRef>reviewInvoice</flowNodeRef>
         <flowNodeRef>reviewSuccessful_gw</flowNodeRef>
         <flowNodeRef>invoiceNotProcessed</flowNodeRef>
         <flowNodeRef>assignApprover</flowNodeRef>
+        <flowNodeRef>StartEvent_1</flowNodeRef>
       </lane>
       <lane id="Accountant" name="accountant">
         <flowNodeRef>saveInvoiceToSVN</flowNodeRef>
@@ -26,7 +25,7 @@
         <flowNodeRef>invoiceProcessed</flowNodeRef>
       </lane>
     </laneSet>
-    <userTask id="approveInvoice" camunda:formKey="app:develop/invoice/approve.html" camunda:expression="${true}" name="approve invoice" camunda:candidateGroups="management">
+    <userTask id="approveInvoice" camunda:formKey="embedded:app:/develop/invoice/approve.html" camunda:assignee="${approver}" camunda:candidateGroups="management" name="approve invoice">
       <incoming>sequenceFlow_178</incoming>
       <incoming>reviewSuccessful</incoming>
       <outgoing>sequenceFlow_180</outgoing>
@@ -36,37 +35,6 @@
       <outgoing>invoiceNotApproved</outgoing>
       <outgoing>invoiceApproved</outgoing>
     </exclusiveGateway>
-    <startEvent id="invoiceReceived" name="invoice received">
-      <extensionElements>
-        <camunda:formData>
-            <camunda:formField
-                id="firstname" label="Firstname" type="string">
-                <camunda:validation>
-                   <camunda:constraint name="maxlength" config="25" />
-                   <camunda:constraint name="required" />
-                </camunda:validation>
-            </camunda:formField>
-            <camunda:formField
-                id="lastname" label="Lastname" type="string">
-                <camunda:validation>
-                   <camunda:constraint name="maxlength" config="25" />
-                   <camunda:constraint name="required" />
-                </camunda:validation>
-            </camunda:formField>
-            <camunda:formField
-                id="dateOfBirth" label="Date of Birth" type="date" />
-            <camunda:formField
-                id="enumField" label="Enum Field" type="enum"
-                defaultValue="a">
-                <camunda:value id="a" name="A"/>
-                <camunda:value id="b" name="B"/>
-                <camunda:value id="c" name="C"/>
-            </camunda:formField>
-        </camunda:formData>
-      </extensionElements>
-      <outgoing>sequenceFlow_187</outgoing>
-      <messageEventDefinition id="messageEventDefinition_30" messageRef="foxMessage_en"/>
-    </startEvent>
     <userTask id="reviewInvoice" camunda:expression="${true}" name="review invoice">
       <incoming>invoiceNotApproved</incoming>
       <outgoing>sequenceFlow_183</outgoing>
@@ -100,7 +68,6 @@
     <sequenceFlow id="reviewNotSuccessful" name="no" isImmediate="true" sourceRef="reviewSuccessful_gw" targetRef="invoiceNotProcessed">
       <conditionExpression xsi:type="tFormalExpression" id="conditionExpression_65">${clarified.equals('no')}</conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="sequenceFlow_187" isImmediate="true" sourceRef="invoiceReceived" targetRef="assignApprover"/>
     <sequenceFlow id="reviewSuccessful" name="yes" isImmediate="true" sourceRef="reviewSuccessful_gw" targetRef="approveInvoice">
       <conditionExpression xsi:type="tFormalExpression" id="conditionExpression_68">${clarified.equals('yes')}</conditionExpression>
     </sequenceFlow>
@@ -108,39 +75,19 @@
     <endEvent id="invoiceProcessed" name="invoice processed">
       <incoming>SequenceFlow_1</incoming>
     </endEvent>
-    <userTask id="assignApprover" camunda:candidateGroups="management" name="assign approver">
+    <userTask id="assignApprover" camunda:formKey="embedded:app:/develop/invoice/select-approver.html" camunda:candidateGroups="management" name="assign approver">
       <extensionElements>
-        <camunda:formData>
-            <camunda:formField
-                id="stringField" label="String Field" type="string"
-                defaultValue="someString">
-                <camunda:validation>
-                  <camunda:constraint name="readonly" />
-                </camunda:validation>
-            </camunda:formField>
-            <camunda:formField
-                id="longField" label="Long Field" type="long"
-                defaultValue="1" />
-            <camunda:formField
-                id="booleanField" label="Boolean Field" type="boolean"
-                defaultValue="true" />
-            <camunda:formField
-                id="dateField" label="Date Field" type="date"
-                defaultValue="10-JAN-2013">
-            </camunda:formField>
-            <camunda:formField
-                id="enumField" label="Enum Field" type="enum"
-                defaultValue="a">
-                <camunda:value id="a" name="A"/>
-                <camunda:value id="b" name="B"/>
-                <camunda:value id="c" name="C"/>
-            </camunda:formField>
-        </camunda:formData>
+        <camunda:taskListener event="create" class="org.camunda.bpm.pa.service.AddListVariableListener" />
+        <camunda:taskListener event="create" class="org.camunda.bpm.pa.service.AddMapVariableListener" />
       </extensionElements>
-      <incoming>sequenceFlow_187</incoming>
+      <incoming>SequenceFlow_2</incoming>
       <outgoing>sequenceFlow_178</outgoing>
     </userTask>
     <sequenceFlow id="sequenceFlow_178" isImmediate="true" sourceRef="assignApprover" targetRef="approveInvoice"/>
+    <startEvent id="StartEvent_1" camunda:formKey="embedded:app:/develop/invoice/start.html" name="Start Event">
+      <outgoing>SequenceFlow_2</outgoing>
+    </startEvent>
+    <sequenceFlow id="SequenceFlow_2" name="" sourceRef="StartEvent_1" targetRef="assignApprover"/>
     <association id="Association_1" sourceRef="DataStoreReference_1" targetRef="prepareBankTransfer"/>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_73">
@@ -162,9 +109,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Freigabe_erfolgt__131_gui" bpmnElement="invoice_approved" isHorizontal="true" isMarkerVisible="true">
         <omgdc:Bounds height="40.0" width="40.0" x="488.0" y="245.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Rechnung_eingegangen_138_gui" bpmnElement="invoiceReceived" isHorizontal="true">
-        <omgdc:Bounds height="28.0" width="28.0" x="112.0" y="78.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Freigebenden_zuordnen_143_gui" bpmnElement="assignApprover" isHorizontal="true">
         <omgdc:Bounds height="80.0" width="100.0" x="180.0" y="52.0"/>
@@ -231,15 +175,24 @@
         <omgdi:waypoint xsi:type="omgdc:Point" x="733.0" y="92.0"/>
         <omgdi:waypoint xsi:type="omgdc:Point" x="923.0" y="92.0"/>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="sequenceFlow_187_gui" bpmnElement="sequenceFlow_187" sourceElement="Rechnung_eingegangen_138_gui" targetElement="Freigebenden_zuordnen_143_gui">
-        <omgdi:waypoint xsi:type="omgdc:Point" x="140.0" y="92.0"/>
-        <omgdi:waypoint xsi:type="omgdc:Point" x="180.0" y="92.0"/>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="ja_186_gui" bpmnElement="reviewSuccessful" sourceElement="Kl_rung_erfolgreich__153_gui" targetElement="Rechnung_freigeben_125_gui">
         <omgdi:waypoint xsi:type="omgdc:Point" x="713.0" y="72.0"/>
         <omgdi:waypoint xsi:type="omgdc:Point" x="713.0" y="35.0"/>
         <omgdi:waypoint xsi:type="omgdc:Point" x="403.0" y="35.0"/>
         <omgdi:waypoint xsi:type="omgdc:Point" x="403.0" y="225.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <omgdc:Bounds height="28.0" width="28.0" x="80.0" y="78.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="22.0" width="70.0" x="59.0" y="111.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_StartEvent_2" targetElement="Freigebenden_zuordnen_143_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="108.0" y="92.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="180.0" y="92.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="6.0" width="6.0" x="144.0" y="92.0"/>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
