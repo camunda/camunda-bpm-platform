@@ -40,6 +40,12 @@
       </td>
     </tr>
 
+    <tr ng-if="!jobDefinitions">
+      <td colspan="5">
+        <i class="icon-loading"></i> loading job definitions...
+      </td>
+    </tr>    
+
     <tr ng-if="jobDefinitions && !jobDefinitions.length">
       <td colspan="5">
         No job definitions matched by current filter.
