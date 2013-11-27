@@ -8,6 +8,37 @@ ngDefine('tasklist.services', [
 
   var FormsProducer = function(Uri) {
 
+    var booleanTypeConverter = function(value) {
+      if(!value) {
+        return false;
+      } else {
+        if(true == value || "true" == value || "TRUE" == value) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+
+    var numberTypeConverter = function(value) {
+      return parseInt(value);
+    }
+
+    var typeConverters = {
+      'boolean' : booleanTypeConverter,
+      'number' : numberTypeConverter,
+      'Integer' : numberTypeConverter
+    };
+
+    function convertValue(variable) {
+      var converter = typeConverters[variable.type];
+      if(!!converter) {
+        return converter(variable.value);
+      } else {
+        return variable.value;
+      }
+    }
+
     var Forms = {
       /**
        *
@@ -21,13 +52,8 @@ ngDefine('tasklist.services', [
           // read-only variables should not be submitted.
           if(!variable.readOnly) {
 
-            var name = variable.name,
-                value = variable.value,
-                type = variable.type;
-
-            if (!value && type == "boolean") {
-              value = false;
-            }
+            var name = variable.name;
+            var value = convertValue(variable);
 
             variablesMap[name] = {"value" : value};
           }

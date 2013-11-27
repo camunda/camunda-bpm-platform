@@ -61,6 +61,10 @@ form.inline-edit {
   right: 0px;
 }
 
+.inline {
+  display: inline;
+}
+
 /** ---- in-place editing ----**/
 
 .in-place-edit {

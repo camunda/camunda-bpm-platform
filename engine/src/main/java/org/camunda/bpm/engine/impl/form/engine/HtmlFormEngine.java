@@ -13,12 +13,16 @@
 package org.camunda.bpm.engine.impl.form.engine;
 
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.form.type.EnumFormType;
 
 /**
  * <p>A simple {@link FormEngine} implementaiton which renders
@@ -81,30 +85,83 @@ public class HtmlFormEngine implements FormEngine {
     // start controls
     documentBuilder.startElement(new HtmlElementWriter("div").attribute("class", "controls"));
 
-    // write input
-    HtmlElementWriter inputElement = new HtmlElementWriter("input", true)
-      .attribute("form-field", null)
-      .attribute("type", formField.getTypeName())
-      .attribute("name", formField.getId());
+    // render form control
+    if(EnumFormType.TYPE_NAME.equals(formField.getTypeName())) {
+      // <select ...>
+      renderSelectBox(formField, documentBuilder);
 
-    // add default value
-    Object defaultValue = formField.getDefaultValue();
-    if(defaultValue != null) {
-      inputElement.attribute("value", defaultValue.toString());
+    } else {
+      // <input ...>
+      renderInputField(formField, documentBuilder);
+
     }
-
-    // add validation constraints
-    for (FormFieldValidationConstraint constraint : formField.getValidationConstraints()) {
-      inputElement.attribute(constraint.getName(), (String) constraint.getConfiguration());
-    }
-
-    documentBuilder.startElement(inputElement).endElement();
 
     // end controls
     documentBuilder.endElement();
 
     // end group
     documentBuilder.endElement();
+  }
+
+  protected void renderInputField(FormField formField, HtmlDocumentBuilder documentBuilder) {
+    HtmlElementWriter inputField = new HtmlElementWriter("input", true);
+    addCommonFormFieldAttributes(formField, inputField);
+
+    // add default value
+    Object defaultValue = formField.getDefaultValue();
+    if(defaultValue != null) {
+      inputField.attribute("value", defaultValue.toString());
+    }
+
+    // <input ... />
+    documentBuilder.startElement(inputField).endElement();
+  }
+
+  protected void renderSelectBox(FormField formField, HtmlDocumentBuilder documentBuilder) {
+    HtmlElementWriter selectBox = new HtmlElementWriter("select", false);
+    addCommonFormFieldAttributes(formField, selectBox);
+    // Limitation: enum is currently always of type "string"
+    selectBox.attribute("type", "string");
+
+    // <select ...>
+    documentBuilder.startElement(selectBox);
+
+    // <option ...>
+    renderSelectOptions(formField, documentBuilder);
+
+    // </select>
+    documentBuilder.endElement();
+  }
+
+  protected void renderSelectOptions(FormField formField, HtmlDocumentBuilder documentBuilder) {
+    EnumFormType enumFormType = (EnumFormType) formField.getType();
+    Map<String, String> values = enumFormType.getValues();
+
+    for (Entry<String, String> value : values.entrySet()) {
+      // <option>
+      HtmlElementWriter option = new HtmlElementWriter("option", false)
+        .attribute("value", value.getKey())
+        .textContent(value.getValue());
+
+      Object defaultValue = formField.getDefaultValue();
+      if(defaultValue != null && defaultValue.equals(value.getKey())) {
+        option.attribute("selected", null);
+      }
+
+      documentBuilder.startElement(option).endElement();
+    }
+  }
+
+  protected void addCommonFormFieldAttributes(FormField formField, HtmlElementWriter formControl) {
+    formControl
+      .attribute("form-field", null)
+      .attribute("type", formField.getTypeName())
+      .attribute("name", formField.getId());
+
+    // add validation constraints
+    for (FormFieldValidationConstraint constraint : formField.getValidationConstraints()) {
+      formControl.attribute(constraint.getName(), (String) constraint.getConfiguration());
+    }
   }
 
 }
