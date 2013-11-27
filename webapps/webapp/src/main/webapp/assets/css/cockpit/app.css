@@ -475,3 +475,9 @@ textarea.variable-type-string {
   margin-left: 19px;
   margin-bottom: 10px;
 }
+
+/*----------- circle suspended ----------*/
+
+span.state-suspended {
+  padding-left: 9px;
+}

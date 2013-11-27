@@ -15,6 +15,8 @@ package org.camunda.bpm.cockpit.impl.plugin.base.dto;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+
 
 public class ProcessInstanceDto {
 
@@ -22,6 +24,7 @@ public class ProcessInstanceDto {
   protected String businessKey;
   protected Date startTime;
   protected List<IncidentStatisticsDto> incidents;
+  protected int suspensionState;
 
   public ProcessInstanceDto() {}
 
@@ -55,6 +58,14 @@ public class ProcessInstanceDto {
 
   public void setIncidents(List<IncidentStatisticsDto> incidents) {
     this.incidents = incidents;
+  }
+
+  public boolean isSuspended() {
+    return SuspensionState.SUSPENDED.getStateCode() == suspensionState;
+  }
+
+  protected void setSuspensionState(int state) {
+    this.suspensionState = state;
   }
 
 }

@@ -15,7 +15,12 @@
 
     <div class="page-header">
       <small>Process Definition View</small>
-      <h1>{{ processDefinition.name || processDefinition.key }}</h1>
+        <h1>
+          {{ processDefinition.name || processDefinition.key }}
+          <span ng-show="processDefinition.suspended" title="Currently suspended">
+            <i class="icon-suspended"></i>
+          </span>
+        </h1>
     </div>
 
     <div class="filters" ng-controller="ProcessDefinitionFilterController">
