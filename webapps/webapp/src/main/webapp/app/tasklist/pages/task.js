@@ -22,6 +22,15 @@ ngDefine('tasklist.pages', [
       return null;
     };
 
+    $scope.formVariable = function(name) {
+      var variable = getVariableByName(name, $scope.variables);
+      if(!!variable) {
+        return variable.value;
+      } else {
+        return null;
+      }
+    }
+
     var task = $scope.task = EngineApi.getTaskList().get({ id: taskId });
 
     task.$then(function() {
