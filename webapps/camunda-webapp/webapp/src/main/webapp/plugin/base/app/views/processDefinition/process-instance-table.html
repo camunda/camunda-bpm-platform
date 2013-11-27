@@ -22,6 +22,9 @@
         <a state-circle 
            incidents="processInstance.incidents"
            href="#/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
+        <span class="state-suspended" ng-show="processInstance.suspended" title="Currently suspended">
+          <i class="icon-suspended"></i>
+        </span>
       </td>
     </tr>
 

@@ -8,6 +8,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <collection property="incidents" javaType="java.util.ArrayList" ofType="org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentStatisticsDto">
       <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
       <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
@@ -36,6 +37,7 @@
       INSTANCE.ID_,
       INSTANCE.BUSINESS_KEY_,
       INSTANCE.START_TIME_,
+      INSTANCE.SUSPENSION_STATE_,
       INCIDENT.INCIDENT_TYPE_,
       INCIDENT.INCIDENT_COUNT_
     from
