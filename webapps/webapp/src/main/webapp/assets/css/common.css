@@ -382,3 +382,8 @@ footer .version {
 .btn.action-button:first-child {
   padding: 0px 8px;
 }
+
+/*----------popover--------------*/
+.tooltip {
+  z-index: 1060;
+}
