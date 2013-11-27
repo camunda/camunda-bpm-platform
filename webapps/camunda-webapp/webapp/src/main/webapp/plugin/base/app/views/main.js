@@ -3,6 +3,8 @@ ngDefine('cockpit.plugin.base.views', [
   './dashboard/processDefinitionTiles',
   './processDefinition/processInstanceTable',
   './processDefinition/calledProcessDefinitionTable',
+  './processDefinition/updateSuspensionStateAction',
+  './processDefinition/updateSuspensionStateDialog',  
   './processInstance/variableInstancesTab',
   './processInstance/incidentsTab',
   './processInstance/calledProcessInstanceTable',
