@@ -133,6 +133,22 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  public void testRenderEnumField() {
+
+    runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testRenderEnumField");
+
+    Task t = taskService.createTaskQuery()
+      .singleResult();
+
+    String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
+
+    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderEnumField.html");
+
+    assertHtmlEquals(expectedForm, renderedForm);
+
+  }
+
+  @Deployment
   public void testRenderTaskForm() {
 
     runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testRenderTaskForm");

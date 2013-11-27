@@ -23,6 +23,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
  */
 public class EnumFormType extends AbstractFormFieldType {
 
+  public final static String TYPE_NAME = "enum";
+
   protected Map<String, String> values;
 
   public EnumFormType(Map<String, String> values) {
@@ -30,7 +32,7 @@ public class EnumFormType extends AbstractFormFieldType {
   }
 
   public String getName() {
-    return "enum";
+    return TYPE_NAME;
   }
 
   @Override
