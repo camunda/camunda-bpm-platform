@@ -276,7 +276,7 @@ ngDefine('cockpit.pages.processDefinition', [
 
     $scope.processDefinition = processDefinition;
 
-    $scope.processDefinitionVars = { read: [ 'processDefinition', 'selection', 'processData' ] };
+    $scope.processDefinitionVars = { read: [ 'processDefinition', 'selection', 'processData', 'filter' ] };
     $scope.processDefinitionViews = Views.getProviders({ component: 'cockpit.processDefinition.view' });
     $scope.processDefinitionActions = Views.getProviders({ component: 'cockpit.processDefinition.action' });
 

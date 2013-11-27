@@ -232,23 +232,25 @@ public class SvnConnector extends Connector {
   @Secured
   @Override
   public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type, String message) {
+    File temporaryFileStore = null;
+
     try {
-      
+
       if (type == null || type == ConnectorNodeType.UNSPECIFIED) {
         throw new IllegalArgumentException("Must specify a valid node type");
       }
-      
+
       beginTransaction();
-      
+
       String id = "";
       if (!parentId.endsWith("/") && !label.startsWith("/")) {
         parentId = parentId + "/";
       }
       id = parentId + label;
-      
+
       String parentFolder = extractParentFolder(id);
-      File temporaryFileStore = getTemporaryFileStore(parentFolder + File.separator + UUID.randomUUID().toString());
-      
+      temporaryFileStore = getTemporaryFileStore(parentFolder + File.separator + UUID.randomUUID().toString());
+
       SVNUrl svnUrl = createSvnUrl(parentFolder);
       checkout(svnUrl, temporaryFileStore);
       
@@ -267,15 +269,17 @@ public class SvnConnector extends Connector {
       }
       
       commit(new File[] {temporaryFileStore}, message);
-      
-      stopTransaction();
-      
-      deleteRecursively(temporaryFileStore);
-      
+
       return new ConnectorNode(id, label, getId() , type, message);
     } catch (Exception e) {
       logger.log(Level.FINER, "Error while creating node '" + label + "'.", e);
       throw new CycleException(e);
+    } finally {
+      stopTransaction();
+
+      if (temporaryFileStore != null) {
+        deleteRecursively(temporaryFileStore);
+      }
     }
   }
 
@@ -309,10 +313,12 @@ public class SvnConnector extends Connector {
   @Secured
   @Override
   public ContentInformation updateContent(ConnectorNode node, InputStream newContent, String message) {
+    File temporaryFileStore = null;
+
     try {
       beginTransaction();
-      
-      File temporaryFileStore = getTemporaryFileStore(UUID.randomUUID().toString());
+
+      temporaryFileStore = getTemporaryFileStore(UUID.randomUUID().toString());
       String parentFolderId = extractParentFolder(node);
       
       SVNUrl svnUrl = createSvnUrl(parentFolderId);
@@ -331,15 +337,17 @@ public class SvnConnector extends Connector {
       }
       
       commit(new File[] {temporaryFileStore}, message);
-      
-      stopTransaction();
-      
-      deleteRecursively(temporaryFileStore);
+
       return getContentInformation(node);
     } catch (Exception e) {
-      stopTransaction();
       logger.log(Level.FINER, "Error while updating file '" + node.getLabel() + "' in '" + extractParentFolder(node) + "'.", e);
       throw new CycleException(e);
+    } finally {
+      stopTransaction();
+
+      if (temporaryFileStore != null) {
+        deleteRecursively(temporaryFileStore);
+      }
     }
   }
   

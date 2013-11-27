@@ -269,6 +269,14 @@ a.expand-collapse:focus {
 
 .btn-control-link {
   padding: 0;
+  margin-left: 5px;
+}
+
+/**
+ * suspended action button
+ */
+.btn-toolbar.btn-suspend-action {
+  padding: 6px;
 }
 
 /**
