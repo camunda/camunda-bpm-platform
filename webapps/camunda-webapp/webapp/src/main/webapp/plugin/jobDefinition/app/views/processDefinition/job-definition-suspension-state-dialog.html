@@ -6,39 +6,96 @@
 <div class="modal-body">
   <div notifications-panel></div>
 
-  <form class="form-horizontal" name="updateSuspensionStateForm" novalidate ng-hide="status === 'SUCCESS' || status === 'FAIL'" request-aware ng-submit="updateSuspensionState()">
-    <fieldset>
-      <div class="control-group">
-        <label class="control-label" for="includeJobsValue">Include Existing Jobs</label>
-        <div class="controls">
-          <input id="includeJobsValueId" name="includeJobsValue" type="checkbox" ng-model="includeJobs">
-        </div>
-      </div>
+  <div ng-hide="status === 'SUCCESS' || status === 'FAIL'">
 
-      <div class="control-group">
-        <label class="control-label" for="executeImmediately">Execute</label>
-        <div class="controls">
-          <label class="radio">
-            <input ng-model="executeImmediately" ng-value="true" type="radio" name="execute">
-            Immediately
+    <p ng-show="jobDefinition.suspended">
+      <!-- activation -->
+      This job definition will be activated, so that new jobs based on this job definition are initially active.
+    </p>
+
+    <p ng-hide="jobDefinition.suspended">
+      <!-- suspension -->
+      This job definition will be suspended, so that new jobs based on this job definition are initially suspended.
+    </p>
+
+    <form class="form-horizontal" name="updateSuspensionStateForm" novalidate request-aware ng-submit="updateSuspensionState()">
+      <fieldset>
+        <div class="control-group">
+          <label class="control-label" for="includeJobsValue">Include Existing Jobs
+            <!-- activation -->
+            <span class="btn btn-small btn-link btn-control btn-control-link"
+                  help
+                  help-text="Including jobs means that all existing jobs of this job definition will be activated too, if the value is set to true."
+                  help-placement="'right'"
+                  ng-show="processDefinition.suspended">
+              <i class="icon-question-sign"></i>
+            </span>
+
+            <!-- suspension -->
+            <span class="btn btn-small btn-link btn-control btn-control-link"
+                  help
+                  help-text="Including jobs means that all existing jobs of this job definition will be suspended too, if the value is set to true."
+                  help-placement="'right'"
+                  ng-hide="processDefinition.suspended">   
+              <i class="icon-question-sign"></i>
+            </span>  
           </label>
-          <label class="radio">
-            <input ng-model="executeImmediately" ng-value="false" type="radio" name="execute">
-            Delayed
+          <div class="controls">
+            <input id="includeJobsValueId" name="includeJobsValue" type="checkbox" ng-model="includeJobs">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="executeImmediately">Execute
+            <span class="btn btn-small btn-link btn-control btn-control-link"
+                  help
+                  help-text="Decide whether the activation of this job definition should be executed immediately or delayed. If the activation should happen delayed then an execution date must be provided on which the activation will be scheduled."
+                  help-placement="'right'"
+                  ng-show="processDefinition.suspended">
+              <i class="icon-question-sign"></i>
+            </span>
+            <span class="btn btn-small btn-link btn-control btn-control-link"
+                  help
+                  help-text="Decide whether the suspension of this job definition should be executed immediately or delayed. If the suspension should happen delayed then an execution date must be provided on which the suspension will be scheduled."
+                  help-placement="'right'"
+                  ng-hide="processDefinition.suspended">   
+              <i class="icon-question-sign"></i>
+            </span> 
           </label>
-        </div>
-        <label class="control-label" for="executionDateValue" ng-show="!executeImmediately">Schedule at</label>
-        <div class="controls" ng-show="!executeImmediately">
-          <input date name="executionDateValue" ng-model="executionDate" type="text" required>
+          <div class="controls">
+            <label class="radio">
+              <input ng-model="executeImmediately" ng-value="true" type="radio" name="execute">
+              Immediately
+            </label>
+            <label class="radio">
+              <input ng-model="executeImmediately" ng-value="false" type="radio" name="execute">
+              Delayed
+            </label>
+          </div>
+          <label class="control-label" for="executionDateValue" ng-show="!executeImmediately">Schedule at</label>
+          <div class="controls" ng-show="!executeImmediately">
+            <input date name="executionDateValue" ng-model="executionDate" type="text" required>
 
-          <p class="invalid" ng-show="this.updateSuspensionStateForm.executionDateValue.$error.date">
-            Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
-          </p>
+            <p class="invalid" ng-show="this.updateSuspensionStateForm.executionDateValue.$error.date">
+              Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
+            </p>
+          </div>
         </div>
-      </div>
 
-    </fieldset>
-  </form>
+      </fieldset>
+    </form>
+
+    <p ng-show="processDefinition.suspended">
+      <!-- activation -->
+      Do you really want to activate this job definition?
+    </p>
+
+    <p ng-hide="processDefinition.suspended">
+      <!-- suspension -->
+      Do you really want to suspend this job definition?
+    </p>
+
+  </div>
 
   <div ng-show="status === 'SUCCESS'">
     <p ng-show="jobDefinition.suspended && executeImmediately">
