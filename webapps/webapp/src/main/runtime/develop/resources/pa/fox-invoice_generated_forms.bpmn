@@ -55,6 +55,13 @@
             </camunda:formField>
             <camunda:formField
                 id="dateOfBirth" label="Date of Birth" type="date" />
+            <camunda:formField
+                id="enumField" label="Enum Field" type="enum"
+                defaultValue="a">
+                <camunda:value id="a" name="A"/>
+                <camunda:value id="b" name="B"/>
+                <camunda:value id="c" name="C"/>
+            </camunda:formField>
         </camunda:formData>
       </extensionElements>
       <outgoing>sequenceFlow_187</outgoing>
