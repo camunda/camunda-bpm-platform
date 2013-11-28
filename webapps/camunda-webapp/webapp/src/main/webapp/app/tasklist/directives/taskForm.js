@@ -162,14 +162,7 @@ ngDefine('tasklist.directives', [
         function parseOptionsList(optionsList) {
           var result = [];
           angular.forEach(optionsList, function(option) {
-            var label, value;
-            if (typeof option === 'string') {
-              result.push({'label':option, 'value':option});
-
-            } else {
-              console.log('Could not map '+option+' to option object. Not a string');
-
-            }
+            result.push({'label':option, 'value':option});
           });
           return result;
         };
@@ -271,7 +264,7 @@ ngDefine('tasklist.directives', [
 
           // bind additional options from process variable
           if(!!formValues) {
-            // wath value of variable since variables are loaded async to form processing
+            // watch value of variable since variables are loaded async to form processing
             scope.$watch(function() {return taskVariables.getVariable(formValues);}, function(additionalOptions) {
               if(!!additionalOptions) {
                 if($.isArray(additionalOptions.value)) {

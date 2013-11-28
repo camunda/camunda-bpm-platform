@@ -24,10 +24,15 @@ ngDefine('tasklist.services', [
       return parseInt(value);
     }
 
+    var stringTypeConverter = function(value) {
+      return value.toString();
+    }
+
     var typeConverters = {
       'boolean' : booleanTypeConverter,
       'number' : numberTypeConverter,
-      'Integer' : numberTypeConverter
+      'Integer' : numberTypeConverter,
+      'string' : stringTypeConverter
     };
 
     function convertValue(variable) {
