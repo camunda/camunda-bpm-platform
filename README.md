@@ -51,6 +51,34 @@ Most of the components that make up the platform can even be completely embedded
 
 Building camunda BPM platform
 ----------
+
+camunda BPM is available on maven central but for development of the platform, you have to add our public nexus repository to your maven settings.xml.
+Add the following lines to it:
+
+    `xml
+    <profiles>
+      <profile>
+        <id>camunda-bpm</id>
+        <repositories>
+          <repository>
+            <id>camunda-bpm-nexus</id>
+            <name>camunda-bpm-nexus</name>
+            <releases>
+              <enabled>true</enabled>
+            </releases>
+            <snapshots>
+              <enabled>true</enabled>
+            </snapshots>
+            <url>https://app.camunda.com/nexus/content/groups/public</url>
+          </repository>
+        </repositories>
+      </profile>
+    </profiles>
+    <activeProfiles>
+      <activeProfile>camunda-bpm</activeProfile>
+    </activeProfiles>
+    `
+
 Apache Maven 3 and Java JDK 6 or 7 are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
 
     mvn clean install

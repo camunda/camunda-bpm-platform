@@ -173,24 +173,6 @@
           </plugin>
         </plugins>
       </build>
-      <repositories>
-        <repository>
-          <id>jboss</id>
-          <name>jboss</name>
-          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-        </repository>
-        <!--<repository>-->
-          <!--<id>jboss-public</id>-->
-          <!--<name>jboss public</name>-->
-          <!--<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>-->
-        <!--</repository>-->
-        <!--&lt;!&ndash; required for commonJ dependency &ndash;&gt;-->
-        <repository>
-          <id>com.springsource.repository.bundles.external</id>
-          <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-          <url>http://repository.springsource.com/maven/bundles/external</url>
-        </repository>
-      </repositories>
     </profile>
   </profiles>
   
@@ -861,5 +843,18 @@
     <system>Jira</system>
     <url>https://app.camunda.com/jira/browse/CAM/</url>
   </issueManagement>
-  
+
+  <repositories>
+    <repository>
+      <id>JBoss public</id>
+      <name>jboss</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+    </repository>
+    <!-- required for commonJ dependency -->
+    <repository>
+      <id>com.springsource.repository.bundles.external</id>
+      <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+      <url>http://repository.springsource.com/maven/bundles/external</url>
+    </repository>
+  </repositories>
 </project>
