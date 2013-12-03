@@ -19,17 +19,27 @@ import org.camunda.bpm.cycle.security.IdentityHolder;
 import org.camunda.bpm.security.UserIdentity;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * Ensures that a {@link Connector} is logged in during a
+ * {@link org.camunda.bpm.cycle.connector.Secured} annotated connector method.
+ *
+ * Performs the login on the fly by calling {@link Connector#login(java.lang.String, java.lang.String)
+ * if {@link Connector#needsLogin()} returns true.
+ *
+ * @author nico.rehwaldt
+ *
+ * @see org.camunda.bpm.cycle.connector.Secured
+ */
 @Component
 @Aspect
 public class LoginAspect {
-  
+
   @Inject
   protected EncryptionService encryptionService;
 
   @Inject
   private ConnectorCredentialsRepository connectorCredentialsRepository;
-  
+
   @Before("@annotation(org.camunda.bpm.cycle.connector.Secured)")
   private void aroundSecured(JoinPoint jp) throws Throwable {
     if (jp.getTarget() instanceof Connector) {
@@ -42,12 +52,12 @@ public class LoginAspect {
 
   public void doLogin(Connector connector) {
     synchronized (connector) {
-      // TODO: better would be a single method and doing the 
+      // TODO: better would be a single method and doing the
       // synchronization in the connector.
       if (connector.needsLogin()) {
         ConnectorConfiguration config = connector.getConfiguration();
         connector.init(config);
-  
+
         loginConnector(connector, config, config.getLoginMode());
       }
     }
@@ -63,7 +73,7 @@ public class LoginAspect {
     }
 
     switch (loginMode) {
-      case LOGIN_NOT_REQUIRED: 
+      case LOGIN_NOT_REQUIRED:
         break;
       case GLOBAL:
         loginConnector(connector, config.getGlobalUser(), config.getGlobalPassword());
@@ -80,18 +90,18 @@ public class LoginAspect {
 
   private void loginWithUserCredentials(Connector connector) {
     UserIdentity identity = IdentityHolder.getIdentity();
-    
+
     if (identity == null) {
       throw missingCredentials("No user identity found. Please relogin into cycle.");
     }
-    
+
     String username = identity.getName();
     Long connectorConfigId = connector.getConfiguration().getId();
-    
+
     if (connectorConfigId == null) {
       throw missingCredentials("No user specific credentials configured for connector '" + connector.getConfiguration().getName() + "'.");
     }
-    
+
     try {
       ConnectorCredentials credentials = connectorCredentialsRepository.findFetchAllByUsernameAndConnectorId(username, connectorConfigId);
       loginConnector(connector, credentials.getUsername(), credentials.getPassword());
@@ -99,7 +109,7 @@ public class LoginAspect {
       throw missingCredentials("No user specific credentials configured for connector '" + connector.getConfiguration().getName() + "'.");
     }
   }
-  
+
   private CycleMissingCredentialsException missingCredentials(String message) {
     return new CycleMissingCredentialsException("Missing credentials: " + message);
   }
