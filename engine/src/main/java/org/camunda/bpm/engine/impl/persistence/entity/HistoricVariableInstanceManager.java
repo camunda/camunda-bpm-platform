@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -43,7 +44,7 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
       for (HistoricVariableInstanceEntity historicProcessVariable : historicProcessVariables) {
         historicProcessVariable.delete();
       }
-      
+
       //delete enrties in Cache
       List<HistoricVariableInstanceEntity> cachedHistoricVariableInstances = getDbSqlSession().findInCache(HistoricVariableInstanceEntity.class);
       for (HistoricVariableInstanceEntity historicProcessVariable : cachedHistoricVariableInstances) {
@@ -54,7 +55,7 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
       }
     }
   }
-  
+
   public long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
     return (Long) getDbSqlSession().selectOne("selectHistoricVariableInstanceCountByQueryCriteria", historicProcessVariableQuery);
   }
@@ -70,8 +71,7 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
 
   public void deleteHistoricVariableInstancesByTaskId(String taskId) {
     if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      HistoricVariableInstanceQueryImpl historicProcessVariableQuery = 
-        (HistoricVariableInstanceQueryImpl) new HistoricVariableInstanceQueryImpl().taskId(taskId);
+      HistoricVariableInstanceQuery historicProcessVariableQuery = new HistoricVariableInstanceQueryImpl().taskIdIn(taskId);
       List<HistoricVariableInstance> historicProcessVariables = historicProcessVariableQuery.list();
       for(HistoricVariableInstance historicProcessVariable : historicProcessVariables) {
         ((HistoricVariableInstanceEntity) historicProcessVariable).delete();

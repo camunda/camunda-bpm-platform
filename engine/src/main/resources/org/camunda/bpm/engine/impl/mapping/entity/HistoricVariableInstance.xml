@@ -133,7 +133,25 @@
       <if test="variableNameLike != null">
         and RES.NAME_ like #{variableNameLike}
       </if>
-      
+
+      <!-- taskIds -->
+      <if test="taskIds != null &amp;&amp; taskIds.length > 0">
+        and RES.TASK_ID_ in
+        <foreach item="item" index="index" collection="taskIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+
+      <!-- executionIds -->
+      <if test="executionIds != null &amp;&amp; executionIds.length > 0">
+        and RES.EXECUTION_ID_ in
+        <foreach item="item" index="index" collection="executionIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+
       <!-- PLEASE NOTE: If you change anything have a look into the Execution, the same query object is used there! -->
       <if test="queryVariableValue != null" >
         <if test="!queryVariableValue.type.equals('null')">

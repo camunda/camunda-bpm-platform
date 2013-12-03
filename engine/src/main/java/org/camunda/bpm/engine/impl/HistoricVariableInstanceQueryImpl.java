@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,13 +31,14 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         HistoricVariableInstanceQuery {
 
   private static final long serialVersionUID = 1L;
-  protected String taskId;
   protected String processInstanceId;
   protected String activityInstanceId;
   protected String variableName;
   protected String variableNameLike;
   protected boolean excludeTaskRelated = false;
   protected QueryVariableValue queryVariableValue;
+  protected String[] taskIds;
+  protected String[] executionIds;
 
   public HistoricVariableInstanceQueryImpl() {
   }
@@ -63,11 +64,13 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return this;
   }
 
-  public HistoricVariableInstanceQuery taskId(String taskId) {
-    if (taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
-    this.taskId = taskId;
+  public HistoricVariableInstanceQuery taskIdIn(String... taskIds) {
+    this.taskIds = taskIds;
+    return this;
+  }
+
+  public HistoricVariableInstanceQuery executionIdIn(String... executionIds) {
+    this.executionIds = executionIds;
     return this;
   }
 
@@ -151,12 +154,16 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return processInstanceId;
   }
 
-  public String getTaskId() {
-    return taskId;
-  }
-
   public String getActivityInstanceId() {
     return activityInstanceId;
+  }
+
+  public String[] getTaskIds() {
+    return taskIds;
+  }
+
+  public String[] getExecutionIds() {
+    return executionIds;
   }
 
   public boolean getExcludeTaskRelated() {

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricVariableInstanceQuery> {
@@ -40,6 +41,8 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   private String variableName;
   private String variableNameLike;
   private Object variableValue;
+  protected String[] executionIdIn;
+  protected String[] taskIdIn;
 
   public HistoricVariableInstanceQueryDto() {
   }
@@ -66,6 +69,16 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   @CamundaQueryParam("variableValue")
   public void setVariableValue(Object variableValue) {
     this.variableValue = variableValue;
+  }
+
+  @CamundaQueryParam(value="executionIdIn", converter = StringArrayConverter.class)
+  public void setExecutionIdIn(String[] executionIdIn) {
+    this.executionIdIn = executionIdIn;
+  }
+
+  @CamundaQueryParam(value="taskIdIn", converter = StringArrayConverter.class)
+  public void setTaskIdIn(String[] taskIdIn) {
+    this.taskIdIn = taskIdIn;
   }
 
   @Override
@@ -96,6 +109,12 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
         throw new InvalidRequestException(Status.BAD_REQUEST,
             "Only a single variable value parameter specified: variable name and value are required to be able to query after a specific variable value.");
       }
+    }
+    if (executionIdIn != null && executionIdIn.length > 0) {
+      query.executionIdIn(executionIdIn);
+    }
+    if (taskIdIn != null && taskIdIn.length > 0) {
+      query.taskIdIn(taskIdIn);
     }
   }
 

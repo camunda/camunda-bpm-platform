@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -349,6 +350,52 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
         .body("message", containsString("Only a single variable value parameter specified: variable name and value are required to be able to query after a specific variable value."))
       .when()
         .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByExecutionIdsAndTaskIds() {
+      String anExecutionId = "anExecutionId";
+      String anotherExecutionId = "anotherExecutionId";
+
+      String aTaskId = "aTaskId";
+      String anotherTaskId = "anotherTaskId";
+
+      given()
+        .queryParam("executionIdIn", anExecutionId + "," + anotherExecutionId)
+        .queryParam("taskIdIn", aTaskId + "," + anotherTaskId)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+      verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
+      verify(mockedQuery).taskIdIn(aTaskId, anotherTaskId);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByExecutionIdsAndTaskIdsAsPost() {
+    String anExecutionId = "anExecutionId";
+    String anotherExecutionId = "anotherExecutionId";
+
+    List<String> executionIdIn= new ArrayList<String>();
+    executionIdIn.add(anExecutionId);
+    executionIdIn.add(anotherExecutionId);
+
+    String aTaskId = "aTaskId";
+    String anotherTaskId = "anotherTaskId";
+
+    List<String> taskIdIn= new ArrayList<String>();
+    taskIdIn.add(aTaskId);
+    taskIdIn.add(anotherTaskId);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("executionIdIn", executionIdIn);
+    json.put("taskIdIn", taskIdIn);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
+    verify(mockedQuery).taskIdIn(aTaskId, anotherTaskId);
   }
 
 }
