@@ -1,7 +1,7 @@
 ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
 
-  var Controller = [ '$scope', '$dialog',
-    function($scope, $dialog) {
+  var Controller = [ '$scope', '$rootScope', '$dialog',
+    function($scope, $rootScope, $dialog) {
 
     $scope.openDialog = function () {
       var dialog = $dialog.dialog({
@@ -18,6 +18,7 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
         // dialog closed. YEA!
         if (result.status === 'SUCCESS') {
           $scope.processInstance.suspended = result.suspended;
+          $rootScope.$broadcast('$processInstance.suspensionState.changed', $scope.processInstance);
 
           $scope.processData.set('filter', angular.extend({}, $scope.filter));
         }

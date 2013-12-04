@@ -16,6 +16,8 @@ Tree
   -moz-box-shadow: 0px 0px 4px 4px rgba(30, 144, 255, 1);
   box-shadow: 0px 0px 4px 4px rgb(30, 144, 255);
   border-radius: 5px;
+
+  cursor: pointer;
 }
 
 .process-diagram {
@@ -31,11 +33,18 @@ Tree
   user-select: none;
 }
 
-.badge-position {
-  margin-left: -1.1em;
-  margin-top: -0.75em;
-  top: 100%;
+.badge-suspended {
   position: absolute;
+  right: -1.3em;
+  top: -0.85em;
+  padding-top: 1.5px;
+  padding-bottom: 1.5px;
+}
+
+.badge-activity-instance-statistics {
+   position: absolute;
+   left: -0.9em;
+   bottom: -0.65em
 }
 
 /* IE Highlight Fix */

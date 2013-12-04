@@ -4,6 +4,7 @@
   </div>
   
   <div class="tile-grid">
+
     <a ng-repeat="statistic in statistics | orderBy:orderByPredicate:orderByReverse"
          ng-cloak class="tile linkable-tile" href="#/process-definition/{{ statistic.definition.id }}">
       <span class="tile-header">
@@ -21,5 +22,14 @@
         Running Instances: {{ statistic.instances }} <span state-circle incidents="statistic.incidents" class="circle-tiles"></span>
       </span>
     </a>
+
+    <span ng-if="!statistics">
+      <i class="icon-loading"></i> loading deployed processes...
+    </span>
+
+    <span ng-if="statistics && !statistics.length">
+      No processes deployed.
+    </span>
+
   </div>
 </div>

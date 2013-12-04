@@ -1,10 +1,16 @@
 ngDefine('cockpit.plugin.base.views', [
+  // dashboard
   './dashboard/processDefinitionList',
   './dashboard/processDefinitionTiles',
+
+  // process definition
   './processDefinition/processInstanceTable',
   './processDefinition/calledProcessDefinitionTable',
   './processDefinition/updateSuspensionStateAction',
-  './processDefinition/updateSuspensionStateDialog',  
+  './processDefinition/updateSuspensionStateDialog',
+  './processDefinition/activityInstanceStatisticsOverlay',
+
+  // process instance
   './processInstance/variableInstancesTab',
   './processInstance/incidentsTab',
   './processInstance/calledProcessInstanceTable',
@@ -16,7 +22,8 @@ ngDefine('cockpit.plugin.base.views', [
   './processInstance/addVariableAction',
   './processInstance/addVariableDialog',
   './processInstance/updateSuspensionStateAction',
-  './processInstance/updateSuspensionStateDialog'  
+  './processInstance/updateSuspensionStateDialog',
+  './processInstance/activityInstanceStatisticsOverlay'
 ], function(module) {
 
 });

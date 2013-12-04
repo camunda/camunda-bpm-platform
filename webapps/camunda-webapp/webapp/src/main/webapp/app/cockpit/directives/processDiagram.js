@@ -8,9 +8,13 @@ ngDefine('cockpit.directives', [
     'jquery-mousewheel'
   ], function(module, angular, $, Bpmn) {
 
-  function DirectiveController($scope, $element, $attrs, $filter, $q, $window) {
+  function DirectiveController($scope, $element, $attrs, $filter, $q, $window, $compile, Views) {
     
     var w = angular.element($window);
+
+    $scope.overlayVars = { read: [ 'processData', 'bpmnElement' ] };
+    $scope.overlayProviders = Views.getProviders({ component:  $scope.providerComponent });
+    var overlay = '<div view ng-repeat="overlayProvider in overlayProviders" provider="overlayProvider" vars="overlayVars"></div>';
 
     var bpmnElements,
         selection,
@@ -23,7 +27,7 @@ ngDefine('cockpit.directives', [
     $scope.$on('$destroy', function() {
       bpmnRenderer = null;
       $scope.processDiagram = null;
-      $scope.processDiagramOverlay = null;
+      $scope.overlayProviders = null;
     });
     
     /*------------------- Rendering of process diagram ---------------------*/
@@ -37,6 +41,7 @@ ngDefine('cockpit.directives', [
           bpmnElements = newValue.bpmnElements;
           bpmnRenderer = new Bpmn();
           renderDiagram();
+          decorateDiagram(bpmnElements);
           initializeScrollAndZoomFunctions();
 
           // update selection in case it has been provided earlier
@@ -46,28 +51,11 @@ ngDefine('cockpit.directives', [
           scrollToBpmnElement(scrollToBpmnElementId);
         } catch (exception) {
           console.log('Unable to render diagram for process definition ' + $scope.processDiagram.processDefinition.id + ', reason: ' + exception.message)
-          element.html('<p style="text-align: center;margin-top: 100px;">Unable to render process diagram.</p>')
+          $element.html('<p style="text-align: center;margin-top: 100px;">Unable to render process diagram.</p>')
         }
       }
     });
     
-    $scope.$watch('processDiagramOverlay', function(newValue, oldValue) {
-      if (newValue) {
-        if (newValue.annotations) {
-          annotations();  
-        }
-
-        if (newValue.incidents) {
-          incidents();  
-        }        
-
-        if (newValue.clickableElements) {
-          registerEventHandlersOnProcessDiagram();
-          registerEventHandlersOnBaseElements(); 
-        }
-      }
-    });
-
     function renderDiagram() {
       
       // set the element id to processDiagram_*
@@ -87,6 +75,107 @@ ngDefine('cockpit.directives', [
       // do the rendering
       bpmnRenderer.renderDiagram($scope.processDiagram.semantic, options);
     }
+
+    /*------------------- Decorate diagram ---------------------*/
+
+    function decorateDiagram(bpmnElements) {
+      decorateProcessDiagramWithEventHandlers(bpmnElements);
+
+      angular.forEach(bpmnElements, function (bpmnElement) {
+        var activityId = bpmnElement.id,
+            elem = $('div#' + $element.attr('id') + ' > #' + activityId);
+        
+        if (elem.length) {
+          decorateBpmnElementWithOverlays(bpmnElement, elem);
+          decorateBpmnElementWithEventHandlers(bpmnElement, elem);
+        }
+
+      });
+    }
+
+    function decorateProcessDiagramWithEventHandlers(bpmnElements) {
+      
+      var moved = false;
+      var mousedown = false;
+      // register event handler on $element: mousedown, mousemove, mouseup
+      $element
+        // register mousedown event
+        .mousedown(function($event) {
+          mousedown = true;
+        })
+        // register mousemove event
+        .mousemove(function($event) {
+          if (mousedown) {
+            // set 'moved' true, when there was
+            // a mousedown event at first.
+            moved = true;
+          }
+        })
+        // register mouseup event
+        .mouseup(function($event) {
+          var targetId = $($event.target).attr('id'),
+              bpmnElement = bpmnElements[targetId],
+              ctrlKey = $event.ctrlKey;
+
+          if (!ctrlKey) {
+            
+            if (!moved && mousedown && (!bpmnElement || !bpmnElement.isSelectable)) {
+              // if the mouse have not moved, a mousedown happend and the bpmnElement is null
+              // or is not selectable, then you have to deselect the current selection.
+              if ($scope.onElementClick) {
+                $scope.onElementClick({id: null, $event: $event});
+                $scope.$apply();
+              }
+            }
+          }
+
+          // always reset the values
+          moved = false;
+          mousedown = false;
+        });
+    }
+
+    function decorateBpmnElementWithOverlays(bpmnElement, htmlElement) {
+      var activityId = bpmnElement.id,
+          childScope = $scope.$new();
+
+      childScope.bpmnElement = bpmnElement;
+
+      var newOverlay = angular.element(overlay);
+
+      $compile(newOverlay)(childScope);
+      htmlElement.html(newOverlay);
+    }
+
+    function decorateBpmnElementWithEventHandlers(bpmnElement, htmlElement) {
+      var activityId = bpmnElement.id;
+      $(htmlElement)
+
+        // register click
+        .click(activityId, function ($event) {
+          if (bpmnElement.isSelectable) {
+            $scope.onElementClick({id: $event.data, $event: $event});
+            $scope.$apply();
+          }
+        })
+
+        // mouseover
+        .mouseover(activityId, function($event) {
+          if (!bpmnElement.isSelected && bpmnElement.isSelectable) {
+
+            // add css class to highlight activity
+            bpmnRenderer.annotation($event.data).addClasses([ activityHighligtClass ]);
+          }
+        })
+        
+        // mouseout
+        .mouseout(activityId, function($event){
+          if (!bpmnElement.isSelected && bpmnElement.isSelectable) {
+            // remove css class to highlight activity
+            bpmnRenderer.annotation($event.data).removeClasses([ activityHighligtClass ]);
+          }          
+        });
+    }    
     
     /*------------------- Handle scroll and zoom ---------------------*/
     
@@ -162,151 +251,7 @@ ngDefine('cockpit.directives', [
     
     $scope.$on('resize', function () {
       $scope.$apply();
-    });
-
-    /*------------------- Handle annotations/incidents ---------------------*/
-
-    function annotations() {
-      for (var i = 0, annotation; !!(annotation = $scope.processDiagramOverlay.annotations[i]); i++) {
-        doAnnotate(annotation.id, annotation.count);
-      }
-    }
-    
-    function incidents() {
-      for (var i = 0, activity; !!(activity = $scope.processDiagramOverlay.incidents[i]); i++) {
-        if (activity.incidents && activity.incidents.length > 0) {
-          executeAnnotation(activity.id, '<p class="badge badge-important">!</p>');
-        }
-      }
-    }
-    
-    function doAnnotate(activityId, count) {
-      var shortenNumberFilter = $filter('shortenNumber');
-      executeAnnotation(activityId, '<p class="badge">' + shortenNumberFilter(count) + '</p>');
-    }
-    
-    function executeAnnotation(activityId, innerHtml) {
-      // get the div element containing the badges (i.e. annotations/incidents).
-      var badge = $('#' + $element.attr('id') + ' > #' + activityId + ' > .badge-position');
-      if (badge.length > 0) {
-        // get the incident badge
-        var importantBadge = $('#' + $element.attr('id') + ' > #' + activityId + ' > .badge-position > .badge-important');
-        
-        if (importantBadge.length > 0) {
-          // if an element with class '.badge-important' (incident badge) already exists, then prepend the innerHtml
-          badge.prepend(innerHtml);
-        } else {
-          // if an element with class '.badge-important' (incident badge) does not exist, then append the innerHtml
-          badge.append(innerHtml);
-        }
-      } else {
-        // in that case there no badges are existings, so the first one will initially added.
-        try {
-          bpmnRenderer.annotation(activityId).addDiv(innerHtml, ['badge-position']);
-        } catch (error) {
-          console.log('Could not annotate activity \'' + activityId + '\': ' + error.message);
-        }
-      }
-    }    
-    
-    /*------------------- Register click events ---------------------*/
-      
-    function registerEventHandlersOnProcessDiagram() {
-      
-      var moved = false;
-      var mousedown = false;
-      // register event handler on $element: mousedown, mousemove, mouseup
-      $element
-        // register mousedown event
-        .mousedown(function($event) {
-          mousedown = true;
-        })
-        // register mousemove event
-        .mousemove(function($event) {
-          if (mousedown) {
-            // set 'moved' true, when there was
-            // a mousedown event at first.
-            moved = true;
-          }
-        })
-        // register mouseup event
-        .mouseup(function($event) {
-          var targetId = $($event.target).attr('id'),
-              idx = $scope.processDiagramOverlay.clickableElements.indexOf(targetId),
-              ctrlKey = $event.ctrlKey;
-
-          if (!ctrlKey) {
-            
-            if (!moved && mousedown) {
-              // if the mouse have not moved and a mousedown happend,
-              // then you have to deselect the current selection.
-              if ($scope.onElementClick && idx === -1) {
-                $scope.onElementClick({id: null, $event: $event});
-                $scope.$apply();
-              }
-            }
-          }
-          // always reset the values
-          moved = false;
-          mousedown = false;
-        });
-    }
-
-    function registerEventHandlersOnBaseElements() {
-      function waitForBpmnElements () {
-        var deferred = $q.defer();
-        $scope.$watch(function () { return bpmnElements; }, function (newValue) {
-          if (newValue) {
-            deferred.resolve(newValue);
-          }
-        });
-        return deferred.promise;
-      }
-      if ($scope.onElementClick) {
-        if (bpmnElements) {
-          for (var key in bpmnElements) {
-            registerEventHandlersOnBaseElement(bpmnElements[key]);
-          }          
-        } else {
-          waitForBpmnElements().then(function(bpmnElements) {
-            for (var key in bpmnElements) {
-              registerEventHandlersOnBaseElement(bpmnElements[key]);
-            }   
-          });
-        }
-      }
-    }
-    
-    function registerEventHandlersOnBaseElement(element) {
-      var elementId = element.id;
-      if ($scope.processDiagramOverlay.clickableElements.indexOf(elementId) != -1) {
-        $('#' + elementId)
-        
-          // register click
-          .click(elementId, function ($event) {
-            $scope.onElementClick({id: $event.data, $event: $event});
-            $scope.$apply();
-          })
-          
-          // mouseover
-          .mouseover(elementId, function($event) {
-            if (!element.isSelected && $scope.processDiagramOverlay.clickableElements.indexOf($event.data) !== -1) {
-              // add css class to highlight activity
-              bpmnRenderer.annotation($event.data).addClasses([ activityHighligtClass ]);
-              // add pointer ass cursor
-              $('#' + element.id).css('cursor', 'pointer');
-            }
-          })
-          
-          // mouseout
-          .mouseout(elementId, function($event){
-            if (!element.isSelected && $scope.processDiagramOverlay.clickableElements.indexOf($event.data) !== -1) {
-              // remove css class to highlight activity
-              bpmnRenderer.annotation($event.data).removeClasses([ activityHighligtClass ]);
-            }          
-          });
-      }
-    }
+    }); 
     
     /*------------------- Handle selected activity id---------------------*/
     
@@ -405,20 +350,22 @@ ngDefine('cockpit.directives', [
     
   }
 
-  var Directive = function ($window) {
+  var Directive = function ($window, $compile, Views) {
     return {
       restrict: 'EAC',
       scope: {
         processDiagram: '=',
         processDiagramOverlay: '=',
         onElementClick: '&',
-        selection: '='
+        selection: '=',
+        processData: '=',
+        providerComponent: '@'
       },
       controller: DirectiveController
     };
   };
   
-  Directive.$inject = [ '$window' ];
+  Directive.$inject = [ '$window', '$compile', 'Views'];
 
   module
     .directive('processDiagram', Directive);

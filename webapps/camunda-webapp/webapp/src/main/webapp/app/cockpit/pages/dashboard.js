@@ -4,9 +4,14 @@ define(['angular'], function(angular) {
 
   var module = angular.module('cockpit.pages');
 
-  var Controller = ['$scope', '$rootScope', 'Views', function ($scope, $rootScope, Views) {
+  var Controller = ['$scope', '$rootScope', 'Views', 'Data', 'dataDepend', function ($scope, $rootScope, Views, Data, dataDepend) {
 
+    var processData = $scope.processData = dataDepend.create($scope);
+
+    $scope.dashboardVars = { read: [ 'processData' ] };
     $scope.dashboardProviders = Views.getProviders({ component: 'cockpit.dashboard'});
+
+    Data.instantiateProviders('cockpit.dashboard.data', {$scope: $scope, processData : processData});
 
     // reset breadcrumbs
     $rootScope.clearBreadcrumbs();

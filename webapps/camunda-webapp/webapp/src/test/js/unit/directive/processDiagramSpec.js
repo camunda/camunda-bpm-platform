@@ -1,7 +1,7 @@
 define([ 'angular',
          'jquery',
          'cockpit/services/transform',
-         'cockpit/filters/shortenNumber',
+         'cockpit/filters/abbreviateNumber',
          'cockpit/directives/processDiagram' ], function(angular, $) {
 
   /**
@@ -25,7 +25,7 @@ define([ 'angular',
       beforeEach(function () {
         angular.module('testmodule', [ 'cockpit.directives',
                                        'cockpit.services',
-                                       'cockpit.filters.shorten.number' ]);
+                                       'cockpit.filters.abbreviate.number' ]);
       });
 
       // load app that uses the directive
