@@ -5,6 +5,9 @@ ngDefine('cockpit.directives', [ 'angular', 'bpmn/Bpmn' ], function(module, angu
   var Directive = function (ProcessDefinitionResource) {
     return {
       restrict: 'EAC',
+      template: '<span ng-hide="$loaded">' + 
+                '  <i class="icon-loading"></i> loading process diagram...' +
+                '</span>',
       link: function(scope, element, attrs) {
         
         scope.$watch(attrs['processDefinitionId'], function(processDefinitionId) {
@@ -26,7 +29,9 @@ ngDefine('cockpit.directives', [ 'angular', 'bpmn/Bpmn' ], function(module, angu
                     height : element.parent().height(),
                     skipOverlays: true
                   });
+                  scope.$loaded = true;
                 } catch (exception) {
+                  scope.$loaded = true;
                   console.log('Unable to render diagram for process definition ' + processDefinitionId + ', reason: ' + exception.message)
                   element.html('<p style="text-align: center;margin-top: 100px;">Unable to render process diagram.</p>')
                 }

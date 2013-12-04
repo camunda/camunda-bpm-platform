@@ -1,80 +1,40 @@
 ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, require) {
 
-  var Controller = [ '$scope', 'search', 'JobDefinitionResource', '$dialog', 
-      function ($scope, search, JobDefinitionResource, $dialog) {
+  var Controller = [ '$scope', '$rootScope', '$dialog', 
+      function ($scope, $rootScope, $dialog) {
 
-    var processData = $scope.processData.newChild($scope);
+    var processData = $scope.processData.newChild($scope),
+        processDefinition = null;
 
-    var processDefinition = $scope.processDefinition;
-    
-    var DEFAULT_PAGES = { size: 50, total: 0, current: 1 };
-
-    var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
-
-    var filter = null;
-
-    $scope.$watch('pages.current', function(newValue, oldValue) {
-      if (newValue == oldValue) {
-        return;
-      }
-
-      search('page', !newValue || newValue == 1 ? null : newValue);
+    processData.observe([ 'filter', 'jobDefinitions', 'bpmnElements' ], function(filter, jobDefinitions, bpmnElements) {
+      updateView(filter, jobDefinitions, bpmnElements);
     });
 
-    processData.observe([ 'filter', 'bpmnElements' ], function(newFilter, bpmnElements) {
-      pages.current = newFilter.page || 1;
-
-      updateView(newFilter, bpmnElements);
-    });
-
-    function updateView(newFilter, bpmnElements) {
-
-      filter = angular.copy(newFilter);
-
-      delete filter.page;
-
-      var page = pages.current,
-          count = pages.size,
-          firstResult = (page - 1) * count;
-
-      var defaultParams = {
-        processDefinitionId: processDefinition.id
-      };
-
-      var pagingParams = {
-        firstResult: firstResult,
-        maxResults: count
-      };
-
-      var countParams = angular.extend({}, filter, defaultParams);
-
-      // fix missmatch -> activityIds -> activityIdIn
-      countParams.activityIdIn = countParams.activityIds;
-      delete countParams.activityIds;
-
-      var params = angular.extend({}, countParams, pagingParams);
+    function updateView(filter, jobDefinitions, bpmnElements) {
 
       $scope.jobDefinitions = null;
 
-      JobDefinitionResource.query(pagingParams, params).$then(function(data) {
-        angular.forEach(data.resource, function (jobDefinition) {
-          var activityId = jobDefinition.activityId;
-          var bpmnElement = bpmnElements[activityId];
-          jobDefinition.activityName = bpmnElement.name || bpmnElement.id;
+      var activityIds = filter.activityIds;
 
-          if (!jobDefinition.suspended) {
-            jobDefinition.state = "Active";
-          } else {
-            jobDefinition.state = "Suspended";
-          }
-        });
+      if (!activityIds || !activityIds.length) {
+        $scope.jobDefinitions = jobDefinitions;
+        return;
+      }
 
-        $scope.jobDefinitions = data.resource;
+      var jobDefinitionSelection = [];
+
+      angular.forEach(jobDefinitions, function(jobDefinition) {
+
+        var activityId = jobDefinition.activityId;
+
+        if (activityIds.indexOf(activityId) != -1) {
+          jobDefinitionSelection.push(jobDefinition);
+        }
+
       });
 
-      JobDefinitionResource.count(countParams).$then(function(data) {
-        pages.total = Math.ceil(data.data.count / pages.size);
-      });
+      $scope.jobDefinitions = jobDefinitionSelection;
+
     };
 
     $scope.openSuspensionStateDialog = function (jobDefinition) {
@@ -87,12 +47,16 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
       });
 
       dialog.open().then(function(result) {
-        if (result === "SUCCESS") {
-          // update job definition tab
-          processData.set('filter', angular.extend({}, $scope.filter));
+        // dialog closed. YEA!
+        if (result.status === 'SUCCESS') {
+          if (result.executeImmediately) {
+            jobDefinition.suspended = result.suspended;
+            $rootScope.$broadcast('$jobDefinition.suspensionState.changed', $scope.jobDefinition);
+          }
+
+          $scope.processData.set('filter', angular.extend({}, $scope.filter));
         }
       });
-
 
     };
 

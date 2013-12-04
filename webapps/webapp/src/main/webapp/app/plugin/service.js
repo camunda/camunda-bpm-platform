@@ -4,52 +4,77 @@
 
 ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
 
-  function ViewsProvider() {
+  var PluginsProvider = [ function() {
 
-    var defaultViewMap = {};
-    var pluginViewMap = {};
+    var pluginMap = {};
 
-    var initialized = false;
-
-    function internalRegisterProvider(key, provider, map) {
-      // make sure map is initialized
-      var viewsByKey = map[key] = map[key] || [];
-
-      addViewProvider(viewsByKey, provider);
-    }
-
-    function addViewProvider(viewProviders, provider) {
-      var priority = provider.priority || 0;
+    function addPlugin(plugins, definition) {
+      var priority = definition.priority || 0;
 
       // check from right to left (*-) where plugin
       // should be added
-      for (var i = 0, p; !!(p = viewProviders[i]); i++) {
+      for (var i = 0, p; !!(p = plugins[i]); i++) {
         if (!p.priority || p.priority < priority) {
-          viewProviders.splice(i, 0, provider);
+          plugins.splice(i, 0, definition);
           return;
         }
       }
 
       // not yet added; add to front
-      viewProviders.push(provider);
+      plugins.push(definition);
     }
 
-    /**
-     * Initializes the view map to replace prefixes in templates
-     *
-     * @param map the plugin map
-     * @param app the application to resolve plugin references against
-     */
-    function initializeViews(map, Uri) {
-      angular.forEach(map, function(viewProviders) {
-        angular.forEach(viewProviders, function(viewProvider) {
+    function internalRegisterPlugin(key, definition, map) {
+      // make sure map is initialized
+      var pluginsByKey = map[key] = map[key] || [];
+      addPlugin(pluginsByKey, definition);
+    }
 
-          if (viewProvider.url) {
-            viewProvider.url = Uri.appUri(viewProvider.url);
+    this.registerPlugin = function(type, key, definition) {
+      var pluginTypeMap = pluginMap[type] = pluginMap[type] || {};
+      internalRegisterPlugin(key, definition, pluginTypeMap);
+    };
+    
+    this.$get = [ '$filter', function($filter) {
+      var service = {
+        getAllProviders: function(type) {
+          return pluginMap[type] || {};
+        },
+
+        getProviders: function(type, options) {
+
+          if (!type) {
+            throw new Error('No type given');
           }
-        });
-      });
-    }
+
+          var component = options.component;
+          if (!component) {
+            throw new Error('No component given');
+          }
+
+          var providers = (pluginMap[type] || {})[component];
+
+          // filter by id and other filter criterias
+          if (options.id) {
+            providers = $filter('filter')(providers, { id: options.id });
+          }
+
+          return providers || [];
+        },
+
+        getProvider: function(type, options) {
+          var providers = this.getProviders(type, options);
+          return (providers || [])[0];
+        }
+      };
+
+      return service;
+    }];
+  }];
+
+  module.provider('Plugins', PluginsProvider);
+
+  var ViewsProvider = [ 'PluginsProvider', function(PluginsProvider) {
 
     /**
      * Registers the given viewProvider for the specified view
@@ -70,76 +95,111 @@ ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
      * @param {Object} viewProvider
      */
     this.registerDefaultView = function(key, viewProvider) {
-      internalRegisterProvider(key, viewProvider, defaultViewMap);
+      PluginsProvider.registerPlugin('view', key, viewProvider);
     };
 
     this.registerView = function(key, viewProvider) {
-      internalRegisterProvider(key, viewProvider, defaultViewMap);
+      PluginsProvider.registerPlugin('view', key, viewProvider);
     };
 
-    function ensureInitialized(Uri) {
-      if (!initialized) {
-        initializeViews(defaultViewMap, Uri);
-        initializeViews(pluginViewMap, Uri);
+    this.$get = [ 'Uri', 'Plugins', function(Uri, Plugins) {
 
-        initialized = true;
+      var initialized = false;
+
+      /**
+       * Initializes the view map to replace prefixes in templates
+       *
+       * @param map the plugin map
+       * @param app the application to resolve plugin references against
+       */
+      function initializeViews(map) {
+        angular.forEach(map, function(viewProviders) {
+          angular.forEach(viewProviders, function(viewProvider) {
+
+            if (viewProvider.url) {
+              viewProvider.url = Uri.appUri(viewProvider.url);
+            }
+          });
+        });
       }
-    }
 
-    this.$get = ['Uri', '$filter', function(Uri, $filter) {
+      function ensureInitialized() {
+        if (!initialized) {
+          initializeViews(Plugins.getAllProviders('view'));
+
+          initialized = true;
+        }
+      }
+
       var service = {
 
         getProviders: function(options) {
-          ensureInitialized(Uri);
+          ensureInitialized();
 
-          var component = options.component;
-          if (!component) {
-            throw new Error("No component given");
-          }
-
-          var viewProviders = defaultViewMap[component];
-
-          // filter by id and other filter criterias
-          if (options.id) {
-            viewProviders = $filter('filter')(viewProviders, { id: options.id });
-          }
-
-          return viewProviders || [];
+          return Plugins.getProviders('view', options);
         },
 
         getProvider: function(options) {
 
           var viewProviders = this.getProviders(options);
-
-          function getViewById(id, viewProviders) {
-            var filtered = $filter('filter')(viewProviders, { id: id });
-            if (filtered.length) {
-              return filtered[0];
-            } else {
-              return null;
-            }
-          }
-
-          function replaceView(viewProviders, id, replaceViewProvider) {
-            for (var i = 0; i < viewProviders.length; i++) {
-              var p = viewProviders[i];
-              if (p.id === id) {
-                viewProviders.splice(i, 1, replaceViewProvider);
-                return true;
-              }
-            }
-
-            return false;
-          }
-
           return (viewProviders || [])[0];
         }
       };
 
       return service;
     }];
-  }
+  }];
 
   module.provider('Views', ViewsProvider);
 
+
+  var DataProvider = [ 'PluginsProvider', function(PluginsProvider) {
+
+    /**
+     * Registers the given dataProvider for the specified data
+     *
+     * Data provider is an object like the following:
+     *
+     * <pre>
+     *   {
+     *     id: // id if the view
+     *     controller: Function // controller reference
+     *   }
+     * </pre>
+     *
+     * @param {string} key
+     * @param {Object} dataProvider
+     */
+    this.registerData = function(key, dataProvider) {
+      PluginsProvider.registerPlugin('data', key, dataProvider);
+    };
+
+    this.$get = [ 'Plugins', '$injector', function(Plugins, $injector) {
+
+      var service = {
+
+        getProviders: function(options) {
+          return Plugins.getProviders('data', options);
+        },
+
+        getProvider: function(options) {
+          var dataProviders = this.getProviders(options);
+          return (dataProviders || [])[0];
+        },
+
+        instantiateProviders : function (key, locals) {
+          var dataProviders = this.getProviders({ component: key });
+
+          angular.forEach(dataProviders, function (dataProvider) {
+            $injector.instantiate(dataProvider.controller, locals);
+          });
+
+        }        
+      };
+
+      return service;
+    }];
+  }];
+
+  module.provider('Data', DataProvider);
 });

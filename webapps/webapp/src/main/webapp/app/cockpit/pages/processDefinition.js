@@ -4,8 +4,8 @@ ngDefine('cockpit.pages.processDefinition', [
 ], function(module, angular) {
 
   var Controller = [
-    '$scope', '$rootScope', 'search', '$q', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Transform', 'Variables', 'dataDepend', 'processDefinition',
-    function($scope, $rootScope, search, $q, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Transform, Variables, dataDepend, processDefinition) {
+    '$scope', '$rootScope', 'search', '$q', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition',
+    function($scope, $rootScope, search, $q, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Data, Transform, Variables, dataDepend, processDefinition) {
 
     var processData = $scope.processData = dataDepend.create($scope);
 
@@ -148,36 +148,6 @@ ngDefine('cockpit.pages.processDefinition', [
       return diagram;
     }]);
 
-    processData.provide([ 'activityInstanceStatistics', 'incidentStatistics', 'clickableElements' ], [ 'processDefinition', function(definition) {
-
-      return ProcessDefinitionResource.queryActivityStatistics({ id : definition.id, incidents: true }).$promise.then(function(stats) {
-        var activityStatistics = [],
-            incidentStatistics = [],
-            clickableElements = [];
-
-        angular.forEach(stats, function(currentStats) {
-          var id = currentStats.id,
-              stats = { id: id, count: currentStats.instances };
-
-          activityStatistics.push(stats);
-          clickableElements.push(id);
-
-          var incident = { id: id, incidents: currentStats.incidents };
-          incidentStatistics.push(incident);
-        });
-
-        return [ activityStatistics, incidentStatistics, clickableElements ];
-      });
-    }]);
-
-    processData.provide('processDiagramOverlay', [ 'processDiagram', 'activityInstanceStatistics', 'clickableElements', 'incidentStatistics', function (processDiagram, activityInstanceStatistics, clickableElements, incidentStatistics) {
-      return {
-        annotations: activityInstanceStatistics,
-        incidents: incidentStatistics,
-        clickableElements: clickableElements
-      };
-    }]);
-
     // end data definition /////////////////////////
 
 
@@ -198,9 +168,8 @@ ngDefine('cockpit.pages.processDefinition', [
       $scope.instanceStatistics.current = currentCount;
     });
 
-    $scope.processDiagramData = processData.observe([ 'processDiagram', 'processDiagramOverlay' ], function(processDiagram, processDiagramOverlay) {
+    $scope.processDiagramData = processData.observe('processDiagram', function(processDiagram) {
       $scope.processDiagram = processDiagram;
-      $scope.processDiagramOverlay = processDiagramOverlay;
     });
 
     processData.observe('filter', function(filter) {
@@ -220,19 +189,19 @@ ngDefine('cockpit.pages.processDefinition', [
 
       if (!activityId) {
         activityIds = null;
+
       } else {
+
         if (ctrl) {
           if (selected) {
-            activityIds = activityIds.splice(idx, 1);
+            activityIds.splice(idx, 1);
+            
           } else {
             activityIds.push(activityId);
           }
+
         } else {
-          if (selected) {
-            activityIds = null;
-          } else {
-            activityIds = [ activityId ];
-          }
+          activityIds = [ activityId ];
         }
       }
 
@@ -279,6 +248,8 @@ ngDefine('cockpit.pages.processDefinition', [
     $scope.processDefinitionVars = { read: [ 'processDefinition', 'selection', 'processData', 'filter' ] };
     $scope.processDefinitionViews = Views.getProviders({ component: 'cockpit.processDefinition.view' });
     $scope.processDefinitionActions = Views.getProviders({ component: 'cockpit.processDefinition.action' });
+
+    Data.instantiateProviders('cockpit.processDefinition.data', {$scope: $scope, processData : processData});
 
 
     $scope.selectView = function(view) {

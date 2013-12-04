@@ -1,6 +1,7 @@
 ngDefine('cockpit.plugin.jobDefinition.views', [
   './processDefinition/jobDefinitionTable',
-  './processDefinition/jobDefinitionSuspensionState'
+  './processDefinition/jobDefinitionSuspensionState',
+  './processDefinition/jobDefinitionSuspensionOverlay'
 ], function(module) {
 
 });

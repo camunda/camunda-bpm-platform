@@ -61,7 +61,15 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
     };
 
     $scope.close = function (status) {
-      dialog.close(status);
+      var response = {};
+
+      response.status = status;
+      response.suspended = !jobDefinition.suspended;
+      response.executeImmediately = $scope.executeImmediately;
+      response.executionDate = $scope.executionDate;
+
+      dialog.close(response);
+      
     };
 
   }];

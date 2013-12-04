@@ -22,7 +22,12 @@
         {{ jobDefinition.jobConfiguration }}
       </td>      
       <td>
-        {{ jobDefinition.state }}
+        <span ng-show="jobDefinition.suspended">
+          Suspended
+        </span>
+        <span ng-hide="jobDefinition.suspended">
+          Active
+        </span>        
       </td>
       <td>
         <a class="btn action-button" ng-click="openSuspensionStateDialog(jobDefinition)" ng-show="jobDefinition.suspended"
