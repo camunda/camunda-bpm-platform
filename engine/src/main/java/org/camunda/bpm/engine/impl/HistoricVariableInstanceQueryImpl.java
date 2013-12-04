@@ -65,11 +65,13 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   }
 
   public HistoricVariableInstanceQuery taskIdIn(String... taskIds) {
+    assertParamNotNull("Task Ids", taskIds);
     this.taskIds = taskIds;
     return this;
   }
 
   public HistoricVariableInstanceQuery executionIdIn(String... executionIds) {
+    assertParamNotNull("Execution Ids", executionIds);
     this.executionIds = executionIds;
     return this;
   }
