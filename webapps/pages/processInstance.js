@@ -3,7 +3,7 @@ ngDefine('cockpit.pages.processInstance', [
   'module:dataDepend:angular-data-depend'
 ], function(module, require) {
 
-  function ProcessInstanceController ($scope, $rootScope, $location, $filter, $dialog, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Transform, processInstance, dataDepend) {
+  function ProcessInstanceController ($scope, $rootScope, $location, $filter, $dialog, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Data, Transform, processInstance, dataDepend) {
 
     $rootScope.clearBreadcrumbs();
 
@@ -291,47 +291,25 @@ ngDefine('cockpit.pages.processInstance', [
       return executionIdToInstanceMap;
     }]);
 
-    // activityInstanceStatistics, clickableElements
-    processData.provide([ 'activityInstanceStatistics', 'clickableElements'], [ 'activityIdToInstancesMap', function (activityIdToInstancesMap) {
-      var activityInstanceStatistics = [],
-          clickableElements = [];
-
-      for (var activityId in activityIdToInstancesMap) {
-        var instances = activityIdToInstancesMap[activityId];
-        activityInstanceStatistics.push( {id: activityId, count: instances.length });
-        clickableElements.push(activityId);
-      }
-
-      return [ activityInstanceStatistics, clickableElements ];
-    }]);
-
     // incidents
     processData.provide('incidents', ['processInstance', function (processInstance) {
       return IncidentResource.query({ id : processInstance.id }).$promise;
     }]);
 
     // incidentStatistics
-    processData.provide('incidentStatistics', ['incidents', function (incidents) {
-      var incidentStatistics = [],
-          statistics = {};
+    processData.provide('activityIdToIncidentsMap', ['incidents', function (incidents) {
+      var activityIdToIncidentsMap = {};
 
       for (var i = 0, incident; !!(incident = incidents[i]); i++) {
-        var activity = statistics[incident.activityId];
+        var activity = activityIdToIncidentsMap[incident.activityId];
         if (!activity) {
           activity = [];
-          statistics[incident.activityId] = activity;
+          activityIdToIncidentsMap[incident.activityId] = activity;
         }
         activity.push(incident);
       }
 
-      for (var key in statistics) {
-        var tmp = {};
-        tmp.id = key;
-        tmp.incidents = statistics[key];
-        incidentStatistics.push(tmp);
-      }
-
-      return incidentStatistics;
+      return activityIdToIncidentsMap;
     }]);
 
     // processDiagram
@@ -383,13 +361,6 @@ ngDefine('cockpit.pages.processInstance', [
 
     $scope.processDiagram = processData.observe('processDiagram', function (processDiagram) {
       $scope.processDiagram = processDiagram;
-    });
-
-    $scope.processDiagramOverlay = processData.observe([ 'processDiagram', 'activityInstanceStatistics', 'clickableElements', 'incidentStatistics' ], function (processDiagram, activityInstanceStatistics, clickableElements, incidentStatistics) {
-      $scope.processDiagramOverlay.annotations = activityInstanceStatistics;
-      $scope.processDiagramOverlay.incidents = incidentStatistics;
-      $scope.processDiagramOverlay.clickableElements = clickableElements;
-      $scope.processDiagramOverlay = angular.extend({}, $scope.processDiagramOverlay);
     });
 
     processData.observe([ 'instanceIdToInstanceMap', 'activityIdToInstancesMap' ], function (instanceIdToInstanceMap, activityIdToInstancesMap) {
@@ -520,6 +491,8 @@ ngDefine('cockpit.pages.processInstance', [
                          .concat(Views.getProviders({ component: 'cockpit.processInstance.instanceDetails' })); // backwards compatibility
     $scope.processInstanceActions = Views.getProviders({ component: 'cockpit.processInstance.action' });
 
+    Data.instantiateProviders('cockpit.processInstance.data', {$scope: $scope, processData : processData});
+
     $scope.selectView = function(view) {
       $scope.selectedView = view;
 
@@ -603,6 +576,7 @@ ngDefine('cockpit.pages.processInstance', [
                                                'ProcessInstanceResource',
                                                'IncidentResource',
                                                'Views',
+                                               'Data',
                                                'Transform',
                                                'processInstance',
                                                'dataDepend', ProcessInstanceController ])
