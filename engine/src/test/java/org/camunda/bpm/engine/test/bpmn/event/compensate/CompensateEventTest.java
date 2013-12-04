@@ -107,7 +107,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
   // See: https://app.camunda.com/jira/browse/CAM-1410
   @Deployment
-  public void FAILING_testCompensateActivityRef() {
+  public void testCompensateActivityRef() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
