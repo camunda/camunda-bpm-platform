@@ -24,8 +24,23 @@
   background-position: 0px 0px;
 }
 
-.icon-suspended-white {
+.icon-suspended.white {
   background-image: url(../img/suspended-white.png);
+}
+
+.badge.badge-suspended {
+  line-height: 13px;
+}
+
+.badge.badge-suspended .icon-suspended {
+  -webkit-background-size: contain;
+  -moz-background-size: contain;
+  -o-background-size: contain;
+  background-size: contain;
+
+  width: 16px;
+  height: 12px;
+  background-repeat: no-repeat;
 }
 
 /* apply a natural box layout model to box elements */
@@ -183,6 +198,7 @@ Icons
   background-color: #999999;
   top: 100%;
   float: left;
+  margin-right: 4px;
 
   -webkit-border-radius: 50%;
    -moz-border-radius: 50%;

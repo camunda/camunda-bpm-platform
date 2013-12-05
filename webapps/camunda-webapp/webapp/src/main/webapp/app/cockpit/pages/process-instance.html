@@ -18,9 +18,9 @@
       <h1>{{ processDefinition.name || processDefinition.key }}</h1>
       <p>
         <strong title="Process instance id, as it appears in the database">{{ processInstance.id }}</strong>        
-        <span title="Currently suspended">
-          <i class="icon-suspended" ng-show="processInstance.suspended"></i>
-        </span>
+        <span class="badge badge-warning badge-suspended" ng-show="processInstance.suspended" title="Currently suspended">
+          <i class="icon-suspended white"></i>
+        </span>        
       </p>
     </div>
 
