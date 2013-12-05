@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ import org.codehaus.jackson.map.SerializationConfig;
 public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
   ObjectMapper mapper;
-  
+
   public JacksonConfigurator() {
     mapper = new ObjectMapper();
 
@@ -36,7 +36,7 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
     mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
   }
-  
+
   @Override
   public ObjectMapper getContext(Class<?> clazz) {
     return mapper;

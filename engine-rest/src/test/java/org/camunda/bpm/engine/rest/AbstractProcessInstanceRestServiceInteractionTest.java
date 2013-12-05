@@ -745,7 +745,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testActivateInstance() {
     ProcessInstanceSuspensionStateDto dto = new ProcessInstanceSuspensionStateDto();
-    dto.setState(false);
+    dto.setSuspended(false);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
@@ -763,7 +763,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testActivateThrowsProcessEngineException() {
     ProcessInstanceSuspensionStateDto dto = new ProcessInstanceSuspensionStateDto();
-    dto.setState(false);
+    dto.setSuspended(false);
 
     String expectedMessage = "expectedMessage";
 
@@ -787,7 +787,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testSuspendInstance() {
     ProcessInstanceSuspensionStateDto dto = new ProcessInstanceSuspensionStateDto();
-    dto.setState(true);
+    dto.setSuspended(true);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
@@ -805,7 +805,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testSuspendThrowsProcessEngineException() {
     ProcessInstanceSuspensionStateDto dto = new ProcessInstanceSuspensionStateDto();
-    dto.setState(true);
+    dto.setSuspended(true);
 
     String expectedMessage = "expectedMessage";
 

@@ -16,13 +16,13 @@ import org.camunda.bpm.engine.ProcessEngine;
 
 public class SuspensionStateDto {
 
-  protected boolean suspended;
+  private boolean suspended;
 
   public boolean getSuspended() {
     return suspended;
   }
 
-  public void setState(boolean suspended) {
+  public void setSuspended(boolean suspended) {
     this.suspended = suspended;
   }
 
