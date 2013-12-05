@@ -509,7 +509,11 @@ ngDefine('cockpit.pages.processInstance', [
       }
 
       if (selectedTabId) {
-        var provider = Views.getProvider({ component: 'cockpit.processInstance.instanceDetails', id: selectedTabId });
+        var provider = Views.getProvider({ component: 'cockpit.processInstance.view', id: selectedTabId });
+        if (!provider) {
+          // backwards compatibility
+          provider = Views.getProvider({ component: 'cockpit.processInstance.instanceDetails', id: selectedTabId });
+        }
         if (provider && tabs.indexOf(provider) != -1) {
           $scope.selectedView = provider;
           return;
