@@ -66,16 +66,17 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
   }
 
   // SEE: https://app.camunda.com/jira/browse/CAM-1448
-  public void FAILING_testEmptyMessageNameFails() {
+  public void testEmptyMessageNameFails() {
     try {
       repositoryService
         .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testEmptyMessageNameFails.bpmn20.xml")
         .deploy();
       fail("exception expected");
     }catch (ProcessEngineException e) {
       // TODO: exception message
-      assertTrue(e.getMessage().contains("TO BE DETERMINED"));
+      //assertTrue(e.getMessage().contains("TO BE DETERMINED"));
+      assertTrue(e.getMessage().contains("Cannot have a message event subscription with an empty or missing name"));
     }
   }
 
