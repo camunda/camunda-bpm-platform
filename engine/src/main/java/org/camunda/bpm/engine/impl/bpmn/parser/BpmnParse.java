@@ -1095,6 +1095,12 @@ public class BpmnParse extends Parse {
 
   @SuppressWarnings("unchecked")
   protected void addEventSubscriptionDeclaration(EventSubscriptionDeclaration subscription, ScopeImpl scope, Element element) {
+    if(subscription.getEventType().equals("message")
+        && (subscription.getEventName() == null
+        || "".equalsIgnoreCase(subscription.getEventName().trim()))) {
+      addError("Cannot have a message event subscription with an empty or missing name", element);
+    }
+
     List<EventSubscriptionDeclaration> eventDefinitions = (List<EventSubscriptionDeclaration>) scope.getProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
     if(eventDefinitions == null) {
       eventDefinitions = new ArrayList<EventSubscriptionDeclaration>();
@@ -1111,6 +1117,7 @@ public class BpmnParse extends Parse {
         }
       }
     }
+
     eventDefinitions.add(subscription);
   }
 
