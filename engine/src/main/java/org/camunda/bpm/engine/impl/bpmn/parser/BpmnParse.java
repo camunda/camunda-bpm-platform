@@ -154,6 +154,8 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_IS_FOR_COMPENSATION = "isForCompensation";
   public static final String PROPERTYNAME_ERROR_EVENT_DEFINITIONS = "errorEventDefinitions";
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION = "eventDefinitions";
+  public static final String PROPERTYNAME_TRIGGERED_BY_EVENT = "triggeredByEvent";
+  public static final String PROPERTYNAME_TYPE = "type";
 
   /* process start authorization specific finals */
   protected static final String POTENTIAL_STARTER = "potentialStarter";
@@ -1095,12 +1097,6 @@ public class BpmnParse extends Parse {
 
   @SuppressWarnings("unchecked")
   protected void addEventSubscriptionDeclaration(EventSubscriptionDeclaration subscription, ScopeImpl scope, Element element) {
-    if(subscription.getEventType().equals("message")
-        && (subscription.getEventName() == null
-        || "".equalsIgnoreCase(subscription.getEventName().trim()))) {
-      addError("Cannot have a message event subscription with an empty or missing name", element);
-    }
-
     List<EventSubscriptionDeclaration> eventDefinitions = (List<EventSubscriptionDeclaration>) scope.getProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
     if(eventDefinitions == null) {
       eventDefinitions = new ArrayList<EventSubscriptionDeclaration>();
@@ -1117,7 +1113,6 @@ public class BpmnParse extends Parse {
         }
       }
     }
-
     eventDefinitions.add(subscription);
   }
 
@@ -1389,7 +1384,14 @@ public class BpmnParse extends Parse {
 
     if(activityRef != null) {
       if(scopeElement.findActivity(activityRef) == null) {
-        addError("Invalid attribute value for 'activityRef': no activity with id '"+activityRef+"' in current scope", compensateEventDefinitionElement);
+        Boolean isTriggeredByEvent = (Boolean) scopeElement.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT);
+        String type = (String) scopeElement.getProperty(PROPERTYNAME_TYPE);
+        if (isTriggeredByEvent != null && isTriggeredByEvent && "subProcess".equals(type) && scopeElement.getProcessDefinition() != null) {
+            scopeElement = scopeElement.getProcessDefinition();
+        }
+        if (scopeElement.findActivity(activityRef) == null) {
+          addError("Invalid attribute value for 'activityRef': no activity with id '"+activityRef+"' in current scope", compensateEventDefinitionElement);
+        }
       }
     }
 
