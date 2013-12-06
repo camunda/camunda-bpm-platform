@@ -1111,6 +1111,9 @@ public class BpmnParse extends Parse {
         }
       }
     }
+    if(subscription.getEventType().equals("message") && (subscription.getEventName() == null || "".equalsIgnoreCase(subscription.getEventName().trim()))) {
+      addError("Cannot have a message event subscription with an empty or missing name", element);
+    }
     eventDefinitions.add(subscription);
   }
 
