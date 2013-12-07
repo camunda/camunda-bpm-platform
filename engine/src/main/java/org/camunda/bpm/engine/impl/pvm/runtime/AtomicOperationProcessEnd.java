@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.drools.lang.dsl.DSLMapParser.scope_section_return;
 
 
 /**

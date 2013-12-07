@@ -47,16 +47,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-compiler</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>javax.persistence</groupId>
       <artifactId>persistence-api</artifactId>
       <scope>provided</scope>
@@ -170,7 +160,6 @@
           org.apache.xerces*;resolution:=optional,
           org.camunda.bpm.engine.osgi*;resolution:=optional,
           org.springframework*;resolution:=optional,
-          org.drools*;resolution:=optional,
           com.fasterxml*;resolution:=optional,
           org.jboss.vfs*;resolution:=optional,
       </camunda.osgi.import.additional>
