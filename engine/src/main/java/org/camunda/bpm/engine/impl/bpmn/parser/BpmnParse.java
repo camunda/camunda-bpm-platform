@@ -63,30 +63,11 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.TaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TransactionActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.WebServiceActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.data.AbstractDataAssociation;
-import org.camunda.bpm.engine.impl.bpmn.data.Assignment;
-import org.camunda.bpm.engine.impl.bpmn.data.ClassStructureDefinition;
-import org.camunda.bpm.engine.impl.bpmn.data.Data;
-import org.camunda.bpm.engine.impl.bpmn.data.DataRef;
-import org.camunda.bpm.engine.impl.bpmn.data.IOSpecification;
-import org.camunda.bpm.engine.impl.bpmn.data.ItemDefinition;
-import org.camunda.bpm.engine.impl.bpmn.data.ItemKind;
-import org.camunda.bpm.engine.impl.bpmn.data.SimpleDataInputAssociation;
-import org.camunda.bpm.engine.impl.bpmn.data.StructureDefinition;
-import org.camunda.bpm.engine.impl.bpmn.data.TransformationDataOutputAssociation;
 import org.camunda.bpm.engine.impl.bpmn.helper.ClassDelegate;
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionTaskListener;
-import org.camunda.bpm.engine.impl.bpmn.webservice.BpmnInterface;
-import org.camunda.bpm.engine.impl.bpmn.webservice.BpmnInterfaceImplementation;
-import org.camunda.bpm.engine.impl.bpmn.webservice.MessageDefinition;
-import org.camunda.bpm.engine.impl.bpmn.webservice.MessageImplicitDataInputAssociation;
-import org.camunda.bpm.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssociation;
-import org.camunda.bpm.engine.impl.bpmn.webservice.Operation;
-import org.camunda.bpm.engine.impl.bpmn.webservice.OperationImplementation;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
@@ -195,12 +176,6 @@ public class BpmnParse extends Parse {
    * definition.
    */
   protected Map<String, MessageDefinition> messages = new HashMap<String, MessageDefinition>();
-  protected Map<String, StructureDefinition> structures = new HashMap<String, StructureDefinition>();
-  protected Map<String, BpmnInterfaceImplementation> interfaceImplementations = new HashMap<String, BpmnInterfaceImplementation>();
-  protected Map<String, OperationImplementation> operationImplementations = new HashMap<String, OperationImplementation>();
-  protected Map<String, ItemDefinition> itemDefinitions = new HashMap<String, ItemDefinition>();
-  protected Map<String, BpmnInterface> bpmnInterfaces = new HashMap<String, BpmnInterface>();
-  protected Map<String, Operation> operations = new HashMap<String, Operation>();
   protected Map<String, SignalDefinition> signals = new HashMap<String, SignalDefinition>();
 
 
@@ -224,12 +199,6 @@ public class BpmnParse extends Parse {
     this.expressionManager = parser.getExpressionManager();
     this.parseListeners = parser.getParseListeners();
     setSchemaResource(ReflectUtil.getResource(BpmnParser.BPMN_20_SCHEMA_LOCATION).toString());
-    this.initializeXSDItemDefinitions();
-  }
-
-  protected void initializeXSDItemDefinitions() {
-    this.itemDefinitions.put("http://www.w3.org/2001/XMLSchema:string", new ItemDefinition("http://www.w3.org/2001/XMLSchema:string",
-            new ClassStructureDefinition(String.class)));
   }
 
   public BpmnParse deployment(DeploymentEntity deployment) {
@@ -270,9 +239,7 @@ public class BpmnParse extends Parse {
     collectElementIds();
     parseDefinitionsAttributes();
     parseImports();
-    parseItemDefinitions();
     parseMessages();
-    parseInterfaces();
     parseErrors();
     parseSignals();
     parseProcessDefinitions();
@@ -355,37 +322,6 @@ public class BpmnParse extends Parse {
     }
   }
 
-  /**
-   * Parses the itemDefinitions of the given definitions file. Item definitions
-   * are not contained within a process element, but they can be referenced from
-   * inner process elements.
-   *
-   * @param definitionsElement
-   *          The root element of the XML file.
-   */
-  public void parseItemDefinitions() {
-    for (Element itemDefinitionElement : rootElement.elements("itemDefinition")) {
-      String id = itemDefinitionElement.attribute("id");
-      String structureRef = this.resolveName(itemDefinitionElement.attribute("structureRef"));
-      String itemKind = itemDefinitionElement.attribute("itemKind");
-      StructureDefinition structure = null;
-
-      try {
-        // it is a class
-        Class< ? > classStructure = ReflectUtil.loadClass(structureRef);
-        structure = new ClassStructureDefinition(classStructure);
-      } catch (ProcessEngineException e) {
-        // it is a reference to a different structure
-        structure = this.structures.get(structureRef);
-      }
-
-      ItemDefinition itemDefinition = new ItemDefinition(this.targetNamespace + ":" + id, structure);
-      if (itemKind != null) {
-        itemDefinition.setItemKind(ItemKind.valueOf(itemKind));
-      }
-      itemDefinitions.put(itemDefinition.getId(), itemDefinition);
-    }
-  }
 
   /**
    * Parses the messages of the given definitions file. Messages are not
@@ -398,21 +334,11 @@ public class BpmnParse extends Parse {
   public void parseMessages() {
     for (Element messageElement : rootElement.elements("message")) {
       String id = messageElement.attribute("id");
-      String itemRef = this.resolveName(messageElement.attribute("itemRef"));
+//      String itemRef = this.resolveName(messageElement.attribute("itemRef"));
       String name = messageElement.attribute("name");
 
       MessageDefinition messageDefinition = new MessageDefinition(this.targetNamespace + ":" + id, name);
-
-      if(itemRef != null) {
-        if(!this.itemDefinitions.containsKey(itemRef)) {
-            addError(itemRef + " does not exist", messageElement);
-        } else {
-            ItemDefinition itemDefinition = this.itemDefinitions.get(itemRef);
-            messageDefinition.setItemDefinition(itemDefinition);
-        }
-      }
       this.messages.put(messageDefinition.getId(), messageDefinition);
-
     }
   }
 
@@ -447,61 +373,6 @@ public class BpmnParse extends Parse {
         signal.setName(signalName);
         this.signals.put(signal.getId(), signal);
       }
-    }
-  }
-
-  /**
-   * Parses the interfaces and operations defined withing the root element.
-   *
-   * @param definitionsElement
-   *          The root element of the XML file/
-   */
-  public void parseInterfaces() {
-    for (Element interfaceElement : rootElement.elements("interface")) {
-
-      // Create the interface
-      String id = interfaceElement.attribute("id");
-      String name = interfaceElement.attribute("name");
-      String implementationRef = this.resolveName(interfaceElement.attribute("implementationRef"));
-      BpmnInterface bpmnInterface = new BpmnInterface(this.targetNamespace + ":" + id, name);
-      bpmnInterface.setImplementation(this.interfaceImplementations.get(implementationRef));
-
-      // Handle all its operations
-      for (Element operationElement : interfaceElement.elements("operation")) {
-        Operation operation = parseOperation(operationElement, bpmnInterface);
-        bpmnInterface.addOperation(operation);
-      }
-
-      bpmnInterfaces.put(bpmnInterface.getId(), bpmnInterface);
-    }
-  }
-
-  public Operation parseOperation(Element operationElement, BpmnInterface bpmnInterface) {
-    Element inMessageRefElement = operationElement.element("inMessageRef");
-    String inMessageRef = this.resolveName(inMessageRefElement.getText());
-
-    if (!this.messages.containsKey(inMessageRef)) {
-      addError(inMessageRef + " does not exist", inMessageRefElement);
-      return null;
-    } else {
-      MessageDefinition inMessage = this.messages.get(inMessageRef);
-      String id = operationElement.attribute("id");
-      String name = operationElement.attribute("name");
-      String implementationRef = this.resolveName(operationElement.attribute("implementationRef"));
-      Operation operation = new Operation(this.targetNamespace + ":" + id, name, bpmnInterface, inMessage);
-      operation.setImplementation(this.operationImplementations.get(implementationRef));
-
-      Element outMessageRefElement = operationElement.element("outMessageRef");
-      if (outMessageRefElement != null) {
-        String outMessageRef = this.resolveName(outMessageRefElement.getText());
-        if (this.messages.containsKey(outMessageRef)) {
-          MessageDefinition outMessage = this.messages.get(outMessageRef);
-          operation.setOutMessage(outMessage);
-        }
-      }
-
-      operations.put(operation.getId(), operation);
-      return operation;
     }
   }
 
@@ -692,10 +563,6 @@ public class BpmnParse extends Parse {
     }
 
     postponedElements.clear();
-
-    IOSpecification ioSpecification = parseIOSpecification(scopeElement.element("ioSpecification"));
-    parentScope.setIoSpecification(ioSpecification);
-
   }
 
   protected void parsePostponedElements(Element scopeElement, ScopeImpl parentScope, HashMap<String, Element> postponedElements) {
@@ -798,82 +665,6 @@ public class BpmnParse extends Parse {
           }
         }
       }
-    }
-  }
-
-  protected IOSpecification parseIOSpecification(Element ioSpecificationElement) {
-    if (ioSpecificationElement == null) {
-      return null;
-    }
-
-    IOSpecification ioSpecification = new IOSpecification();
-
-    for (Element dataInputElement : ioSpecificationElement.elements("dataInput")) {
-      String id = dataInputElement.attribute("id");
-      String itemSubjectRef = this.resolveName(dataInputElement.attribute("itemSubjectRef"));
-      ItemDefinition itemDefinition = this.itemDefinitions.get(itemSubjectRef);
-      Data dataInput = new Data(this.targetNamespace + ":" + id, id, itemDefinition);
-      ioSpecification.addInput(dataInput);
-    }
-
-    for (Element dataOutputElement : ioSpecificationElement.elements("dataOutput")) {
-      String id = dataOutputElement.attribute("id");
-      String itemSubjectRef = this.resolveName(dataOutputElement.attribute("itemSubjectRef"));
-      ItemDefinition itemDefinition = this.itemDefinitions.get(itemSubjectRef);
-      Data dataOutput = new Data(this.targetNamespace + ":" + id, id, itemDefinition);
-      ioSpecification.addOutput(dataOutput);
-    }
-
-    for (Element inputSetElement : ioSpecificationElement.elements("inputSet")) {
-      for (Element dataInputRef : inputSetElement.elements("dataInputRefs")) {
-        DataRef dataRef = new DataRef(dataInputRef.getText());
-        ioSpecification.addInputRef(dataRef);
-      }
-    }
-
-    for (Element outputSetElement : ioSpecificationElement.elements("outputSet")) {
-      for (Element dataInputRef : outputSetElement.elements("dataOutputRefs")) {
-        DataRef dataRef = new DataRef(dataInputRef.getText());
-        ioSpecification.addOutputRef(dataRef);
-      }
-    }
-
-    return ioSpecification;
-  }
-
-  protected AbstractDataAssociation parseDataInputAssociation(Element dataAssociationElement) {
-    String sourceRef = null;
-    Element sourceElement = dataAssociationElement.element("sourceRef");
-    if (sourceElement != null) {
-      sourceRef = sourceElement.getText();
-    }
-
-    String targetRef = null;
-    Element targetElement = dataAssociationElement.element("targetRef");
-    if (targetElement != null) {
-      targetRef = targetElement.getText();
-    }
-
-    if (targetRef != null && targetRef.equals("")) {
-      addError("targetRef is required", dataAssociationElement);
-    }
-
-    List<Element> assignments = dataAssociationElement.elements("assignment");
-    if (assignments.isEmpty()) {
-      return new MessageImplicitDataInputAssociation(sourceRef, targetRef);
-    } else {
-      SimpleDataInputAssociation dataAssociation = new SimpleDataInputAssociation(sourceRef, targetRef);
-
-      for (Element assigmentElement : dataAssociationElement.elements("assignment")) {
-        if (assigmentElement.element("from") != null && assigmentElement.element("to") != null) {
-          Expression from = this.expressionManager.createExpression(assigmentElement.element("from").getText());
-          Expression to = this.expressionManager.createExpression(assigmentElement.element("to").getText());
-          Assignment assignment = new Assignment(from, to);
-          dataAssociation.addAssignment(assignment);
-        }
-      }
-
-      return dataAssociation;
     }
   }
 
@@ -1722,16 +1513,12 @@ public class BpmnParse extends Parse {
     if (resultVariableName == null) {
       resultVariableName = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariableName");
     }
-    String implementation = serviceTaskElement.attribute("implementation");
-    String operationRef = this.resolveName(serviceTaskElement.attribute("operationRef"));
 
     parseAsynchronousContinuation(serviceTaskElement, activity);
 
     if (type != null) {
       if (type.equalsIgnoreCase("mail")) {
         parseEmailServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
-      } else if (type.equalsIgnoreCase("mule")) {
-        parseMuleServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
       } else if (type.equalsIgnoreCase("shell")) {
         parseShellServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
       } else {
@@ -1753,33 +1540,8 @@ public class BpmnParse extends Parse {
     } else if (expression != null && expression.trim().length() > 0) {
       activity.setActivityBehavior(new ServiceTaskExpressionActivityBehavior(expressionManager.createExpression(expression), resultVariableName));
 
-    } else if (implementation != null && operationRef != null && implementation.equalsIgnoreCase("##WebService")) {
-      if (!this.operations.containsKey(operationRef)) {
-        addError(operationRef + " does not exist", serviceTaskElement);
-      } else {
-        Operation operation = this.operations.get(operationRef);
-        WebServiceActivityBehavior webServiceActivityBehavior = new WebServiceActivityBehavior(operation);
-
-        Element ioSpecificationElement = serviceTaskElement.element("ioSpecification");
-        if (ioSpecificationElement != null) {
-          IOSpecification ioSpecification = this.parseIOSpecification(ioSpecificationElement);
-          webServiceActivityBehavior.setIoSpecification(ioSpecification);
-        }
-
-        for (Element dataAssociationElement : serviceTaskElement.elements("dataInputAssociation")) {
-          AbstractDataAssociation dataAssociation = this.parseDataInputAssociation(dataAssociationElement);
-          webServiceActivityBehavior.addDataInputAssociation(dataAssociation);
-        }
-
-        for (Element dataAssociationElement : serviceTaskElement.elements("dataOutputAssociation")) {
-          AbstractDataAssociation dataAssociation = this.parseDataOutputAssociation(dataAssociationElement);
-          webServiceActivityBehavior.addDataOutputAssociation(dataAssociation);
-        }
-
-        activity.setActivityBehavior(webServiceActivityBehavior);
-      }
     } else {
-      addError("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on " + elementName + ".", serviceTaskElement);
+      addError("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on " + elementName + ".", serviceTaskElement);
     }
 
     parseExecutionListenersOnScope(serviceTaskElement, activity);
@@ -1907,48 +1669,15 @@ public class BpmnParse extends Parse {
       // for e-mail
       String type = sendTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "type");
 
-      // for web service
-      String implementation = sendTaskElement.attribute("implementation");
-      String operationRef = this.resolveName(sendTaskElement.attribute("operationRef"));
-
       // for e-mail
       if (type != null) {
         if (type.equalsIgnoreCase("mail")) {
           parseEmailServiceTask(activity, sendTaskElement, parseFieldDeclarations(sendTaskElement));
-        } else if (type.equalsIgnoreCase("mule")) {
-          parseMuleServiceTask(activity, sendTaskElement, parseFieldDeclarations(sendTaskElement));
         } else {
           addError("Invalid usage of type attribute: '" + type + "'", sendTaskElement);
         }
-
-        // for web service
-      } else if (implementation != null && operationRef != null && implementation.equalsIgnoreCase("##WebService")) {
-        if (!this.operations.containsKey(operationRef)) {
-          addError(operationRef + " does not exist", sendTaskElement);
-        } else {
-          Operation operation = this.operations.get(operationRef);
-          WebServiceActivityBehavior webServiceActivityBehavior = new WebServiceActivityBehavior(operation);
-
-          Element ioSpecificationElement = sendTaskElement.element("ioSpecification");
-          if (ioSpecificationElement != null) {
-            IOSpecification ioSpecification = this.parseIOSpecification(ioSpecificationElement);
-            webServiceActivityBehavior.setIoSpecification(ioSpecification);
-          }
-
-          for (Element dataAssociationElement : sendTaskElement.elements("dataInputAssociation")) {
-            AbstractDataAssociation dataAssociation = this.parseDataInputAssociation(dataAssociationElement);
-            webServiceActivityBehavior.addDataInputAssociation(dataAssociation);
-          }
-
-          for (Element dataAssociationElement : sendTaskElement.elements("dataOutputAssociation")) {
-            AbstractDataAssociation dataAssociation = this.parseDataOutputAssociation(dataAssociationElement);
-            webServiceActivityBehavior.addDataOutputAssociation(dataAssociation);
-          }
-
-          activity.setActivityBehavior(webServiceActivityBehavior);
-        }
       } else {
-        addError("One of the attributes 'type' or 'operation' is mandatory on sendTask.", sendTaskElement);
+        addError("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on sendTask.", sendTaskElement);
       }
 
       parseExecutionListenersOnScope(sendTaskElement, activity);
@@ -1957,28 +1686,6 @@ public class BpmnParse extends Parse {
         parseListener.parseSendTask(sendTaskElement, scope, activity);
       }
       return activity;
-    }
-  }
-
-  protected AbstractDataAssociation parseDataOutputAssociation(Element dataAssociationElement) {
-    String targetRef = dataAssociationElement.element("targetRef").getText();
-
-    if (dataAssociationElement.element("sourceRef") != null) {
-      String sourceRef = dataAssociationElement.element("sourceRef").getText();
-      return new MessageImplicitDataOutputAssociation(targetRef, sourceRef);
-    } else {
-      Expression transformation = this.expressionManager.createExpression(dataAssociationElement.element("transformation").getText());
-      AbstractDataAssociation dataOutputAssociation = new TransformationDataOutputAssociation(null, targetRef, transformation);
-      return dataOutputAssociation;
-    }
-  }
-
-  protected void parseMuleServiceTask(ActivityImpl activity, Element serviceTaskElement, List<FieldDeclaration> fieldDeclarations) {
-    try {
-      Class< ? > theClass = Class.forName("org.camunda.bpm.engine.test.mule.MuleSendActivitiBehavior");
-      activity.setActivityBehavior((ActivityBehavior) ClassDelegate.instantiateDelegate(theClass, fieldDeclarations));
-    } catch (ClassNotFoundException e) {
-      addError("Could not find org.camunda.bpm.engine.test.mule.MuleSendActivitiBehavior", serviceTaskElement);
     }
   }
 
@@ -2947,15 +2654,15 @@ public class BpmnParse extends Parse {
         String businessKeyExpression = listenerElement.attribute("businessKey");
         if (sourceExpression != null) {
           Expression expression = expressionManager.createExpression(sourceExpression.trim());
-          callActivityBehaviour.addDataInputAssociation(new SimpleDataInputAssociation(expression, target));
+          callActivityBehaviour.addDataInputAssociation(new DataAssociation(expression, target));
         } else if (variables != null && ("all").equals(variables)) {
-          callActivityBehaviour.addDataInputAssociation(new SimpleDataInputAssociation(variables));
+          callActivityBehaviour.addDataInputAssociation(new DataAssociation(variables));
         } else if (businessKeyExpression != null) {
           Expression expression = expressionManager.createExpression(businessKeyExpression.trim());
-          callActivityBehaviour.addDataInputAssociation(new SimpleDataInputAssociation(expression));
+          callActivityBehaviour.addDataInputAssociation(new DataAssociation(expression));
         } else {
           String source = listenerElement.attribute("source");
-          callActivityBehaviour.addDataInputAssociation(new SimpleDataInputAssociation(source, target));
+          callActivityBehaviour.addDataInputAssociation(new DataAssociation(source, target));
         }
       }
       // output data elements
@@ -2965,30 +2672,15 @@ public class BpmnParse extends Parse {
         String variables = listenerElement.attribute("variables");
         if (sourceExpression != null) {
           Expression expression = expressionManager.createExpression(sourceExpression.trim());
-          callActivityBehaviour.addDataOutputAssociation(new MessageImplicitDataOutputAssociation(target, expression));
+          callActivityBehaviour.addDataOutputAssociation(new DataAssociation(expression, target));
         } else if (variables != null && ("all").equals(variables)) {
-          callActivityBehaviour.addDataOutputAssociation(new MessageImplicitDataOutputAssociation(variables));
+          callActivityBehaviour.addDataOutputAssociation(new DataAssociation(variables));
         } else {
           String source = listenerElement.attribute("source");
-          callActivityBehaviour.addDataOutputAssociation(new MessageImplicitDataOutputAssociation(target, source));
+          callActivityBehaviour.addDataOutputAssociation(new DataAssociation(source, target));
         }
       }
-    }
-
-    // // parse data input and output
-    // for (Element dataAssociationElement :
-    // callActivityElement.elements("dataInputAssociation")) {
-    // AbstractDataAssociation dataAssociation =
-    // this.parseDataInputAssociation(dataAssociationElement);
-    // callActivityBehaviour.addDataInputAssociation(dataAssociation);
-    // }
-    //
-    // for (Element dataAssociationElement :
-    // callActivityElement.elements("dataOutputAssociation")) {
-    // AbstractDataAssociation dataAssociation =
-    // this.parseDataOutputAssociation(dataAssociationElement);
-    // callActivityBehaviour.addDataOutputAssociation(dataAssociation);
-    // }
+    }   
 
     activity.setScope(true);
     activity.setActivityBehavior(callActivityBehaviour);
@@ -3039,18 +2731,7 @@ public class BpmnParse extends Parse {
       }
     }
 
-    String itemSubjectRef = propertyElement.attribute("itemSubjectRef");
     String type = null;
-    if (itemSubjectRef != null) {
-      ItemDefinition itemDefinition = itemDefinitions.get(itemSubjectRef);
-      if (itemDefinition != null) {
-        StructureDefinition structure = itemDefinition.getStructureDefinition();
-        type = structure.getId();
-      } else {
-        addError("Invalid itemDefinition reference: " + itemSubjectRef + " not found", propertyElement);
-      }
-    }
-
     parsePropertyCustomExtensions(activity, propertyElement, name, type);
   }
 
@@ -3286,14 +2967,6 @@ public class BpmnParse extends Parse {
     return executionListener;
   }
 
-  /**
-   * Retrieves the {@link Operation} corresponding with the given operation
-   * identifier.
-   */
-  public Operation getOperation(String operationId) {
-    return operations.get(operationId);
-  }
-
   // Diagram interchange
   // /////////////////////////////////////////////////////////////////
 
@@ -3472,18 +3145,6 @@ public class BpmnParse extends Parse {
   public BpmnParse sourceUrl(URL url) {
     super.sourceUrl(url);
     return this;
-  }
-
-  public void addStructure(StructureDefinition structure) {
-    this.structures.put(structure.getId(), structure);
-  }
-
-  public void addService(BpmnInterfaceImplementation bpmnInterfaceImplementation) {
-    this.interfaceImplementations.put(bpmnInterfaceImplementation.getName(), bpmnInterfaceImplementation);
-  }
-
-  public void addOperation(OperationImplementation operationImplementation) {
-    this.operationImplementations.put(operationImplementation.getId(), operationImplementation);
   }
 
   public Boolean parseBooleanAttribute(String booleanText, boolean defaultValue) {
