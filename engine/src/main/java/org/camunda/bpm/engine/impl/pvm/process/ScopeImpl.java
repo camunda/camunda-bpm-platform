@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.bpmn.data.IOSpecification;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 
@@ -35,7 +34,6 @@ public abstract class ScopeImpl extends ProcessElementImpl implements PvmScope {
   protected List<ActivityImpl> activities = new ArrayList<ActivityImpl>();
   protected Map<String, ActivityImpl> namedActivities = new HashMap<String, ActivityImpl>();
   protected Map<String, List<ExecutionListener>> executionListeners = new HashMap<String, List<ExecutionListener>>();
-  protected IOSpecification ioSpecification;
   
   public ScopeImpl(String id, ProcessDefinitionImpl processDefinition) {
     super(id, processDefinition);
@@ -122,11 +120,4 @@ public abstract class ScopeImpl extends ProcessElementImpl implements PvmScope {
     return activities;
   }
 
-  public IOSpecification getIoSpecification() {
-    return ioSpecification;
-  }
-  
-  public void setIoSpecification(IOSpecification ioSpecification) {
-    this.ioSpecification = ioSpecification;
-  }
 }
