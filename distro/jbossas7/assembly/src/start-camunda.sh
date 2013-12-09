@@ -5,6 +5,8 @@ if [ "`which firefox`" = "/usr/bin/firefox" ]; then
   BROWSER="/usr/bin/firefox";
 elif [ "`which chromium-browser`" = "/usr/bin/chromium-browser" ]; then
   BROWSER="/usr/bin/chromium-browser";
+elif [ "`which google-chrome`" = "/usr/bin/google-chrome" ]; then
+  BROWSER="/usr/bin/google-chrome";
 else
   BROWSER="empty";
 fi

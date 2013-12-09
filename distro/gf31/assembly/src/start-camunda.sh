@@ -5,6 +5,8 @@ if [ "`which firefox`" = "/usr/bin/firefox" ]; then
   BROWSER="/usr/bin/firefox";
 elif [ "`which chromium-browser`" = "/usr/bin/chromium-browser" ]; then
   BROWSER="/usr/bin/chromium-browser";
+elif [ "`which google-chrome`" = "/usr/bin/google-chrome" ]; then
+  BROWSER="/usr/bin/google-chrome";
 else
   BROWSER="empty";
 fi
@@ -15,4 +17,4 @@ else
   (sleep 5; $BROWSER "http://localhost:8080/camunda-welcome/index.html";) &
 fi
 
-/bin/sh $(dirname "$0")/server/glassfish3/glassfish/bin/startserv
+/bin/sh "$(dirname "$0")/server/glassfish3/glassfish/bin/startserv"
