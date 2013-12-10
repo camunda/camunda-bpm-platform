@@ -2566,7 +2566,7 @@ public class BpmnParse extends Parse {
     }
 
     CallActivityBehavior callActivityBehaviour = null;
-    String expressionRegex = "[$#]+\\{+.+\\}";
+    String expressionRegex = "(\\$|#)(\\{.+\\})";
     if (calledElement != null && calledElement.matches(expressionRegex)) {
       if (calledElementBinding == null) {
         callActivityBehaviour = new CallActivityBehavior(expressionManager.createExpression(calledElement));
