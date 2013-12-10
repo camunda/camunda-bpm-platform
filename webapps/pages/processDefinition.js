@@ -195,7 +195,7 @@ ngDefine('cockpit.pages.processDefinition', [
         if (ctrl) {
           if (selected) {
             activityIds.splice(idx, 1);
-            
+
           } else {
             activityIds.push(activityId);
           }
@@ -249,6 +249,9 @@ ngDefine('cockpit.pages.processDefinition', [
     $scope.processDefinitionViews = Views.getProviders({ component: 'cockpit.processDefinition.view' });
     $scope.processDefinitionActions = Views.getProviders({ component: 'cockpit.processDefinition.action' });
 
+
+    // extend the current scope to instantiate
+    // with process definition data providers
     Data.instantiateProviders('cockpit.processDefinition.data', {$scope: $scope, processData : processData});
 
 
