@@ -34,7 +34,7 @@ ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
       var pluginTypeMap = pluginMap[type] = pluginMap[type] || {};
       internalRegisterPlugin(key, definition, pluginTypeMap);
     };
-    
+
     this.$get = [ '$filter', function($filter) {
       var service = {
         getAllProviders: function(type) {
@@ -83,11 +83,11 @@ ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
      *
      * <pre>
      *   {
-     *     id: // id if the view
+     *     id: String, // id if the view
      *     label: String, // label of the view
      *     url: String, // url to the provided view; may be prefixed with plugin://
      *     controller: Function || String, // controller reference or name
-     *     priority: // priority of the view (default 0)
+     *     priority: number// priority of the view (default 0)
      *   }
      * </pre>
      *
@@ -162,8 +162,8 @@ ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
      *
      * <pre>
      *   {
-     *     id: // id if the view
-     *     controller: Function // controller reference
+     *     id: String, // id if the view
+     *     controller: Function || Array // controller reference
      *   }
      * </pre>
      *
@@ -193,8 +193,7 @@ ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
           angular.forEach(dataProviders, function (dataProvider) {
             $injector.instantiate(dataProvider.controller, locals);
           });
-
-        }        
+        }
       };
 
       return service;
