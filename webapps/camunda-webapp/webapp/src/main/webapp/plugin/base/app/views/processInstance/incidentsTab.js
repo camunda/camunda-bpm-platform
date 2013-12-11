@@ -96,7 +96,10 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
         });
 
         dialog.open().then(function(result) {
-          // dialog closed. YEA!
+          if (result === 'finished') {
+            // refresh filter and all views
+            $scope.processData.set('filter', angular.extend({}, $scope.filter));
+          }
         });      
 
       };
