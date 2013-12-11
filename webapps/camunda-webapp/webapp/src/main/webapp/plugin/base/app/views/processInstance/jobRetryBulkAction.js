@@ -9,7 +9,7 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
           processInstance: function() { return $scope.processInstance; }
         },
         controller: 'JobRetriesController',
-        templateUrl: require.toUrl('./job-retry-dialog.html')
+        templateUrl: require.toUrl('./job-retry-bulk-dialog.html')
       });
 
       dialog.open().then(function(result) {
@@ -27,7 +27,7 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
     ViewsProvider.registerDefaultView('cockpit.processInstance.action', {
       id: 'job-retry-action',
       label: 'Job Retry Action',
-      url: 'plugin://base/static/app/views/processInstance/job-retry-action.html',
+      url: 'plugin://base/static/app/views/processInstance/job-retry-bulk-action.html',
       controller: 'JobRetryActionController',
       priority: 15
     });

@@ -18,11 +18,9 @@ package org.camunda.bpm.engine.impl.juel;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import org.camunda.bpm.engine.impl.bpmn.data.ItemInstance;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
 import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
 import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
-import org.camunda.bpm.engine.impl.javax.el.DynamicBeanPropertyELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
@@ -43,7 +41,6 @@ public class SimpleResolver extends ELResolver {
 			add(new ListELResolver(true));
 			add(new MapELResolver(true));
 			add(new ResourceBundleELResolver());
-      add(new DynamicBeanPropertyELResolver(true, ItemInstance.class, "getFieldValue", "setFieldValue"));
 			add(new BeanELResolver(true));
 		}
 	};
@@ -53,7 +50,6 @@ public class SimpleResolver extends ELResolver {
 			add(new ListELResolver(false));
 			add(new MapELResolver(false));
 			add(new ResourceBundleELResolver());
-      add(new DynamicBeanPropertyELResolver(false, ItemInstance.class, "getFieldValue", "setFieldValue"));
 			add(new BeanELResolver(false));
 		}
 	};

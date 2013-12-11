@@ -150,6 +150,9 @@ ngDefine('cockpit.pages.processInstance', [
     // processInstance
     processData.provide('processInstance', processInstance);
 
+    // filter
+    processData.provide('filter', parseFilterFromUri());
+
     // processDefinition
     processData.provide('processDefinition', ['processInstance', function (processInstance) {
       return ProcessDefinitionResource.get({ id: processInstance.definitionId }).$promise;
@@ -292,7 +295,7 @@ ngDefine('cockpit.pages.processInstance', [
     }]);
 
     // incidents
-    processData.provide('incidents', ['processInstance', function (processInstance) {
+    processData.provide('incidents', ['processInstance', 'filter', function (processInstance, filter) {
       return IncidentResource.query({ id : processInstance.id }).$promise;
     }]);
 
@@ -322,8 +325,6 @@ ngDefine('cockpit.pages.processInstance', [
 
       return processDiagram;
     }]);
-
-    processData.provide('filter', parseFilterFromUri());
 
     // /////// End definition of process data
 
@@ -509,7 +510,11 @@ ngDefine('cockpit.pages.processInstance', [
       }
 
       if (selectedTabId) {
-        var provider = Views.getProvider({ component: 'cockpit.processInstance.instanceDetails', id: selectedTabId });
+        var provider = Views.getProvider({ component: 'cockpit.processInstance.view', id: selectedTabId });
+        if (!provider) {
+          // backwards compatibility
+          provider = Views.getProvider({ component: 'cockpit.processInstance.instanceDetails', id: selectedTabId });
+        }
         if (provider && tabs.indexOf(provider) != -1) {
           $scope.selectedView = provider;
           return;

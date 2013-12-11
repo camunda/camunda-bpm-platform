@@ -10,15 +10,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.bpmn.data;
+package org.camunda.bpm.engine.impl.bpmn.parser;
+
 
 /**
- * Implementation of the BPMN 2.0 'itemKind'
+ * Implementation of the BPMN 2.0 'message'
  * 
  * @author Esteban Robles Luna
  */
-public enum ItemKind {
+public class MessageDefinition {
 
-  Information,
-  Physical
+  protected String id;
+  
+  protected String name;
+  
+  public MessageDefinition(String id, String name) {
+    this.id = id;
+    this.name = name;
+  }
+
+  public String getId() {
+    return this.id;
+  }
+  
+  public String getName() {
+    return name;
+  }
+  
+  public void setName(String name) {
+    this.name = name;
+  }
 }

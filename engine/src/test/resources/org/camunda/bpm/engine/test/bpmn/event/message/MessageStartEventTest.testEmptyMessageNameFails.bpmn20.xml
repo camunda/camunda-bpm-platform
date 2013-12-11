@@ -5,7 +5,7 @@
   targetNamespace="Examples"
   xmlns:tns="Examples">
   
-  <message id="newInvoice" />
+  <message id="newInvoice"/>
   
   <process id="singleMessageStartEvent">
   

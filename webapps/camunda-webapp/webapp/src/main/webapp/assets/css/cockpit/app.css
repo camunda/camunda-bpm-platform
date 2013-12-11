@@ -33,15 +33,13 @@ Tree
   user-select: none;
 }
 
-.badge-suspended {
+.activity-top-right-position {
   position: absolute;
   right: -1.3em;
   top: -0.85em;
-  padding-top: 1.5px;
-  padding-bottom: 1.5px;
 }
 
-.badge-activity-instance-statistics {
+.activity-bottom-left-position {
    position: absolute;
    left: -0.9em;
    bottom: -0.65em
@@ -483,10 +481,4 @@ textarea.variable-type-string {
 .instance-tree .tree-node ul {
   margin-left: 19px;
   margin-bottom: 10px;
-}
-
-/*----------- circle suspended ----------*/
-
-span.state-suspended {
-  padding-left: 9px;
 }

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.bpmn.event.message;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -124,6 +125,18 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
+  }
+
+  public void testEmptyMessageNameFails() {
+    try {
+      repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testEmptyMessageNameFails.bpmn20.xml")
+        .deploy();
+      fail("exception expected");
+    }catch (ProcessEngineException e) {
+      assertTrue(e.getMessage().contains("Cannot have a message event subscription with an empty or missing name"));
+    }
   }
 
 }

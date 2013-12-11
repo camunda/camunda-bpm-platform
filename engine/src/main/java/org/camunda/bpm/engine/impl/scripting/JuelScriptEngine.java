@@ -29,12 +29,10 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.bpmn.data.ItemInstance;
 import org.camunda.bpm.engine.impl.el.ExpressionFactoryResolver;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
 import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
 import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
-import org.camunda.bpm.engine.impl.javax.el.DynamicBeanPropertyELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.javax.el.ELException;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
@@ -118,7 +116,6 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
     compositeResolver.add(new ListELResolver());
     compositeResolver.add(new MapELResolver());
     compositeResolver.add(new ResourceBundleELResolver());
-    compositeResolver.add(new DynamicBeanPropertyELResolver(ItemInstance.class, "getFieldValue", "setFieldValue"));
     compositeResolver.add(new BeanELResolver());
     return new SimpleResolver(compositeResolver);
   }

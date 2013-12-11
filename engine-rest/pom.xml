@@ -18,7 +18,7 @@
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-jaxrs</artifactId>
-      <version>1.9.11</version>
+      <version>${jackson.version}</version>
     </dependency>
 
     <dependency>
@@ -194,92 +194,6 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/Abstract*</exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>default-test</id>
-            <configuration>
-              <includes>
-                <include>**/rest/standalone/**</include>
-              </includes>
-              <excludes>
-                <exclude>**/rest/resteasy/**</exclude>
-                <exclude>**/rest/jersey/**</exclude>
-                <exclude>**/rest/wink/**</exclude>
-                <exclude>**/rest/history/**</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-          <execution>
-            <id>resteasy-tests</id>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <phase>test</phase>
-            <configuration>
-              <includes>
-                <include>**/rest/resteasy/**</include>
-                <include>**/rest/history/resteasy/**</include>
-              </includes>
-              <excludes>
-                <exclude>**/rest/jersey/**</exclude>
-                <exclude>**/rest/history/jersey/**</exclude>
-                <exclude>**/rest/wink/**</exclude>
-                <exclude>**/rest/history/wink/**</exclude>
-                <exclude>**/rest/standalone/**</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-          <execution>
-            <id>jersey-tests</id>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <phase>test</phase>
-            <configuration>
-              <includes>
-                <include>**/rest/jersey/**</include>
-                <include>**/rest/history/jersey/**</include>
-              </includes>
-              <excludes>
-                <exclude>**/rest/resteasy/**</exclude>
-                <exclude>**/rest/history/resteasy/**</exclude>
-                <exclude>**/rest/wink/**</exclude>
-                <exclude>**/rest/history/wink/**</exclude>
-                <exclude>**/rest/standalone/**</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-          <execution>
-            <id>wink-tests</id>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <phase>test</phase>
-            <configuration>
-              <includes>
-                <include>**/rest/wink/**</include>
-                <include>**/rest/history/wink/**</include>
-              </includes>
-              <excludes>
-                <exclude>**/rest/resteasy/**</exclude>
-                <exclude>**/rest/history/resteasy/**</exclude>
-                <exclude>**/rest/jersey/**</exclude>
-                <exclude>**/rest/history/jersey/**</exclude>
-                <exclude>**/rest/standalone/**</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
@@ -373,6 +287,9 @@
   <profiles>
     <profile>
       <id>distro</id>
+      <properties>
+        <jackson.version>1.9.11</jackson.version>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -384,8 +301,8 @@
           </plugin>
         </plugins>
       </build>
-    
     </profile>
+    
     <profile>
       <id>embedded-rest</id>
       <activation>
@@ -393,6 +310,7 @@
       </activation>
       <properties>
         <rest.http.port>38080</rest.http.port>
+        <jackson.version>1.9.11</jackson.version>
       </properties>
       <build>
         <plugins>
@@ -403,11 +321,137 @@
               <systemPropertyVariables>
                 <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
+              <excludes>
+                <exclude>**/Abstract*</exclude>
+              </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
+            <executions>
+              <execution>
+                <id>default-test</id>
+                <configuration>
+                  <includes>
+                    <include>**/rest/standalone/**</include>
+                  </includes>
+                  <excludes>
+                    <exclude>**/rest/resteasy/**</exclude>
+                    <exclude>**/rest/jersey/**</exclude>
+                    <exclude>**/rest/wink/**</exclude>
+                    <exclude>**/rest/history/**</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+              <execution>
+                <id>resteasy-tests</id>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <includes>
+                    <include>**/rest/resteasy/**</include>
+                    <include>**/rest/history/resteasy/**</include>
+                  </includes>
+                  <excludes>
+                    <exclude>**/rest/jersey/**</exclude>
+                    <exclude>**/rest/history/jersey/**</exclude>
+                    <exclude>**/rest/wink/**</exclude>
+                    <exclude>**/rest/history/wink/**</exclude>
+                    <exclude>**/rest/standalone/**</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+              <execution>
+                <id>jersey-tests</id>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <includes>
+                    <include>**/rest/jersey/**</include>
+                    <include>**/rest/history/jersey/**</include>
+                  </includes>
+                  <excludes>
+                    <exclude>**/rest/resteasy/**</exclude>
+                    <exclude>**/rest/history/resteasy/**</exclude>
+                    <exclude>**/rest/wink/**</exclude>
+                    <exclude>**/rest/history/wink/**</exclude>
+                    <exclude>**/rest/standalone/**</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+              <execution>
+                <id>wink-tests</id>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <includes>
+                    <include>**/rest/wink/**</include>
+                    <include>**/rest/history/wink/**</include>
+                  </includes>
+                  <excludes>
+                    <exclude>**/rest/resteasy/**</exclude>
+                    <exclude>**/rest/history/resteasy/**</exclude>
+                    <exclude>**/rest/jersey/**</exclude>
+                    <exclude>**/rest/history/jersey/**</exclude>
+                    <exclude>**/rest/standalone/**</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
     </profile>
+    
+    <profile>
+      <id>was-compatibility</id>
+      <properties>
+        <rest.http.port>38080</rest.http.port>
+        <jackson.version>1.6.2</jackson.version>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
+              </systemPropertyVariables>
+              <excludes>
+                <exclude>**/Abstract*</exclude>
+              </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+            <executions>
+              <execution>
+                <id>default-test</id>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <includes>
+                    <include>**/rest/wink/**</include>
+                    <include>**/rest/history/wink/**</include>
+                  </includes>
+                  <excludes>
+                    <exclude>**/rest/resteasy/**</exclude>
+                    <exclude>**/rest/history/resteasy/**</exclude>
+                    <exclude>**/rest/jersey/**</exclude>
+                    <exclude>**/rest/history/jersey/**</exclude>
+                    <exclude>**/rest/standalone/**</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>    
   </profiles>
 </project>

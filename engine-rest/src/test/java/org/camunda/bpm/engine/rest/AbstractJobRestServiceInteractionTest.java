@@ -272,7 +272,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
   @Test
   public void testActivateJob() {
     JobSuspensionStateDto dto = new JobSuspensionStateDto();
-    dto.setState(false);
+    dto.setSuspended(false);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
@@ -290,7 +290,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
   @Test
   public void testActivateThrowsProcessEngineException() {
     JobSuspensionStateDto dto = new JobSuspensionStateDto();
-    dto.setState(false);
+    dto.setSuspended(false);
 
     String expectedMessage = "expectedMessage";
 
@@ -314,7 +314,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
   @Test
   public void testSuspendJob() {
     JobSuspensionStateDto dto = new JobSuspensionStateDto();
-    dto.setState(true);
+    dto.setSuspended(true);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
@@ -332,7 +332,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
   @Test
   public void testSuspendedThrowsProcessEngineException() {
     JobSuspensionStateDto dto = new JobSuspensionStateDto();
-    dto.setState(true);
+    dto.setSuspended(true);
 
     String expectedMessage = "expectedMessage";
 
