@@ -8,9 +8,9 @@ Development Setup
 -----------------
 
 For developing the application you can use the `develop` profile.
-It will bootstrap the application in an embedded tomcat and allows it to reload web resources on the fly.
+It will bootstrap the application in an embedded jetty and allows it to reload web resources on the fly.
 
-Start the application on an embedded tomcat by executing `mvn clean tomcat:run -Pdevelop` from within the `camunda-webapp` folder.
+Start the application on an embedded jetty by executing `mvn clean jetty:run -Pdevelop` from within the `camunda-webapp` folder.
 
 
 Test Suite

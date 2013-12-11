@@ -8,9 +8,6 @@
   <listener>
     <listener-class>org.camunda.bpm.cockpit.impl.web.bootstrap.CockpitContainerBootstrap</listener-class>
   </listener>
-  <listener>
-    <listener-class>org.camunda.bpm.pa.DevProcessApplication</listener-class>
-  </listener>
 
   <!-- Authentication filter -->
   <filter>
