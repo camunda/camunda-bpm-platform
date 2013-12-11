@@ -367,6 +367,52 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
   }
 
   /**
+   * This testcase verifies that <camunda:out variables="all" /> works also in case super process has no variables
+   *
+   * https://app.camunda.com/jira/browse/CAM-1617
+   *
+   */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutput.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+  public void testSubProcessAllDataOutput() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessAllDataInputOutput");
+
+    // one task in the super process should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskBeforeSubProcess = taskQuery.singleResult();
+    assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+
+    taskService.complete(taskBeforeSubProcess.getId());
+
+    // one task in sub process should be active after starting sub process instance
+    taskQuery = taskService.createTaskQuery();
+    Task taskInSubProcess = taskQuery.singleResult();
+    assertEquals("Task in subprocess", taskInSubProcess.getName());
+
+    // add variables to sub process
+    runtimeService.setVariable(taskInSubProcess.getProcessInstanceId(), "superVariable", "Hello from sub process.");
+    runtimeService.setVariable(taskInSubProcess.getProcessInstanceId(), "testVariable", "Variable changed in sub process.");
+
+    taskService.complete(taskInSubProcess.getId());
+
+    // task after sub process in super process
+    taskQuery = taskService.createTaskQuery();
+    Task taskAfterSubProcess = taskQuery.singleResult();
+    assertEquals("Task after subprocess", taskAfterSubProcess.getName());
+
+    // variables are copied to super process instance after sub process instance finishes
+    assertEquals("Hello from sub process.", runtimeService.getVariable(processInstance.getId(), "superVariable"));
+    assertEquals("Variable changed in sub process.", runtimeService.getVariable(processInstance.getId(), "testVariable"));
+
+    taskService.complete(taskAfterSubProcess.getId());
+
+    assertProcessEnded(processInstance.getId());
+    assertEquals(0, runtimeService.createExecutionQuery().list().size());
+  }
+
+  /**
    * Test case for handing businessKey to a sub process
    */
   @Deployment(resources = {
