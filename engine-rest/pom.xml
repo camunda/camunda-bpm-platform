@@ -334,11 +334,24 @@
                     <include>**/rest/standalone/**</include>
                   </includes>
                   <excludes>
+                    <exclude>**/rest/standalone/ServletAuthenticationFilterTest*</exclude>
                     <exclude>**/rest/resteasy/**</exclude>
                     <exclude>**/rest/jersey/**</exclude>
                     <exclude>**/rest/wink/**</exclude>
                     <exclude>**/rest/history/**</exclude>
                   </excludes>
+                </configuration>
+              </execution>
+              <execution>
+                <id>serlvet-authentication-test</id>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <includes>
+                    <include>**/rest/standalone/ServletAuthenticationFilterTest*</include>
+                  </includes>
                 </configuration>
               </execution>
               <execution>
