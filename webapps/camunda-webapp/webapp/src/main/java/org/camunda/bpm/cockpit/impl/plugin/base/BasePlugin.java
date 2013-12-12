@@ -50,7 +50,7 @@ public class BasePlugin extends AbstractCockpitPlugin {
 
   @Override
   public String getAssetDirectory() {
-    return "webapp://plugin/base";
+    return "plugin/base";
   }
 
   @Override

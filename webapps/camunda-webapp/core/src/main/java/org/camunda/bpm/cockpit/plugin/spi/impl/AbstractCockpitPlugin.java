@@ -28,19 +28,19 @@ import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 public abstract class AbstractCockpitPlugin implements CockpitPlugin {
 
   /**
-   * Returns a uri to a plugins asset directory.
+   * Returns a uri to a plugin resources directory.
    * The directory must be unique across all plugins.
    *
    * <p>
    *
-   * This implementation assumes that the assets are provided in the directory <code>assets</code>,
-   * relative to the location of the {@link CockpitPlugin} SPI implementation class.
+   * This implementation assumes that the resources are provided in the directory <code>plugin-webapp/PLUGIN_ID</code>,
+   * absolute to the root directory.
    *
-   * @return the directory providing the plugins client side assets
+   * @return the directory providing the plugins client side resources
    */
   @Override
   public String getAssetDirectory() {
-    return String.format("assets", getId());
+    return String.format("plugin-webapp/%s", getId());
   }
 
   @Override
