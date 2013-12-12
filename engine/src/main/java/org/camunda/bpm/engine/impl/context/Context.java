@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.context;
 
 import java.util.Stack;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
@@ -31,6 +33,8 @@ import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
  * @author Daniel Meyer
  */
 public class Context {
+
+  private final static Logger LOGGER = Logger.getLogger(Context.class.getName());
 
   protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
   protected static ThreadLocal<Stack<ProcessEngineConfigurationImpl>> processEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<ProcessEngineConfigurationImpl>>();
@@ -71,7 +75,12 @@ public class Context {
   }
 
   public static ExecutionContext getExecutionContext() {
-    return getStack(executionContextStackThreadLocal).peek();
+    Stack<ExecutionContext> stack = getStack(executionContextStackThreadLocal);
+    if(stack == null || stack.isEmpty()) {
+      return null;
+    } else {
+      return stack.peek();
+    }
   }
 
   public static void setExecutionContext(InterpretableExecution execution) {
@@ -90,19 +99,19 @@ public class Context {
     }
     return stack;
   }
-  
+
   public static JobExecutorContext getJobExecutorContext() {
     return jobExecutorContextThreadLocal.get();
   }
-  
+
   public static void setJobExecutorContext(JobExecutorContext jobExecutorContext) {
     jobExecutorContextThreadLocal.set(jobExecutorContext);
   }
-  
+
   public static void removeJobExecutorContext() {
     jobExecutorContextThreadLocal.remove();
   }
-  
+
 
   public static ProcessApplicationReference getCurrentProcessApplication() {
     Stack<ProcessApplicationReference> stack = getStack(processApplicationContext);
@@ -112,12 +121,12 @@ public class Context {
       return stack.peek();
     }
   }
-  
+
   public static void setCurrentProcessApplication(ProcessApplicationReference reference) {
     Stack<ProcessApplicationReference> stack = getStack(processApplicationContext);
     stack.push(reference);
   }
-  
+
   public static void removeCurrentProcessApplication() {
     Stack<ProcessApplicationReference> stack = getStack(processApplicationContext);
     stack.pop();
@@ -134,23 +143,24 @@ public class Context {
       setCurrentProcessApplication(processApplicationReference);
 
       try {
-        
+        LOGGER.log(Level.FINE, "[PA-CONTEXT] Switch to {0}", paName);
         return processApplication.execute(callback);
-        
+
       } catch (Exception e) {
-        
+
         // unwrap exception
         if(e.getCause() != null && e.getCause() instanceof RuntimeException) {
           throw (RuntimeException) e.getCause();
         }else {
           throw new ProcessEngineException("Unexpected exeption while executing within process application ", e);
         }
-        
+
       } finally {
+        LOGGER.log(Level.FINE, "[PA-CONTEXT] Return from {0}", paName);
         removeCurrentProcessApplication();
       }
-      
-      
+
+
     } catch (ProcessApplicationUnavailableException e) {
       throw new ProcessEngineException("Cannot switch to process application '"+paName+"' for execution: "+e.getMessage(), e);
     }
