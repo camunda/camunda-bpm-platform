@@ -16,9 +16,6 @@
   <profiles>
     <profile>
       <id>openwebbeans-embedded-1</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
       <dependencies>
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
@@ -50,10 +47,10 @@
       </dependencyManagement>
     </profile>
     <profile>
+      <id>distro</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
-      <id>distro</id>
       <dependencies>
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
@@ -89,6 +86,7 @@
           </dependency>
         </dependencies>
       </dependencyManagement>
+
       <build>
         <plugins>
           <plugin>
