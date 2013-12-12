@@ -41,7 +41,7 @@ public class JobDefinitionPlugin extends AbstractCockpitPlugin {
 
   @Override
   public String getAssetDirectory() {
-    return "webapp://plugin/jobDefinition";
+    return "plugin/jobDefinition";
   }
 
 }

@@ -55,8 +55,6 @@ import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
  */
 public class AbstractPluginRootResource {
 
-  protected static final String WEBAPP_PREFIX = "webapp://";
-
   @Context
   private ServletContext servletContext;
 
@@ -126,12 +124,12 @@ public class AbstractPluginRootResource {
       return null;
     }
 
-    if (assetDirectory.startsWith(WEBAPP_PREFIX)) {
-      assetDirectory = assetDirectory.substring(WEBAPP_PREFIX.length());
-      return getWebResourceAsStream(assetDirectory, fileName);
-    } else {
-      return getClasspathResourceAsStream(plugin, assetDirectory, fileName);
+    InputStream result = getClasspathResourceAsStream(plugin, assetDirectory, fileName);
+
+    if (result == null) {
+      result = getWebResourceAsStream(assetDirectory, fileName);
     }
+    return result;
   }
 
   private InputStream getWebResourceAsStream(String assetDirectory, String fileName) {
@@ -142,7 +140,7 @@ public class AbstractPluginRootResource {
 
   private InputStream getClasspathResourceAsStream(CockpitPlugin plugin, String assetDirectory, String fileName) {
     String resourceName = String.format("%s/%s", assetDirectory, fileName);
-    return plugin.getClass().getResourceAsStream(resourceName);
+    return plugin.getClass().getClassLoader().getResourceAsStream(resourceName);
   }
 
   private PluginRegistry getPluginRegistry() {

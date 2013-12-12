@@ -34,7 +34,7 @@ import java.util.Set;
  *
  * Plugin developers should not use this interface directly but use
  * {@link org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin} as a base class.
- * 
+ *
  * @author nico.rehwaldt
  *
  * @see org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin
@@ -70,10 +70,10 @@ public interface CockpitPlugin {
   public List<String> getMappingFiles();
 
   /**
-   * Returns a uri to a plugins asset directory.
+   * Returns a uri to a plugin resources directory.
    * The directory must be unique across all plugins.
    *
-   * @return the directory providing the plugins client side assets
+   * @return the directory providing the plugins client side resources
    */
   public String getAssetDirectory();
 
