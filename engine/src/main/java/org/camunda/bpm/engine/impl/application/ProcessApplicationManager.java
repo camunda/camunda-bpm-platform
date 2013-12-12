@@ -181,6 +181,9 @@ public class ProcessApplicationManager {
   public String getRegistrationSummary() {
     StringBuilder builder = new StringBuilder();
     for (Entry<String, DefaultProcessApplicationRegistration> entry : registrationsByDeploymentId.entrySet()) {
+      if(builder.length()>0) {
+        builder.append(", ");
+      }
       builder.append(entry.getKey());
       builder.append("->");
       builder.append(entry.getValue().getReference().getName());
