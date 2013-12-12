@@ -1178,14 +1178,14 @@ public class BpmnParse extends Parse {
     boolean waitForCompletion = "true".equals(compensateEventDefinitionElement.attribute("waitForCompletion", "true"));
 
     if(activityRef != null) {
-      if(scopeElement.findActivity(activityRef) == null) {
+      if(scopeElement.getChildActivity(activityRef) == null) {
         Boolean isTriggeredByEvent = (Boolean) scopeElement.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT);
         String type = (String) scopeElement.getProperty(PROPERTYNAME_TYPE);
-        if (isTriggeredByEvent != null && isTriggeredByEvent && "subProcess".equals(type) && scopeElement.getProcessDefinition() != null) {
-            scopeElement = scopeElement.getProcessDefinition();
+        if (Boolean.TRUE == isTriggeredByEvent && "subProcess".equals(type)) {
+          scopeElement = scopeElement.getParentScope();
         }
-        if (scopeElement.findActivity(activityRef) == null) {
-          addError("Invalid attribute value for 'activityRef': no activity with id '"+activityRef+"' in current scope", compensateEventDefinitionElement);
+        if (scopeElement.getChildActivity(activityRef) == null) {
+          addError("Invalid attribute value for 'activityRef': no activity with id '"+activityRef+"' in scope '"+scopeElement.getId()+"'", compensateEventDefinitionElement);
         }
       }
     }

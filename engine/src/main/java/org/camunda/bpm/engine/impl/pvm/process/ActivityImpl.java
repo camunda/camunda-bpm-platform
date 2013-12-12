@@ -183,4 +183,8 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     return super.getId();
   }
 
+  public ScopeImpl getParentScope() {
+    return parent;
+  }
+
 }
