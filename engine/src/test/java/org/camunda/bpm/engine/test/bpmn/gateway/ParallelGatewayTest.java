@@ -138,4 +138,23 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
     //assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).finished().count());    
   }
   
+  /**
+   * https://app.camunda.com/jira/browse/CAM-1537
+   */
+  @Deployment
+  public void testGatewayEndTimes() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("gatewayEndTimes");
+
+    TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
+    List<Task> tasks = query.list();
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(1).getId());
+
+    // process instance should have finished
+    assertNotNull(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getEndTime());
+    // gateways should have end timestamps
+    assertNotNull(historyService.createHistoricActivityInstanceQuery().activityId("Gateway_0").singleResult().getEndTime());
+    assertNotNull(historyService.createHistoricActivityInstanceQuery().activityId("Gateway_1").list().get(0).getEndTime());
+  }
+
 }

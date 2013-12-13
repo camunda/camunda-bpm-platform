@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:activiti="http://activiti.org/bpmn"
+    xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL">
+
+  <!-- CAM-1537 -->
+
+  <process id="gatewayEndTimes" name="gatewayEndTimes">
+
+    <startEvent id="Start" name="Start"></startEvent>
+
+    <parallelGateway id="Gateway_0" name="Gateway 0"></parallelGateway>
+
+    <userTask id="Task_0" name="Task 0"></userTask>
+
+    <userTask id="Task_1" name="Task 1"></userTask>
+
+    <parallelGateway id="Gateway_1" name="Gateway 1"></parallelGateway>
+
+    <endEvent id="End" name="End"></endEvent>
+
+    <sequenceFlow id="Flow_0" name="" sourceRef="Start" targetRef="Gateway_0"></sequenceFlow>
+
+    <sequenceFlow id="Flow_1" name="" sourceRef="Gateway_0" targetRef="Task_0"></sequenceFlow>
+
+    <sequenceFlow id="Flow_2" name="" sourceRef="Gateway_0" targetRef="Task_1"></sequenceFlow>
+
+    <sequenceFlow id="Flow_3" name="" sourceRef="Task_1" targetRef="Gateway_1"></sequenceFlow>
+
+    <sequenceFlow id="Flow_4" name="" sourceRef="Task_0" targetRef="Gateway_1"></sequenceFlow>
+
+    <sequenceFlow id="Flow_5" name="" sourceRef="Gateway_1" targetRef="End"></sequenceFlow>
+
+  </process>
+
+</definitions>
