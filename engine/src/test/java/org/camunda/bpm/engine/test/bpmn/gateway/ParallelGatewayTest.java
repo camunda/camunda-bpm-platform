@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.test.bpmn.gateway;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -137,32 +136,6 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
 
     // There is a QA config without history, so we cannot work with this:
     //assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).finished().count());
-  }
-
-  /**
-   * https://app.camunda.com/jira/browse/CAM-1537
-   */
-  @Deployment
-  public void testGatewayEndTimes() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("gatewayEndTimes");
-
-    TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
-    List<Task> tasks = query.list();
-    taskService.complete(tasks.get(0).getId());
-    taskService.complete(tasks.get(1).getId());
-
-    // process instance should have finished
-    assertNotNull(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getEndTime());
-    // gateways should have end timestamps
-    assertNotNull(historyService.createHistoricActivityInstanceQuery().activityId("Gateway_0").singleResult().getEndTime());
-
-    // there exists two historic activity instances for "Gateway_1" (parallel join)
-    HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("Gateway_1");
-
-    assertEquals(2, historicActivityInstanceQuery.count());
-    // they should have an end timestamp
-    assertNotNull(historicActivityInstanceQuery.list().get(0).getEndTime());
-    assertNotNull(historicActivityInstanceQuery.list().get(1).getEndTime());
   }
 
 }

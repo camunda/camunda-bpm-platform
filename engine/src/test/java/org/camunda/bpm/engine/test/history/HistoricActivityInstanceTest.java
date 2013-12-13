@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.history;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
@@ -22,10 +23,12 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -319,7 +322,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     hourAgo.add(Calendar.HOUR_OF_DAY, -1);
     Calendar hourFromNow = Calendar.getInstance();
     hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
-       
+
     // Start/end dates
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourAgo.getTime()).count());
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourFromNow.getTime()).count());
@@ -329,7 +332,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").startedBefore(hourAgo.getTime()).count());
     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").startedAfter(hourAgo.getTime()).count());
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").startedAfter(hourFromNow.getTime()).count());
-  
+
     // After finishing process
     taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finished().count());
@@ -337,6 +340,32 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourFromNow.getTime()).count());
     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedAfter(hourAgo.getTime()).count());
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedAfter(hourFromNow.getTime()).count());
+  }
+
+  /**
+   * https://app.camunda.com/jira/browse/CAM-1537
+   */
+  @Deployment
+  public void testHistoricActivityInstanceGatewayEndTimes() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("gatewayEndTimes");
+
+    TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
+    List<Task> tasks = query.list();
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(1).getId());
+
+    // process instance should have finished
+    assertNotNull(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getEndTime());
+    // gateways should have end timestamps
+    assertNotNull(historyService.createHistoricActivityInstanceQuery().activityId("Gateway_0").singleResult().getEndTime());
+
+    // there exists two historic activity instances for "Gateway_1" (parallel join)
+    HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("Gateway_1");
+
+    assertEquals(2, historicActivityInstanceQuery.count());
+    // they should have an end timestamp
+    assertNotNull(historicActivityInstanceQuery.list().get(0).getEndTime());
+    assertNotNull(historicActivityInstanceQuery.list().get(1).getEndTime());
   }
 
 }
