@@ -121,6 +121,7 @@ public class DeploymentHelper {
     String pkgName = SimplePlugin.class.getPackage().getName().replaceAll("\\.", "/");
 
     addFiles(archive, pkgName, new File("src/test/resources/" + pkgName));
+    addFiles(archive, "plugin-webapp", new File("src/test/resources/plugin-webapp"));
 
     return archive;
   }

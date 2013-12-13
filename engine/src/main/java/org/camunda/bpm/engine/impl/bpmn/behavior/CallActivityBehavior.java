@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
-import org.camunda.bpm.engine.impl.bpmn.data.AbstractDataAssociation;
+import org.camunda.bpm.engine.impl.bpmn.parser.DataAssociation;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -40,8 +40,8 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
   protected String processDefinitionKey;
   protected String binding;
   protected Integer version;
-  private List<AbstractDataAssociation> dataInputAssociations = new ArrayList<AbstractDataAssociation>();
-  private List<AbstractDataAssociation> dataOutputAssociations = new ArrayList<AbstractDataAssociation>();
+  private List<DataAssociation> dataInputAssociations = new ArrayList<DataAssociation>();
+  private List<DataAssociation> dataOutputAssociations = new ArrayList<DataAssociation>();
   private Expression processDefinitionExpression;
 
   public enum CalledElementBinding {
@@ -82,11 +82,11 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     this.version = version;
   }
 
-  public void addDataInputAssociation(AbstractDataAssociation dataInputAssociation) {
+  public void addDataInputAssociation(DataAssociation dataInputAssociation) {
     this.dataInputAssociations.add(dataInputAssociation);
   }
 
-  public void addDataOutputAssociation(AbstractDataAssociation dataOutputAssociation) {
+  public void addDataOutputAssociation(DataAssociation dataOutputAssociation) {
     this.dataOutputAssociations.add(dataOutputAssociation);
   }
 
@@ -121,7 +121,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     String businessKey = null;
     Map<String, Object> callActivityVariables = new HashMap<String, Object>();
 
-    for (AbstractDataAssociation dataInputAssociation : dataInputAssociations) {
+    for (DataAssociation dataInputAssociation : dataInputAssociations) {
       Object value = null;
 
       if (dataInputAssociation.getBusinessKeyExpression() != null) {
@@ -156,12 +156,12 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     // only data.  no control flow available on this execution.
 
     // copy process variables
-    for (AbstractDataAssociation dataOutputAssociation : dataOutputAssociations) {
+    for (DataAssociation dataOutputAssociation : dataOutputAssociations) {
       Object value = null;
         if (dataOutputAssociation.getVariables() != null) {
-          Map<String, Object> variables = execution.getVariables();
+          Map<String, Object> variables = subProcessInstance.getVariables();
           if (variables != null && !variables.isEmpty()) {
-            execution.setVariables(subProcessInstance.getVariables());
+            execution.setVariables(variables);
           }
         }
         else if (dataOutputAssociation.getSourceExpression()!=null) {

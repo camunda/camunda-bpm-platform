@@ -15,17 +15,9 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.sql.DataSource;
-import javax.transaction.TransactionManager;
-
 import org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration;
 import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
+import org.camunda.bpm.container.impl.jboss.util.JBossCompatibilityExtension;
 import org.camunda.bpm.container.impl.jboss.util.Tccl;
 import org.camunda.bpm.container.impl.jboss.util.Tccl.Operation;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineController;
@@ -38,7 +30,6 @@ import org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
 import org.jboss.as.naming.deployment.ContextNames;
-import org.jboss.as.server.Services;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
@@ -47,6 +38,14 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
+
+import javax.sql.DataSource;
+import javax.transaction.TransactionManager;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -257,7 +256,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
       serviceBuilder.addAliases(ServiceNames.forDefaultProcessEngine());
     }
 
-    Services.addServerExecutorDependency(serviceBuilder, service.getExecutorInjector(), false);
+    JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder, service.getExecutorInjector(), false);
 
   }
 

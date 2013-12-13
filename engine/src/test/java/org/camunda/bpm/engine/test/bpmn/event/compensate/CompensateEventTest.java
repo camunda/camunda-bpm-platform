@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.bpmn.event.compensate;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -242,6 +243,42 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
         .variableName("undoBookFlight")
         .count());
     }
+  }
+
+  public void testIllegalCompensateActivityRefParentScope() {
+
+    try {
+      String id = repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testIllegalCompensateActivityRefParentScope.bpmn20.xml")
+        .deploy()
+        .getId();
+      repositoryService.deleteDeployment(id, true);
+      fail("Exception expected!");
+
+    } catch (ProcessEngineException e) {
+      if(!e.getMessage().contains("Invalid attribute value for 'activityRef': no activity with id 'someServiceInMainProcess' in scope 'subProcess'")) {
+        fail("different exception expected");
+      }
+    }
+
+  }
+
+  public void testIllegalCompensateActivityRefNestedScope() {
+
+    try {
+      String id = repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testIllegalCompensateActivityRefNestedScope.bpmn20.xml")
+        .deploy()
+        .getId();
+      repositoryService.deleteDeployment(id, true);
+      fail("Exception expected!");
+
+    } catch (ProcessEngineException e) {
+      if(!e.getMessage().contains("Invalid attribute value for 'activityRef': no activity with id 'someServiceInNestedScope' in scope 'subProcess'")) {
+        fail("different exception expected");
+      }
+    }
+
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationInEventSubProcessActivityRef.bpmn20.xml"})

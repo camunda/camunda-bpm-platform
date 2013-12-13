@@ -10,17 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.bpmn.data;
+package org.camunda.bpm.engine.impl.bpmn.parser;
 
 import org.camunda.bpm.engine.delegate.Expression;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
  * A data association (Input or Output) between a source and a target
- * 
- * @author Esteban Robles Luna
  */
-public abstract class AbstractDataAssociation {
+public class DataAssociation {
 
   protected String source;
 
@@ -32,25 +29,23 @@ public abstract class AbstractDataAssociation {
 
   protected Expression businessKeyExpression;
 
-  protected AbstractDataAssociation(String source, String target) {
+  protected DataAssociation(String source, String target) {
     this.source = source;
     this.target = target;
   }
 
-  protected AbstractDataAssociation(Expression sourceExpression, String target) {
+  protected DataAssociation(Expression sourceExpression, String target) {
     this.sourceExpression = sourceExpression;
     this.target = target;
   }
 
-  protected AbstractDataAssociation(String variables) {
+  protected DataAssociation(String variables) {
     this.variables = variables;
   }
 
-  protected AbstractDataAssociation(Expression businessKeyExpression) {
+  protected DataAssociation(Expression businessKeyExpression) {
     this.businessKeyExpression = businessKeyExpression;
   }
-
-  public abstract void evaluate(ActivityExecution execution);
 
   public String getSource() {
     return source;

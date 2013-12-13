@@ -66,11 +66,9 @@ import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.ServiceImpl;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
-import org.camunda.bpm.engine.impl.bpmn.data.ItemInstance;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
-import org.camunda.bpm.engine.impl.bpmn.webservice.MessageInstance;
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendarManager;
 import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.DueDateBusinessCalendar;
@@ -178,7 +176,6 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.variable.BooleanType;
 import org.camunda.bpm.engine.impl.variable.ByteArrayType;
-import org.camunda.bpm.engine.impl.variable.CustomObjectType;
 import org.camunda.bpm.engine.impl.variable.DateType;
 import org.camunda.bpm.engine.impl.variable.DefaultVariableTypes;
 import org.camunda.bpm.engine.impl.variable.DoubleType;
@@ -1008,8 +1005,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       variableTypes.addType(new DoubleType());
       variableTypes.addType(new ByteArrayType());
       variableTypes.addType(new SerializableType());
-      variableTypes.addType(new CustomObjectType("item", ItemInstance.class));
-      variableTypes.addType(new CustomObjectType("message", MessageInstance.class));
       if (customPostVariableTypes!=null) {
         for (VariableType customVariableType: customPostVariableTypes) {
           variableTypes.addType(customVariableType);
