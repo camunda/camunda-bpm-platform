@@ -21,6 +21,9 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -366,6 +369,48 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     // they should have an end timestamp
     assertNotNull(historicActivityInstanceQuery.list().get(0).getEndTime());
     assertNotNull(historicActivityInstanceQuery.list().get(1).getEndTime());
+  }
+
+  @Deployment
+  public void FAILING_testHistoricActivityInstanceTimerEvent() {
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
+
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.count());
+
+    Job timer = jobQuery.singleResult();
+    managementService.executeJob(timer.getId());
+
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task task = taskQuery.singleResult();
+
+    assertEquals("afterTimer", task.getName());
+
+    HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("timerEvent");
+    assertEquals(1, historicActivityInstanceQuery.count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceTimerEvent.bpmn20.xml"})
+  public void FAILING_testHistoricActivityInstanceMessageEvent() {
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.count());
+
+    EventSubscriptionQuery eventSubscriptionQuery = runtimeService.createEventSubscriptionQuery();
+    assertEquals(1, eventSubscriptionQuery.count());
+
+    runtimeService.correlateMessage("newInvoice");
+
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task task = taskQuery.singleResult();
+
+    assertEquals("afterMessage", task.getName());
+
+    HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("messageEvent");
+    assertEquals(1, historicActivityInstanceQuery.count());
   }
 
 }
