@@ -33,11 +33,6 @@ public class EmbeddedPlugin extends AbstractCockpitPlugin {
   }
 
   @Override
-  public String getAssetDirectory() {
-    return "webapp://plugin/embedded";
-  }
-
-  @Override
   public Set<Class<?>> getResourceClasses() {
     final HashSet<Class<?>> classes = new HashSet<Class<?>>();
 

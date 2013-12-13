@@ -38,7 +38,7 @@ public class PluginArchiveTest {
     assertThat(contents)
         .contains("/META-INF/services/" + CockpitPlugin.class.getName())
         .contains("/" + pluginPkg + "/" + SimplePlugin.class.getSimpleName() + ".class")
-        .contains("/" + pluginPkg + "/assets/test.txt")
+        .contains("/plugin-webapp/simple/test.txt")
         .contains("/" + pluginPkg + "/queries/simple.xml");
   }
 }

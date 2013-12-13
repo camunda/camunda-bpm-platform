@@ -50,7 +50,7 @@ public class EmbeddedPluginApiTest extends AbstractCockpitCoreTest {
     WebArchive archive = createBaseDeployment("test-embedded.war")
           .addAsServiceProvider(CockpitPlugin.class, EmbeddedPlugin.class)
           .addPackages(true, EmbeddedPlugin.class.getPackage())
-          .addAsWebResource("org/camunda/bpm/cockpit/test/sample/plugin/simple/assets/test.txt", "/plugin/embedded/test.txt");
+          .addAsWebResource("plugin-webapp/simple/test.txt", "/plugin-webapp/embedded/test.txt");
 
     return archive;
   }
