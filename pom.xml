@@ -118,16 +118,33 @@
 
         <module>examples/invoice</module>
         <module>examples/wait-states</module>
-    
+
+        <module>identity/identity-ldap</module>
+        
         <module>distro/jbossas7</module>
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
 
-        <module>identity/identity-ldap</module>
-            
-      </modules>     
-    </profile>  
+      </modules>
+    </profile>
+    
+    <profile>
+      <id>distro-ce</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+
+        <module>webapps/camunda-webapp</module>
+
+        <module>distro/jbossas7</module>
+        <module>distro/gf31</module>
+        <module>distro/tomcat</module>
+
+      </modules>
+    </profile>
+    
     <profile>
       <!-- profile for running process-engine unit tests in QA -->
       <id>check-engine</id>
