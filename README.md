@@ -1,4 +1,4 @@
-camunda BPM platform - [![Build Status](https://buildhive.cloudbees.com/job/camunda/job/camunda-bpm-platform/badge/icon)](https://buildhive.cloudbees.com/job/camunda/job/camunda-bpm-platform/)
+camunda BPM platform [![Build Status](https://buildhive.cloudbees.com/job/camunda/job/camunda-bpm-platform/badge/icon)](https://buildhive.cloudbees.com/job/camunda/job/camunda-bpm-platform/)
 ====================
 
 The open source BPM platform
@@ -55,39 +55,43 @@ Building camunda BPM platform
 camunda BPM is available on maven central but for development of the platform, you have to add our public nexus repository to your maven settings.xml.
 Add the following lines to it:
 
-    `xml
-    <profiles>
-      <profile>
-        <id>camunda-bpm</id>
-        <repositories>
-          <repository>
-            <id>camunda-bpm-nexus</id>
-            <name>camunda-bpm-nexus</name>
-            <releases>
-              <enabled>true</enabled>
-            </releases>
-            <snapshots>
-              <enabled>true</enabled>
-            </snapshots>
-            <url>https://app.camunda.com/nexus/content/groups/public</url>
-          </repository>
-        </repositories>
-      </profile>
-    </profiles>
-    <activeProfiles>
-      <activeProfile>camunda-bpm</activeProfile>
-    </activeProfiles>
-    `
+```xml
+<profiles>
+  <profile>
+    <id>camunda-bpm</id>
+    <repositories>
+      <repository>
+        <id>camunda-bpm-nexus</id>
+        <name>camunda-bpm-nexus</name>
+        <releases>
+          <enabled>true</enabled>
+        </releases>
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>
+        <url>https://app.camunda.com/nexus/content/groups/public</url>
+      </repository>
+    </repositories>
+  </profile>
+</profiles>
+<activeProfiles>
+  <activeProfile>camunda-bpm</activeProfile>
+</activeProfiles>
+```
 
 Apache Maven 3 and Java JDK 6 or 7 are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
 
-    mvn clean install
+```
+mvn clean install
+```
 
 This will build all the modules that make up the camunda BPM platform but will not perform any integration testing. After the build is completed, you will find the distributions under
 
-    distro/tomcat/distro/target     (Apache Tomcat 7 Distribution)
-    distro/gf31/distro/target       (Glassfish 3 Distribution)
-    distro/jbossas7/distro/target   (JBoss AS 7 Distribution)
+```
+distro/tomcat/distro/target     (Apache Tomcat 7 Distribution)
+distro/gf31/distro/target       (Glassfish 3 Distribution)
+distro/jbossas7/distro/target   (JBoss AS 7 Distribution)
+```
 
 Running Integration Tests
 ----------
@@ -104,11 +108,15 @@ We have different maven profiles for selecting
 
 In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
 
-    mvn clean install -Pengine-integration,jboss,h2
+```
+mvn clean install -Pengine-integration,jboss,h2
+```
 
 You can select multiple testsuites but only a single database and a single runtime container. This is valid:
 
-    mvn clean install -Pengine-integration,webapps-integration,tomcat,db2
+```
+mvn clean install -Pengine-integration,webapps-integration,tomcat,db2
+```
 
 There is a special profile for JBoss Application Server:
 
