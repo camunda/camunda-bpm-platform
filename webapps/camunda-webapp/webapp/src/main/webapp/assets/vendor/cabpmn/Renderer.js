@@ -731,9 +731,10 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
           markerPath.setTransform({dx :width/2 + (count * 15)*sign, dy:height-10});
         }
         // always render reference marker first, so its always centered
-        if ( (baseElement.type == "callActivity" && baseElement.calledElement) ||
-             (baseElement.type == "subProcess" && baseElement.bpmndi[0].isExpanded === "false") ||
-             (baseElement.type == "transaction" && baseElement.bpmndi[0].isExpanded === "false")) {
+        if ( (baseElement.type == "callActivity" && (!baseElement.bpmndi[0].isExpanded || baseElement.bpmndi[0].isExpanded === "false")) ||             
+             (baseElement.type == "subProcess" && (!baseElement.bpmndi[0].isExpanded || baseElement.bpmndi[0].isExpanded === "false")) ||
+             (baseElement.type == "adHocSubProcess" && (!baseElement.bpmndi[0].isExpanded || baseElement.bpmndi[0].isExpanded === "false")) ||
+             (baseElement.type == "transaction" && (!baseElement.bpmndi[0].isExpanded || baseElement.bpmndi[0].isExpanded === "false")) ) {
           renderMarker("reference");
           count++;
         }
