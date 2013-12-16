@@ -14,13 +14,34 @@
     <relativePath>../..</relativePath>
   </parent>
 
-  <modules>
-    <module>core</module>
-    <module>webapp</module>
-    <module>tomcat</module>
-    <module>glassfish</module>
-    <module>jboss</module>
-  </modules>
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+
+        <module>core</module>
+        <module>webapp</module>
+
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-ce</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+
+        <module>jboss</module>
+        <module>tomcat</module>
+        <module>glassfish</module>
+
+      </modules>
+    </profile>
+  </profiles>
 
   <properties>
     <tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
