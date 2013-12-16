@@ -124,10 +124,10 @@ public class AbstractPluginRootResource {
       return null;
     }
 
-    InputStream result = getClasspathResourceAsStream(plugin, assetDirectory, fileName);
+    InputStream result = getWebResourceAsStream(assetDirectory, fileName);
 
     if (result == null) {
-      result = getWebResourceAsStream(assetDirectory, fileName);
+      result = getClasspathResourceAsStream(plugin, assetDirectory, fileName);
     }
     return result;
   }
