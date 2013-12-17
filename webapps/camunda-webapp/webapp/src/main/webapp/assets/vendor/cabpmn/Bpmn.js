@@ -30,6 +30,8 @@ define(['jquery', 'bpmn/Transformer', 'bpmn/Renderer'], function ($, Transformer
     this.definitionRenderer = definitionRenderer;
     this.processDefinitions = diagram;
     this.options = options;
+    this.overlayMap = options.overlayMap;
+    delete options.overlayMap;
 
     // zoom the diagram to suite the bounds specified on options if any;
     var bounds = definitionRenderer.getSurface().getDimensions(), bwidth = 1, bheight = 1;
@@ -85,12 +87,12 @@ define(['jquery', 'bpmn/Transformer', 'bpmn/Renderer'], function ($, Transformer
   };
 
   Bpmn.prototype.getOverlay = function(id) {
-    return $("#" + id);
+    return this.overlayMap[id];
   };
 
   Bpmn.prototype.annotation = function (id) {
     var element = this.getOverlay(id);
-    if (!element.length) {
+    if (!element) {
       throw new Error("Element " + id + " does not exist.");
     }
 
