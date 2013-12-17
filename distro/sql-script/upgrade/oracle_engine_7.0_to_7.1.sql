@@ -35,7 +35,11 @@ SET
             ACT_RU_EXECUTION PI
         WHERE
             PI.ID_ = J.PROCESS_INSTANCE_ID_
-    ),
+    );
+
+UPDATE
+    ACT_RU_JOB J
+SET
     SUSPENSION_STATE_  = (
         SELECT
             PI.SUSPENSION_STATE_
