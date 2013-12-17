@@ -59,7 +59,7 @@ ngDefine('cockpit.directives', [
     function renderDiagram() {
       
       // set the element id to processDiagram_*
-      var elementId = 'processDiagram_' + $scope.processDiagram.processDefinition.id.replace(/:/g, '_');
+      var elementId = 'processDiagram_' + $scope.processDiagram.processDefinition.id.replace(/[.|:]/g, '_');
       $element.attr('id', elementId);
 
       // clear innerHTML of element in case that the process diagram has changed 
@@ -83,9 +83,9 @@ ngDefine('cockpit.directives', [
 
       angular.forEach(bpmnElements, function (bpmnElement) {
         var activityId = bpmnElement.id,
-            elem = $('div#' + $element.attr('id') + ' > #' + activityId);
+            elem = bpmnRenderer.getOverlay(activityId);
         
-        if (elem.length) {
+        if (elem) {
           decorateBpmnElementWithOverlays(bpmnElement, elem);
           decorateBpmnElementWithEventHandlers(bpmnElement, elem);
         }
@@ -113,7 +113,7 @@ ngDefine('cockpit.directives', [
         })
         // register mouseup event
         .mouseup(function($event) {
-          var targetId = $($event.target).attr('id'),
+          var targetId = $($event.target).attr('data-activity-id'),
               bpmnElement = bpmnElements[targetId],
               ctrlKey = $event.ctrlKey;
 
@@ -325,7 +325,7 @@ ngDefine('cockpit.directives', [
       var parentElementWidth = $element.width();
       
       // get the bpmn element to scroll to
-      var bpmnElement = $('#' + $element.attr('id') + '> #' + element.id);
+      var bpmnElement = bpmnRenderer.getOverlay(element.id);
 
       // get the height and width of the bpmn element
       var bpmnElementHeight = bpmnElement.height();
