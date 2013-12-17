@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.repository;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Date;
 import java.util.zip.ZipInputStream;
 
@@ -60,5 +61,10 @@ public interface DeploymentBuilder {
    * Deploys all provided sources to the process engine.
    */
   Deployment deploy();
+
+  /**
+   *  @return the names of the resources which were added to this builder.
+   */
+  Collection<String> getResourceNames();
 
 }

@@ -15,11 +15,13 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
@@ -98,7 +100,6 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
       deploymentName = processApplication.getName();
     }
     deploymentBuilder.name(deploymentName);
-    logDeploymentSummary(deploymentMap, deploymentName);
 
     // enable duplicate filtering
     deploymentBuilder.enableDuplicateFiltering();
@@ -116,23 +117,32 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     // allow the process application to add additional resources to the deployment
     processApplication.createDeployment(processArchive.getName(), deploymentBuilder);
 
-    // perform the process engine deployment
-    deployment = deploymentBuilder.deploy();
+    Collection<String> deploymentResourceNames = deploymentBuilder.getResourceNames();
+    if(!deploymentResourceNames.isEmpty()) {
+      logDeploymentSummary(deploymentResourceNames, deploymentName);
 
-    // add attachment
-    Map<String, DeployedProcessArchive> processArchiveDeploymentMap = operationContext.getAttachment(Attachments.PROCESS_ARCHIVE_DEPLOYMENT_MAP);
-    if(processArchiveDeploymentMap == null) {
-      processArchiveDeploymentMap = new HashMap<String, DeployedProcessArchive>();
-      operationContext.addAttachment(Attachments.PROCESS_ARCHIVE_DEPLOYMENT_MAP, processArchiveDeploymentMap);
+      // perform the process engine deployment
+      deployment = deploymentBuilder.deploy();
+
+      // add attachment
+      Map<String, DeployedProcessArchive> processArchiveDeploymentMap = operationContext.getAttachment(Attachments.PROCESS_ARCHIVE_DEPLOYMENT_MAP);
+      if(processArchiveDeploymentMap == null) {
+        processArchiveDeploymentMap = new HashMap<String, DeployedProcessArchive>();
+        operationContext.addAttachment(Attachments.PROCESS_ARCHIVE_DEPLOYMENT_MAP, processArchiveDeploymentMap);
+      }
+      processArchiveDeploymentMap.put(processArchive.getName(), new DeployedProcessArchive(deployment));
+
+    } else {
+      LOGGER.info("Not creating a deployment for process archive '" + processArchive.getName() + "': no resources provided.");
+
     }
-    processArchiveDeploymentMap.put(processArchive.getName(), new DeployedProcessArchive(deployment));
   }
 
-  protected void logDeploymentSummary(Map<String, byte[]> deploymentMap, String deploymentName) {
+  protected void logDeploymentSummary(Collection<String> deploymentResourceNames, String deploymentName) {
     StringBuilder builder = new StringBuilder();
     builder.append("Deployment summary for process archive '"+deploymentName+"': \n");
     builder.append("\n");
-    for (String resourceName : deploymentMap.keySet()) {
+    for (String resourceName : deploymentResourceNames) {
       builder.append("        "+resourceName);
       builder.append("\n");
     }

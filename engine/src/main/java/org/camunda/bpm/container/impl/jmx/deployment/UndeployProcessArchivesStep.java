@@ -14,10 +14,7 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
@@ -51,11 +48,15 @@ public class UndeployProcessArchivesStep extends MBeanDeploymentOperationStep {
     }
 
     Map<String, DeployedProcessArchive> deploymentMap = deployedProcessApplication.getProcessArchiveDeploymentMap();
-
-    List<ProcessesXml> processesXmls = deployedProcessApplication.getProcessesXmls();
-    for (ProcessesXml processesXml : processesXmls) {
-      for (ProcessArchiveXml parsedProcessArchive : processesXml.getProcessArchives()) {
-        operationContext.addStep(new UndeployProcessArchiveStep(deployedProcessApplication, parsedProcessArchive, deploymentMap.get(parsedProcessArchive.getName()).getProcessEngineName()));
+    if(deploymentMap != null) {
+      List<ProcessesXml> processesXmls = deployedProcessApplication.getProcessesXmls();
+      for (ProcessesXml processesXml : processesXmls) {
+        for (ProcessArchiveXml parsedProcessArchive : processesXml.getProcessArchives()) {
+          DeployedProcessArchive deployedProcessArchive = deploymentMap.get(parsedProcessArchive.getName());
+          if(deployedProcessArchive != null) {
+            operationContext.addStep(new UndeployProcessArchiveStep(deployedProcessApplication, parsedProcessArchive, deployedProcessArchive.getProcessEngineName()));
+          }
+        }
       }
     }
 

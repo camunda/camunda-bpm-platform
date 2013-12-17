@@ -126,11 +126,13 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
         referencedProcessEngines.add(value.getProcessEngineInjector().getValue());
 
         ProcessApplicationDeployment deployment = value.getDeployment();
-        for (String deploymentId : deployment.getProcessApplicationRegistration().getDeploymentIds()) {
-          ProcessApplicationDeploymentInfoImpl deploymentInfo = new ProcessApplicationDeploymentInfoImpl();
-          deploymentInfo.setDeploymentId(deploymentId);
-          deploymentInfo.setProcessEngineName(value.getProcessEngineName());
-          deploymentInfos.add(deploymentInfo);
+        if(deployment != null) {
+          for (String deploymentId : deployment.getProcessApplicationRegistration().getDeploymentIds()) {
+            ProcessApplicationDeploymentInfoImpl deploymentInfo = new ProcessApplicationDeploymentInfoImpl();
+            deploymentInfo.setDeploymentId(deploymentId);
+            deploymentInfo.setProcessEngineName(value.getProcessEngineName());
+            deploymentInfos.add(deploymentInfo);
+          }
         }
 
       }
