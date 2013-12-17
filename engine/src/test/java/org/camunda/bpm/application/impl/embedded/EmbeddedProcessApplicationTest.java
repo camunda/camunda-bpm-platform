@@ -34,7 +34,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     
   }
 
-  public void FAILING_testDeployAppWithoutProcesses() {
+  public void testDeployAppWithoutProcesses() {
 
     // register existing process engine with BPM platform
     RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
@@ -45,12 +45,12 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
     ProcessEngine processEngine = BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
     long deployments = processEngine.getRepositoryService().createDeploymentQuery().count();
-    assertEquals(0, deployments);
 
     processApplication.undeploy();
 
     // unregister process engine
     runtimeContainerDelegate.unregisterProcessEngine(processEngine);
+    assertEquals(0, deployments);
 
   }
 
