@@ -42,12 +42,13 @@ public class DeployProcessArchivesStep extends MBeanDeploymentOperationStep {
 
     for (Entry<URL, ProcessesXml> processesXml : processesXmls.entrySet()) {
       for (ProcessArchiveXml processArchive : processesXml.getValue().getProcessArchives()) {
-
-        // for each process archive add an individual operation step
-        operationContext.addStep(new DeployProcessArchiveStep(processArchive, processesXml.getKey()));
+        if(processArchive.getProcessResourceNames().size() > 0) {
+          // for each process archive add an individual operation step
+          operationContext.addStep(new DeployProcessArchiveStep(processArchive, processesXml.getKey()));
+        } else {
+          LOGGER.warning("Ignoring deployment for " + processArchive.getName() + " because it does not have any defined processes.");
+        }
       }
     }
-
   }
-
 }
