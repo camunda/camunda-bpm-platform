@@ -81,8 +81,8 @@
       <id>upgrade</id>
       <build>
         <plugins>
-        
-          <plugin>
+
+         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
@@ -91,8 +91,8 @@
                 <include>**/Test*.java</include>
               </includes>
             </configuration>
-          </plugin>
-        
+          </plugin> 
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
@@ -100,7 +100,7 @@
 	          <skip>true</skip>
 	        </configuration>
           </plugin>
-            
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
@@ -130,6 +130,9 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
+            <configuration>
+                <cleanupDaemonThreads>true</cleanupDaemonThreads>
+            </configuration>
             <version>1.2.1</version>
             <executions>
               <execution>
@@ -162,7 +165,7 @@
                   </arguments>
                 </configuration>
               </execution>
-              <execution>
+             <execution>
                 <id>Drop upgraded DB</id>
                 <goals>
                   <goal>java</goal>
