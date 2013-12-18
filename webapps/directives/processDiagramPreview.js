@@ -14,7 +14,7 @@ ngDefine('cockpit.directives', [ 'angular', 'bpmn/Bpmn' ], function(module, angu
           if (processDefinitionId) {
             
             // set the element id to processDiagram_*
-            var elementId = 'processDiagram_' + processDefinitionId.replace(/:/g, '_');
+            var elementId = 'processDiagram_' + processDefinitionId.replace(/[.|:]/g, '_');
             element.attr('id', elementId);
             
             ProcessDefinitionResource
