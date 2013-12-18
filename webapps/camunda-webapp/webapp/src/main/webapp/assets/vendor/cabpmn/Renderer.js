@@ -260,7 +260,9 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
     group.moveToFront();
 
     var overlay = options.overlayMap[element.id];
-    overlay.appendTo(overlay.parent());
+    if (overlay) {
+      overlay.appendTo(overlay.parent());  
+    }
   }
 
   /**
