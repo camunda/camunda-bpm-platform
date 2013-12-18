@@ -50,6 +50,7 @@ create table ACT_HI_TASKINST (
     DELETE_REASON_ NVARCHAR2(2000),
     PRIORITY_ INTEGER,
     DUE_DATE_ TIMESTAMP(6),
+    FOLLOW_UP_DATE_ TIMESTAMP(6),
     primary key (ID_)
 );
 

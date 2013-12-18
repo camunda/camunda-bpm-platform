@@ -27,6 +27,7 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
   protected String name;
   protected String description;
   protected Date dueDate;
+  protected Date followUpDate;
   protected int priority;
   protected String parentTaskId;
   protected String deleteReason;
@@ -78,6 +79,14 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
     this.dueDate = dueDate;
   }
 
+  public Date getFollowUpDate() {
+    return followUpDate;
+  }
+
+  public void setFollowUpDate(Date followUpDate) {
+    this.followUpDate = followUpDate;
+  }
+  
   public int getPriority() {
     return priority;
   }
@@ -123,6 +132,7 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
            + ", name=" + name
            + ", description=" + description
            + ", dueDate=" + dueDate
+           + ", followUpDate=" + followUpDate
            + ", priority=" + priority
            + ", parentTaskId=" + parentTaskId
            + ", deleteReason=" + deleteReason

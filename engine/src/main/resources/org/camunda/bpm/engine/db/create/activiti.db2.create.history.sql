@@ -54,6 +54,7 @@ create table ACT_HI_TASKINST (
     DELETE_REASON_ varchar(4000),
     PRIORITY_ integer,
     DUE_DATE_ timestamp,
+    FOLLOW_UP_DATE_ timestamp,
     primary key (ID_)
 );
 

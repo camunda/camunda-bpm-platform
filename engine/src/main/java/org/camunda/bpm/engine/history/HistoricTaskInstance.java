@@ -75,4 +75,6 @@ public interface HistoricTaskInstance {
   /** The parent task of this task, in case this task was a subtask */
   String getParentTaskId();
 
+  Date getFollowUpDate();
+
 }
