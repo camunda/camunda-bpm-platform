@@ -13,6 +13,7 @@
 package org.camunda.bpm.container.impl.jboss.service;
 
 import java.io.ByteArrayInputStream;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -142,7 +143,6 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
         deploymentName = processApplicationName;
       }
       deploymentBuilder.name(deploymentName);
-      logDeploymentSummary(deploymentMap, deploymentName, processApplicationName);
 
       // add deployment resources
       for (Entry<String, byte[]> resource : deploymentMap.entrySet()) {
@@ -152,8 +152,16 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       // let the process application component add resources to the deployment.
       processApplication.createDeployment(processArchive.getName(), deploymentBuilder);
 
-      // perform the actual deployment
-      deployment = deploymentBuilder.deploy();
+      Collection<String> resourceNames = deploymentBuilder.getResourceNames();
+      if(!resourceNames.isEmpty()) {
+        logDeploymentSummary(resourceNames, deploymentName, processApplicationName);
+        // perform the actual deployment
+        deployment = deploymentBuilder.deploy();
+
+      } else {
+        LOGGER.info("Not creating a deployment for process archive '" + processArchive.getName() + "': no resources provided.");
+
+      }
 
     } catch (Exception e) {
       throw new StartException("Could not register process application with shared process engine ",e);
@@ -169,24 +177,16 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
    * @param deploymentMap2
    * @param deploymentName
    */
-  protected void logDeploymentSummary(Map<String, byte[]> deploymentMap, String deploymentName, String processApplicationName) {
+  protected void logDeploymentSummary(Collection<String> resourceNames, String deploymentName, String processApplicationName) {
     // log a summary of the deployment
-    if(!deploymentMap.isEmpty()) {
-      StringBuilder builder = new StringBuilder();
-      builder.append("Deployment summary for process archive '"+deploymentName+"' of process application '"+processApplicationName+"': \n");
+    StringBuilder builder = new StringBuilder();
+    builder.append("Deployment summary for process archive '"+deploymentName+"' of process application '"+processApplicationName+"': \n");
+    builder.append("\n");
+    for (String resourceName : resourceNames) {
+      builder.append("        "+resourceName);
       builder.append("\n");
-      for (String resourceName : deploymentMap.keySet()) {
-        builder.append("        "+resourceName);
-        builder.append("\n");
-      }
-      LOGGER.log(Level.INFO, builder.toString());
-
-    } else {
-      LOGGER.info("process archive '"+deploymentName+"'"
-          +" of process application '"+processApplicationName+"'"
-          +" does provide any deployment resources.");
-
     }
+    LOGGER.log(Level.INFO, builder.toString());
   }
 
   protected void performUndeployment() {
@@ -194,16 +194,18 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     final ProcessEngine processEngine = processEngineInjector.getValue();
 
     try {
-      // always unregister
-      Set<String> deploymentIds = deployment.getProcessApplicationRegistration().getDeploymentIds();
-      processEngine.getManagementService().unregisterProcessApplication(deploymentIds, true);
+      if(deployment != null) {
+        // always unregister
+        Set<String> deploymentIds = deployment.getProcessApplicationRegistration().getDeploymentIds();
+        processEngine.getManagementService().unregisterProcessApplication(deploymentIds, true);
+      }
     } catch(Exception e) {
       LOGGER.log(Level.SEVERE, "Exception while unregistering process application with the process engine.");
 
     }
 
     // delete the deployment only if requested in metadata
-    if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {
+    if(deployment != null && PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {
       try {
         LOGGER.info("Deleting cascade deployment with name '"+deployment.getName()+"/"+deployment.getId()+"'.");
         processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);

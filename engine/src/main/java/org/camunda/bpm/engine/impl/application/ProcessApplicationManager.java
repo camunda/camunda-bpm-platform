@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -175,6 +176,19 @@ public class ProcessApplicationManager {
       // ignore
       LOGGER.log(Level.WARNING, "Exception while logging registration summary", e);
     }
+  }
+
+  public String getRegistrationSummary() {
+    StringBuilder builder = new StringBuilder();
+    for (Entry<String, DefaultProcessApplicationRegistration> entry : registrationsByDeploymentId.entrySet()) {
+      if(builder.length()>0) {
+        builder.append(", ");
+      }
+      builder.append(entry.getKey());
+      builder.append("->");
+      builder.append(entry.getValue().getReference().getName());
+    }
+    return builder.toString();
   }
 
 }

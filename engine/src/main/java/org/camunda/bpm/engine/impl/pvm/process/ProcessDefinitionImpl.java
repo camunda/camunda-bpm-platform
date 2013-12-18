@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,9 +30,9 @@ import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
  * @author Tom Baeyens
  */
 public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefinition {
-  
+
   private static final long serialVersionUID = 1L;
-  
+
   protected String name;
   protected String description;
   protected ActivityImpl initial;
@@ -51,23 +51,23 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     }
     return createProcessInstanceForInitial(initial);
   }
-  
+
   /** creates a process instance using the provided activity as initial */
   public PvmProcessInstance createProcessInstanceForInitial(ActivityImpl initial) {
-    
+
     if(initial == null) {
       throw new ProcessEngineException("Cannot start process instance, initial activity where the process instance should start is null.");
     }
-    
+
     InterpretableExecution processInstance = newProcessInstance(initial);
     processInstance.setProcessDefinition(this);
     processInstance.setProcessInstance(processInstance);
     processInstance.initialize();
 
     InterpretableExecution scopeInstance = processInstance;
-    
+
     List<ActivityImpl> initialActivityStack = getInitialActivityStack(initial);
-    
+
     for (ActivityImpl initialActivity: initialActivityStack) {
       if (initialActivity.isScope()) {
         scopeInstance = (InterpretableExecution) scopeInstance.createExecution();
@@ -77,16 +77,16 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
         }
       }
     }
-    
+
     scopeInstance.setActivity(initial);
 
     return processInstance;
   }
 
   public List<ActivityImpl> getInitialActivityStack() {
-    return getInitialActivityStack(initial);    
+    return getInitialActivityStack(initial);
   }
-  
+
   public synchronized List<ActivityImpl> getInitialActivityStack(ActivityImpl startActivity) {
     List<ActivityImpl> initialActivityStack = initialActivityStacks.get(startActivity);
     if(initialActivityStack == null) {
@@ -112,11 +112,11 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
   public String getDeploymentId() {
     return null;
   }
-  
+
   public void addLaneSet(LaneSet newLaneSet) {
     getLaneSets().add(newLaneSet);
   }
-  
+
   public Lane getLaneForId(String id) {
     if(laneSets != null && laneSets.size() > 0) {
       Lane lane;
@@ -129,9 +129,9 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     }
     return null;
   }
-  
+
   // getters and setters //////////////////////////////////////////////////////
-  
+
   public ActivityImpl getInitial() {
     return initial;
   }
@@ -139,7 +139,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
   public void setInitial(ActivityImpl initial) {
     this.initial = initial;
   }
-  
+
   public String toString() {
     return "ProcessDefinition("+id+")";
   }
@@ -151,13 +151,13 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
   public void setName(String name) {
     this.name = name;
   }
-  
+
   public String getDescription() {
     return (String) getProperty("documentation");
   }
-  
+
   /**
-   * @return all lane-sets defined on this process-instance. Returns an empty list if none are defined. 
+   * @return all lane-sets defined on this process-instance. Returns an empty list if none are defined.
    */
   public List<LaneSet> getLaneSets() {
     if(laneSets == null) {
@@ -165,14 +165,18 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     }
     return laneSets;
   }
-  
-  
+
+
   public void setParticipantProcess(ParticipantProcess participantProcess) {
     this.participantProcess = participantProcess;
   }
-  
+
   public ParticipantProcess getParticipantProcess() {
     return participantProcess;
   }
-  
+
+  public ScopeImpl getParentScope() {
+    return null;
+  }
+
 }

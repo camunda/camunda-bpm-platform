@@ -18,7 +18,8 @@
 		<prefill>false</prefill>
 		<use-strict-min>false</use-strict-min>
 		<flush-strategy>FailingConnectionOnly</flush-strategy>
-		<no-tx-separate-pools>true</no-tx-separate-pools>
+		<no-tx-separate-pools>false</no-tx-separate-pools>
+		<is-same-rm-override>false</is-same-rm-override>
 		<pad-xid>false</pad-xid>
 		<wrap-xa-resource>true</wrap-xa-resource>
 	  </xa-pool>
@@ -42,7 +43,8 @@
 		<prefill>false</prefill>
 		<use-strict-min>false</use-strict-min>
 		<flush-strategy>FailingConnectionOnly</flush-strategy>
-		<no-tx-separate-pools>true</no-tx-separate-pools>
+		<no-tx-separate-pools>false</no-tx-separate-pools>
+		<is-same-rm-override>false</is-same-rm-override>
 		<pad-xid>false</pad-xid>
 		<wrap-xa-resource>true</wrap-xa-resource>
 	  </xa-pool>

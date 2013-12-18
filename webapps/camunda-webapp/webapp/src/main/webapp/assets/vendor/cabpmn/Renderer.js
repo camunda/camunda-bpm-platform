@@ -6,6 +6,7 @@
  * @author: Andreas Drobisch
  * @author: Jakob Freund
  * @author: Daniel Meyer
+ * @author: Michael Schoettes
  * 
  */
 
@@ -255,11 +256,13 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
    * @param  {object}   element   the bpmn element that should be moved to front
    * @param  {gfxGroup} group     the graphics group the element is drawn on
    */
-  function moveToFront(element, group) {
+  function moveToFront(element, group, options) {
     group.moveToFront();
 
-    var overlay = $("#" + element.id);
-    overlay.appendTo(overlay.parent());
+    var overlay = options.overlayMap[element.id];
+    if (overlay) {
+      overlay.appendTo(overlay.parent());  
+    }
   }
 
   /**
@@ -731,9 +734,10 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
           markerPath.setTransform({dx :width/2 + (count * 15)*sign, dy:height-10});
         }
         // always render reference marker first, so its always centered
-        if ( (baseElement.type == "callActivity" && baseElement.calledElement) ||
-             (baseElement.type == "subProcess" && baseElement.bpmndi[0].isExpanded === "false") ||
-             (baseElement.type == "transaction" && baseElement.bpmndi[0].isExpanded === "false")) {
+        if ( (baseElement.type == "callActivity" && (!baseElement.bpmndi[0].isExpanded || baseElement.bpmndi[0].isExpanded === "false")) ||             
+             (baseElement.type == "subProcess" && (!baseElement.bpmndi[0].isExpanded || baseElement.bpmndi[0].isExpanded === "false")) ||
+             (baseElement.type == "adHocSubProcess" && (!baseElement.bpmndi[0].isExpanded || baseElement.bpmndi[0].isExpanded === "false")) ||
+             (baseElement.type == "transaction" && (!baseElement.bpmndi[0].isExpanded || baseElement.bpmndi[0].isExpanded === "false")) ) {
           renderMarker("reference");
           count++;
         }
@@ -799,13 +803,13 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
         path5.setStroke({color : style.stroke, width: 0.69999999});
         path5.setFill("#f0eff0");
       }
-	  
-	    function createSendTaskPath(group, style) {
+    
+      function createSendTaskPath(group, style) {
         var path1String = "M8,11 L8,21 L24,21 L24,11 L16,17z";
         var path1 = group.createPath(path1String);
         path1.setFill("#000000");
-		    path1.setTransform({ xx:1.2 });
-		
+        path1.setTransform({ xx:1.2 });
+    
         var path2String = "M7,10 L16,17 L25 10z";
         var path2 = group.createPath(path2String);
         path2.setFill("#000000");
@@ -826,7 +830,7 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
         if (baseElement.type == 'userTask') {
           createUserTaskPath(taskGroup, style);
         } else 
-    		if (baseElement.type == 'sendTask') {
+        if (baseElement.type == 'sendTask') {
           createSendTaskPath(taskGroup, style);
         } else {
           createTaskPath(taskGroup, style, taskDefinitionPaths[baseElement.type]);
@@ -913,7 +917,7 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
       if (element.type == "boundaryEvent") {
         (function(e, group) {
           elementRenderer.postRenderParent(function() {
-            moveToFront(e, group);
+            moveToFront(e, group, elementRenderer.options);
           });
         })(element, circleGroup);
       }
@@ -1242,6 +1246,12 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
     this.gfxGroup = gfxGroup;
     this.options = options;
 
+    if (!options.overlayMap) {
+      options.overlayMap = {};
+    }
+
+    this.overlayMap = options.overlayMap;
+
     // create surface element if needed
     if (!gfxGroup) {
       var width = options.width ? options.width : 800;
@@ -1270,7 +1280,7 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
         var overlayDiv = $('<div class="bpmnElement"></div>');
 
         overlayDiv
-          .attr('id', currentElement.id)
+          .attr('data-activity-id', currentElement.id)
           .css({
             position: "absolute" ,
             left: +bounds.x +"px",
@@ -1279,6 +1289,8 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
             height : +bounds.height + "px"
           })
           .appendTo(diagramElement);
+
+        this.overlayMap[currentElement.id] = overlayDiv;
 
         if (options.overlayHtml) {
           overlayDiv.html(options.overlayHtml);

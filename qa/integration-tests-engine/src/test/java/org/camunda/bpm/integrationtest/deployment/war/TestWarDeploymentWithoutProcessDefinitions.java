@@ -27,19 +27,22 @@ import org.junit.runner.RunWith;
 
 /**
  * Assert that we can deploy a WAR with a processes.xml but no process definitions.
- * 
+ *
  */
 @RunWith(Arquillian.class)
 public class TestWarDeploymentWithoutProcessDefinitions extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive processArchive() {    
+  public static WebArchive processArchive() {
     return initWebArchiveDeployment();
   }
-  
+
   @Test
   public void testDeployProcessArchive() {
     Assert.assertNotNull(ProgrammaticBeanLookup.lookup(ProcessEngine.class));
+
+    // no deployment has been constructed
+    Assert.assertEquals(0, repositoryService.createDeploymentQuery().deploymentName("pa").count());
   }
 
 }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.bpmn.data.IOSpecification;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 
@@ -31,18 +30,18 @@ import org.camunda.bpm.engine.impl.pvm.PvmScope;
 public abstract class ScopeImpl extends ProcessElementImpl implements PvmScope {
 
   private static final long serialVersionUID = 1L;
-  
+
   protected List<ActivityImpl> activities = new ArrayList<ActivityImpl>();
   protected Map<String, ActivityImpl> namedActivities = new HashMap<String, ActivityImpl>();
   protected Map<String, List<ExecutionListener>> executionListeners = new HashMap<String, List<ExecutionListener>>();
-  protected IOSpecification ioSpecification;
-  
+
   public ScopeImpl(String id, ProcessDefinitionImpl processDefinition) {
     super(id, processDefinition);
   }
-  
+
+  /** searches for the activity recursively */
   public ActivityImpl findActivity(String activityId) {
-    ActivityImpl localActivity = namedActivities.get(activityId);
+    ActivityImpl localActivity = getChildActivity(activityId);
     if (localActivity!=null) {
       return localActivity;
     }
@@ -53,6 +52,11 @@ public abstract class ScopeImpl extends ProcessElementImpl implements PvmScope {
       }
     }
     return null;
+  }
+
+  /** searches for the activity locally */
+  public ActivityImpl getChildActivity(String activityId) {
+    return namedActivities.get(activityId);
   }
 
   public ActivityImpl createActivity() {
@@ -83,9 +87,9 @@ public abstract class ScopeImpl extends ProcessElementImpl implements PvmScope {
     }
     return false;
   }
-  
+
   // event listeners //////////////////////////////////////////////////////////
-  
+
   @SuppressWarnings("unchecked")
   public List<ExecutionListener> getExecutionListeners(String eventName) {
     List<ExecutionListener> executionListenerList = getExecutionListeners().get(eventName);
@@ -94,11 +98,11 @@ public abstract class ScopeImpl extends ProcessElementImpl implements PvmScope {
     }
     return Collections.EMPTY_LIST;
   }
-  
+
   public void addExecutionListener(String eventName, ExecutionListener executionListener) {
     addExecutionListener(eventName, executionListener, -1);
   }
-  
+
   public void addExecutionListener(String eventName, ExecutionListener executionListener, int index) {
     List<ExecutionListener> listeners = executionListeners.get(eventName);
     if (listeners==null) {
@@ -111,22 +115,17 @@ public abstract class ScopeImpl extends ProcessElementImpl implements PvmScope {
       listeners.add(index, executionListener);
     }
   }
-  
+
   public Map<String, List<ExecutionListener>> getExecutionListeners() {
     return executionListeners;
   }
-  
+
   // getters and setters //////////////////////////////////////////////////////
-  
+
   public List<ActivityImpl> getActivities() {
     return activities;
   }
 
-  public IOSpecification getIoSpecification() {
-    return ioSpecification;
-  }
-  
-  public void setIoSpecification(IOSpecification ioSpecification) {
-    this.ioSpecification = ioSpecification;
-  }
+  public abstract ScopeImpl getParentScope();
+
 }

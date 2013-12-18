@@ -19,8 +19,14 @@ import java.util.Set;
  * @author: drobisch
  */
 public class GroupInfoDto {
+
   private final List<GroupDto> groups;
   private Set<UserDto> groupUsers;
+
+  public GroupInfoDto() {
+    this.groups = null;
+    this.groupUsers = null;
+  }
 
   public GroupInfoDto(List<GroupDto> groups, Set<UserDto> groupUsers) {
     this.groupUsers = groupUsers;

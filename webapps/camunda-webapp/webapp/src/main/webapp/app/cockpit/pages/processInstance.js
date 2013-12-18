@@ -150,6 +150,9 @@ ngDefine('cockpit.pages.processInstance', [
     // processInstance
     processData.provide('processInstance', processInstance);
 
+    // filter
+    processData.provide('filter', parseFilterFromUri());
+
     // processDefinition
     processData.provide('processDefinition', ['processInstance', function (processInstance) {
       return ProcessDefinitionResource.get({ id: processInstance.definitionId }).$promise;
@@ -292,7 +295,7 @@ ngDefine('cockpit.pages.processInstance', [
     }]);
 
     // incidents
-    processData.provide('incidents', ['processInstance', function (processInstance) {
+    processData.provide('incidents', ['processInstance', 'filter', function (processInstance, filter) {
       return IncidentResource.query({ id : processInstance.id }).$promise;
     }]);
 
@@ -322,8 +325,6 @@ ngDefine('cockpit.pages.processInstance', [
 
       return processDiagram;
     }]);
-
-    processData.provide('filter', parseFilterFromUri());
 
     // /////// End definition of process data
 

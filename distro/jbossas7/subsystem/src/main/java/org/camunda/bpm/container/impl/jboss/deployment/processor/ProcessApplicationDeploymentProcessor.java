@@ -12,18 +12,6 @@
  */
 package org.camunda.bpm.container.impl.jboss.deployment.processor;
 
-import static org.jboss.as.server.deployment.Attachments.MODULE;
-
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
@@ -32,6 +20,7 @@ import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessApplication
 import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationDeploymentService;
 import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationStartService;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
+import org.camunda.bpm.container.impl.jboss.util.JBossCompatibilityExtension;
 import org.camunda.bpm.container.impl.jboss.util.ProcessesXmlWrapper;
 import org.camunda.bpm.container.impl.jmx.deployment.scanning.VfsProcessApplicationScanner;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
@@ -40,7 +29,6 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.ee.component.ViewDescription;
-import org.jboss.as.server.Services;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -55,6 +43,18 @@ import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.vfs.VirtualFile;
+
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.jboss.as.server.deployment.Attachments.MODULE;
 
 
 /**
@@ -121,7 +121,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
           serviceBuilder.addDependency(noViewStartService, ProcessApplicationInterface.class, deploymentService.getNoViewProcessApplication());
         }
 
-        Services.addServerExecutorDependency(serviceBuilder, deploymentService.getExecutorInjector(), false);
+        JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder, deploymentService.getExecutorInjector(), false);
 
         serviceBuilder.install();
 
