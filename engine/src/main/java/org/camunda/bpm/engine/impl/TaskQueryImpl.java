@@ -69,6 +69,9 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Date dueDate;
   protected Date dueBefore;
   protected Date dueAfter;
+  protected Date followUpDate;
+  protected Date followUpBefore;
+  protected Date followUpAfter;
   protected boolean excludeSubtasks = false;
   protected SuspensionState suspensionState;
 
@@ -329,6 +332,21 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     this.dueAfter = dueAfter;
     return this;
   }
+
+  public TaskQuery followUpDate(Date followUpDate) {
+    this.followUpDate = followUpDate;
+    return this;
+  }
+
+  public TaskQuery followUpBefore(Date followUpBefore) {
+    this.followUpBefore = followUpBefore;
+    return this;
+  }
+
+  public TaskQuery followUpAfter(Date followUpAfter) {
+    this.followUpAfter = followUpAfter;
+    return this;
+  }
   
   public TaskQuery excludeSubtasks() {
     this.excludeSubtasks = true;
@@ -417,6 +435,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return orderBy(TaskQueryProperty.DUE_DATE);
   }
   
+  public TaskQuery orderByFollowUpDate() {
+    return orderBy(TaskQueryProperty.FOLLOW_UP_DATE);
+  }
+
   //results ////////////////////////////////////////////////////////////////
   
   public List<Task> executeList(CommandContext commandContext, Page page) {

@@ -1,3 +1,10 @@
+-- add follow-up date to tasks --
+alter table ACT_RU_TASK
+    add FOLLOW_UP_DATE_ datetime;
+alter table ACT_HI_TASKINST
+    add FOLLOW_UP_DATE_ datetime;
+
+-- add JOBDEF table --
 create table ACT_RU_JOBDEF (
     ID_ varchar(64) NOT NULL,
     REV_ integer,

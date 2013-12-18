@@ -95,6 +95,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setAssignee(taskEntity.getAssignee());
     evt.setDescription(taskEntity.getDescription());
     evt.setDueDate(taskEntity.getDueDate());
+    evt.setFollowUpDate(taskEntity.getFollowUpDate());
     evt.setName(taskEntity.getName());
     evt.setOwner(taskEntity.getOwner());
     evt.setParentTaskId(taskEntity.getParentTaskId());
