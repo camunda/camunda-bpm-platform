@@ -192,6 +192,21 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery dueAfter(Date dueDate);
   
   /**
+   * Only select tasks with the given follow-up date.
+   */
+  TaskQuery followUpDate(Date dueDate);
+  
+  /**
+   * Only select tasks which have a follow-up date before the given date.
+   */
+  TaskQuery followUpBefore(Date dueDate);
+
+  /**
+   * Only select tasks which have a follow-up date after the given date.
+   */
+  TaskQuery followUpAfter(Date dueDate);
+  
+  /**
    * Only selects tasks which are suspended, because its process instance was suspended.
    */
   TaskQuery suspended();
@@ -229,4 +244,8 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   
   /** Order by due date (needs to be followed by {@link #asc()} or {@link #desc()}). */
   TaskQuery orderByDueDate();
+  
+  /** Order by follow-up date (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  TaskQuery orderByFollowUpDate();  
+
 }

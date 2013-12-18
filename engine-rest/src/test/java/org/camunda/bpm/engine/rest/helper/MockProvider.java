@@ -80,6 +80,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_ASSIGNEE_NAME = "anAssignee";
   public static final String EXAMPLE_TASK_CREATE_TIME = "2013-01-23T13:42:42";
   public static final String EXAMPLE_TASK_DUE_DATE = "2013-01-23T13:42:43";
+  public static final String EXAMPLE_FOLLOW_UP_DATE = "2013-01-23T13:42:44";
   public static final DelegationState EXAMPLE_TASK_DELEGATION_STATE = DelegationState.RESOLVED;
   public static final String EXAMPLE_TASK_DESCRIPTION = "aDescription";
   public static final String EXAMPLE_TASK_EXECUTION_ID = "anExecution";
@@ -254,6 +255,7 @@ public abstract class MockProvider {
   public static Task createMockTask() {
     Task mockTask = new MockTaskBuilder().id(EXAMPLE_TASK_ID).name(EXAMPLE_TASK_NAME).assignee(EXAMPLE_TASK_ASSIGNEE_NAME)
         .createTime(DateTime.parse(EXAMPLE_TASK_CREATE_TIME).toDate()).dueDate(DateTime.parse(EXAMPLE_TASK_DUE_DATE).toDate())
+        .followUpDate(DateTime.parse(EXAMPLE_FOLLOW_UP_DATE).toDate())
         .delegationState(EXAMPLE_TASK_DELEGATION_STATE).description(EXAMPLE_TASK_DESCRIPTION).executionId(EXAMPLE_TASK_EXECUTION_ID).owner(EXAMPLE_TASK_OWNER)
         .parentTaskId(EXAMPLE_TASK_PARENT_TASK_ID).priority(EXAMPLE_TASK_PRIORITY).processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
         .processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID).taskDefinitionKey(EXAMPLE_TASK_DEFINITION_KEY).build();

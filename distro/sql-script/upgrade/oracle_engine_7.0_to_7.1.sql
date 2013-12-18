@@ -1,3 +1,10 @@
+-- add folllow-up date to tasks --
+alter table ACT_RU_TASK 
+    add FOLLOW_UP_DATE_ TIMESTAMP(6);
+alter table ACT_HI_TASKINST 
+    add FOLLOW_UP_DATE_ TIMESTAMP(6);
+
+-- add JOBDEF table --
 create table ACT_RU_JOBDEF (
     ID_ NVARCHAR2(64) NOT NULL,
     REV_ INTEGER,

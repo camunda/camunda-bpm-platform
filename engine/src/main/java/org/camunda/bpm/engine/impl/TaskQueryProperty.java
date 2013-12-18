@@ -54,6 +54,7 @@ public class TaskQueryProperty implements QueryProperty {
   public static final TaskQueryProperty PROCESS_INSTANCE_ID = new TaskQueryProperty("RES.PROC_INST_ID_");
   public static final TaskQueryProperty EXECUTION_ID = new TaskQueryProperty("RES.EXECUTION_ID_");
   public static final TaskQueryProperty DUE_DATE = new TaskQueryProperty("RES.DUE_DATE_");
+  public static final TaskQueryProperty FOLLOW_UP_DATE = new TaskQueryProperty("RES.FOLLOW_UP_DATE_");
   
   private String name;
 

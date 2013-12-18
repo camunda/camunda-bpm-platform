@@ -68,6 +68,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   protected int priority = Task.PRIORITY_NORMAL;
   protected Date createTime; // The time when the task has been created
   protected Date dueDate;
+  protected Date followUpDate;
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
   protected boolean isIdentityLinksInitialized = false;
@@ -656,6 +657,20 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   public boolean isSuspended() {
     return suspensionState == SuspensionState.SUSPENDED.getStateCode();
   }
+  
+  public Date getFollowUpDate() {
+    return followUpDate;
+  }
+
+  public void setFollowUpDate(Date followUpDate) {
+    registerCommandContextCloseListener();
+    this.followUpDate = followUpDate;
+  }
+  
+  public void setFollowUpDateWithoutCascade(Date followUpDate) {
+    this.followUpDate = followUpDate;
+  }  
+  
   public void onCommandContextClose(CommandContext commandContext) {
     if(commandContext.getDbSqlSession().isUpdated(this)) {
       commandContext.getHistoricTaskInstanceManager().updateHistoricTaskInstance(this);
@@ -667,4 +682,5 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
       commandContext.registerCommandContextCloseListener(this);
     }
   }
+
 }
