@@ -50,6 +50,7 @@ create table ACT_HI_TASKINST (
     DELETE_REASON_ varchar(4000),
     PRIORITY_ integer,
     DUE_DATE_ datetime,
+    FOLLOW_UP_DATE_ datetime,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

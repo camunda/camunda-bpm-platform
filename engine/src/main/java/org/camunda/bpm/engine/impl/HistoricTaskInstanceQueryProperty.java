@@ -43,6 +43,7 @@ public class HistoricTaskInstanceQueryProperty implements QueryProperty {
   public static final HistoricTaskInstanceQueryProperty DURATION = new HistoricTaskInstanceQueryProperty("DURATION_");
   public static final HistoricTaskInstanceQueryProperty TASK_PRIORITY = new HistoricTaskInstanceQueryProperty("PRIORITY_");
   public static final HistoricTaskInstanceQueryProperty TASK_DUE_DATE = new HistoricTaskInstanceQueryProperty("DUE_DATE_");
+  public static final HistoricTaskInstanceQueryProperty TASK_FOLLOW_UP_DATE = new HistoricTaskInstanceQueryProperty("FOLLOW_UP_DATE_");
 
   private String name;
 
