@@ -29,18 +29,16 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
 
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+  var Configuration = [ 'ViewsProvider', function(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.action', {
+    ViewsProvider.registerDefaultView('cockpit.processDefinition.live.action', {
       id: 'update-suspension-state-action',
       label: 'Update Suspension State',
       url: 'plugin://base/static/app/views/processDefinition/update-suspension-state-action.html',
       controller: Controller,
       priority: 50
     });
-  };
-
-  Configuration.$inject = ['ViewsProvider'];
+  }];
 
   module.config(Configuration);
 

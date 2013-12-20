@@ -223,7 +223,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.live.tab', {
       id: 'variables-tab',
       label: 'Variables',
       url: 'plugin://base/static/app/views/processInstance/variable-instances-tab.html',

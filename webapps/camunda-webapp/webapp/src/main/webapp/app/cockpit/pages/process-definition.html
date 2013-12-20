@@ -1,27 +1,31 @@
+<div class="ctn-header">
+  <h1>
+    <i class="icon-type icon-inbox"></i>
+    {{ processDefinition.name || processDefinition.key }}
+
+    <span class="badge badge-warning badge-suspended"
+          ng-show="processDefinition.suspended"
+          title="Currently suspended">
+      <i class="icon-suspended white"></i>
+    </span>
+  </h1>
+
+  <div class="view-pills" id="cockpit.processDefinition.view"></div>
+</div>
+
 <div class="ctn-content-container ctn-collapsable-parent">
 
   <!-- tool bar -->
   <div class="ctn-toolbar">
 
     <!-- Toolbar actions are provided by plugins -->
-    <span ng-repeat="viewProvider in processDefinitionActions">
-      <view provider="viewProvider" vars="processDefinitionVars" />
+    <span ng-repeat="actionProvider in processDefinitionActions">
+      <view provider="actionProvider" vars="processDefinitionVars" />
     </span>
-
   </div>
 
   <!-- sitebar -->
   <div class="ctn-column ctn-sitebar ctn-collapsable ctn-scroll" collapsable="left">
-
-    <div class="page-header">
-      <small>Process Definition View</small>
-        <h1>
-          {{ processDefinition.name || processDefinition.key }}
-          <span class="badge badge-warning badge-suspended" ng-show="processDefinition.suspended" title="Currently suspended">
-            <i class="icon-suspended white"></i>
-          </span>            
-        </h1>
-    </div>
 
     <div class="filters" ng-controller="ProcessDefinitionFilterController">
       <h5>
@@ -209,15 +213,15 @@
 
     <!-- content bottom pane -->
     <div class="ctn-row ctn-content-bottom ctn-tabbed ctn-collapsable" collapse="bottom">
-      <div ng-show="processDefinitionViews.length">
+      <div ng-show="processDefinitionTabs.length">
         <ul class="nav nav-tabs">
-          <li ng-class="{ active: selectedView == viewProvider }" ng-repeat="viewProvider in processDefinitionViews">
-            <a href ng-click="selectView(viewProvider)">{{ viewProvider.label }}</a>
+          <li ng-class="{ active: selectedTab == tabProvider }" ng-repeat="tabProvider in processDefinitionTabs">
+            <a href ng-click="selectTab(tabProvider)">{{ tabProvider.label }}</a>
           </li>
         </ul>
 
         <div class="ctn-tabbed-content ctn-scroll">
-          <view provider="selectedView" vars="processDefinitionVars" />
+          <view provider="selectedTab" vars="processDefinitionVars" />
         </div>
       </div>
     </div>

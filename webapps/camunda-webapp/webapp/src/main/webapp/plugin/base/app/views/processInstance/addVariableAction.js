@@ -1,6 +1,6 @@
 ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
 
-  function AddVariableActionController ($scope, $http, search, Uri, $dialog) {
+  var AddVariableActionController = [ '$scope', '$http', 'search', 'Uri', '$dialog', function($scope, $http, search, Uri, $dialog) {
 
     $scope.openDialog = function () {
       var dialog = $dialog.dialog({
@@ -21,18 +21,16 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
         }
       });
     };
+  }];
 
-  };
-
-  module.controller('AddVariableActionController', [ '$scope', '$http', 'search', 'Uri', '$dialog', AddVariableActionController ]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.action', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.live.action', {
       id: 'add-variable-action',
       label: 'Add Variable Action',
       url: 'plugin://base/static/app/views/processInstance/add-variable-action.html',
-      controller: 'AddVariableActionController',
+      controller: AddVariableActionController,
       priority: 10
     });
   };
