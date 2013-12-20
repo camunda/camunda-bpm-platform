@@ -488,17 +488,17 @@ ngDefine('cockpit.pages.processInstance', [
     });
 
     $scope.processInstanceVars = { read: [ 'processInstance', 'processData', 'filter' ] };
-    $scope.processInstanceTabs = Views.getProviders({ component: 'cockpit.processInstance.view' })
-                         .concat(Views.getProviders({ component: 'cockpit.processInstance.instanceDetails' })); // backwards compatibility
-    $scope.processInstanceActions = Views.getProviders({ component: 'cockpit.processInstance.action' });
+    $scope.processInstanceTabs = Views.getProviders({ component: 'cockpit.processInstance.live.tab' });
+
+    $scope.processInstanceActions = Views.getProviders({ component: 'cockpit.processInstance.live.action' });
 
     Data.instantiateProviders('cockpit.processInstance.data', {$scope: $scope, processData : processData});
 
-    $scope.selectView = function(view) {
-      $scope.selectedView = view;
+    $scope.selectTab = function(tabProvider) {
+      $scope.selectedTab = tabProvider;
 
       search.updateSilently({
-        detailsTab: view.id
+        detailsTab: tabProvider.id
       });
     };
 
@@ -510,13 +510,10 @@ ngDefine('cockpit.pages.processInstance', [
       }
 
       if (selectedTabId) {
-        var provider = Views.getProvider({ component: 'cockpit.processInstance.view', id: selectedTabId });
-        if (!provider) {
-          // backwards compatibility
-          provider = Views.getProvider({ component: 'cockpit.processInstance.instanceDetails', id: selectedTabId });
-        }
+        var provider = Views.getProvider({ component: 'cockpit.processInstance.live.tab', id: selectedTabId });
+
         if (provider && tabs.indexOf(provider) != -1) {
-          $scope.selectedView = provider;
+          $scope.selectedTab = provider;
           return;
         }
       }
@@ -525,12 +522,11 @@ ngDefine('cockpit.pages.processInstance', [
         detailsTab: null
       });
 
-      $scope.selectedView = tabs[0];
+      $scope.selectedTab = tabs[0];
     }
 
     setDefaultTab($scope.processInstanceTabs);
-
-  };
+  }
 
   function ProcessInstanceFilterController ($scope) {
 
@@ -588,14 +584,19 @@ ngDefine('cockpit.pages.processInstance', [
     .controller('ProcessInstanceFilterController', ['$scope', ProcessInstanceFilterController]);
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
-    $routeProvider.when('/process-instance/:processInstanceId', {
+
+    $routeProvider.when('/process-instance/:id', {
+      redirectTo: '/process-instance/:id/live'
+    });
+
+    $routeProvider.when('/process-instance/:id/live', {
       templateUrl: 'pages/process-instance.html',
       controller: 'ProcessInstanceController',
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
         processInstance: ['ResourceResolver', 'ProcessInstanceResource',
           function(ResourceResolver, ProcessInstanceResource) {
-            return ResourceResolver.getByRouteParam('processInstanceId', {
+            return ResourceResolver.getByRouteParam('id', {
               name: 'process instance',
               resolve: function(id) {
                 return ProcessInstanceResource.get({ id : id });
@@ -607,5 +608,15 @@ ngDefine('cockpit.pages.processInstance', [
     });
   }];
 
-  module.config(RouteConfig);
+  var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
+      id: 'live',
+      priority: 20,
+      label: 'Live'
+    });
+  }];
+
+  module
+    .config(RouteConfig)
+    .config(ViewConfig);
 });

@@ -51,9 +51,9 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
       ProcessInstanceResource.query({'subProcessInstance': subProcessInstanceId}).$then(function (response) {
 
         if (response.data.length > 0) {
-          var superProcessIntance = response.data[0];
+          var superProcessInstance = response.data[0];
 
-          ProcessDefinitionResource.get({'id': superProcessIntance.definitionId}).$then(function (response) {
+          ProcessDefinitionResource.get({'id': superProcessInstance.definitionId}).$then(function (response) {
             var processDefinition = response.data;            
 
             var processDefinitionBreadcrumb = {
@@ -67,16 +67,16 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
             var processInstanceBreadcrumb = {
               'type': 'processInstance',
               'processDefinition': processDefinition,
-              'processInstance': superProcessIntance,
-              'label': superProcessIntance.id,
+              'processInstance': superProcessInstance,
+              'label': superProcessInstance.id,
               'divider': ':',
-              'href': '/process-instance/' + superProcessIntance.id
+              'href': '/process-instance/' + superProcessInstance.id
             };
 
             $rootScope.breadcrumbs.unshift(processInstanceBreadcrumb);
             $rootScope.breadcrumbs.unshift(processDefinitionBreadcrumb);
 
-            return fetchAllSuperProcessInstances(superProcessIntance.id);
+            return fetchAllSuperProcessInstances(superProcessInstance.id);
           });
         }
       });
