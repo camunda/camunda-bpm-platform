@@ -65,21 +65,19 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       PluginProcessInstanceResource.count(countParams).$then(function(data) {
         pages.total = Math.ceil(data.data.count / pages.size);
       });
-    };
+    }
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+  var Configuration = [ 'ViewsProvider', function(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
+    ViewsProvider.registerDefaultView('cockpit.processDefinition.live.tab', {
       id: 'process-instances-table',
       label: 'Process Instances',
       url: 'plugin://base/static/app/views/processDefinition/process-instance-table.html',
       controller: Controller,
       priority: 10
-    }); 
-  };
-
-  Configuration.$inject = ['ViewsProvider'];
+    });
+  }];
 
   module.config(Configuration);
 });

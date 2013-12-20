@@ -246,20 +246,20 @@ ngDefine('cockpit.pages.processDefinition', [
     $scope.processDefinition = processDefinition;
 
     $scope.processDefinitionVars = { read: [ 'processDefinition', 'selection', 'processData', 'filter' ] };
-    $scope.processDefinitionViews = Views.getProviders({ component: 'cockpit.processDefinition.view' });
-    $scope.processDefinitionActions = Views.getProviders({ component: 'cockpit.processDefinition.action' });
+    $scope.processDefinitionTabs = Views.getProviders({ component: 'cockpit.processDefinition.live.tab' });
+    $scope.processDefinitionActions = Views.getProviders({ component: 'cockpit.processDefinition.live.action' });
 
 
     // extend the current scope to instantiate
     // with process definition data providers
-    Data.instantiateProviders('cockpit.processDefinition.data', {$scope: $scope, processData : processData});
+    Data.instantiateProviders('cockpit.processDefinition.data', { $scope: $scope, processData : processData });
 
 
-    $scope.selectView = function(view) {
-      $scope.selectedView = view;
+    $scope.selectTab = function(tabProvider) {
+      $scope.selectedTab = tabProvider;
 
       search.updateSilently({
-        detailsTab: view.id
+        detailsTab: tabProvider.id
       });
     };
 
@@ -271,9 +271,9 @@ ngDefine('cockpit.pages.processDefinition', [
       }
 
       if (selectedTabId) {
-        var provider = Views.getProvider({ component: 'cockpit.processDefinition.view', id: selectedTabId });
+        var provider = Views.getProvider({ component: 'cockpit.processDefinition.live.tab', id: selectedTabId });
         if (provider && tabs.indexOf(provider) != -1) {
-          $scope.selectedView = provider;
+          $scope.selectedTab = provider;
           return;
         }
       }
@@ -282,10 +282,10 @@ ngDefine('cockpit.pages.processDefinition', [
         detailsTab: null
       });
 
-      $scope.selectedView = tabs[0];
+      $scope.selectedTab = tabs[0];
     }
 
-    setDefaultTab($scope.processDefinitionViews);
+    setDefaultTab($scope.processDefinitionTabs);
   }];
 
   var ProcessDefinitionFilterController = [ '$scope', 'debounce', 'Variables', function($scope, debounce, Variables) {
@@ -461,14 +461,19 @@ ngDefine('cockpit.pages.processDefinition', [
   }];
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
-    $routeProvider.when('/process-definition/:processDefinitionId', {
+
+    $routeProvider.when('/process-definition/:id', {
+      redirectTo: '/process-definition/:id/live'
+    });
+
+    $routeProvider.when('/process-definition/:id/live', {
       templateUrl: 'pages/process-definition.html',
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
         processDefinition: [ 'ResourceResolver', 'ProcessDefinitionResource',
           function(ResourceResolver, ProcessDefinitionResource) {
-            return ResourceResolver.getByRouteParam('processDefinitionId', {
+            return ResourceResolver.getByRouteParam('id', {
               name: 'process definition',
               resolve: function(id) {
                 return ProcessDefinitionResource.get({ id : id });
@@ -480,8 +485,17 @@ ngDefine('cockpit.pages.processDefinition', [
     });
   }];
 
+  var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
+    ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
+      id: 'live',
+      priority: 20,
+      label: 'Live'
+    });
+  }];
+
   module
     .controller('ProcessDefinitionFilterController', ProcessDefinitionFilterController)
     .directive('processVariable', ProcessVariableFilter)
-    .config(RouteConfig);
+    .config(RouteConfig)
+    .config(ViewConfig);
 });

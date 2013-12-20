@@ -150,7 +150,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.live.tab', {
       id: 'user-tasks-tab',
       label: 'User Tasks',
       url: 'plugin://base/static/app/views/processInstance/user-tasks-table.html',

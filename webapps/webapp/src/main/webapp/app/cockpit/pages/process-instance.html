@@ -1,28 +1,36 @@
+<div class="ctn-header">
+  <h1>
+    <i class="icon-type icon-inbox"></i>
+    {{ processDefinition.name || processDefinition.key }}
+    
+    <span title="Process instance id, as it appears in the database">
+      &lt;{{ processInstance.id }}&gt;
+    </span>
+
+    <span class="badge badge-warning badge-suspended"
+          ng-show="processInstance.suspended"
+          title="Currently suspended">
+      <i class="icon-suspended white"></i>
+    </span>
+  </h1>
+
+  <div class="view-pills" id="cockpit.processInstance.view"></div>
+</div>
+
 <div class="ctn-content-container ctn-collapsable-parent">
 
   <!-- toolbar -->
   <div class="ctn-toolbar">
 
     <!-- Toolbar actions are provided by plugins -->
-    <span ng-repeat="viewProvider in processInstanceActions">
-      <view provider="viewProvider" vars="processInstanceVars" />
+    <span ng-repeat="tabProvider in processInstanceActions">
+      <view provider="tabProvider" vars="processInstanceVars" />
     </span>
 
   </div>
 
   <!-- sitebar -->
   <div class="ctn-column ctn-sitebar ctn-collapsable ctn-scroll" collapsable="left">
-
-    <div class="page-header">
-      <small>Process Instance View</small>
-      <h1>{{ processDefinition.name || processDefinition.key }}</h1>
-      <p>
-        <strong title="Process instance id, as it appears in the database">{{ processInstance.id }}</strong>        
-        <span class="badge badge-warning badge-suspended" ng-show="processInstance.suspended" title="Currently suspended">
-          <i class="icon-suspended white"></i>
-        </span>        
-      </p>
-    </div>
 
     <div class="filters" ng-controller="ProcessInstanceFilterController">
       <h5>
@@ -74,13 +82,13 @@
     <div class="ctn-row ctn-content-bottom ctn-tabbed ctn-collapsable" collapse="bottom">
       <div ng-show="processInstanceTabs.length">
         <ul class="nav nav-tabs">
-          <li ng-class="{ active: selectedView == viewProvider }" ng-repeat="viewProvider in processInstanceTabs">
-            <a href ng-click="selectView(viewProvider)">{{ viewProvider.label }}</a>
+          <li ng-class="{ active: selectedTab == tabProvider }" ng-repeat="tabProvider in processInstanceTabs">
+            <a href ng-click="selectTab(tabProvider)">{{ tabProvider.label }}</a>
           </li>
         </ul>
 
         <div class="ctn-tabbed-content ctn-scroll">
-          <view provider="selectedView" vars="processInstanceVars" />
+          <view provider="selectedTab" vars="processInstanceVars" />
         </div>
       </div>
     </div>

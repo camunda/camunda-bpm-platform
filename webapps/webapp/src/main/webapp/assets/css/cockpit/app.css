@@ -86,6 +86,19 @@ a.expand-collapse:focus {
   color: #e9322d;
 }
 
+.ctn-header h1 {
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.ctn-header .icon-type {
+  margin: 5px 5px 5px 0;
+}
+
+.ctn-header .nav > li {
+  margin: 0 5px 0 0;
+}
+
 @media (min-width: 980px) {
 
   .breadcrumbs-panel {
@@ -96,7 +109,6 @@ a.expand-collapse:focus {
     right: 0;
 
     background: whiteSmoke;
-    border-bottom: 1px solid #E5E5E5;
   }
 
   .ctn-wrapper div[ng-view] {
@@ -105,7 +117,28 @@ a.expand-collapse:focus {
     left: 0;
     bottom: 30px;
     right: 0;
-    overflow: auto;
+    overflow: visible;
+  }
+
+  .ctn-header {
+    left: 0;
+    right: 0;
+    background: whitesmoke;
+    height: 35px;
+    position: absolute;
+  }
+
+  .ctn-header h1 {
+    position: absolute;
+    bottom: 0;
+    margin: 0 10px;
+  }
+
+  .ctn-header .nav {
+    position: absolute;
+    right: 10px;
+    bottom: 0;
+    margin: 5px;
   }
 
   .ctn-content-container, .ctn-column, .ctn-toolbar {
@@ -114,6 +147,11 @@ a.expand-collapse:focus {
     left: 0;
     right: 0;
     bottom: 0;
+  }
+
+  .ctn-content-container {
+    border-top: 1px solid #E5E5E5;
+    top: 35px;
   }
 
   .ctn-toolbar {
@@ -264,10 +302,6 @@ a.expand-collapse:focus {
   line-height: 30px;
 
   margin-top: 2px;
-}
-
-.ctn-sitebar .page-header {
-  padding-bottom: 0;
 }
 
 .btn-control {

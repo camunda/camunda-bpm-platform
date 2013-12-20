@@ -64,7 +64,7 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
+    ViewsProvider.registerDefaultView('cockpit.processDefinition.live.tab', {
       id: 'job-definition-table',
       label: 'Job Definitions',
       url: 'plugin://jobDefinition/static/app/views/processDefinition/job-definition-table.html',
