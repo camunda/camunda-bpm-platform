@@ -28,6 +28,12 @@ import javax.enterprise.inject.spi.PassivationCapable;
  * <p />
  * Note: BusinessProcessScoped beans need to be {@link PassivationCapable}.
  * <p />
+ * Note: BusinessProcessScoped is not capable of managing local process variables,
+ * and there is currently also no respective other implementation for that. Please use
+ * {@link org.camunda.bpm.engine.cdi.BusinessProcess#setVariableLocal(String, Object)}
+ * and {@link org.camunda.bpm.engine.cdi.BusinessProcess#getVariableLocal(String)}
+ * or an injected Map of local process variables instead.
+ * <p />
  * If no ProcessInstance is currently managed, instances of
  * {@link BusinessProcessScoped} beans are temporarily stored in a local scope
  * (I.e. the Conversation or the Request, depending on the context, see javadoc

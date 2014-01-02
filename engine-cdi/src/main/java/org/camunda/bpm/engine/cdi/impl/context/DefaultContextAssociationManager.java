@@ -63,6 +63,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
     private TaskService taskService;
 
     protected Map<String, Object> cachedVariables = new HashMap<String, Object>();
+    protected Map<String, Object> cachedVariablesLocal = new HashMap<String, Object>();
     protected Execution execution;
     protected Task task;
 
@@ -101,11 +102,36 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
       return cachedVariables;
     }
 
+    public <T> T getVariableLocal(String variableName) {
+	    Object value = cachedVariablesLocal.get(variableName);
+	    if(value == null) {
+	      if(execution != null) {
+	        value = runtimeService.getVariableLocal(execution.getId(), variableName);
+	        cachedVariablesLocal.put(variableName, value);
+	      }
+	    }
+	    return (T) value;
+	  }
+	
+	  public void setVariableLocal(String variableName, Object value) {
+	  	if(execution == null && task == null) {
+	  		throw new ProcessEngineCdiException("Cannot set a local cached variable: neither a Task nor an Execution is associated.");
+	  	}
+	  	
+	  	cachedVariablesLocal.put(variableName, value);
+	  }
+	
+	  public Map<String, Object> getCachedVariablesLocal() {
+	    return cachedVariablesLocal;
+	  }
+
     public void flushVariableCache() {
       if(task != null) {
+      	taskService.setVariablesLocal(task.getId(), cachedVariablesLocal);
         taskService.setVariables(task.getId(), cachedVariables);
 
       } else if(execution != null) {
+      	runtimeService.setVariablesLocal(execution.getId(), cachedVariablesLocal);
         runtimeService.setVariables(execution.getId(), cachedVariables);
 
       } else {
@@ -115,6 +141,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
 
       // clear variable cache after flush
       cachedVariables.clear();
+      cachedVariablesLocal.clear();
     }
 
   }
@@ -235,6 +262,27 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
     }
   }
 
+  @Override
+  public Object getVariableLocal(String variableName) {
+    ExecutionEntity execution = getExecutionFromContext();
+    if(execution != null) {
+      return execution.getVariableLocal(variableName);
+    } else {
+      return getScopedAssociation().getVariableLocal(variableName);
+    }
+  }
+
+  @Override
+  public void setVariableLocal(String variableName, Object value) {
+    ExecutionEntity execution = getExecutionFromContext();
+    if(execution != null) {
+      execution.setVariableLocal(variableName, value);
+      execution.getVariableLocal(variableName);
+    } else {
+      getScopedAssociation().setVariableLocal(variableName, value);
+    }
+  }
+
   protected ExecutionEntity getExecutionFromContext() {
     if(Context.getCommandContext() != null) {
       ExecutionContext executionContext = Context.getExecutionContext();
@@ -258,6 +306,11 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
   public Map<String, Object> getCachedVariables() {
     ensureCommandContextNotActive();
     return getScopedAssociation().getCachedVariables();
+  }
+
+  public Map<String, Object> getCachedVariablesLocal() {
+    ensureCommandContextNotActive();
+    return getScopedAssociation().getCachedVariablesLocal();
   }
 
   public void flushVariableCache() {
