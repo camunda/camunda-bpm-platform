@@ -127,12 +127,12 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
 
     public void flushVariableCache() {
       if(task != null) {
+      	taskService.setVariablesLocal(task.getId(), cachedVariablesLocal);
         taskService.setVariables(task.getId(), cachedVariables);
-        taskService.setVariablesLocal(task.getId(), cachedVariablesLocal);
 
       } else if(execution != null) {
+      	runtimeService.setVariablesLocal(execution.getId(), cachedVariablesLocal);
         runtimeService.setVariables(execution.getId(), cachedVariables);
-        runtimeService.setVariablesLocal(execution.getId(), cachedVariablesLocal);
 
       } else {
         throw new ProcessEngineCdiException("Cannot flush variable cache: neither a Task nor an Execution is associated.");
