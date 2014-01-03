@@ -1,0 +1,47 @@
+= camunda BPMN Model API
+
+The camunda BPMN Model API is a simple, lightweight Java library for parsing, creating and editing BPMN 2.0 Xml files. It is licensed under the Apache 2.0 license and does not depend on any external libraries.
+
+== Examples
+
+== Features
+
+=== Parse BPMN 2.0 XML files into a Java Object Model
+
+=== Fluent DSL for creating BPMN Processes
+
+=== Custom Elements and Extensions
+
+=== Edit / update existing BPMN 2.0 XML Models
+
+camunda BPMN model API supports the complete model editing roundtrip: importing a BPMN XML file, doing some changes on the model and updating the XML file with the changes. Updating an existing file preseves existing formatting as much as possible and does not remove Non-BPMN elements. 
+
+=== JSON Import and Export
+
+== FAQ
+
+=== What is BPMN 2.0?
+
+Read the http://camunda.org/bpmn/tutorial.html[BPMN 2.0 Tutorial on camunda.org].
+
+=== Which parts of BPMN 2.0 are supported?
+
+camunda BPMN Model API currently lacks support for the following BPMN constructs:
+
+ALL!
+
+=== Which third party libraries are required?
+
+None :)
+
+=== Which Java (JRE) Version is required?
+
+Java JRE 1.6+ is required. We test camunda BPMN Model API on Oracle and IBM JVMs.
+
+=== Under which License is camunda BPMN Model API distributed?
+
+Apache License 2.0.
+
+== Roadmap
+
+* Revise Maven POM
