@@ -2,33 +2,103 @@
 
 The camunda BPMN Model API is a simple, lightweight Java library for parsing, creating and editing BPMN 2.0 Xml files. It is licensed under the Apache 2.0 license and does not depend on any external libraries.
 
-== Examples
-
 == Features
 
 === Parse BPMN 2.0 XML files into a Java Object Model
 
-=== Fluent DSL for creating BPMN Processes
+Open an existing BPMN 2.0 process model from a file (or an input stream) and parse it into a Java Object Model. The model can than be inspected using a high level Java API:
+
+[source,java]
+----
+// read existing model from file (or input stream):
+BpmnModelInstance model = Bpmn.readModelFromFile("path/to/my/Process.bpmn20.xml");
+
+// The definitions element is the root element of a BPMN model
+Definitions definitions = model.getDefinitions();
+
+// iterate all processes
+Collection<Process> processes = definitions.getProcesses();
+for(Process process : processes) {
+
+  // iterate all activities
+  Collection<Activity> activities = process.getActivities();
+  for(Activity activity : activities) {
+    LOG.info("Model contains activity with name "+activity.getName());
+  }
+
+}
+----
 
 === Custom Elements and Extensions
 
+BPMN 2.0 XXML files can be extended using custom attributes and elements in custom namespaces: 
+
+[source,xml]
+----
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:custom="http://example.org/monitoring"
+  targetNamespace="Examples">
+  ...
+  <userTask id="myTask" name="Review Order" custom:monitoringEnabled="true">
+    <extensionElements>
+      <custom:monitoringData maxDuration="6h" severity="high" />
+    </extensionElements>
+  </userTask>
+  ...
+</definitions>
+----
+
+The camunda model API provides generic read/write access to extension attributes and elements: 
+
+[source,java]
+----
+final String customNs = "http://example.org/monitoring";
+
+// find user task in model
+UserTask userTask = ...; 
+
+// use generic API to get monitoring data from UserTask element
+if(userTask.getBooleanAttribute("monitoringEnabled", customNs)) {
+  ModelElementInstance monitoringData = userTask.getExtensionElements().getChildElement("monitoringData", customNs);
+  String maxDuration = monitoringData.getAttribute("maxDuration");
+}
+----
+
+On top of this, it is also possible to extend the model with a custom user task implementation and 
+provide a custom high-level API for such extended tasks. In this case the model elements can be casted to your custom extended types:
+
+[source,java]
+----
+
+// find user task in model
+UserTask userTask = ...; 
+// cast to extended type:
+CustomUserTask customUserTask = (CustomUserTask) userTask;
+
+// use high level API to get monitoring data from CustomUserTask element
+if(customUserTask.isMonitoringEnabled()) {
+  String maxDuration = customUserTask.getMonitoringMaxDuration();
+}
+----
+
 === Edit / update existing BPMN 2.0 XML Models
 
-camunda BPMN model API supports the complete model editing roundtrip: importing a BPMN XML file, doing some changes on the model and updating the XML file with the changes. Updating an existing file preseves existing formatting as much as possible and does not remove Non-BPMN elements. 
+camunda BPMN model API supports the complete model editing roundtrip: importing a BPMN XML file, doing some changes on the model and updating the XML file with the changes. Updating an existing file preseves existing formatting as much as possible and does not remove any non-BPMN elements.
+
+=== Fluent DSL for creating Models
+
+TODO.
 
 === JSON Import and Export
+
+Full support for importing / exporting a BPMN model to JSON is provided. Just as the editing capabilites, the JSON import/export does not remove any custom elements and attributes.
 
 == FAQ
 
 === What is BPMN 2.0?
 
 Read the http://camunda.org/bpmn/tutorial.html[BPMN 2.0 Tutorial on camunda.org].
-
-=== Which parts of BPMN 2.0 are supported?
-
-camunda BPMN Model API currently lacks support for the following BPMN constructs:
-
-ALL!
 
 === Which third party libraries are required?
 
@@ -41,7 +111,3 @@ Java JRE 1.6+ is required. We test camunda BPMN Model API on Oracle and IBM JVMs
 === Under which License is camunda BPMN Model API distributed?
 
 Apache License 2.0.
-
-== Roadmap
-
-* Revise Maven POM
