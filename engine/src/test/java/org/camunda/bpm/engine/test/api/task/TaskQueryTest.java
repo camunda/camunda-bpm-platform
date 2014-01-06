@@ -21,7 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -732,6 +735,61 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     
     assertEquals(0, taskService.createTaskQuery().dueAfter(oneHourLater.getTime()).count());
     assertEquals(0, taskService.createTaskQuery().dueAfter(oneHourAgo.getTime()).count());
+  }
+  
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  public void testFollowUpDate() throws Exception {
+    Calendar otherDate = Calendar.getInstance();
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // do not find any task instances without follow up date
+    assertEquals(0, taskService.createTaskQuery().followUpDate(otherDate.getTime()).count());
+
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    
+    // Set due-date on task
+    Date followUpDate = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("01/02/2003 01:12:13");
+    task.setFollowUpDate(followUpDate);
+    taskService.saveTask(task);
+
+    assertEquals(followUpDate, taskService.createTaskQuery().taskId(task.getId()).singleResult().getFollowUpDate());
+    assertEquals(1, taskService.createTaskQuery().followUpDate(followUpDate).count());
+    
+    otherDate.setTime(followUpDate);
+    otherDate.add(Calendar.YEAR, 1);
+    
+    assertEquals(0, taskService.createTaskQuery().followUpDate(otherDate.getTime()).count());
+    assertEquals(1, taskService.createTaskQuery().followUpBefore(otherDate.getTime()).count());
+    assertEquals(0, taskService.createTaskQuery().followUpAfter(otherDate.getTime()).count());
+
+    otherDate.add(Calendar.YEAR, -2);
+    assertEquals(1, taskService.createTaskQuery().followUpAfter(otherDate.getTime()).count());
+    assertEquals(0, taskService.createTaskQuery().followUpBefore(otherDate.getTime()).count());
+    
+    assertEquals(1, taskService.createTaskQuery().taskId(task.getId()).orderByFollowUpDate().asc().list().size());
+
+    taskService.complete(task.getId());
+    
+    // now process instance is ended - check history
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
+      assertEquals(followUpDate, historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult().getFollowUpDate());
+
+      assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpDate(followUpDate).count());
+      
+      otherDate.setTime(followUpDate);
+      otherDate.add(Calendar.YEAR, 1);
+      
+      assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskFollowUpDate(otherDate.getTime()).count());
+      assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpBefore(otherDate.getTime()).count());
+      assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskFollowUpAfter(otherDate.getTime()).count());
+
+      otherDate.add(Calendar.YEAR, -2);
+      assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpAfter(otherDate.getTime()).count());
+      assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskFollowUpBefore(otherDate.getTime()).count());
+
+      assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).orderByTaskFollowUpDate().asc().list().size());
+    }
   }
   
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})

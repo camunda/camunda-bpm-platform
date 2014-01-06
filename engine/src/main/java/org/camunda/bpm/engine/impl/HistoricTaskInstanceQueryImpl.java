@@ -58,7 +58,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected Date dueDate;
   protected Date dueAfter;
   protected Date dueBefore;
-
+  protected Date followUpDate;
+  protected Date followUpBefore;
+  protected Date followUpAfter; 
+  
   public HistoricTaskInstanceQueryImpl() {
   }
 
@@ -230,6 +233,21 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     this.dueBefore = dueBefore;
     return this;
   }
+  
+  public HistoricTaskInstanceQuery taskFollowUpDate(Date followUpDate) {
+    this.followUpDate = followUpDate;
+    return this;
+  }
+  
+  public HistoricTaskInstanceQuery taskFollowUpBefore(Date followUpBefore) {
+    this.followUpBefore = followUpBefore;
+    return this;
+  }
+  
+  public HistoricTaskInstanceQuery taskFollowUpAfter(Date followUpAfter) {
+    this.followUpAfter = followUpAfter;
+    return this;
+  }  
 
   // ordering /////////////////////////////////////////////////////////////////
 
@@ -295,6 +313,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public HistoricTaskInstanceQuery orderByTaskDueDate() {
     orderBy(HistoricTaskInstanceQueryProperty.TASK_DUE_DATE);
+    return this;
+  }
+  
+  public HistoricTaskInstanceQuery orderByTaskFollowUpDate() {
+    orderBy(HistoricTaskInstanceQueryProperty.TASK_FOLLOW_UP_DATE);
     return this;
   }
   

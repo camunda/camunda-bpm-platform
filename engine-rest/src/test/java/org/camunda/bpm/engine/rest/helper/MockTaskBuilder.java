@@ -27,6 +27,7 @@ public class MockTaskBuilder {
   private String assignee;
   private Date createTime;
   private Date dueDate;
+  private Date followUpDate;
   private DelegationState delegationState;
   private String description;
   private String executionId;
@@ -59,6 +60,11 @@ public class MockTaskBuilder {
   
   public MockTaskBuilder dueDate(Date dueDate) {
     this.dueDate = dueDate;
+    return this;
+  }
+  
+  public MockTaskBuilder followUpDate(Date followUpDate) {
+    this.followUpDate = followUpDate;
     return this;
   }
   
@@ -114,6 +120,7 @@ public class MockTaskBuilder {
     when(mockTask.getAssignee()).thenReturn(assignee);
     when(mockTask.getCreateTime()).thenReturn(createTime);  
     when(mockTask.getDueDate()).thenReturn(dueDate); 
+    when(mockTask.getFollowUpDate()).thenReturn(followUpDate); 
     when(mockTask.getDelegationState()).thenReturn(delegationState); 
     when(mockTask.getDescription()).thenReturn(description); 
     when(mockTask.getExecutionId()).thenReturn(executionId); 
