@@ -101,6 +101,22 @@ a.expand-collapse:focus {
 
 @media (min-width: 980px) {
 
+  .ctn-view {
+    border-top: 1px solid #E5E5E5; /* bread crumbs border */
+
+    padding-top: 10px;
+    margin-top: 30px;
+  }
+
+  .ctn-fixed-view {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    bottom: 30px;
+    right: 0;
+    overflow: visible;
+  }
+
   .breadcrumbs-panel {
     position: absolute;
     height: 30px;
@@ -109,15 +125,6 @@ a.expand-collapse:focus {
     right: 0;
 
     background: whiteSmoke;
-  }
-
-  .ctn-wrapper div[ng-view] {
-    position: absolute;
-    top: 30px;
-    left: 0;
-    bottom: 30px;
-    right: 0;
-    overflow: visible;
   }
 
   .ctn-header {
@@ -150,7 +157,7 @@ a.expand-collapse:focus {
   }
 
   .ctn-content-container {
-    border-top: 1px solid #E5E5E5;
+    border-top: 1px solid #E5E5E5; /* bread crumbs border */
     top: 35px;
   }
 
@@ -256,7 +263,7 @@ a.expand-collapse:focus {
   a.expand-collapse {
     visibility: hidden;
   }
-  
+
   .resize-handle {
     display: none;
   }
