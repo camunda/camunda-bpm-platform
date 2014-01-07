@@ -169,11 +169,11 @@ a.expand-collapse:focus {
     background-color: whiteSmoke;
   }
 
-  .ctn-sitebar > div {
+  .ctn-sidebar > div {
     margin: 10px;
   }
 
-  .ctn-sitebar {
+  .ctn-sidebar {
     width: 250px;
     right: auto;
   }
@@ -183,7 +183,7 @@ a.expand-collapse:focus {
     right: 41px;
   }
 
-  .ctn-sitebar, .ctn-content {
+  .ctn-sidebar, .ctn-content {
     overflow: auto;
   }
 
@@ -256,7 +256,7 @@ a.expand-collapse:focus {
     margin: 10px;
   }
 
-  .ctn-sitebar {
+  .ctn-sidebar {
     border-bottom: solid 1px #BBB;
   }
 
@@ -304,7 +304,7 @@ a.expand-collapse:focus {
   opacity: 1;
 }
 
-.ctn-sitebar h1 {
+.ctn-sidebar h1 {
   font-size: 20px;
   line-height: 30px;
 
