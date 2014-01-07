@@ -85,7 +85,12 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     ProcessInstance instance = null;
     try {
       Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
-      instance = runtimeService.startProcessInstanceById(processDefinitionId, variables);
+      String businessKey = parameters.getBusinessKey();
+      if (businessKey != null) {
+        instance = runtimeService.startProcessInstanceById(processDefinitionId, businessKey, variables);
+      } else {
+        instance = runtimeService.startProcessInstanceById(processDefinitionId, variables);
+      }
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
@@ -124,7 +129,12 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     ProcessInstance instance = null;
     try {
       Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
-      instance = formService.submitStartForm(processDefinitionId, variables);
+      String businessKey = parameters.getBusinessKey();
+      if (businessKey != null) {
+        instance = formService.submitStartForm(processDefinitionId, businessKey, variables);
+      } else {
+        instance = formService.submitStartForm(processDefinitionId, variables);
+      }
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());

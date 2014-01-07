@@ -303,6 +303,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskPriority().asc().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().asc().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskId().asc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskDueDate().asc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskFollowUpDate().asc().count());
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByDeleteReason().desc().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByExecutionId().desc().count());
@@ -316,6 +318,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskPriority().desc().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().desc().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskId().desc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskDueDate().desc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskFollowUpDate().desc().count());
   }
 
   public void testInvalidSorting() {
@@ -339,5 +343,43 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
 
     }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  public void testHistoricTaskInstanceQueryByFollowUpDate() throws Exception {
+    Calendar otherDate = Calendar.getInstance();
+
+    runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
+
+    // do not find any task instances with follow up date
+    assertEquals(0, taskService.createTaskQuery().followUpDate(otherDate.getTime()).count());
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // set follow-up date on task
+    Date followUpDate = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("01/02/2003 01:12:13");
+    task.setFollowUpDate(followUpDate);
+    taskService.saveTask(task);
+
+    // test that follow-up date was written to historic database
+    assertEquals(followUpDate, historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult().getFollowUpDate());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpDate(followUpDate).count());
+
+    otherDate.setTime(followUpDate);
+
+    otherDate.add(Calendar.YEAR, 1);
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskFollowUpDate(otherDate.getTime()).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpBefore(otherDate.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskFollowUpAfter(otherDate.getTime()).count());
+
+    otherDate.add(Calendar.YEAR, -2);
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpAfter(otherDate.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskFollowUpBefore(otherDate.getTime()).count());
+    assertEquals(followUpDate, historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult().getFollowUpDate());
+
+    taskService.complete(task.getId());
+
+    assertEquals(followUpDate, historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult().getFollowUpDate());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpDate(followUpDate).count());
   }
 }

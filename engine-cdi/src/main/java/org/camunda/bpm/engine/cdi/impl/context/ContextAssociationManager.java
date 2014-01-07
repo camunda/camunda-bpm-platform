@@ -77,6 +77,21 @@ public interface ContextAssociationManager {
   public Map<String,Object> getCachedVariables();
 
   /**
+   * set a local process variable
+   */
+	void setVariableLocal(String variableName, Object value);
+
+	/**
+   * get a local process variable
+   */
+	Object getVariableLocal(String variableName);
+
+  /**
+   * @return a map of local process variables cached between flushes
+   */
+  public Map<String,Object> getCachedVariablesLocal();
+
+  /**
    * allows to flush the cached variables.
    */
   public void flushVariableCache();

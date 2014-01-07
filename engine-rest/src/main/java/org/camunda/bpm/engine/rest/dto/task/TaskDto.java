@@ -24,6 +24,7 @@ public class TaskDto {
   private String assignee;
   private Date created;
   private Date due;
+  private Date followUp;
   private DelegationState delegationState;
   private String description;
   private String executionId;
@@ -90,6 +91,10 @@ public class TaskDto {
     return taskDefinitionKey;
   }
 
+  public Date getFollowUp() {
+    return followUp;
+  }
+
   public static TaskDto fromTask(Task task) {
     TaskDto dto = new TaskDto();
     dto.id = task.getId();
@@ -97,6 +102,7 @@ public class TaskDto {
     dto.assignee = task.getAssignee();
     dto.created = task.getCreateTime();
     dto.due = task.getDueDate();
+    dto.followUp = task.getFollowUpDate();
     dto.delegationState = task.getDelegationState();
     dto.description = task.getDescription();
     dto.executionId = task.getExecutionId();

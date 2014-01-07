@@ -175,6 +175,21 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    */
   HistoricTaskInstanceQuery taskDueAfter(Date dueDate);
   
+  /**
+   * Only select select historic task instances with the given follow-up date.
+   */
+  HistoricTaskInstanceQuery taskFollowUpDate(Date followUpDate);
+
+  /**
+   * Only select select historic task instances which have a follow-up date before the given date.
+   */
+  HistoricTaskInstanceQuery taskFollowUpBefore(Date followUpDate);
+
+  /**
+   * Only select select historic task instances which have a follow-up date after the given date.
+   */
+  HistoricTaskInstanceQuery taskFollowUpAfter(Date followUpDate);
+
   /** Order by task id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricTaskInstanceQuery orderByTaskId();
   
@@ -216,6 +231,9 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   
   /** Order by task due date (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricTaskInstanceQuery orderByTaskDueDate();
+
+  /** Order by task follow-up date (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricTaskInstanceQuery orderByTaskFollowUpDate();
   
   /** Order by task delete reason (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricTaskInstanceQuery orderByDeleteReason();
