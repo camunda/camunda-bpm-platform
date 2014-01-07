@@ -675,6 +675,11 @@ public class ExecutionImpl implements
       for (OutgoingExecution outgoingExecution: outgoingExecutions) {
         outgoingExecution.take();
       }
+
+      // if no outgoing executions, the concurrent root execution ends
+      if (outgoingExecutions.isEmpty()) {
+        concurrentRoot.end();
+      }
     }
   }
 
