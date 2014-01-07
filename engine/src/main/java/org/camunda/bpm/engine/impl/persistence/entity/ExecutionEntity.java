@@ -582,6 +582,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       for (OutgoingExecution outgoingExecution: outgoingExecutions) {
         outgoingExecution.take();
       }
+
+      // if no outgoing executions, the concurrent root execution ends
+      if (outgoingExecutions.isEmpty()) {
+        concurrentRoot.end();
+      }
     }
   }
 
