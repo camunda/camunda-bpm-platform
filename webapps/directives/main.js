@@ -5,7 +5,7 @@ ngDefine('cockpit.directives', [
   './processDiagram',
   './processDiagramPreview',
   './activityInstanceTree',
-  './sitebarContainer',
+  './sidebarContainer',
   './stateCircle',
   './variable',
   './viewPills'
