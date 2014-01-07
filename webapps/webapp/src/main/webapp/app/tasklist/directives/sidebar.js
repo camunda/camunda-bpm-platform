@@ -1,10 +1,10 @@
 ngDefine('tasklist.directives', [
-  'angular', 
+  'angular',
   'require'
 ], function(module, angular, require) {
 
-  var SitebarController = [ 
-    '$scope', '$location', 'EngineApi', 'Authentication', 
+  var SitebarController = [
+    '$scope', '$location', 'EngineApi', 'Authentication',
     function($scope, $location, EngineApi, Authentication) {
 
     var tasks;
@@ -25,7 +25,7 @@ ngDefine('tasklist.directives', [
       if (!authenticatedUser) {
         return;
       }
-      
+
       tasks = $scope.tasks = {
         mytasks: EngineApi.getTaskCount().get({ 'assignee' : authenticatedUser }),
         unassigned: EngineApi.getTaskCount().get({ 'candidateUser' : authenticatedUser })
@@ -64,10 +64,10 @@ ngDefine('tasklist.directives', [
 
   var SitebarDirective = [ 'AuthenticationService', function(AuthenticationService) {
     return {
-      templateUrl: require.toUrl('./sitebar.html'),
+      templateUrl: require.toUrl('./sidebar.html'),
       controller: SitebarController
     };
   }];
 
-  module.directive('sitebar', SitebarDirective);
+  module.directive('sidebar', SitebarDirective);
 });
