@@ -101,6 +101,22 @@ a.expand-collapse:focus {
 
 @media (min-width: 980px) {
 
+  .ctn-view {
+    border-top: 1px solid #E5E5E5; /* bread crumbs border */
+
+    padding-top: 10px;
+    margin-top: 30px;
+  }
+
+  .ctn-fixed-view {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    bottom: 30px;
+    right: 0;
+    overflow: visible;
+  }
+
   .breadcrumbs-panel {
     position: absolute;
     height: 30px;
@@ -109,15 +125,6 @@ a.expand-collapse:focus {
     right: 0;
 
     background: whiteSmoke;
-  }
-
-  .ctn-wrapper div[ng-view] {
-    position: absolute;
-    top: 30px;
-    left: 0;
-    bottom: 30px;
-    right: 0;
-    overflow: visible;
   }
 
   .ctn-header {
@@ -150,7 +157,7 @@ a.expand-collapse:focus {
   }
 
   .ctn-content-container {
-    border-top: 1px solid #E5E5E5;
+    border-top: 1px solid #E5E5E5; /* bread crumbs border */
     top: 35px;
   }
 
@@ -162,11 +169,11 @@ a.expand-collapse:focus {
     background-color: whiteSmoke;
   }
 
-  .ctn-sitebar > div {
+  .ctn-sidebar > div {
     margin: 10px;
   }
 
-  .ctn-sitebar {
+  .ctn-sidebar {
     width: 250px;
     right: auto;
   }
@@ -176,7 +183,7 @@ a.expand-collapse:focus {
     right: 41px;
   }
 
-  .ctn-sitebar, .ctn-content {
+  .ctn-sidebar, .ctn-content {
     overflow: auto;
   }
 
@@ -249,14 +256,14 @@ a.expand-collapse:focus {
     margin: 10px;
   }
 
-  .ctn-sitebar {
+  .ctn-sidebar {
     border-bottom: solid 1px #BBB;
   }
 
   a.expand-collapse {
     visibility: hidden;
   }
-  
+
   .resize-handle {
     display: none;
   }
@@ -297,7 +304,7 @@ a.expand-collapse:focus {
   opacity: 1;
 }
 
-.ctn-sitebar h1 {
+.ctn-sidebar h1 {
   font-size: 20px;
   line-height: 30px;
 

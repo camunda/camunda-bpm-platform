@@ -138,4 +138,17 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
     //assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).finished().count());
   }
 
+  @Deployment
+  public void testCompletingJoin() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    assertTrue(processInstance.isEnded());
+  }
+
+  @Deployment
+  public void FAILING_testCompletingJoinInSubProcess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    assertTrue(processInstance.isEnded());
+  }
 }

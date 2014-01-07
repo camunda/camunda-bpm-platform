@@ -115,6 +115,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     String returendAssignee = from(content).getString("[0].assignee");
     String returnedCreateTime = from(content).getString("[0].created");
     String returnedDueDate = from(content).getString("[0].due");
+    String returnedFollowUpDate = from(content).getString("[0].followUp");
     String returnedDelegationState = from(content).getString("[0].delegationState");
     String returnedDescription = from(content).getString("[0].description");
     String returnedExecutionId = from(content).getString("[0].executionId");
@@ -130,6 +131,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME, returendAssignee);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_CREATE_TIME, returnedCreateTime);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_DUE_DATE, returnedDueDate);
+    Assert.assertEquals(MockProvider.EXAMPLE_FOLLOW_UP_DATE, returnedFollowUpDate);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_DELEGATION_STATE.toString(), returnedDelegationState);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_DESCRIPTION, returnedDescription);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_EXECUTION_ID, returnedExecutionId);
@@ -270,6 +272,9 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     verify(mockQuery).dueAfter(any(Date.class));
     verify(mockQuery).dueBefore(any(Date.class));
     verify(mockQuery).dueDate(any(Date.class));
+    verify(mockQuery).followUpAfter(any(Date.class));
+    verify(mockQuery).followUpBefore(any(Date.class));
+    verify(mockQuery).followUpDate(any(Date.class));
     verify(mockQuery).taskCreatedAfter(any(Date.class));
     verify(mockQuery).taskCreatedBefore(any(Date.class));
     verify(mockQuery).taskCreatedOn(any(Date.class));
@@ -283,6 +288,9 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     parameters.put("createdAfter", "2013-01-23T14:42:45");
     parameters.put("createdBefore", "2013-01-23T14:42:46");
     parameters.put("created", "2013-01-23T14:42:47");
+    parameters.put("followUpAfter", "2013-01-23T14:42:48");
+    parameters.put("followUpBefore", "2013-01-23T14:42:49");
+    parameters.put("followUp", "2013-01-23T14:42:50");
     return parameters;
   }
 
@@ -331,6 +339,16 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     inOrder.verify(mockQuery).orderByDueDate();
     inOrder.verify(mockQuery).desc();
   
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("followUpDate", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByFollowUpDate();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("followUpDate", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByFollowUpDate();
+    inOrder.verify(mockQuery).asc();
+
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("executionId", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByExecutionId();

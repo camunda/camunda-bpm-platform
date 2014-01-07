@@ -1,6 +1,6 @@
 ngDefine(
-  'cockpit.directives', [ 
-  'jquery', 'angular' 
+  'cockpit.directives', [
+  'jquery', 'angular'
 ], function(module, $, angular) {
 
   module.directive('ctnCollapsableParent', function() {
@@ -26,19 +26,19 @@ ngDefine(
 
         /////// init show / hide handles ////////
 
-        var showHandle = 
+        var showHandle =
           compensateElement
             .children('.show-collapsable')
               .addClass('expand-collapse')
               .append('<i class="icon-chevron-right"></i>')
-              .attr('title', 'Show sitebar');
-        
-        var hideHandle = 
+              .attr('title', 'Show sidebar');
+
+        var hideHandle =
           collapsableElement
             .children('.hide-collapsable')
               .addClass('expand-collapse')
               .append('<i class="icon-chevron-left"></i>')
-              .attr('title', 'Hide sitebar');
+              .attr('title', 'Hide sidebar');
 
         /**
          * Toggle show / hide handles

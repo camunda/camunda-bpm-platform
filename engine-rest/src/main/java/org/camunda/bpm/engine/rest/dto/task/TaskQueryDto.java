@@ -38,6 +38,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
   private static final String SORT_BY_DUE_DATE_VALUE = "dueDate";
+  private static final String SORT_BY_FOLLOW_UP_VALUE = "followUpDate";
   private static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
   private static final String SORT_BY_ASSIGNEE_VALUE = "assignee";
   private static final String SORT_BY_CREATE_TIME_VALUE = "created";
@@ -51,6 +52,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DUE_DATE_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_FOLLOW_UP_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_EXECUTION_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ASSIGNEE_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_CREATE_TIME_VALUE);
@@ -88,6 +90,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private Date dueAfter;
   private Date dueBefore;
   private Date dueDate;
+  private Date followUpAfter;
+  private Date followUpBefore;
+  private Date followUpDate;
   private Date createdAfter;
   private Date createdBefore;
   private Date createdOn;
@@ -242,6 +247,21 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.dueDate = dueDate;
   }
 
+  @CamundaQueryParam(value = "followUpAfter", converter = DateConverter.class)
+  public void setFollowUpAfter(Date followUpAfter) {
+    this.followUpAfter = followUpAfter;
+  }
+
+  @CamundaQueryParam(value = "followUpBefore", converter = DateConverter.class)
+  public void setFollowUpBefore(Date followUpBefore) {
+    this.followUpBefore = followUpBefore;
+  }
+
+  @CamundaQueryParam(value = "followUp", converter = DateConverter.class)
+  public void setFollowUpDate(Date followUp) {
+    this.followUpDate = followUp;
+  }
+
   @CamundaQueryParam(value = "createdAfter", converter = DateConverter.class)
   public void setCreatedAfter(Date createdAfter) {
     this.createdAfter = createdAfter;
@@ -364,6 +384,15 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (dueDate != null) {
       query.dueDate(dueDate);
     }
+    if (followUpAfter != null) {
+      query.followUpAfter(followUpAfter);
+    }
+    if (followUpBefore != null) {
+      query.followUpBefore(followUpBefore);
+    }
+    if (followUpDate != null) {
+      query.followUpDate(followUpDate);
+    }
     if (createdAfter != null) {
       query.taskCreatedAfter(createdAfter);
     }
@@ -427,6 +456,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
         query.orderByProcessInstanceId();
       } else if (sortBy.equals(SORT_BY_DUE_DATE_VALUE)) {
         query.orderByDueDate();
+      } else if (sortBy.equals(SORT_BY_FOLLOW_UP_VALUE)) {
+        query.orderByFollowUpDate();
       } else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
         query.orderByExecutionId();
       } else if (sortBy.equals(SORT_BY_ASSIGNEE_VALUE)) {
