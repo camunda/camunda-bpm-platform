@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Daniel Meyer
  *
  */
-public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
+public abstract class ReceiveTaskTest extends PluggableProcessEngineTestCase {
 
   // https://app.camunda.com/jira/browse/CAM-1612
   @Deployment
