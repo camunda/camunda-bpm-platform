@@ -9,16 +9,21 @@ ngDefine(
       restrict: 'CA',
       link: function(scope, element, attrs) {
         var container = $(element);
+        var containerId = attrs.ctnCollapsableParent;
 
         // the element being collapsed
-        var collapsableElement = container.children('.ctn-collapsable');
+        // var collapsableElement = container.children('.ctn-collapsable');
+        var collapsableElement = $('[ctn-collapsable]', container).eq(0);
 
         // the direction into which to collapse
-        var direction = collapsableElement.attr('collapse') || 'left';
-        var vertical = direction == 'left' || direction == 'right';
+        // var direction = collapsableElement.attr('collapse') || 'left';
+        var direction = collapsableElement.attr('ctn-collapsable') || 'left';
+        var vertical = direction === 'left' || direction === 'right';
+
+        var originalCollapsabled = localStorage ? localStorage.getItem('ctnCollapsableParent:collapsed:'+ containerId) : 'no';
 
         // the main element that compensates the collapsing
-        var compensateElement = collapsableElement[direction == 'left' || direction == 'top' ? 'next' : 'prev']();
+        var compensateElement = collapsableElement[direction === 'left' || direction === 'top' ? 'next' : 'prev']();
 
         // a resize handle
         var resizeHandle = $('<div class="resize-handle"></div>')
@@ -50,6 +55,11 @@ ngDefine(
           } else {
             showHandle.hide();
             hideHandle.css('display', 'block');
+          }
+
+          if (localStorage) {
+            // we need to store something else than a boolean because if it was never "initialized"
+            localStorage.setItem('ctnCollapsableParent:collapsed:'+ containerId, collapsed ? 'yes' : 'no');
           }
         }
 
@@ -84,11 +94,25 @@ ngDefine(
 
           var originalCollapsableSize = collapsableElement[changeAttr]();
 
+          if (localStorage) {
+            var storedPos = localStorage.getItem('ctnCollapsableParent:size:'+ containerId);
+            originalCollapsableSize = (storedPos !== null ? storedPos : originalCollapsableSize);
+          }
+
+          if (originalCollapsabled === 'yes') {
+            collapsableElement.css(changeAttr, 0);
+            compensateElement.css(direction, 6 +'px');
+          }
+          else {
+            collapsableElement.css(changeAttr, originalCollapsableSize);
+            compensateElement.css(direction, originalCollapsableSize +'px');
+          }
+
           function updateResizeHandlePosition() {
             var collapsableSize = collapsableElement[changeAttr]();
             var collapsablePosition = collapsableElement.position();
 
-            if (direction == 'left' || direction == 'top') {
+            if (direction === 'left' || direction === 'top') {
               resizeHandle
                 .css(resizeHandleAttachAttr, collapsableSize)
             } else {
@@ -103,11 +127,11 @@ ngDefine(
               var position = resizeHandle.position();
               var pos = position[direction];
 
-              if (direction == 'right') {
+              if (direction === 'right') {
                 pos = container.width() - position.left;
               }
 
-              if (direction == 'bottom') {
+              if (direction === 'bottom') {
                 pos = container.height() - position.top;
               }
 
@@ -115,14 +139,17 @@ ngDefine(
               setCollapsed(pos < 10);
 
               collapsableElement.css(changeAttr, pos);
-              compensateElement.css(direction, pos + 6);
+              compensateElement.css(direction, (pos + 6) +'px');
+
+              if (localStorage) {
+                localStorage.setItem('ctnCollapsableParent:size:'+ containerId, pos);
+              }
             })
             .on('dragstop', function(event) {
               scope.$broadcast('resize', [ event ]);
             });
 
           hideHandle.click(function() {
-
             setCollapsed(true);
 
             resizeHandle.animate(createOffset(0));
@@ -147,7 +174,7 @@ ngDefine(
           updateResizeHandlePosition();
         }
 
-        setCollapsed(false);
+        setCollapsed(originalCollapsabled === 'yes');
         initResize();
       }
     };
