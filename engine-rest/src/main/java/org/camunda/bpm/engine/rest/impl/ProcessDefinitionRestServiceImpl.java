@@ -12,28 +12,40 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import java.net.URI;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
+import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResourceImpl;
+import org.camunda.bpm.engine.rest.util.DtoUtil;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements ProcessDefinitionRestService {
 
@@ -142,6 +154,50 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
       String message = String.format("Could not update the suspension state of Process Definitions due to: %s", e.getMessage()) ;
       throw new InvalidRequestException(Status.BAD_REQUEST, e, message);
     }
+  }
+
+  @Override
+  public ProcessInstanceDto startProcessInstance(UriInfo context, String processDefinitionKey, StartProcessInstanceDto parameters) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+
+    ProcessInstance instance = null;
+    try {
+      Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
+      String businessKey = parameters.getBusinessKey();
+      if (businessKey != null) {
+        instance = runtimeService.startProcessInstanceByKey(processDefinitionKey, businessKey, variables);
+      } else {
+        instance = runtimeService.startProcessInstanceByKey(processDefinitionKey, variables);
+      }
+
+    } catch (ProcessEngineException e) {
+      String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionKey, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
+
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot instantiate process definition %s due to number format exception: %s", processDefinitionKey, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot instantiate process definition %s due to parse exception: %s", processDefinitionKey, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionKey, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);
+    }
+
+    ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
+
+    URI uri = context.getBaseUriBuilder()
+      .path(relativeRootResourcePath)
+      .path(ProcessInstanceRestService.class)
+      .path(instance.getId())
+      .build();
+
+    result.addReflexiveLink(uri, HttpMethod.GET, "self");
+
+    return result;
   }
 
 }

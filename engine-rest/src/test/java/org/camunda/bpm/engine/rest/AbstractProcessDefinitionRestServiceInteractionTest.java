@@ -55,6 +55,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   protected static final String SINGLE_PROCESS_DEFINITION_URL = PROCESS_DEFINITION_URL + "/{id}";
   protected static final String START_PROCESS_INSTANCE_URL = SINGLE_PROCESS_DEFINITION_URL + "/start";
   protected static final String XML_DEFINITION_URL = SINGLE_PROCESS_DEFINITION_URL + "/xml";
+  protected static final String START_PROCESS_INSTANCE_BY_KEY_URL = PROCESS_DEFINITION_URL + "/start/{key}";
 
   protected static final String START_FORM_URL = SINGLE_PROCESS_DEFINITION_URL + "/startForm";
   protected static final String RENDERED_FORM_URL = SINGLE_PROCESS_DEFINITION_URL + "/rendered-form";
@@ -78,6 +79,8 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
     when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
     when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), anyString(), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
+    when(runtimeServiceMock.startProcessInstanceByKey(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
+    when(runtimeServiceMock.startProcessInstanceByKey(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY), anyString(), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
 
     repositoryServiceMock = mock(RepositoryService.class);
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
@@ -537,6 +540,77 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("type", equalTo(RestException.class.getSimpleName()))
         .body("message", containsString("Cannot instantiate process definition"))
       .when().post(START_PROCESS_INSTANCE_URL);
+  }
+
+  @Test
+  public void testSimpleProcessInstantiationByKey() {
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
+  }
+
+  @Test
+  public void testProcessInstantiationByKeyWithBusinessKey() throws IOException {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("businessKey", "myBusinessKey");
+
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
+
+    verify(runtimeServiceMock).startProcessInstanceByKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, "myBusinessKey", null);
+
+  }
+
+  @Test
+  public void testProcessInstantiationByKeyWithBusinessKeyAndParameters() throws IOException {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("businessKey", "myBusinessKey");
+
+    Map<String, Object> parameters = VariablesBuilder.create()
+        .variable("aBoolean", Boolean.TRUE)
+        .variable("aString", "aStringVariableValue")
+        .variable("anInteger", 42).getVariables();
+
+    json.put("variables", parameters);
+
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
+
+    Map<String, Object> expectedParameters = new HashMap<String, Object>();
+    expectedParameters.put("aBoolean", Boolean.TRUE);
+    expectedParameters.put("aString", "aStringVariableValue");
+    expectedParameters.put("anInteger", 42);
+
+    verify(runtimeServiceMock).startProcessInstanceByKey(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY), eq("myBusinessKey"), argThat(new EqualsMap(expectedParameters)));
+
+  }
+
+  /**
+   * {@link RuntimeService#startProcessInstanceByKey(String, Map)} throws an {@link ProcessEngineException}, if a definition with the given key does not exist.
+   */
+  @Test
+  public void testUnsuccessfulInstantiationByKey() {
+    when(runtimeServiceMock.startProcessInstanceByKey(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY), Matchers.<Map<String, Object>>any()))
+      .thenThrow(new ProcessEngineException("expected exception"));
+
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot instantiate process definition"))
+      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
   }
 
   @Test
