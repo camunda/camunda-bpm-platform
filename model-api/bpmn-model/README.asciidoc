@@ -31,7 +31,7 @@ for(Process process : processes) {
 
 === Custom Elements and Extensions
 
-BPMN 2.0 XXML files can be extended using custom attributes and elements in custom namespaces: 
+BPMN 2.0 XML files can be extended using custom attributes and elements in custom namespaces:
 
 [source,xml]
 ----
