@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -30,6 +31,8 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 
 @Path(ProcessDefinitionRestService.PATH)
@@ -44,6 +47,12 @@ public interface ProcessDefinitionRestService {
 
   @Path("/{id}")
   ProcessDefinitionResource getProcessDefinition(@PathParam("id") String processDefinitionId);
+
+  @POST
+  @Path("/start/{key}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  ProcessInstanceDto startProcessInstance(@Context UriInfo context, @PathParam("key") String processDefinitionKey, StartProcessInstanceDto parameters);
 
   /**
    * Exposes the {@link ProcessDefinitionQuery} interface as a REST service.
