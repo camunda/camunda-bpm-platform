@@ -92,8 +92,7 @@ public interface ActivityExecution extends DelegateExecution {
   /**
    * ends this execution.
    */
-  void end();
-
+  void end(boolean isScopeComplete);
 
   /* State management */
 
@@ -143,6 +142,16 @@ public interface ActivityExecution extends DelegateExecution {
    * Changes whether this execution is a scope or not
    */
   void setScope(boolean isScope);
+
+  /**
+   * Returns whether this execution completed the parent scope.
+   */
+  boolean isCompleteScope();
+
+  /**
+   * Returns whether this execution has been canceled.
+   */
+  boolean isCanceled();
 
   /**
    * Retrieves all executions which are concurrent and inactive at the given activity.

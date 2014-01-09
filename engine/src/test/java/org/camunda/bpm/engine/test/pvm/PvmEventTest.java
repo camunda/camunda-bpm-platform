@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,7 +44,7 @@ public class PvmEventTest extends PvmTestCase {
    */
   public void testStartEndEvents() {
     EventCollector eventCollector = new EventCollector();
-    
+
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder("events")
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
@@ -63,7 +63,7 @@ public class PvmEventTest extends PvmTestCase {
         .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
       .endActivity()
     .buildProcessDefinition();
-    
+
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
 
@@ -92,7 +92,7 @@ public class PvmEventTest extends PvmTestCase {
    */
   public void testNestedActivitiesEventsOnTransitionEvents() {
     EventCollector eventCollector = new EventCollector();
-    
+
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder("events")
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
@@ -124,10 +124,10 @@ public class PvmEventTest extends PvmTestCase {
         .behavior(new WaitState())
       .endActivity()
     .buildProcessDefinition();
-    
+
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     List<String> expectedEvents = new ArrayList<String>();
     expectedEvents.add("start on ProcessDefinition(events)");
     expectedEvents.add("start on Activity(start)");
@@ -141,12 +141,12 @@ public class PvmEventTest extends PvmTestCase {
 
     PvmExecution execution = processInstance.findExecution("wait");
     execution.signal(null, null);
-    
+
     expectedEvents.add("end on Activity(wait)");
     expectedEvents.add("end on Activity(innerscope)");
     expectedEvents.add("end on Activity(outerscope)");
 
-    assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events); 
+    assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
   }
 
   /**
@@ -158,7 +158,7 @@ public class PvmEventTest extends PvmTestCase {
    */
   public void testEmbeddedSubProcessEvents() {
     EventCollector eventCollector = new EventCollector();
-    
+
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder("events")
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
@@ -193,8 +193,8 @@ public class PvmEventTest extends PvmTestCase {
         .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
 
     List<String> expectedEvents = new ArrayList<String>();
@@ -210,11 +210,11 @@ public class PvmEventTest extends PvmTestCase {
     expectedEvents.add("start on Activity(end)");
     expectedEvents.add("end on Activity(end)");
     expectedEvents.add("end on ProcessDefinition(events)");
-    
-    assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events); 
+
+    assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
   }
-  
-  
+
+
   /**
    *                   +--+
    *              +--->|c1|---+
@@ -230,7 +230,7 @@ public class PvmEventTest extends PvmTestCase {
    */
   public void testSimpleAutmaticConcurrencyEvents() {
     EventCollector eventCollector = new EventCollector();
-    
+
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder("events")
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
@@ -272,10 +272,10 @@ public class PvmEventTest extends PvmTestCase {
         .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     List<String> expectedEvents = new ArrayList<String>();
     expectedEvents.add("start on ProcessDefinition(events)");
     expectedEvents.add("start on Activity(start)");
@@ -290,13 +290,14 @@ public class PvmEventTest extends PvmTestCase {
     expectedEvents.add("end on Activity(c2)");
     expectedEvents.add("start on Activity(join)");
     expectedEvents.add("end on Activity(join)");
+    expectedEvents.add("end on Activity(join)");
     expectedEvents.add("start on Activity(end)");
     expectedEvents.add("end on Activity(end)");
     expectedEvents.add("end on ProcessDefinition(events)");
-    
-    assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events); 
+
+    assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
   }
-  
+
   /**
    *           +-----------------------------------------------+
    * +-----+   | +-----------+   +------------+   +----------+ |   +---+
@@ -306,7 +307,7 @@ public class PvmEventTest extends PvmTestCase {
    */
   public void testEmbeddedSubProcessEventsDelete() {
     EventCollector eventCollector = new EventCollector();
-    
+
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder("events")
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
@@ -347,17 +348,17 @@ public class PvmEventTest extends PvmTestCase {
         .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     ExecutionImpl execution = (ExecutionImpl) processInstance;
     FoxDeleteProcessInstanceCmd cmd = new FoxDeleteProcessInstanceCmd(null, null);
     List<InterpretableExecution> collectExecutionToDelete = cmd.collectExecutionToDelete(execution);
     for (InterpretableExecution interpretableExecution : collectExecutionToDelete) {
-      interpretableExecution.deleteCascade2("");      
+      interpretableExecution.deleteCascade2("");
     }
-    
+
     List<String> expectedEvents = new ArrayList<String>();
     expectedEvents.add("start on ProcessDefinition(events)");
     expectedEvents.add("start on Activity(start)");
@@ -369,7 +370,7 @@ public class PvmEventTest extends PvmTestCase {
     expectedEvents.add("end on Activity(taskInside)");
     expectedEvents.add("end on Activity(embeddedsubprocess)");
     expectedEvents.add("end on ProcessDefinition(events)");
-    
-    assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events); 
+
+    assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
   }
 }

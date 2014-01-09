@@ -32,7 +32,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
   public void execute(ActivityExecution execution) throws Exception {
     // we are the last execution inside this scope: calling end() ends this scope.
-    execution.end();
+    execution.end(true);
   }
 
 }

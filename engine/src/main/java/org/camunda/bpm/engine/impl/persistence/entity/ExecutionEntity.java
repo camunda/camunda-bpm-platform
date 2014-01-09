@@ -132,6 +132,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   protected boolean isEnded = false;
   protected boolean isEventScope = false;
 
+  /** marks the current activity instance */
+  protected int activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
+
   // events ///////////////////////////////////////////////////////////////////
 
   protected String eventName;
@@ -212,7 +215,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
    * persisted reference to the parent of this execution.
    *
    * @see #getParent()
-   * @see #setParent(ExecutionEntity)
    */
   protected String parentId;
 
@@ -432,13 +434,18 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
   /** removes an execution. if there are nested executions, those will be ended recursively.
    * if there is a parent, this method removes the bidirectional relation
-   * between parent and this execution. */
-  public void end() {
+   * between parent and this execution.
+   *
+   * @param completeScope true if ending the execution contributes to completing the BPMN 2.0 scope
+   */
+  public void end(boolean completeScope) {
+
+    setCompleteScope(completeScope);
+
     isActive = false;
     isEnded = true;
     performOperation(AtomicOperation.ACTIVITY_END);
   }
-
 
   // methods that translate to operations /////////////////////////////////////
 
@@ -563,7 +570,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         // Others are already ended (end activities)
         if (!prunedExecution.isEnded()) {
           log.fine("pruning execution " + prunedExecution);
-          prunedExecution.end();
+          prunedExecution.end(false);
         }
       }
 
@@ -604,10 +611,12 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
       concurrentRoot.setActivityInstanceId(concurrentRoot.getParentActivityInstanceId());
 
+      boolean isConcurrentEnd = outgoingExecutions.isEmpty();
+
       // prune the executions that are not recycled
       for (ActivityExecution prunedExecution: recyclableExecutions) {
         log.fine("pruning execution "+prunedExecution);
-        prunedExecution.end();
+        prunedExecution.end(isConcurrentEnd);
       }
 
       // then launch all the concurrent executions
@@ -616,8 +625,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       }
 
       // if no outgoing executions, the concurrent root execution ends
-      if (outgoingExecutions.isEmpty()) {
-        concurrentRoot.end();
+      if (isConcurrentEnd) {
+        concurrentRoot.end(true);
       }
     }
   }
@@ -906,6 +915,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       activityInstanceId = getParentActivityInstanceId();
     }
 
+    activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
   }
 
   public String getParentActivityInstanceId() {
@@ -1062,7 +1072,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     this.isScope = isScope;
   }
 
-  // customized persistence behaviour /////////////////////////////////////////
+  // customized persistence behavior /////////////////////////////////////////
 
   public void remove() {
     ensureParentInitialized();
@@ -1293,7 +1303,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     return getParent();
   }
 
-  /** used to calculate the sourceActivityExecution for method {@link #updateActivityInstanceIdInHistoricVariableUpdate(HistoricDetailVariableInstanceUpdateEntity, ExecutionEntity)} */
+  /** used to calculate the sourceActivityExecution */
   protected ExecutionEntity getSourceActivityExecution() {
     return (activityId!=null ? this : null);
   }
@@ -1622,6 +1632,31 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   public boolean isEnded() {
     return isEnded;
   }
+
+  public boolean isCanceled() {
+    return ActivityInstanceState.CANCELED.getStateCode() == activityInstanceState;
+  }
+
+  public void setCanceled(boolean canceled) {
+    if (canceled) {
+      activityInstanceState = ActivityInstanceState.CANCELED.getStateCode();
+    }
+  }
+
+  public boolean isCompleteScope() {
+    return ActivityInstanceState.SCOPE_COMPLETE.getStateCode() == activityInstanceState;
+  }
+
+  public void setCompleteScope(boolean completeScope) {
+    if (completeScope) {
+      activityInstanceState = ActivityInstanceState.SCOPE_COMPLETE.getStateCode();
+    }
+  }
+
+  public int getActivityInstanceState() {
+    return activityInstanceState;
+  }
+
   public String getEventName() {
     return eventName;
   }

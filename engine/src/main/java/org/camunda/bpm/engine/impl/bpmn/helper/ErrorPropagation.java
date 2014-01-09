@@ -73,7 +73,7 @@ public class ErrorPropagation {
           LOG.info(execution.getActivity().getId() + " throws error event with errorCode '"
                   + errorCode + "', but no catching boundary event was defined. "
                   +   "Execution will simply be ended (none end event semantics).");
-          execution.end();
+          execution.end(true);
         } else
           // throw original exception
           throw origException;

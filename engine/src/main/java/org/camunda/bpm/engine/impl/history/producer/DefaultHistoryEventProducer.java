@@ -281,6 +281,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // create event instance
     HistoricActivityInstanceEventEntity evt = loadActivityInstanceEventEntity(executionEntity);
+    evt.setActivityInstanceState(executionEntity.getActivityInstanceState());
 
     // initialize event
     initActivityInstanceEvent(evt, (ExecutionEntity) execution, HistoryEvent.ACTIVITY_EVENT_TYPE_END);

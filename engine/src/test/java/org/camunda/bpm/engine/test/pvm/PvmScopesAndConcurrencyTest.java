@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,12 +33,12 @@ import org.camunda.bpm.engine.test.pvm.activities.WaitState;
 public class PvmScopesAndConcurrencyTest extends PvmTestCase {
 
   /**
-   *         +---------+ 
+   *         +---------+
    *         |scope    |  +--+
    *         |      +---->|c1|
    *         |      |  |  +--+
    *         |      |  |
-   * +-----+ |  +----+ |  +--+ 
+   * +-----+ |  +----+ |  +--+
    * |start|--->|fork|--->|c2|
    * +-----+ |  +----+ |  +--+
    *         |      |  |
@@ -73,16 +73,16 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
         .behavior(new WaitState())
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     List<String> activeActivityIds = processInstance.findActiveActivityIds();
     List<String> expectedActiveActivityIds = new ArrayList<String>();
     expectedActiveActivityIds.add("c3");
     expectedActiveActivityIds.add("c1");
     expectedActiveActivityIds.add("c2");
-    
+
     assertEquals(expectedActiveActivityIds, activeActivityIds);
   }
 
@@ -91,7 +91,7 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
    *                      |scope       |
    *                  +----------+     |
    *                  |   |      v     |
-   * +-----+   +--------+ |   +------+ | 
+   * +-----+   +--------+ |   +------+ |
    * |start|-->|parallel|---->|inside| |
    * +-----+   +--------+ |   +------+ |
    *                  |   |      ^     |
@@ -119,16 +119,16 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
         .endActivity()
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     List<String> activeActivityIds = processInstance.findActiveActivityIds();
     List<String> expectedActiveActivityIds = new ArrayList<String>();
     expectedActiveActivityIds.add("inside");
     expectedActiveActivityIds.add("inside");
     expectedActiveActivityIds.add("inside");
-    
+
     assertEquals(expectedActiveActivityIds, activeActivityIds);
   }
 
@@ -147,7 +147,7 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
    */
   public void testConcurrentPathsThroughNonScopeNestedActivity() {
     EventCollector eventCollector = new EventCollector();
-    
+
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder("scopes and concurrency")
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
@@ -193,10 +193,10 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
         .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
       .endActivity()
     .buildProcessDefinition();
-    
+
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     List<String> expectedEvents = new ArrayList<String>();
     expectedEvents.add("start on ProcessDefinition(scopes and concurrency)");
     expectedEvents.add("start on Activity(start)");
@@ -208,10 +208,10 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
     expectedEvents.add("end on Activity(fork)");
     expectedEvents.add("start on Activity(noscope)");
     expectedEvents.add("start on Activity(c2)");
-    
+
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();
-    
+
     PvmExecution execution = processInstance.findExecution("c1");
     execution.signal(null, null);
 
@@ -222,7 +222,7 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
 
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();
-    
+
     execution = processInstance.findExecution("c2");
     execution.signal(null, null);
 
@@ -231,13 +231,14 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
     expectedEvents.add("end on Activity(noscope)");
     expectedEvents.add("start on Activity(join)");
     expectedEvents.add("end on Activity(join)");
+    expectedEvents.add("end on Activity(join)");
     expectedEvents.add("start on Activity(end)");
     expectedEvents.add("end on Activity(end)");
     expectedEvents.add("end on ProcessDefinition(scopes and concurrency)");
-    
+
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();
-    
+
     assertTrue(processInstance.isEnded());
   }
 
@@ -256,7 +257,7 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
    */
   public void testConcurrentPathsThroughScope() {
     EventCollector eventCollector = new EventCollector();
-    
+
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder("scopes and concurrency")
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
@@ -303,10 +304,10 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
         .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
       .endActivity()
     .buildProcessDefinition();
-    
+
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     List<String> expectedEvents = new ArrayList<String>();
     expectedEvents.add("start on ProcessDefinition(scopes and concurrency)");
     expectedEvents.add("start on Activity(start)");
@@ -321,7 +322,7 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
 
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();
-    
+
     PvmExecution execution = processInstance.findExecution("c1");
     execution.signal(null, null);
 
@@ -332,7 +333,7 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
 
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();
-    
+
     execution = processInstance.findExecution("c2");
     execution.signal(null, null);
 
@@ -341,13 +342,14 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
     expectedEvents.add("end on Activity(scope)");
     expectedEvents.add("start on Activity(join)");
     expectedEvents.add("end on Activity(join)");
+    expectedEvents.add("end on Activity(join)");
     expectedEvents.add("start on Activity(end)");
     expectedEvents.add("end on Activity(end)");
     expectedEvents.add("end on ProcessDefinition(scopes and concurrency)");
-    
+
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();
-    
+
     assertTrue(processInstance.isEnded());
   }
 
@@ -366,7 +368,7 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
    */
   public void testConcurrentPathsGoingOutOfScope() {
     EventCollector eventCollector = new EventCollector();
-    
+
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder("scopes and concurrency")
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
@@ -413,10 +415,10 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
         .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
       .endActivity()
     .buildProcessDefinition();
-    
+
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     List<String> expectedEvents = new ArrayList<String>();
     expectedEvents.add("start on ProcessDefinition(scopes and concurrency)");
     expectedEvents.add("start on Activity(start)");
@@ -430,7 +432,7 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
 
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();
-    
+
     PvmExecution execution = processInstance.findExecution("c1");
     execution.signal(null, null);
 
@@ -441,7 +443,7 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
 
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();
-    
+
     execution = processInstance.findExecution("c2");
     execution.signal(null, null);
 
@@ -450,13 +452,15 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
     expectedEvents.add("end on Activity(scope)");
     expectedEvents.add("start on Activity(join)");
     expectedEvents.add("end on Activity(join)");
+    expectedEvents.add("end on Activity(join)");
     expectedEvents.add("start on Activity(end)");
     expectedEvents.add("end on Activity(end)");
     expectedEvents.add("end on ProcessDefinition(scopes and concurrency)");
-    
+    expectedEvents.add("end on Activity(join)");
+
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();
-    
+
     assertTrue(processInstance.isEnded());
   }
 
@@ -475,7 +479,7 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
    */
   public void testConcurrentPathsJoiningInsideScope() {
     EventCollector eventCollector = new EventCollector();
-    
+
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder("scopes and concurrency")
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
       .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
@@ -522,10 +526,10 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
         .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
       .endActivity()
     .buildProcessDefinition();
-    
+
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     List<String> expectedEvents = new ArrayList<String>();
     expectedEvents.add("start on ProcessDefinition(scopes and concurrency)");
     expectedEvents.add("start on Activity(start)");
@@ -540,7 +544,7 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
 
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();
-    
+
     PvmExecution execution = processInstance.findExecution("c1");
     execution.signal(null, null);
 
@@ -550,9 +554,9 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
 
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();
-    
+
     execution = processInstance.findExecution("c2");
-    
+
     // this process gets blocked in the join
     execution.signal(null, null);
   }
