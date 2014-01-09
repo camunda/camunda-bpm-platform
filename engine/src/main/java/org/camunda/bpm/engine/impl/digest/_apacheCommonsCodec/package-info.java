@@ -11,14 +11,14 @@
  * limitations under the License.
  */
 /**
- * <p>The following classes are copied from apache commons codec:</p>
+ * The following classes are copied from Apache Commons Codec:
  * 
  * <ul>
  *  <li> {@link org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64} </li>
  *  <li> {@link org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.StringUtils} </li>
  * </ul>
  * 
- * The classes are slightly modifyed to minimize imports.
+ * The classes are slightly modified to minimize imports.
  * 
  * Used apache commons codec version: 1.4
  * 
