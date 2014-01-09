@@ -17,33 +17,36 @@
 package org.camunda.bpm.cycle.roundtrip;
 
 
-import org.camunda.bpm.cycle.util.IoUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  *
- * @author nico.rehwaldt
+ * @author Nico Rehwaldt
  */
-public class MergeTest {
-
-  private BpmnProcessModelUtil roundtripUtil = new BpmnProcessModelUtil();
+public class MergeTest extends AbstractRoundtripTest {
 
   @Test
   public void shouldMergeExtensionElements() throws Exception {
 
-    String mergedDiagram = mergeExecutablePool(
+    String mergedDiagram = importExecutableModelFileBased(
         "org/camunda/bpm/cycle/roundtrip/repository/signavio-extension-elements-pool-extracted.bpmn",
         "org/camunda/bpm/cycle/roundtrip/repository/signavio-extension-elements.bpmn");
 
     Assert.assertTrue(mergedDiagram.contains("<signavio:signavioType dataObjectType=\"ProcessParticipant\"/>"));
+
+    Assert.assertTrue(mergedDiagram.contains("Non Executable Pool"));
+    Assert.assertTrue(mergedDiagram.contains("Executable Pool"));
   }
 
-  private String mergeExecutablePool(String sourceDiagram, String targetDiagram) {
+  @Test
+  public void shouldMergeExtensionElementAttributes() throws Exception {
+    String mergedDiagram = importExecutableModelFileBased(
+        "org/camunda/bpm/cycle/roundtrip/repository/signavio-extension-elements-pool-extracted.bpmn",
+        "org/camunda/bpm/cycle/roundtrip/repository/signavio-extension-elements.bpmn");
 
-    String sourceXml = IoUtil.readFileAsString(sourceDiagram);
-    String targetXml = IoUtil.readFileAsString(targetDiagram);
+    String normalizedMergedDiagram = normalizeXml(mergedDiagram);
 
-    return roundtripUtil.importChangesFromExecutableBpmnModel(sourceXml, targetXml);
+    Assert.assertTrue(normalizedMergedDiagram.contains("<signavio:signavioLabel align=\"center\" bottom=\"false\" left=\"false\" ref=\"text_name\" right=\"false\" top=\"true\" valign=\"bottom\" x=\"20.0\" y=\"-8.0\"/>"));
   }
 }

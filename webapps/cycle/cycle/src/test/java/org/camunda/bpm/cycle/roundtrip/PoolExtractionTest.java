@@ -16,33 +16,31 @@
 
 package org.camunda.bpm.cycle.roundtrip;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-
-import org.camunda.bpm.cycle.util.IoUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  *
- * @author nico.rehwaldt
+ * @author Nico Rehwaldt
  */
-public class PoolExtractionTest {
+public class PoolExtractionTest extends AbstractRoundtripTest {
 
   private BpmnProcessModelUtil roundtripUtil = new BpmnProcessModelUtil();
 
   @Test
   public void shouldKeepExtensionElements() throws Exception {
-    String executablePool = extractExecutablePool("org/camunda/bpm/cycle/roundtrip/repository/signavio-extension-elements.bpmn");
+    String executablePool = extractExecutableModelFromFile("/org/camunda/bpm/cycle/roundtrip/repository/signavio-extension-elements.bpmn");
     Assert.assertTrue(executablePool.contains("<signavio:signavioType dataObjectType=\"ProcessParticipant\"/>"));
+
+    Assert.assertFalse(executablePool.contains("Non Executable Pool"));
   }
 
-  public String extractExecutablePool(String diagramFile) throws IOException {
-    FileInputStream is = new FileInputStream(IoUtil.getFile(diagramFile));
-    InputStream resultStream = roundtripUtil.extractExecutablePool(is);
+  @Test
+  public void shouldKeepExtensionElementAttributes() throws Exception {
+    String executablePool = extractExecutableModelFromFile("/org/camunda/bpm/cycle/roundtrip/repository/signavio-extension-elements.bpmn");
 
-    return new String(IoUtil.readInputStream(resultStream, "extracted executable pool"), Charset.forName("UTF-8"));
+    String normalizedExecutablePool = normalizeXml(executablePool);
+
+    Assert.assertTrue(normalizedExecutablePool.contains("<signavio:signavioLabel align=\"center\" bottom=\"false\" left=\"false\" ref=\"text_name\" right=\"false\" top=\"true\" valign=\"bottom\" x=\"20.0\" y=\"-8.0\"/>"));
   }
 }
