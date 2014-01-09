@@ -17,4 +17,4 @@ Plugins
 Parts of the application may be extended using plugins.
 The aim of these plugins is to provide the application with additional views on process engines provided by a camunda BPM platform installation.
 
-See [plugin development guide](http://docs.camunda.org/how-tos/cockpit/develop-a-plugin/) for details.
+See [plugin development guide](http://docs.camunda.org/latest/real-life/how-to/#cockpit-how-to-develop-a-cockpit-plugin) for details.
