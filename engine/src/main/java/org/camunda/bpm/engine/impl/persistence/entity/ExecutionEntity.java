@@ -348,13 +348,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     // create event subscriptions for the current scope
-    List<EventSubscriptionDeclaration> eventSubscriptionDeclarations = (List<EventSubscriptionDeclaration>) scope.getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
+    List<EventSubscriptionDeclaration> eventSubscriptionDeclarations = (List<EventSubscriptionDeclaration>) scope
+        .getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
     if(eventSubscriptionDeclarations != null) {
       for (EventSubscriptionDeclaration eventSubscriptionDeclaration : eventSubscriptionDeclarations) {
-        if(!eventSubscriptionDeclaration.isStartEvent()) {
-          EventSubscriptionEntity eventSubscriptionEntity = eventSubscriptionDeclaration.prepareEventSubscriptionEntity(this);
-          eventSubscriptionEntity.insert();
-        }
+        eventSubscriptionDeclaration.createEntity(this);
       }
     }
   }
@@ -1080,7 +1078,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
   }
 
-  private void removeEventSubscriptions() {
+  public void removeEventSubscriptions() {
     for (EventSubscriptionEntity eventSubscription : getEventSubscriptions()) {
       if (replacedBy != null) {
         eventSubscription.setExecution((ExecutionEntity) replacedBy);

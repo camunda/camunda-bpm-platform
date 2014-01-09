@@ -70,6 +70,7 @@ import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
+import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
@@ -191,7 +192,6 @@ public class BpmnParse extends Parse {
 
   /**
    * Constructor to be called by the {@link BpmnParser}.
-   * @param deploymentContext
    */
   public BpmnParse(BpmnParser parser) {
     super(parser);
@@ -285,9 +285,6 @@ public class BpmnParse extends Parse {
 
   /**
    * Parses the rootElement importing structures
-   *
-   * @param rootElement
-   *          The root element of the XML file.
    */
   protected void parseImports() {
     List<Element> imports = rootElement.elements("import");
@@ -326,9 +323,6 @@ public class BpmnParse extends Parse {
    * Parses the messages of the given definitions file. Messages are not
    * contained within a process element, but they can be referenced from inner
    * process elements.
-   *
-   * @param definitionsElement
-   *          The root element of the XML file/
    */
   public void parseMessages() {
     for (Element messageElement : rootElement.elements("message")) {
@@ -344,9 +338,6 @@ public class BpmnParse extends Parse {
    * Parses the signals of the given definitions file. Signals are not
    * contained within a process element, but they can be referenced from inner
    * process elements.
-   *
-   * @param definitionsElement
-   *          The root element of the XML file/
    */
   protected void parseSignals() {
     for (Element signalElement : rootElement.elements("signal")) {
@@ -396,9 +387,6 @@ public class BpmnParse extends Parse {
   /**
    * Parses all the process definitions defined within the 'definitions' root
    * element.
-   *
-   * @param definitionsElement
-   *          The root element of the XML file.
    */
   public void parseProcessDefinitions() {
     for (Element processElement : rootElement.elements("process")) {
@@ -881,7 +869,7 @@ public class BpmnParse extends Parse {
       addError("Invalid 'messageRef': no message with id '"+messageRef+"' found.", messageEventDefinition);
     }
 
-    return new EventSubscriptionDeclaration(messageDefinition.getName(), "message");
+    return new EventSubscriptionDeclaration(messageDefinition.getName(), MessageEventHandler.EVENT_HANDLER_TYPE);
   }
 
   @SuppressWarnings("unchecked")
@@ -921,7 +909,6 @@ public class BpmnParse extends Parse {
    * @param scopeElement
    *          The {@link ScopeImpl} to which the activities must be added.
    * @param postponedElements
-   * @param postProcessActivities
    */
   public void parseActivities(Element parentElement, ScopeImpl scopeElement, HashMap<String, Element> postponedElements) {
     for (Element activityElement : parentElement.elements()) {
@@ -1053,7 +1040,7 @@ public class BpmnParse extends Parse {
 
     } else if(messageEventDefinition != null) {
       nestedActivity.setActivityBehavior(defaultCatchBehaviour);
-      parseIntemediateMessageEventDefinition(messageEventDefinition, nestedActivity, isAfterEventBasedGateway);
+      parseIntermediateMessageEventDefinition(messageEventDefinition, nestedActivity, isAfterEventBasedGateway);
 
     } else if(linkEventDefinitionElement != null) {
       nestedActivity.setActivityBehavior(new IntermediateCatchLinkEventActivityBehaviour());
@@ -1093,7 +1080,7 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected void parseIntemediateMessageEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity, boolean isAfterEventBasedGateway) {
+  protected void parseIntermediateMessageEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity, boolean isAfterEventBasedGateway) {
 
     nestedActivity.setProperty("type", "intermediateMessageCatch");
 
@@ -1820,6 +1807,13 @@ public class BpmnParse extends Parse {
     parseAsynchronousContinuation(receiveTaskElement, activity);
 
     parseExecutionListenersOnScope(receiveTaskElement, activity);
+
+    if (receiveTaskElement.attribute("messageRef") != null) {
+      activity.setScope(true);
+      EventSubscriptionDeclaration declaration = parseMessageEventDefinition(receiveTaskElement);
+      declaration.setActivityId(activity.getActivityId());
+      addEventSubscriptionDeclaration(declaration, activity, receiveTaskElement);
+    }
 
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseReceiveTask(receiveTaskElement, scope, activity);
@@ -2828,7 +2822,6 @@ public class BpmnParse extends Parse {
    *          the XML element containing the scope definition.
    * @param scope
    *          the scope to add the executionListeners to.
-   * @param postProcessActivities
    */
   public void parseExecutionListenersOnScope(Element scopeElement, ScopeImpl scope) {
     Element extentionsElement = scopeElement.element("extensionElements");

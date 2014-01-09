@@ -16,7 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -59,8 +62,9 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         extraScopedExecution.setConcurrent(false);
         extraScopedExecution.setScope(true);
         concurrentExecution = extraScopedExecution;
-      } 
-      
+      }
+
+      createEventSubscriptions(execution, (ExecutionEntity) concurrentExecution);
       concurrentExecutions.add(concurrentExecution);
       logLoopDetails(concurrentExecution, "initialized", loopCounter, 0, nrOfInstances, nrOfInstances);
     }
@@ -86,7 +90,24 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     }
     
   }
-  
+
+  /**
+   * create event subscriptions for the concurrent execution
+   * @param execution
+   * @param concurrentExecution
+   */
+  @SuppressWarnings("unchecked")
+  private void createEventSubscriptions(ActivityExecution execution, ExecutionEntity concurrentExecution) {
+    PvmActivity scope = execution.getActivity();
+    List<EventSubscriptionDeclaration> eventSubscriptionDeclarations = (List<EventSubscriptionDeclaration>) scope
+        .getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
+    if(eventSubscriptionDeclarations != null) {
+      for (EventSubscriptionDeclaration eventSubscriptionDeclaration : eventSubscriptionDeclarations) {
+        eventSubscriptionDeclaration.createEntityForMultiInstance(concurrentExecution);
+      }
+    }
+  }
+
   /**
    * Called when the wrapped {@link ActivityBehavior} calls the 
    * {@link AbstractBpmnActivityBehavior#leave(ActivityExecution)} method.
@@ -116,6 +137,9 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
     
     ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+    // remove event subscriptions that manually created inside the event declaration for multi instances
+    executionEntity.removeEventSubscriptions();
     executionEntity.inactivate();
     executionEntity.getParent().forceUpdate();
     
