@@ -15,6 +15,8 @@ import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,18 +27,21 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
 
   protected static final String PROCESS_DEFINITION_STATISTICS_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/statistics";
   protected static final String ACTIVITY_STATISTICS_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/{id}/statistics";
-  private ProcessDefinitionStatisticsQuery processDefinitionQueryMock;
+  protected static final String ACTIVITY_STATISTICS_BY_KEY_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/key/{key}/statistics";
+  private ProcessDefinitionStatisticsQuery processDefinitionStatisticsQueryMock;
   private ActivityStatisticsQuery activityQueryMock;
-  
+  private ProcessDefinitionQuery processDefinitionQueryMock;
+
   @Before
   public void setUpRuntimeData() {
     setupProcessDefinitionStatisticsMock();
     setupActivityStatisticsMock();
+    setupProcessDefinitionMock();
   }
 
   private void setupActivityStatisticsMock() {
     List<ActivityStatistics> mocks = MockProvider.createMockActivityStatistics();
-    
+
     activityQueryMock = mock(ActivityStatisticsQuery.class);
     when(activityQueryMock.list()).thenReturn(mocks);
     when(processEngine.getManagementService().createActivityStatisticsQuery(any(String.class))).thenReturn(activityQueryMock);
@@ -44,12 +49,21 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
 
   private void setupProcessDefinitionStatisticsMock() {
     List<ProcessDefinitionStatistics> mocks = MockProvider.createMockProcessDefinitionStatistics();
-    
-    processDefinitionQueryMock = mock(ProcessDefinitionStatisticsQuery.class);
-    when(processDefinitionQueryMock.list()).thenReturn(mocks);
-    when(processEngine.getManagementService().createProcessDefinitionStatisticsQuery()).thenReturn(processDefinitionQueryMock);
+
+    processDefinitionStatisticsQueryMock = mock(ProcessDefinitionStatisticsQuery.class);
+    when(processDefinitionStatisticsQueryMock.list()).thenReturn(mocks);
+    when(processEngine.getManagementService().createProcessDefinitionStatisticsQuery()).thenReturn(processDefinitionStatisticsQueryMock);
   }
-  
+
+  private void setupProcessDefinitionMock() {
+    ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
+    processDefinitionQueryMock = mock(ProcessDefinitionQuery.class);
+    when(processDefinitionQueryMock.processDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)).thenReturn(processDefinitionQueryMock);
+    when(processDefinitionQueryMock.latestVersion()).thenReturn(processDefinitionQueryMock);
+    when(processDefinitionQueryMock.singleResult()).thenReturn(mockDefinition);
+    when(processEngine.getRepositoryService().createProcessDefinitionQuery()).thenReturn(processDefinitionQueryMock);
+  }
+
   @Test
   public void testStatisticsRetrievalPerProcessDefinitionVersion() {
     given()
@@ -60,7 +74,7 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
       .body("definition.id", hasItems(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID))
     .when().get(PROCESS_DEFINITION_STATISTICS_URL);
   }
-  
+
   @Test
   public void testActivityStatisticsRetrieval() {
     given().pathParam("id", "aDefinitionId")
@@ -71,6 +85,15 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
     .when().get(ACTIVITY_STATISTICS_URL);
   }
 
+  @Test
+  public void testActivityStatisticsRetrievalByKey() {
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("$.size()", is(2))
+      .body("id", hasItems(MockProvider.EXAMPLE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID))
+    .when().get(ACTIVITY_STATISTICS_BY_KEY_URL);
+  }
 
   @Test
   public void testAdditionalFailedJobsOption() {
@@ -78,62 +101,62 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(PROCESS_DEFINITION_STATISTICS_URL);
-    
-    InOrder inOrder = Mockito.inOrder(processDefinitionQueryMock);
-    inOrder.verify(processDefinitionQueryMock).includeFailedJobs();
-    inOrder.verify(processDefinitionQueryMock).list();
+
+    InOrder inOrder = Mockito.inOrder(processDefinitionStatisticsQueryMock);
+    inOrder.verify(processDefinitionStatisticsQueryMock).includeFailedJobs();
+    inOrder.verify(processDefinitionStatisticsQueryMock).list();
   }
-  
+
   @Test
   public void testAdditionalIncidentsOption() {
     given().queryParam("incidents", "true")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(PROCESS_DEFINITION_STATISTICS_URL);
-    
-    InOrder inOrder = Mockito.inOrder(processDefinitionQueryMock);
-    inOrder.verify(processDefinitionQueryMock).includeIncidents();
-    inOrder.verify(processDefinitionQueryMock).list();
+
+    InOrder inOrder = Mockito.inOrder(processDefinitionStatisticsQueryMock);
+    inOrder.verify(processDefinitionStatisticsQueryMock).includeIncidents();
+    inOrder.verify(processDefinitionStatisticsQueryMock).list();
   }
-  
+
   @Test
   public void testAdditionalIncidentsForTypeOption() {
     given().queryParam("incidentsForType", "failedJob")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(PROCESS_DEFINITION_STATISTICS_URL);
-    
-    InOrder inOrder = Mockito.inOrder(processDefinitionQueryMock);
-    inOrder.verify(processDefinitionQueryMock).includeIncidentsForType("failedJob");
-    inOrder.verify(processDefinitionQueryMock).list();
+
+    InOrder inOrder = Mockito.inOrder(processDefinitionStatisticsQueryMock);
+    inOrder.verify(processDefinitionStatisticsQueryMock).includeIncidentsForType("failedJob");
+    inOrder.verify(processDefinitionStatisticsQueryMock).list();
   }
-  
+
   @Test
   public void testAdditionalIncidentsAndFailedJobsOption() {
     given().queryParam("incidents", "true").queryParam("failedJobs", "true")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(PROCESS_DEFINITION_STATISTICS_URL);
-    
-    InOrder inOrder = Mockito.inOrder(processDefinitionQueryMock);
-    inOrder.verify(processDefinitionQueryMock).includeFailedJobs();
-    inOrder.verify(processDefinitionQueryMock).includeIncidents();
-    inOrder.verify(processDefinitionQueryMock).list();
+
+    InOrder inOrder = Mockito.inOrder(processDefinitionStatisticsQueryMock);
+    inOrder.verify(processDefinitionStatisticsQueryMock).includeFailedJobs();
+    inOrder.verify(processDefinitionStatisticsQueryMock).includeIncidents();
+    inOrder.verify(processDefinitionStatisticsQueryMock).list();
   }
-  
+
   @Test
   public void testAdditionalIncidentsForTypeAndFailedJobsOption() {
     given().queryParam("incidentsForType", "failedJob").queryParam("failedJobs", "true")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(PROCESS_DEFINITION_STATISTICS_URL);
-    
-    InOrder inOrder = Mockito.inOrder(processDefinitionQueryMock);
-    inOrder.verify(processDefinitionQueryMock).includeFailedJobs();
-    inOrder.verify(processDefinitionQueryMock).includeIncidentsForType("failedJob");
-    inOrder.verify(processDefinitionQueryMock).list();
+
+    InOrder inOrder = Mockito.inOrder(processDefinitionStatisticsQueryMock);
+    inOrder.verify(processDefinitionStatisticsQueryMock).includeFailedJobs();
+    inOrder.verify(processDefinitionStatisticsQueryMock).includeIncidentsForType("failedJob");
+    inOrder.verify(processDefinitionStatisticsQueryMock).list();
   }
-  
+
   @Test
   public void testAdditionalIncidentsAndIncidentsForType() {
     given().queryParam("incidents", "true").queryParam("incidentsForType", "anIncidentTpye")
@@ -148,36 +171,72 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(ACTIVITY_STATISTICS_URL);
-    
+
     InOrder inOrder = Mockito.inOrder(activityQueryMock);
     inOrder.verify(activityQueryMock).includeFailedJobs();
     inOrder.verify(activityQueryMock).list();
   }
-  
+
+  @Test
+  public void testActivityStatisticsWithFailedJobsByKey() {
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY).queryParam("failedJobs", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(ACTIVITY_STATISTICS_BY_KEY_URL);
+
+    InOrder inOrder = Mockito.inOrder(activityQueryMock);
+    inOrder.verify(activityQueryMock).includeFailedJobs();
+    inOrder.verify(activityQueryMock).list();
+  }
+
   @Test
   public void testActivityStatisticsWithIncidents() {
     given().pathParam("id", "aDefinitionId").queryParam("incidents", "true")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(ACTIVITY_STATISTICS_URL);
-    
+
     InOrder inOrder = Mockito.inOrder(activityQueryMock);
     inOrder.verify(activityQueryMock).includeIncidents();
     inOrder.verify(activityQueryMock).list();
   }
-  
+
+  @Test
+  public void testActivityStatisticsWithIncidentsByKey() {
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY).queryParam("incidents", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(ACTIVITY_STATISTICS_BY_KEY_URL);
+
+    InOrder inOrder = Mockito.inOrder(activityQueryMock);
+    inOrder.verify(activityQueryMock).includeIncidents();
+    inOrder.verify(activityQueryMock).list();
+  }
+
   @Test
   public void testActivityStatisticsIncidentsForTypeTypeOption() {
     given().pathParam("id", "aDefinitionId").queryParam("incidentsForType", "failedJob")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(ACTIVITY_STATISTICS_URL);
-    
+
     InOrder inOrder = Mockito.inOrder(activityQueryMock);
     inOrder.verify(activityQueryMock).includeIncidentsForType("failedJob");
     inOrder.verify(activityQueryMock).list();
   }
-  
+
+  @Test
+  public void testActivityStatisticsIncidentsForTypeTypeOptionByKey() {
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY).queryParam("incidentsForType", "failedJob")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(ACTIVITY_STATISTICS_BY_KEY_URL);
+
+    InOrder inOrder = Mockito.inOrder(activityQueryMock);
+    inOrder.verify(activityQueryMock).includeIncidentsForType("failedJob");
+    inOrder.verify(activityQueryMock).list();
+  }
+
   @Test
   public void testActivtyStatisticsIncidentsAndFailedJobsOption() {
     given().pathParam("id", "aDefinitionId")
@@ -185,13 +244,27 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(ACTIVITY_STATISTICS_URL);
-    
+
     InOrder inOrder = Mockito.inOrder(activityQueryMock);
     inOrder.verify(activityQueryMock).includeFailedJobs();
     inOrder.verify(activityQueryMock).includeIncidents();
     inOrder.verify(activityQueryMock).list();
   }
-  
+
+  @Test
+  public void testActivtyStatisticsIncidentsAndFailedJobsOptionByKey() {
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+    .queryParam("incidents", "true").queryParam("failedJobs", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(ACTIVITY_STATISTICS_BY_KEY_URL);
+
+    InOrder inOrder = Mockito.inOrder(activityQueryMock);
+    inOrder.verify(activityQueryMock).includeFailedJobs();
+    inOrder.verify(activityQueryMock).includeIncidents();
+    inOrder.verify(activityQueryMock).list();
+  }
+
   @Test
   public void testActivtyStatisticsIncidentsForTypeAndFailedJobsOption() {
     given().pathParam("id", "aDefinitionId")
@@ -199,13 +272,27 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(ACTIVITY_STATISTICS_URL);
-    
+
     InOrder inOrder = Mockito.inOrder(activityQueryMock);
     inOrder.verify(activityQueryMock).includeFailedJobs();
     inOrder.verify(activityQueryMock).includeIncidentsForType("failedJob");
     inOrder.verify(activityQueryMock).list();
   }
-  
+
+  @Test
+  public void testActivtyStatisticsIncidentsForTypeAndFailedJobsOptionByKey() {
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+    .queryParam("incidentsForType", "failedJob").queryParam("failedJobs", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(ACTIVITY_STATISTICS_BY_KEY_URL);
+
+    InOrder inOrder = Mockito.inOrder(activityQueryMock);
+    inOrder.verify(activityQueryMock).includeFailedJobs();
+    inOrder.verify(activityQueryMock).includeIncidentsForType("failedJob");
+    inOrder.verify(activityQueryMock).list();
+  }
+
   @Test
   public void testActivtyStatisticsIncidentsAndIncidentsForType() {
     given().pathParam("id", "aDefinitionId")
@@ -213,6 +300,15 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().get(ACTIVITY_STATISTICS_URL);
+  }
+
+  @Test
+  public void testActivtyStatisticsIncidentsAndIncidentsForTypeByKey() {
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+    .queryParam("incidents", "true").queryParam("incidentsForType", "anIncidentTpye")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(ACTIVITY_STATISTICS_BY_KEY_URL);
   }
 
 }

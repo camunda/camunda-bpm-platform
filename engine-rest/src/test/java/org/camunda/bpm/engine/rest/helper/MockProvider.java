@@ -137,6 +137,7 @@ public abstract class MockProvider {
   public static final String NON_EXISTING_PROCESS_DEFINITION_ID = "aNonExistingProcDefId";
   public static final String EXAMPLE_PROCESS_DEFINITION_NAME = "aName";
   public static final String EXAMPLE_PROCESS_DEFINITION_KEY = "aKey";
+  public static final String NON_EXISTING_PROCESS_DEFINITION_KEY = "aNonExistingKey";
   public static final String EXAMPLE_PROCESS_DEFINITION_CATEGORY = "aCategory";
   public static final String EXAMPLE_PROCESS_DEFINITION_DESCRIPTION = "aDescription";
   public static final int EXAMPLE_PROCESS_DEFINITION_VERSION = 42;
