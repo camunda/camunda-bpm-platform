@@ -1,3 +1,0 @@
-<PUBLIC:COMPONENT lightweight="true">
-    <PUBLIC:ATTACH EVENT="oncontentready" ONEVENT="element.fireEvent('ondataavailable', window.document.createEventObject())"/>
-</PUBLIC:COMPONENT>

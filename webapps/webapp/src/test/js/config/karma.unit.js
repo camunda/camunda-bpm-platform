@@ -1,5 +1,5 @@
 module.exports = function(karma) {
-  karma.configure({
+  karma.set({
 
     // base path, that will be used to
     // resolve files and exclude
@@ -26,7 +26,7 @@ module.exports = function(karma) {
     },
 
     plugins: [
-      'karma-ie-launcher',            
+      'karma-ie-launcher',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-phantomjs-launcher',
