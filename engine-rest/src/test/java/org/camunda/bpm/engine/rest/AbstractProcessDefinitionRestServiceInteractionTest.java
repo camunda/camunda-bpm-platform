@@ -1430,7 +1430,6 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .get(RENDERED_FORM_BY_KEY_URL);
 
     String responseContent = response.asString();
-    System.out.println(responseContent);
     Assertions.assertThat(responseContent).isEqualTo(expectedResult);
   }
 
@@ -1798,6 +1797,10 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   public void testNonExistingProcessDefinitionRetrieval_ByKey() {
     String nonExistingKey = "aNonExistingDefinitionKey";
 
+    when(repositoryServiceMock.createProcessDefinitionQuery().processDefinitionKey(nonExistingKey)).thenReturn(processDefinitionQueryMock);
+    when(processDefinitionQueryMock.latestVersion()).thenReturn(processDefinitionQueryMock);
+    when(processDefinitionQueryMock.singleResult()).thenReturn(null);
+
     given().pathParam("key", nonExistingKey)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
@@ -2009,25 +2012,25 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   }
 
   @Test
-  public void testActivateThrowsRestException_ByKey() {
+  public void testActivateThrowsProcessEngineException_ByKey() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", false);
     params.put("includeProcessInstances", false);
 
-    String expectedMessage = "No matching process definition with key: " + MockProvider.NON_EXISTING_PROCESS_DEFINITION_KEY;
+    String expectedMessage = "expectedMessage";
 
-    doThrow(new RestException(expectedMessage))
+    doThrow(new ProcessEngineException(expectedMessage))
       .when(repositoryServiceMock)
-      .activateProcessDefinitionByKey(eq(MockProvider.NON_EXISTING_PROCESS_DEFINITION_KEY), eq(false), isNull(Date.class));
+      .activateProcessDefinitionById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq(false), isNull(Date.class));
 
     given()
-      .pathParam("key", MockProvider.NON_EXISTING_PROCESS_DEFINITION_KEY)
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
       .contentType(ContentType.JSON)
       .body(params)
     .then()
       .expect()
-        .statusCode(Status.NOT_FOUND.getStatusCode())
-        .body("type", is(RestException.class.getSimpleName()))
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
         .body("message", containsString(expectedMessage))
       .when()
         .put(SINGLE_PROCESS_DEFINITION_BY_KEY_SUSPENDED_URL);
@@ -2141,25 +2144,25 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   }
 
   @Test
-  public void testSuspendThrowsRestException_ByKey() {
+  public void testSuspendThrowsProcessEngineException_ByKey() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", true);
     params.put("includeProcessInstances", false);
 
-    String expectedMessage = "No matching process definition with key: " + MockProvider.NON_EXISTING_PROCESS_DEFINITION_KEY;
+    String expectedMessage = "expectedMessage";
 
-    doThrow(new RestException(expectedMessage))
+    doThrow(new ProcessEngineException(expectedMessage))
       .when(repositoryServiceMock)
-      .suspendProcessDefinitionByKey(eq(MockProvider.NON_EXISTING_PROCESS_DEFINITION_KEY), eq(false), isNull(Date.class));
+      .suspendProcessDefinitionById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq(false), isNull(Date.class));
 
     given()
-      .pathParam("key", MockProvider.NON_EXISTING_PROCESS_DEFINITION_KEY)
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
       .contentType(ContentType.JSON)
       .body(params)
     .then()
       .expect()
-        .statusCode(Status.NOT_FOUND.getStatusCode())
-        .body("type", is(RestException.class.getSimpleName()))
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
         .body("message", containsString(expectedMessage))
       .when()
         .put(SINGLE_PROCESS_DEFINITION_BY_KEY_SUSPENDED_URL);
