@@ -648,7 +648,37 @@
         </dependency>
        </dependencies>
     </profile>
-	
+
+    <profile>
+      <!-- check for official api differences between latest major release -->
+      <id>check-api-compability</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>clirr-maven-plugin</artifactId>
+            <configuration>
+              <comparisonVersion>7.0.0-Final</comparisonVersion>
+              <textOutputFile>${project.build.directory}/clirr.txt</textOutputFile>
+              <failOnError>false</failOnError>
+              <includes>
+                <include>org/camunda/bpm/application/*</include>
+                <include>org/camunda/bpm/container/*</include>
+                <include>org/camunda/bpm/engine/*</include>
+              </includes>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
 </project>
