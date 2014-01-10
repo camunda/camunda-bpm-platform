@@ -20,8 +20,8 @@
       <bpmn2:outgoing>SequenceFlow_7</bpmn2:outgoing>
       <bpmn2:signalEventDefinition id="_SignalEventDefinition_4" signalRef="Signal_1"/>
     </bpmn2:boundaryEvent>
-    <bpmn2:sequenceFlow id="SequenceFlow_7" name="" sourceRef="subprocessBoundary" targetRef="endAfterSignal"/>
-    <bpmn2:endEvent id="endAfterSignal">
+    <bpmn2:sequenceFlow id="SequenceFlow_7" name="" sourceRef="subprocessBoundary" targetRef="endAfterBoundary"/>
+    <bpmn2:endEvent id="endAfterBoundary">
       <bpmn2:incoming>SequenceFlow_7</bpmn2:incoming>
     </bpmn2:endEvent>
     <bpmn2:endEvent id="end">
@@ -60,7 +60,7 @@
           <dc:Bounds height="0.0" width="0.0" x="354.0" y="180.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="endAfterSignal">
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="endAfterBoundary">
         <dc:Bounds height="36.0" width="36.0" x="522.0" y="300.0"/>
         <bpmndi:BPMNLabel>
           <dc:Bounds height="0.0" width="0.0" x="540.0" y="341.0"/>

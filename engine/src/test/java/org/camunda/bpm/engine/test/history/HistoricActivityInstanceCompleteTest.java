@@ -146,7 +146,7 @@ public class HistoricActivityInstanceCompleteTest extends PluggableProcessEngine
   }
 
   @Deployment
-  public void testBoundaryCancel() {
+  public void testBoundarySignalCancel() {
     ProcessInstance processInstance = startProcess();
 
     // should wait in user task
@@ -158,9 +158,57 @@ public class HistoricActivityInstanceCompleteTest extends PluggableProcessEngine
     List<HistoricActivityInstance> allInstances = getAllActivityInstances();
 
     assertNonCompletingActivityInstance(allInstances, "subprocess");
-// TODO: not supported yet
-//    assertIsCompletingActivityInstances(allInstances, "subprocessBoundary", 1);
-    assertIsCompletingActivityInstances(allInstances, "endAfterSignal", 1);
+
+    assertIsCompletingActivityInstances(allInstances, "subprocessBoundary", 1);
+    assertIsCompletingActivityInstances(allInstances, "endAfterBoundary", 1);
+  }
+
+  @Deployment
+  public void testBoundaryErrorCancel() {
+    ProcessInstance processInstance = startProcess();
+
+    assertTrue(processInstance.isEnded());
+
+    List<HistoricActivityInstance> allInstances = getAllActivityInstances();
+
+    assertNonCompletingActivityInstance(allInstances, "subprocess");
+
+    assertIsCompletingActivityInstances(allInstances, "errorSubprocessEnd", 1);
+
+    assertIsCompletingActivityInstances(allInstances, "subprocessBoundary", 1);
+    assertIsCompletingActivityInstances(allInstances, "endAfterBoundary", 1);
+  }
+
+  @Deployment
+  public void testEventSubprocessErrorCancel() {
+    ProcessInstance processInstance = startProcess();
+
+    assertTrue(processInstance.isEnded());
+
+    List<HistoricActivityInstance> allInstances = getAllActivityInstances();
+
+    assertNonCompletingActivityInstance(allInstances, "userTask");
+
+    assertIsCompletingActivityInstances(allInstances, "errorEnd", 1);
+
+    assertIsCompletingActivityInstances(allInstances, "eventSubprocess", 1);
+    assertIsCompletingActivityInstances(allInstances, "eventSubprocessEnd", 1);
+  }
+
+  @Deployment
+  public void testEventSubprocessSignalCancel() {
+    ProcessInstance processInstance = startProcess();
+
+    assertTrue(processInstance.isEnded());
+
+    List<HistoricActivityInstance> allInstances = getAllActivityInstances();
+
+    assertNonCompletingActivityInstance(allInstances, "userTask");
+
+    assertIsCompletingActivityInstances(allInstances, "errorEnd", 1);
+
+    assertIsCompletingActivityInstances(allInstances, "eventSubprocess", 1);
+    assertIsCompletingActivityInstances(allInstances, "eventSubprocessEnd", 1);
   }
 
   private void assertIsCompletingActivityInstances(List<HistoricActivityInstance> allInstances, String activityId) {
@@ -185,7 +233,7 @@ public class HistoricActivityInstanceCompleteTest extends PluggableProcessEngine
     for (HistoricActivityInstance instance : allInstances) {
       if (instance.getActivityId().equals(activityId)) {
         found++;
-        assertEquals(completing, instance.isCompleteScope());
+        assertEquals(String.format("expect <%s> to be %scompleting", activityId, (completing ? "" : "non-")), completing, instance.isCompleteScope());
       }
     }
 
