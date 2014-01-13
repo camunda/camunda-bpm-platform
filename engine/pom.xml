@@ -681,7 +681,7 @@
     </profile>
 
     <profile>
-      <id>wls-compability</id>
+      <id>wls-compatibility</id>
       <dependencies>
         <dependency>
           <groupId>joda-time</groupId>

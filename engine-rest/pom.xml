@@ -483,6 +483,19 @@
           </plugin>
         </plugins>
       </build>
-    </profile>    
+    </profile>
+
+    <profile>
+      <id>wls-compatibility</id>
+      <dependencies>
+        <dependency>
+          <groupId>joda-time</groupId>
+          <artifactId>joda-time</artifactId>
+          <version>1.2.1</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
   </profiles>
 </project>
