@@ -678,7 +678,9 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
 
+    <profile>
       <id>wls-compability</id>
       <dependencies>
         <dependency>
