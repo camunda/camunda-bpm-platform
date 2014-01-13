@@ -678,6 +678,15 @@
           </plugin>
         </plugins>
       </build>
+
+      <id>wls-compability</id>
+      <dependencies>
+        <dependency>
+          <groupId>joda-time</groupId>
+          <artifactId>joda-time</artifactId>
+          <version>1.2.1</version>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 

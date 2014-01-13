@@ -36,14 +36,14 @@ public class DateTimeUtil {
   }
 
   public static DateTime now() {
-    return DateTime.now(JVM_DEFAULT_DATE_TIME_ZONE);
+    return new DateTime(JVM_DEFAULT_DATE_TIME_ZONE);
   }
 
-  public static DateTime parseDateTime(String date) throws Exception {
-    return DateTime.parse(date, getDataTimeFormater());
+  public static DateTime parseDateTime(String date) {
+    return getDataTimeFormater().parseDateTime(date);
   }
 
-  public static Date parseDate(String date) throws Exception {
+  public static Date parseDate(String date) {
     return parseDateTime(date).toDate();
   }
 

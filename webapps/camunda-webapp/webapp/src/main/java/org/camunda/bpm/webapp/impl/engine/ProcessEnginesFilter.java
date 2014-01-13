@@ -42,7 +42,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   public static final String APP_ROOT_PLACEHOLDER = "$APP_ROOT";
   public static final String BASE_PLACEHOLDER = "$BASE";
 
-  public static Pattern APP_PREFIX_PATTERN = Pattern.compile("/app/(?:(\\w+?)/(?:(\\w+)?/([^\\?]*)?)?)?");
+  public static Pattern APP_PREFIX_PATTERN = Pattern.compile("/app/(?:(\\w+?)/(?:(index\\.html|\\w+)?/?([^\\?]*)?)?)?");
 
   @Override
   protected void applyFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -56,6 +56,11 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
       String appName = uriMatcher.group(1);
       String engineName = uriMatcher.group(2);
       String pageUri = uriMatcher.group(3);
+
+      // this happens on weblogic - /app/cockpit/index.html
+      if (INDEX_PAGE.equals(engineName)) {
+        engineName = null;
+      }
 
       if (pageUri == null || pageUri.isEmpty() || SETUP_PAGE.equals(pageUri)) {
         serveIndexPage(appName, engineName, pageUri, contextPath, request, response, chain);

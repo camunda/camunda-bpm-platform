@@ -12,14 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.dto.converter;
 
-import java.util.Date;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 
-import org.joda.time.DateTime;
+import java.util.Date;
 
 public class DateConverter implements StringToTypeConverter<Date> {
 
   @Override
   public Date convertQueryParameterToType(String value) {
-    return DateTime.parse(value).toDate();
+    return DateTimeUtil.parseDateTime(value).toDate();
   }
 }

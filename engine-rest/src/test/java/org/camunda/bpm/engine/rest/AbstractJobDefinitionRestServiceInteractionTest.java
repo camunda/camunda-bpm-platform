@@ -1,35 +1,29 @@
 package org.camunda.bpm.engine.rest;
 
+import com.jayway.restassured.http.ContentType;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.management.JobDefinitionQuery;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InOrder;
+
+import javax.ws.rs.core.Response.Status;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.ws.rs.core.Response.Status;
-
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.management.JobDefinition;
-import org.camunda.bpm.engine.management.JobDefinitionQuery;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InOrder;
-
-import com.jayway.restassured.http.ContentType;
+import static org.mockito.Mockito.*;
 
 public abstract class AbstractJobDefinitionRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -132,7 +126,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("includeJobs", false);
     params.put("executionDate", MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
@@ -173,7 +167,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("includeJobs", true);
     params.put("executionDate", MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
@@ -262,7 +256,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("includeJobs", false);
     params.put("executionDate", MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
@@ -303,7 +297,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("includeJobs", true);
     params.put("executionDate", MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
@@ -432,7 +426,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .contentType(ContentType.JSON)
@@ -454,7 +448,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .contentType(ContentType.JSON)
@@ -556,7 +550,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .contentType(ContentType.JSON)
@@ -578,7 +572,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .contentType(ContentType.JSON)
@@ -680,7 +674,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .contentType(ContentType.JSON)
@@ -702,7 +696,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .contentType(ContentType.JSON)
@@ -804,7 +798,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .contentType(ContentType.JSON)
@@ -826,7 +820,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .contentType(ContentType.JSON)
