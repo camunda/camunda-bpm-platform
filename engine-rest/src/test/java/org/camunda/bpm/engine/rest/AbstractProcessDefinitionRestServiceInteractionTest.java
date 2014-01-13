@@ -1953,7 +1953,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -1994,7 +1994,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2083,7 +2083,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2126,7 +2126,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTime.parse(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
