@@ -702,46 +702,10 @@
 
   <developers>
     <developer>
-      <id>meyerdan</id>
-      <name>Daniel Meyer</name>
-      <email>daniel.meyer@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>Project Lead</role></roles>
-    </developer>
-    <developer>
-      <id>Nikku</id>
-      <name>Nico Rehwaldt</name>
-      <email>nico.rehwaldt@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>Webapp Lead</role></roles>
-    </developer>
-    <developer>
-      <id>romansmirnov</id>
-      <name>Roman Smirnov</name>
-      <email>roman.smirnov@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>Core Developer</role></roles>
-    </developer>
-    <developer>
-      <id>hawky-4s-</id>
-      <name>Christian Lipphardt</name>
-      <email>christian.lipphardt@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>Developer / CI</role></roles>
-    </developer>
-    <developer>
-      <id>polenz</id>
-      <name>Kristin Polenz</name>
-      <email>kristin.polenz@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>Application Developer</role></roles>
-    </developer>
-    <developer>
-      <id>mschoe</id>
-      <name>Michael Schoettes</name>
-      <email>michael.schoettes@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>QA Engineer</role></roles>
+      <id>camunda.org</id>
+      <name>camunda BPM Community</name>
+      <organization>camunda.org</organization>
+      <organizationUrl>http://camunda.org</organizationUrl>
     </developer>
   </developers>
 
