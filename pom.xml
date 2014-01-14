@@ -105,11 +105,6 @@
     <profile>
       <id>sonatype-oss-release</id>
       <modules>
-        <module>javaee/ejb-service</module>
-        <module>javaee/ejb-client</module>
-        <module>javaee/jobexecutor-ra</module>
-        <module>javaee/jobexecutor-rar</module>
-
         <module>engine</module>
         <module>engine-cdi</module>
         <!--<module>engine-osgi</module>-->
