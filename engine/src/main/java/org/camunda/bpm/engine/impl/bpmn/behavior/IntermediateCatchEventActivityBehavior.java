@@ -12,27 +12,38 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
- * <p>The BPMN terminate End Event.</p>
- *
- * <p>The hosting activity must be marked {@link PvmActivity#isCancelScope()} since it will
- * cancel the scope in which it is embedded. When this activitiy is executed, the sope execution
- * will have performed "cancel scope" behavior and the {@link ActivityBehavior} will be called on
- * the scope execution.</p>
- *
  *
  * @author Daniel Meyer
  * @author Roman Smirnov
+ *
  */
-public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior {
+public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  public void execute(ActivityExecution execution) throws Exception {
-    // we are the last execution inside this scope: calling end() ends this scope.
-    execution.end();
+  protected boolean isAfterEventBasedGateway;
+
+  public IntermediateCatchEventActivityBehavior(boolean isAfterEventBasedGateway) {
+    this.isAfterEventBasedGateway = isAfterEventBasedGateway;
   }
 
+  public void execute(ActivityExecution execution) throws Exception {
+    if (isAfterEventBasedGateway) {
+      leave(execution);
+
+    } else {
+      // Do nothing: waitstate behavior
+    }
+  }
+
+  public boolean isAfterEventBasedGateway() {
+    return isAfterEventBasedGateway;
+  }
+
+  @Override
+  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+    leave(execution);
+  }
 }
+

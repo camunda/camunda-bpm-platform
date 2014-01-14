@@ -138,24 +138,15 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
 
   @Deployment
   public void testJoin() {
-    // Set the clock fixed
-    Date startTime = new Date();
-
     // After process start, there should be 3 timers created
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testJoin");
     Task task1 = taskService.createTaskQuery().singleResult();
     assertEquals("Main Task", task1.getName());
 
-    JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi.getId());
-    List<Job> jobs = jobQuery.list();
-    assertEquals(1, jobs.size());
+    Job job = managementService.createJobQuery().processInstanceId(pi.getId()).singleResult();
+    assertNotNull(job);
 
-    // After setting the clock to time '1 hour and 5 seconds', the first timer should fire
-    ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-    waitForJobExecutorToProcessAllJobs(5000L);
-
-    // timer has fired
-    assertEquals(0L, jobQuery.count());
+    managementService.executeJob(job.getId());
 
     // we now have both tasks
     assertEquals(2L, taskService.createTaskQuery().count());
@@ -411,6 +402,102 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
     jobExecutor.shutdown();
   }
 
+  @Deployment
+  public void testMultipleOutgoingSequenceFlows() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("nonInterruptingTimer");
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    managementService.executeJob(job.getId());
+
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    assertEquals(3, taskQuery.count());
+
+    List<Task> tasks = taskQuery.list();
+
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testMultipleOutgoingSequenceFlowsOnSubprocess() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("nonInterruptingTimer");
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    managementService.executeJob(job.getId());
+
+    Task task = taskService.createTaskQuery().taskDefinitionKey("innerTask1").singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    task = taskService.createTaskQuery().taskDefinitionKey("innerTask2").singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    task = taskService.createTaskQuery().taskDefinitionKey("timerFiredTask1").singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    task = taskService.createTaskQuery().taskDefinitionKey("timerFiredTask2").singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    assertProcessEnded(pi.getId());
+
+    // Case 2: fire outer tasks first
+
+    pi = runtimeService.startProcessInstanceByKey("nonInterruptingTimer");
+
+    job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    managementService.executeJob(job.getId());
+
+    task = taskService.createTaskQuery().taskDefinitionKey("timerFiredTask1").singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    task = taskService.createTaskQuery().taskDefinitionKey("timerFiredTask2").singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    task = taskService.createTaskQuery().taskDefinitionKey("innerTask1").singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    task = taskService.createTaskQuery().taskDefinitionKey("innerTask2").singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testMultipleOutgoingSequenceFlowsOnSubprocessMi() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("nonInterruptingTimer");
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    managementService.executeJob(job.getId());
+
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    assertEquals(10, taskQuery.count());
+
+    List<Task> tasks = taskQuery.list();
+
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    assertProcessEnded(pi.getId());
+  }
 
 
 }

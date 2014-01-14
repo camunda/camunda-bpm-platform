@@ -64,6 +64,8 @@ public class ExecutionImpl implements
   /** current activity */
   protected ActivityImpl activity;
 
+  protected PvmActivity nextActivity;
+
   /** the Id of the current activity instance */
   protected String activityInstanceId;
 
@@ -222,7 +224,7 @@ public class ExecutionImpl implements
     }
   }
 
-  public void destroyScope(String reason) {
+  public void cancelScope(String reason) {
 
     if(log.isLoggable(Level.FINE)) {
       log.fine("performing destroy scope behavior for execution "+this);
@@ -237,6 +239,9 @@ public class ExecutionImpl implements
       childExecution.deleteCascade(reason);
     }
 
+  }
+
+  public void interruptScope(String reason) {
   }
 
   // parent ///////////////////////////////////////////////////////////////////
@@ -421,8 +426,8 @@ public class ExecutionImpl implements
 
   /** sets the current activity.  can be overridden by subclasses.  doesn't
    * require initialization. */
-  public void setActivity(ActivityImpl activity) {
-    this.activity = activity;
+  public void setActivity(PvmActivity activity) {
+    this.activity = (ActivityImpl) activity;
   }
 
   /** must be called before the activity member field or getActivity() is called */
@@ -558,8 +563,13 @@ public class ExecutionImpl implements
   }
 
   public void executeActivity(PvmActivity activity) {
-    setActivity((ActivityImpl) activity);
-    performOperation(AtomicOperation.ACTIVITY_START);
+    if(activity.isConcurrent()) {
+      this.nextActivity = activity;
+      performOperation(AtomicOperation.ACTIVITY_START_CONCURRENT);
+    } else {
+      setActivity((ActivityImpl) activity);
+      performOperation(AtomicOperation.ACTIVITY_START);
+    }
   }
 
   public List<ActivityExecution> findInactiveConcurrentExecutions(PvmActivity activity) {
@@ -635,7 +645,7 @@ public class ExecutionImpl implements
       log.fine("activating the concurrent root "+concurrentRoot+" as the single path of execution going forward");
       concurrentRoot.setActive(true);
       concurrentRoot.setActivity(activity);
-      concurrentRoot.setConcurrent(false);
+      concurrentRoot.setConcurrent(hasConcurrentSiblings(concurrentRoot));
       concurrentRoot.take(transitions.get(0));
 
     } else {
@@ -703,6 +713,20 @@ public class ExecutionImpl implements
     }
   }
 
+  protected boolean hasConcurrentSiblings(ExecutionImpl concurrentRoot) {
+    if(concurrentRoot.isProcessInstance()) {
+      return false;
+    } else {
+      List<ExecutionImpl> executions = concurrentRoot.getParent().getExecutions();
+      for (ExecutionImpl executionImpl : executions) {
+        if(executionImpl != concurrentRoot
+            && !executionImpl.isEventScope()) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
 
   public boolean isActive(String activityId) {
     return findExecution(activityId)!=null;
@@ -880,6 +904,12 @@ public class ExecutionImpl implements
     // set execution to this activity instance
     replacedBy.setActivityInstanceId(this.activityInstanceId);
   }
+
+  public void replace(InterpretableExecution execution) {
+    this.activityInstanceId = execution.getActivityInstanceId();
+    execution.leaveActivityInstance();
+  }
+
   public void setExecutions(List<ExecutionImpl> executions) {
     this.executions = executions;
   }
@@ -986,6 +1016,10 @@ public class ExecutionImpl implements
 
   public void setActivityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
+  }
+
+  public PvmActivity getNextActivity() {
+    return nextActivity;
   }
 
   public String getCurrentTransitionId() {
