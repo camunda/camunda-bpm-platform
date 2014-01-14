@@ -550,13 +550,13 @@
     <profile>
       <id>tomcat</id>
       <dependencies>
-	  
+    
         <!-- dependencies only used for testing (not added to cycle-tomcat.war in distribution) -->
         <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
         </dependency>
-		
+    
         <dependency>
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
@@ -567,23 +567,23 @@
           <groupId>org.hibernate.javax.persistence</groupId>
           <artifactId>hibernate-jpa-2.0-api</artifactId>
         </dependency>
-		
-		<dependency>
+    
+        <dependency>
           <groupId>org.glassfish</groupId>
           <artifactId>javax.annotation</artifactId>
         </dependency>
-		
-		<dependency>
+    
+        <dependency>
           <groupId>javax.inject</groupId>
           <artifactId>javax.inject</artifactId>
           <version>1</version>
         </dependency>
-		
+    
         <dependency>
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-entitymanager</artifactId>
         </dependency>
-		
+    
         <dependency>
           <groupId>cglib</groupId>
           <artifactId>cglib</artifactId>

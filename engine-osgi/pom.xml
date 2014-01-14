@@ -6,11 +6,12 @@
   <artifactId>camunda-engine-osgi</artifactId>
     <packaging>bundle</packaging>
 
-	<parent>
-		<groupId>org.camunda.bpm</groupId>
-		<artifactId>camunda-root</artifactId>
-		<version>7.1.0-SNAPSHOT</version>
-	</parent>
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../parent</relativePath>
+    <version>7.1.0-SNAPSHOT</version>
+  </parent>
 
   <build>
     <resources>
@@ -21,12 +22,12 @@
         </includes>
       </resource>
     </resources>
-	<plugins>
-	  <plugin>
+  <plugins>
+    <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
       </plugin>
-	</plugins>
+  </plugins>
   </build>
 
   <dependencies>
@@ -34,37 +35,37 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
     </dependency>
-        <dependency>
-          <groupId>org.osgi</groupId>
-          <artifactId>org.osgi.core</artifactId>
-          <version>4.2.0</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.osgi</groupId>
-          <artifactId>org.osgi.compendium</artifactId>
-          <version>4.2.0</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.apache.felix</groupId>
-          <artifactId>org.apache.felix.fileinstall</artifactId>
-          <version>3.0.2</version>
-          <optional>true</optional>
-        </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <version>4.2.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <version>4.2.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.fileinstall</artifactId>
+      <version>3.0.2</version>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 
-    <properties>
-        <camunda.osgi.activator>
-            org.camunda.bpm.engine.osgi.Activator
-        </camunda.osgi.activator>
-        <camunda.osgi.import.pkg>
-            org.apache.felix.fileinstall*;resolution:=optional,*
-        </camunda.osgi.import.pkg>
-        <camunda.artifact>
-            org.camunda.bpm.engine.osgi
-        </camunda.artifact>
-    </properties>
+  <properties>
+    <camunda.osgi.activator>
+        org.camunda.bpm.engine.osgi.Activator
+    </camunda.osgi.activator>
+    <camunda.osgi.import.pkg>
+        org.apache.felix.fileinstall*;resolution:=optional,*
+    </camunda.osgi.import.pkg>
+    <camunda.artifact>
+        org.camunda.bpm.engine.osgi
+    </camunda.artifact>
+  </properties>
 
   <profiles>
     <profile>
