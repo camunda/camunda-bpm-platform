@@ -60,6 +60,7 @@
         <module>distro/sql-script</module>
   
         <module>parent</module>
+        <module>bom</module>
       </modules>
     </profile>
     
@@ -76,6 +77,7 @@
         <module>distro/tomcat</module>
   
         <module>parent</module>
+        <module>bom</module>
       </modules>
     </profile>
     
@@ -90,6 +92,7 @@
         <module>engine-rest</module>
   
         <module>parent</module>
+        <module>bom</module>
       </modules>
     </profile>    
     <profile>
@@ -100,6 +103,7 @@
         <module>webapps/camunda-webapp</module>
   
         <module>parent</module>
+        <module>bom</module>
       </modules>
     </profile>
     <profile>
@@ -114,6 +118,7 @@
         <module>identity/identity-ldap</module>
   
         <module>parent</module>
+        <module>bom</module>
       </modules>
 
       <build>
