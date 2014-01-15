@@ -15,7 +15,7 @@
     <signavio.globalpassword>${env.signavio.globalpassword}</signavio.globalpassword>
     <signavio.baseurl>${env.signavio.baseurl}</signavio.baseurl>
 
-    <cargo.timeout>60000</cargo.timeout>
+    <cargo.timeout>120000</cargo.timeout>
   </properties>
 
   <dependencies>

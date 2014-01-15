@@ -128,7 +128,7 @@
         <version>${version.oracle11g}</version>
         <scope>test</scope>
       </dependency>
-	    <dependency>
+      <dependency>
         <groupId>com.oracle.jdbc</groupId>
         <artifactId>ojdbc14</artifactId>
         <version>${version.oracle10g}</version>
@@ -212,7 +212,7 @@
         <artifactId>commons-email</artifactId>
         <version>1.2</version>
       </dependency>
-      <!-- Web service -->
+        <!-- Web service -->
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-frontend-jaxws</artifactId>
@@ -260,8 +260,8 @@
         <version>20070829</version>
       </dependency>
       <dependency>
-      <!-- required for building with JDK 5 -->
-      <groupId>org.livetribe</groupId>
+        <!-- required for building with JDK 5 -->
+        <groupId>org.livetribe</groupId>
         <artifactId>livetribe-jsr223</artifactId>
         <version>2.0.6</version>
         <type>jar</type>
@@ -390,12 +390,12 @@
         <classifier>lgpl</classifier>
         <version>2.0.0</version>
       </dependency>
-	    <dependency>
+      <dependency>
         <groupId>com.fasterxml.uuid</groupId>
         <artifactId>java-uuid-generator</artifactId>
         <version>3.1.2</version>
       </dependency>
-	     
+       
       <dependency>
         <groupId>org.camunda.bpm.javaee</groupId>
         <artifactId>camunda-ejb-client</artifactId>
@@ -502,7 +502,7 @@
     </dependencies>
   </dependencyManagement>
   
-  <build>
+   <build>   
     <pluginManagement>
       <plugins>
         <plugin>
@@ -656,6 +656,11 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>sql-maven-plugin</artifactId>
           <version>1.5</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>clirr-maven-plugin</artifactId>
+          <version>2.6.1</version>
         </plugin>
       </plugins>
     </pluginManagement>

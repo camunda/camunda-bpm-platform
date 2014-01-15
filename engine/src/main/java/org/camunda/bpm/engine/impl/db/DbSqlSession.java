@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -56,11 +55,8 @@ import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.upgrade.DbUpgradeStep;
-import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
 import org.camunda.bpm.engine.impl.identity.db.DbUserQueryImpl;
-import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -74,12 +70,12 @@ import org.camunda.bpm.engine.impl.variable.DeserializedObject;
  *   - delayed flushing of inserts updates and deletes
  *   - optional dirty checking
  *   - db specific statement name mapping
- *   
+ *
  * @author Tom Baeyens
  * @author Joram Barrez
  */
 public class DbSqlSession implements Session {
-  
+
   private static Logger log = Logger.getLogger(DbSqlSession.class.getName());
 
   protected SqlSession sqlSession;
@@ -110,25 +106,25 @@ public class DbSqlSession implements Session {
   }
 
   // insert ///////////////////////////////////////////////////////////////////
-  
+
   public void insert(PersistentObject persistentObject) {
     if (persistentObject.getId()==null) {
-      String id = dbSqlSessionFactory.getIdGenerator().getNextId();  
+      String id = dbSqlSessionFactory.getIdGenerator().getNextId();
       persistentObject.setId(id);
     }
     insertedObjects.add(persistentObject);
     cachePut(persistentObject, false);
   }
-  
+
   // update ///////////////////////////////////////////////////////////////////
-  
+
   public void update(PersistentObject persistentObject) {
     updatedObjects.add(persistentObject);
     cachePut(persistentObject, false);
   }
-  
+
   // delete ///////////////////////////////////////////////////////////////////
-  
+
 //  public void delete(Class<?> persistentObjectClass, String persistentObjectId) {
 //    for (DeleteOperation deleteOperation: deleteOperations) {
 //      if (deleteOperation instanceof DeleteById) {
@@ -143,7 +139,7 @@ public class DbSqlSession implements Session {
 //    }
 //    deleteOperations.add(new DeleteById(persistentObjectClass, persistentObjectId));
 //  }
-  
+
   public interface DeleteOperation {
     void execute();
   }
@@ -168,11 +164,11 @@ public class DbSqlSession implements Session {
 //      return "delete "+ClassNameUtil.getClassNameWithoutPackage(persistenceObjectClass)+"["+persistentObjectId+"]";
 //    }
 //  }
-  
+
   public void delete(String statement, Object parameter) {
     deleteOperations.add(new BulkDeleteOperation(statement, parameter));
   }
-  
+
   public void update(String statement, Object parameter) {
     BulkUpdateOperation updateOperation = new BulkUpdateOperation(statement, parameter);
     bulkUpdates.add(updateOperation);
@@ -180,15 +176,15 @@ public class DbSqlSession implements Session {
 
   /**
    * Use this {@link DeleteOperation} to execute a dedicated delete statement.
-   * It is important to note there won't be any optimistic locking checks done 
+   * It is important to note there won't be any optimistic locking checks done
    * for these kind of delete operations!
-   * 
+   *
    * For example, a usage of this operation would be to delete all variables for
    * a certain execution, when that certain execution is removed. The optimistic locking
    * happens on the execution, but the variables can be removed by a simple
    * 'delete from var_table where execution_id is xxx'. It could very well be there
-   * are no variables, which would also work with this query, but not with the 
-   * regular {@link DeletePersistentObjectOperation} operation. 
+   * are no variables, which would also work with this query, but not with the
+   * regular {@link DeletePersistentObjectOperation} operation.
    */
   public class BulkDeleteOperation implements DeleteOperation {
     String statement;
@@ -204,30 +200,30 @@ public class DbSqlSession implements Session {
       return "bulk delete: "+statement;
     }
   }
-  
+
   public class BulkUpdateOperation {
     String statement;
     Object parameter;
-    
+
     public BulkUpdateOperation(String statement, Object parameter) {
       this.statement = statement;
       this.parameter = parameter;
     }
-    
+
     public String getStatement() {
       return statement;
     }
-    
+
     public Object getParameter() {
       return parameter;
     }
   }
-  
+
 
   public void delete(PersistentObject persistentObject) {
     for (DeleteOperation deleteOperation: deleteOperations) {
       if (deleteOperation instanceof DeletePersistentObjectOperation) {
-        
+
         DeletePersistentObjectOperation deletePersistentObjectOperation = (DeletePersistentObjectOperation) deleteOperation;
         if (persistentObject.getId().equals(deletePersistentObjectOperation.getPersistentObject().getId())
                 && persistentObject.getClass().equals(deletePersistentObjectOperation.getPersistentObject().getClass())) {
@@ -235,21 +231,21 @@ public class DbSqlSession implements Session {
         }
       }
     }
-    
+
     deleteOperations.add(new DeletePersistentObjectOperation(persistentObject));
   }
-  
+
   /**
    * A {@link DeleteOperation} used when the persistent object has been fetched already.
    */
   public class DeletePersistentObjectOperation implements DeleteOperation {
 
     protected PersistentObject persistentObject;
-    
+
     public DeletePersistentObjectOperation(PersistentObject persistentObject) {
       this.persistentObject = persistentObject;
     }
-    
+
     public void execute() {
       String deleteStatement = dbSqlSessionFactory.getDeleteStatement(persistentObject.getClass());
       deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
@@ -257,8 +253,8 @@ public class DbSqlSession implements Session {
         throw new ProcessEngineException("no delete statement for " + persistentObject.getClass() + " in the ibatis mapping files");
       }
       log.fine("deleting: " + ClassNameUtil.getClassNameWithoutPackage(persistentObject.getClass()) + "[" + persistentObject.getId() + "]");
-      
-      
+
+
       // It only makes sense to check for optimistic locking exceptions for objects that actually have a revision
       if (persistentObject instanceof HasRevision) {
         int nrOfRowsDeleted = sqlSession.delete(deleteStatement, persistentObject);
@@ -273,62 +269,62 @@ public class DbSqlSession implements Session {
     public PersistentObject getPersistentObject() {
       return persistentObject;
     }
-    
+
     public void setPersistentObject(PersistentObject persistentObject) {
       this.persistentObject = persistentObject;
     }
-    
+
     public String toString() {
       return "Delete operation for " + persistentObject.getClass() + " [" + persistentObject.getId() + "]";
     }
-    
+
   }
-  
+
   // select ///////////////////////////////////////////////////////////////////
 
   @SuppressWarnings("unchecked")
   public List selectList(String statement) {
     return selectList(statement, null, 0, Integer.MAX_VALUE);
   }
-  
+
   @SuppressWarnings("unchecked")
-  public List selectList(String statement, Object parameter) {  
+  public List selectList(String statement, Object parameter) {
     return selectList(statement, parameter, 0, Integer.MAX_VALUE);
   }
-  
+
   @SuppressWarnings("unchecked")
-  public List selectList(String statement, Object parameter, Page page) {   
+  public List selectList(String statement, Object parameter, Page page) {
     if(page!=null) {
       return selectList(statement, parameter, page.getFirstResult(), page.getMaxResults());
     }else {
       return selectList(statement, parameter, 0, Integer.MAX_VALUE);
     }
   }
-  
+
   @SuppressWarnings("unchecked")
-  public List selectList(String statement, ListQueryParameterObject parameter, Page page) {   
+  public List selectList(String statement, ListQueryParameterObject parameter, Page page) {
     return selectList(statement, parameter);
   }
 
   @SuppressWarnings("unchecked")
-  public List selectList(String statement, Object parameter, int firstResult, int maxResults) {   
+  public List selectList(String statement, Object parameter, int firstResult, int maxResults) {
     return selectList(statement, new ListQueryParameterObject(parameter, firstResult, maxResults));
   }
-  
+
   @SuppressWarnings("unchecked")
   public List selectList(String statement, ListQueryParameterObject parameter) {
     return selectListWithRawParameter(statement, parameter, parameter.getFirstResult(), parameter.getMaxResults());
   }
-  
+
   @SuppressWarnings("unchecked")
   public List selectListWithRawParameter(String statement, Object parameter, int firstResult, int maxResults) {
-    statement = dbSqlSessionFactory.mapStatement(statement);    
+    statement = dbSqlSessionFactory.mapStatement(statement);
     if(firstResult == -1 ||  maxResults==-1) {
       return Collections.EMPTY_LIST;
-    }    
+    }
     List loadedObjects = sqlSession.selectList(statement, parameter);
     return filterLoadedObjects(loadedObjects);
-  }  
+  }
 
   public Object selectOne(String statement, Object parameter) {
     statement = dbSqlSessionFactory.mapStatement(statement);
@@ -339,17 +335,17 @@ public class DbSqlSession implements Session {
     }
     return result;
   }
-  
+
   public boolean selectBoolean(String statement, Object parameter) {
     statement = dbSqlSessionFactory.mapStatement(statement);
     List<String> result = sqlSession.selectList(statement, parameter);
     if(result != null) {
       return result.contains(1);
-    } 
-    return false;  
-    
-  } 
-  
+    }
+    return false;
+
+  }
+
   @SuppressWarnings("unchecked")
   public <T extends PersistentObject> T selectById(Class<T> entityClass, String id) {
     T persistentObject = cacheGet(entityClass, id);
@@ -367,7 +363,7 @@ public class DbSqlSession implements Session {
   }
 
   // internal session cache ///////////////////////////////////////////////////
-  
+
   @SuppressWarnings("unchecked")
   protected List filterLoadedObjects(List<Object> loadedObjects) {
     if (loadedObjects.isEmpty()) {
@@ -394,9 +390,9 @@ public class DbSqlSession implements Session {
     classCache.put(persistentObject.getId(), cachedObject);
     return cachedObject;
   }
-  
-  /** returns the object in the cache.  if this object was loaded before, 
-   * then the original object is returned.  if this is the first time 
+
+  /** returns the object in the cache.  if this object was loaded before,
+   * then the original object is returned.  if this is the first time
    * this object is loaded, then the loadedObject is added to the cache. */
   protected PersistentObject cacheFilter(PersistentObject persistentObject) {
     PersistentObject cachedPersistentObject = cacheGet(persistentObject.getClass(), persistentObject.getId());
@@ -419,7 +415,7 @@ public class DbSqlSession implements Session {
     }
     return null;
   }
-  
+
   protected void cacheRemove(Class<?> persistentObjectClass, String persistentObjectId) {
     Map<String, CachedObject> classCache = cachedObjects.get(persistentObjectClass);
     if (classCache==null) {
@@ -427,7 +423,7 @@ public class DbSqlSession implements Session {
     }
     classCache.remove(persistentObjectId);
   }
-  
+
   @SuppressWarnings("unchecked")
   public <T> List<T> findInCache(Class<T> entityClass) {
     Map<String, CachedObject> classCache = cachedObjects.get(entityClass);
@@ -440,16 +436,16 @@ public class DbSqlSession implements Session {
     }
     return Collections.emptyList();
   }
-  
+
   public <T> T findInCache(Class<T> entityClass, String id) {
     return cacheGet(entityClass, id);
   }
 
-  
+
   public static class CachedObject {
     protected PersistentObject persistentObject;
     protected Object persistentObjectState;
-    
+
     public CachedObject(PersistentObject persistentObject, boolean storeState) {
       this.persistentObject = persistentObject;
       if (storeState) {
@@ -467,7 +463,7 @@ public class DbSqlSession implements Session {
   }
 
   // deserialized objects /////////////////////////////////////////////////////
-  
+
   public void addDeserializedObject(Object deserializedObject, byte[] serializedBytes, VariableInstanceEntity variableInstanceEntity) {
     deserializedObjects.add(new DeserializedObject(deserializedObject, serializedBytes, variableInstanceEntity));
   }
@@ -478,7 +474,7 @@ public class DbSqlSession implements Session {
     removeUnnecessaryOperations();
     flushDeserializedObjects();
     List<PersistentObject> updatedObjects = getUpdatedObjects();
-    
+
     if (log.isLoggable(Level.FINE)) {
       log.fine("flush summary:");
       for (PersistentObject insertedObject: insertedObjects) {
@@ -523,36 +519,36 @@ public class DbSqlSession implements Session {
 //      cacheRemove(insertedObject.getClass(), insertedObject.getId());
 //    }
 //  }
-  
+
   protected void removeUnnecessaryOperations() {
     List<DeleteOperation> deletedObjectsCopy = new ArrayList<DeleteOperation>(deleteOperations);
-    
+
     // Check all delete operations to see if there are any inserts that cancel the delete
     for (DeleteOperation deleteOperation: deletedObjectsCopy) {
       if (deleteOperation instanceof DeletePersistentObjectOperation) {
-        
+
         DeletePersistentObjectOperation deletePersistentObjectOperation = (DeletePersistentObjectOperation) deleteOperation;
         PersistentObject insertedObject = findInsertedObject(deletePersistentObjectOperation.getPersistentObject().getClass(),
                 deletePersistentObjectOperation.getPersistentObject().getId());
-        
+
         // if the deleted object is inserted,
         if (insertedObject != null) {
           // remove the insert and the delete, they cancel each other
           insertedObjects.remove(insertedObject);
           deleteOperations.remove(deleteOperation);
         }
-        
+
         // in any case, remove the deleted object from the cache
-        cacheRemove(deletePersistentObjectOperation.getPersistentObject().getClass(), 
+        cacheRemove(deletePersistentObjectOperation.getPersistentObject().getClass(),
                 deletePersistentObjectOperation.getPersistentObject().getId());
-        
-      } 
+
+      }
     }
-    
+
     for (PersistentObject insertedObject: insertedObjects) {
       cacheRemove(insertedObject.getClass(), insertedObject.getId());
     }
-    
+
   }
 
   protected PersistentObject findInsertedObject(Class< ? > persistenceObjectClass, String persistentObjectId) {
@@ -590,36 +586,36 @@ public class DbSqlSession implements Session {
 //    }
 //    return updatedObjects;
 //  }
-  
+
   public List<PersistentObject> getUpdatedObjects() {
     List<PersistentObject> updatedObjects = new ArrayList<PersistentObject>();
     for (Class<?> clazz: cachedObjects.keySet()) {
-      
+
       Map<String, CachedObject> classCache = cachedObjects.get(clazz);
       for (CachedObject cachedObject: classCache.values()) {
-        
+
         PersistentObject persistentObject = (PersistentObject) cachedObject.getPersistentObject();
         if (!isPersistentObjectDeleted(persistentObject)) {
           Object originalState = cachedObject.getPersistentObjectState();
           if (!persistentObject.getPersistentState().equals(originalState)) {
             updatedObjects.add(persistentObject);
-            
+
           } else {
             log.finest("loaded object '"+persistentObject+"' was not updated");
           }
         }
-        
+
       }
-      
+
     }
-    
+
     return updatedObjects;
   }
-  
+
   public boolean isUpdated(PersistentObject persistentObject) {
     return getUpdatedObjects().contains(persistentObject);
   }
-  
+
   protected boolean isPersistentObjectDeleted(PersistentObject persistentObject) {
     for (DeleteOperation deleteOperation : deleteOperations) {
       if (deleteOperation instanceof DeletePersistentObjectOperation) {
@@ -630,8 +626,8 @@ public class DbSqlSession implements Session {
     }
     return false;
   }
-  
-//  public <T extends PersistentObject> List<T> pruneDeletedEntities(List<T> listToPrune) {   
+
+//  public <T extends PersistentObject> List<T> pruneDeletedEntities(List<T> listToPrune) {
 //    ArrayList<T> prunedList = new ArrayList<T>(listToPrune);
 //    for (T potentiallyDeleted : listToPrune) {
 //      for (DeleteOperation deleteOperation: deleteOperations) {
@@ -639,7 +635,7 @@ public class DbSqlSession implements Session {
 //          DeleteById deleteById = (DeleteById) deleteOperation;
 //          if ( potentiallyDeleted.getClass().equals(deleteById.persistenceObjectClass)
 //               && potentiallyDeleted.getId().equals(deleteById.persistentObjectId)
-//             ) {            
+//             ) {
 //            prunedList.remove(potentiallyDeleted);
 //          }
 //        }
@@ -647,19 +643,19 @@ public class DbSqlSession implements Session {
 //    }
 //    return prunedList;
 //  }
-  
-  public <T extends PersistentObject> List<T> pruneDeletedEntities(List<T> listToPrune) {   
+
+  public <T extends PersistentObject> List<T> pruneDeletedEntities(List<T> listToPrune) {
     ArrayList<T> prunedList = new ArrayList<T>(listToPrune);
     for (T potentiallyDeleted : listToPrune) {
       for (DeleteOperation deleteOperation: deleteOperations) {
         if (deleteOperation instanceof DeletePersistentObjectOperation) {
-          
+
           DeletePersistentObjectOperation deletePersistentObjectOperation = (DeletePersistentObjectOperation) deleteOperation;
           if (potentiallyDeleted.getClass().equals(deletePersistentObjectOperation.getPersistentObject().getClass())
                   && potentiallyDeleted.getId().equals(deletePersistentObjectOperation.getPersistentObject().getId())) {
             prunedList.remove(potentiallyDeleted);
           }
-          
+
         }
       }
     }
@@ -674,10 +670,10 @@ public class DbSqlSession implements Session {
       if (insertStatement==null) {
         throw new ProcessEngineException("no insert statement for "+insertedObject.getClass()+" in the ibatis mapping files");
       }
-      
+
       log.fine("inserting: "+toString(insertedObject));
       sqlSession.insert(insertStatement, insertedObject);
-      
+
       // See http://jira.codehaus.org/browse/ACT-1290
       if (insertedObject instanceof HasRevision) {
         ((HasRevision) insertedObject).setRevision(((HasRevision) insertedObject).getRevisionNext());
@@ -697,24 +693,24 @@ public class DbSqlSession implements Session {
         log.fine("updating: "+toString(updatedObject)+"]");
       }
       int updatedRecords = sqlSession.update(updateStatement, updatedObject);
-      
-      if (!(updatedObject instanceof HistoricActivityInstanceEventEntity)) {
-      
+
+      if (updatedObject instanceof HasRevision) {
+
         if (updatedRecords!=1) {
           throw new OptimisticLockingException(toString(updatedObject)+" was updated by another transaction concurrently");
-        } 
-        
-        if (updatedObject instanceof HasRevision) {
+
+        } else {
           // See http://jira.codehaus.org/browse/ACT-1290
           ((HasRevision) updatedObject).setRevision(((HasRevision) updatedObject).getRevisionNext());
-        }        
-      
+
+        }
+
       }
-      
+
     }
     updatedObjects.clear();
   }
-  
+
   protected void flushBulkUpdates() {
     for (BulkUpdateOperation bulkUpdateOperation : bulkUpdates) {
       String updateStatement = bulkUpdateOperation.getStatement();
@@ -726,7 +722,7 @@ public class DbSqlSession implements Session {
       }
       sqlSession.update(updateStatement, bulkUpdateOperation.parameter);
     }
-    
+
   }
 
   protected void flushDeletes() {
@@ -755,10 +751,10 @@ public class DbSqlSession implements Session {
     }
     return ClassNameUtil.getClassNameWithoutPackage(persistentObject)+"["+persistentObject.getId()+"]";
   }
-  
+
   // schema operations ////////////////////////////////////////////////////////
-  
-  
+
+
   public void dbSchemaCheckVersion() {
     try {
       String dbVersion = getDbVersion();
@@ -776,7 +772,7 @@ public class DbSqlSession implements Session {
       if (dbSqlSessionFactory.isDbIdentityUsed() && !isIdentityTablePresent()) {
         errorMessage = addMissingComponent(errorMessage, "identity");
       }
-      
+
       if (errorMessage!=null) {
         throw new ProcessEngineException("Activiti database problem: "+errorMessage);
       }
@@ -803,7 +799,7 @@ public class DbSqlSession implements Session {
     insert(property);
     log.info("Creating historyLevel property in database with value: " + processEngineConfiguration.getHistory());
   }
-  
+
   public void checkHistoryLevel() {
     Integer configuredHistoryLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     PropertyEntity historyLevelProperty = selectById(PropertyEntity.class, "historyLevel");
@@ -832,7 +828,7 @@ public class DbSqlSession implements Session {
 
   public void dbSchemaCreate() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    
+
     int configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
     if ( (!processEngineConfiguration.isDbHistoryUsed())
          && (configuredHistoryLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE)
@@ -899,13 +895,13 @@ public class DbSqlSession implements Session {
     String feedback = null;
     String dbVersion = null;
     boolean isUpgradeNeeded = false;
-      
+
     if (isEngineTablePresent()) {
       // the next piece assumes both DB version and library versions are formatted 5.x
       PropertyEntity dbVersionProperty = selectById(PropertyEntity.class, "schema.version");
       dbVersion = dbVersionProperty.getValue();
       isUpgradeNeeded = !ProcessEngine.VERSION.equals(dbVersion);
-      
+
       if (isUpgradeNeeded) {
         dbVersionProperty.setValue(ProcessEngine.VERSION);
 
@@ -916,10 +912,10 @@ public class DbSqlSession implements Session {
         } else {
           dbHistoryProperty = selectById(PropertyEntity.class, "schema.history");
         }
-        
+
         String dbHistoryValue = dbHistoryProperty.getValue()+" upgrade("+dbVersion+"->"+ProcessEngine.VERSION+")";
         dbHistoryProperty.setValue(dbHistoryValue);
-        
+
         dbSchemaUpgrade("engine", dbVersion);
 
         feedback = "upgraded Activiti from "+dbVersion+" to "+ProcessEngine.VERSION;
@@ -927,7 +923,7 @@ public class DbSqlSession implements Session {
     } else {
       dbSchemaCreateEngine();
     }
-    
+
     if (isHistoryTablePresent()) {
       if (isUpgradeNeeded) {
         dbSchemaUpgrade("history", dbVersion);
@@ -935,7 +931,7 @@ public class DbSqlSession implements Session {
     } else if (dbSqlSessionFactory.isDbHistoryUsed()) {
       dbSchemaCreateHistory();
     }
-    
+
     if (isIdentityTablePresent()) {
       if (isUpgradeNeeded) {
         dbSchemaUpgrade("identity", dbVersion);
@@ -943,7 +939,7 @@ public class DbSqlSession implements Session {
     } else if (dbSqlSessionFactory.isDbIdentityUsed()) {
       dbSchemaCreateIdentity();
     }
-    
+
     return feedback;
   }
 
@@ -964,48 +960,48 @@ public class DbSqlSession implements Session {
       connection = sqlSession.getConnection();
       DatabaseMetaData databaseMetaData = connection.getMetaData();
       ResultSet tables = null;
-      
+
       String schema = this.connectionMetadataDefaultSchema;
       if (dbSqlSessionFactory.getDatabaseSchema()!=null) {
         schema = dbSqlSessionFactory.getDatabaseSchema();
       }
-      
+
       String databaseType = dbSqlSessionFactory.getDatabaseType();
-      
+
       if ("postgres".equals(databaseType)) {
         tableName = tableName.toLowerCase();
       }
-      
+
       try {
         tables = databaseMetaData.getTables(this.connectionMetadataDefaultCatalog, schema, tableName, JDBC_METADATA_TABLE_TYPES);
         return tables.next();
       } finally {
         tables.close();
       }
-      
+
     } catch (Exception e) {
-      throw new ProcessEngineException("couldn't check if tables are already present using metadata: "+e.getMessage(), e); 
+      throw new ProcessEngineException("couldn't check if tables are already present using metadata: "+e.getMessage(), e);
     }
   }
 
   protected String prependDatabaseTablePrefix(String tableName) {
-    return dbSqlSessionFactory.getDatabaseTablePrefix() + tableName;    
+    return dbSqlSessionFactory.getDatabaseTablePrefix() + tableName;
   }
 
   protected void dbSchemaUpgrade(String component, String dbVersion) {
     log.info("upgrading activiti "+component+" schema from "+dbVersion+" to "+ProcessEngine.VERSION);
-    
+
     if (dbVersion.endsWith("-SNAPSHOT")) {
       dbVersion = dbVersion.substring(0, dbVersion.length()-"-SNAPSHOT".length());
     }
     int minorDbVersionNumber = Integer.parseInt(dbVersion.substring(2));
-    
+
     String libraryVersion = ProcessEngine.VERSION;
     if (ProcessEngine.VERSION.endsWith("-SNAPSHOT")) {
       libraryVersion = ProcessEngine.VERSION.substring(0, ProcessEngine.VERSION.length()-"-SNAPSHOT".length());
     }
     int minorLibraryVersionNumber = Integer.parseInt(libraryVersion.substring(2));
-    
+
     while (minorDbVersionNumber<minorLibraryVersionNumber) {
       executeSchemaResource("upgrade", component, getResourceForDbOperation("upgrade", "upgradestep.5"+minorDbVersionNumber+".to.5"+(minorDbVersionNumber+1), component), true);
       minorDbVersionNumber++;
@@ -1035,7 +1031,7 @@ public class DbSqlSession implements Session {
       IoUtil.closeSilently(inputStream);
     }
   }
-  
+
   public void executeSchemaResource(String schemaFileResourceName) {
     FileInputStream inputStream = null;
     try {
@@ -1062,10 +1058,10 @@ public class DbSqlSession implements Session {
       while (line != null) {
         if (line.startsWith("# ")) {
           log.fine(line.substring(2));
-          
+
         } else if (line.startsWith("-- ")) {
           log.fine(line.substring(3));
-          
+
         } else if (line.startsWith("execute java ")) {
           String upgradestepClassName = line.substring(13).trim();
           DbUpgradeStep dbUpgradeStep = null;
@@ -1080,9 +1076,9 @@ public class DbSqlSession implements Session {
           } catch (Exception e) {
             throw new ProcessEngineException("error while executing database update java class '"+upgradestepClassName+"': "+e.getMessage(), e);
           }
-          
+
         } else if (line.length()>0) {
-          
+
           if (line.endsWith(";")) {
             sqlStatement = addSqlStatementPiece(sqlStatement, line.substring(0, line.length()-1));
             Statement jdbcStatement = connection.createStatement();
@@ -1098,22 +1094,22 @@ public class DbSqlSession implements Session {
               }
               log.log(Level.SEVERE, "problem during schema " + operation + ", statement '" + sqlStatement, e);
             } finally {
-              sqlStatement = null; 
+              sqlStatement = null;
             }
           } else {
             sqlStatement = addSqlStatementPiece(sqlStatement, line);
           }
         }
-        
+
         line = readNextTrimmedLine(reader);
       }
 
       if (exception != null) {
         throw exception;
       }
-      
+
       log.fine("activiti db schema " + operation + " for component "+component+" successful");
-      
+
     } catch (Exception e) {
       throw new ProcessEngineException("couldn't "+operation+" db schema: "+exceptionSqlStatement, e);
     }
@@ -1125,7 +1121,7 @@ public class DbSqlSession implements Session {
     }
     return sqlStatement + " \n" + line;
   }
-  
+
   protected String readNextTrimmedLine(BufferedReader reader) throws IOException {
     String line = reader.readLine();
     if (line!=null) {
@@ -1133,20 +1129,20 @@ public class DbSqlSession implements Session {
     }
     return line;
   }
-  
+
   protected boolean isMissingTablesException(Exception e) {
     String exceptionMessage = e.getMessage();
-    if(e.getMessage() != null) {      
+    if(e.getMessage() != null) {
       // Matches message returned from H2
       if ((exceptionMessage.indexOf("Table") != -1) && (exceptionMessage.indexOf("not found") != -1)) {
         return true;
       }
-      
+
       // Message returned from MySQL and Oracle
       if (((exceptionMessage.indexOf("Table") != -1 || exceptionMessage.indexOf("table") != -1)) && (exceptionMessage.indexOf("doesn't exist") != -1)) {
         return true;
       }
-      
+
       // Message returned from Postgres
       if (((exceptionMessage.indexOf("relation") != -1 || exceptionMessage.indexOf("table") != -1)) && (exceptionMessage.indexOf("does not exist") != -1)) {
         return true;
@@ -1154,7 +1150,7 @@ public class DbSqlSession implements Session {
     }
     return false;
   }
-  
+
   public void performSchemaOperationsProcessEngineBuild() {
     String databaseSchemaUpdate = Context.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
     if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
@@ -1164,7 +1160,7 @@ public class DbSqlSession implements Session {
         // ignore
       }
     }
-    if ( ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate) 
+    if ( ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)
          || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)
          || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE.equals(databaseSchemaUpdate)
        ) {
@@ -1174,7 +1170,7 @@ public class DbSqlSession implements Session {
     } else if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
       dbSchemaUpdate();
     }
-    
+
     checkHistoryLevel();
   }
 
@@ -1185,7 +1181,7 @@ public class DbSqlSession implements Session {
     }
   }
 
-  // query factory methods ////////////////////////////////////////////////////  
+  // query factory methods ////////////////////////////////////////////////////
 
   public DeploymentQueryImpl createDeploymentQuery() {
     return new DeploymentQueryImpl();
@@ -1228,7 +1224,7 @@ public class DbSqlSession implements Session {
   }
 
   // getters and setters //////////////////////////////////////////////////////
-  
+
   public SqlSession getSqlSession() {
     return sqlSession;
   }

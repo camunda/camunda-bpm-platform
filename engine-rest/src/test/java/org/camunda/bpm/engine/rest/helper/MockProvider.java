@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -57,7 +58,19 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
-import org.joda.time.DateTime;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Provides mocks for the basic engine entities, such as
@@ -255,8 +268,8 @@ public abstract class MockProvider {
   // tasks
   public static Task createMockTask() {
     Task mockTask = new MockTaskBuilder().id(EXAMPLE_TASK_ID).name(EXAMPLE_TASK_NAME).assignee(EXAMPLE_TASK_ASSIGNEE_NAME)
-        .createTime(DateTime.parse(EXAMPLE_TASK_CREATE_TIME).toDate()).dueDate(DateTime.parse(EXAMPLE_TASK_DUE_DATE).toDate())
-        .followUpDate(DateTime.parse(EXAMPLE_FOLLOW_UP_DATE).toDate())
+        .createTime(DateTimeUtil.parseDateTime(EXAMPLE_TASK_CREATE_TIME).toDate()).dueDate(DateTimeUtil.parseDateTime(EXAMPLE_TASK_DUE_DATE).toDate())
+        .followUpDate(DateTimeUtil.parseDateTime(EXAMPLE_FOLLOW_UP_DATE).toDate())
         .delegationState(EXAMPLE_TASK_DELEGATION_STATE).description(EXAMPLE_TASK_DESCRIPTION).executionId(EXAMPLE_TASK_EXECUTION_ID).owner(EXAMPLE_TASK_OWNER)
         .parentTaskId(EXAMPLE_TASK_PARENT_TASK_ID).priority(EXAMPLE_TASK_PRIORITY).processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
         .processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID).taskDefinitionKey(EXAMPLE_TASK_DEFINITION_KEY).build();
@@ -404,7 +417,7 @@ public abstract class MockProvider {
     when(mock.getExecutionId()).thenReturn(EXAMPLE_EXECUTION_ID);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
-    when(mock.getCreated()).thenReturn(DateTime.parse(EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE).toDate());
+    when(mock.getCreated()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE).toDate());
 
     return mock;
   }
@@ -552,7 +565,7 @@ public abstract class MockProvider {
       .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
       .retries(EXAMPLE_JOB_RETRIES)
       .exceptionMessage(EXAMPLE_JOB_NO_EXCEPTION_MESSAGE)
-      .dueDate(DateTime.parse(EXAMPLE_DUE_DATE).toDate())
+      .dueDate(DateTimeUtil.parseDateTime(EXAMPLE_DUE_DATE).toDate())
       .suspended(EXAMPLE_JOB_IS_SUSPENDED)
       .build();
     return mock;
@@ -680,8 +693,8 @@ public abstract class MockProvider {
     when(mock.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(mock.getCalledProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID);
     when(mock.getAssignee()).thenReturn(EXAMPLE_TASK_ASSIGNEE_NAME);
-    when(mock.getStartTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate());
-    when(mock.getEndTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME).toDate());
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate());
+    when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME).toDate());
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION);
 
     return mock;
@@ -707,7 +720,7 @@ public abstract class MockProvider {
     when(mock.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(mock.getCalledProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID);
     when(mock.getAssignee()).thenReturn(EXAMPLE_TASK_ASSIGNEE_NAME);
-    when(mock.getStartTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate());
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate());
     when(mock.getEndTime()).thenReturn(null);
     when(mock.getDurationInMillis()).thenReturn(null);
 
@@ -727,8 +740,8 @@ public abstract class MockProvider {
     when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
     when(mock.getDeleteReason()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON);
-    when(mock.getEndTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME).toDate());
-    when(mock.getStartTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME).toDate());
+    when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME).toDate());
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME).toDate());
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS);
     when(mock.getStartUserId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_USER_ID);
     when(mock.getStartActivityId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_ACTIVITY_ID);
@@ -750,7 +763,7 @@ public abstract class MockProvider {
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
     when(mock.getDeleteReason()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON);
     when(mock.getEndTime()).thenReturn(null);
-    when(mock.getStartTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME).toDate());
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME).toDate());
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS);
     return mock;
   }

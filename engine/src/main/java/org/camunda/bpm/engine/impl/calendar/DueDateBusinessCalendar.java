@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.calendar;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.joda.time.Period;
+import org.joda.time.format.ISOPeriodFormat;
+
+import java.util.Date;
 
 
 public class DueDateBusinessCalendar implements BusinessCalendar {
@@ -25,7 +25,7 @@ public class DueDateBusinessCalendar implements BusinessCalendar {
   public Date resolveDuedate(String duedate) {
     try {
       if (duedate.startsWith("P")){
-        return DateTimeUtil.now().plus(Period.parse(duedate)).toDate();
+        return DateTimeUtil.now().plus(ISOPeriodFormat.standard().parsePeriod(duedate)).toDate();
       }
 
       return DateTimeUtil.parseDateTime(duedate).toDate();

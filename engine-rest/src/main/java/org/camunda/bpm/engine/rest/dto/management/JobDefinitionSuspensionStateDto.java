@@ -12,15 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.dto.management;
 
-import java.util.Date;
-
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.joda.time.DateTime;
+
+import javax.ws.rs.core.Response.Status;
+import java.util.Date;
 
 /**
  * @author roman.smirnov
@@ -71,7 +70,7 @@ public class JobDefinitionSuspensionStateDto extends SuspensionStateDto {
 
     Date delayedExecutionDate = null;
     if (executionDate != null && !executionDate.equals("")) {
-      delayedExecutionDate = DateTime.parse(executionDate).toDate();
+      delayedExecutionDate = DateTimeUtil.parseDateTime(executionDate).toDate();
     }
 
     if (jobDefinitionId != null) {

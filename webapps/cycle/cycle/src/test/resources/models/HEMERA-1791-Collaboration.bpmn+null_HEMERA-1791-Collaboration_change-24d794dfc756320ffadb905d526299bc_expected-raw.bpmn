@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.0.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-031ffe91-9a0c-44ab-b4a3-c6a4faf37ff7" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <collaboration id="sid-12282d62-0d3d-4566-a6f2-3264fa42a2b1">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-d43009d1-4278-4431-b366-95e5c72ef3c3" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <collaboration id="sid-9eec415f-e5a3-4a82-a835-8e05940a6c1c">
       <participant id="Process_Engine_1" name="Process Engine" processRef="HEMERA-1791-Collaboration_">
          <extensionElements/>
       </participant>
@@ -11,7 +11,7 @@
    </collaboration>
    <process id="My_Collab_43" isClosed="false" isExecutable="false" name="My Collab" processType="None">
       <extensionElements/>
-      <laneSet id="sid-c3f243d2-93ea-4f34-ac3b-09286c6a205d">
+      <laneSet id="sid-a1790420-eace-4776-bf9a-c1a4e5e9c3d3">
          <lane id="lane_44">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -45,8 +45,11 @@
    </process>
    <process id="HEMERA-1791-Collaboration_" isClosed="false" isExecutable="true" name="Process Engine" processType="None">
       <extensionElements/>
-      <laneSet id="sid-2cec47d2-5183-482e-840b-8218f910a11d">
+      <laneSet id="sid-cf29cd0f-a9e0-4f38-bf4e-cb10605bd971">
          <lane id="lane_9">
+            <extensionElements>
+               <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
+            </extensionElements>
             <flowNodeRef>order_position_changed_18</flowNodeRef>
             <flowNodeRef>mark_order_position_as_ready_for_pickup_22</flowNodeRef>
             <flowNodeRef>kaputt_27</flowNodeRef>
@@ -55,30 +58,42 @@
          </lane>
       </laneSet>
       <startEvent id="order_position_changed_18" name="order position changed">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <outgoing>sequenceFlow_40</outgoing>
       </startEvent>
       <userTask completionQuantity="1" id="mark_order_position_as_ready_for_pickup_22" isForCompensation="false" name="mark order position as ready for pickup" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+         </extensionElements>
          <incoming>sequenceFlow_40</incoming>
          <outgoing>sequenceFlow_41</outgoing>
       </userTask>
       <endEvent id="kaputt_27" name="kaputt">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <incoming>sequenceFlow_39</incoming>
       </endEvent>
       <endEvent id="ganz_31" name="ganz">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <incoming>sequenceFlow_41</incoming>
       </endEvent>
       <boundaryEvent attachedToRef="mark_order_position_as_ready_for_pickup_22" cancelActivity="false" id="every_6_hours_35" name="every 6 hours" parallelMultiple="false">
          <outgoing>sequenceFlow_39</outgoing>
-         <timerEventDefinition id="sid-25a81c84-b737-4fb8-a84c-d17a4633f5ab">
-            <timeCycle id="sid-9032e722-8d08-48d0-b0e7-5164787d605d" xsi:type="tFormalExpression">PT6H</timeCycle>
+         <timerEventDefinition id="sid-5942a68d-a73b-4ae4-ae92-d1247a5d6dfb">
+            <timeCycle id="sid-3b464253-b8fc-4a48-87d8-6ff0c6d55f95" xsi:type="tFormalExpression">PT6H</timeCycle>
          </timerEventDefinition>
       </boundaryEvent>
       <sequenceFlow id="sequenceFlow_39" isImmediate="true" name="" sourceRef="every_6_hours_35" targetRef="kaputt_27"/>
       <sequenceFlow id="sequenceFlow_41" isImmediate="true" name="" sourceRef="mark_order_position_as_ready_for_pickup_22" targetRef="ganz_31"/>
       <sequenceFlow id="sequenceFlow_40" isImmediate="true" name="" sourceRef="order_position_changed_18" targetRef="mark_order_position_as_ready_for_pickup_22"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-38bf6a99-987b-4c90-a28e-cf670d2d6860">
-      <bpmndi:BPMNPlane bpmnElement="sid-12282d62-0d3d-4566-a6f2-3264fa42a2b1" id="sid-bbd7cf1c-834b-4f65-8459-b3e3878d5e11">
+   <bpmndi:BPMNDiagram id="sid-ac0c0b8b-cc53-43d2-a1e4-8c5ba876d248">
+      <bpmndi:BPMNPlane bpmnElement="sid-9eec415f-e5a3-4a82-a835-8e05940a6c1c" id="sid-a311283a-cca0-4dce-9dcc-197759a3968e">
          <bpmndi:BPMNShape bpmnElement="Process_Engine_1" id="Process_Engine_1_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="600.0" x="90.0" y="300.0"/>
          </bpmndi:BPMNShape>

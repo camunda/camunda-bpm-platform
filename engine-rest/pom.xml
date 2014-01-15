@@ -279,6 +279,24 @@
               <workDirectory>target/assembly/work</workDirectory>
             </configuration>
           </execution>
+
+          <execution>
+            <id>wls</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly-wls.xml</descriptor>
+              </descriptors>
+              <finalName>camunda-engine-rest-${project.version}</finalName>
+              <attach>true</attach>
+              <classifier>wls</classifier>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 
@@ -466,6 +484,18 @@
           </plugin>
         </plugins>
       </build>
-    </profile>    
+    </profile>
+
+    <profile>
+      <id>wls-compatibility</id>
+      <dependencies>
+        <dependency>
+          <groupId>joda-time</groupId>
+          <artifactId>joda-time</artifactId>
+          <version>1.2.1</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
   </profiles>
 </project>

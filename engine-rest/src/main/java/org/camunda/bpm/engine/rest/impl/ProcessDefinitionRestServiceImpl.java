@@ -54,12 +54,13 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
     ProcessDefinitionQuery processDefinitionQuery = getProcessEngine().getRepositoryService().createProcessDefinitionQuery();
     processDefinitionQuery = processDefinitionQuery.processDefinitionKey(processDefinitionKey);
-    if (processDefinitionQuery == null) {
+
+    ProcessDefinition processDefinition = processDefinitionQuery.latestVersion().singleResult();
+
+    if (processDefinition == null) {
       String errorMessage = String.format("No matching process definition with key: %s ", processDefinitionKey);
       throw new RestException(Status.NOT_FOUND, errorMessage);
     }
-
-    ProcessDefinition processDefinition = processDefinitionQuery.latestVersion().singleResult();
 
     ProcessDefinitionResource processDefinitionResource = getProcessDefinitionById(processDefinition.getId());
 
