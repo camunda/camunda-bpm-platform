@@ -15,79 +15,12 @@
   <name>camunda BPM - Root Pom</name>
 
   <description>
-    This pom defines the modules that make up the build. 
-    The pom under parent is used as parent for the ee projects.
+    This pom defines the modules that make up the build.
+    The parent pom for all camunda BPM projects can be found in the parent directory relative to this file.
   </description>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <spring.framework.version>3.1.2.RELEASE</spring.framework.version>
-    <cxf.version>2.6.1</cxf.version>
-    <junit.version>4.11</junit.version>
-    <version.resteasy>2.3.5.Final</version.resteasy>
-
-    <version.commonj>1.1.0</version.commonj>
-    <version.bouncycastle>1.47</version.bouncycastle>
-
-    <!-- application servers -->
-    <version.jboss.as>7.2.0.Final</version.jboss.as>
-    <version.glassfish>3.1.2</version.glassfish>
-    <version.tomcat>7.0.33</version.tomcat>
-
-    <version.arquillian>1.0.0.Final</version.arquillian>
-    <version.arquillian.drone>1.0.0.Final</version.arquillian.drone>
-    <version.shrinkwrap.resolvers>2.0.0</version.shrinkwrap.resolvers>
-
-    <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
-
-    <version.ejb>3.1</version.ejb>
-    <version.java>1.6</version.java>
-
-    <!-- database drivers -->
-    <version.h2>1.3.168</version.h2>
-    <version.oracle11g>11.2.0.3</version.oracle11g>
-    <version.oracle10g>10.2.0.5</version.oracle10g>
-    <version.mysql>5.1.21</version.mysql>
-    <version.mssql.oss>1.2.4</version.mssql.oss>
-    <version.mssql>4.0</version.mssql>
-    <version.db2.97>9.7</version.db2.97>
-    <version.postgre>9.1-901-1.jdbc4</version.postgre>
-
-      <!-- OSGi bundles properties -->
-      <camunda.artifact />
-      <camunda.osgi.import.camunda.version>version="[$(version;==;${camunda.osgi.version.clean}),$(version;=+;${camunda.osgi.version.clean}))"</camunda.osgi.import.camunda.version>
-      <camunda.osgi.import.strict.version>version="[$(version;===;${camunda.osgi.version.clean}),$(version;==+;${camunda.osgi.version.clean}))"</camunda.osgi.import.strict.version>
-      <camunda.osgi.import.default.version>[$(version;==;$(@)),$(version;+;$(@)))</camunda.osgi.import.default.version>
-      <camunda.osgi.import.defaults>
-      </camunda.osgi.import.defaults>
-      <camunda.osgi.import.before.defaults />
-      <camunda.osgi.import.additional />
-      <camunda.osgi.import.pkg>
-        org.camunda.*;${camunda.osgi.import.camunda.version},
-        ${camunda.osgi.import.before.defaults},
-        ${camunda.osgi.import.defaults},
-        ${camunda.osgi.import.additional},
-        *
-      </camunda.osgi.import.pkg>
-      <camunda.osgi.activator />
-      <camunda.osgi.failok>false</camunda.osgi.failok>
-      <camunda.osgi.export>${camunda.osgi.export.pkg};${camunda.osgi.version};-noimport:=true</camunda.osgi.export>
-      <!--
-      <camunda.osgi.export.pkg>!*.impl;${camunda.artifact}*</camunda.osgi.export.pkg>
-      <camunda.osgi.private.pkg>${camunda.artifact}*.impl</camunda.osgi.private.pkg>
-      -->
-      <camunda.osgi.export.pkg>${camunda.artifact}*</camunda.osgi.export.pkg>
-      <camunda.osgi.private.pkg />
-      <camunda.osgi.version>version=${project.version}</camunda.osgi.version>
-      <camunda.osgi.split.pkg>-split-package:=first</camunda.osgi.split.pkg>
-      <camunda.osgi.import>${camunda.osgi.import.pkg}</camunda.osgi.import>
-      <camunda.osgi.dynamic />
-      <camunda.osgi.symbolic.name>${camunda.artifact}</camunda.osgi.symbolic.name>
-      <camunda.osgi.exclude.dependencies>false</camunda.osgi.exclude.dependencies>
-      <camunda.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</camunda.osgi.remove.headers>
-      <camunda.osgi.include.resource>{maven-resources}</camunda.osgi.include.resource>
-      <camunda.osgi.embed />
   </properties>
 
   <profiles>
@@ -98,7 +31,7 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
-      <modules>  
+      <modules>
         <module>qa</module>            
         
         <module>webapps/h2-webapp</module>
@@ -125,7 +58,9 @@
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
-
+  
+        <module>parent</module>
+        <module>bom</module>
       </modules>
     </profile>
     
@@ -135,13 +70,14 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-
         <module>webapps/camunda-webapp</module>
 
         <module>distro/jbossas7</module>
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
-
+  
+        <module>parent</module>
+        <module>bom</module>
       </modules>
     </profile>
     
@@ -154,6 +90,9 @@
         <module>engine-osgi</module>
         <module>engine-spring</module>          
         <module>engine-rest</module>
+  
+        <module>parent</module>
+        <module>bom</module>
       </modules>
     </profile>    
     <profile>
@@ -161,17 +100,15 @@
       <id>check-webapps</id>
       <modules>
         <module>webapps/cycle</module>
-        <module>webapps/camunda-webapp</module>    
+        <module>webapps/camunda-webapp</module>
+  
+        <module>parent</module>
+        <module>bom</module>
       </modules>
     </profile>
     <profile>
       <id>sonatype-oss-release</id>
       <modules>
-        <module>javaee/ejb-service</module>
-        <module>javaee/ejb-client</module>
-        <module>javaee/jobexecutor-ra</module>
-        <module>javaee/jobexecutor-rar</module>
-
         <module>engine</module>
         <module>engine-cdi</module>
         <!--<module>engine-osgi</module>-->
@@ -179,6 +116,9 @@
         <module>engine-rest</module>
 
         <module>identity/identity-ldap</module>
+  
+        <module>parent</module>
+        <module>bom</module>
       </modules>
 
       <build>
@@ -242,601 +182,6 @@
       </build>
     </profile>
   </profiles>
-  
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>cglib</groupId>
-        <artifactId>cglib</artifactId>
-        <version>2.2</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-dbcp</groupId>
-        <artifactId>commons-dbcp</artifactId>
-        <version>1.4</version>
-      </dependency>
-      <dependency>
-        <!-- required by Apache commons httpclient -->
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>1.1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.4</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.0.1</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-fileupload</groupId>
-        <artifactId>commons-fileupload</artifactId>
-        <version>1.2.2</version>
-      </dependency>
-
-      <!-- database drivers -->
-      <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>${version.h2}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.oracle.jdbc</groupId>
-        <artifactId>ojdbc6</artifactId>
-        <version>${version.oracle11g}</version>
-        <scope>test</scope>
-      </dependency>
-	    <dependency>
-        <groupId>com.oracle.jdbc</groupId>
-        <artifactId>ojdbc14</artifactId>
-        <version>${version.oracle10g}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>${version.mysql}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>net.sourceforge.jtds</groupId>
-        <artifactId>jtds</artifactId>
-        <version>${version.mssql.oss}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.microsoft.sqlserver</groupId>
-        <artifactId>sqljdbc4</artifactId>
-        <version>${version.mssql}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.ibm.db2.jcc</groupId>
-        <artifactId>db2jcc4</artifactId>
-        <version>${version.db2.97}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>${version.postgre}</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>javax.xml.bind</groupId>
-        <artifactId>jaxb-api</artifactId>
-        <version>2.2.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-impl</artifactId>
-        <version>2.1.7</version>
-      </dependency>
-      <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-xjc</artifactId>
-        <version>2.1.7</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>2.5</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mail</artifactId>
-        <version>1.4.1</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.persistence</groupId>
-        <artifactId>persistence-api</artifactId>
-        <version>1.0</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.ant</groupId>
-        <artifactId>ant</artifactId>
-        <version>1.7.1</version>
-        <scope>provided</scope>
-      </dependency>
-      <!-- EMAIL -->
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-email</artifactId>
-        <version>1.2</version>
-      </dependency>
-        <!-- Web service -->
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-frontend-jaxws</artifactId>
-        <version>${cxf.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-transports-http</artifactId>
-        <version>${cxf.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-transports-http-jetty</artifactId>
-        <version>${cxf.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-bindings-soap</artifactId>
-        <version>${cxf.version}</version>
-      </dependency> 
-      <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jta_1.1_spec</artifactId>
-        <version>1.1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.opensaml</groupId>
-        <artifactId>opensaml</artifactId>
-        <version>1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.openjpa</groupId>
-        <artifactId>openjpa</artifactId>
-        <version>1.2.2</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy</artifactId>
-        <version>1.8.6</version>
-      </dependency>
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>20070829</version>
-      </dependency>
-      <dependency>
-        <!-- required for building with JDK 5 -->
-        <groupId>org.livetribe</groupId>
-        <artifactId>livetribe-jsr223</artifactId>
-        <version>2.0.6</version>
-        <type>jar</type>
-        <scope>compile</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.mule.modules</groupId>
-        <artifactId>mule-module-cxf</artifactId>
-        <version>${mule.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mule.tests</groupId>
-        <artifactId>mule-tests-functional</artifactId>
-        <version>${mule.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mybatis</groupId>
-        <artifactId>mybatis</artifactId>
-        <version>3.1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>1.9.5</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.osgi</groupId>
-        <artifactId>org.osgi.core</artifactId>
-        <version>4.2.0</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.osgi</groupId>
-        <artifactId>org.osgi.compendium</artifactId>
-        <version>4.2.0</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>org.apache.felix.fileinstall</artifactId>
-        <version>3.0.2</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-jdk14</artifactId>
-        <version>1.6.1</version>
-      </dependency>    
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-beans</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-core</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-aop</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-orm</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-tx</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-web</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-test</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.subethamail</groupId>
-        <artifactId>subethasmtp-wiser</artifactId>
-        <version>1.2</version>
-        <scope>test</scope>
-      </dependency>     
-      <dependency>
-        <groupId>wsdl4j</groupId>
-        <artifactId>wsdl4j</artifactId>
-        <version>1.6.2</version>
-      </dependency>
-      <dependency>
-        <groupId>xerces</groupId>
-        <artifactId>xercesImpl</artifactId>
-        <version>2.9.1</version>
-      </dependency>
-      <dependency>
-        <groupId>joda-time</groupId>
-        <artifactId>joda-time</artifactId>
-        <version>2.1</version>
-      </dependency>
-      <!-- Camel integration -->
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-spring</artifactId>
-        <version>2.10.0</version>
-      </dependency>
-      <!-- Mule integration -->
-      <dependency>
-        <groupId>org.safehaus.jug</groupId>
-        <artifactId>jug</artifactId>
-        <classifier>lgpl</classifier>
-        <version>2.0.0</version>
-      </dependency>
-	    <dependency>
-        <groupId>com.fasterxml.uuid</groupId>
-        <artifactId>java-uuid-generator</artifactId>
-        <version>3.1.2</version>
-      </dependency>
-	     
-      <dependency>
-        <groupId>org.camunda.bpm.javaee</groupId>
-        <artifactId>camunda-ejb-client</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-engine</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-engine-spring</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-engine-cdi</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.camunda.bpm.identity</groupId>
-        <artifactId>camunda-identity-ldap</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jboss.spec</groupId>
-        <artifactId>jboss-javaee-6.0</artifactId>
-        <version>${version.jboss-javaee-spec}</version>
-        <type>pom</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jboss.spec</groupId>
-        <artifactId>jboss-javaee-web-6.0</artifactId>
-        <version>${version.jboss-javaee-spec}</version>
-        <type>pom</type>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.jboss.spec.javax.servlet</groupId>
-        <artifactId>jboss-servlet-api_3.0_spec</artifactId>
-        <version>1.0.2.Final</version>       
-      </dependency>
-      
-      <!-- licensing dependencies -->
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>${version.bouncycastle}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-ext-jdk15on</artifactId>
-        <version>${version.bouncycastle}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpg-jdk15on</artifactId>
-        <version>${version.bouncycastle}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>catalina</artifactId>
-        <version>6.0.36</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-jaxrs</artifactId>
-        <version>${version.resteasy}</version>
-        <exclusions>
-          <exclusion>
-            <artifactId>httpclient</artifactId>
-            <groupId>org.apache.httpcomponents</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>tjws</artifactId>
-        <version>${version.resteasy}</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-netty</artifactId>
-        <version>2.3.6.Final</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.apache.directory.server</groupId>
-        <artifactId>apacheds-all</artifactId>
-        <version>1.5.5</version>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
-  
-   <build>   
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
-          <configuration>
-            <source>${version.java}</source>
-            <target>${version.java}</target>
-          </configuration>
-        </plugin>
-        
-        <!-- test plugins -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.16</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.16</version>
-          <executions>
-              <execution>
-                <goals>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
-                </goals>
-              </execution>
-            </executions>
-        </plugin>
-        
-        <!-- code plugins -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.8</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.2.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.6</version>
-        </plugin>
-        
-        <!-- artifact plugins -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-ejb-plugin</artifactId>
-          <version>2.3</version>
-          <configuration>
-            <ejbVersion>${version.ejb}</ejbVersion>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-rar-plugin</artifactId>
-          <version>2.3</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-ear-plugin</artifactId>
-          <version>2.9</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>2.2</version>
-          <configuration>
-            <createSourcesJar>true</createSourcesJar>
-          </configuration>
-          <executions>
-            <execution>
-              <phase>package</phase>
-              <goals>
-                <goal>shade</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.7</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.7</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.felix</groupId>
-          <artifactId>maven-bundle-plugin</artifactId>
-          <version>2.3.7</version>
-          <extensions>true</extensions>
-          <configuration>
-           <excludeDependencies>${camunda.osgi.exclude.dependencies}</excludeDependencies>
-           <instructions>
-             <Bundle-Name>${project.name}</Bundle-Name>
-             <Bundle-SymbolicName>${camunda.osgi.symbolic.name}</Bundle-SymbolicName>
-             <Bundle-Activator>${camunda.osgi.activator}</Bundle-Activator>
-             <Export-Package>${camunda.osgi.export}</Export-Package>
-             <Import-Package>org.camunda.bpm.engine.osgi*;resolution:=optional, ${camunda.osgi.import}</Import-Package>
-             <DynamicImport-Package>${camunda.osgi.dynamic}</DynamicImport-Package>
-             <Private-Package>${camunda.osgi.private.pkg}</Private-Package>
-             <Implementation-Title>camunda</Implementation-Title>
-             <Implementation-Version>${project.version}</Implementation-Version>
-             <Include-Resource>${camunda.osgi.include.resource}</Include-Resource>
-             <_versionpolicy>${camunda.osgi.import.default.version}</_versionpolicy>
-             <_removeheaders>${camunda.osgi.remove.headers}</_removeheaders>
-             <_failok>${camunda.osgi.failok}</_failok>
-             <Export-Service>${camunda.osgi.export.service}</Export-Service>
-             <Import-Service>${camunda.osgi.import.service}</Import-Service>
-             <Embed-Dependency>${camunda.osgi.embed}</Embed-Dependency>
-            </instructions>
-           <versions>
-            <camunda.osgi.version.clean>${project.version}</camunda.osgi.version.clean>
-           </versions>
-          </configuration>
-        </plugin>
-        <plugin>                    
-          <groupId>org.codehaus.cargo</groupId>
-          <artifactId>cargo-maven2-plugin</artifactId>
-          <version>1.4.5</version>
-        </plugin>
-        <plugin>
-          <groupId>net.kennychua</groupId>
-          <artifactId>maven-urlpoller-plugin</artifactId>
-          <version>1.0.3</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>sql-maven-plugin</artifactId>
-          <version>1.5</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>clirr-maven-plugin</artifactId>
-          <version>2.6.1</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-            <source>${version.java}</source>
-            <target>${version.java}</target>
-          </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
   <licenses>
     <license>
@@ -854,46 +199,10 @@
 
   <developers>
     <developer>
-      <id>meyerdan</id>
-      <name>Daniel Meyer</name>
-      <email>daniel.meyer@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>Project Lead</role></roles>
-    </developer>
-    <developer>
-      <id>Nikku</id>
-      <name>Nico Rehwaldt</name>
-      <email>nico.rehwaldt@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>Webapp Lead</role></roles>
-    </developer>
-    <developer>
-      <id>romansmirnov</id>
-      <name>Roman Smirnov</name>
-      <email>roman.smirnov@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>Core Developer</role></roles>
-    </developer>
-    <developer>
-      <id>hawky-4s-</id>
-      <name>Christian Lipphardt</name>
-      <email>christian.lipphardt@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>Developer / CI</role></roles>
-    </developer>
-    <developer>
-      <id>polenz</id>
-      <name>Kristin Polenz</name>
-      <email>kristin.polenz@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>Application Developer</role></roles>
-    </developer>
-    <developer>
-      <id>mschoe</id>
-      <name>Michael Schoettes</name>
-      <email>michael.schoettes@camunda.com</email>
-      <organization>camunda services GmbH</organization>
-      <roles><role>QA Engineer</role></roles>
+      <id>camunda.org</id>
+      <name>camunda BPM Community</name>
+      <organization>camunda.org</organization>
+      <organizationUrl>http://camunda.org</organizationUrl>
     </developer>
   </developers>
 
@@ -908,18 +217,4 @@
     <system>Jira</system>
     <url>https://app.camunda.com/jira/browse/CAM/</url>
   </issueManagement>
-
-  <repositories>
-    <repository>
-      <id>JBoss public</id>
-      <name>jboss</name>
-      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-    </repository>
-    <!-- required for commonJ dependency -->
-    <repository>
-      <id>com.springsource.repository.bundles.external</id>
-      <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-      <url>http://repository.springsource.com/maven/bundles/external</url>
-    </repository>
-  </repositories>
 </project>

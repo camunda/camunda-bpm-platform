@@ -107,4 +107,16 @@
     </plugins>
   </build>
 
+  <!-- 
+    We need this repository to fetch
+
+      org.jboss.as:jboss-as-dist:${version.jboss.as}
+  -->
+  <repositories>
+    <repository>
+      <id>camunda public</id>
+      <name>camunda</name>
+      <url>https://app.camunda.com/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
 </project>
