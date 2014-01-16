@@ -11,7 +11,7 @@
       bpmn-model
     </module>
     <module>
-      xml-api
+      xml-model
     </module>
   </modules>
 </project>
