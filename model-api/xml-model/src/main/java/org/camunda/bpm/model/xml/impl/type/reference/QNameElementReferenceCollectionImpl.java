@@ -1,0 +1,42 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.camunda.bpm.model.xml.impl.type.reference;
+
+import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
+import org.camunda.bpm.model.xml.impl.util.QName;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
+
+/**
+ * @author Sebastian Menski
+ */
+public class QNameElementReferenceCollectionImpl<T extends ModelElementInstance, V extends ModelElementInstance> extends ElementReferenceCollectionImpl<T, V> {
+
+  public QNameElementReferenceCollectionImpl(ChildElementCollection<V> referenceSourceCollection) {
+    super(referenceSourceCollection);
+  }
+
+  @Override
+  public String getReferenceIdentifier(ModelElementInstance referenceSourceElement) {
+    String identifier = super.getReferenceIdentifier(referenceSourceElement);
+    if (identifier != null) {
+      QName qName = QName.parseQName(identifier, (ModelElementInstanceImpl) referenceSourceElement);
+      return qName.getLocalName();
+    }
+    else {
+      return null;
+    }
+  }
+
+}
