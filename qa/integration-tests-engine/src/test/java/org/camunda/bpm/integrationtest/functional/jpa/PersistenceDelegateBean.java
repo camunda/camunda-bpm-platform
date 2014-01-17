@@ -1,4 +1,4 @@
-package org.camunda.bpm.integrationtest.functional.transactions;
+package org.camunda.bpm.integrationtest.functional.jpa;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
@@ -17,17 +17,17 @@ public class PersistenceDelegateBean implements JavaDelegate {
   private EntityManager em;
   
   private SomeEntity entity;
-  
+
   public void execute(DelegateExecution execution) throws Exception {
-    
-    // we assert that the entity manager contains the entity 
+
+    // we assert that the entity manager contains the entity
     // this means that we obtain the same entity manager we used to
     // persist the entity before starting the process
- 
+
     Assert.assertTrue(em.contains(entity));
-    
+
   }
-  
+
   public void setEntity(SomeEntity entity) {
     this.entity = entity;
   }
