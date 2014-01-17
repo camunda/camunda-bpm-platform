@@ -172,10 +172,13 @@ public abstract class ReferenceImpl<T extends ModelElementInstance> implements R
    * Remove the reference if the target element is removed
    *
    * @param referenceTargetElement the reference target model element instance, which is removed
+   * @param referenceIdentifier
    */
-  public void referencedElementRemoved(ModelElementInstance referenceTargetElement) {
+  public void referencedElementRemoved(ModelElementInstance referenceTargetElement, Object referenceIdentifier) {
     for (ModelElementInstance referenceSourceElement : findReferenceSourceElements(referenceTargetElement)) {
-      removeReference(referenceSourceElement);
+      if (referenceIdentifier.equals(getReferenceIdentifier(referenceSourceElement))) {
+        removeReference(referenceSourceElement);
+      }
     }
   }
 

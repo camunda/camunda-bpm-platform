@@ -289,7 +289,10 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
   public void removeAttribute(String attributeName) {
     Attribute<?> attribute = elementType.getAttribute(attributeName);
     if (attribute != null) {
-      ((AttributeImpl<?>) attribute).unlinkReference(this);
+      Object identifier = attribute.getValue(this);
+      if (identifier != null) {
+        ((AttributeImpl<?>) attribute).unlinkReference(this, identifier);
+      }
     }
     DomUtil.removeAttribute(domElement, attributeName);
   }
@@ -297,7 +300,10 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
   public void removeAttributeNs(String attributeName, String namespaceUri) {
     Attribute<?> attribute = elementType.getAttribute(attributeName);
     if (attribute != null) {
-      ((AttributeImpl<?>) attribute).unlinkReference(this);
+      Object identifier = attribute.getValue(this);
+      if (identifier != null) {
+        ((AttributeImpl<?>) attribute).unlinkReference(this, identifier);
+      }
     }
     DomUtil.removeAttributeNs(domElement, attributeName, namespaceUri);
   }
@@ -337,7 +343,10 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
   void unlinkAllReferences() {
     Collection<Attribute<?>> attributes = elementType.getAllAttributes();
     for (Attribute<?> attribute : attributes) {
-      ((AttributeImpl<?>) attribute).unlinkReference(this);
+      Object identifier = attribute.getValue(this);
+      if (identifier != null) {
+        ((AttributeImpl<?>) attribute).unlinkReference(this, identifier);
+      }
     }
   }
 

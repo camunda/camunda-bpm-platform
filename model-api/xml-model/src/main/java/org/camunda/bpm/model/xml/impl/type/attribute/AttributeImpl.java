@@ -169,10 +169,10 @@ public abstract class AttributeImpl<T> implements Attribute<T> {
     }
   }
 
-  public void unlinkReference(ModelElementInstance modelElement) {
+  public void unlinkReference(ModelElementInstance modelElement, Object referenceIdentifier) {
     if (!incomingReferences.isEmpty()) {
       for (Reference<?> incomingReference : incomingReferences) {
-        ((ReferenceImpl<?>) incomingReference).referencedElementRemoved(modelElement);
+        ((ReferenceImpl<?>) incomingReference).referencedElementRemoved(modelElement, referenceIdentifier);
       }
     }
   }
