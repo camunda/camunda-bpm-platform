@@ -56,10 +56,6 @@ public class ModelImpl implements Model {
     return typesByName.get(ModelUtil.getQName(typeName, namespaceUri));
   }
 
-  public ModelElementTypeBuilder defineType(Class<? extends ModelElementInstance> modelInstanceType, String typeName) {
-    return new ModelElementTypeBuilderImpl(modelInstanceType, typeName, this);
-  }
-
   public void registerType(ModelElementType modelElementType, Class<? extends ModelElementInstance> instanceType) {
     QName qName = ModelUtil.getQName(modelElementType.getTypeName(), modelElementType.getTypeNamespace());
     typesByName.put(qName, modelElementType);
