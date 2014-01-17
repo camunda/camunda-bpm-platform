@@ -149,7 +149,7 @@ public class ModelUtil {
    * @return the collection of model element instances of the view
    */
   @SuppressWarnings("unchecked")
-  public static <T> Collection<T> getModelElementCollection(Collection<Element> view, ModelInstanceImpl model) {
+  public static <T extends ModelElementInstance> Collection<T> getModelElementCollection(Collection<Element> view, ModelInstanceImpl model) {
     List<ModelElementInstance> resultList = new ArrayList<ModelElementInstance>();
     for (Element element : view) {
       resultList.add(getModelElement(element, model));
