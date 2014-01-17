@@ -39,6 +39,7 @@ public abstract class TestModelConstants {
   public final static String ATTRIBUTE_NAME_IS_ENDANGERED = "isEndangered";
   public final static String ATTRIBUTE_NAME_GENDER = "gender";
   public final static String ATTRIBUTE_NAME_AGE = "age";
+  public final static String ATTRIBUTE_NAME_ANIMAL_REF = "animalRef";
 
   private TestModelConstants() {
 

@@ -20,7 +20,7 @@ import org.camunda.bpm.model.xml.testmodel.instance.*;
  * @author Daniel Meyer
  *
  */
-class TestModel {
+public class TestModel {
 
   private static Model model;
 

@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema
-  xmlns="http://www.w3.org/2001/XMLSchema"
-  xmlns:tns="http://camunda.org/animals"
-  targetNamespace="http://camunda.org/animals">
+<schema elementFormDefault="qualified" attributeFormDefault="unqualified"
+xmlns="http://www.w3.org/2001/XMLSchema"
+xmlns:tns="http://camunda.org/animals"
+targetNamespace="http://camunda.org/animals">
 
-  <element name="animals" type="tns:tAnimals"/>
-  <complexType name="tAnimals">
-    <sequence>
-      <element ref="tns:animal" minOccurs="0" maxOccurs="unbounded" />
-    </sequence>
-  </complexType>
+<element name="animals" type="tns:tAnimals"/>
+<complexType name="tAnimals">
+  <sequence>
+    <element ref="tns:animal" minOccurs="0" maxOccurs="unbounded" />
+  </sequence>
+</complexType>
 
-  <element name="animal" type="tns:tAnimal"/>
-  <complexType name="tAnimal" abstract="true" mixed="true">
-    <sequence>
-      <element ref="tns:relationshipDefinition" minOccurs="0" maxOccurs="unbounded"/>
-      <element name="relationshipDefinitionRef" type="QName" minOccurs="0" maxOccurs="unbounded"/>
-    </sequence>
-    <attribute name="id" type="ID"/>
-    <attribute name="name" type="string"/>
-    <attribute name="father" type="QName"/>
-    <attribute name="mother" type="QName"/>
-    <attribute name="isEndangered" type="boolean" default="false"/>
-    <attribute name="gender" type="tns:tGender" use="required"/>
-    <attribute name="age" type="integer"/>
-    <anyAttribute namespace="##other" processContents="lax"/>
-  </complexType>
+<element name="animal" type="tns:tAnimal"/>
+<complexType name="tAnimal" abstract="true" mixed="true">
+  <sequence>
+    <element ref="tns:relationshipDefinition" minOccurs="0" maxOccurs="unbounded"/>
+    <element name="relationshipDefinitionRef" type="QName" minOccurs="0" maxOccurs="unbounded"/>
+  </sequence>
+  <attribute name="id" type="ID"/>
+  <attribute name="name" type="string"/>
+  <attribute name="father" type="QName"/>
+  <attribute name="mother" type="QName"/>
+  <attribute name="isEndangered" type="boolean" default="false"/>
+  <attribute name="gender" type="tns:tGender" use="required"/>
+  <attribute name="age" type="integer"/>
+  <anyAttribute namespace="##other" processContents="lax"/>
+</complexType>
 
-  <element name="flyingAnimal" type="tns:tFlyingAnimal"/>
-  <complexType name="tFlyingAnimal" abstract="true" mixed="true">
-    <complexContent>
-      <extension base="tns:tAnimal">
-        <sequence>
-          <element name="flightPartnerRef" type="IDREF" minOccurs="0" maxOccurs="unbounded"/>
-        </sequence>
-     </extension>
-    </complexContent>
-  </complexType>
+<element name="flyingAnimal" type="tns:tFlyingAnimal"/>
+<complexType name="tFlyingAnimal" abstract="true" mixed="true">
+  <complexContent>
+    <extension base="tns:tAnimal">
+      <sequence>
+        <element name="flightPartnerRef" type="IDREF" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+   </extension>
+  </complexContent>
+</complexType>
 
-  <element name="bird" type="tns:tBird" substitutionGroup="tns:animal"/>
-  <complexType name="tBird">
-    <complexContent>
-      <extension base="tns:tFlyingAnimal"/>
-    </complexContent>
-  </complexType>
+<element name="bird" type="tns:tBird" substitutionGroup="tns:animal"/>
+<complexType name="tBird">
+  <complexContent>
+    <extension base="tns:tFlyingAnimal"/>
+  </complexContent>
+</complexType>
 
-  <simpleType name="tGender">
-    <restriction base="string">
-      <enumeration value="Unknown"/>
-      <enumeration value="Male"/>
-      <enumeration value="Female"/>
-    </restriction>
-  </simpleType>
+<simpleType name="tGender">
+  <restriction base="string">
+    <enumeration value="Unknown"/>
+    <enumeration value="Male"/>
+    <enumeration value="Female"/>
+  </restriction>
+</simpleType>
 
-  <element name="relationshipDefinition" type="tns:tRelationshipDefinition"/>
-  <complexType name="tRelationshipDefinition" abstract="true">
-    <attribute name="id" type="ID"/>
-    <attribute name="animalRef" type="IDREF"/>
-  </complexType>
+<element name="relationshipDefinition" type="tns:tRelationshipDefinition"/>
+<complexType name="tRelationshipDefinition" abstract="true">
+  <attribute name="id" type="ID"/>
+  <attribute name="animalRef" type="IDREF"/>
+</complexType>
 
-  <element name="childRelationshipDefinition" type="tns:tChildRelationshipDefinition"/>
-  <complexType name="tChildRelationshipDefinition">
-    <complexContent>
-      <extension base="tns:tRelationshipDefinition"/>
-    </complexContent>
-  </complexType>
+<element name="childRelationshipDefinition" type="tns:tChildRelationshipDefinition" substitutionGroup="tns:relationshipDefinition"/>
+<complexType name="tChildRelationshipDefinition">
+  <complexContent>
+    <extension base="tns:tRelationshipDefinition"/>
+  </complexContent>
+</complexType>
 
-  <element name="friendRelationshipDefinition" type="tns:tFriendRelationshipDefinition"/>
-  <complexType name="tFriendRelationshipDefinition">
-    <complexContent>
-      <extension base="tns:tRelationshipDefinition"/>
-    </complexContent>
-  </complexType>
+<element name="friendRelationshipDefinition" type="tns:tFriendRelationshipDefinition" substitutionGroup="tns:relationshipDefinition"/>
+<complexType name="tFriendRelationshipDefinition">
+  <complexContent>
+    <extension base="tns:tRelationshipDefinition"/>
+  </complexContent>
+</complexType>
 </schema>

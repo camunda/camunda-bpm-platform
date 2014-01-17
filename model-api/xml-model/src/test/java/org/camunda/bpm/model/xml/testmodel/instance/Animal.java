@@ -79,7 +79,7 @@ public abstract class Animal extends ModelElementInstanceImpl implements ModelEl
 
     SequenceBuilder sequence = typeBuilder.sequence();
 
-    relationshipDefinitionsColl = sequence.elementCollection(RelationshipDefinition.class, TYPE_NAME_RELATIONSHIP_DEFINITION)
+    relationshipDefinitionsColl = sequence.elementCollection(RelationshipDefinition.class)
       .build();
 
     relationshipDefinitionRefsColl = sequence.elementCollection(RelationshipDefinitionRef.class, ELEMENT_NAME_RELATIONSHIP_DEFINITION_REF)
@@ -114,7 +114,7 @@ public abstract class Animal extends ModelElementInstanceImpl implements ModelEl
   }
 
   public void setFather(Animal father) {
-    ((AttributeReferenceImpl<Animal>) fatherRef).setReferencedElement(this, father);
+    fatherRef.setReferencedElement(this, father);
   }
 
   public Animal getMother() {
@@ -122,10 +122,10 @@ public abstract class Animal extends ModelElementInstanceImpl implements ModelEl
   }
 
   public void setMother(Animal mother) {
-    ((AttributeReferenceImpl<Animal>) motherRef).setReferencedElement(this, mother);
+    motherRef.setReferencedElement(this, mother);
   }
 
-  public boolean isEndangered() {
+  public Boolean isEndangered() {
     return isEndangeredAttr.getValue(this);
   }
 
@@ -141,7 +141,7 @@ public abstract class Animal extends ModelElementInstanceImpl implements ModelEl
     genderAttr.setValue(this, gender);
   }
 
-  public int getAge() {
+  public Integer getAge() {
     return ageAttr.getValue(this);
   }
 
@@ -153,7 +153,7 @@ public abstract class Animal extends ModelElementInstanceImpl implements ModelEl
     return relationshipDefinitionsColl.get(this);
   }
 
-  public Collection<RelationshipDefinition> getRelationshipDefinitionsRef() {
+  public Collection<RelationshipDefinition> getRelationshipDefinitionRefs() {
     return relationshipDefinitionRefsColl.getReferenceTargetElements(this);
   }
 
