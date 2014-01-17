@@ -33,6 +33,8 @@ public interface Reference<T extends ModelElementInstance> {
 
   T getReferencedElement(ModelElementInstance modelElement);
 
+  void setReferencedElement(ModelElementInstance referenceSourceElement, T referenceTargetElement);
+
   Attribute<String> getReferenceTargetAttribute();
 
 }
