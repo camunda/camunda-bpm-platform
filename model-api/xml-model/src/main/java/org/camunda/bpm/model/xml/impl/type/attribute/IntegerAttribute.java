@@ -25,7 +25,12 @@ public class IntegerAttribute extends AttributeImpl<Integer> {
   }
 
   protected Integer convertXmlValueToModelValue(String rawValue) {
-    return Integer.parseInt(rawValue);
+    try {
+      return Integer.parseInt(rawValue);
+    }
+    catch (NumberFormatException e) {
+      return null;
+    }
   }
 
   protected String convertModelValueToXmlValue(Integer modelValue) {

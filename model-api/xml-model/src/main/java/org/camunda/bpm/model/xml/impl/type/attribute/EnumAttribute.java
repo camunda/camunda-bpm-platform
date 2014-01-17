@@ -30,7 +30,12 @@ public class EnumAttribute<T extends Enum<T>> extends AttributeImpl<T> {
   }
 
   protected T convertXmlValueToModelValue(String rawValue) {
-    return Enum.valueOf(type, rawValue);
+    if (rawValue != null) {
+      return Enum.valueOf(type, rawValue);
+    }
+    else {
+      return null;
+    }
   }
 
   protected String convertModelValueToXmlValue(T modelValue) {
