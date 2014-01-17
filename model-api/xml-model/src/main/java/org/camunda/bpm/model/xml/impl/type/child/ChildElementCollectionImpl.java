@@ -113,8 +113,9 @@ public abstract class ChildElementCollectionImpl<T extends ModelElementInstance>
 
   /** the "clear" operation used by this collection */
   void performClearOperation(ModelElementInstanceImpl modelElement, Collection<Element> elementsToRemove) {
-    for (Element element : elementsToRemove) {
-      DomUtil.removeChild(modelElement.getDomElement(), element);
+    Collection<ModelElementInstance> modelElements = ModelUtil.getModelElementCollection(elementsToRemove, modelElement.getModelInstance());
+    for (ModelElementInstance element : modelElements) {
+      modelElement.removeChildElement((ModelElementInstanceImpl) element);
     }
   }
 
@@ -156,11 +157,13 @@ public abstract class ChildElementCollectionImpl<T extends ModelElementInstance>
       }
 
       public Object[] toArray() {
-        return getView(modelElement).toArray();
+        Collection<T> modelElementCollection = ModelUtil.getModelElementCollection(getView(modelElement), modelElement.getModelInstance());
+        return modelElementCollection.toArray();
       }
 
       public <U> U[] toArray(U[] a) {
-        return getView(modelElement).toArray(a);
+        Collection<T> modelElementCollection = ModelUtil.getModelElementCollection(getView(modelElement), modelElement.getModelInstance());
+        return modelElementCollection.toArray(a);
       }
 
       public int size() {

@@ -170,12 +170,14 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
 
       @Override
       public Object[] toArray() {
-        return getView(referenceSourceParentElement).toArray();
+        Collection<T> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
+        return modelElementCollection.toArray();
       }
 
       @Override
       public <T1> T1[] toArray(T1[] a) {
-        return getView(referenceSourceParentElement).toArray(a);
+        Collection<T> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
+        return modelElementCollection.toArray(a);
       }
 
       @Override
