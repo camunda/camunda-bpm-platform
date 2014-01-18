@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>camunda-qa-performance-tests-engine</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - QA Performance Tests Engine</name>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
+    <version>7.1.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+
+    <!-- distro profile skips tests -->
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>performance-test</id>
+
+      <properties>
+        <!-- default values for properties -->
+        <numberOfThreads>2</numberOfThreads>
+        <numberOfRuns>1000</numberOfRuns>
+      </properties>
+
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+          </plugin>
+        </plugins>
+
+      </build>
+
+    </profile>
+    
+    <!-- override h2 profile to use in-mem db -->
+    <profile>    
+      <id>h2</id>
+      <properties>
+        <database.type>h2</database.type>
+        <database.user>sa</database.user>
+        <database.password>sa</database.password>
+        <database.driver>org.h2.Driver</database.driver>
+        <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
+        <database.url>jdbc:h2:mem:performance-test;MVCC=TRUE</database.url>
+      </properties>
+    </profile>
+
+  </profiles>
+
+</project>
