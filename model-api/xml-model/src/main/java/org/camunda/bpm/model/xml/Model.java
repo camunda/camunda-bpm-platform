@@ -25,14 +25,43 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  */
 public interface Model {
 
+  /**
+   * Gets the collection of all {@link ModelElementType} defined in the model.
+   *
+   * @return the list of all defined element types of this model
+   */
   public Collection<ModelElementType> getTypes();
 
-  public ModelElementType getType(Class<? extends ModelElementInstance> type);
+  /**
+   * Gets the defined {@link ModelElementType} of a {@link ModelElementInstance}.
+   *
+   * @param instanceClass  the instance class to find the type for
+   * @return the corresponding element type or null if no type is defined for the instance
+   */
+  public ModelElementType getType(Class<? extends ModelElementInstance> instanceClass);
 
-  public <T extends ModelElementInstance> ModelElementType getTypeForName(String typeName);
+  /**
+   * Gets the defined {@link ModelElementType} for a type by its name.
+   *
+   * @param typeName  the name of the type
+   * @return the element type or null if no type is defined for the name
+   */
+  public ModelElementType getTypeForName(String typeName);
 
+  /**
+   * Gets the defined {@link ModelElementType} for a type by its name and namespace URI.
+   *
+   * @param typeName  the name of the type
+   * @param namespaceUri  the namespace URI for the type
+   * @return the element type or null if no type is defined for the name and namespace URI
+   */
   public ModelElementType getTypeForName(String typeName, String namespaceUri);
 
+  /**
+   * Returns the model name, which is the identifier of this model.
+   *
+   * @return the model name
+   */
   String getModelName();
 
 }

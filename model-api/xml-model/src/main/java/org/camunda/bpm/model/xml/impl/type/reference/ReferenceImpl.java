@@ -171,8 +171,8 @@ public abstract class ReferenceImpl<T extends ModelElementInstance> implements R
   /**
    * Remove the reference if the target element is removed
    *
-   * @param referenceTargetElement the reference target model element instance, which is removed
-   * @param referenceIdentifier
+   * @param referenceTargetElement  the reference target model element instance, which is removed
+   * @param referenceIdentifier  the identifier of the reference to filter reference source elements
    */
   public void referencedElementRemoved(ModelElementInstance referenceTargetElement, Object referenceIdentifier) {
     for (ModelElementInstance referenceSourceElement : findReferenceSourceElements(referenceTargetElement)) {

@@ -35,7 +35,10 @@ public class ModelImpl implements Model {
   private final Map<Class<? extends ModelElementInstance>, ModelElementType> typesByClass = new HashMap<Class<? extends ModelElementInstance>, ModelElementType>();
   private final String modelName;
 
-
+  /**
+   * Create a new {@link Model} with a model name.
+   * @param modelName  the model name to identify the model
+   */
   public ModelImpl(String modelName) {
     this.modelName = modelName;
   }
@@ -44,11 +47,11 @@ public class ModelImpl implements Model {
     return new ArrayList<ModelElementType>(typesByName.values());
   }
 
-  public ModelElementType getType(Class<? extends ModelElementInstance> type) {
-    return typesByClass.get(type);
+  public ModelElementType getType(Class<? extends ModelElementInstance> instanceClass) {
+    return typesByClass.get(instanceClass);
   }
 
-  public <T extends ModelElementInstance> ModelElementType getTypeForName(String typeName) {
+  public ModelElementType getTypeForName(String typeName) {
     return getTypeForName(typeName, null);
   }
 
@@ -56,6 +59,12 @@ public class ModelImpl implements Model {
     return typesByName.get(ModelUtil.getQName(typeName, namespaceUri));
   }
 
+  /**
+   * Registers a {@link ModelElementType} in this {@link Model}.
+   *
+   * @param modelElementType  the element type to register
+   * @param instanceType  the instance class of the type to register
+   */
   public void registerType(ModelElementType modelElementType, Class<? extends ModelElementInstance> instanceType) {
     QName qName = ModelUtil.getQName(modelElementType.getTypeName(), modelElementType.getTypeNamespace());
     typesByName.put(qName, modelElementType);

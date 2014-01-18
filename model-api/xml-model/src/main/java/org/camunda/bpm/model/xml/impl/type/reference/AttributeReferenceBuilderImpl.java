@@ -23,7 +23,7 @@ import org.camunda.bpm.model.xml.type.reference.AttributeReferenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.ReferenceBuilder;
 
 /**
- * A builder for a attribute model reference based on a QNname
+ * A builder for a attribute model reference based on a QName
  *
  * @author Sebastian Menski
  *
