@@ -12,10 +12,13 @@
  */
 package org.camunda.bpm.qa.performance.engine;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.qa.performance.engine.framework.PerformanceTestException;
 import org.camunda.bpm.qa.performance.engine.framework.PerformanceTestResults;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
@@ -34,9 +37,39 @@ public class PerformanceTestResultRecorderRule extends TestWatcher {
   @Override
   protected void succeeded(Description description) {
     if(results != null) {
-      results.setTestName(description.getDisplayName());
+      results.setTestName(description.getClassName() +"."+description.getMethodName());
       LOG.log(Level.INFO, results.toString());
+
+      String resultFileName = formatResultFileName(description);
+
+      try {
+        // create file:
+        File directory = new File(formatResultFileDirName());
+        if (!directory.exists()) {
+          directory.mkdir();
+        }
+        File testResults = new File(resultFileName);
+        if(testResults.exists()) {
+          testResults.delete();
+        }
+        testResults.createNewFile();
+
+        // write to file:
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(testResults, results);
+      } catch ( Exception e ){
+        throw new PerformanceTestException("Could not record results to file "+resultFileName, e);
+
+      }
     }
+  }
+
+  protected String formatResultFileDirName() {
+    return "target"+File.separatorChar + "results";
+  }
+
+  protected String formatResultFileName(Description description) {
+    return formatResultFileDirName() + File.separatorChar + description.getTestClass().getSimpleName() + "."+description.getMethodName() +".json";
   }
 
   public void setResults(PerformanceTestResults results) {

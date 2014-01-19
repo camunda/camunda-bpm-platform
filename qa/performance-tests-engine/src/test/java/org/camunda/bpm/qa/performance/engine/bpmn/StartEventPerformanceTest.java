@@ -44,6 +44,4 @@ public class StartEventPerformanceTest extends ProcessEnginePerformanceTestBase 
 
   }
 
-
-
 }

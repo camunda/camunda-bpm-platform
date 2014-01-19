@@ -48,9 +48,7 @@ public class PerformanceTestRunner {
   protected void init() {
     executor = Executors.newFixedThreadPool(configuration.getNumberOfThreads());
 
-    results = new PerformanceTestResults();
-    results.setNumberOfRuns(configuration.getNumberOfRuns());
-    results.setNumberOfThreads(configuration.getNumberOfThreads());
+    results = new PerformanceTestResults(configuration);
 
     completedRuns = new AtomicLong();
     doneMonitor = new Object();

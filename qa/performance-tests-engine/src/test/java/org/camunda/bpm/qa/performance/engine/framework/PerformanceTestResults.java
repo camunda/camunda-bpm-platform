@@ -18,43 +18,48 @@ package org.camunda.bpm.qa.performance.engine.framework;
  */
 public class PerformanceTestResults {
 
+  /** the name of the test */
   protected String testName;
 
-  // global state
+  /** the configuration used */
+  protected PerformanceTestConfiguration configuration;
+
   protected long duration;
-  protected long numberOfRuns;
-  protected int numberOfThreads;
+
+  public PerformanceTestResults(PerformanceTestConfiguration configuration) {
+    this.configuration = configuration;
+  }
 
   // getter / setters ////////////////////////////
 
   public String getTestName() {
     return testName;
   }
+
   public void setTestName(String testName) {
     this.testName = testName;
   }
+
+  public PerformanceTestConfiguration getConfiguration() {
+    return configuration;
+  }
+
+  public void setConfiguration(PerformanceTestConfiguration configuration) {
+    this.configuration = configuration;
+  }
+
   public long getDuration() {
     return duration;
   }
+
   public void setDuration(long duration) {
     this.duration = duration;
-  }
-  public long getNumberOfRuns() {
-    return numberOfRuns;
-  }
-  public void setNumberOfRuns(long numberOfRuns) {
-    this.numberOfRuns = numberOfRuns;
-  }
-  public int getNumberOfThreads() {
-    return numberOfThreads;
-  }
-  public void setNumberOfThreads(int numberOfThreads) {
-    this.numberOfThreads = numberOfThreads;
   }
 
   @Override
   public String toString() {
-    return testName + " Completed " + numberOfRuns + " runs using " + numberOfThreads +" threads. Took " + duration + "ms.";
+    return testName + " Completed " + configuration.getNumberOfRuns()
+        + " runs using " + configuration.getNumberOfThreads() +" threads. Took " + duration + "ms.";
   }
 
 }
