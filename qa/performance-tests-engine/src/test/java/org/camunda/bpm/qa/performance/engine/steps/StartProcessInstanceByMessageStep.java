@@ -10,15 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.qa.performance.engine.framework.steps;
+package org.camunda.bpm.qa.performance.engine.steps;
 
-import static org.camunda.bpm.qa.performance.engine.framework.steps.PerformanceTestConstants.*;
+import static org.camunda.bpm.qa.performance.engine.steps.PerfTestConstants.*;
 
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.qa.performance.engine.framework.PerformaceTestRunContext;
+import org.camunda.bpm.qa.performance.engine.framework.PerfTestRunContext;
 
 /**
  * @author Daniel Meyer
@@ -40,7 +40,7 @@ public class StartProcessInstanceByMessageStep extends ProcessEngineAwareStep {
   }
 
   @Override
-  public void execute(PerformaceTestRunContext context) {
+  public void execute(PerfTestRunContext context) {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByMessage(message, processVariables);
     context.setVariable(PROCESS_INSTANCE_ID, processInstance.getId());
   }

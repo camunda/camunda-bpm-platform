@@ -10,17 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.qa.performance.engine.framework.steps;
+package org.camunda.bpm.qa.performance.engine.framework;
 
 /**
+ *
  * @author Daniel Meyer
  *
  */
-public final class PerformanceTestConstants {
+public interface PerfTestStepBehavior {
 
-  public static final String PROCESS_INSTANCE_ID = "processInstanceId";
-
-
-  private PerformanceTestConstants() {}
+  /**
+   * Execute the step logic. Implementations must be stateless and pass all data
+   * from one step to the other using the {@link PerfTestRunContext}
+   *
+   * @param context the current run
+   */
+  public void execute(PerfTestRunContext context);
 
 }

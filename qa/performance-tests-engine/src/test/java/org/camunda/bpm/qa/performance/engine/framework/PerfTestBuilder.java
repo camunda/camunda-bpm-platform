@@ -21,29 +21,29 @@ import org.camunda.bpm.qa.performance.engine.PerformanceTestResultRecorderRule;
  * @author Daniel Meyer
  *
  */
-public class PerformanceTestBuilder {
+public class PerfTestBuilder {
 
-  protected final PerformanceTest performanceTest;
-  protected PerformanceTestConfiguration performanceTestConfiguration;
+  protected final PerfTest perfTest;
+  protected PerfTestConfiguration perfTestConfiguration;
   protected PerformanceTestResultRecorderRule resultRecorder;
 
-  public PerformanceTestBuilder(PerformanceTestConfiguration performanceTestConfiguration,
+  public PerfTestBuilder(PerfTestConfiguration perfTestConfiguration,
                                   PerformanceTestResultRecorderRule resultRecorder) {
-    this.performanceTestConfiguration = performanceTestConfiguration;
+    this.perfTestConfiguration = perfTestConfiguration;
     this.resultRecorder = resultRecorder;
-    performanceTest = new PerformanceTest();
+    perfTest = new PerfTest();
   }
 
-  public PerformanceTestBuilder step(StepBehavior behavior) {
-    PerformanceTestStep step = new PerformanceTestStep(behavior);
-    performanceTest.addStep(step);
+  public PerfTestBuilder step(PerfTestStepBehavior behavior) {
+    PerfTestStep step = new PerfTestStep(behavior);
+    perfTest.addStep(step);
     return this;
   }
 
-  public PerformanceTestResults run() {
-    PerformanceTestRunner testRunner = new PerformanceTestRunner(performanceTest, performanceTestConfiguration);
+  public PerfTestResults run() {
+    PerfTestRunner testRunner = new PerfTestRunner(perfTest, perfTestConfiguration);
     try {
-      PerformanceTestResults results = testRunner.execute()
+      PerfTestResults results = testRunner.execute()
         .get();
       resultRecorder.setResults(results);
       return results;
@@ -54,16 +54,23 @@ public class PerformanceTestBuilder {
         if(cause instanceof RuntimeException) {
           throw (RuntimeException) cause;
         } else {
-          throw new PerformanceTestException(cause);
+          throw new PerfTestException(cause);
         }
       }
       else {
-        throw new PerformanceTestException(e);
+        throw new PerfTestException(e);
       }
     } catch (Exception e) {
-      throw new PerformanceTestException(e);
+      throw new PerfTestException(e);
     }
 
+  }
+
+  public PerfTestBuilder steps(int i, PerfTestStepBehavior behavior) {
+    for (int j = 0; j < i; j++) {
+      step(behavior);
+    }
+    return this;
   }
 
 }

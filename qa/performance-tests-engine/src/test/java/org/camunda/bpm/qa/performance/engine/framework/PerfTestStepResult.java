@@ -13,18 +13,26 @@
 package org.camunda.bpm.qa.performance.engine.framework;
 
 /**
- *
  * @author Daniel Meyer
  *
  */
-public interface StepBehavior {
+public class PerfTestStepResult {
 
-  /**
-   * Execute the step logic. Implementations must be stateless and pass all data
-   * from one step to the other using the {@link PerformaceTestRunContext}
-   *
-   * @param context the current run
-   */
-  public void execute(PerformaceTestRunContext context);
+  protected String stepName;
+
+  protected Object resultData;
+
+  public PerfTestStepResult(String stepName, Object resultData) {
+    this.stepName = stepName;
+    this.resultData = resultData;
+  }
+
+  public Object getResultData() {
+    return resultData;
+  }
+
+  public String getStepName() {
+    return stepName;
+  }
 
 }

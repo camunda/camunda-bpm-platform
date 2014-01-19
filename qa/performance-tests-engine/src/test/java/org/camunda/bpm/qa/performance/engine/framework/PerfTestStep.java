@@ -13,16 +13,37 @@
 package org.camunda.bpm.qa.performance.engine.framework;
 
 /**
- * Represents an individual run. This is passed from one step to
- * another and can be used for passing context data.
+ * A step in a performance test.
  *
  * @author Daniel Meyer
  *
  */
-public interface PerformaceTestRunContext {
+public class PerfTestStep {
 
-  void setVariable(String name, Object value);
+  protected final PerfTestStepBehavior perfTestStepBehavior;
 
-  <T> T getVariable(String name);
+  protected PerfTestStep nextStep;
+
+  protected String stepName;
+
+  public PerfTestStep(PerfTestStepBehavior behavior) {
+    perfTestStepBehavior = behavior;
+  }
+
+  public void setNextStep(PerfTestStep step) {
+    nextStep = step;
+  }
+
+  public PerfTestStepBehavior getStepBehavior() {
+    return perfTestStepBehavior;
+  }
+
+  public PerfTestStep getNextStep() {
+    return nextStep;
+  }
+
+  public String getStepName() {
+    return perfTestStepBehavior.getClass().getSimpleName();
+  }
 
 }

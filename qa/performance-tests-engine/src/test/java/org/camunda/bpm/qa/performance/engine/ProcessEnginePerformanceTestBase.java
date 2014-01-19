@@ -14,7 +14,7 @@ package org.camunda.bpm.qa.performance.engine;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.qa.performance.engine.framework.PerformanceTestBuilder;
+import org.camunda.bpm.qa.performance.engine.framework.PerfTestBuilder;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -42,7 +42,7 @@ public abstract class ProcessEnginePerformanceTestBase {
     engine = processEngineRule.getProcessEngine();
   }
 
-  protected PerformanceTestBuilder perfomanceTest() {
-    return new PerformanceTestBuilder(testConfigurationRule.getPerformanceTestConfiguration(), resultRecorderRule);
+  protected PerfTestBuilder perfomanceTest() {
+    return new PerfTestBuilder(testConfigurationRule.getPerformanceTestConfiguration(), resultRecorderRule);
   }
 }

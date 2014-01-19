@@ -21,30 +21,44 @@ import java.util.Properties;
  * @author Daniel Meyer
  *
  */
-public class PerformanceTestConfiguration {
+public class PerfTestConfiguration {
 
   protected int numberOfThreads = 2;
   protected int numberOfRuns = 1000;
 
-  public PerformanceTestConfiguration(Properties properties) {
+  protected String testWatchers = null;
+
+  public PerfTestConfiguration(Properties properties) {
     numberOfRuns = Integer.parseInt(properties.getProperty("numberOfRuns"));
     numberOfThreads =  Integer.parseInt(properties.getProperty("numberOfThreads"));
+    testWatchers = properties.getProperty("testWatchers", null);
   }
 
-  public PerformanceTestConfiguration() {
+  public PerfTestConfiguration() {
   }
 
   public int getNumberOfThreads() {
     return numberOfThreads;
   }
+
   public void setNumberOfThreads(int numberOfThreads) {
     this.numberOfThreads = numberOfThreads;
   }
+
   public int getNumberOfRuns() {
     return numberOfRuns;
   }
+
   public void setNumberOfRuns(int numberOfExecutions) {
     this.numberOfRuns = numberOfExecutions;
+  }
+
+  public String getTestWatchers() {
+    return testWatchers;
+  }
+
+  public void setTestWatchers(String testWatchers) {
+    this.testWatchers = testWatchers;
   }
 
 }

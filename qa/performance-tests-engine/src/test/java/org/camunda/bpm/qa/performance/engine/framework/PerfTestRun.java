@@ -13,6 +13,7 @@
 package org.camunda.bpm.qa.performance.engine.framework;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +22,7 @@ import java.util.Map;
  * @author Daniel Meyer
  *
  */
-public class PerformanceTestRun implements PerformaceTestRunContext, Runnable {
+public class PerfTestRun implements PerfTestRunContext, Runnable {
 
   protected boolean isStarted;
 
@@ -31,13 +32,13 @@ public class PerformanceTestRun implements PerformaceTestRunContext, Runnable {
   protected long stepStartTime;
   protected long stepEndTime;
 
-  protected PerformanceTestStep currentStep;
+  protected PerfTestStep currentStep;
 
-  protected PerformanceTestRunner runner;
+  protected PerfTestRunner runner;
 
   protected Map<String, Object> runContext = new HashMap<String, Object>();
 
-  public PerformanceTestRun(PerformanceTestRunner runner, PerformanceTestStep firstStep) {
+  public PerfTestRun(PerfTestRunner runner, PerfTestStep firstStep) {
     this.runner = runner;
     this.currentStep = firstStep;
   }
@@ -45,10 +46,12 @@ public class PerformanceTestRun implements PerformaceTestRunContext, Runnable {
   public void startRun() {
     runStartTime = System.currentTimeMillis();
     isStarted = true;
+    notifyWatchersStartRun();
   }
 
   public void endRun() {
     runEndTime = System.currentTimeMillis();
+    notifyWatchersEndRun();
   }
 
   public void run() {
@@ -56,8 +59,12 @@ public class PerformanceTestRun implements PerformaceTestRunContext, Runnable {
       if(!isStarted) {
         startRun();
       }
-      StepBehavior stepBehavior = currentStep.getStepBehavior();
-      stepBehavior.execute(this);
+      notifyWatchersBeforeStep();
+
+      PerfTestStepBehavior perfTestStepBehavior = currentStep.getStepBehavior();
+      perfTestStepBehavior.execute(this);
+
+      notifyWatchersAfterStep();
       runner.completedStep(this, currentStep);
     } catch(Throwable t) {
       runner.failed(this, t);
@@ -77,7 +84,7 @@ public class PerformanceTestRun implements PerformaceTestRunContext, Runnable {
     runContext.put(name, value);
   }
 
-  public void setCurrentStep(PerformanceTestStep currentStep) {
+  public void setCurrentStep(PerfTestStep currentStep) {
     this.currentStep = currentStep;
   }
 
@@ -89,11 +96,11 @@ public class PerformanceTestRun implements PerformaceTestRunContext, Runnable {
     return runEndTime;
   }
 
-  public PerformanceTestStep getCurrentStep() {
+  public PerfTestStep getCurrentStep() {
     return currentStep;
   }
 
-  public PerformanceTestRunner getRunner() {
+  public PerfTestRunner getRunner() {
     return runner;
   }
 
@@ -103,6 +110,46 @@ public class PerformanceTestRun implements PerformaceTestRunContext, Runnable {
 
   public long getStepStartTime() {
     return stepStartTime;
+  }
+
+  protected void notifyWatchersStartRun() {
+    List<PerfTestWatcher> watchers = runner.getWatchers();
+    if(watchers != null) {
+      for (PerfTestWatcher perfTestWatcher : watchers) {
+        perfTestWatcher.beforeRun(runner.getTest(), this);
+      }
+    }
+  }
+
+  protected void notifyWatchersEndRun() {
+    List<PerfTestWatcher> watchers = runner.getWatchers();
+    if(watchers != null) {
+      for (PerfTestWatcher perfTestWatcher : watchers) {
+        perfTestWatcher.afterRun(runner.getTest(), this);
+      }
+    }
+  }
+
+  protected void notifyWatchersBeforeStep() {
+    List<PerfTestWatcher> watchers = runner.getWatchers();
+    if(watchers != null) {
+      for (PerfTestWatcher perfTestWatcher : watchers) {
+        perfTestWatcher.beforeStep(currentStep, this);
+      }
+    }
+  }
+
+  protected void notifyWatchersAfterStep() {
+    List<PerfTestWatcher> watchers = runner.getWatchers();
+    if(watchers != null) {
+      for (PerfTestWatcher perfTestWatcher : watchers) {
+        perfTestWatcher.afterStep(currentStep, this);
+      }
+    }
+  }
+
+  public void logStepResult(Object stepResult) {
+    runner.logStepResult(this, stepResult);
   }
 
 }

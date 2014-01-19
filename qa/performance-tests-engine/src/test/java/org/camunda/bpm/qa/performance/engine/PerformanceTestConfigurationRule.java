@@ -17,8 +17,8 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.qa.performance.engine.framework.PerformanceTestConfiguration;
-import org.camunda.bpm.qa.performance.engine.framework.PerformanceTestException;
+import org.camunda.bpm.qa.performance.engine.framework.PerfTestConfiguration;
+import org.camunda.bpm.qa.performance.engine.framework.PerfTestException;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
@@ -32,24 +32,24 @@ public class PerformanceTestConfigurationRule extends TestWatcher {
 
   private static final String PROPERTY_FILE_NAME = "PerformaceTestConfiguration.properties";
 
-  static PerformanceTestConfiguration performanceTestConfiguration;
+  static PerfTestConfiguration perfTestConfiguration;
 
   @Override
   protected void starting(Description description) {
-    if(performanceTestConfiguration == null) {
+    if(perfTestConfiguration == null) {
 
       File file = IoUtil.getFile(PROPERTY_FILE_NAME);
       if(!file.exists()) {
-        throw new PerformanceTestException("Cannot load file '"+PROPERTY_FILE_NAME+"': file does not exist.");
+        throw new PerfTestException("Cannot load file '"+PROPERTY_FILE_NAME+"': file does not exist.");
       }
       FileInputStream propertyInputStream = null;
       try {
         propertyInputStream = new FileInputStream(file);
         Properties properties = new Properties();
         properties.load(propertyInputStream);
-        performanceTestConfiguration = new PerformanceTestConfiguration(properties);
+        perfTestConfiguration = new PerfTestConfiguration(properties);
       } catch(Exception e) {
-        throw new PerformanceTestException("Cannot load properties from file "+PROPERTY_FILE_NAME+": "+e);
+        throw new PerfTestException("Cannot load properties from file "+PROPERTY_FILE_NAME+": "+e);
 
       } finally {
         IoUtil.closeSilently(propertyInputStream);
@@ -57,8 +57,8 @@ public class PerformanceTestConfigurationRule extends TestWatcher {
     }
   }
 
-  public PerformanceTestConfiguration getPerformanceTestConfiguration() {
-    return performanceTestConfiguration;
+  public PerfTestConfiguration getPerformanceTestConfiguration() {
+    return perfTestConfiguration;
   }
 
 }

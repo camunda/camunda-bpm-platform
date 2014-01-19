@@ -13,31 +13,27 @@
 package org.camunda.bpm.qa.performance.engine.framework;
 
 /**
- * A step in a performance test.
- *
  * @author Daniel Meyer
  *
  */
-public class PerformanceTestStep {
+public class PerfTestException extends RuntimeException {
 
-  protected final StepBehavior stepBehavior;
+  private static final long serialVersionUID = 1L;
 
-  protected PerformanceTestStep nextStep;
-
-  public PerformanceTestStep(StepBehavior behavior) {
-    stepBehavior = behavior;
+  public PerfTestException() {
+    super();
   }
 
-  public void setNextStep(PerformanceTestStep step) {
-    nextStep = step;
+  public PerfTestException(String message, Throwable cause) {
+    super(message, cause);
   }
 
-  public StepBehavior getStepBehavior() {
-    return stepBehavior;
+  public PerfTestException(String message) {
+    super(message);
   }
 
-  public PerformanceTestStep getNextStep() {
-    return nextStep;
+  public PerfTestException(Throwable cause) {
+    super(cause);
   }
 
 }

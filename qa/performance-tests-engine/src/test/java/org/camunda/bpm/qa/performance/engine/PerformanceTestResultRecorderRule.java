@@ -16,8 +16,8 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.qa.performance.engine.framework.PerformanceTestException;
-import org.camunda.bpm.qa.performance.engine.framework.PerformanceTestResults;
+import org.camunda.bpm.qa.performance.engine.framework.PerfTestException;
+import org.camunda.bpm.qa.performance.engine.framework.PerfTestResults;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -32,7 +32,7 @@ public class PerformanceTestResultRecorderRule extends TestWatcher {
 
   public static final Logger LOG = Logger.getLogger(PerformanceTestResultRecorderRule.class.getName());
 
-  protected PerformanceTestResults results;
+  protected PerfTestResults results;
 
   @Override
   protected void succeeded(Description description) {
@@ -58,7 +58,7 @@ public class PerformanceTestResultRecorderRule extends TestWatcher {
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(testResults, results);
       } catch ( Exception e ){
-        throw new PerformanceTestException("Could not record results to file "+resultFileName, e);
+        throw new PerfTestException("Could not record results to file "+resultFileName, e);
 
       }
     }
@@ -72,7 +72,7 @@ public class PerformanceTestResultRecorderRule extends TestWatcher {
     return formatResultFileDirName() + File.separatorChar + description.getTestClass().getSimpleName() + "."+description.getMethodName() +".json";
   }
 
-  public void setResults(PerformanceTestResults results) {
+  public void setResults(PerfTestResults results) {
     this.results = results;
   }
 

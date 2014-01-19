@@ -14,8 +14,8 @@ package org.camunda.bpm.qa.performance.engine.bpmn;
 
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.performance.engine.ProcessEnginePerformanceTestBase;
-import org.camunda.bpm.qa.performance.engine.framework.steps.StartProcessInstanceByMessageStep;
-import org.camunda.bpm.qa.performance.engine.framework.steps.StartProcessInstanceStep;
+import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceByMessageStep;
+import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceStep;
 import org.junit.Test;
 
 /**

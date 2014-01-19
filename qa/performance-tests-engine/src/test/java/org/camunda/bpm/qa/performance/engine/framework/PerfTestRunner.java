@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.qa.performance.engine.framework;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,26 +22,29 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
+
 /**
  * @author Daniel Meyer
  *
  */
-public class PerformanceTestRunner {
+public class PerfTestRunner {
 
   protected ExecutorService executor;
-  protected PerformanceTest test;
-  protected PerformanceTestConfiguration configuration;
+  protected PerfTest test;
+  protected PerfTestConfiguration configuration;
 
   // runner state
   protected AtomicLong completedRuns;
-  protected PerformanceTestResults results;
+  protected PerfTestResults results;
   protected Object doneMonitor;
   protected boolean isDone;
   protected Throwable exception;
+  protected List<PerfTestWatcher> watchers;
 
   protected long startTime;
 
-  public PerformanceTestRunner(PerformanceTest test, PerformanceTestConfiguration configuration) {
+  public PerfTestRunner(PerfTest test, PerfTestConfiguration configuration) {
     this.test = test;
     this.configuration = configuration;
     init();
@@ -48,24 +53,39 @@ public class PerformanceTestRunner {
   protected void init() {
     executor = Executors.newFixedThreadPool(configuration.getNumberOfThreads());
 
-    results = new PerformanceTestResults(configuration);
+    results = new PerfTestResults(configuration);
 
     completedRuns = new AtomicLong();
     doneMonitor = new Object();
     isDone = false;
+
+    // init test watchers
+    String testWatchers = configuration.getTestWatchers();
+    if(testWatchers != null) {
+      watchers = new ArrayList<PerfTestWatcher>();
+      String[] watcherClassNames = testWatchers.split(",");
+      for (String watcherClassName : watcherClassNames) {
+        Object watcher = ReflectUtil.instantiate(watcherClassName);
+        if(watcher instanceof PerfTestWatcher) {
+          watchers.add((PerfTestWatcher) watcher);
+        } else {
+          throw new PerfTestException("Test watcher "+watcherClassName+" must implement "+PerfTestWatcher.class.getName());
+        }
+      }
+    }
   }
 
-  public Future<PerformanceTestResults> execute() {
+  public Future<PerfTestResults> execute() {
 
-    PerformanceTestStep firstStep = test.getFirstStep();
+    PerfTestStep firstStep = test.getFirstStep();
 
     this.startTime = System.currentTimeMillis();
 
     for (int i = 0; i < configuration.getNumberOfRuns(); i++) {
-      executor.execute(new PerformanceTestRun(this, firstStep));
+      executor.execute(new PerfTestRun(this, firstStep));
     }
 
-    return new Future<PerformanceTestResults>() {
+    return new Future<PerfTestResults>() {
 
       public boolean isDone() {
         synchronized (doneMonitor) {
@@ -77,7 +97,7 @@ public class PerformanceTestRunner {
         throw new UnsupportedOperationException("Cannot cancel a performance test.");
       }
 
-      public PerformanceTestResults get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+      public PerfTestResults get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         synchronized (doneMonitor) {
           if(!isDone) {
             doneMonitor.wait(unit.convert(timeout, TimeUnit.MILLISECONDS));
@@ -89,7 +109,7 @@ public class PerformanceTestRunner {
         return results;
       }
 
-      public PerformanceTestResults get() throws InterruptedException, ExecutionException {
+      public PerfTestResults get() throws InterruptedException, ExecutionException {
         synchronized (doneMonitor) {
           if(!isDone) {
             doneMonitor.wait();
@@ -108,14 +128,14 @@ public class PerformanceTestRunner {
   }
 
   /**
-   * Invoked when a {@link PerformanceTestRun} completed a step
+   * Invoked when a {@link PerfTestRun} completed a step
    *
    * @param run the current Run
    * @param currentStep the completed step
    */
-  public void completedStep(PerformanceTestRun run, PerformanceTestStep currentStep) {
+  public void completedStep(PerfTestRun run, PerfTestStep currentStep) {
 
-    PerformanceTestStep nextStep = currentStep.getNextStep();
+    PerfTestStep nextStep = currentStep.getNextStep();
 
     if(nextStep != null) {
       // if test has more steps, execute the next step
@@ -129,10 +149,10 @@ public class PerformanceTestRunner {
   }
 
   /**
-   * Invoked when a {@link PerformanceTestRun} is completed.
+   * Invoked when a {@link PerfTestRun} is completed.
    * @param run the completed run
    */
-  public void completedRun(PerformanceTestRun run) {
+  public void completedRun(PerfTestRun run) {
     run.endRun();
 
     long currentlyCompleted = completedRuns.incrementAndGet();
@@ -149,14 +169,26 @@ public class PerformanceTestRunner {
   }
 
   /**
-   * @param performanceTestRun
+   * @param perfTestRun
    * @param t
    */
-  public void failed(PerformanceTestRun performanceTestRun, Throwable t) {
+  public void failed(PerfTestRun perfTestRun, Throwable t) {
     synchronized (doneMonitor) {
       this.exception = t;
       doneMonitor.notifyAll();
     }
+  }
+
+  public List<PerfTestWatcher> getWatchers() {
+    return watchers;
+  }
+
+  public PerfTest getTest() {
+    return test;
+  }
+
+  public void logStepResult(PerfTestRun perfTestRun, Object stepResult) {
+    results.logStepResult(perfTestRun.getCurrentStep(), stepResult);
   }
 
 }

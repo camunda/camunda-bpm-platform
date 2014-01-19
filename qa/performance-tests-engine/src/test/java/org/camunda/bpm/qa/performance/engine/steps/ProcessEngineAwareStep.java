@@ -10,19 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.qa.performance.engine.framework.steps;
+package org.camunda.bpm.qa.performance.engine.steps;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.qa.performance.engine.framework.StepBehavior;
+import org.camunda.bpm.qa.performance.engine.framework.PerfTestStepBehavior;
 
 /**
  * @author Daniel Meyer
  *
  */
-public abstract class ProcessEngineAwareStep implements StepBehavior {
+public abstract class ProcessEngineAwareStep implements PerfTestStepBehavior {
 
   protected ProcessEngine processEngine;
   protected RuntimeService runtimeService;

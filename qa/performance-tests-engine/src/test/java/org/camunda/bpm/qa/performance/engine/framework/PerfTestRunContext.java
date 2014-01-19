@@ -13,27 +13,16 @@
 package org.camunda.bpm.qa.performance.engine.framework;
 
 /**
+ * Represents an individual run. This is passed from one step to
+ * another and can be used for passing context data.
+ *
  * @author Daniel Meyer
  *
  */
-public class PerformanceTestException extends RuntimeException {
+public interface PerfTestRunContext {
 
-  private static final long serialVersionUID = 1L;
+  void setVariable(String name, Object value);
 
-  public PerformanceTestException() {
-    super();
-  }
-
-  public PerformanceTestException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public PerformanceTestException(String message) {
-    super(message);
-  }
-
-  public PerformanceTestException(Throwable cause) {
-    super(cause);
-  }
+  <T> T getVariable(String name);
 
 }

@@ -18,29 +18,30 @@ import java.util.List;
 /**
  * <p>A performance test.</p>
  *
- * <p>A performance test is made up of a sequence of steps. Each steps will
+ * <p>A performance test is composed of a sequence of steps. Each steps will
  * move the performance test forward and may be scheduled using a tread pool</p>
  *
  * @author Daniel Meyer
  *
  */
-public class PerformanceTest {
+public class PerfTest {
 
   /** the individual steps that make up the performance test */
-  protected List<PerformanceTestStep> steps = new ArrayList<PerformanceTestStep>();
+  protected List<PerfTestStep> steps = new ArrayList<PerfTestStep>();
 
-  public void addStep(PerformanceTestStep step) {
+  public void addStep(PerfTestStep step) {
     if(steps.isEmpty()) {
       // this is the first step
       steps.add(step);
     } else {
-      PerformanceTestStep lastStep = steps.get(steps.size() -1);
+      // link the step to the last step
+      PerfTestStep lastStep = steps.get(steps.size() -1);
       lastStep.setNextStep(step);
       steps.add(step);
     }
   }
 
-  public PerformanceTestStep getFirstStep() {
+  public PerfTestStep getFirstStep() {
     return steps.get(0);
   }
 
