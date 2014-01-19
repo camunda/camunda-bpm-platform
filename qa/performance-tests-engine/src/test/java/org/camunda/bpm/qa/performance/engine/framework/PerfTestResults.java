@@ -36,6 +36,9 @@ public class PerfTestResults {
     this.configuration = configuration;
   }
 
+  public PerfTestResults() {
+  }
+
   // getter / setters ////////////////////////////
 
   public String getTestName() {

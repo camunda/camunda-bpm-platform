@@ -78,6 +78,7 @@
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
+          
         </plugins>
 
       </build>
@@ -113,6 +114,25 @@
             <configuration>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.4</version>
+            <executions>              
+              <execution>
+                <id>database-test-drop-schema</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="Generating reports" />
+                    <java classname="org.camunda.bpm.qa.performance.engine.sql.statementlog.SqlStatementLogReport" classpathref="maven.test.classpath" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
 

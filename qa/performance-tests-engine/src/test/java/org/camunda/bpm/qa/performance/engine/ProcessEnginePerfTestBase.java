@@ -24,16 +24,16 @@ import org.junit.Rule;
  * @author Daniel Meyer
  *
  */
-public abstract class ProcessEnginePerformanceTestBase {
+public abstract class ProcessEnginePerfTestBase {
 
   @Rule
   public ProcessEngineRule processEngineRule = new ProcessEngineRule();
 
   @Rule
-  public PerformanceTestConfigurationRule testConfigurationRule = new PerformanceTestConfigurationRule();
+  public PerfTestConfigurationRule testConfigurationRule = new PerfTestConfigurationRule();
 
   @Rule
-  public PerformanceTestResultRecorderRule resultRecorderRule = new PerformanceTestResultRecorderRule();
+  public PerfTestResultRecorderRule resultRecorderRule = new PerfTestResultRecorderRule();
 
   protected ProcessEngine engine;
 

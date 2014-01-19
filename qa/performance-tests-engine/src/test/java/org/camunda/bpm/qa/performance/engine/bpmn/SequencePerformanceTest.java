@@ -15,7 +15,7 @@ package org.camunda.bpm.qa.performance.engine.bpmn;
 import static org.camunda.bpm.qa.performance.engine.steps.PerfTestConstants.*;
 
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.qa.performance.engine.ProcessEnginePerformanceTestBase;
+import org.camunda.bpm.qa.performance.engine.ProcessEnginePerfTestBase;
 import org.camunda.bpm.qa.performance.engine.steps.SignalExecutionStep;
 import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceStep;
 import org.junit.Test;
@@ -24,7 +24,7 @@ import org.junit.Test;
  * @author Daniel Meyer
  *
  */
-public class SequencePerformanceTest extends ProcessEnginePerformanceTestBase {
+public class SequencePerformanceTest extends ProcessEnginePerfTestBase {
 
   @Test
   @Deployment

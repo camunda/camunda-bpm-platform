@@ -13,7 +13,7 @@
 package org.camunda.bpm.qa.performance.engine.bpmn;
 
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.qa.performance.engine.ProcessEnginePerformanceTestBase;
+import org.camunda.bpm.qa.performance.engine.ProcessEnginePerfTestBase;
 import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceByMessageStep;
 import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceStep;
 import org.junit.Test;
@@ -22,7 +22,7 @@ import org.junit.Test;
  * @author Daniel Meyer
  *
  */
-public class StartEventPerformanceTest extends ProcessEnginePerformanceTestBase {
+public class StartEventPerformanceTest extends ProcessEnginePerfTestBase {
 
   @Test
   @Deployment

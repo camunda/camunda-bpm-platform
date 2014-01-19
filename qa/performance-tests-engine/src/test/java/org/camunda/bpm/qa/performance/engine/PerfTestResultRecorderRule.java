@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestException;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestResults;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.camunda.bpm.qa.performance.engine.util.JsonUtil;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
@@ -28,16 +28,16 @@ import org.junit.runner.Description;
  * @author Daniel Meyer
  *
  */
-public class PerformanceTestResultRecorderRule extends TestWatcher {
+public class PerfTestResultRecorderRule extends TestWatcher {
 
-  public static final Logger LOG = Logger.getLogger(PerformanceTestResultRecorderRule.class.getName());
+  public static final Logger LOG = Logger.getLogger(PerfTestResultRecorderRule.class.getName());
 
   protected PerfTestResults results;
 
   @Override
   protected void succeeded(Description description) {
     if(results != null) {
-      results.setTestName(description.getClassName() +"."+description.getMethodName());
+      results.setTestName(description.getTestClass().getSimpleName() +"."+description.getMethodName());
       LOG.log(Level.INFO, results.toString());
 
       String resultFileName = formatResultFileName(description);
@@ -48,15 +48,9 @@ public class PerformanceTestResultRecorderRule extends TestWatcher {
         if (!directory.exists()) {
           directory.mkdir();
         }
-        File testResults = new File(resultFileName);
-        if(testResults.exists()) {
-          testResults.delete();
-        }
-        testResults.createNewFile();
 
-        // write to file:
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(testResults, results);
+        JsonUtil.writeObjectToFile(resultFileName, results);
+
       } catch ( Exception e ){
         throw new PerfTestException("Could not record results to file "+resultFileName, e);
 

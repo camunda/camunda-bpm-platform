@@ -14,7 +14,7 @@ package org.camunda.bpm.qa.performance.engine.framework;
 
 import java.util.concurrent.ExecutionException;
 
-import org.camunda.bpm.qa.performance.engine.PerformanceTestResultRecorderRule;
+import org.camunda.bpm.qa.performance.engine.PerfTestResultRecorderRule;
 
 
 /**
@@ -25,10 +25,10 @@ public class PerfTestBuilder {
 
   protected final PerfTest perfTest;
   protected PerfTestConfiguration perfTestConfiguration;
-  protected PerformanceTestResultRecorderRule resultRecorder;
+  protected PerfTestResultRecorderRule resultRecorder;
 
   public PerfTestBuilder(PerfTestConfiguration perfTestConfiguration,
-                                  PerformanceTestResultRecorderRule resultRecorder) {
+                                  PerfTestResultRecorderRule resultRecorder) {
     this.perfTestConfiguration = perfTestConfiguration;
     this.resultRecorder = resultRecorder;
     perfTest = new PerfTest();

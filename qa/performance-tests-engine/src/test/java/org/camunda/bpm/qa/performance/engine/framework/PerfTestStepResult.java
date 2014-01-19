@@ -27,6 +27,9 @@ public class PerfTestStepResult {
     this.resultData = resultData;
   }
 
+  public PerfTestStepResult() {
+  }
+
   public Object getResultData() {
     return resultData;
   }

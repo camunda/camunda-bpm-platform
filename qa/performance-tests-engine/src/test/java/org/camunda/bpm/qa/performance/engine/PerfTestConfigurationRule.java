@@ -28,7 +28,7 @@ import org.junit.runner.Description;
  * @author Daniel Meyer
  *
  */
-public class PerformanceTestConfigurationRule extends TestWatcher {
+public class PerfTestConfigurationRule extends TestWatcher {
 
   private static final String PROPERTY_FILE_NAME = "PerformaceTestConfiguration.properties";
 
