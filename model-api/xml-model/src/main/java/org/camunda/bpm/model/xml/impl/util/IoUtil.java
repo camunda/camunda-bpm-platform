@@ -12,14 +12,12 @@
  */
 package org.camunda.bpm.model.xml.impl.util;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import org.w3c.dom.Document;
+
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
 
 /**
  * @author Daniel Meyer
@@ -89,5 +87,25 @@ public class IoUtil {
   public static InputStream convertOutputStreamToInputStream(OutputStream outputStream) {
     byte[] data = ((ByteArrayOutputStream) outputStream).toByteArray();
     return new ByteArrayInputStream(data);
+  }
+
+  /**
+   * Converts a {@link org.w3c.dom.Document} to its String representation
+   *
+   * @param document  the XML document to convert
+   */
+  public static String convertXmlDocumentToString(Document document) {
+    StringWriter stringWriter = new StringWriter();
+    try {
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
+    } catch (TransformerConfigurationException e) {
+      e.printStackTrace();
+    } catch (TransformerException e) {
+      e.printStackTrace();
+    }
+    return stringWriter.toString();
   }
 }
