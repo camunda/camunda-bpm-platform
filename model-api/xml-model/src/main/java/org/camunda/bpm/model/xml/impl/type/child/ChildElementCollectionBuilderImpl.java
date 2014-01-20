@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.model.xml.impl.type.child;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.ModelBuildOperation;
@@ -19,13 +22,10 @@ import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.type.reference.ElementReferenceCollectionBuilderImpl;
 import org.camunda.bpm.model.xml.impl.type.reference.QNameElementReferenceCollectionBuilderImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.child.ChildElementCollectionBuilder;
-import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollectionBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollectionBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Daniel Meyer
@@ -81,14 +81,12 @@ public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> i
     return collection;
   }
 
-  @Override
   public <V extends ModelElementInstance> ElementReferenceCollectionBuilder<V,T> qNameElementReferenceCollection(Class<V> referenceTargetType) {
     QNameElementReferenceCollectionBuilderImpl<V,T> builder = new QNameElementReferenceCollectionBuilderImpl<V,T>(childElementType, referenceTargetType, collection, containingType);
     setReferenceBuilder(builder);
     return builder;
   }
 
-  @Override
   public <V extends ModelElementInstance> ElementReferenceCollectionBuilder<V, T> idElementReferenceCollection(Class<V> referenceTargetType) {
     ElementReferenceCollectionBuilder<V,T> builder = new ElementReferenceCollectionBuilderImpl<V,T>(childElementType, referenceTargetType, collection);
     setReferenceBuilder(builder);

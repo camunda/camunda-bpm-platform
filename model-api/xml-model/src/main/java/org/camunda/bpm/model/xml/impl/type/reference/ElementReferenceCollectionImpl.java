@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.model.xml.impl.type.reference;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelReferenceException;
 import org.camunda.bpm.model.xml.UnsupportedModelOperationException;
@@ -22,15 +26,11 @@ import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * @author Sebastian Menski
@@ -44,7 +44,6 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
     this.referenceSourceCollection = referenceSourceCollection;
   }
 
-  @Override
   public ChildElementCollection<V> getReferenceSourceCollection() {
     return referenceSourceCollection;
   }
@@ -82,7 +81,6 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
     }
   }
 
-  @Override
   public String getReferenceIdentifier(ModelElementInstance referenceSourceElement) {
     return referenceSourceElement.getTextContent();
   }
@@ -135,21 +133,18 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
     return referenceTargetElements;
   }
 
-  @Override
   public Collection<T> getReferenceTargetElements(final ModelElementInstanceImpl referenceSourceParentElement) {
 
     return new Collection<T>() {
-      @Override
+
       public int size() {
         return getView(referenceSourceParentElement).size();
       }
 
-      @Override
       public boolean isEmpty() {
         return getView(referenceSourceParentElement).isEmpty();
       }
 
-      @Override
       public boolean contains(Object o) {
         if (o == null) {
           return false;
@@ -162,25 +157,21 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
         }
       }
 
-      @Override
       public Iterator<T> iterator() {
         Collection<T> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
         return modelElementCollection.iterator();
       }
 
-      @Override
       public Object[] toArray() {
         Collection<T> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
         return modelElementCollection.toArray();
       }
 
-      @Override
       public <T1> T1[] toArray(T1[] a) {
         Collection<T> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
         return modelElementCollection.toArray(a);
       }
 
-      @Override
       public boolean add(T t) {
         if (referenceSourceCollection.isImmutable()) {
           throw new UnsupportedModelOperationException("add()", "collection is immutable");
@@ -191,7 +182,6 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
         }
       }
 
-      @Override
       public boolean remove(Object o) {
         if (referenceSourceCollection.isImmutable()) {
           throw new UnsupportedModelOperationException("remove()", "collection is immutable");
@@ -203,12 +193,10 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
         }
       }
 
-      @Override
       public boolean containsAll(Collection<?> c) {
         return getView(referenceSourceParentElement).containsAll(c);
       }
 
-      @Override
       public boolean addAll(Collection<? extends T> c) {
         if (referenceSourceCollection.isImmutable()) {
           throw new UnsupportedModelOperationException("addAll()", "collection is immutable");
@@ -223,7 +211,6 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
 
       }
 
-      @Override
       public boolean removeAll(Collection<?> c) {
         if (referenceSourceCollection.isImmutable()) {
           throw new UnsupportedModelOperationException("removeAll()", "collection is immutable");
@@ -237,12 +224,10 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
         }
       }
 
-      @Override
       public boolean retainAll(Collection<?> c) {
         throw new UnsupportedModelOperationException("retainAll()", "not implemented");
       }
 
-      @Override
       public void clear() {
         if (referenceSourceCollection.isImmutable()) {
           throw new UnsupportedModelOperationException("clear()", "collection is immutable");

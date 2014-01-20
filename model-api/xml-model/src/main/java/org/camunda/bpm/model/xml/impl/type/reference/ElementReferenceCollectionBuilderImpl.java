@@ -52,7 +52,6 @@ public class ElementReferenceCollectionBuilderImpl<T extends ModelElementInstanc
     this.elementReferenceCollectionImpl = new ElementReferenceCollectionImpl<T, V>(collection);
   }
 
-  @Override
   public ElementReferenceCollection<T, V> build() {
     return elementReferenceCollectionImpl;
   }

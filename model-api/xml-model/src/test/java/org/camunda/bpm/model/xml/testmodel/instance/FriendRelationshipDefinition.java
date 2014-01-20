@@ -13,13 +13,13 @@
 
 package org.camunda.bpm.model.xml.testmodel.instance;
 
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.TYPE_NAME_FRIEND_RELATIONSHIP_DEFINITION;
+
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
-
-import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
-import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.TYPE_NAME_FRIEND_RELATIONSHIP_DEFINITION;
-import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
 /**
  * @author Sebastian Menski
@@ -31,7 +31,7 @@ public class FriendRelationshipDefinition extends RelationshipDefinition {
       .namespaceUri(MODEL_NAMESPACE)
       .extendsType(RelationshipDefinition.class)
       .instanceProvider(new ModelTypeInstanceProvider<FriendRelationshipDefinition>() {
-        @Override
+
         public FriendRelationshipDefinition newInstance(ModelTypeInstanceContext instanceContext) {
           return new FriendRelationshipDefinition(instanceContext);
         }

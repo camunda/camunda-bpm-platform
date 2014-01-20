@@ -25,11 +25,11 @@ import org.camunda.bpm.model.xml.impl.type.attribute.IntegerAttributeBuilder;
 import org.camunda.bpm.model.xml.impl.type.attribute.StringAttributeBuilderImpl;
 import org.camunda.bpm.model.xml.impl.type.child.SequenceBuilderImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.attribute.AttributeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
-import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
+import org.camunda.bpm.model.xml.type.attribute.AttributeBuilder;
 import org.camunda.bpm.model.xml.type.attribute.StringAttributeBuilder;
+import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
 /**
  * @author Daniel Meyer
@@ -77,7 +77,6 @@ public class ModelElementTypeBuilderImpl implements ModelElementTypeBuilder, Mod
     return builder;
   }
 
-  @Override
   public AttributeBuilder<Integer> integerAttribute(String attributeName) {
     IntegerAttributeBuilder builder = new IntegerAttributeBuilder(attributeName, modelType);
     modelBuildOperations.add(builder);

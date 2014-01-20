@@ -13,13 +13,13 @@
 
 package org.camunda.bpm.model.xml.testmodel.instance;
 
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.TYPE_NAME_CHILD_RELATIONSHIP_DEFINITION;
+
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
-
-import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
-import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.TYPE_NAME_CHILD_RELATIONSHIP_DEFINITION;
-import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
 /**
  * @author Sebastian Menski
@@ -31,7 +31,7 @@ public class ChildRelationshipDefinition extends RelationshipDefinition {
       .namespaceUri(MODEL_NAMESPACE)
       .extendsType(RelationshipDefinition.class)
       .instanceProvider(new ModelTypeInstanceProvider<ChildRelationshipDefinition>() {
-        @Override
+
         public ChildRelationshipDefinition newInstance(ModelTypeInstanceContext instanceContext) {
           return new ChildRelationshipDefinition(instanceContext);
         }

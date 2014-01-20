@@ -27,9 +27,9 @@ import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -235,7 +235,6 @@ public class ModelElementTypeImpl implements ModelElementType {
    * @param attributeName the name of the attribute
    * @return the attribute or null if it not exists
    */
-  @Override
   public Attribute<?> getAttribute(String attributeName) {
     for (Attribute<?> attribute : getAllAttributes()) {
       if (attribute.getAttributeName().equals(attributeName)) {

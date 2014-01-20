@@ -18,8 +18,8 @@ import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.type.reference.AttributeReferenceBuilderImpl;
 import org.camunda.bpm.model.xml.impl.type.reference.QNameAttributeReferenceBuilderImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.reference.AttributeReferenceBuilder;
 import org.camunda.bpm.model.xml.type.attribute.StringAttributeBuilder;
+import org.camunda.bpm.model.xml.type.reference.AttributeReferenceBuilder;
 
 
 /**
@@ -47,7 +47,6 @@ public class StringAttributeBuilderImpl extends AttributeBuilderImpl<String> imp
     return referenceBuilder;
   }
 
-  @Override
   public <V extends ModelElementInstance> AttributeReferenceBuilder<V> idAttributeReference(Class<V> referenceTargetElement) {
     AttributeReferenceBuilderImpl<V> referenceBuilder = new AttributeReferenceBuilderImpl<V>(attribute, referenceTargetElement);
     setAttributeReference(referenceBuilder);

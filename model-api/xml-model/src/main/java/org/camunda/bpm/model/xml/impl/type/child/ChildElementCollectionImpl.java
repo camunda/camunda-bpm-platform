@@ -21,8 +21,8 @@ import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.impl.util.DomUtil.ElementNodeListFilter;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -92,7 +92,6 @@ public abstract class ChildElementCollectionImpl<T extends ModelElementInstance>
     return maxOccurs;
   }
 
-  @Override
   public ModelElementType getContainingType() {
     return containingType;
   }
