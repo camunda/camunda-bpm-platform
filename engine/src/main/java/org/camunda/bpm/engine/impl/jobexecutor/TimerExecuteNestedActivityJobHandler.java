@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,9 +26,9 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  * @author Joram Barrez
  */
 public class TimerExecuteNestedActivityJobHandler implements JobHandler {
-  
+
   private static Logger log = Logger.getLogger(TimerExecuteNestedActivityJobHandler.class.getName());
-  
+
   public static final String TYPE = "timer-transition";
 
   public String getType() {
@@ -43,15 +43,13 @@ public class TimerExecuteNestedActivityJobHandler implements JobHandler {
     }
 
     try {
-      
-      borderEventActivity
-        .getActivityBehavior()
-        .execute(execution);
-      
+
+      execution.executeActivity(borderEventActivity);
+
     } catch (RuntimeException e) {
       log.log(Level.SEVERE, "exception during timer execution", e);
       throw e;
-      
+
     } catch (Exception e) {
       log.log(Level.SEVERE, "exception during timer execution", e);
       throw new ProcessEngineException("exception during timer execution: "+e.getMessage(), e);

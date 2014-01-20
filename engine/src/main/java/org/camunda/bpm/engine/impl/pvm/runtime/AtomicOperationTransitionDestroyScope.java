@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,23 +24,23 @@ import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
  * @author Tom Baeyens
  */
 public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
-  
+
   private static Logger log = Logger.getLogger(AtomicOperationTransitionDestroyScope.class.getName());
-  
+
   public boolean isAsync(InterpretableExecution execution) {
     return false;
   }
 
   @SuppressWarnings("unchecked")
   public void execute(InterpretableExecution execution) {
-    
+
     // calculate the propagating execution
     InterpretableExecution propagatingExecution = null;
 
     ActivityImpl activity = (ActivityImpl) execution.getActivity();
     // if this transition is crossing a scope boundary
     if (activity.isScope()) {
-      
+
       InterpretableExecution parentScopeInstance = null;
       // if this is a concurrent execution crossing a scope boundary
       if (execution.isConcurrent() && !execution.isScope()) {
@@ -56,28 +56,28 @@ public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
           // it now becomes a concurrent execution
           parentScopeInstanceExecutions.get(0).setConcurrent(true);
         }
-        
+
         concurrentRootExecutions.remove(execution);
         parentScopeInstanceExecutions.add(execution);
         execution.setParent(parentScopeInstance);
         execution.setActivity(activity);
         propagatingExecution = execution;
-        
+
         // if there is only a single concurrent execution left
-        // in the concurrent root, auto-prune it.  meaning, the 
+        // in the concurrent root, auto-prune it.  meaning, the
         // last concurrent child execution data should be cloned into
-        // the concurrent root.   
+        // the concurrent root.
         if (concurrentRootExecutions.size()==1) {
           InterpretableExecution lastConcurrent = concurrentRootExecutions.get(0);
           if (lastConcurrent.isScope()) {
             lastConcurrent.setConcurrent(false);
-            
+
           } else {
             log.fine("merging last concurrent "+lastConcurrent+" into concurrent root "+concurrentRoot);
-            
+
             // We can't just merge the data of the lastConcurrent into the concurrentRoot.
-            // This is because the concurrent root might be in a takeAll-loop.  So the 
-            // concurrent execution is the one that will be receiveing the take
+            // This is because the concurrent root might be in a takeAll-loop.  So the
+            // concurrent execution is the one that will be receiving the take
             concurrentRoot.setActivity((ActivityImpl) lastConcurrent.getActivity());
             concurrentRoot.setActive(lastConcurrent.isActive());
             lastConcurrent.setReplacedBy(concurrentRoot);
@@ -91,7 +91,7 @@ public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
         // TODO!
         execution.destroy();
         propagatingExecution = execution;
-        
+
       } else {
         propagatingExecution = (InterpretableExecution) execution.getParent();
         propagatingExecution.setActivity((ActivityImpl) execution.getActivity());
@@ -101,16 +101,16 @@ public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
         execution.destroy();
         execution.remove();
       }
-      
+
     } else {
       propagatingExecution = execution;
     }
-    
+
     // if there is another scope element that is ended
     ScopeImpl nextOuterScopeElement = activity.getParent();
     TransitionImpl transition = propagatingExecution.getTransition();
     ActivityImpl destination = transition.getDestination();
-    if (transitionLeavesNextOuterScope(nextOuterScopeElement, destination)) {
+    if (transitionLeavesNextOuterScope(nextOuterScopeElement, activity, destination)) {
       propagatingExecution.setActivity((ActivityImpl) nextOuterScopeElement);
       propagatingExecution.performOperation(TRANSITION_NOTIFY_LISTENER_END);
     } else {
@@ -118,8 +118,8 @@ public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
     }
   }
 
-  public boolean transitionLeavesNextOuterScope(ScopeImpl nextScopeElement, ActivityImpl destination) {
-    return !nextScopeElement.contains(destination);
+  public boolean transitionLeavesNextOuterScope(ScopeImpl nextScopeElement, ActivityImpl current, ActivityImpl destination) {
+    return !current.isCancelScope() && !current.isConcurrent() && !nextScopeElement.contains(destination);
   }
 
   @Override

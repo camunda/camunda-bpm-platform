@@ -1,4 +1,4 @@
-package org.camunda.bpm.integrationtest.functional.transactions;
+package org.camunda.bpm.integrationtest.functional.jpa;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

@@ -29,8 +29,6 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 
 
 /**
@@ -202,9 +200,7 @@ public class ErrorPropagation {
 
   private static void executeEventHandler(ActivityImpl borderEventActivity, ActivityExecution leavingExecution) {
     if(borderEventActivity.getActivityBehavior() instanceof EventSubProcessStartEventActivityBehavior) {
-      InterpretableExecution execution = (InterpretableExecution) leavingExecution;
-      execution.setActivity(borderEventActivity.getParentActivity());
-      execution.performOperation(AtomicOperation.ACTIVITY_START); // make sure the listeners are invoked!
+      leavingExecution.executeActivity(borderEventActivity.getParentActivity());
     }else {
       leavingExecution.executeActivity(borderEventActivity);
     }

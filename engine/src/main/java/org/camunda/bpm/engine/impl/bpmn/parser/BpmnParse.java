@@ -38,8 +38,8 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavi
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivitiBehaviour;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivityBehaviour;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
@@ -70,6 +70,7 @@ import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
+import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
@@ -191,7 +192,6 @@ public class BpmnParse extends Parse {
 
   /**
    * Constructor to be called by the {@link BpmnParser}.
-   * @param deploymentContext
    */
   public BpmnParse(BpmnParser parser) {
     super(parser);
@@ -285,9 +285,6 @@ public class BpmnParse extends Parse {
 
   /**
    * Parses the rootElement importing structures
-   *
-   * @param rootElement
-   *          The root element of the XML file.
    */
   protected void parseImports() {
     List<Element> imports = rootElement.elements("import");
@@ -326,9 +323,6 @@ public class BpmnParse extends Parse {
    * Parses the messages of the given definitions file. Messages are not
    * contained within a process element, but they can be referenced from inner
    * process elements.
-   *
-   * @param definitionsElement
-   *          The root element of the XML file/
    */
   public void parseMessages() {
     for (Element messageElement : rootElement.elements("message")) {
@@ -344,9 +338,6 @@ public class BpmnParse extends Parse {
    * Parses the signals of the given definitions file. Signals are not
    * contained within a process element, but they can be referenced from inner
    * process elements.
-   *
-   * @param definitionsElement
-   *          The root element of the XML file/
    */
   protected void parseSignals() {
     for (Element signalElement : rootElement.elements("signal")) {
@@ -396,9 +387,6 @@ public class BpmnParse extends Parse {
   /**
    * Parses all the process definitions defined within the 'definitions' root
    * element.
-   *
-   * @param definitionsElement
-   *          The root element of the XML file.
    */
   public void parseProcessDefinitions() {
     for (Element processElement : rootElement.elements("process")) {
@@ -777,24 +765,27 @@ public class BpmnParse extends Parse {
     Element errorEventDefinition = startEventElement.element("errorEventDefinition");
     Element messageEventDefinition = startEventElement.element("messageEventDefinition");
     Element signalEventDefinition = startEventElement.element("signalEventDefinition");
+    Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
 
     if (isTriggeredByEvent) { // event subprocess
 
       // all start events of an event subprocess share common behavior
-      EventSubProcessStartEventActivityBehavior activityBehavior = new EventSubProcessStartEventActivityBehavior(startEventActivity.getId());
+      EventSubProcessStartEventActivityBehavior activityBehavior = new EventSubProcessStartEventActivityBehavior();
       startEventActivity.setActivityBehavior(activityBehavior);
 
       String isInterrupting = startEventElement.attribute("isInterrupting");
-      if(isInterrupting != null && (isInterrupting.equals("false")||isInterrupting.equals("FALSE"))) {
-        activityBehavior.setInterrupting(false);
-      }
+      boolean interrupting = isInterrupting.equalsIgnoreCase("true") ? true : false;
+
+      startEventActivity.setCancelScope(interrupting);
+      startEventActivity.setConcurrent(!interrupting);
 
       // the scope of the event subscription is the parent of the event
       // subprocess (subscription must be created when parent is initialized)
       ScopeImpl catchingScope = ((ActivityImpl) scope).getParent();
+      startEventActivity.setScope(catchingScope);
 
       if (errorEventDefinition != null) {
-        if(!activityBehavior.isInterrupting()) {
+        if(!interrupting) {
           addError("error start event of event subprocess must be interrupting", startEventElement);
         }
         if (scope.getProperty(PROPERTYNAME_INITIAL) == null) {
@@ -824,7 +815,6 @@ public class BpmnParse extends Parse {
       Element conditionalEventDefinition = startEventElement.element("conditionalEventDefinition");
       Element timerEventDefinition = startEventElement.element("timerEventDefinition");
       Element escalationEventDefinition = startEventElement.element("escalationEventDefinition");
-      Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
 
       if (conditionalEventDefinition != null) {
         addError("conditionalEventDefinition is not allowed on start event within a subprocess", conditionalEventDefinition);
@@ -881,7 +871,7 @@ public class BpmnParse extends Parse {
       addError("Invalid 'messageRef': no message with id '"+messageRef+"' found.", messageEventDefinition);
     }
 
-    return new EventSubscriptionDeclaration(messageDefinition.getName(), "message");
+    return new EventSubscriptionDeclaration(messageDefinition.getName(), MessageEventHandler.EVENT_HANDLER_TYPE);
   }
 
   @SuppressWarnings("unchecked")
@@ -921,7 +911,6 @@ public class BpmnParse extends Parse {
    * @param scopeElement
    *          The {@link ScopeImpl} to which the activities must be added.
    * @param postponedElements
-   * @param postProcessActivities
    */
   public void parseActivities(Element parentElement, ScopeImpl scopeElement, HashMap<String, Element> postponedElements) {
     for (Element activityElement : parentElement.elements()) {
@@ -1041,7 +1030,12 @@ public class BpmnParse extends Parse {
     Element linkEventDefinitionElement = intermediateEventElement.element("linkEventDefinition");
 
     // shared by all events except for link event
-    IntermediateCatchEventActivitiBehaviour defaultCatchBehaviour = new IntermediateCatchEventActivitiBehaviour();
+    IntermediateCatchEventActivityBehavior defaultCatchBehaviour = new IntermediateCatchEventActivityBehavior(isAfterEventBasedGateway);
+
+    if(isAfterEventBasedGateway) {
+      nestedActivity.setCancelScope(true);
+      nestedActivity.setScope(scopeElement.getParentScope());
+    }
 
     if (timerEventDefinition != null) {
       nestedActivity.setActivityBehavior(defaultCatchBehaviour);
@@ -1053,10 +1047,13 @@ public class BpmnParse extends Parse {
 
     } else if(messageEventDefinition != null) {
       nestedActivity.setActivityBehavior(defaultCatchBehaviour);
-      parseIntemediateMessageEventDefinition(messageEventDefinition, nestedActivity, isAfterEventBasedGateway);
+      parseIntermediateMessageEventDefinition(messageEventDefinition, nestedActivity, isAfterEventBasedGateway);
 
     } else if(linkEventDefinitionElement != null) {
-      nestedActivity.setActivityBehavior(new IntermediateCatchLinkEventActivityBehaviour());
+      if (isAfterEventBasedGateway) {
+        addError("IntermediateCatchLinkEvent is not allowed after an EventBasedGateway.", intermediateEventElement);
+      }
+      nestedActivity.setActivityBehavior(new IntermediateCatchLinkEventActivityBehavior());
       parseIntermediateLinkEventCatchBehavior(intermediateEventElement, nestedActivity, linkEventDefinitionElement);
 
     } else {
@@ -1093,7 +1090,7 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected void parseIntemediateMessageEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity, boolean isAfterEventBasedGateway) {
+  protected void parseIntermediateMessageEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity, boolean isAfterEventBasedGateway) {
 
     nestedActivity.setProperty("type", "intermediateMessageCatch");
 
@@ -1148,7 +1145,7 @@ public class BpmnParse extends Parse {
     } else if (messageEventDefinitionElement != null) {
       if (isServiceTaskLike(messageEventDefinitionElement)) {
 
-        // CAM-436 same behaviour as service task
+        // CAM-436 same behavior as service task
         activityBehavior = parseServiceTaskLike("intermediateMessageThrowEvent", messageEventDefinitionElement, scopeElement).getActivityBehavior();
       } else {
         // default to non behavior if no service task
@@ -1821,6 +1818,13 @@ public class BpmnParse extends Parse {
 
     parseExecutionListenersOnScope(receiveTaskElement, activity);
 
+    if (receiveTaskElement.attribute("messageRef") != null) {
+      activity.setScope(true);
+      EventSubscriptionDeclaration declaration = parseMessageEventDefinition(receiveTaskElement);
+      declaration.setActivityId(activity.getActivityId());
+      addEventSubscriptionDeclaration(declaration, activity, receiveTaskElement);
+    }
+
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseReceiveTask(receiveTaskElement, scope, activity);
     }
@@ -2125,6 +2129,7 @@ public class BpmnParse extends Parse {
         }
       } else if (terminateEventDefinition != null) {
         activity.setActivityBehavior(new TerminateEndEventActivityBehavior());
+        activity.setCancelScope(true);
       } else if (messageEventDefinitionElement != null) {
         if (isServiceTaskLike(messageEventDefinitionElement)) {
 
@@ -2204,33 +2209,43 @@ public class BpmnParse extends Parse {
       Element cancelEventDefinition = boundaryEventElement.element("cancelEventDefinition");
       Element compensateEventDefinition = boundaryEventElement.element("compensateEventDefinition");
       Element messageEventDefinition = boundaryEventElement.element("messageEventDefinition");
+
+      behavior = new BoundaryEventActivityBehavior();
       if (timerEventDefinition != null) {
-    	behavior = new BoundaryEventActivityBehavior(interrupting, nestedActivity.getId());
         parseBoundaryTimerEventDefinition(timerEventDefinition, interrupting, nestedActivity);
+
       } else if (errorEventDefinition != null) {
-        interrupting = true; // non-interrupting not yet supported
-        behavior = new BoundaryEventActivityBehavior(interrupting, nestedActivity.getId());
+        interrupting = true; // always interrupting
         parseBoundaryErrorEventDefinition(errorEventDefinition, interrupting, parentActivity, nestedActivity);
+
       } else if (signalEventDefinition != null) {
-    	behavior = new BoundaryEventActivityBehavior(interrupting, nestedActivity.getId());
         parseBoundarySignalEventDefinition(signalEventDefinition, interrupting, nestedActivity);
+
       } else if (cancelEventDefinition != null) {
-        // always interrupting
         behavior = parseBoundaryCancelEventDefinition(cancelEventDefinition, nestedActivity);
+
       } else if(compensateEventDefinition != null) {
-        behavior = new BoundaryEventActivityBehavior(interrupting, nestedActivity.getId());
         parseCatchCompensateEventDefinition(compensateEventDefinition, nestedActivity);
+
       } else if(messageEventDefinition != null) {
-        behavior = new BoundaryEventActivityBehavior(interrupting, nestedActivity.getId());
         parseBoundaryMessageEventDefinition(messageEventDefinition, interrupting, nestedActivity);
+
       } else {
         addError("Unsupported boundary event type", boundaryEventElement);
+
       }
 
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseBoundaryEvent(boundaryEventElement, scopeElement, nestedActivity);
       }
 
+      if(cancelEventDefinition == null) {
+        nestedActivity.setCancelScope(interrupting);
+        nestedActivity.setConcurrent(!interrupting);
+      }
+
+      // scope of the boundary event is the parent of the activity to which it is attached.
+      nestedActivity.setScope(parentActivity.getParentScope());
       nestedActivity.setActivityBehavior(behavior);
     }
   }
@@ -2774,7 +2789,7 @@ public class BpmnParse extends Parse {
         addError("Invalid destination '" + destinationRef + "' of sequence flow '" + id + "'", sequenceFlowElement);
       } else if(sourceActivity.getActivityBehavior() instanceof EventBasedGatewayActivityBehavior) {
         // ignore
-      } else if(destinationActivity.getActivityBehavior() instanceof IntermediateCatchEventActivitiBehaviour
+      } else if(destinationActivity.getActivityBehavior() instanceof IntermediateCatchEventActivityBehavior
               && (destinationActivity.getParentActivity() != null)
               && (destinationActivity.getParentActivity().getActivityBehavior() instanceof EventBasedGatewayActivityBehavior)) {
         addError("Invalid incoming sequenceflow for intermediateCatchEvent with id '"+destinationActivity.getId()+"' connected to an event-based gateway.", sequenceFlowElement);
@@ -2828,7 +2843,6 @@ public class BpmnParse extends Parse {
    *          the XML element containing the scope definition.
    * @param scope
    *          the scope to add the executionListeners to.
-   * @param postProcessActivities
    */
   public void parseExecutionListenersOnScope(Element scopeElement, ScopeImpl scope) {
     Element extentionsElement = scopeElement.element("extensionElements");

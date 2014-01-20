@@ -10,21 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.bpmn.behavior;
+package org.camunda.bpm.engine.impl.pvm.runtime;
 
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+/**
+ * @author Daniel Meyer
+ * @author Roman Smirnov
+ *
+ */
+public class AtomicOperationActivityStartConcurrent extends AtomicOperationCreateConcurrentExecution {
 
-
-public class IntermediateCatchEventActivitiBehaviour extends AbstractBpmnActivityBehavior {
-
-
-  public void execute(ActivityExecution execution) throws Exception {
-    // Do nothing: waitstate behavior
+  protected void concurrentExecutionCreated(InterpretableExecution propagatingExecution) {
+    propagatingExecution.performOperation(ACTIVITY_START);
   }
 
-  @Override
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-    leave(execution);
+  public String getCanonicalName() {
+    return "activity-start-concurrent";
   }
+
 }
-

@@ -1,14 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.0.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-428d675b-5bfe-4222-9464-77cdc5cc4578" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <message id="sid-c8edeccd-4203-4c32-a92a-ef915a974091" name=""/>
-   <collaboration id="sid-a6ec941d-46c3-445d-9bff-1c0894fb8205">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-5ca52539-a6e2-422f-be13-3731bdf6dcb7" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <message id="sid-8d387a27-2ffe-4978-80ce-6c23ae2dfe92" name=""/>
+   <collaboration id="sid-d3e3ad23-8c59-477c-b53c-2f84fe73a415">
       <participant id="Process_Engine_1" name="Process Engine" processRef="HEMERA-1820_">
          <extensionElements/>
       </participant>
    </collaboration>
    <process id="HEMERA-1820_" isClosed="false" isExecutable="true" name="Process Engine" processType="None">
       <extensionElements/>
-      <laneSet id="sid-64193527-49f2-4a06-91d3-efb2ae79e2c9">
+      <laneSet id="sid-b2e6de20-351f-4bf3-b61b-32ebd4b1faa6">
          <lane id="lane_5">
+            <extensionElements>
+               <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
+            </extensionElements>
             <flowNodeRef>startEvent_16</flowNodeRef>
             <flowNodeRef>exclusiveGateway_21</flowNodeRef>
             <flowNodeRef>Task_1_27</flowNodeRef>
@@ -19,32 +22,53 @@
          </lane>
       </laneSet>
       <startEvent id="startEvent_16" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <outgoing>sequenceFlow_52</outgoing>
-         <messageEventDefinition id="sid-35df120f-1dbf-441e-b802-d25a7319fee7" messageRef="sid-c8edeccd-4203-4c32-a92a-ef915a974091"/>
+         <messageEventDefinition id="sid-6e7eca48-6b93-4e89-bb11-4bc0cddae8e9" messageRef="sid-8d387a27-2ffe-4978-80ce-6c23ae2dfe92"/>
       </startEvent>
       <exclusiveGateway default="sequenceFlow_58" gatewayDirection="Diverging" id="exclusiveGateway_21" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <incoming>sequenceFlow_55</incoming>
          <outgoing>sequenceFlow_54</outgoing>
          <outgoing>sequenceFlow_58</outgoing>
       </exclusiveGateway>
       <task completionQuantity="1" id="Task_1_27" isForCompensation="false" name="Task 1" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+         </extensionElements>
          <incoming>sequenceFlow_52</incoming>
          <outgoing>sequenceFlow_55</outgoing>
       </task>
       <task completionQuantity="1" id="Task_2_32" isForCompensation="false" name="Task 2" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+         </extensionElements>
          <incoming>sequenceFlow_58</incoming>
          <outgoing>sequenceFlow_56</outgoing>
       </task>
       <task completionQuantity="1" id="Task_3_37" isForCompensation="false" name="Task 3" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+         </extensionElements>
          <incoming>sequenceFlow_54</incoming>
          <outgoing>sequenceFlow_53</outgoing>
       </task>
       <exclusiveGateway gatewayDirection="Converging" id="exclusiveGateway_42" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <incoming>sequenceFlow_53</incoming>
          <incoming>sequenceFlow_56</incoming>
          <outgoing>sequenceFlow_57</outgoing>
       </exclusiveGateway>
       <endEvent id="endEvent_48" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <incoming>sequenceFlow_57</incoming>
       </endEvent>
       <sequenceFlow id="sequenceFlow_52" isImmediate="true" name="" sourceRef="startEvent_16" targetRef="Task_1_27"/>
@@ -55,8 +79,8 @@
       <sequenceFlow id="sequenceFlow_57" isImmediate="true" name="" sourceRef="exclusiveGateway_42" targetRef="endEvent_48"/>
       <sequenceFlow id="sequenceFlow_58" isImmediate="true" name="" sourceRef="exclusiveGateway_21" targetRef="Task_2_32"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-78368fe7-7a0c-4f40-a59e-b7b4322a5da1">
-      <bpmndi:BPMNPlane bpmnElement="sid-a6ec941d-46c3-445d-9bff-1c0894fb8205" id="sid-be8e02c7-1c63-4bce-860a-6ff18ee16bf0">
+   <bpmndi:BPMNDiagram id="sid-27ee95d3-f9b6-4291-8b0d-2b340d484f3b">
+      <bpmndi:BPMNPlane bpmnElement="sid-d3e3ad23-8c59-477c-b53c-2f84fe73a415" id="sid-e061172f-d7ba-40ef-a5b4-34b325ea0b7f">
          <bpmndi:BPMNShape bpmnElement="Process_Engine_1" id="Process_Engine_1_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="677.0" x="0.0" y="0.0"/>
          </bpmndi:BPMNShape>

@@ -8,9 +8,9 @@
   
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-root</artifactId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../../parent</relativePath>
     <version>7.1.0-SNAPSHOT</version>
-    <relativePath>../..</relativePath>
   </parent>
   
   <properties>
@@ -135,5 +135,18 @@
       </dependency>      
     </dependencies>
   </dependencyManagement>
-   
+  
+  <!-- 
+    We need this repository to fetch the ancient libraries
+
+      org.tigris.subversion:svnclientadapter:0.9.100
+      org.xnap.commons:gettext-commons:0.9.6
+  -->
+  <repositories>
+    <repository>
+      <id>camunda public</id>
+      <name>camunda</name>
+      <url>https://app.camunda.com/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
 </project>

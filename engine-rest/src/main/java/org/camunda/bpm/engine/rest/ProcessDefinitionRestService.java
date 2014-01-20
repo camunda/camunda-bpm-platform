@@ -43,7 +43,10 @@ public interface ProcessDefinitionRestService {
   public static final String PATH = "/process-definition";
 
   @Path("/{id}")
-  ProcessDefinitionResource getProcessDefinition(@PathParam("id") String processDefinitionId);
+  ProcessDefinitionResource getProcessDefinitionById(@PathParam("id") String processDefinitionId);
+
+  @Path("/key/{key}")
+  ProcessDefinitionResource getProcessDefinitionByKey(@PathParam("key") String processDefinitionKey);
 
   /**
    * Exposes the {@link ProcessDefinitionQuery} interface as a REST service.

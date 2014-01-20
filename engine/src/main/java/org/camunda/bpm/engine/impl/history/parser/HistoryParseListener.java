@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,6 @@ import java.util.List;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
@@ -33,26 +32,26 @@ import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 
 /**
- * <p>This class is responsible for wiring history as execution listeners into process execution. 
- * 
- * <p>NOTE: the role of this class has changed since 7.0: in order to customize history behavior it is 
- * usually not necessary to override this class but rather the {@link HistoryEventProducer} for 
- * customizing data acquisition and {@link HistoryEventHandler} for customizing the persistence behavior 
+ * <p>This class is responsible for wiring history as execution listeners into process execution.
+ *
+ * <p>NOTE: the role of this class has changed since 7.0: in order to customize history behavior it is
+ * usually not necessary to override this class but rather the {@link HistoryEventProducer} for
+ * customizing data acquisition and {@link HistoryEventHandler} for customizing the persistence behavior
  * or if you need a history event stream.
- *  
+ *
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Falko Menge
  * @author Bernd Ruecker (camunda)
  * @author Christian Lipphardt (camunda)
- * 
+ *
  * @author Daniel Meyer
  */
 public class HistoryParseListener implements BpmnParseListener {
 
   // Cached listeners
-  // listeners can be reused for a given process engine instance but cannot be cached in static fields since 
-  // different process engine instances on the same Classloader may have different HistoryEventProducer 
+  // listeners can be reused for a given process engine instance but cannot be cached in static fields since
+  // different process engine instances on the same Classloader may have different HistoryEventProducer
   // configurations wired
   protected ExecutionListener PROCESS_INSTANCE_START_LISTENER;
   protected ExecutionListener PROCESS_INSTANCE_END_LISTENER;
@@ -74,10 +73,10 @@ public class HistoryParseListener implements BpmnParseListener {
   protected void initExecutionListeners(HistoryEventProducer historyEventProducer) {
     PROCESS_INSTANCE_START_LISTENER = new ProcessInstanceStartListener(historyEventProducer);
     PROCESS_INSTANCE_END_LISTENER = new ProcessInstanceEndListener(historyEventProducer);
-    
+
     ACTIVITY_INSTANCE_START_LISTENER = new ActivityInstanceStartListener(historyEventProducer);
     ACTIVITY_INSTANCE_END_LISTENER = new ActivityInstanceEndListener(historyEventProducer);
-    
+
     USER_TASK_ASSIGNMENT_HANDLER = new ActivityInstanceUpdateListener(historyEventProducer);
     USER_TASK_ID_HANDLER = USER_TASK_ASSIGNMENT_HANDLER;
   }
@@ -151,7 +150,7 @@ public class HistoryParseListener implements BpmnParseListener {
   }
 
   public void parseParallelGateway(Element parallelGwElement, ScopeImpl scope, ActivityImpl activity) {
-    addActivityHandlers(activity);    
+    addActivityHandlers(activity);
   }
 
   public void parseBoundaryTimerEventDefinition(Element timerEventDefinition, boolean interrupting, ActivityImpl timerActivity) {
@@ -171,15 +170,15 @@ public class HistoryParseListener implements BpmnParseListener {
 
   public void parseRootElement(Element rootElement, List<ProcessDefinitionEntity> processDefinitions) {
   }
-  
+
   public void parseBoundarySignalEventDefinition(Element signalEventDefinition, boolean interrupting, ActivityImpl signalActivity) {
   }
-  
+
   public void parseEventBasedGateway(Element eventBasedGwElement, ScopeImpl scope, ActivityImpl activity) {
-    // TODO: Shall we add audit logging here as well? 
+    addActivityHandlers(activity);
   }
-  
-  public void parseMultiInstanceLoopCharacteristics(Element activityElement, 
+
+  public void parseMultiInstanceLoopCharacteristics(Element activityElement,
           Element multiInstanceLoopCharacteristicsElement, ActivityImpl activity) {
     // Remove any history parse listeners already attached: the Multi instance behavior will
     // call them for every instance that will be created
@@ -206,9 +205,9 @@ public class HistoryParseListener implements BpmnParseListener {
   }
 
   public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl activity) {
-    // TODO: Add to audit logging? Discuss
+    addActivityHandlers(activity);
   }
-  
+
   public void parseIntermediateMessageCatchEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity) {
   }
 
@@ -235,9 +234,9 @@ public class HistoryParseListener implements BpmnParseListener {
   public static boolean variableHistoryEnabled(ScopeImpl scopeElement, int historyLevel) {
     return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY;
   }
-  
+
   public static boolean activityHistoryEnabled(ScopeImpl scopeElement, int historyLevel) {
     return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY;
   }
-  
+
 }

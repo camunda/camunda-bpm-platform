@@ -1,33 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.0.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-5d5c657b-19f4-4cdf-8a8b-72ebfdd177cf" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <collaboration id="sid-9a8a4ff2-cb53-493e-b2cc-2042bbbc94b9">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-6029fb47-fc19-4b59-8351-fa8b9014db5a" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <collaboration id="sid-760f8534-8ae6-4e33-a0e4-9409d3024696">
       <participant id="TestLane_1" name="TestLane" processRef="CollaborationDropTest_">
          <extensionElements/>
       </participant>
    </collaboration>
    <process id="CollaborationDropTest_" isClosed="false" isExecutable="true" name="TestLane" processType="None">
       <extensionElements/>
-      <laneSet id="sid-baba5c44-c165-4b83-9918-79eac635a5ac">
+      <laneSet id="sid-39897862-0d15-4409-8250-238729a51e90">
          <lane id="lane_5">
+            <extensionElements>
+               <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
+            </extensionElements>
             <flowNodeRef>startEvent_12</flowNodeRef>
             <flowNodeRef>Task1_16</flowNodeRef>
             <flowNodeRef>endEvent_23</flowNodeRef>
          </lane>
       </laneSet>
       <startEvent id="startEvent_12" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <outgoing>sequenceFlow_27</outgoing>
       </startEvent>
       <task completionQuantity="1" id="Task1_16" isForCompensation="false" name="Task1" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+         </extensionElements>
          <incoming>sequenceFlow_27</incoming>
          <outgoing>sequenceFlow_28</outgoing>
       </task>
       <endEvent id="endEvent_23" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <incoming>sequenceFlow_28</incoming>
       </endEvent>
       <sequenceFlow id="sequenceFlow_28" isImmediate="true" name="" sourceRef="Task1_16" targetRef="endEvent_23"/>
       <sequenceFlow id="sequenceFlow_27" isImmediate="true" name="" sourceRef="startEvent_12" targetRef="Task1_16"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-82ebe566-13f4-4ddc-a60f-17cf1c961562">
-      <bpmndi:BPMNPlane bpmnElement="sid-9a8a4ff2-cb53-493e-b2cc-2042bbbc94b9" id="sid-5f056a5b-6da6-450c-9400-d34a8754f326">
+   <bpmndi:BPMNDiagram id="sid-3230e2d6-f4b5-4e39-a981-51d6f73a6b36">
+      <bpmndi:BPMNPlane bpmnElement="sid-760f8534-8ae6-4e33-a0e4-9409d3024696" id="sid-78e7c664-caa7-41cb-a16f-d5898824880b">
          <bpmndi:BPMNShape bpmnElement="TestLane_1" id="TestLane_1_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="600.0" x="0.0" y="0.0"/>
          </bpmndi:BPMNShape>

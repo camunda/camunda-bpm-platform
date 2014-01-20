@@ -9,9 +9,9 @@
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-root</artifactId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../../parent</relativePath>
     <version>7.1.0-SNAPSHOT</version>
-    <relativePath>../..</relativePath>
   </parent>
 
   <profiles>

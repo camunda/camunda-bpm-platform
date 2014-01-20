@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.0.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-b4c02b0c-d71a-4c5f-baf1-19844468cb3c" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-e980ff53-c2f4-410c-873d-f07782cd27be" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
    <message id="message_1"/>
-   <message id="sid-65515f33-93b9-4405-aea6-8e54317def2c" name=""/>
-   <collaboration id="sid-3ba52728-8800-4865-9525-13760a42ce5f">
+   <message id="sid-314ba2de-40b6-4018-9e85-8c7567aefcd0" name=""/>
+   <collaboration id="sid-b578ba5a-708a-4296-81e5-157cc13d1758">
       <participant id="Process_Engine_2" name="Process Engine" processRef="TestStartMessageEvent_">
          <extensionElements/>
       </participant>
@@ -16,7 +16,7 @@
    </collaboration>
    <process id="Dummy_37" isClosed="false" isExecutable="false" name="Dummy" processType="None">
       <extensionElements/>
-      <laneSet id="sid-e73fe13a-21cd-47c5-b713-33ef1a93a939">
+      <laneSet id="sid-e1482f5b-aed6-4cf1-888a-fd24aa071dad">
          <lane id="lane_38">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -50,29 +50,41 @@
    </process>
    <process id="TestStartMessageEvent_" isClosed="false" isExecutable="true" name="Process Engine" processType="None">
       <extensionElements/>
-      <laneSet id="sid-5c50e720-6d2c-478d-aa8b-ca6c353a2e98">
+      <laneSet id="sid-34ed4546-2b77-4780-a115-0810ea5aa48a">
          <lane id="lane_13">
+            <extensionElements>
+               <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
+            </extensionElements>
             <flowNodeRef>Start_20</flowNodeRef>
             <flowNodeRef>Task_25</flowNodeRef>
             <flowNodeRef>End_30</flowNodeRef>
          </lane>
       </laneSet>
       <startEvent id="Start_20" name="Start">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <outgoing>sequenceFlow_34</outgoing>
-         <messageEventDefinition id="sid-bd831187-805f-4a5d-86cf-7c57a1c716b7" messageRef="sid-65515f33-93b9-4405-aea6-8e54317def2c"/>
+         <messageEventDefinition id="sid-e276215c-6166-4be9-beba-9e73201b45cc" messageRef="sid-314ba2de-40b6-4018-9e85-8c7567aefcd0"/>
       </startEvent>
       <userTask completionQuantity="1" id="Task_25" isForCompensation="false" name="Task" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+         </extensionElements>
          <incoming>sequenceFlow_34</incoming>
          <outgoing>sequenceFlow_35</outgoing>
       </userTask>
       <endEvent id="End_30" name="End">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <incoming>sequenceFlow_35</incoming>
       </endEvent>
       <sequenceFlow id="sequenceFlow_34" isImmediate="true" name="" sourceRef="Start_20" targetRef="Task_25"/>
       <sequenceFlow id="sequenceFlow_35" isImmediate="true" name="" sourceRef="Task_25" targetRef="End_30"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-8fed445e-99c0-4971-8474-39521024a536">
-      <bpmndi:BPMNPlane bpmnElement="sid-3ba52728-8800-4865-9525-13760a42ce5f" id="sid-f71246ce-8c4f-42e4-9930-c1822c6d307b">
+   <bpmndi:BPMNDiagram id="sid-5a9927f8-317b-4936-8c36-fb33cae654c5">
+      <bpmndi:BPMNPlane bpmnElement="sid-b578ba5a-708a-4296-81e5-157cc13d1758" id="sid-41c08cb0-33ba-4c51-8353-0b4724c957da">
          <bpmndi:BPMNShape bpmnElement="Process_Engine_2" id="Process_Engine_2_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="600.0" x="105.0" y="285.0"/>
          </bpmndi:BPMNShape>

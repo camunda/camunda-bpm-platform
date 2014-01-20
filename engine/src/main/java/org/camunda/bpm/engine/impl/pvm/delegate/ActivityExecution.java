@@ -161,11 +161,12 @@ public interface ActivityExecution extends DelegateExecution {
   void executeActivity(PvmActivity activity);
 
   /**
-   * Called when an execution is interrupted.
-   *
-   * Performs destroy scope behavior: all child executions and sub-process instances and other related
-   * resources are removed. The execution itself can continue execution.
+   * Called when an execution is interrupted. This will remove all associated entities
+   * such as event subscriptions, jobs, ...
    */
-  void destroyScope(String string);
+  void interruptScope(String reason);
+
+  /** An activity which is to be started next. */
+  PvmActivity getNextActivity();
 
 }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.0.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-30fbb74a-abf7-4d59-9e63-7b5b87a5638d" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-e4901347-2fe8-43cf-bf8e-921c68a3095e" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
    <process id="MyProcess2" isClosed="false" isExecutable="true" name="MyProcess2" processType="None">
       <startEvent id="startevent1" name="Start">
          <outgoing>flow1</outgoing>
@@ -39,8 +39,8 @@
       <sequenceFlow id="flow9" isImmediate="true" name="" sourceRef="exclusivegateway2" targetRef="servicetask1"/>
       <sequenceFlow id="flow8" isImmediate="true" name="" sourceRef="usertask1" targetRef="exclusivegateway2"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-29abdb9b-736a-47c5-9ec7-174556dd2eed">
-      <bpmndi:BPMNPlane bpmnElement="MyProcess2" id="sid-943479bc-354b-4a78-98e1-ee522fdb2a89">
+   <bpmndi:BPMNDiagram id="sid-77ac162b-6e61-4ed6-b5a4-45c6a83dddd4">
+      <bpmndi:BPMNPlane bpmnElement="MyProcess2" id="sid-3b258593-6267-4803-aff3-084a3de382d3">
          <bpmndi:BPMNShape bpmnElement="startevent1" id="startevent1_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="52.5" y="82.5"/>
          </bpmndi:BPMNShape>

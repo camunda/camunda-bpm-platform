@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-cf7b7720-d6fb-443e-bba4-fb7ef0a488fb" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
    <collaboration id="sid-da6930d3-8716-4880-8144-37af36218a83">
-      <participant id="sid-B2555EAE-46C0-4B04-BC0A-8B65D29F569E" name="Testpool" processRef="sid-31FD00AB-B13F-489C-9865-A557AAB76CDE">
-         <extensionElements>
-            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
-         </extensionElements>
-      </participant>
+     <participant id="sid-B2555EAE-46C0-4B04-BC0A-8B65D29F569E" name="Executable Pool" processRef="sid-31FD00AB-B13F-489C-9865-A557AAB76CDE">
+       <extensionElements>
+         <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+       </extensionElements>
+     </participant>
+     <participant id="sid-B2555EAE-46C0-4B04-BC0A-8B65D29F569F" name="Non Executable Pool" processRef="sid-31FD00AB-B13F-489C-9865-A557AAB76CDF">
+     </participant>
    </collaboration>
-   <process id="sid-31FD00AB-B13F-489C-9865-A557AAB76CDE" isClosed="false" isExecutable="false" name="Testpool" processType="None">
+   <process id="sid-31FD00AB-B13F-489C-9865-A557AAB76CDF" isClosed="false" isExecutable="false" name="Non Executable Process" processType="None">
+   </process>
+   <process id="sid-31FD00AB-B13F-489C-9865-A557AAB76CDE" isClosed="false" isExecutable="true" name="Executable Process" processType="None">
       <extensionElements/>
       <laneSet id="sid-1295b1e7-ef8b-4d39-a0b2-52d5267f1ce2">
          <lane id="sid-9A009A78-24EE-44C6-A039-CF34024D93A3">

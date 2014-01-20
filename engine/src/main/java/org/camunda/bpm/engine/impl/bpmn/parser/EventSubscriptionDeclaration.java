@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 /**
  * @author Daniel Meyer
  * @author Falko Menge
+ * @author Danny Gräf
  */
 public class EventSubscriptionDeclaration implements Serializable {
 
@@ -35,8 +37,9 @@ public class EventSubscriptionDeclaration implements Serializable {
   protected final String eventType;
   
   protected boolean async;
-  protected String activityId;
+  protected String activityId = null;
   protected boolean isStartEvent;
+  protected Boolean isForMultiInstance = null;
 
   public EventSubscriptionDeclaration(String eventName, String eventType) {
     this.eventName = eventName;
@@ -62,7 +65,19 @@ public class EventSubscriptionDeclaration implements Serializable {
   public String getActivityId() {
     return activityId;
   }
-  
+
+  public boolean isForMultiInstance(ExecutionEntity execution) {
+    if (isForMultiInstance == null) { // cache result
+      if (activityId == null) {
+        isForMultiInstance = false;
+      } else {
+        ActivityImpl activity = execution.getProcessDefinition().findActivity(activityId);
+        isForMultiInstance = activity.getActivityBehavior() instanceof ParallelMultiInstanceBehavior;
+      }
+    }
+    return isForMultiInstance;
+  }
+
   public boolean isStartEvent() {
     return isStartEvent;
   }
@@ -75,7 +90,23 @@ public class EventSubscriptionDeclaration implements Serializable {
     return eventType;
   }
 
-  public EventSubscriptionEntity prepareEventSubscriptionEntity(ExecutionEntity execution) {
+  public EventSubscriptionEntity createEntity(ExecutionEntity execution) {
+    if (isStartEvent() || isForMultiInstance(execution)) {
+      return null;
+    } else {
+      return createEventSubscription(execution);
+    }
+  }
+
+  public EventSubscriptionEntity createEntityForMultiInstance(ExecutionEntity execution) {
+    if(isForMultiInstance(execution)) {
+      return createEventSubscription(execution);
+    } else {
+      return null;
+    }
+  }
+
+  private EventSubscriptionEntity createEventSubscription(ExecutionEntity execution) {
     EventSubscriptionEntity eventSubscriptionEntity = null;
     if(eventType.equals("message")) {
       eventSubscriptionEntity = new MessageEventSubscriptionEntity(execution);
@@ -84,12 +115,16 @@ public class EventSubscriptionDeclaration implements Serializable {
     }else {
       throw new ProcessEngineException("Found event definition of unknown type: "+eventType);
     }
-    
+
     eventSubscriptionEntity.setEventName(eventName);
     if(activityId != null) {
       ActivityImpl activity = execution.getProcessDefinition().findActivity(activityId);
       eventSubscriptionEntity.setActivity(activity);
     }
+
+    // insert event subscription
+    eventSubscriptionEntity.insert();
+
     return eventSubscriptionEntity;
   }
 

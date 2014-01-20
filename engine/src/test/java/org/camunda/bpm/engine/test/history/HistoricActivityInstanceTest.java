@@ -372,7 +372,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment
-  public void FAILING_testHistoricActivityInstanceTimerEvent() {
+  public void testHistoricActivityInstanceTimerEvent() {
     runtimeService.startProcessInstanceByKey("catchSignal");
 
     assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
@@ -388,12 +388,17 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
     assertEquals("afterTimer", task.getName());
 
-    HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("timerEvent");
+    HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("gw1");
     assertEquals(1, historicActivityInstanceQuery.count());
+    assertNotNull(historicActivityInstanceQuery.singleResult().getEndTime());
+
+    historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("timerEvent");
+    assertEquals(1, historicActivityInstanceQuery.count());
+    assertNotNull(historicActivityInstanceQuery.singleResult().getEndTime());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceTimerEvent.bpmn20.xml"})
-  public void FAILING_testHistoricActivityInstanceMessageEvent() {
+  public void testHistoricActivityInstanceMessageEvent() {
     runtimeService.startProcessInstanceByKey("catchSignal");
 
     JobQuery jobQuery = managementService.createJobQuery();
@@ -409,8 +414,38 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
     assertEquals("afterMessage", task.getName());
 
-    HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("messageEvent");
+    HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("gw1");
     assertEquals(1, historicActivityInstanceQuery.count());
+    assertNotNull(historicActivityInstanceQuery.singleResult().getEndTime());
+
+    historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("messageEvent");
+    assertEquals(1, historicActivityInstanceQuery.count());
+    assertNotNull(historicActivityInstanceQuery.singleResult().getEndTime());
+  }
+
+  @Deployment
+  public void testUserTaskStillRunning() {
+    runtimeService.startProcessInstanceByKey("nonInterruptingEvent");
+
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.count());
+
+    managementService.executeJob(jobQuery.singleResult().getId());
+
+    HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("userTask");
+    assertEquals(1, historicActivityInstanceQuery.count());
+    assertNull(historicActivityInstanceQuery.singleResult().getEndTime());
+
+    historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("end1");
+    assertEquals(0, historicActivityInstanceQuery.count());
+
+    historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("timer");
+    assertEquals(1, historicActivityInstanceQuery.count());
+    assertNotNull(historicActivityInstanceQuery.singleResult().getEndTime());
+
+    historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("end2");
+    assertEquals(1, historicActivityInstanceQuery.count());
+    assertNotNull(historicActivityInstanceQuery.singleResult().getEndTime());
   }
 
 }

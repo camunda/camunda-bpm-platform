@@ -12,38 +12,32 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.Response.Status;
-
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
-import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.*;
 
 public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServiceTest {
 
@@ -138,7 +132,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 		String returnedExecutionId = from(content).getString("[0].executionId");
 		String returnedExceptionMessage = from(content).getString("[0].exceptionMessage");
 		int returnedRetries = from(content).getInt("[0].retries");
-		Date returnedDueDate = DateTime.parse(from(content).getString("[0].dueDate")).toDate();
+		Date returnedDueDate = DateTimeUtil.parseDateTime(from(content).getString("[0].dueDate")).toDate();
 		boolean returnedSuspended = from(content).getBoolean("[0].suspended");
 
 		Assert.assertEquals(MockProvider.EXAMPLE_JOB_ID, returnedJobId);
@@ -148,7 +142,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 		Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
 		Assert.assertEquals(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE, returnedExceptionMessage);
 		Assert.assertEquals(MockProvider.EXAMPLE_JOB_RETRIES, returnedRetries);
-		Assert.assertEquals(DateTime.parse(MockProvider.EXAMPLE_DUE_DATE).toDate(), returnedDueDate);
+		Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_DUE_DATE).toDate(), returnedDueDate);
 		Assert.assertEquals(MockProvider.EXAMPLE_JOB_IS_SUSPENDED, returnedSuspended);
 	}
 

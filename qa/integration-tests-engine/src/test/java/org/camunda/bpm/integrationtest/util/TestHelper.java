@@ -1,8 +1,13 @@
 package org.camunda.bpm.integrationtest.util;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
+import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.jboss.shrinkwrap.api.asset.Asset;
+import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
+import org.junit.Assert;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,13 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.jboss.shrinkwrap.api.asset.Asset;
-import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
-import org.junit.Assert;
+import static org.junit.Assert.*;
 
 
 public abstract class TestHelper {
@@ -54,15 +53,28 @@ public abstract class TestHelper {
       .processDefinitionKey(processDefinitionKey)
       .singleResult();
     assertNotNull(processDefinition);
-    InputStream actualStream = repositoryService.getProcessDiagram(processDefinition.getId());
-    if (deployed) {
-      assertNotNull(actualStream);
-      assertTrue(0 < actualStream.available());
-      InputStream expectedStream = clazz.getResourceAsStream(expectedDiagramResource);
-      assertNotNull(expectedStream);
-      assertTrue(isEqual(expectedStream, actualStream));
-    } else {
-      assertNull(actualStream);
+
+    InputStream actualStream = null;
+    InputStream expectedStream = null;
+    try {
+      actualStream = repositoryService.getProcessDiagram(processDefinition.getId());
+
+      if (deployed) {
+        byte[] actualDiagram = IoUtil.readInputStream(actualStream, "actualStream");
+        assertNotNull(actualDiagram);
+        assertTrue(actualDiagram.length > 0);
+
+        expectedStream = clazz.getResourceAsStream(expectedDiagramResource);
+        byte[] expectedDiagram = IoUtil.readInputStream(expectedStream, "expectedSteam");
+        assertNotNull(expectedDiagram);
+
+        assertTrue(isEqual(expectedStream, actualStream));
+      } else {
+        assertNull(actualStream);
+      }
+    } finally {
+      IoUtil.closeSilently(actualStream);
+      IoUtil.closeSilently(expectedStream);
     }
   }
 

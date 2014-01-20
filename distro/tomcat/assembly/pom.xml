@@ -109,4 +109,16 @@
     </plugins>
   </build>
 
+  <!-- 
+    We need this repository to fetch
+
+      org.apache.tomcat:apache-tomcat-dist:tar.gz:${version.tomcat}
+  -->
+  <repositories>
+    <repository>
+      <id>camunda public</id>
+      <name>camunda</name>
+      <url>https://app.camunda.com/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
 </project>
