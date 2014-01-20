@@ -143,22 +143,22 @@ public class SignavioConnectorIT {
   @Test
   public void testRoundtripWithMessageEvents() throws Exception {
     bpmnSimplePoolExtractionRoundtripWithDevFriendlyEngineDeploy("testRoundtripWithMessageEvents.sgx",
-            "<serviceTask\\sid=\"(test(_\\d*))\"\\sname=\"test\"/>",
-            "<serviceTask id=\"testTwitter\" name=\"testTwitter\" activiti:class=\"org.camunda.bpm.demo.twitter.TweetContentDelegate\" />");
+            "<serviceTask\\sid=\"(test(_\\d*))\"\\sname=\"test\">",
+            "<serviceTask id=\"testTwitter\" name=\"testTwitter\" activiti:class=\"org.camunda.bpm.demo.twitter.TweetContentDelegate\" >");
   }
   
   @Test
   public void test_HEMERA_1319() throws Exception {
     bpmnSimplePoolExtractionRoundtripWithDevFriendlyEngineDeploy("HEMERA-1319.sgx",
-            "<serviceTask\\sid=\"(Task(_\\d*))\"/>",
-            "<serviceTask id=\"Task_abc\" name=\"Task_abc\" activiti:class=\"org.camunda.bpm.demo.pdf.SavePdfDelegate\" />");
+            "<serviceTask\\sid=\"(Task(_\\d*))\">",
+            "<serviceTask id=\"Task_abc\" name=\"Task_abc\" activiti:class=\"org.camunda.bpm.demo.pdf.SavePdfDelegate\" >");
   }
   
   @Test
   public void test_HEMERA_1610() throws Exception {
     bpmnSimplePoolExtractionRoundtripWithDevFriendlyEngineDeploy("HEMERA-1610.sgx",
-      "<serviceTask\\sid=\"(PDF_in_SVN_ablegen(_\\d*))\"\\sname=\"PDF\\sin\\sSVN\\sablegen\"/>",
-      "<serviceTask id=\"PDF_in_SVN_ablegen_abc\" name=\"PDF in SVN ablegen\" activiti:class=\"org.camunda.bpm.demo.pdf.SavePdfDelegate\" />");
+      "<serviceTask\\sid=\"(PDF_in_SVN_ablegen(_\\d*))\"\\sname=\"PDF\\sin\\sSVN\\sablegen\">",
+      "<serviceTask id=\"PDF_in_SVN_ablegen_abc\" name=\"PDF in SVN ablegen\" activiti:class=\"org.camunda.bpm.demo.pdf.SavePdfDelegate\" >");
   }
   
   @Test
