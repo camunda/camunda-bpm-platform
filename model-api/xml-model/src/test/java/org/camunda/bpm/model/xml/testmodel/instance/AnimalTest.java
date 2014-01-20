@@ -165,8 +165,8 @@ public class AnimalTest {
     animal.setMother(mother);
     assertThat(animal.getMother()).isEqualTo(mother);
 
-    // set mother by name with namespace
-    animal.setAttributeValue("mother", "tns:" + stepmother.getId(), false);
+    // set mother by name
+    animal.setAttributeValue("mother", stepmother.getId(), false);
     assertThat(animal.getMother()).isEqualTo(stepmother);
 
     // replace mother

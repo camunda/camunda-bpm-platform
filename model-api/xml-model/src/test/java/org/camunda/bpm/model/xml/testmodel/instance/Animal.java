@@ -63,7 +63,7 @@ public abstract class Animal extends ModelElementInstanceImpl implements ModelEl
       .build();
 
     motherRef = typeBuilder.stringAttribute(ATTRIBUTE_NAME_MOTHER)
-      .qNameAttributeReference(Animal.class)
+      .idAttributeReference(Animal.class)
       .build();
 
     isEndangeredAttr = typeBuilder.booleanAttribute(ATTRIBUTE_NAME_IS_ENDANGERED)
