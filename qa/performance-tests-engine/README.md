@@ -7,26 +7,47 @@ This testsuite allows running different kinds of performance tests against the p
 
 > **Design Rationale**: This testsuite does not try to produce absolute numbers. The goal is not to produce numbers that show "how fast the process engine is". On the contrary, the idea is to produce relative numbers that can be compared over time. The benchmarks allow us to get a sense of whether a certain change to the codebase made the process engine faster or slower compared to the numbers we were getting before. Other performance tests like the Sql Statement Log are meant to serve as a tool for gaining insight into the inner workings of the perocess engine and may be used for tracking down the source of performance degradations or for finding potential for optimization.
 
-## Running a Benchmark
+## The Benchmark
+
+The benchmark runs the performance testsuite in multiple passes. Each pass will perform a configurable number of iterations on a certain number of threads. The first pass will use one thread, the second one two threads, the third one three theads and so forth. The benchmark gives some relative numbers as to how long it takes to run a certain process in a number of iterations with a given amount of threads. It will also show to which extent adding more threads will influence the performance numbers (scale up).
+
+### Running the Benchmark
 
 In order to run a benchmark, you need to select the `benchmark` profile:
 
 ```Shell
 mvn clean install -Pbenchmark,h2 -DnumberOfThreads=4 -DnumberOfRuns=10000
 ```
+### Inspecting the Benchmark Results
 
-The results are collected as JSON files in the `target/results/` folder:
+Running the Sql Statement Log will produce the following folders in the `target/` folder of the project:
+
+* `reports/` - containing an aggregated report for all tests run in both HTML and JSON format.
+* `results/` - containing the results of the individual test runs in raw JSON format.
+
+The Html Report gives you an aggregated overview of the execution times in milliseconds:
+
+![Benchmark Screenshot][1]
+
+The raw JSON result files are located in the `target/results/` folder and provide the numbers collected for each pass.
 
 ```json
 {
-    "testName": "org.camunda.bpm.qa.performance.engine.bpmn.SequencePerformanceTest.asyncSequence15Steps",
-    "configuration": {
-        "numberOfThreads": 4,
-        "numberOfRuns": 10000,
-        "testWatchers": null
-    },
-    "duration": 23960,
-    "stepResults": []
+  "testName" : "SequencePerformanceTest.asyncSequence5Steps",
+  "configuration" : {
+    "numberOfThreads" : 4,
+    "numberOfRuns" : 500,
+    "testWatchers" : null
+  },
+  "passResults" : [ {
+    "duration" : 650,
+    "numberOfThreads" : 1,
+    "stepResults" : [ ]
+  }, {
+    "duration" : 401,
+    "numberOfThreads" : 2,
+    "stepResults" : [ ]
+  }, ...
 }
 ```
 
@@ -42,7 +63,7 @@ The sql-statementlog will typically run each performance test once and on a sing
 mvn clean install -Psql-statementlog,h2 
 ```
 
-### Inpecting the Sql Statement Log Results
+### Inspecting the Sql Statement Log Results
 
 Running the Sql Statement Log will produce the following folders in the `target/` folder of the project:
 
@@ -51,7 +72,7 @@ Running the Sql Statement Log will produce the following folders in the `target/
 
 The Html Report gives you an aggregated overview over the INSERT / UPDATE / DELETE / SELECT statements executed by each test:
 
-![Statement log Screenshot][1]
+![Statement log Screenshot][2]
 
 The raw JSON result files allow you to inspect the database communication between the process engine and the database on a fine grained level:
 
@@ -99,4 +120,5 @@ The raw JSON result files allow you to inspect the database communication betwee
 }
 ```
 
-[1]: docs/sql-statement-log-report.png
+[1]: docs/benchmark-report.png
+[2]: docs/sql-statement-log-report.png

@@ -13,7 +13,6 @@
 package org.camunda.bpm.qa.performance.engine.framework;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,9 +27,8 @@ public class PerfTestResults {
   /** the configuration used */
   protected PerfTestConfiguration configuration;
 
-  protected long duration;
-
-  protected List<PerfTestStepResult> stepResults = Collections.synchronizedList(new ArrayList<PerfTestStepResult>());
+  /** the individual result entries **/
+  protected List<PerfTestResult> passResults = new ArrayList<PerfTestResult>();
 
   public PerfTestResults(PerfTestConfiguration configuration) {
     this.configuration = configuration;
@@ -57,32 +55,12 @@ public class PerfTestResults {
     this.configuration = configuration;
   }
 
-  public long getDuration() {
-    return duration;
+  public List<PerfTestResult> getPassResults() {
+    return passResults;
   }
 
-  public void setDuration(long duration) {
-    this.duration = duration;
-  }
-
-  public List<PerfTestStepResult> getStepResults() {
-    return stepResults;
-  }
-
-  @Override
-  public String toString() {
-    return testName + " Completed " + configuration.getNumberOfRuns()
-        + " runs using " + configuration.getNumberOfThreads() +" threads. Took " + duration + "ms.";
-  }
-
-  /**
-   * log a step result. NOTE: this is expensive as it requires synchronization on the stepResultList.
-   *
-   * @param currentStep
-   * @param stepResult
-   */
-  public void logStepResult(PerfTestStep currentStep, Object stepResult) {
-    stepResults.add(new PerfTestStepResult(currentStep.getStepName(), stepResult));
+  public void setPassResults(List<PerfTestResult> results) {
+    this.passResults = results;
   }
 
 }

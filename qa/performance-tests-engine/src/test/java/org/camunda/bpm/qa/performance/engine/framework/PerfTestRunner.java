@@ -34,15 +34,20 @@ public class PerfTestRunner {
   protected PerfTest test;
   protected PerfTestConfiguration configuration;
 
-  // runner state
-  protected AtomicLong completedRuns;
+  // pass state
+  protected AtomicLong passCompletedRuns;
+  protected Object passMonitor;
+  protected boolean passCompleted;
+  protected long passStartTime;
+  protected int passNumberOfThreads;
+  protected PerfTestResult passResult;
+
+  // global state
   protected PerfTestResults results;
   protected Object doneMonitor;
   protected boolean isDone;
   protected Throwable exception;
   protected List<PerfTestWatcher> watchers;
-
-  protected long startTime;
 
   public PerfTestRunner(PerfTest test, PerfTestConfiguration configuration) {
     this.test = test;
@@ -51,11 +56,9 @@ public class PerfTestRunner {
   }
 
   protected void init() {
-    executor = Executors.newFixedThreadPool(configuration.getNumberOfThreads());
 
     results = new PerfTestResults(configuration);
 
-    completedRuns = new AtomicLong();
     doneMonitor = new Object();
     isDone = false;
 
@@ -77,13 +80,20 @@ public class PerfTestRunner {
 
   public Future<PerfTestResults> execute() {
 
-    PerfTestStep firstStep = test.getFirstStep();
+    // run a pass for each number of threads
+    new Thread() {
+      public void run() {
+        for (int i = 1; i <= configuration.getNumberOfThreads(); i++) {
+          runPassWithThreadCount(i);
+        }
 
-    this.startTime = System.currentTimeMillis();
+        synchronized (doneMonitor) {
+          isDone = true;
+          doneMonitor.notifyAll();
+        }
 
-    for (int i = 0; i < configuration.getNumberOfRuns(); i++) {
-      executor.execute(new PerfTestRun(this, firstStep));
-    }
+      }
+    }.start();
 
     return new Future<PerfTestResults>() {
 
@@ -101,7 +111,7 @@ public class PerfTestRunner {
         synchronized (doneMonitor) {
           if(!isDone) {
             doneMonitor.wait(unit.convert(timeout, TimeUnit.MILLISECONDS));
-            if(exception != null || !isDone) {
+            if(exception != null) {
               throw new ExecutionException(exception);
             }
            }
@@ -113,7 +123,7 @@ public class PerfTestRunner {
         synchronized (doneMonitor) {
           if(!isDone) {
             doneMonitor.wait();
-            if(exception != null || !isDone) {
+            if(exception != null) {
               throw new ExecutionException(exception);
             }
           }
@@ -125,6 +135,48 @@ public class PerfTestRunner {
         throw new UnsupportedOperationException("Cannot cancel a performance test.");
       }
     };
+  }
+
+
+  protected void runPassWithThreadCount(int t) {
+
+    this.passNumberOfThreads = t;
+
+    executor = Executors.newFixedThreadPool(t);
+    passCompletedRuns = new AtomicLong();
+    passResult = new PerfTestResult();
+
+    // do a GC pause before running the test
+    for(int i = 0; i<5; i++) {
+      System.gc();
+    }
+
+    passMonitor = new Object();
+    passCompleted = false;
+
+    PerfTestStep firstStep = test.getFirstStep();
+    this.passStartTime = System.currentTimeMillis();
+    for (int i = 0; i < configuration.getNumberOfRuns(); i++) {
+      executor.execute(new PerfTestRun(this, firstStep));
+    }
+
+    synchronized (passMonitor) {
+      if(!passCompleted) {
+        try {
+          passMonitor.wait();
+
+          executor.shutdownNow();
+          try {
+            executor.awaitTermination(60, TimeUnit.SECONDS);
+          } catch (InterruptedException e) {
+            exception = e;
+          }
+
+        } catch (InterruptedException e) {
+          throw new PerfTestException("Interrupted wile waiting for pass "+t+" to complete.");
+        }
+      }
+    }
   }
 
   /**
@@ -155,26 +207,30 @@ public class PerfTestRunner {
   public void completedRun(PerfTestRun run) {
     run.endRun();
 
-    long currentlyCompleted = completedRuns.incrementAndGet();
+    long currentlyCompleted = passCompletedRuns.incrementAndGet();
     if(currentlyCompleted >= configuration.getNumberOfRuns()) {
-      synchronized (doneMonitor) {
+      synchronized (passMonitor) {
 
-        results.setDuration(System.currentTimeMillis() - startTime);
+        // record the results:
+        passResult.setDuration(System.currentTimeMillis() - passStartTime);
+        passResult.setNumberOfThreads(passNumberOfThreads);
 
-        executor.shutdownNow();
-        isDone = true;
-        doneMonitor.notifyAll();
+        results.getPassResults().add(passResult);
+
+        passCompleted = true;
+        passMonitor.notifyAll();
       }
     }
   }
 
-  /**
-   * @param perfTestRun
-   * @param t
-   */
+
   public void failed(PerfTestRun perfTestRun, Throwable t) {
     synchronized (doneMonitor) {
       this.exception = t;
+      isDone = true;
+      synchronized (passMonitor) {
+        passMonitor.notifyAll();
+      }
       doneMonitor.notifyAll();
     }
   }
@@ -188,7 +244,7 @@ public class PerfTestRunner {
   }
 
   public void logStepResult(PerfTestRun perfTestRun, Object stepResult) {
-    results.logStepResult(perfTestRun.getCurrentStep(), stepResult);
+    passResult.logStepResult(perfTestRun.getCurrentStep(), stepResult);
   }
 
 }

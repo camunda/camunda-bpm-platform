@@ -50,7 +50,13 @@ public abstract class TabularResultAggregator {
       }
     }
 
+    postProcessResultSet(tabularResultSet);
+
     return tabularResultSet;
+  }
+
+  protected void postProcessResultSet(TabularResultSet tabularResultSet) {
+    // do nothing
   }
 
   protected void processFile(File resultFile, TabularResultSet tabularResultSet) {

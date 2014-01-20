@@ -65,7 +65,11 @@ public class SqlStatementCountAggregator extends TabularResultAggregator {
     int updateCount = 0;
     int selectCount = 0;
 
-    List<PerfTestStepResult> stepResults = results.getStepResults();
+    if(results.getPassResults().isEmpty()) {
+      return;
+    }
+
+    List<PerfTestStepResult> stepResults = results.getPassResults().get(0).getStepResults();
     for (PerfTestStepResult stepResult : stepResults) {
       List<LinkedHashMap<String, String>> statementLogs = (List<LinkedHashMap<String, String>>) stepResult.getResultData();
       for (LinkedHashMap<String, String> statementLog : statementLogs) {
