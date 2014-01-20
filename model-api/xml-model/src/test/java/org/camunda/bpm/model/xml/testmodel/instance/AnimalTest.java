@@ -17,13 +17,17 @@ import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelValidationException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.testmodel.Gender;
+import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import javax.xml.XMLConstants;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -37,6 +41,19 @@ public class AnimalTest {
   private ModelInstance modelInstance;
   private Animals animals;
   private Animal animal;
+  private Animal hedwig;
+  private Animal birdo;
+  private Animal plucky;
+  private Animal fiffy;
+  private Animal timmy;
+  private Animal daisy;
+  private RelationshipDefinition hedwigRelationship;
+  private RelationshipDefinition birdoRelationship;
+  private RelationshipDefinition pluckyRelationship;
+  private RelationshipDefinition fiffyRelationship;
+  private RelationshipDefinition timmyRelationship;
+  private RelationshipDefinition daisyRelationship;
+
 
   public Bird createBird(String id, Gender gender) {
     Bird bird = modelInstance.newInstance(Bird.class);
@@ -46,43 +63,57 @@ public class AnimalTest {
     return bird;
   }
 
-  public RelationshipDefinition addFriendRelationshipDefinition(Animal animalWithRelationship, Animal animalInRelationshipWith) {
-    RelationshipDefinition friendRelationshipDefinition = createFriendRelationshipDefinition(animalInRelationshipWith);
-    friendRelationshipDefinition.setId(animalWithRelationship.getId() + "-" + animalInRelationshipWith.getId());
-    animalWithRelationship.getRelationshipDefinitions().add(friendRelationshipDefinition);
-    return friendRelationshipDefinition;
+  private RelationshipDefinition createRelationshipDefinition(final Animal animalInRelationshipWith, final Class<? extends RelationshipDefinition> relationshipDefinitionClass) {
+    RelationshipDefinition relationshipDefinition = modelInstance.newInstance(relationshipDefinitionClass);
+    relationshipDefinition.setId("relationship-" + animalInRelationshipWith.getId());
+    relationshipDefinition.setAnimal(animalInRelationshipWith);
+    return relationshipDefinition;
   }
 
-  public RelationshipDefinition createFriendRelationshipDefinition(Animal animalInRelationshipWith) {
-    FriendRelationshipDefinition friendRelationshipDefinition = modelInstance.newInstance(FriendRelationshipDefinition.class);
-    friendRelationshipDefinition.setId("friend-" + animalInRelationshipWith.getId());
-    friendRelationshipDefinition.setAnimal(animalInRelationshipWith);
-    return friendRelationshipDefinition;
-  }
-
-  public RelationshipDefinition addChildRelationshipDefinition(Animal animalWithRelationship, Animal animalInRelationshipWith) {
-    ChildRelationshipDefinition childRelationshipDefinition = createChildRelationshipDefinition(animalInRelationshipWith);
-    childRelationshipDefinition.setId(animalWithRelationship.getId() + "-" + animalInRelationshipWith.getId());
-    animalWithRelationship.getRelationshipDefinitions().add(childRelationshipDefinition);
-    return childRelationshipDefinition;
-  }
-
-  public ChildRelationshipDefinition createChildRelationshipDefinition(Animal animalInRelationshipWith) {
-    ChildRelationshipDefinition childRelationshipDefinition = modelInstance.newInstance(ChildRelationshipDefinition.class);
-    childRelationshipDefinition.setAnimal(animalInRelationshipWith);
-    childRelationshipDefinition.setId("child-" + animalInRelationshipWith.getId());
-    return childRelationshipDefinition;
+  public void addRelationshipDefinition(final Animal animalWithRelationship, final RelationshipDefinition relationshipDefinition) {
+    Animal animalInRelationshipWith = relationshipDefinition.getAnimal();
+    relationshipDefinition.setId(animalWithRelationship.getId() + "-" + animalInRelationshipWith.getId());
+    animalWithRelationship.getRelationshipDefinitions().add(relationshipDefinition);
   }
 
   @Before
-  public void createModelWithOneBird() {
+  public void createModel() {
     modelParser = new TestModelParser();
     modelInstance = modelParser.getEmptyModel();
 
     animals = modelInstance.newInstance(Animals.class);
     modelInstance.setDocumentElement(animals);
 
+    // add a tns namespace prefix for QName testing
+    animals.setAttributeValueNs("xmlns:tns", XMLConstants.XMLNS_ATTRIBUTE_NS_URI, TestModelConstants.MODEL_NAMESPACE, false);
+
+    // create the test animal
     animal = createBird("tweety", Gender.Female);
+
+    // create some childs and friends
+    hedwig = createBird("hedwig", Gender.Male);
+    birdo = createBird("birdo", Gender.Female);
+    plucky = createBird("plucky", Gender.Unknown);
+    fiffy = createBird("fiffy", Gender.Female);
+    timmy = createBird("timmy", Gender.Male);
+    daisy = createBird("daisy", Gender.Female);
+
+    // create and add some relationships
+    hedwigRelationship = createRelationshipDefinition(hedwig, ChildRelationshipDefinition.class);
+    addRelationshipDefinition(animal, hedwigRelationship);
+    birdoRelationship = createRelationshipDefinition(birdo, ChildRelationshipDefinition.class);
+    addRelationshipDefinition(animal, birdoRelationship);
+    pluckyRelationship = createRelationshipDefinition(plucky, FriendRelationshipDefinition.class);
+    addRelationshipDefinition(animal, pluckyRelationship);
+    fiffyRelationship = createRelationshipDefinition(fiffy, FriendRelationshipDefinition.class);
+    addRelationshipDefinition(animal, fiffyRelationship);
+    timmyRelationship = createRelationshipDefinition(timmy, FriendRelationshipDefinition.class);
+    daisyRelationship = createRelationshipDefinition(daisy, ChildRelationshipDefinition.class);
+
+    animal.getRelationshipDefinitionRefs().add(hedwigRelationship);
+    animal.getRelationshipDefinitionRefs().add(birdoRelationship);
+    animal.getRelationshipDefinitionRefs().add(pluckyRelationship);
+    animal.getRelationshipDefinitionRefs().add(fiffyRelationship);
   }
 
   @After
@@ -92,123 +123,152 @@ public class AnimalTest {
   }
 
   @Test
-  public void testId() {
-    assertThat(animal.getId()).isEqualTo("tweety");
+  public void testSetIdAttributeByHelper() {
+    animal.setId("new-animal-id");
+    assertThat(animal.getId()).isEqualTo("new-animal-id");
+  }
 
-    // set id by helper
-    animal.setId("daisy");
-    assertThat(animal.getId()).isEqualTo("daisy");
-
-    // set id by name
+  @Test
+  public void testSetIdAttributeByAttributeName() {
     animal.setAttributeValue("id", "duffy", true);
     assertThat(animal.getId()).isEqualTo("duffy");
+  }
 
-    // remove id
+  @Test
+  public void testRemoveIdAttribute() {
     animal.removeAttribute("id");
     assertThat(animal.getId()).isNull();
   }
 
   @Test
-  public void testName() {
-    assertThat(animal.getName()).isNull();
-
-    // set name by helper
+  public void testSetNameAttributeByHelper() {
     animal.setName("tweety");
     assertThat(animal.getName()).isEqualTo("tweety");
+  }
 
-    // set name by name
+  @Test
+  public void testSetNameAttributeByAttributeName() {
     animal.setAttributeValue("name", "daisy", false);
     assertThat(animal.getName()).isEqualTo("daisy");
+  }
 
-    // remove name
+  @Test
+  public void testRemoveNameAttribute() {
     animal.removeAttribute("name");
     assertThat(animal.getName()).isNull();
   }
 
   @Test
-  public void testFather() {
-    assertThat(animal.getFather()).isNull();
+  public void testSetFatherAttributeByHelper() {
+    animal.setFather(timmy);
+    assertThat(animal.getFather()).isEqualTo(timmy);
+  }
 
-    // create father and stepfather
-    Animal father = createBird("daffy", Gender.Male);
-    Animal stepfather = createBird("timmy", Gender.Male);
+  @Test
+  public void testSetFatherAttributeByAttributeName() {
+    animal.setAttributeValue("father", timmy.getId(), false);
+    assertThat(animal.getFather()).isEqualTo(timmy);
+  }
 
-    // set father by helper
-    animal.setFather(father);
-    assertThat(animal.getFather()).isEqualTo(father);
+  @Test
+  public void testSetFatherAttributeByAttributeNameWithNamespace() {
+    animal.setAttributeValue("father", "tns:hedwig", false);
+    assertThat(animal.getFather()).isEqualTo(hedwig);
+  }
 
-    father.setId("changed-father");
-    assertThat(animal.getFather()).isEqualTo(father);
-
-    // set father by name with namespace
-    animal.setAttributeValue("father", "tns:" + stepfather.getId(), false);
-    assertThat(animal.getFather()).isEqualTo(stepfather);
-
-    // replace father
-    stepfather.replaceWithElement(father);
-    assertThat(animal.getFather()).isEqualTo(father);
-
-    // remove father
+  @Test
+  public void testRemoveFatherAttribute() {
+    animal.setFather(timmy);
+    assertThat(animal.getFather()).isEqualTo(timmy);
     animal.removeAttribute("father");
     assertThat(animal.getFather()).isNull();
   }
 
   @Test
-  public void testMother() {
-    assertThat(animal.getMother()).isNull();
+  public void testChangeIdAttributeOfFatherReference() {
+    animal.setFather(timmy);
+    assertThat(animal.getFather()).isEqualTo(timmy);
+    timmy.setId("new-" + timmy.getId());
+    assertThat(animal.getFather()).isEqualTo(timmy);
+  }
 
-    // create mother and stepmother
-    Animal mother = createBird("fiffy", Gender.Female);
-    Animal stepmother = createBird("birdo", Gender.Female);
+  @Test
+  public void testReplaceFatherReferenceWithNewAnimal() {
+    animal.setFather(timmy);
+    assertThat(animal.getFather()).isEqualTo(timmy);
+    timmy.replaceWithElement(plucky);
+    assertThat(animal.getFather()).isEqualTo(plucky);
+  }
 
-    // set mother by helper
-    animal.setMother(mother);
-    assertThat(animal.getMother()).isEqualTo(mother);
+  @Test
+  public void testSetMotherAttributeByHelper() {
+    animal.setMother(daisy);
+    assertThat(animal.getMother()).isEqualTo(daisy);
+  }
 
-    // set mother by name
-    animal.setAttributeValue("mother", stepmother.getId(), false);
-    assertThat(animal.getMother()).isEqualTo(stepmother);
+  @Test
+  public void testSetMotherAttributeByAttributeName() {
+    animal.setAttributeValue("mother", fiffy.getId(), false);
+    assertThat(animal.getMother()).isEqualTo(fiffy);
+  }
 
-    // replace mother
-    stepmother.replaceWithElement(mother);
-    assertThat(animal.getMother()).isEqualTo(mother);
-
-    // remove mother
+  @Test
+  public void testRemoveMotherAttribute() {
+    animal.setMother(daisy);
+    assertThat(animal.getMother()).isEqualTo(daisy);
     animal.removeAttribute("mother");
     assertThat(animal.getMother()).isNull();
   }
 
   @Test
-  public void testIsEndangered() {
-    // default value of endangered is false
-    assertThat(animal.isEndangered()).isFalse();
+  public void testReplaceMotherReferenceWithNewAnimal() {
+    animal.setMother(daisy);
+    assertThat(animal.getMother()).isEqualTo(daisy);
+    daisy.replaceWithElement(birdo);
+    assertThat(animal.getMother()).isEqualTo(birdo);
+  }
 
-    // set isEndangered by helper
+  @Test
+  public void testChangeIdAttributeOfMotherReference() {
+    animal.setMother(daisy);
+    assertThat(animal.getMother()).isEqualTo(daisy);
+    daisy.setId("new-" + daisy.getId());
+    assertThat(animal.getMother()).isEqualTo(daisy);
+  }
+
+  @Test
+  public void testSetIsEndangeredAttributeByHelper() {
     animal.setIsEndangered(true);
     assertThat(animal.isEndangered()).isTrue();
+  }
 
-    // set isEndangered by name
+  @Test
+  public void testSetIsEndangeredAttributeByAttributeName() {
     animal.setAttributeValue("isEndangered", "false", false);
-    assertThat(animal.isEndangered()).isFalse();
-
-    // remove isEndangered
-    animal.removeAttribute("isEndangered");
     assertThat(animal.isEndangered()).isFalse();
   }
 
   @Test
-  public void testGender() {
-    assertThat(animal.getGender()).isEqualTo(Gender.Female);
+  public void testRemoveIsEndangeredAttribute() {
+    animal.removeAttribute("isEndangered");
+    // default value of isEndangered: false
+    assertThat(animal.isEndangered()).isFalse();
+  }
 
-    // set gender by helper
+  @Test
+  public void testSetGenderAttributeByHelper() {
     animal.setGender(Gender.Male);
     assertThat(animal.getGender()).isEqualTo(Gender.Male);
+  }
 
-    // set gender by name
+  @Test
+  public void testSetGenderAttributeByAttributeName() {
     animal.setAttributeValue("gender", Gender.Unknown.toString(), false);
     assertThat(animal.getGender()).isEqualTo(Gender.Unknown);
+  }
 
-    // remove gender
+  @Test
+  public void testRemoveGenderAttribute() {
     animal.removeAttribute("gender");
     assertThat(animal.getGender()).isNull();
 
@@ -226,196 +286,239 @@ public class AnimalTest {
   }
 
   @Test
-  public void testAge() {
-    assertThat(animal.getAge()).isNull();
-
-    // set age by helper
+  public void testSetAgeAttributeByHelper() {
     animal.setAge(13);
     assertThat(animal.getAge()).isEqualTo(13);
+  }
 
-    // set age by name
+  @Test
+  public void testSetAgeAttributeByAttributeName() {
     animal.setAttributeValue("age", "23", false);
     assertThat(animal.getAge()).isEqualTo(23);
+  }
 
-    // remove age
+  @Test
+  public void testRemoveAgeAttribute() {
     animal.removeAttribute("age");
     assertThat(animal.getAge()).isNull();
   }
 
   @Test
-  public void testChildRelationshipDefinitions() {
-    assertThat(animal.getRelationshipDefinitions()).isEmpty();
+  public void testAddRelationshipDefinitionsByHelper() {
+    assertThat(animal.getRelationshipDefinitions())
+      .isNotEmpty()
+      .hasSize(4)
+      .containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
 
-    // create some childs and friends
-    Bird hedwig = createBird("hedwig", Gender.Male);
-    Bird birdo = createBird("birdo", Gender.Female);
-    Bird plucky = createBird("plucky", Gender.Unknown);
-    Bird fiffy = createBird("fiffy", Gender.Female);
-    Bird timmy = createBird("timmy", Gender.Male);
-    Bird daisy = createBird("daisy", Gender.Female);
+    animal.getRelationshipDefinitions().add(timmyRelationship);
+    animal.getRelationshipDefinitions().add(daisyRelationship);
 
-    // create and add some relationships
-    RelationshipDefinition hedwigRelationship = addChildRelationshipDefinition(animal, hedwig);
-    RelationshipDefinition birdoRelationship = addChildRelationshipDefinition(animal, birdo);
-    RelationshipDefinition pluckyRelationship = addFriendRelationshipDefinition(animal, plucky);
-    RelationshipDefinition fiffyRelationship = addFriendRelationshipDefinition(animal, fiffy);
-    RelationshipDefinition timmyRelationship = createFriendRelationshipDefinition(timmy);
-    RelationshipDefinition daisyRelationship = createChildRelationshipDefinition(daisy);
+    assertThat(animal.getRelationshipDefinitions())
+      .hasSize(6)
+      .containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship, timmyRelationship, daisyRelationship);
+  }
 
-    assertThat(animal.getRelationshipDefinitions()).isNotEmpty();
-    assertThat(animal.getRelationshipDefinitions()).hasSize(4);
-    assertThat(animal.getRelationshipDefinitions()).containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
+  @Test
+  public void testUpdateRelationshipDefinitionsByIdByHelper() {
+    hedwigRelationship.setId("new-" + hedwigRelationship.getId());
+    pluckyRelationship.setId("new-" + pluckyRelationship.getId());
+    assertThat(animal.getRelationshipDefinitions())
+      .hasSize(4)
+      .containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
+  }
 
-    // set new id by setId
-    hedwigRelationship.setId("child-relationship");
-    pluckyRelationship.setId("friend-relationship");
-    assertThat(animal.getRelationshipDefinitions()).hasSize(4);
-    assertThat(animal.getRelationshipDefinitions()).containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
+  @Test
+  public void testUpdateRelationshipDefinitionsByIdByAttributeName() {
+    birdoRelationship.setAttributeValue("id", "new-" + birdoRelationship.getId(), true);
+    fiffyRelationship.setAttributeValue("id", "new-" + fiffyRelationship.getId(), true);
+    assertThat(animal.getRelationshipDefinitions())
+      .hasSize(4)
+      .containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
+  }
 
-    // set new id by setAttributeValue
-    birdoRelationship.setAttributeValue("id", "birdo-relationship", true);
-    fiffyRelationship.setAttributeValue("id", "fiffy-relationship", true);
-    assertThat(animal.getRelationshipDefinitions()).hasSize(4);
-    assertThat(animal.getRelationshipDefinitions()).containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
-
-    // replace element
+  @Test
+  public void testUpdateRelationshipDefinitionsByReplaceElements() {
     hedwigRelationship.replaceWithElement(timmyRelationship);
     pluckyRelationship.replaceWithElement(daisyRelationship);
-    assertThat(animal.getRelationshipDefinitions()).hasSize(4);
-    assertThat(animal.getRelationshipDefinitions()).containsOnly(birdoRelationship, fiffyRelationship, timmyRelationship, daisyRelationship);
+    assertThat(animal.getRelationshipDefinitions())
+      .hasSize(4)
+      .containsOnly(birdoRelationship, fiffyRelationship, timmyRelationship, daisyRelationship);
+  }
 
-    // remove element
+  @Test
+  public void testUpdateRelationshipDefinitionsByRemoveElements() {
     animal.getRelationshipDefinitions().remove(birdoRelationship);
     animal.getRelationshipDefinitions().remove(fiffyRelationship);
-    assertThat(animal.getRelationshipDefinitions()).hasSize(2);
-    assertThat(animal.getRelationshipDefinitions()).containsOnly(timmyRelationship, daisyRelationship);
+    assertThat(animal.getRelationshipDefinitions())
+      .hasSize(2)
+      .containsOnly(hedwigRelationship, pluckyRelationship);
+  }
 
-    // clear collection
+  @Test
+  public void testClearRelationshipDefinitions() {
     animal.getRelationshipDefinitions().clear();
     assertThat(animal.getRelationshipDefinitions()).isEmpty();
   }
 
   @Test
-  public void testRelationshipDefinitionRefs() throws Exception {
-    assertThat(animal.getRelationshipDefinitionRefs()).isEmpty();
-
-    // create some childs and friends
-    Bird hedwig = createBird("hedwig", Gender.Male);
-    Bird birdo = createBird("birdo", Gender.Female);
-    Bird plucky = createBird("plucky", Gender.Unknown);
-    Bird fiffy = createBird("fiffy", Gender.Female);
-    Bird timmy = createBird("timmy", Gender.Male);
-    Bird daisy = createBird("daisy", Gender.Female);
-
-    // create and add some relationships
-    RelationshipDefinition hedwigRelationship = addChildRelationshipDefinition(animal, hedwig);
-    RelationshipDefinition birdoRelationship = addChildRelationshipDefinition(animal, birdo);
-    RelationshipDefinition pluckyRelationship = addFriendRelationshipDefinition(animal, plucky);
-    RelationshipDefinition fiffyRelationship = addFriendRelationshipDefinition(animal, fiffy);
-    RelationshipDefinition timmyRelationship = createFriendRelationshipDefinition(timmy);
-    RelationshipDefinition daisyRelationship = createChildRelationshipDefinition(daisy);
-
-    animal.getRelationshipDefinitionRefs().add(hedwigRelationship);
-    animal.getRelationshipDefinitionRefs().add(birdoRelationship);
-    animal.getRelationshipDefinitionRefs().add(pluckyRelationship);
-    animal.getRelationshipDefinitionRefs().add(fiffyRelationship);
-    assertThat(animal.getRelationshipDefinitionRefs()).isNotEmpty();
-    assertThat(animal.getRelationshipDefinitionRefs()).hasSize(4);
-    assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
-
-    // set new id by setId
-    hedwigRelationship.setId("child-relationship");
-    pluckyRelationship.setId("friend-relationship");
-    assertThat(animal.getRelationshipDefinitionRefs()).hasSize(4);
-    assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
-
-    // set new id by setAttributeValue
-    birdoRelationship.setAttributeValue("id", "birdo-relationship", true);
-    fiffyRelationship.setAttributeValue("id", "fiffy-relationship", true);
-    assertThat(animal.getRelationshipDefinitionRefs()).hasSize(4);
-    assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
-
-    // replace element
-    hedwigRelationship.replaceWithElement(timmyRelationship);
-    pluckyRelationship.replaceWithElement(daisyRelationship);
-    assertThat(animal.getRelationshipDefinitionRefs()).hasSize(4);
-    assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(birdoRelationship, fiffyRelationship, timmyRelationship, daisyRelationship);
-
-    // remove element
-
-    animal.getRelationshipDefinitions().remove(birdoRelationship);
-    Collection<RelationshipDefinition> relationshipDefinitionRefs = animal.getRelationshipDefinitionRefs();
-    assertThat(relationshipDefinitionRefs).hasSize(3);
-    assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(fiffyRelationship, timmyRelationship, daisyRelationship);
-
-    // remove id attribute
-    fiffyRelationship.removeAttribute("id");
-    assertThat(animal.getRelationshipDefinitionRefs()).hasSize(2);
-    assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(timmyRelationship, daisyRelationship);
-
-    // clear definitions collection
-    animal.getRelationshipDefinitions().clear();
-    assertThat(animal.getRelationshipDefinitionRefs()).isEmpty();
-
-    // add again definitions
-    animal.getRelationshipDefinitions().add(hedwigRelationship);
-    animal.getRelationshipDefinitionRefs().add(hedwigRelationship);
-    animal.getRelationshipDefinitions().add(pluckyRelationship);
-    animal.getRelationshipDefinitionRefs().add(pluckyRelationship);
-    assertThat(animal.getRelationshipDefinitionRefs()).hasSize(2);
-    assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(hedwigRelationship, pluckyRelationship);
-
-    // clear refs collection
-    animal.getRelationshipDefinitionRefs().clear();
-    assertThat(animal.getRelationshipDefinitionRefs()).isEmpty();
-    assertThat(animal.getRelationshipDefinitions()).hasSize(2);
+  public void testAddRelationsDefinitionRefsByHelper() {
+    addRelationshipDefinition(animal, timmyRelationship);
+    addRelationshipDefinition(animal, daisyRelationship);
+    animal.getRelationshipDefinitionRefs().add(timmyRelationship);
+    animal.getRelationshipDefinitionRefs().add(daisyRelationship);
+    assertThat(animal.getRelationshipDefinitionRefs())
+      .isNotEmpty()
+      .hasSize(6)
+      .containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship, timmyRelationship, daisyRelationship);
   }
 
   @Test
-  public void testRelationshipDefinitionRefElements() throws Exception {
-    assertThat(animal.getRelationshipDefinitionRefElements()).isEmpty();
+  public void testUpdateRelationshipDefinitionRefsByIdByHelper() {
+    hedwigRelationship.setId("child-relationship");
+    pluckyRelationship.setId("friend-relationship");
+    assertThat(animal.getRelationshipDefinitionRefs())
+      .hasSize(4)
+      .containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
+  }
 
-    // create some childs and friends
-    Bird hedwig = createBird("hedwig", Gender.Male);
-    Bird birdo = createBird("birdo", Gender.Female);
-    Bird plucky = createBird("plucky", Gender.Unknown);
-    Bird fiffy = createBird("fiffy", Gender.Female);
-    Bird timmy = createBird("timmy", Gender.Male);
+  @Test
+  public void testUpdateRelationshipDefinitionRefsByIdByAttributeName() {
+    birdoRelationship.setAttributeValue("id", "birdo-relationship", true);
+    fiffyRelationship.setAttributeValue("id", "fiffy-relationship", true);
+    assertThat(animal.getRelationshipDefinitionRefs())
+      .hasSize(4)
+      .containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
+  }
 
-    // create and add some relationships
-    RelationshipDefinition hedwigRelationship = addChildRelationshipDefinition(animal, hedwig);
-    RelationshipDefinition birdoRelationship = addChildRelationshipDefinition(animal, birdo);
-    RelationshipDefinition pluckyRelationship = addFriendRelationshipDefinition(animal, plucky);
-    RelationshipDefinition fiffyRelationship = addFriendRelationshipDefinition(animal, fiffy);
-    RelationshipDefinition timmyRelationship = addFriendRelationshipDefinition(animal, timmy);
+  @Test
+  public void testUpdateRelationshipDefinitionRefsByReplaceElements() {
+    hedwigRelationship.replaceWithElement(timmyRelationship);
+    pluckyRelationship.replaceWithElement(daisyRelationship);
+    assertThat(animal.getRelationshipDefinitionRefs())
+      .hasSize(4)
+      .containsOnly(birdoRelationship, fiffyRelationship, timmyRelationship, daisyRelationship);
+  }
 
-    animal.getRelationshipDefinitionRefs().add(hedwigRelationship);
-    animal.getRelationshipDefinitionRefs().add(birdoRelationship);
-    animal.getRelationshipDefinitionRefs().add(pluckyRelationship);
-    animal.getRelationshipDefinitionRefs().add(fiffyRelationship);
-    assertThat(animal.getRelationshipDefinitionRefElements()).isNotEmpty();
-    assertThat(animal.getRelationshipDefinitionRefElements()).hasSize(4);
+  @Test
+  public void testUpdateRelationshipDefinitionRefsByRemoveElements() {
+    animal.getRelationshipDefinitions().remove(birdoRelationship);
+    animal.getRelationshipDefinitions().remove(fiffyRelationship);
+    assertThat(animal.getRelationshipDefinitionRefs())
+      .hasSize(2)
+      .containsOnly(hedwigRelationship, pluckyRelationship);
+  }
 
-    // test text content
-    Collection<RelationshipDefinitionRef> relationshipDefinitionRefElements = animal.getRelationshipDefinitionRefElements();
-    for (RelationshipDefinitionRef relationshipDefinitionRef : relationshipDefinitionRefElements) {
-      assertThat(relationshipDefinitionRef.getTextContent()).isNotEmpty();
-      assertThat(relationshipDefinitionRef.getTextContent()).contains(animal.getId());
-    }
+  @Test
+  public void testUpdateRelationshipDefinitionRefsByRemoveIdAttribute() {
+    birdoRelationship.removeAttribute("id");
+    pluckyRelationship.removeAttribute("id");
+    assertThat(animal.getRelationshipDefinitionRefs())
+      .hasSize(2)
+      .containsOnly(hedwigRelationship, fiffyRelationship);
+  }
 
-    // change text-content and add namespace prefix
-    RelationshipDefinitionRef relationshipDefinitionRef = (RelationshipDefinitionRef) relationshipDefinitionRefElements.toArray()[0];
-    relationshipDefinitionRef.setTextContent("tns:" + animal.getId() + "-" + timmy.getId());
-    assertThat(animal.getRelationshipDefinitionRefs()).hasSize(4);
-    assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(birdoRelationship, pluckyRelationship, fiffyRelationship, timmyRelationship);
-
-    // remove element
-    animal.getRelationshipDefinitionRefElements().remove(relationshipDefinitionRef);
-    assertThat(animal.getRelationshipDefinitionRefs()).hasSize(3);
-    assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(birdoRelationship, pluckyRelationship, fiffyRelationship);
-
-    // clear elements
-    animal.getRelationshipDefinitionRefElements().clear();
+  @Test
+  public void testClearRelationshipDefinitionsRefs() {
+    animal.getRelationshipDefinitionRefs().clear();
     assertThat(animal.getRelationshipDefinitionRefs()).isEmpty();
+    // should not affect animal relationship definitions
+    assertThat(animal.getRelationshipDefinitions()).hasSize(4);
+  }
+
+  @Test
+  public void testClearRelationshipDefinitionRefsByClearRelationshipDefinitions() {
+    assertThat(animal.getRelationshipDefinitionRefs()).isNotEmpty();
+    animal.getRelationshipDefinitions().clear();
+    assertThat(animal.getRelationshipDefinitions()).isEmpty();
+    // should affect animal relationship definition refs
+    assertThat(animal.getRelationshipDefinitionRefs()).isEmpty();
+  }
+
+  @Test
+  public void testAddRelationshipDefinitionRefElementsByHelper() {
+    addRelationshipDefinition(animal, timmyRelationship);
+    RelationshipDefinitionRef relationshipDefinitionRef = modelInstance.newInstance(RelationshipDefinitionRef.class);
+    relationshipDefinitionRef.setTextContent(timmyRelationship.getId());
+    animal.getRelationshipDefinitionRefElements().add(relationshipDefinitionRef);
+
+    assertThat(animal.getRelationshipDefinitionRefElements())
+      .isNotEmpty()
+      .hasSize(5);
+  }
+
+  @Test
+  public void testRelationshipDefinitionRefElementsByTextContent() {
+    Collection<RelationshipDefinitionRef> relationshipDefinitionRefElements = animal.getRelationshipDefinitionRefElements();
+    Collection<String> textContents = new ArrayList<String>();
+    for (RelationshipDefinitionRef relationshipDefinitionRef : relationshipDefinitionRefElements) {
+      String textContent = relationshipDefinitionRef.getTextContent();
+      assertThat(textContent).isNotEmpty();
+      textContents.add(textContent);
+    }
+    assertThat(textContents)
+      .isNotEmpty()
+      .hasSize(4)
+      .containsOnly(hedwigRelationship.getId(), birdoRelationship.getId(), pluckyRelationship.getId(), fiffyRelationship.getId());
+  }
+
+  @Test
+  public void testUpdateRelationshipDefinitionRefElementsByTextContent() {
+    addRelationshipDefinition(animal, timmyRelationship);
+    RelationshipDefinitionRef relationshipDefinitionRef = (RelationshipDefinitionRef) animal.getRelationshipDefinitionRefElements().toArray()[0];
+    relationshipDefinitionRef.setTextContent(timmyRelationship.getId());
+    assertThat(animal.getRelationshipDefinitionRefs())
+      .hasSize(4)
+      .containsOnly(birdoRelationship, pluckyRelationship, fiffyRelationship, timmyRelationship);
+  }
+
+  @Test
+  public void testUpdateRelationshipDefinitionRefElementsByTextContentWithNamespace() {
+    addRelationshipDefinition(animal, timmyRelationship);
+    RelationshipDefinitionRef relationshipDefinitionRef = (RelationshipDefinitionRef) animal.getRelationshipDefinitionRefElements().toArray()[0];
+    relationshipDefinitionRef.setTextContent("tns:" + timmyRelationship.getId());
+    assertThat(animal.getRelationshipDefinitionRefs())
+      .hasSize(4)
+      .containsOnly(birdoRelationship, pluckyRelationship, fiffyRelationship, timmyRelationship);
+  }
+
+  @Test
+  public void testUpdateRelationshipDefinitionRefElementsByRemoveElements() {
+    List<RelationshipDefinitionRef> relationshipDefinitionRefElements = new ArrayList<RelationshipDefinitionRef>(animal.getRelationshipDefinitionRefElements());
+    animal.getRelationshipDefinitionRefElements().remove(relationshipDefinitionRefElements.get(0));
+    animal.getRelationshipDefinitionRefElements().remove(relationshipDefinitionRefElements.get(2));
+    assertThat(animal.getRelationshipDefinitionRefs())
+      .hasSize(2)
+      .containsOnly(birdoRelationship, fiffyRelationship);
+  }
+
+  @Test
+  public void testClearRelationshipDefinitionRefElements() {
+    animal.getRelationshipDefinitionRefElements().clear();
+    assertThat(animal.getRelationshipDefinitionRefElements()).isEmpty();
+    assertThat(animal.getRelationshipDefinitionRefs()).isEmpty();
+    // should not affect animal relationship definitions
+    assertThat(animal.getRelationshipDefinitions())
+      .isNotEmpty()
+      .hasSize(4);
+  }
+
+  @Test
+  public void testClearRelationshipDefinitionRefElementsByClearRelationshipDefinitionRefs() {
+    animal.getRelationshipDefinitionRefs().clear();
+    assertThat(animal.getRelationshipDefinitionRefs()).isEmpty();
+    assertThat(animal.getRelationshipDefinitionRefElements()).isEmpty();
+    // should not affect animal relationship definitions
+    assertThat(animal.getRelationshipDefinitions())
+      .isNotEmpty()
+      .hasSize(4);
+  }
+
+  @Test
+  public void testClearRelationshipDefinitionRefElementsByClearRelationshipDefinitions() {
+    animal.getRelationshipDefinitions().clear();
+    assertThat(animal.getRelationshipDefinitionRefs()).isEmpty();
+    assertThat(animal.getRelationshipDefinitionRefElements()).isEmpty();
+    // should affect animal relationship definitions
+    assertThat(animal.getRelationshipDefinitions()).isEmpty();
   }
 }

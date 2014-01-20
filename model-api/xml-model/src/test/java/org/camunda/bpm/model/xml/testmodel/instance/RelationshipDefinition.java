@@ -61,4 +61,8 @@ public abstract class RelationshipDefinition extends ModelElementInstanceImpl {
   public void setAnimal(Animal animalInRelationshipWith) {
     animalRef.setReferencedElement(this, animalInRelationshipWith);
   }
+
+  public Animal getAnimal() {
+    return animalRef.getReferencedElement(this);
+  }
 }
