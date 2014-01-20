@@ -140,8 +140,8 @@ public class AnimalTest {
     father.setId("changed-father");
     assertThat(animal.getFather()).isEqualTo(father);
 
-    // set father by name
-    animal.setAttributeValue("father", stepfather.getId(), false);
+    // set father by name with namespace
+    animal.setAttributeValue("father", "tns:" + stepfather.getId(), false);
     assertThat(animal.getFather()).isEqualTo(stepfather);
 
     // replace father
@@ -165,8 +165,8 @@ public class AnimalTest {
     animal.setMother(mother);
     assertThat(animal.getMother()).isEqualTo(mother);
 
-    // set mother by name
-    animal.setAttributeValue("mother", stepmother.getId(), false);
+    // set mother by name with namespace
+    animal.setAttributeValue("mother", "tns:" + stepmother.getId(), false);
     assertThat(animal.getMother()).isEqualTo(stepmother);
 
     // replace mother
@@ -403,9 +403,9 @@ public class AnimalTest {
       assertThat(relationshipDefinitionRef.getTextContent()).contains(animal.getId());
     }
 
-    // change text-content
+    // change text-content and add namespace prefix
     RelationshipDefinitionRef relationshipDefinitionRef = (RelationshipDefinitionRef) relationshipDefinitionRefElements.toArray()[0];
-    relationshipDefinitionRef.setTextContent(animal.getId() + "-" + timmy.getId());
+    relationshipDefinitionRef.setTextContent("tns:" + animal.getId() + "-" + timmy.getId());
     assertThat(animal.getRelationshipDefinitionRefs()).hasSize(4);
     assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(birdoRelationship, pluckyRelationship, fiffyRelationship, timmyRelationship);
 
