@@ -145,7 +145,7 @@ public class AnimalTest {
     assertThat(animal.getFather()).isEqualTo(stepfather);
 
     // replace father
-    stepfather.replaceElement(father);
+    stepfather.replaceWithElement(father);
     assertThat(animal.getFather()).isEqualTo(father);
 
     // remove father
@@ -170,7 +170,7 @@ public class AnimalTest {
     assertThat(animal.getMother()).isEqualTo(stepmother);
 
     // replace mother
-    stepmother.replaceElement(mother);
+    stepmother.replaceWithElement(mother);
     assertThat(animal.getMother()).isEqualTo(mother);
 
     // remove mother
@@ -279,8 +279,8 @@ public class AnimalTest {
     assertThat(animal.getRelationshipDefinitions()).containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
 
     // replace element
-    hedwigRelationship.replaceElement(timmyRelationship);
-    pluckyRelationship.replaceElement(daisyRelationship);
+    hedwigRelationship.replaceWithElement(timmyRelationship);
+    pluckyRelationship.replaceWithElement(daisyRelationship);
     assertThat(animal.getRelationshipDefinitions()).hasSize(4);
     assertThat(animal.getRelationshipDefinitions()).containsOnly(birdoRelationship, fiffyRelationship, timmyRelationship, daisyRelationship);
 
@@ -336,8 +336,8 @@ public class AnimalTest {
     assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(hedwigRelationship, birdoRelationship, pluckyRelationship, fiffyRelationship);
 
     // replace element
-    hedwigRelationship.replaceElement(timmyRelationship);
-    pluckyRelationship.replaceElement(daisyRelationship);
+    hedwigRelationship.replaceWithElement(timmyRelationship);
+    pluckyRelationship.replaceWithElement(daisyRelationship);
     assertThat(animal.getRelationshipDefinitionRefs()).hasSize(4);
     assertThat(animal.getRelationshipDefinitionRefs()).containsOnly(birdoRelationship, fiffyRelationship, timmyRelationship, daisyRelationship);
 

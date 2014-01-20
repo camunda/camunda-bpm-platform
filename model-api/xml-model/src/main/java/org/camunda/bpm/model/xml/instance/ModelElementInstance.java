@@ -42,7 +42,12 @@ public interface ModelElementInstance {
 
   void removeAttributeNs(String attributeName, String namespaceUri);
 
-  void replaceElement(ModelElementInstance newElement);
+  /**
+   * Replaces this element with a new element and updates references.
+   *
+   * @param newElement  the new element to replace with
+   */
+  void replaceWithElement(ModelElementInstance newElement);
 
   String getTextContent();
 

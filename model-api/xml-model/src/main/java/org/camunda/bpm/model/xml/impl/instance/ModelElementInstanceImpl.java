@@ -132,7 +132,7 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
     domElement.replaceChild(newChildDomElement, existingChildDomElement);
   }
 
-  public void replaceElement(ModelElementInstance newElement) {
+  public void replaceWithElement(ModelElementInstance newElement) {
     ModelElementInstanceImpl parentElement = (ModelElementInstanceImpl) getParentElement();
     if (parentElement != null) {
       parentElement.replaceChildElement(this, (ModelElementInstanceImpl) newElement);

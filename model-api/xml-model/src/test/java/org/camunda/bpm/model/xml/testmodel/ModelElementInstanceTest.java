@@ -103,14 +103,14 @@ public class ModelElementInstanceTest {
     assertThat(tweety.getFather()).isEqualTo(daffy);
 
     // replace birds
-    fiffy.replaceElement(timmy);
+    fiffy.replaceWithElement(timmy);
     assertThat(tweety.getMother()).isEqualTo(timmy);
-    timmy.replaceElement(fiffy);
+    timmy.replaceWithElement(fiffy);
     assertThat(tweety.getMother()).isEqualTo(fiffy);
 
-    daffy.replaceElement(timmy);
+    daffy.replaceWithElement(timmy);
     assertThat(tweety.getFather()).isEqualTo(timmy);
-    timmy.replaceElement(daffy);
+    timmy.replaceWithElement(daffy);
     assertThat(tweety.getFather()).isEqualTo(daffy);
 
     // remove id
