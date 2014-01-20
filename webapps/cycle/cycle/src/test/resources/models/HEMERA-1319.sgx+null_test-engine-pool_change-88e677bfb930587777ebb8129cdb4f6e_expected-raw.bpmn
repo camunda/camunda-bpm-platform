@@ -1,29 +1,50 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.0.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-42699947-56ba-412f-95e3-91bff24257c4" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-9bed646b-5e45-4feb-ae5b-f51141aa6b6d" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
    <process id="test-engine-pool" isClosed="false" isExecutable="true" processType="None">
       <startEvent id="StartNoneEvent" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <outgoing>SequenceFlow</outgoing>
       </startEvent>
       <userTask completionQuantity="1" id="Task_2" isForCompensation="false" name="" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+         </extensionElements>
          <incoming>SequenceFlow_7</incoming>
          <outgoing>SequenceFlow_3</outgoing>
       </userTask>
       <userTask completionQuantity="1" id="Task" isForCompensation="false" name="" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+         </extensionElements>
          <incoming>SequenceFlow_2</incoming>
          <outgoing>sequenceFlow_42</outgoing>
       </userTask>
       <serviceTask activiti:class="org.camunda.bpm.demo.pdf.SavePdfDelegate" completionQuantity="1" id="Task_abc" isForCompensation="false" name="Task_abc" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+         </extensionElements>
          <incoming>sequenceFlow_42</incoming>
          <outgoing>SequenceFlow_5</outgoing>
       </serviceTask>
       <endEvent id="EndNoneEvent" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <incoming>SequenceFlow_5</incoming>
       </endEvent>
       <exclusiveGateway gatewayDirection="Diverging" id="Exclusive_Databased_Gateway" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <incoming>SequenceFlow</incoming>
          <outgoing>SequenceFlow_8</outgoing>
          <outgoing>SequenceFlow_7</outgoing>
       </exclusiveGateway>
       <exclusiveGateway gatewayDirection="Converging" id="Exclusive_Databased_Gateway_2" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
          <incoming>SequenceFlow_8</incoming>
          <incoming>SequenceFlow_3</incoming>
          <outgoing>SequenceFlow_2</outgoing>
@@ -36,8 +57,8 @@
       <sequenceFlow id="SequenceFlow_2" isImmediate="true" name="" sourceRef="Exclusive_Databased_Gateway_2" targetRef="Task"/>
       <sequenceFlow id="SequenceFlow_3" isImmediate="true" name="" sourceRef="Task_2" targetRef="Exclusive_Databased_Gateway_2"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-d24db100-0b4e-4314-bb56-b6485008073e">
-      <bpmndi:BPMNPlane bpmnElement="test-engine-pool" id="sid-02eee039-deda-4f30-b6ae-aea221e69a52">
+   <bpmndi:BPMNDiagram id="sid-2b59aaaf-4a1a-4348-b146-3d0f6e7560f7">
+      <bpmndi:BPMNPlane bpmnElement="test-engine-pool" id="sid-219b49fc-13b4-45a9-99ce-94913edd7539">
          <bpmndi:BPMNShape bpmnElement="StartNoneEvent" id="StartNoneEvent_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="106.0" y="216.0"/>
          </bpmndi:BPMNShape>
