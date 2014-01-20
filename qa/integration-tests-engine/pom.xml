@@ -719,6 +719,7 @@
                 <exclude>**/ejb/**</exclude>
                 <exclude>**/jar/**</exclude>
                 <exclude>**/transactions/**</exclude>
+                <exclude>**/jpa/**</exclude>
                 <!-- No EJB RequestContext available -->
                 <exclude>**/JobExecutorRequestContextTest.java</exclude>
                 <!-- Not supported by arquillian tomcat container -->
