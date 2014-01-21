@@ -17,6 +17,7 @@ import java.io.File;
 import org.camunda.bpm.qa.performance.engine.framework.aggregate.BenchmarkAggregator;
 import org.camunda.bpm.qa.performance.engine.framework.aggregate.TabularResultSet;
 import org.camunda.bpm.qa.performance.engine.framework.report.HtmlReportBuilder;
+import org.camunda.bpm.qa.performance.engine.util.CsvUtil;
 import org.camunda.bpm.qa.performance.engine.util.FileUtil;
 import org.camunda.bpm.qa.performance.engine.util.JsonUtil;
 
@@ -31,8 +32,13 @@ public class BenchmarkReport {
     final String resultsFolder = "target"+File.separatorChar+"results";
     final String reportsFolder = "target"+File.separatorChar+"reports";
 
-    final String htmlReportFilename = reportsFolder + File.separatorChar + "benckmark-report.html";
-    final String jsonReportFilename = reportsFolder + File.separatorChar + "benckmark-report.json";
+    final String htmlReportFilename = reportsFolder + File.separatorChar + "benchmark-report.html";
+
+    final String jsonReportFilename = "benchmark-report.json";
+    final String jsonReportPath = reportsFolder + File.separatorChar + jsonReportFilename;
+
+    final String csvReportFilename = "benchmark-report.csv";
+    final String csvReportPath = reportsFolder + File.separatorChar + csvReportFilename;
 
     // make sure reports folder exists
     File reportsFolderFile = new File(reportsFolder);
@@ -44,18 +50,21 @@ public class BenchmarkReport {
     TabularResultSet aggregatedResults = aggregator.execute();
 
     // write Json report
-    JsonUtil.writeObjectToFile(jsonReportFilename, aggregatedResults);
+    JsonUtil.writeObjectToFile(jsonReportPath, aggregatedResults);
 
     // format HTML report
     HtmlReportBuilder reportWriter = new HtmlReportBuilder(aggregatedResults)
       .name("Benchmark Report")
       .resultDetailsFolder(".."+File.separatorChar+"results"+File.separatorChar)
       .createImageLinks(true)
-      .jsonSource("benckmark-report.json");
+      .jsonSource(jsonReportFilename)
+      .csvSource(csvReportFilename);
 
     String report = reportWriter.execute();
-
     FileUtil.writeStringToFile(report, htmlReportFilename);
+
+    // write CSV report
+    CsvUtil.saveResultSetToFile(csvReportPath, aggregatedResults);
 
   }
 }

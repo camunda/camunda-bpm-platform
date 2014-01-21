@@ -17,6 +17,7 @@ import java.io.File;
 import org.camunda.bpm.qa.performance.engine.framework.aggregate.SqlStatementCountAggregator;
 import org.camunda.bpm.qa.performance.engine.framework.aggregate.TabularResultSet;
 import org.camunda.bpm.qa.performance.engine.framework.report.HtmlReportBuilder;
+import org.camunda.bpm.qa.performance.engine.util.CsvUtil;
 import org.camunda.bpm.qa.performance.engine.util.FileUtil;
 import org.camunda.bpm.qa.performance.engine.util.JsonUtil;
 
@@ -32,7 +33,12 @@ public class SqlStatementLogReport {
     final String reportsFolder = "target"+File.separatorChar+"reports";
 
     final String htmlReportFilename = reportsFolder + File.separatorChar + "sql-statement-log-report.html";
-    final String jsonReportFilename = reportsFolder + File.separatorChar + "sql-statement-log-report.json";
+
+    final String jsonReportFilename = "sql-statement-log-report.json";
+    final String jsonReportPath = reportsFolder + File.separatorChar + jsonReportFilename;
+
+    final String csvReportFilename = "sql-statement-log-report.csv";
+    final String csvReportPath = reportsFolder + File.separatorChar + csvReportFilename;
 
     // make sure reports folder exists
     File reportsFolderFile = new File(reportsFolder);
@@ -44,18 +50,22 @@ public class SqlStatementLogReport {
     TabularResultSet aggregatedResults = aggregator.execute();
 
     // write Json report
-    JsonUtil.writeObjectToFile(jsonReportFilename, aggregatedResults);
+    JsonUtil.writeObjectToFile(jsonReportPath, aggregatedResults);
+    // write CSV Report
+    CsvUtil.saveResultSetToFile(csvReportPath, aggregatedResults);
 
     // format HTML report
     HtmlReportBuilder reportWriter = new HtmlReportBuilder(aggregatedResults)
       .name("Sql Statement Log Report")
       .resultDetailsFolder(".."+File.separatorChar+"results"+File.separatorChar)
       .createImageLinks(true)
-      .jsonSource("sql-statement-log-report.json");
+      .jsonSource(jsonReportFilename)
+      .csvSource(csvReportFilename);
 
     String report = reportWriter.execute();
-
     FileUtil.writeStringToFile(report, htmlReportFilename);
+
+
 
   }
 }

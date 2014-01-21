@@ -29,6 +29,7 @@ public class HtmlReportBuilder {
   protected TabularResultSet resultSet;
   protected String resultsBaseFolder;
   protected String jsonSourceFileName;
+  protected String csvSourceFileName;
   protected String reportName;
   protected boolean isCreateImageLinks;
 
@@ -53,6 +54,11 @@ public class HtmlReportBuilder {
 
   public HtmlReportBuilder createImageLinks(boolean shouldCreateImageLinks) {
     isCreateImageLinks = shouldCreateImageLinks;
+    return this;
+  }
+
+  public HtmlReportBuilder csvSource(String csvReportFilename) {
+    this.csvSourceFileName = csvReportFilename;
     return this;
   }
 
@@ -87,16 +93,32 @@ public class HtmlReportBuilder {
         .endElement()
       .endElement();
 
-    if(jsonSourceFileName != null) {
+    if(jsonSourceFileName != null || csvSourceFileName != null) {
 
-      bodyBuilder
+     HtmlDocumentBuilder sourceRow = bodyBuilder
         .startElement(new HtmlElementWriter("div").attribute("class", "row"))
           .startElement(new HtmlElementWriter("div").attribute("class", "coll-md-12"))
-            .startElement(new HtmlElementWriter("p"))
-              .startElement(new HtmlElementWriter("a")
+            .startElement(new HtmlElementWriter("p"));
+
+     if(jsonSourceFileName != null) {
+         sourceRow.startElement(new HtmlElementWriter("a")
                   .attribute("href", jsonSourceFileName)
                   .textContent("This Report as JSON"))
-            .endElement()
+                  .endElement();
+     }
+
+     if(jsonSourceFileName != null && jsonSourceFileName != null) {
+        sourceRow.startElement(new HtmlElementWriter("span").textContent("&nbsp;|&nbsp;")).endElement();
+     }
+
+     if(jsonSourceFileName != null) {
+        sourceRow.startElement(new HtmlElementWriter("a")
+                 .attribute("href", csvSourceFileName)
+                 .textContent("This Report as CSV"))
+                 .endElement();
+     }
+
+     sourceRow
             .endElement()
           .endElement()
         .endElement();
@@ -184,5 +206,6 @@ public class HtmlReportBuilder {
     /** </table> */
     tableBuilder.endElement();
   }
+
 
 }
