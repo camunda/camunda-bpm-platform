@@ -322,6 +322,7 @@
     update ${prefix}ACT_RU_JOB
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
+       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
        LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
        LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
        RETRIES_ = #{retries, jdbcType=INTEGER},
@@ -405,6 +406,7 @@
     update ${prefix}ACT_RU_JOB
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
+       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
        LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
        LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
        RETRIES_ = #{retries, jdbcType=INTEGER},
