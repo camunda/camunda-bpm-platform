@@ -50,6 +50,7 @@ public class BenchmarkReport {
     HtmlReportBuilder reportWriter = new HtmlReportBuilder(aggregatedResults)
       .name("Benchmark Report")
       .resultDetailsFolder(".."+File.separatorChar+"results"+File.separatorChar)
+      .createImageLinks(true)
       .jsonSource("benckmark-report.json");
 
     String report = reportWriter.execute();

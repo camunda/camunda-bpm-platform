@@ -50,6 +50,7 @@ public class SqlStatementLogReport {
     HtmlReportBuilder reportWriter = new HtmlReportBuilder(aggregatedResults)
       .name("Sql Statement Log Report")
       .resultDetailsFolder(".."+File.separatorChar+"results"+File.separatorChar)
+      .createImageLinks(true)
       .jsonSource("sql-statement-log-report.json");
 
     String report = reportWriter.execute();

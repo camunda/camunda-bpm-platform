@@ -30,6 +30,7 @@ public class HtmlReportBuilder {
   protected String resultsBaseFolder;
   protected String jsonSourceFileName;
   protected String reportName;
+  protected boolean isCreateImageLinks;
 
   public HtmlReportBuilder(TabularResultSet resultSet) {
     this.resultSet = resultSet;
@@ -47,6 +48,11 @@ public class HtmlReportBuilder {
 
   public HtmlReportBuilder name(String reportName) {
     this.reportName = reportName;
+    return this;
+  }
+
+  public HtmlReportBuilder createImageLinks(boolean shouldCreateImageLinks) {
+    isCreateImageLinks = shouldCreateImageLinks;
     return this;
   }
 
@@ -143,9 +149,20 @@ public class HtmlReportBuilder {
       /** <tr> */
       HtmlDocumentBuilder tableRowBuilder = tableBuilder.startElement(new HtmlElementWriter("tr"));
 
-      for (Object resultColumn : resultRow) {
-        tableHeadRowBuilder.startElement(new HtmlElementWriter("td").textContent(String.valueOf(resultColumn)))
+      for (int i = 0; i<resultRow.size(); i++) {
+        Object value = resultRow.get(i);
+        if(i==0 && isCreateImageLinks) {
+          tableHeadRowBuilder.startElement(new HtmlElementWriter("td"))
+            .startElement(new HtmlElementWriter("a")
+                             .attribute("href", "images/"+value+".png")
+                             .textContent(String.valueOf(value)))
+            .endElement()
           .endElement();
+
+        } else {
+          tableHeadRowBuilder.startElement(new HtmlElementWriter("td").textContent(String.valueOf(value)))
+          .endElement();
+        }
       }
 
       if(resultsBaseFolder != null) {

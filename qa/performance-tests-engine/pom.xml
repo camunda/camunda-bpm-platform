@@ -92,6 +92,11 @@
                 <configuration>
                   <tasks>
                     <echo message="Generating reports" />
+                    <copy todir="${basedir}/target/reports/images" flatten="true">
+                      <fileset dir="${basedir}/src/test/resources">
+                        <include name="**/*.png"/>
+                      </fileset>
+                    </copy>
                     <java classname="org.camunda.bpm.qa.performance.engine.benchmark.BenchmarkReport" classpathref="maven.test.classpath" />
                   </tasks>
                 </configuration>
@@ -146,8 +151,13 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>
-                    <echo message="Generating reports" />
+                  <tasks>                  
+                    <echo message="Generating reports in ${basedir}/target/reports/" />
+                    <copy todir="${basedir}/target/reports/images" flatten="true">
+                      <fileset dir="${basedir}/src/test/resources">
+                        <include name="**/*.png"/>
+                      </fileset>
+                    </copy>
                     <java classname="org.camunda.bpm.qa.performance.engine.sqlstatementlog.SqlStatementLogReport" classpathref="maven.test.classpath" />
                   </tasks>
                 </configuration>
