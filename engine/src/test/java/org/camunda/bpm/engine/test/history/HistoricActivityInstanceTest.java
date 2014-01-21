@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEn
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -446,6 +447,208 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("end2");
     assertEquals(1, historicActivityInstanceQuery.count());
     assertNotNull(historicActivityInstanceQuery.singleResult().getEndTime());
+  }
+
+  @Deployment
+  public void testInterruptingBoundaryMessageEvent() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("newMessage").singleResult();
+
+    runtimeService.messageEventReceived("newMessage", execution.getId());
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("message");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testNonInterruptingBoundaryMessageEvent() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("newMessage").singleResult();
+
+    runtimeService.messageEventReceived("newMessage", execution.getId());
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("message");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testInterruptingBoundarySignalEvent() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    Execution execution = runtimeService.createExecutionQuery().signalEventSubscriptionName("newSignal").singleResult();
+
+    runtimeService.signalEventReceived("newSignal", execution.getId());
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("signal");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testNonInterruptingBoundarySignalEvent() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    Execution execution = runtimeService.createExecutionQuery().signalEventSubscriptionName("newSignal").singleResult();
+
+    runtimeService.signalEventReceived("newSignal", execution.getId());
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("signal");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testInterruptingBoundaryTimerEvent() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    managementService.executeJob(job.getId());
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("timer");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testNonInterruptingBoundaryTimerEvent() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    managementService.executeJob(job.getId());
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("timer");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testBoundaryErrorEvent() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("error");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testBoundaryCancelEvent() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("catchCancel");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testBoundaryCompensateEvent() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    // the compensation boundary event should not appear in history!
+    query.activityId("compensate");
+    assertEquals(0, query.count());
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testBoundaryCompensateEvent.bpmn20.xml")
+  public void FAILING_testCompensationServiceTaskHasEndTime() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("compensationServiceTask");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testBoundaryCancelEvent.bpmn20.xml")
+  public void testTransaction() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("transaction");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    assertProcessEnded(pi.getId());
   }
 
 }

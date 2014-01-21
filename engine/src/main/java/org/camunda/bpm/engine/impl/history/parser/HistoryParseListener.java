@@ -188,6 +188,7 @@ public class HistoryParseListener implements BpmnParseListener {
   }
 
   public void parseTransaction(Element transactionElement, ScopeImpl scope, ActivityImpl activity) {
+    addActivityHandlers(activity);
   }
 
   public void parseCompensateEventDefinition(Element compensateEventDefinition, ActivityImpl compensationActivity) {
