@@ -155,9 +155,18 @@ public class PerfTestRunner {
     passCompleted = false;
 
     PerfTestStep firstStep = test.getFirstStep();
+    int numberOfRuns = configuration.getNumberOfRuns();
+
+    // first create the runs
+    PerfTestRun[] runs = new PerfTestRun[numberOfRuns];
+    for (int i = 0; i < numberOfRuns; i++) {
+      runs[i] = new PerfTestRun(this, firstStep);
+    }
+
+    // now execute the runs
     this.passStartTime = System.currentTimeMillis();
-    for (int i = 0; i < configuration.getNumberOfRuns(); i++) {
-      executor.execute(new PerfTestRun(this, firstStep));
+    for (int i = 0; i < numberOfRuns; i++) {
+      executor.execute(runs[i]);
     }
 
     synchronized (passMonitor) {

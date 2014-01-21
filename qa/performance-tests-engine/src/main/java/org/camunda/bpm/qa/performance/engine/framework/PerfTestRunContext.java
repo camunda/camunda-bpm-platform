@@ -21,6 +21,8 @@ package org.camunda.bpm.qa.performance.engine.framework;
  */
 public interface PerfTestRunContext {
 
+  public static ThreadLocal<PerfTestRunContext> currentContext = new ThreadLocal<PerfTestRunContext>();
+
   void setVariable(String name, Object value);
 
   <T> T getVariable(String name);

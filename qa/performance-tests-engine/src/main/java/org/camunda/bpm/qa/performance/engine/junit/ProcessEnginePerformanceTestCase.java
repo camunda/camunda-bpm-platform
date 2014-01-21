@@ -24,7 +24,7 @@ import org.junit.Rule;
  * @author Daniel Meyer
  *
  */
-public abstract class ProcessEnginePerfTestBase {
+public abstract class ProcessEnginePerformanceTestCase {
 
   @Rule
   public ProcessEngineRule processEngineRule = new ProcessEngineRule();

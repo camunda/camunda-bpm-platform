@@ -61,13 +61,20 @@ public class PerfTestRun implements PerfTestRunContext, Runnable {
       }
       notifyWatchersBeforeStep();
 
+      PerfTestRunContext.currentContext.set(this);
+
       PerfTestStepBehavior perfTestStepBehavior = currentStep.getStepBehavior();
       perfTestStepBehavior.execute(this);
 
       notifyWatchersAfterStep();
       runner.completedStep(this, currentStep);
+
     } catch(Throwable t) {
       runner.failed(this, t);
+
+    } finally {
+      PerfTestRunContext.currentContext.remove();
+
     }
   }
 

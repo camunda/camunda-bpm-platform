@@ -19,7 +19,19 @@ package org.camunda.bpm.qa.performance.engine.steps;
 public final class PerfTestConstants {
 
   public static final String PROCESS_INSTANCE_ID = "processInstanceId";
+  public static final String EXECUTION_ID = "executionId";
+  public static final String TASK_ID = "taskId";
 
+  public static final String VARIABLE1 = "variable1";
+  public static final String VARIABLE2 = "variable2";
+  public static final String VARIABLE3 = "variable3";
+  public static final String VARIABLE4 = "variable4";
+  public static final String VARIABLE5 = "variable5";
+  public static final String VARIABLE6 = "variable6";
+  public static final String VARIABLE7 = "variable7";
+  public static final String VARIABLE8 = "variable8";
+  public static final String VARIABLE9 = "variable9";
+  public static final String VARIABLE10 = "variable10";
 
   private PerfTestConstants() {}
 

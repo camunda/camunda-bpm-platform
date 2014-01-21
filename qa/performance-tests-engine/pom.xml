@@ -59,7 +59,7 @@
       <properties>
         <!-- default values for properties -->
         <numberOfThreads>2</numberOfThreads>
-        <numberOfRuns>500</numberOfRuns>
+        <numberOfRuns>100</numberOfRuns>
       </properties>
 
       <build>

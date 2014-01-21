@@ -24,11 +24,11 @@ import org.junit.Test;
  * @author Daniel Meyer
  *
  */
-public class SequencePerformanceTest extends ProcessEnginePerformanceTestCase {
+public class EmbeddedSubprocessPerformanceTest extends ProcessEnginePerformanceTestCase {
 
   @Test
   @Deployment
-  public void syncSequence1Step() {
+  public void sync1Subprocess() {
     perfomanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
@@ -36,7 +36,7 @@ public class SequencePerformanceTest extends ProcessEnginePerformanceTestCase {
 
   @Test
   @Deployment
-  public void syncSequence5Steps() {
+  public void sync2Subprocesses() {
     perfomanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
@@ -44,7 +44,7 @@ public class SequencePerformanceTest extends ProcessEnginePerformanceTestCase {
 
   @Test
   @Deployment
-  public void syncSequence15Steps() {
+  public void sync3Subprocesses() {
     perfomanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
@@ -52,31 +52,29 @@ public class SequencePerformanceTest extends ProcessEnginePerformanceTestCase {
 
   @Test
   @Deployment
-  public void asyncSequence1Step() {
+  public void async1Subprocess() {
     perfomanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
-      .step(new SignalExecutionStep(engine, PROCESS_INSTANCE_ID))
+      .step(new SignalExecutionStep(engine, EXECUTION_ID))
     .run();
   }
 
   @Test
   @Deployment
-  public void asyncSequence5Steps() {
+  public void async2Subprocesses() {
     perfomanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
-      .steps(5, new SignalExecutionStep(engine, PROCESS_INSTANCE_ID))
+      .step(new SignalExecutionStep(engine, EXECUTION_ID))
     .run();
   }
 
   @Test
   @Deployment
-  public void asyncSequence15Steps() {
+  public void async3Subprocesses() {
     perfomanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
-      .steps(15, new SignalExecutionStep(engine, PROCESS_INSTANCE_ID))
+      .step(new SignalExecutionStep(engine, EXECUTION_ID))
     .run();
   }
-
-
 
 }

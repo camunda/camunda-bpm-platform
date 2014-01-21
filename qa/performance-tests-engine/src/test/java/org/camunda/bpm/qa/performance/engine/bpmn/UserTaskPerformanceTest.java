@@ -12,9 +12,11 @@
  */
 package org.camunda.bpm.qa.performance.engine.bpmn;
 
+import static org.camunda.bpm.qa.performance.engine.steps.PerfTestConstants.TASK_ID;
+
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.performance.engine.junit.ProcessEnginePerformanceTestCase;
-import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceByMessageStep;
+import org.camunda.bpm.qa.performance.engine.steps.CompleteTaskStep;
 import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceStep;
 import org.junit.Test;
 
@@ -22,26 +24,15 @@ import org.junit.Test;
  * @author Daniel Meyer
  *
  */
-public class StartEventPerformanceTest extends ProcessEnginePerformanceTestCase {
+public class UserTaskPerformanceTest extends ProcessEnginePerformanceTestCase {
 
   @Test
   @Deployment
-  public void noneStartEvent() {
-
+  public void singleTask() {
     perfomanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
+      .step(new CompleteTaskStep(engine, TASK_ID))
     .run();
-
-  }
-
-  @Test
-  @Deployment
-  public void messageStartEvent() {
-
-    perfomanceTest()
-      .step(new StartProcessInstanceByMessageStep(engine, "message"))
-    .run();
-
   }
 
 }
