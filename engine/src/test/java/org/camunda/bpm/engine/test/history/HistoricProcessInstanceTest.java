@@ -256,6 +256,9 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey("businessKey123").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKeyLike("business%").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionName("The One Task Process").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionNameLike("The One Task %").count());
 
     List<String> exludeIds = new ArrayList<String>();
     exludeIds.add("unexistingProcessDefinition");

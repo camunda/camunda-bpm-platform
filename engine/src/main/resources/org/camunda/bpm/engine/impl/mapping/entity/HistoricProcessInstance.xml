@@ -124,7 +124,7 @@
   
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
     from ${prefix}ACT_HI_PROCINST RES
-    <if test="processKeyNotIn != null || processDefinitionKey != null">
+    <if test="processKeyNotIn != null || processDefinitionKey != null || processDefinitionName != null || processDefinitionNameLike != null">
       inner join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
     </if>
     <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
@@ -146,8 +146,17 @@
       <if test="processDefinitionKey != null">
         and RES.PROC_DEF_ID_ like #{processDefinitionIdLike}
       </if>
+      <if test="processDefinitionName != null">
+        and DEF.NAME_ = #{processDefinitionName}
+      </if>
+      <if test="processDefinitionNameLike != null">
+        and DEF.NAME_ like #{processDefinitionNameLike}
+      </if>
       <if test="businessKey != null">
         and RES.BUSINESS_KEY_ = #{businessKey}
+      </if>
+      <if test="businessKeyLike != null">
+        and RES.BUSINESS_KEY_ like #{businessKeyLike}
       </if>
 
       <if test="startedBefore != null">

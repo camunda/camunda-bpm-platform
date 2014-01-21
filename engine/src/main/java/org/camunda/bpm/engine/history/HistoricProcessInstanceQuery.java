@@ -21,6 +21,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.task.TaskQuery;
 
 /**
  * Allows programmatic querying of {@link HistoricProcessInstance}s.
@@ -49,8 +50,20 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   /** Only select historic process instances that don't have a process-definition of which the key is present in the given list */
   HistoricProcessInstanceQuery processDefinitionKeyNotIn(List<String> processDefinitionKeys);
 
+  /** Only select historic process instances that are defined by a process
+   * definition with the given name.  */
+  HistoricProcessInstanceQuery processDefinitionName(String processDefinitionName);
+  
+  /** Only select historic process instances with a name matching the parameter.
+   *  The syntax is that of SQL: for example usage: nameLike(%processDefinitionName%)*/
+  HistoricProcessInstanceQuery processDefinitionNameLike(String nameLike);
+  
   /** Only select historic process instances with the given business key */
   HistoricProcessInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey);
+  
+  /** Only select historic process instances with a name matching the parameter.
+   *  The syntax is that of SQL: for example usage: processInstanceBusinessKeyLike(%processInstanceBusinessKey%)*/
+  HistoricProcessInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey);
 
   /** Only select historic process instances that are completely finished. */
   HistoricProcessInstanceQuery finished();
