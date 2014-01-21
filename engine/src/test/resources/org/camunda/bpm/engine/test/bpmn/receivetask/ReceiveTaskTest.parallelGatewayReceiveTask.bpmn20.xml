@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="TestProcess">
+
+  <message id="newInvoice" name="newInvoiceMessage"/>
+
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="theStart"/>
+    <sequenceFlow sourceRef="theStart" targetRef="fork"/>
+
+    <parallelGateway id="fork"/>
+    <sequenceFlow sourceRef="fork" targetRef="waitState1"/>
+    <sequenceFlow sourceRef="fork" targetRef="waitState2"/>
+
+    <receiveTask id="waitState1" name="Wait State 1" messageRef="newInvoice"/>
+    <sequenceFlow sourceRef="waitState1" targetRef="join"/>
+
+    <receiveTask id="waitState2" name="Wait State 2" messageRef="newInvoice"/>
+    <sequenceFlow sourceRef="waitState2" targetRef="join"/>
+
+    <parallelGateway id="join"/>
+    <sequenceFlow sourceRef="join" targetRef="theEnd"/>
+    <endEvent id="theEnd"/>
+  </process>
+
+</definitions>

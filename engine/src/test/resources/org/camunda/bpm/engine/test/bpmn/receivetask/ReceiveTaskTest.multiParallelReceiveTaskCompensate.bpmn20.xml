@@ -2,23 +2,28 @@
 <definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="TestProcess">
 
   <message id="newInvoice" name="newInvoiceMessage"/>
-  <message id="cancelInvoice" name="cancelInvoiceMessage"/>
 
   <process id="testProcess" isExecutable="true">
     <startEvent id="theStart"/>
     <sequenceFlow sourceRef="theStart" targetRef="waitState"/>
+
     <receiveTask id="waitState" name="Wait State" messageRef="newInvoice">
       <multiInstanceLoopCharacteristics>
         <loopCardinality>2</loopCardinality>
       </multiInstanceLoopCharacteristics>
     </receiveTask>
-    <sequenceFlow sourceRef="waitState" targetRef="theEnd"/>
-    <boundaryEvent id="cancelBoundary" attachedToRef="waitState">
-      <messageEventDefinition messageRef="cancelInvoice"/>
+
+    <boundaryEvent id="compensate" attachedToRef="waitState">
+      <compensateEventDefinition/>
     </boundaryEvent>
-    <sequenceFlow sourceRef="cancelBoundary" targetRef="invoiceCanceled"/>
-    <endEvent id="invoiceCanceled"/>
+    <userTask id="compensation" name="Compensation" isForCompensation="true"/>
+
+    <sequenceFlow sourceRef="waitState" targetRef="interaction"/>
+    <userTask id="interaction" name="Interaction"/>
+    <sequenceFlow sourceRef="interaction" targetRef="theEnd"/>
     <endEvent id="theEnd"/>
+
+    <association id="assoc" sourceRef="compensate" targetRef="compensation"/>
   </process>
 
 </definitions>

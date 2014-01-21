@@ -59,6 +59,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.OutgoingExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -354,12 +355,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     // create event subscriptions for the current scope
-    List<EventSubscriptionDeclaration> eventSubscriptionDeclarations = (List<EventSubscriptionDeclaration>) scope
-        .getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
-    if(eventSubscriptionDeclarations != null) {
-      for (EventSubscriptionDeclaration eventSubscriptionDeclaration : eventSubscriptionDeclarations) {
-        eventSubscriptionDeclaration.createEntity(this);
-      }
+    for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(scope)) {
+      declaration.createSubscription(this);
     }
   }
 
