@@ -622,4 +622,17 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertProcessEnded(pi.getId());
   }
 
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testBoundaryCompensateEvent.bpmn20.xml")
+  public void FAILING_testCompensationServiceTaskHasEndTime() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("compensationServiceTask");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    assertProcessEnded(pi.getId());
+  }
+
 }
