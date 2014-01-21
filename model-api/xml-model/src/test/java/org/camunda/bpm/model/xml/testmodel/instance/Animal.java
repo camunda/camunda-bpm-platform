@@ -15,7 +15,6 @@ package org.camunda.bpm.model.xml.testmodel.instance;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
-import org.camunda.bpm.model.xml.impl.type.reference.AttributeReferenceImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.testmodel.Gender;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -110,19 +109,19 @@ public abstract class Animal extends ModelElementInstanceImpl implements ModelEl
   }
 
   public Animal getFather() {
-    return fatherRef.getReferencedElement(this);
+    return fatherRef.getReferenceTargetElement(this);
   }
 
   public void setFather(Animal father) {
-    fatherRef.setReferencedElement(this, father);
+    fatherRef.setReferenceTargetElement(this, father);
   }
 
   public Animal getMother() {
-    return motherRef.getReferencedElement(this);
+    return motherRef.getReferenceTargetElement(this);
   }
 
   public void setMother(Animal mother) {
-    motherRef.setReferencedElement(this, mother);
+    motherRef.setReferenceTargetElement(this, mother);
   }
 
   public Boolean isEndangered() {

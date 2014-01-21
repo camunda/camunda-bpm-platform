@@ -31,9 +31,9 @@ public interface Reference<T extends ModelElementInstance> {
    */
   String getReferenceIdentifier(ModelElementInstance referenceSourceElement);
 
-  T getReferencedElement(ModelElementInstance modelElement);
+  T getReferenceTargetElement(ModelElementInstance modelElement);
 
-  void setReferencedElement(ModelElementInstance referenceSourceElement, T referenceTargetElement);
+  void setReferenceTargetElement(ModelElementInstance referenceSourceElement, T referenceTargetElement);
 
   Attribute<String> getReferenceTargetAttribute();
 

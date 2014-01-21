@@ -51,7 +51,7 @@ public abstract class ReferenceImpl<T extends ModelElementInstance> implements R
    * @return the reference target model element instance or null if not set
    */
   @SuppressWarnings("unchecked")
-  public T getReferencedElement(ModelElementInstance referenceSourceElement) {
+  public T getReferenceTargetElement(ModelElementInstance referenceSourceElement) {
     String identifier = getReferenceIdentifier(referenceSourceElement);
     ModelElementInstance referenceTargetElement = referenceSourceElement.getModelInstance().getModelElementById(identifier);
     if (referenceTargetElement != null) {
@@ -75,7 +75,7 @@ public abstract class ReferenceImpl<T extends ModelElementInstance> implements R
    * @param referenceTargetElement the reference target model element instance
    * @throws ModelReferenceException if element is not already added to the model
    */
-  public void setReferencedElement(ModelElementInstance referenceSourceElement, T referenceTargetElement) {
+  public void setReferenceTargetElement(ModelElementInstance referenceSourceElement, T referenceTargetElement) {
     ModelInstance modelInstance = referenceSourceElement.getModelInstance();
     String referenceTargetIdentifier = referenceTargetAttribute.getValue(referenceTargetElement);
     ModelElementInstance existingElement = modelInstance.getModelElementById(referenceTargetIdentifier);
