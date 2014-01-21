@@ -14,20 +14,30 @@
 
 package org.camunda.bpm.model.xml.testmodel.instance;
 
+import org.camunda.bpm.model.xml.ModelInstance;
+import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.testmodel.Gender;
+import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
+import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import javax.xml.XMLConstants;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author Sebastian Menski
  */
+@RunWith(Parameterized.class)
 public class FlyingAnimalTest extends TestModelTest {
 
   private FlyingAnimal tweety;
@@ -39,23 +49,52 @@ public class FlyingAnimalTest extends TestModelTest {
   private FlyingAnimal daisy;
 
 
-  @Before
-  public void createModel() {
-    createTestModel();
+  public FlyingAnimalTest(ModelInstance modelInstance, AbstractModelParser modelParser) {
+    super(modelInstance, modelParser);
+  }
 
-    tweety = (FlyingAnimal) animal;
-    // create some other flying animals
-    hedwig = createBird("hedwig", Gender.Male);
-    birdo = createBird("birdo", Gender.Female);
-    plucky = createBird("plucky", Gender.Unknown);
-    fiffy = createBird("fiffy", Gender.Female);
-    timmy = createBird("timmy", Gender.Male);
-    daisy = createBird("daisy", Gender.Female);
+  @Parameters
+  public static Collection<Object[]> models() {
+    Object[][] models = new Object[][]{createModel(), parseModel(FlyingAnimalTest.class)};
+    return Arrays.asList(models);
+  }
+
+  public static Object[] createModel() {
+    TestModelParser modelParser = new TestModelParser();
+    ModelInstance modelInstance = modelParser.getEmptyModel();
+
+    Animals animals = modelInstance.newInstance(Animals.class);
+    modelInstance.setDocumentElement(animals);
+
+    // add a tns namespace prefix for QName testing
+    animals.setAttributeValueNs("xmlns:tns", XMLConstants.XMLNS_ATTRIBUTE_NS_URI, TestModelConstants.MODEL_NAMESPACE, false);
+
+    FlyingAnimal tweety = createBird(modelInstance, "tweety", Gender.Female);
+    FlyingAnimal hedwig = createBird(modelInstance, "hedwig", Gender.Male);
+    FlyingAnimal birdo = createBird(modelInstance, "birdo", Gender.Female);
+    FlyingAnimal plucky = createBird(modelInstance, "plucky", Gender.Unknown);
+    FlyingAnimal fiffy = createBird(modelInstance, "fiffy", Gender.Female);
+    createBird(modelInstance, "timmy", Gender.Male);
+    createBird(modelInstance, "daisy", Gender.Female);
 
     tweety.getFlightPartnerRefs().add(hedwig);
     tweety.getFlightPartnerRefs().add(birdo);
     tweety.getFlightPartnerRefs().add(plucky);
     tweety.getFlightPartnerRefs().add(fiffy);
+
+    return new Object[]{modelInstance, modelParser};
+  }
+
+  @Before
+  public void copyModel() {
+    modelInstance = cloneModelInstance();
+    tweety = (FlyingAnimal) modelInstance.getModelElementById("tweety");
+    hedwig = (FlyingAnimal) modelInstance.getModelElementById("hedwig");
+    birdo = (FlyingAnimal) modelInstance.getModelElementById("birdo");
+    plucky = (FlyingAnimal) modelInstance.getModelElementById("plucky");
+    fiffy = (FlyingAnimal) modelInstance.getModelElementById("fiffy");
+    timmy = (FlyingAnimal) modelInstance.getModelElementById("timmy");
+    daisy = (FlyingAnimal) modelInstance.getModelElementById("daisy");
   }
 
   @Test
@@ -177,7 +216,9 @@ public class FlyingAnimalTest extends TestModelTest {
   public void testClearFlightPartnerRefElements() {
     tweety.getFlightPartnerRefElements().clear();
     assertThat(tweety.getFlightPartnerRefElements()).isEmpty();
+
     // should not affect animals collection
+    Animals animals = (Animals) modelInstance.getDocumentElement();
     assertThat(animals.getAnimals())
       .isNotEmpty()
       .hasSize(7);

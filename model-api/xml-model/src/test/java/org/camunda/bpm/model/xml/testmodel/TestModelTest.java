@@ -15,58 +15,65 @@ package org.camunda.bpm.model.xml.testmodel;
 
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
-import org.camunda.bpm.model.xml.testmodel.instance.Animal;
-import org.camunda.bpm.model.xml.testmodel.instance.Animals;
-import org.camunda.bpm.model.xml.testmodel.instance.Bird;
-import org.camunda.bpm.model.xml.testmodel.instance.RelationshipDefinition;
+import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
+import org.camunda.bpm.model.xml.testmodel.instance.*;
 import org.junit.After;
 import org.w3c.dom.Document;
 
-import javax.xml.XMLConstants;
+import java.io.InputStream;
 
 /**
  * @author Sebastian Menski
  */
 public abstract class TestModelTest {
 
-  protected TestModelParser modelParser;
-  protected ModelInstance modelInstance;
-  protected Animals animals;
-  protected Animal animal;
+  private final ModelInstance testModelInstance;
+  private final AbstractModelParser modelParser;
 
-  public Bird createBird(String id, Gender gender) {
+  // cloned model instance for every test method (see subclasses)
+  protected ModelInstance modelInstance;
+
+  public TestModelTest(final ModelInstance testModelInstance, final AbstractModelParser modelParser) {
+    this.testModelInstance = testModelInstance;
+    this.modelParser = modelParser;
+  }
+
+  public ModelInstance cloneModelInstance() {
+    return (ModelInstance) ((ModelInstanceImpl) testModelInstance).clone();
+  }
+
+  protected static Object[] parseModel(Class<?> test) {
+    TestModelParser modelParser = new TestModelParser();
+    String testXml = test.getSimpleName() + ".xml";
+    InputStream testXmlAsStream = test.getResourceAsStream(testXml);
+    ModelInstance modelInstance = modelParser.parseModelFromStream(testXmlAsStream);
+    return new Object[]{modelInstance, modelParser};
+  }
+
+  public Bird createBird(final String id, final Gender gender) {
+    return createBird(testModelInstance, id, gender);
+  }
+
+  public static Bird createBird(final ModelInstance modelInstance, final String id, Gender gender) {
     Bird bird = modelInstance.newInstance(Bird.class);
     bird.setId(id);
     bird.setGender(gender);
+    Animals animals = (Animals) modelInstance.getDocumentElement();
     animals.getAnimals().add(bird);
     return bird;
   }
 
-  protected RelationshipDefinition createRelationshipDefinition(final Animal animalInRelationshipWith, final Class<? extends RelationshipDefinition> relationshipDefinitionClass) {
+  protected static RelationshipDefinition createRelationshipDefinition(final ModelInstance modelInstance, final Animal animalInRelationshipWith, final Class<? extends RelationshipDefinition> relationshipDefinitionClass) {
     RelationshipDefinition relationshipDefinition = modelInstance.newInstance(relationshipDefinitionClass);
     relationshipDefinition.setId("relationship-" + animalInRelationshipWith.getId());
     relationshipDefinition.setAnimal(animalInRelationshipWith);
     return relationshipDefinition;
   }
 
-  public void addRelationshipDefinition(final Animal animalWithRelationship, final RelationshipDefinition relationshipDefinition) {
+  public static void addRelationshipDefinition(final Animal animalWithRelationship, final RelationshipDefinition relationshipDefinition) {
     Animal animalInRelationshipWith = relationshipDefinition.getAnimal();
     relationshipDefinition.setId(animalWithRelationship.getId() + "-" + animalInRelationshipWith.getId());
     animalWithRelationship.getRelationshipDefinitions().add(relationshipDefinition);
-  }
-
-  public void createTestModel() {
-    modelParser = new TestModelParser();
-    modelInstance = modelParser.getEmptyModel();
-
-    animals = modelInstance.newInstance(Animals.class);
-    modelInstance.setDocumentElement(animals);
-
-    // add a tns namespace prefix for QName testing
-    animals.setAttributeValueNs("xmlns:tns", XMLConstants.XMLNS_ATTRIBUTE_NS_URI, TestModelConstants.MODEL_NAMESPACE, false);
-
-    // create the test animal
-    animal = createBird("tweety", Gender.Female);
   }
 
   @After

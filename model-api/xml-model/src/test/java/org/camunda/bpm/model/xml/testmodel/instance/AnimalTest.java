@@ -13,22 +13,29 @@
 
 package org.camunda.bpm.model.xml.testmodel.instance;
 
+import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelValidationException;
+import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.testmodel.Gender;
+import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
+import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import javax.xml.XMLConstants;
+import java.util.*;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author Sebastian Menski
  */
+@RunWith(Parameterized.class)
 public class AnimalTest extends TestModelTest {
 
   private Animal tweety;
@@ -45,35 +52,71 @@ public class AnimalTest extends TestModelTest {
   private RelationshipDefinition timmyRelationship;
   private RelationshipDefinition daisyRelationship;
 
-  @Before
-  public void createModel() {
-    createTestModel();
+  public AnimalTest(final ModelInstance modelInstance, final AbstractModelParser modelParser) {
+    super(modelInstance, modelParser);
+  }
 
-    tweety = animal;
-    // create some childs and friends
-    hedwig = createBird("hedwig", Gender.Male);
-    birdo = createBird("birdo", Gender.Female);
-    plucky = createBird("plucky", Gender.Unknown);
-    fiffy = createBird("fiffy", Gender.Female);
-    timmy = createBird("timmy", Gender.Male);
-    daisy = createBird("daisy", Gender.Female);
+   @Parameters
+   public static Collection<Object[]> models() {
+     Object[][] models = new Object[][]{createModel(), parseModel(AnimalTest.class)};
+     return Arrays.asList(models);
+   }
+
+  public static Object[] createModel() {
+    TestModelParser modelParser = new TestModelParser();
+    ModelInstance modelInstance = modelParser.getEmptyModel();
+
+    Animals animals = modelInstance.newInstance(Animals.class);
+    modelInstance.setDocumentElement(animals);
+
+    // add a tns namespace prefix for QName testing
+    animals.setAttributeValueNs("xmlns:tns", XMLConstants.XMLNS_ATTRIBUTE_NS_URI, TestModelConstants.MODEL_NAMESPACE, false);
+
+    Animal tweety = createBird(modelInstance, "tweety", Gender.Female);
+    Animal hedwig = createBird(modelInstance, "hedwig", Gender.Male);
+    Animal birdo = createBird(modelInstance, "birdo", Gender.Female);
+    Animal plucky = createBird(modelInstance, "plucky", Gender.Unknown);
+    Animal fiffy = createBird(modelInstance, "fiffy", Gender.Female);
+    createBird(modelInstance, "timmy", Gender.Male);
+    createBird(modelInstance, "daisy", Gender.Female);
 
     // create and add some relationships
-    hedwigRelationship = createRelationshipDefinition(hedwig, ChildRelationshipDefinition.class);
+    RelationshipDefinition hedwigRelationship = createRelationshipDefinition(modelInstance, hedwig, ChildRelationshipDefinition.class);
     addRelationshipDefinition(tweety, hedwigRelationship);
-    birdoRelationship = createRelationshipDefinition(birdo, ChildRelationshipDefinition.class);
+    RelationshipDefinition birdoRelationship = createRelationshipDefinition(modelInstance, birdo, ChildRelationshipDefinition.class);
     addRelationshipDefinition(tweety, birdoRelationship);
-    pluckyRelationship = createRelationshipDefinition(plucky, FriendRelationshipDefinition.class);
+    RelationshipDefinition pluckyRelationship = createRelationshipDefinition(modelInstance, plucky, FriendRelationshipDefinition.class);
     addRelationshipDefinition(tweety, pluckyRelationship);
-    fiffyRelationship = createRelationshipDefinition(fiffy, FriendRelationshipDefinition.class);
+    RelationshipDefinition fiffyRelationship = createRelationshipDefinition(modelInstance, fiffy, FriendRelationshipDefinition.class);
     addRelationshipDefinition(tweety, fiffyRelationship);
-    timmyRelationship = createRelationshipDefinition(timmy, FriendRelationshipDefinition.class);
-    daisyRelationship = createRelationshipDefinition(daisy, ChildRelationshipDefinition.class);
 
     tweety.getRelationshipDefinitionRefs().add(hedwigRelationship);
     tweety.getRelationshipDefinitionRefs().add(birdoRelationship);
     tweety.getRelationshipDefinitionRefs().add(pluckyRelationship);
     tweety.getRelationshipDefinitionRefs().add(fiffyRelationship);
+
+    return new Object[]{modelInstance, modelParser};
+  }
+
+  @Before
+  public void copyModel() {
+    modelInstance = cloneModelInstance();
+
+    tweety = (Animal) modelInstance.getModelElementById("tweety");
+    hedwig = (Animal) modelInstance.getModelElementById("hedwig");
+    birdo = (Animal) modelInstance.getModelElementById("birdo");
+    plucky = (Animal) modelInstance.getModelElementById("plucky");
+    fiffy = (Animal) modelInstance.getModelElementById("fiffy");
+    timmy = (Animal) modelInstance.getModelElementById("timmy");
+    daisy = (Animal) modelInstance.getModelElementById("daisy");
+
+    hedwigRelationship = (RelationshipDefinition) modelInstance.getModelElementById("tweety-hedwig");
+    birdoRelationship = (RelationshipDefinition) modelInstance.getModelElementById("tweety-birdo");
+    pluckyRelationship = (RelationshipDefinition) modelInstance.getModelElementById("tweety-plucky");
+    fiffyRelationship = (RelationshipDefinition) modelInstance.getModelElementById("tweety-fiffy");
+
+    timmyRelationship = createRelationshipDefinition(modelInstance, timmy, FriendRelationshipDefinition.class);
+    daisyRelationship = createRelationshipDefinition(modelInstance, daisy, ChildRelationshipDefinition.class);
   }
 
   @Test
