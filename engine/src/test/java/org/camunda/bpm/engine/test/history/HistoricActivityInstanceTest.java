@@ -635,4 +635,20 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertProcessEnded(pi.getId());
   }
 
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testBoundaryCancelEvent.bpmn20.xml")
+  public void testTransaction() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("transaction");
+    assertEquals(1, query.count());
+    assertNotNull(query.singleResult().getEndTime());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    assertProcessEnded(pi.getId());
+  }
+
 }
