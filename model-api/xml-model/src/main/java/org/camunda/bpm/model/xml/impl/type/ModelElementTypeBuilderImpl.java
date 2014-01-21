@@ -105,7 +105,7 @@ public class ModelElementTypeBuilderImpl implements ModelElementTypeBuilder, Mod
     return builder;
   }
 
-  public void performModelBuild(Model model) {
+  public void buildTypeHierarchy(Model model) {
 
     // build type hierarchy
     if(extendedType != null) {
@@ -118,7 +118,9 @@ public class ModelElementTypeBuilderImpl implements ModelElementTypeBuilder, Mod
         extendedModelElementType.registerExtendingType(modelType);
       }
     }
+  }
 
+  public void performModelBuild(Model model) {
     for (ModelBuildOperation operation : modelBuildOperations) {
       operation.performModelBuild(model);
     }

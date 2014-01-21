@@ -42,6 +42,9 @@ public class ModelBuilderImpl extends ModelBuilder {
 
   public Model build() {
     for (ModelElementTypeBuilderImpl typeBuilder : typeBuilders) {
+      typeBuilder.buildTypeHierarchy(model);
+    }
+    for (ModelElementTypeBuilderImpl typeBuilder : typeBuilders) {
       typeBuilder.performModelBuild(model);
     }
     return model;
