@@ -30,7 +30,7 @@ import org.junit.runner.Description;
  */
 public class PerfTestConfigurationRule extends TestWatcher {
 
-  private static final String PROPERTY_FILE_NAME = "PerformaceTestConfiguration.properties";
+  private static final String PROPERTY_FILE_NAME = "perf-test-config.properties";
 
   static PerfTestConfiguration perfTestConfiguration;
 

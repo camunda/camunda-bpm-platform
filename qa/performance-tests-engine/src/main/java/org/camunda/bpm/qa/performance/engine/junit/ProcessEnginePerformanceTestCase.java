@@ -27,7 +27,7 @@ import org.junit.Rule;
 public abstract class ProcessEnginePerformanceTestCase {
 
   @Rule
-  public ProcessEngineRule processEngineRule = new ProcessEngineRule();
+  public ProcessEngineRule processEngineRule = new ProcessEngineRule(PerfTestProcessEngine.getInstance());
 
   @Rule
   public PerfTestConfigurationRule testConfigurationRule = new PerfTestConfigurationRule();

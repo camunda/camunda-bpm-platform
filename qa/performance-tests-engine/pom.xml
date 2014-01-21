@@ -9,6 +9,10 @@
     <artifactId>camunda-qa</artifactId>
     <version>7.1.0-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+    <historyLevel>FULL</historyLevel>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -21,13 +25,26 @@
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
+      <artifactId>h2</artifactId>      
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
       <version>1.9.11</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jdbc</artifactId>
+      <version>7.0.33</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-juli</artifactId>
+      <version>7.0.33</version>
+    </dependency>
+    
   </dependencies>
 
   <profiles>
@@ -60,6 +77,8 @@
         <!-- default values for properties -->
         <numberOfThreads>2</numberOfThreads>
         <numberOfRuns>100</numberOfRuns>
+        <testWatchers></testWatchers>
+        <processEnginePlugins></processEnginePlugins>
       </properties>
 
       <build>
@@ -118,16 +137,14 @@
       <properties>        
         <numberOfThreads>1</numberOfThreads>
         <numberOfRuns>1</numberOfRuns>
+        <testWatchers>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogPerfTestWatcher</testWatchers>
+        <processEnginePlugins>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogProcessEnginePlugin</processEnginePlugins>
       </properties>
 
       <build>
         <testResources>
           <testResource>
             <directory>src/test/resources</directory>
-            <filtering>true</filtering>
-          </testResource>
-           <testResource>
-            <directory>src/test/sql-statementlog</directory>
             <filtering>true</filtering>
           </testResource>
         </testResources>
@@ -181,6 +198,73 @@
         <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
         <database.url>jdbc:h2:mem:performance-test;MVCC=TRUE</database.url>
       </properties>
+    </profile>
+    
+    <profile>
+      <id>history-none</id>
+      <properties>
+        <historyLevel>NONE</historyLevel>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>history-full</id>
+      <properties>
+        <historyLevel>FULL</historyLevel>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>mysql</id>
+      <dependencies>
+        <dependency>
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    
+    <profile>
+      <id>postgresql</id>
+      <dependencies>
+        <dependency>
+          <groupId>postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    
+    <profile>
+      <id>mssql</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.microsoft.sqlserver</groupId>
+          <artifactId>sqljdbc4</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+
+
+    <profile>
+      <id>db2</id>
+      <dependencies>
+         <dependency>
+          <groupId>com.ibm.db2.jcc</groupId>
+          <artifactId>db2jcc4</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>oracle</id>
+      <dependencies>
+         <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc6</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
 
   </profiles>

@@ -25,13 +25,17 @@ public class PerfTestConfiguration {
 
   protected int numberOfThreads = 2;
   protected int numberOfRuns = 1000;
+  protected String databaseName = "";
 
   protected String testWatchers = null;
+  protected String historyLevel;
 
   public PerfTestConfiguration(Properties properties) {
     numberOfRuns = Integer.parseInt(properties.getProperty("numberOfRuns"));
     numberOfThreads =  Integer.parseInt(properties.getProperty("numberOfThreads"));
     testWatchers = properties.getProperty("testWatchers", null);
+    databaseName = properties.getProperty("databaseDriver", null);
+    historyLevel = properties.getProperty("historyLevel");
   }
 
   public PerfTestConfiguration() {
@@ -57,8 +61,20 @@ public class PerfTestConfiguration {
     return testWatchers;
   }
 
+  public String getDatabaseName() {
+    return databaseName;
+  }
+
   public void setTestWatchers(String testWatchers) {
     this.testWatchers = testWatchers;
+  }
+
+  public String getHistoryLevel() {
+    return historyLevel;
+  }
+
+  public void setHistoryLevel(String historyLevel) {
+    this.historyLevel = historyLevel;
   }
 
 }
