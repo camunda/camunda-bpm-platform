@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.qa.performance.engine.sql.statementlog;
+package org.camunda.bpm.qa.performance.engine.sqlstatementlog;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import org.camunda.bpm.qa.performance.engine.framework.PerfTest;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestRun;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestStep;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestWatcher;
-import org.camunda.bpm.qa.performance.engine.sql.statementlog.StatementLogSqlSession.SqlStatementLog;
+import org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogSqlSession.SqlStatementLog;
 
 /**
  * {@link PerfTestWatcher} performing statement logging.

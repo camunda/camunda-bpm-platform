@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestResults;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestStepResult;
-import org.camunda.bpm.qa.performance.engine.sql.statementlog.StatementLogSqlSession.SqlStatementType;
+import org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogSqlSession.SqlStatementType;
 
 /**
  * Aggregates the results from a Sql Statement Test run.

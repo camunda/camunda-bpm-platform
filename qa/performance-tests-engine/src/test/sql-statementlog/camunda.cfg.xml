@@ -28,7 +28,7 @@
     <property name="processEnginePlugins">
         <list>
             <!-- activate the statement logger -->
-            <bean class="org.camunda.bpm.qa.performance.engine.sql.statementlog.StatementLogProcessEnginePlugin" />
+            <bean class="org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogProcessEnginePlugin" />
         </list>
     </property>
 

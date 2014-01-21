@@ -148,7 +148,7 @@
                 <configuration>
                   <tasks>
                     <echo message="Generating reports" />
-                    <java classname="org.camunda.bpm.qa.performance.engine.sql.statementlog.SqlStatementLogReport" classpathref="maven.test.classpath" />
+                    <java classname="org.camunda.bpm.qa.performance.engine.sqlstatementlog.SqlStatementLogReport" classpathref="maven.test.classpath" />
                   </tasks>
                 </configuration>
               </execution>

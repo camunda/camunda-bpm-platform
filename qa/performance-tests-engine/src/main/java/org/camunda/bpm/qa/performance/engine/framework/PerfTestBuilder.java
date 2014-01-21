@@ -14,7 +14,7 @@ package org.camunda.bpm.qa.performance.engine.framework;
 
 import java.util.concurrent.ExecutionException;
 
-import org.camunda.bpm.qa.performance.engine.PerfTestResultRecorderRule;
+import org.camunda.bpm.qa.performance.engine.junit.PerfTestResultRecorderRule;
 
 
 /**
