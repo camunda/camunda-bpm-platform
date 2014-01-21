@@ -76,6 +76,15 @@ public class ModelImpl implements Model {
   }
 
   @Override
+  protected Object clone() {
+    ModelImpl model = new ModelImpl(this.modelName);
+    for (Map.Entry<Class<? extends ModelElementInstance>, ModelElementType> type : typesByClass.entrySet()) {
+      model.registerType(type.getValue(), type.getKey());
+    }
+    return model;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
