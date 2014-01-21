@@ -610,14 +610,14 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment
-  public void FAILING_testBoundaryCompensateEvent() {
+  public void testBoundaryCompensateEvent() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
 
+    // the compensation boundary event should not appear in history!
     query.activityId("compensate");
-    assertEquals(1, query.count());
-    assertNotNull(query.singleResult().getEndTime());
+    assertEquals(0, query.count());
 
     assertProcessEnded(pi.getId());
   }
