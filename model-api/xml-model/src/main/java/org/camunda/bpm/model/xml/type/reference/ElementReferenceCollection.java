@@ -26,5 +26,15 @@ public interface ElementReferenceCollection<T extends ModelElementInstance, V ex
 
   ChildElementCollection<V> getReferenceSourceCollection();
 
+  T getFirstReferenceTargetElement(ModelElementInstanceImpl referenceSourceParentElement);
+
+  /**
+   * Set the reference target collection to only hold a single element
+   *
+   * @param referenceSourceParentElement  the parent element of the element reference collection
+   * @param referenceTargetElement  the single reference target
+   */
+  void setSingleTargetElement(ModelElementInstanceImpl referenceSourceParentElement, T referenceTargetElement);
+
   Collection<T> getReferenceTargetElements(ModelElementInstanceImpl referenceSourceElement);
 }

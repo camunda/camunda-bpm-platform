@@ -16,8 +16,13 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
+import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
+
+import java.util.Collection;
 
 import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.ELEMENT_NAME_BIRD;
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.ELEMENT_NAME_SPOUSE_REF;
 import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
 
 /**
@@ -26,8 +31,9 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMES
  */
 public class Bird extends FlyingAnimal {
 
-  public static void registerType(ModelBuilder modelBuilder) {
+  private static ElementReferenceCollection<Bird, SpouseRef> spouseRefsColl;
 
+  public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Bird.class, ELEMENT_NAME_BIRD)
       .namespaceUri(MODEL_NAMESPACE)
       .extendsType(FlyingAnimal.class)
@@ -37,12 +43,34 @@ public class Bird extends FlyingAnimal {
         }
       });
 
+    SequenceBuilder sequence = typeBuilder.sequence();
+
+    spouseRefsColl = sequence.element(SpouseRef.class, ELEMENT_NAME_SPOUSE_REF)
+      .qNameElementReferenceCollection(Bird.class)
+      .build();
+
     typeBuilder.build();
 
   }
 
   public Bird(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
+  }
+
+  public Bird getSpouse() {
+    return spouseRefsColl.getFirstReferenceTargetElement(this);
+  }
+
+  public void setSpouse(Bird bird) {
+    spouseRefsColl.setSingleTargetElement(this, bird);
+  }
+
+  public void removeSpouse() {
+    spouseRefsColl.getReferenceTargetElements(this).clear();
+  }
+
+  public Collection<SpouseRef> getSpouseRefs() {
+    return spouseRefsColl.getReferenceSourceCollection().get(this);
   }
 
 }

@@ -34,6 +34,7 @@ public class TestModel {
       ChildRelationshipDefinition.registerType(modelBuilder);
       FlightPartnerRef.registerType(modelBuilder);
       FlyingAnimal.registerType(modelBuilder);
+      SpouseRef.registerType(modelBuilder);
       FriendRelationshipDefinition.registerType(modelBuilder);
       RelationshipDefinition.registerType(modelBuilder);
       RelationshipDefinitionRef.registerType(modelBuilder);

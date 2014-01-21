@@ -39,9 +39,13 @@
   </complexType>
 
   <element name="bird" type="tns:tBird" substitutionGroup="tns:animal"/>
-  <complexType name="tBird">
+  <complexType name="tBird" mixed="true">
     <complexContent>
-      <extension base="tns:tFlyingAnimal"/>
+      <extension base="tns:tFlyingAnimal">
+        <sequence>
+          <element name="spouseRef" type="QName" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+      </extension>
     </complexContent>
   </complexType>
 

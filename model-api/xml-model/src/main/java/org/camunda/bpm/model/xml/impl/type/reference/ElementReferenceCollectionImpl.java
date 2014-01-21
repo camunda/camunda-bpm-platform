@@ -16,6 +16,7 @@ package org.camunda.bpm.model.xml.impl.type.reference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelReferenceException;
@@ -27,6 +28,7 @@ import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 import org.w3c.dom.Document;
@@ -131,6 +133,24 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
       }
     }
     return referenceTargetElements;
+  }
+
+  public T getFirstReferenceTargetElement(final ModelElementInstanceImpl referenceSourceParentElement) {
+    Collection<T> referenceTargetElements = getReferenceTargetElements(referenceSourceParentElement);
+    if (!referenceTargetElements.isEmpty()) {
+      return referenceTargetElements.iterator().next();
+    }
+    else {
+      return null;
+    }
+  }
+
+  public void setSingleTargetElement(final ModelElementInstanceImpl referenceSourceParentElement, T referenceTargetElement) {
+    Collection<T> referenceTargetElements = getReferenceTargetElements(referenceSourceParentElement);
+    if (!referenceTargetElements.isEmpty()) {
+      referenceTargetElements.clear();
+    }
+    referenceTargetElements.add(referenceTargetElement);
   }
 
   public Collection<T> getReferenceTargetElements(final ModelElementInstanceImpl referenceSourceParentElement) {
