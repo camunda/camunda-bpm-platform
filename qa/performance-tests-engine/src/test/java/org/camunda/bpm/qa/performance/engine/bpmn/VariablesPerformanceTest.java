@@ -131,7 +131,7 @@ public class VariablesPerformanceTest extends ProcessEnginePerformanceTestCase {
     {"org/camunda/bpm/qa/performance/engine/bpmn/StartEventPerformanceTest.noneStartEvent.bpmn"})
   public void noneStartEventLargeByteVar() {
     HashMap<String, Object> variables = new HashMap<String, Object>();
-    byte[] bytes = new byte[1048576]; // = 1MB
+    byte[] bytes = new byte[5*1024];
     variables.put(VARIABLE1, bytes);
 
     perfomanceTest()

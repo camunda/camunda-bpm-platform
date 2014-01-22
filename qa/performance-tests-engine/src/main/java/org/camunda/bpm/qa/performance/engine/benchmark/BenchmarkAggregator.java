@@ -10,15 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.qa.performance.engine.framework.aggregate;
+package org.camunda.bpm.qa.performance.engine.benchmark;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestResult;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestResults;
+import org.camunda.bpm.qa.performance.engine.framework.aggregate.TabularResultAggregator;
+import org.camunda.bpm.qa.performance.engine.framework.aggregate.TabularResultSet;
 
 /**
+ * The default benchmark aggregator records the duration
+ *
  * @author Daniel Meyer
  *
  */
@@ -40,10 +45,33 @@ public class BenchmarkAggregator extends TabularResultAggregator {
     row.add(results.getTestName());
 
     for (PerfTestResult passResult : results.getPassResults()) {
-      row.add(passResult.getDuration());
+      processRow(row, passResult, results);
     }
 
     tabularResultSet.getResults().add(row);
+  }
+
+  protected void processRow(List<Object> row, PerfTestResult passResult, PerfTestResults results) {
+    // add duration
+    row.add(passResult.getDuration());
+
+    // add throughput per minute
+    long duration = passResult.getDuration();
+    float numberOfRuns = results.getConfiguration().getNumberOfRuns();
+    float throughput = (numberOfRuns / duration) * 1000;
+    row.add(throughput);
+
+    // add speedup
+    float durationForSequential = 0;
+    for (PerfTestResult perfTestResult : results.getPassResults()) {
+      if(perfTestResult.getNumberOfThreads() == 1) {
+        durationForSequential = perfTestResult.getDuration();
+      }
+    }
+    double speedUp = durationForSequential / passResult.getDuration();
+    BigDecimal bigDecimal = new BigDecimal(speedUp);
+    bigDecimal.setScale(1, BigDecimal.ROUND_HALF_UP);
+    row.add(bigDecimal.doubleValue());
   }
 
   protected void postProcessResultSet(TabularResultSet tabularResultSet) {
@@ -53,7 +81,11 @@ public class BenchmarkAggregator extends TabularResultAggregator {
       ArrayList<String> columnNames = new ArrayList<String>();
       columnNames.add(TEST_NAME);
       for (int i = 1; i < columnSize; i++) {
-        columnNames.add("T = "+i);
+        if((i-1)%3 == 0) {
+          columnNames.add("T = "+(i/3));
+        } else {
+          columnNames.add(" ");
+        }
       }
 
       tabularResultSet.setResultColumnNames(columnNames);

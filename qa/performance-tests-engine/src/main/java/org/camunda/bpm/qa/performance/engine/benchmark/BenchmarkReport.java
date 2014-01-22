@@ -14,7 +14,7 @@ package org.camunda.bpm.qa.performance.engine.benchmark;
 
 import java.io.File;
 
-import org.camunda.bpm.qa.performance.engine.framework.aggregate.BenchmarkAggregator;
+import org.camunda.bpm.qa.performance.engine.framework.aggregate.TabularResultAggregator;
 import org.camunda.bpm.qa.performance.engine.framework.aggregate.TabularResultSet;
 import org.camunda.bpm.qa.performance.engine.framework.report.HtmlReportBuilder;
 import org.camunda.bpm.qa.performance.engine.util.CsvUtil;
@@ -32,12 +32,26 @@ public class BenchmarkReport {
     final String resultsFolder = "target"+File.separatorChar+"results";
     final String reportsFolder = "target"+File.separatorChar+"reports";
 
-    final String htmlReportFilename = reportsFolder + File.separatorChar + "benchmark-report.html";
+    writeReport(
+        resultsFolder,
+        reportsFolder,
+        "benchmark",
+        new BenchmarkAggregator(resultsFolder),
+        "Benchmark Duration Report");
+  }
 
-    final String jsonReportFilename = "benchmark-report.json";
+  private static void writeReport(String resultsFolder,
+      String reportsFolder,
+      String benchmarkName,
+      TabularResultAggregator aggregator,
+      String reportDescription) {
+
+    final String htmlReportFilename = reportsFolder + File.separatorChar + benchmarkName+"-report.html";
+
+    final String jsonReportFilename = benchmarkName+"-report.json";
     final String jsonReportPath = reportsFolder + File.separatorChar + jsonReportFilename;
 
-    final String csvReportFilename = "benchmark-report.csv";
+    final String csvReportFilename = benchmarkName+"-report.csv";
     final String csvReportPath = reportsFolder + File.separatorChar + csvReportFilename;
 
     // make sure reports folder exists
@@ -46,7 +60,6 @@ public class BenchmarkReport {
       reportsFolderFile.mkdir();
     }
 
-    BenchmarkAggregator aggregator = new BenchmarkAggregator(resultsFolder);
     TabularResultSet aggregatedResults = aggregator.execute();
 
     // write Json report
@@ -54,7 +67,7 @@ public class BenchmarkReport {
 
     // format HTML report
     HtmlReportBuilder reportWriter = new HtmlReportBuilder(aggregatedResults)
-      .name("Benchmark Report")
+      .name(reportDescription)
       .resultDetailsFolder(".."+File.separatorChar+"results"+File.separatorChar)
       .createImageLinks(true)
       .jsonSource(jsonReportFilename)
@@ -65,6 +78,5 @@ public class BenchmarkReport {
 
     // write CSV report
     CsvUtil.saveResultSetToFile(csvReportPath, aggregatedResults);
-
   }
 }

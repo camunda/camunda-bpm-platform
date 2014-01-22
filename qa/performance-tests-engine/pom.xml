@@ -11,7 +11,7 @@
   </parent>
   
   <properties>
-    <historyLevel>FULL</historyLevel>
+    <historyLevel>full</historyLevel>
   </properties>
 
   <dependencies>
@@ -95,6 +95,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <argLine>-Xmx512m</argLine>
             </configuration>
           </plugin>
           
@@ -155,6 +156,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <argLine>-Xmx512m</argLine>
             </configuration>
           </plugin>
           <plugin>
@@ -201,16 +203,16 @@
     </profile>
     
     <profile>
-      <id>history-none</id>
+      <id>history-level-none</id>
       <properties>
-        <historyLevel>NONE</historyLevel>
+        <historyLevel>none</historyLevel>
       </properties>
     </profile>
     
     <profile>
-      <id>history-full</id>
+      <id>history-level-full</id>
       <properties>
-        <historyLevel>FULL</historyLevel>
+        <historyLevel>full</historyLevel>
       </properties>
     </profile>
     
@@ -225,7 +227,7 @@
     </profile>
     
     <profile>
-      <id>postgresql</id>
+      <id>postgres</id>
       <dependencies>
         <dependency>
           <groupId>postgresql</groupId>
