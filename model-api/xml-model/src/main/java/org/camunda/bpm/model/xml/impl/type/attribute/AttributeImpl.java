@@ -118,14 +118,23 @@ public abstract class AttributeImpl<T> implements Attribute<T> {
     }
   }
 
+  public T getDefaultValue() {
+    return defaultValue;
+  }
+
   public void setDefaultValue(T defaultValue) {
     this.defaultValue = defaultValue;
   }
 
+
+  public boolean isRequired() {
+    return isRequired;
+  }
+
   /**
    */
-  public void setRequired() {
-    this.isRequired = true;
+  public void setRequired(boolean required) {
+    this.isRequired = required;
   }
 
   /**
@@ -142,15 +151,23 @@ public abstract class AttributeImpl<T> implements Attribute<T> {
     return namespaceUri;
   }
 
+  public boolean isIdAttribute() {
+    return isIdAttribute;
+  }
+
+  /**
+   * Indicate whether this attribute is an Id attribute
+   *
+   */
+  public void setId() {
+    this.isIdAttribute = true;
+  }
+
   /**
    * @return the attributeName
    */
   public String getAttributeName() {
     return attributeName;
-  }
-
-  public boolean isIdAttribute() {
-    return isIdAttribute;
   }
 
   /**
@@ -175,14 +192,6 @@ public abstract class AttributeImpl<T> implements Attribute<T> {
         ((ReferenceImpl<?>) incomingReference).referencedElementRemoved(modelElement, referenceIdentifier);
       }
     }
-  }
-
-  /**
-   * Indicate whether this attribute is an Id attribute
-   *
-   */
-  public void setId() {
-    this.isIdAttribute = true;
   }
 
   /**

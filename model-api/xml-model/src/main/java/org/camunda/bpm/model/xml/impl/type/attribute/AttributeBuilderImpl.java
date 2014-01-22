@@ -33,6 +33,7 @@ public abstract class AttributeBuilderImpl<T> implements AttributeBuilder<T>, Mo
     this.modelType = modelType;
     this.attribute = attribute;
     attribute.setAttributeName(attributeName);
+    modelType.registerAttribute(attribute);
   }
 
   public AttributeBuilder<T> idAttribute() {
@@ -47,12 +48,11 @@ public abstract class AttributeBuilderImpl<T> implements AttributeBuilder<T>, Mo
   }
 
   public AttributeBuilder<T> required() {
-    attribute.setRequired();
+    attribute.setRequired(true);
     return this;
   }
 
   public Attribute<T> build() {
-    modelType.registerAttribute(attribute);
     return attribute;
   }
 

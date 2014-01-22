@@ -39,6 +39,10 @@ public interface Attribute<T> {
    */
   void setValue(ModelElementInstance modelElement, T value);
 
+  T getDefaultValue();
+
+  boolean isRequired();
+
   /**
    * @return the namespaceUri
    */
