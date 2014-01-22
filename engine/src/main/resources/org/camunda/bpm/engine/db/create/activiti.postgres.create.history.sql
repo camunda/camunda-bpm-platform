@@ -30,6 +30,7 @@ create table ACT_HI_ACTINST (
     START_TIME_ timestamp not null,
     END_TIME_ timestamp,
     DURATION_ bigint,
+    ACT_INST_STATE_ integer,
     primary key (ID_)
 );
 
