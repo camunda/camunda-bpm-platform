@@ -1,3 +1,7 @@
+-- add new column to historic activity instance table --
+alter table ACT_HI_ACTINST
+    add ACT_INST_STATE_ tinyint;
+    
 -- add follow-up date to tasks --
 alter table ACT_RU_TASK
     add FOLLOW_UP_DATE_ datetime2;
