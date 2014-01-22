@@ -50,10 +50,6 @@ public abstract class TestModelTest {
     return new Object[]{modelInstance, modelParser};
   }
 
-  public Bird createBird(final String id, final Gender gender) {
-    return createBird(testModelInstance, id, gender);
-  }
-
   public static Bird createBird(final ModelInstance modelInstance, final String id, Gender gender) {
     Bird bird = modelInstance.newInstance(Bird.class);
     bird.setId(id);
@@ -74,6 +70,12 @@ public abstract class TestModelTest {
     Animal animalInRelationshipWith = relationshipDefinition.getAnimal();
     relationshipDefinition.setId(animalWithRelationship.getId() + "-" + animalInRelationshipWith.getId());
     animalWithRelationship.getRelationshipDefinitions().add(relationshipDefinition);
+  }
+
+  public static Egg createEgg(final ModelInstance modelInstance, final String id) {
+    Egg egg = modelInstance.newInstance(Egg.class);
+    egg.setId(id);
+    return egg;
   }
 
   @After

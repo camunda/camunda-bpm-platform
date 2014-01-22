@@ -1,5 +1,4 @@
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
+/* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -16,7 +15,6 @@ package org.camunda.bpm.model.xml.testmodel.instance;
 
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.testmodel.Gender;
 import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
@@ -44,6 +42,8 @@ public class BirdTest extends TestModelTest {
   private Bird tweety;
   private Bird hedwig;
   private Bird timmy;
+  private Egg egg1;
+  private Egg egg2;
 
   public BirdTest(final ModelInstance testModelInstance, final AbstractModelParser modelParser) {
     super(testModelInstance, modelParser);
@@ -68,8 +68,12 @@ public class BirdTest extends TestModelTest {
     Bird tweety = createBird(modelInstance, "tweety", Gender.Female);
     Bird hedwig = createBird(modelInstance, "hedwig", Gender.Female);
     createBird(modelInstance, "timmy", Gender.Female);
+    Egg egg1 = createEgg(modelInstance, "egg1");
+    Egg egg2 = createEgg(modelInstance, "egg2");
 
     tweety.setSpouse(hedwig);
+    tweety.getEggs().add(egg1);
+    tweety.getEggs().add(egg2);
 
     return new Object[]{modelInstance, modelParser};
   }
@@ -80,6 +84,69 @@ public class BirdTest extends TestModelTest {
     tweety = (Bird) modelInstance.getModelElementById("tweety");
     hedwig = (Bird) modelInstance.getModelElementById("hedwig");
     timmy = (Bird) modelInstance.getModelElementById("timmy");
+    egg1 = (Egg) modelInstance.getModelElementById("egg1");
+    egg2 = (Egg) modelInstance.getModelElementById("egg2");
+  }
+
+  @Test
+  public void testAddEggsByHelper() {
+    assertThat(tweety.getEggs())
+      .isNotEmpty()
+      .hasSize(2)
+      .containsOnly(egg1, egg2);
+
+    Egg egg3 = createEgg(modelInstance, "egg3");
+    tweety.getEggs().add(egg3);
+    Egg egg4 = createEgg(modelInstance, "egg4");
+    tweety.getEggs().add(egg4);
+
+    assertThat(tweety.getEggs())
+      .hasSize(4)
+      .containsOnly(egg1, egg2, egg3, egg4);
+  }
+
+  @Test
+  public void testUpdateEggsByIdByHelper() {
+    egg1.setId("new-" + egg1.getId());
+    egg2.setId("new-" + egg2.getId());
+    assertThat(tweety.getEggs())
+      .hasSize(2)
+      .containsOnly(egg1, egg2);
+  }
+
+  @Test
+  public void testUpdateEggsByIdByAttributeName() {
+    egg1.setAttributeValue("id", "new-" + egg1.getId(), true);
+    egg2.setAttributeValue("id", "new-" + egg2.getId(), true);
+    assertThat(tweety.getEggs())
+      .hasSize(2)
+      .containsOnly(egg1, egg2);
+  }
+
+  @Test
+  public void testUpdateEggsByReplaceElements() {
+    Egg egg3 = createEgg(modelInstance, "egg3");
+    Egg egg4 = createEgg(modelInstance, "egg4");
+    egg1.replaceWithElement(egg3);
+    egg2.replaceWithElement(egg4);
+    assertThat(tweety.getEggs())
+      .hasSize(2)
+      .containsOnly(egg3, egg4);
+  }
+
+  @Test
+  public void testUpdateEggsByRemoveElement() {
+    tweety.getEggs().remove(egg1);
+    assertThat(tweety.getEggs())
+      .hasSize(1)
+      .containsOnly(egg2);
+  }
+
+  @Test
+  public void testClearEggs() {
+    tweety.getEggs().clear();
+    assertThat(tweety.getEggs())
+      .isEmpty();
   }
 
   @Test

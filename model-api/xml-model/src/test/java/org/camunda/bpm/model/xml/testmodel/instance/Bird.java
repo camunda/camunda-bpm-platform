@@ -16,14 +16,13 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 
 import java.util.Collection;
 
-import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.ELEMENT_NAME_BIRD;
-import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.ELEMENT_NAME_SPOUSE_REF;
-import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.*;
 
 /**
  * @author Daniel Meyer
@@ -31,6 +30,7 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMES
  */
 public class Bird extends FlyingAnimal {
 
+  private static ChildElementCollection<Egg> eggColl;
   private static ElementReferenceCollection<Bird, SpouseRef> spouseRefsColl;
 
   public static void registerType(ModelBuilder modelBuilder) {
@@ -45,6 +45,11 @@ public class Bird extends FlyingAnimal {
 
     SequenceBuilder sequence = typeBuilder.sequence();
 
+    eggColl = sequence.elementCollection(Egg.class, ELEMENT_NAME_EGG)
+      .minOccurs(0)
+      .maxOccurs(6)
+      .build();
+
     spouseRefsColl = sequence.element(SpouseRef.class, ELEMENT_NAME_SPOUSE_REF)
       .qNameElementReferenceCollection(Bird.class)
       .build();
@@ -55,6 +60,10 @@ public class Bird extends FlyingAnimal {
 
   public Bird(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
+  }
+
+  public Collection<Egg> getEggs() {
+    return eggColl.get(this);
   }
 
   public Bird getSpouse() {

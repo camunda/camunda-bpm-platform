@@ -16,29 +16,43 @@ package org.camunda.bpm.model.xml.testmodel.instance;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
-import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 
 import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.*;
 
 /**
  * @author Sebastian Menski
  */
-public class SpouseRef extends ModelElementInstanceImpl {
+public class Egg extends ModelElementInstanceImpl {
+
+  private static Attribute<String> idAttr;
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(SpouseRef.class, ELEMENT_NAME_SPOUSE_REF)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Egg.class, ELEMENT_NAME_EGG)
       .namespaceUri(MODEL_NAMESPACE)
-      .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<SpouseRef>() {
-        public SpouseRef newInstance(ModelTypeInstanceContext instanceContext) {
-          return new SpouseRef(instanceContext);
+      .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<Egg>() {
+        public Egg newInstance(ModelTypeInstanceContext instanceContext) {
+          return new Egg(instanceContext);
         }
       });
+
+    idAttr = typeBuilder.stringAttribute(ATTRIBUTE_NAME_ID)
+      .idAttribute()
+      .build();
 
     typeBuilder.build();
   }
 
-  public SpouseRef(final ModelTypeInstanceContext instanceContext) {
+  public Egg(final ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
+  }
+
+  public String getId() {
+    return idAttr.getValue(this);
+  }
+
+  public void setId(String id) {
+    idAttr.setValue(this, id);
   }
 }

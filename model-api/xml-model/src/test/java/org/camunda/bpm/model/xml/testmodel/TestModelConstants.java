@@ -32,6 +32,7 @@ public abstract class TestModelConstants {
   public final static String ELEMENT_NAME_RELATIONSHIP_DEFINITION_REF = "relationshipDefinitionRef";
   public final static String ELEMENT_NAME_FLIGHT_PARTNER_REF = "flightPartnerRef";
   public final static String ELEMENT_NAME_SPOUSE_REF = "spouseRef";
+  public final static String ELEMENT_NAME_EGG = "egg";
 
   public final static String ATTRIBUTE_NAME_ID = "id";
   public final static String ATTRIBUTE_NAME_NAME = "name";

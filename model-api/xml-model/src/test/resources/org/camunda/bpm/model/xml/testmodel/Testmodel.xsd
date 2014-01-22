@@ -43,6 +43,7 @@
     <complexContent>
       <extension base="tns:tFlyingAnimal">
         <sequence>
+          <element ref="tns:egg" minOccurs="0" maxOccurs="6"/>
           <element name="spouseRef" type="QName" minOccurs="0" maxOccurs="1"/>
         </sequence>
       </extension>
@@ -75,6 +76,11 @@
     <complexContent>
       <extension base="tns:tRelationshipDefinition"/>
     </complexContent>
+  </complexType>
+
+  <element name="egg" type="tns:tEgg"/>
+  <complexType name="tEgg">
+    <attribute name="id" type="ID"/>
   </complexType>
 
 </schema>

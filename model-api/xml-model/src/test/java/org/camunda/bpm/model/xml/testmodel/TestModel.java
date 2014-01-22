@@ -38,6 +38,7 @@ public class TestModel {
       FriendRelationshipDefinition.registerType(modelBuilder);
       RelationshipDefinition.registerType(modelBuilder);
       RelationshipDefinitionRef.registerType(modelBuilder);
+      Egg.registerType(modelBuilder);
 
       model = modelBuilder.build();
     }

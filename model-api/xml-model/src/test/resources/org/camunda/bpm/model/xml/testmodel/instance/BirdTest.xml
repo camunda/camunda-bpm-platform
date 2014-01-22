@@ -5,6 +5,8 @@
   xsi:schemaLocation="http://camunda.org/animals ../Testmodel.xsd ">
 
   <bird id="tweety" gender="Female">
+    <egg id="egg1"/>
+    <egg id="egg2"/>
     <spouseRef>hedwig</spouseRef>
   </bird>
   <bird id="hedwig" gender="Male"/>
