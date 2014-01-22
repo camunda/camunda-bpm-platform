@@ -99,4 +99,8 @@ public interface InterpretableExecution extends ActivityExecution, ExecutionList
 
   void disposeProcessInstanceStartContext();
 
+  void setCanceled(boolean canceled);
+
+  void setCompleteScope(boolean completeScope);
+
 }

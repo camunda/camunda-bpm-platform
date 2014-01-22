@@ -70,6 +70,7 @@
       <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
+        , ACT_INST_STATE_ = #{activityInstanceState, jdbcType=INTEGER}
       </if>
     WHERE
       ID_ = #{id, jdbcType=VARCHAR}

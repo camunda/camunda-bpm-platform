@@ -28,6 +28,12 @@ public class AtomicOperationDeleteCascadeFireActivityEnd extends AtomicOperation
   }
 
   @Override
+  protected InterpretableExecution eventNotificationsStarted(InterpretableExecution execution) {
+    execution.setCanceled(true);
+    return super.eventNotificationsStarted(execution);
+  }
+
+  @Override
   protected ScopeImpl getScope(InterpretableExecution execution) {
     ActivityImpl activity = (ActivityImpl) execution.getActivity();
 

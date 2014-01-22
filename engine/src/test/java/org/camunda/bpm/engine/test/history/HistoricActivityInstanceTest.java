@@ -346,6 +346,65 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedAfter(hourFromNow.getTime()).count());
   }
 
+  @Deployment
+  public void testHistoricActivityInstanceQueryByCompleteScope() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery().completeScope();
+
+    assertEquals(3, query.count());
+
+    List<HistoricActivityInstance> instances = query.list();
+
+    for (HistoricActivityInstance instance : instances) {
+      if (!instance.getActivityId().equals("innerEnd") && !instance.getActivityId().equals("end1") && !instance.getActivityId().equals("end2")) {
+        fail("Unexpected instance with activity id " + instance.getActivityId() + " found.");
+      }
+    }
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceQueryByCompleteScope.bpmn")
+  public void testHistoricActivityInstanceQueryByCanceled() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery().canceled();
+
+    assertEquals(3, query.count());
+
+    List<HistoricActivityInstance> instances = query.list();
+
+    for (HistoricActivityInstance instance : instances) {
+      if (!instance.getActivityId().equals("subprocess") && !instance.getActivityId().equals("userTask1") && !instance.getActivityId().equals("userTask2")) {
+        fail("Unexpected instance with activity id " + instance.getActivityId() + " found.");
+      }
+    }
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  public void testHistoricActivityInstanceQueryByCompleteScopeAndCanceled() {
+    try {
+      historyService
+          .createHistoricActivityInstanceQuery()
+          .completeScope()
+          .canceled()
+          .list();
+      fail("It should not be possible to query by completeScope and canceled.");
+    } catch (ProcessEngineException e) {
+      // exception expected
+    }
+  }
+
   /**
    * https://app.camunda.com/jira/browse/CAM-1537
    */
