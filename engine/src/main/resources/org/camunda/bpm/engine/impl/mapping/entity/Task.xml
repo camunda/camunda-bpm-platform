@@ -147,10 +147,10 @@
         </otherwise>
       </choose>       
     </foreach>
-    <if test="processDefinitionKey != null || processDefinitionName != null">
+    <if test="processDefinitionKey != null || processDefinitionName != null || processDefinitionNameLike != null">
       inner join ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
     </if>
-    <if test="processInstanceBusinessKey != null">
+    <if test="processInstanceBusinessKey != null || processInstanceBusinessKeyLike != null">
         inner join ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
     </if>
     <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
@@ -184,6 +184,9 @@
       <if test="assignee != null">
         and RES.ASSIGNEE_ = #{assignee}
       </if>
+      <if test="assigneeLike != null">
+        and RES.ASSIGNEE_ like #{assigneeLike}
+      </if>
       <if test="owner != null">
         and RES.OWNER_ = #{owner}
       </if>
@@ -201,7 +204,10 @@
       </if>
       <if test="processInstanceBusinessKey != null">
         and E.BUSINESS_KEY_ = #{processInstanceBusinessKey}
-      </if>         
+      </if>
+      <if test="processInstanceBusinessKeyLike != null">
+        and E.BUSINESS_KEY_ like #{processInstanceBusinessKeyLike}
+      </if>      
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
       </if>
@@ -228,6 +234,9 @@
       </if>
       <if test="processDefinitionName != null">
         and D.NAME_ = #{processDefinitionName}
+      </if>
+      <if test="processDefinitionNameLike != null">
+        and D.NAME_ like #{processDefinitionNameLike}
       </if>
       <if test="dueDate != null">
         and RES.DUE_DATE_ = #{dueDate}
