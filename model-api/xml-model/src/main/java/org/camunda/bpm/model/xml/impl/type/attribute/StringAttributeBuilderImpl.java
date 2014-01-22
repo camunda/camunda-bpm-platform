@@ -35,6 +35,18 @@ public class StringAttributeBuilderImpl extends AttributeBuilderImpl<String> imp
     super(attributeName, modelType, new StringAttribute(modelType));
   }
 
+  public StringAttributeBuilder defaultValue(String defaultValue) {
+    return (StringAttributeBuilder) super.defaultValue(defaultValue);
+  }
+
+  public StringAttributeBuilder required() {
+    return (StringAttributeBuilder) super.required();
+  }
+
+  public StringAttributeBuilder idAttribute() {
+    return (StringAttributeBuilder) super.idAttribute();
+  }
+
   /**
    * Create a new {@link AttributeReferenceBuilder} for the reference source element instance
    *

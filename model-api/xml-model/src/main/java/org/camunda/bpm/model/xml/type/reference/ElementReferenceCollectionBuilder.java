@@ -19,8 +19,8 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 /**
  * @author Sebastian Menski
  */
-public interface ElementReferenceCollectionBuilder<T extends ModelElementInstance, V extends ModelElementInstance> extends ModelBuildOperation {
+public interface ElementReferenceCollectionBuilder<Target extends ModelElementInstance, Source extends ModelElementInstance> extends ModelBuildOperation {
 
-  ElementReferenceCollection<T, V> build();
+  ElementReferenceCollection<Target, Source> build();
 
 }

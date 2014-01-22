@@ -21,9 +21,9 @@ import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 /**
  * @author Sebastian Menski
  */
-public class QNameElementReferenceCollectionImpl<T extends ModelElementInstance, V extends ModelElementInstance> extends ElementReferenceCollectionImpl<T, V> {
+public class QNameElementReferenceCollectionImpl<Target extends ModelElementInstance, Source extends ModelElementInstance> extends ElementReferenceCollectionImpl<Target, Source> {
 
-  public QNameElementReferenceCollectionImpl(ChildElementCollection<V> referenceSourceCollection) {
+  public QNameElementReferenceCollectionImpl(ChildElementCollection<Source> referenceSourceCollection) {
     super(referenceSourceCollection);
   }
 

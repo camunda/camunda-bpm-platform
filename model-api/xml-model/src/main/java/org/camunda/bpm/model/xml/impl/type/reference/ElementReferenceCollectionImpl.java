@@ -16,7 +16,6 @@ package org.camunda.bpm.model.xml.impl.type.reference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelReferenceException;
@@ -28,7 +27,6 @@ import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 import org.w3c.dom.Document;
@@ -37,16 +35,16 @@ import org.w3c.dom.Element;
 /**
  * @author Sebastian Menski
  */
-public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V extends ModelElementInstance> extends  ReferenceImpl<T> implements ElementReferenceCollection<T, V> {
+public class ElementReferenceCollectionImpl<Target extends ModelElementInstance, Source extends ModelElementInstance> extends  ReferenceImpl<Target> implements ElementReferenceCollection<Target, Source> {
 
-  private final ChildElementCollection<V> referenceSourceCollection;
+  private final ChildElementCollection<Source> referenceSourceCollection;
   private ModelElementTypeImpl referenceSourceType;
 
-  public ElementReferenceCollectionImpl(ChildElementCollection<V> referenceSourceCollection) {
+  public ElementReferenceCollectionImpl(ChildElementCollection<Source> referenceSourceCollection) {
     this.referenceSourceCollection = referenceSourceCollection;
   }
 
-  public ChildElementCollection<V> getReferenceSourceCollection() {
+  public ChildElementCollection<Source> getReferenceSourceCollection() {
     return referenceSourceCollection;
   }
 
@@ -56,7 +54,7 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
   }
 
   @SuppressWarnings("unchecked")
-  private void performAddOperation(ModelElementInstanceImpl referenceSourceParentElement, T referenceTargetElement) {
+  private void performAddOperation(ModelElementInstanceImpl referenceSourceParentElement, Target referenceTargetElement) {
     ModelInstanceImpl modelInstance = referenceSourceParentElement.getModelInstance();
     String referenceTargetIdentifier = referenceTargetAttribute.getValue(referenceTargetElement);
     ModelElementInstance existingElement = modelInstance.getModelElementById(referenceTargetIdentifier);
@@ -66,8 +64,8 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
         +": element is not part of model. Please connect element to the model first.");
     }
     else {
-      Collection<V> referenceSourceElements = referenceSourceCollection.get(referenceSourceParentElement);
-      V referenceSourceElement = modelInstance.newInstance(referenceSourceType);
+      Collection<Source> referenceSourceElements = referenceSourceCollection.get(referenceSourceParentElement);
+      Source referenceSourceElement = modelInstance.newInstance(referenceSourceType);
       referenceSourceElements.add(referenceSourceElement);
       setReferenceIdentifier(referenceSourceElement, referenceTargetIdentifier);
     }
@@ -98,7 +96,7 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
   @Override
   protected void removeReference(ModelElementInstance referenceSourceElement) {
     ModelElementInstance parentElement = referenceSourceElement.getParentElement();
-    Collection<V> childElementCollection = referenceSourceCollection.get(parentElement);
+    Collection<Source> childElementCollection = referenceSourceCollection.get(parentElement);
     childElementCollection.remove(referenceSourceElement);
   }
 
@@ -114,9 +112,9 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
   @SuppressWarnings("unchecked")
   private Collection<Element> getView(ModelElementInstanceImpl referenceSourceParentElement) {
     Document document = referenceSourceParentElement.getModelInstance().getDocument();
-    Collection<V> referenceSourceElements = referenceSourceCollection.get(referenceSourceParentElement);
+    Collection<Source> referenceSourceElements = referenceSourceCollection.get(referenceSourceParentElement);
     Collection<Element> referenceTargetElements = new ArrayList<Element>();
-    for (V referenceSourceElement : referenceSourceElements) {
+    for (Source referenceSourceElement : referenceSourceElements) {
       String identifier = getReferenceIdentifier(referenceSourceElement);
       Element referenceTargetElement = DomUtil.findElementById(document, identifier);
       if (referenceTargetElement != null) {
@@ -135,8 +133,8 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
     return referenceTargetElements;
   }
 
-  public T getFirstReferenceTargetElement(final ModelElementInstanceImpl referenceSourceParentElement) {
-    Collection<T> referenceTargetElements = getReferenceTargetElements(referenceSourceParentElement);
+  public Target getFirstReferenceTargetElement(final ModelElementInstanceImpl referenceSourceParentElement) {
+    Collection<Target> referenceTargetElements = getReferenceTargetElements(referenceSourceParentElement);
     if (!referenceTargetElements.isEmpty()) {
       return referenceTargetElements.iterator().next();
     }
@@ -145,17 +143,17 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
     }
   }
 
-  public void setSingleTargetElement(final ModelElementInstanceImpl referenceSourceParentElement, T referenceTargetElement) {
-    Collection<T> referenceTargetElements = getReferenceTargetElements(referenceSourceParentElement);
+  public void setSingleTargetElement(final ModelElementInstanceImpl referenceSourceParentElement, Target referenceTargetElement) {
+    Collection<Target> referenceTargetElements = getReferenceTargetElements(referenceSourceParentElement);
     if (!referenceTargetElements.isEmpty()) {
       referenceTargetElements.clear();
     }
     referenceTargetElements.add(referenceTargetElement);
   }
 
-  public Collection<T> getReferenceTargetElements(final ModelElementInstanceImpl referenceSourceParentElement) {
+  public Collection<Target> getReferenceTargetElements(final ModelElementInstanceImpl referenceSourceParentElement) {
 
-    return new Collection<T>() {
+    return new Collection<Target>() {
 
       public int size() {
         return getView(referenceSourceParentElement).size();
@@ -177,22 +175,22 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
         }
       }
 
-      public Iterator<T> iterator() {
-        Collection<T> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
+      public Iterator<Target> iterator() {
+        Collection<Target> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
         return modelElementCollection.iterator();
       }
 
       public Object[] toArray() {
-        Collection<T> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
+        Collection<Target> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
         return modelElementCollection.toArray();
       }
 
       public <T1> T1[] toArray(T1[] a) {
-        Collection<T> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
+        Collection<Target> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
         return modelElementCollection.toArray(a);
       }
 
-      public boolean add(T t) {
+      public boolean add(Target t) {
         if (referenceSourceCollection.isImmutable()) {
           throw new UnsupportedModelOperationException("add()", "collection is immutable");
         }
@@ -220,13 +218,13 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
         return modelElementCollection.containsAll(c);
       }
 
-      public boolean addAll(Collection<? extends T> c) {
+      public boolean addAll(Collection<? extends Target> c) {
         if (referenceSourceCollection.isImmutable()) {
           throw new UnsupportedModelOperationException("addAll()", "collection is immutable");
         }
         else {
           boolean result = false;
-          for (T o: c) {
+          for (Target o: c) {
             result |= add(o);
           }
           return result;
@@ -257,7 +255,7 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
         }
         else {
           Collection<Element> view = new ArrayList<Element>();
-          for (V referenceSourceElement : referenceSourceCollection.get(referenceSourceParentElement)) {
+          for (Source referenceSourceElement : referenceSourceCollection.get(referenceSourceParentElement)) {
             view.add(((ModelElementInstanceImpl) referenceSourceElement).getDomElement());
           }
           performClearOperation(referenceSourceParentElement, view);

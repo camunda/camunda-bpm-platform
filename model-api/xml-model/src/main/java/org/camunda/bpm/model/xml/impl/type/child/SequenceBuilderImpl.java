@@ -19,6 +19,7 @@ import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.impl.ModelBuildOperation;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementBuilder;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollectionBuilder;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
@@ -43,6 +44,12 @@ public class SequenceBuilderImpl implements SequenceBuilder, ModelBuildOperation
 
   public <T extends ModelElementInstance> ChildElementBuilder<T> element(Class<T> childElementType, String localName, String namespaceUri) {
     ChildElementBuilderImpl<T> builder = new ChildElementBuilderImpl<T>(childElementType, localName, namespaceUri, elementType);
+    modelBuildOperations.add(builder);
+    return builder;
+  }
+
+  public <T extends ModelElementInstance> ChildElementBuilder<T> element(Class<T> childElementType) {
+    ChildElementBuilderImpl<T> builder = new ChildElementBuilderImpl<T>(childElementType, elementType);
     modelBuildOperations.add(builder);
     return builder;
   }

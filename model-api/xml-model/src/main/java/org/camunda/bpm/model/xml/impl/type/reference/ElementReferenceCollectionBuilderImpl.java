@@ -39,20 +39,20 @@ import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollectionBuilde
 /**
  * @author Sebastian Menski
  */
-public class ElementReferenceCollectionBuilderImpl<T extends ModelElementInstance, V extends ModelElementInstance> implements ElementReferenceCollectionBuilder<T, V> {
+public class ElementReferenceCollectionBuilderImpl<Target extends ModelElementInstance, Source extends ModelElementInstance> implements ElementReferenceCollectionBuilder<Target, Source> {
 
-  private final Class<V> childElementType;
-  private final Class<T> referenceTargetClass;
+  private final Class<Source> childElementType;
+  private final Class<Target> referenceTargetClass;
 
-  ElementReferenceCollectionImpl<T, V> elementReferenceCollectionImpl;
+  ElementReferenceCollectionImpl<Target, Source> elementReferenceCollectionImpl;
 
-  public ElementReferenceCollectionBuilderImpl(Class<V> childElementType, Class<T> referenceTargetClass, ChildElementCollectionImpl<V> collection) {
+  public ElementReferenceCollectionBuilderImpl(Class<Source> childElementType, Class<Target> referenceTargetClass, ChildElementCollectionImpl<Source> collection) {
     this.childElementType = childElementType;
     this.referenceTargetClass = referenceTargetClass;
-    this.elementReferenceCollectionImpl = new ElementReferenceCollectionImpl<T, V>(collection);
+    this.elementReferenceCollectionImpl = new ElementReferenceCollectionImpl<Target, Source>(collection);
   }
 
-  public ElementReferenceCollection<T, V> build() {
+  public ElementReferenceCollection<Target, Source> build() {
     return elementReferenceCollectionImpl;
   }
 

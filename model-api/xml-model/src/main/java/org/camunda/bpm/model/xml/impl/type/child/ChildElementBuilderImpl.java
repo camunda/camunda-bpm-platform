@@ -27,6 +27,10 @@ public class ChildElementBuilderImpl<T extends ModelElementInstance> extends Chi
     super(childElementType, localName, namespaceUri, containingType);
   }
 
+  public ChildElementBuilderImpl(Class<T> childElementType, ModelElementType containingType) {
+    super(childElementType, containingType);
+  }
+
   public ChildElement<T> build() {
     return (ChildElement<T>) super.build();
   }

@@ -21,7 +21,14 @@ import org.camunda.bpm.model.xml.type.reference.AttributeReferenceBuilder;
  */
 public interface StringAttributeBuilder extends AttributeBuilder<String> {
 
+  StringAttributeBuilder defaultValue(String defaultValue);
+
+  StringAttributeBuilder required();
+
+  StringAttributeBuilder idAttribute();
+
   <V extends ModelElementInstance> AttributeReferenceBuilder<V> qNameAttributeReference(Class<V> referenceTargetElement);
 
   <V extends ModelElementInstance> AttributeReferenceBuilder<V> idAttributeReference(Class<V>  referenceTargetElement);
+
 }

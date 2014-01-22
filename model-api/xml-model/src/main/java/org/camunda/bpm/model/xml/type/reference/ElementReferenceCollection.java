@@ -22,11 +22,11 @@ import java.util.Collection;
 /**
  * @author Sebastian Menski
  */
-public interface ElementReferenceCollection<T extends ModelElementInstance, V extends ModelElementInstance> extends Reference<T> {
+public interface ElementReferenceCollection<Target extends ModelElementInstance, Source extends ModelElementInstance> extends Reference<Target> {
 
-  ChildElementCollection<V> getReferenceSourceCollection();
+  ChildElementCollection<Source> getReferenceSourceCollection();
 
-  T getFirstReferenceTargetElement(ModelElementInstanceImpl referenceSourceParentElement);
+  Target getFirstReferenceTargetElement(ModelElementInstanceImpl referenceSourceParentElement);
 
   /**
    * Set the reference target collection to only hold a single element
@@ -34,7 +34,7 @@ public interface ElementReferenceCollection<T extends ModelElementInstance, V ex
    * @param referenceSourceParentElement  the parent element of the element reference collection
    * @param referenceTargetElement  the single reference target
    */
-  void setSingleTargetElement(ModelElementInstanceImpl referenceSourceParentElement, T referenceTargetElement);
+  void setSingleTargetElement(ModelElementInstanceImpl referenceSourceParentElement, Target referenceTargetElement);
 
-  Collection<T> getReferenceTargetElements(ModelElementInstanceImpl referenceSourceElement);
+  Collection<Target> getReferenceTargetElements(ModelElementInstanceImpl referenceSourceElement);
 }
