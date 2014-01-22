@@ -460,13 +460,37 @@ ngDefine('cockpit.pages.processDefinition', [
     }
   }];
 
-  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
+  var RouteConfig = [
+    '$routeProvider',
+    'AuthenticationServiceProvider',
+  function(
+    $routeProvider,
+    AuthenticationServiceProvider
+  ) {
 
-    $routeProvider.when('/process-definition/:id', {
-      redirectTo: '/process-definition/:id/live'
-    });
+    // $routeProvider.when('/process-definition/:id', {
+    //   redirectTo: '/process-definition/:id/live'
+    // });
 
-    $routeProvider.when('/process-definition/:id/live', {
+    $routeProvider
+    .when('/process-definition/:id', {
+      redirectTo: function(params, currentPath, currentSearch) {
+        return '/process-definition/'+ params.id +'/live'+
+        // in case we have something to pass to the search (overkill? could simply use "?")
+        (currentSearch.detailsTab || currentSearch.activityIds ? '?' : '') +
+        // make an array with the search
+        [
+          currentSearch.activityIds ? 'activityIds='+ currentSearch.activityIds : false,
+          currentSearch.detailsTab ? 'detailsTab='+ currentSearch.detailsTab : false
+        ]
+        // remove the empty values...
+        .filter(function(v) { return v; })
+        // and join.
+        .join('&');
+      },
+      reloadOnSearch: false
+    })
+    .when('/process-definition/:id/live', {
       templateUrl: 'pages/process-definition.html',
       controller: Controller,
       resolve: {

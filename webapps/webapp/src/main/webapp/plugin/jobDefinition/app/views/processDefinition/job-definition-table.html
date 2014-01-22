@@ -11,7 +11,8 @@
   <tbody>
     <tr ng-repeat="jobDefinition in jobDefinitions">
       <td>
-        <a href="#/process-definition/{{ processDefinition.id }}?activityIds={{ jobDefinition.activityId }}">
+        <a ng-click="selectActivity(jobDefinition.activityId, $event)"
+           ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ jobDefinition.activityId }}&amp;detailsTab=job-definition-table">
           {{ jobDefinition.activityName }}
         </a>
       </td>
@@ -20,14 +21,14 @@
       </td>
       <td>
         {{ jobDefinition.jobConfiguration }}
-      </td>      
+      </td>
       <td>
         <span ng-show="jobDefinition.suspended">
           Suspended
         </span>
         <span ng-hide="jobDefinition.suspended">
           Active
-        </span>        
+        </span>
       </td>
       <td>
         <a class="btn action-button" ng-click="openSuspensionStateDialog(jobDefinition)" ng-show="jobDefinition.suspended"
@@ -41,7 +42,7 @@
            help-text="Suspend Job Definition"
            help-placement="'left'">
           <i class="icon-suspended"></i>
-        </a>        
+        </a>
       </td>
     </tr>
 
@@ -49,7 +50,7 @@
       <td colspan="5">
         <i class="icon-loading"></i> loading job definitions...
       </td>
-    </tr>    
+    </tr>
 
     <tr ng-if="jobDefinitions && !jobDefinitions.length">
       <td colspan="5">
