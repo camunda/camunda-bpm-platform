@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeBuilderImpl;
+import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.impl.util.QName;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -73,15 +74,6 @@ public class ModelImpl implements Model {
 
   public String getModelName() {
     return modelName;
-  }
-
-  @Override
-  protected Object clone() {
-    ModelImpl model = new ModelImpl(this.modelName);
-    for (Map.Entry<Class<? extends ModelElementInstance>, ModelElementType> type : typesByClass.entrySet()) {
-      model.registerType(type.getValue(), type.getKey());
-    }
-    return model;
   }
 
   @Override
