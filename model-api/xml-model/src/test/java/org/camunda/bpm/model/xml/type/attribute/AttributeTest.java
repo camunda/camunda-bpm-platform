@@ -17,6 +17,7 @@ import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.impl.type.attribute.AttributeImpl;
 import org.camunda.bpm.model.xml.testmodel.Gender;
+import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.camunda.bpm.model.xml.testmodel.instance.Animal;
@@ -30,6 +31,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
 
@@ -127,6 +129,7 @@ public class AttributeTest extends TestModelTest {
     String testNamespace = "http://camunda.org/test";
     ((AttributeImpl<String>) idAttribute).setNamespaceUri(testNamespace);
     assertThat(idAttribute.getNamespaceUri()).isEqualTo(testNamespace);
+    ((AttributeImpl<String>) idAttribute).setNamespaceUri(null);
   }
 
   @Test

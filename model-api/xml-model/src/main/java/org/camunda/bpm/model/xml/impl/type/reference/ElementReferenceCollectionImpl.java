@@ -197,7 +197,9 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
           throw new UnsupportedModelOperationException("add()", "collection is immutable");
         }
         else {
-          performAddOperation(referenceSourceParentElement, t);
+          if (!contains(t)) {
+            performAddOperation(referenceSourceParentElement, t);
+          }
           return true;
         }
       }
@@ -214,7 +216,8 @@ public class ElementReferenceCollectionImpl<T extends ModelElementInstance, V ex
       }
 
       public boolean containsAll(Collection<?> c) {
-        return getView(referenceSourceParentElement).containsAll(c);
+        Collection<Target> modelElementCollection = ModelUtil.getModelElementCollection(getView(referenceSourceParentElement), referenceSourceParentElement.getModelInstance());
+        return modelElementCollection.containsAll(c);
       }
 
       public boolean addAll(Collection<? extends T> c) {
