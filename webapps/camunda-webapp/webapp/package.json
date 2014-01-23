@@ -28,6 +28,7 @@
     "karma-ng-scenario": "*",
     "karma-requirejs": "~0.2.0",
     "karma-html2js-preprocessor": "~0.1.0",
-    "grunt-bower-task": "~0.3.4"
+    "grunt-bower-task": "~0.3.4",
+    "grunt-newer": "~0.6.1"
   }
 }
