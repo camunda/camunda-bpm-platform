@@ -95,7 +95,7 @@ public class ModelElementTypeBuilderImpl implements ModelElementTypeBuilder, Mod
   }
 
   public ModelElementTypeBuilder abstractType() {
-    modelType.setAbstract();
+    modelType.setAbstract(true);
     return this;
   }
 

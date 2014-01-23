@@ -26,6 +26,10 @@ public class ModelTypeException extends ModelException {
 
   private static final long serialVersionUID = 1L;
 
+  public ModelTypeException(String message) {
+    super(message);
+  }
+
   public ModelTypeException(String value, Type type) {
     super("Illegal value "+value+" for type "+type);
   }

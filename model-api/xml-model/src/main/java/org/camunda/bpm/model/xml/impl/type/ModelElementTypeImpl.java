@@ -25,6 +25,7 @@ import org.camunda.bpm.model.xml.impl.ModelImpl;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.impl.util.DomUtil;
+import org.camunda.bpm.model.xml.impl.util.ModelTypeException;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
@@ -89,15 +90,16 @@ public class ModelElementTypeImpl implements ModelElementType {
   }
 
   ModelElementInstance createModelElementInstance(ModelTypeInstanceContext instanceContext) {
-    return instanceProvider.newInstance(instanceContext);
+    if (isAbstract) {
+      throw new ModelTypeException("Model element type " + getTypeName() + " is abstract and no instances can be created.");
+    }
+    else {
+      return instanceProvider.newInstance(instanceContext);
+    }
   }
 
   public final List<Attribute<?>> getAttributes() {
     return attributes;
-  }
-
-  final void setAttributes(List<Attribute<?>> attributes) {
-    this.attributes = attributes;
   }
 
   public String getTypeName() {
@@ -134,8 +136,8 @@ public class ModelElementTypeImpl implements ModelElementType {
     return isAbstract;
   }
 
-  public void setAbstract() {
-    this.isAbstract = true;
+  public void setAbstract(boolean isAbstract) {
+    this.isAbstract = isAbstract;
   }
 
   public Collection<ModelElementType> getExtendingTypes() {
