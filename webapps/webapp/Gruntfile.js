@@ -4,6 +4,8 @@ var _ = require('underscore');
 
 var rjsConf = require('./src/main/webapp/require-conf');
 
+var livereloadPort = parseInt(process.env.LIVERELOAD_PORT || 8081, 10);
+
 
 module.exports = function(grunt) {
   var packageJSON = grunt.file.readJSON('package.json');
@@ -42,12 +44,7 @@ module.exports = function(grunt) {
               'require-conf.js',
               'index.html'
             ],
-            dest: 'target/webapp/',
-            options: {
-              process: function(content, srcpath) {
-                return content.replace(/\/\*\* live-reload/, '');
-              }
-            }
+            dest: 'target/webapp/'
           },
           {
             expand: true,
@@ -57,7 +54,14 @@ module.exports = function(grunt) {
             ],
             dest: 'target/webapp/'
           }
-        ]
+        ],
+        options: {
+          process: function(content, srcpath) {
+            return content
+              .replace(/\/\* live-reload/, '/** live-reload */')
+              .replace(/LIVERELOAD_PORT/g, livereloadPort);
+          }
+        }
       },
 
       assets: {
@@ -103,8 +107,8 @@ module.exports = function(grunt) {
         ],
         tasks: [
           // 'jshint:scripts',
-          // 'newer:copy:development'
-          'copy:development'
+          'newer:copy:development'
+          // 'copy:development'
         ]
       },
 
@@ -112,20 +116,20 @@ module.exports = function(grunt) {
       // QUESTION:
       // Does that entry make sense?
       // We can use `karma:unit` and `karma:e2e` instead of watching
-      tests: {
-        files: [
-          'src/main/webapp/require-conf.js',
-          'src/main/webapp/{app,develop,plugin,common}/**/*.{js,html}',
-          'src/test/js/{config,e2e,test,unit}/{,**/}*.js'
-        ],
-        tasks: [
-          // 'jshint:test',
-          // we use the CI versions (who are runned only once)
-          // 'karma:testOnce',
-          'karma:unitOnce',
-          'karma:e2eOnce'
-        ]
-      },
+      // tests: {
+      //   files: [
+      //     'src/main/webapp/require-conf.js',
+      //     'src/main/webapp/{app,develop,plugin,common}/**/*.{js,html}',
+      //     'src/test/js/{config,e2e,test,unit}/{,**/}*.js'
+      //   ],
+      //   tasks: [
+      //     // 'jshint:test',
+      //     // we use the CI versions (who are runned only once)
+      //     // 'karma:testOnce',
+      //     'karma:unitOnce',
+      //     'karma:e2eOnce'
+      //   ]
+      // },
 
       // TODO: add that when using less
       // styles: {
@@ -143,14 +147,14 @@ module.exports = function(grunt) {
           'src/main/webapp/assets/css/**/*.css'
         ],
         tasks: [
-          // 'newer:copy:css'
-          'copy:css'
+          'newer:copy:css'
+          // 'copy:css'
         ]
       },
 
       servedAssets: {
         options: {
-          livereload: 8081
+          livereload: livereloadPort
         },
         files: [
           'target/webapp/assets/{css,img}/**/*.{css,jpg,png,html}',
@@ -185,37 +189,37 @@ module.exports = function(grunt) {
     //   }
     // },
 
-    karma: {
-      options: {
-        browsers: ['Chrome', 'Firefox']//, 'IE']
-      },
+    // karma: {
+    //   options: {
+    //     browsers: ['Chrome', 'Firefox']//, 'IE']
+    //   },
 
-      // to test the testing environment
-      test: {
-        configFile: 'src/test/js/config/karma.test.js'
-      },
+    //   // to test the testing environment
+    //   test: {
+    //     configFile: 'src/test/js/config/karma.test.js'
+    //   },
 
-      unit: {
-        configFile: 'src/test/js/config/karma.unit.js'
-      },
-      e2e: {
-        configFile: 'src/test/js/config/karma.e2e.js'
-      },
+    //   unit: {
+    //     configFile: 'src/test/js/config/karma.unit.js'
+    //   },
+    //   e2e: {
+    //     configFile: 'src/test/js/config/karma.e2e.js'
+    //   },
 
-      //continuous integration mode: run tests once in PhantomJS browser.
-      unitOnce: {
-        singleRun: true,
-        autoWatch: false,
-        configFile: 'src/test/js/config/karma.unit.js',
-        browsers: ['PhantomJS']
-      },
-      e2eOnce: {
-        singleRun: true,
-        autoWatch: false,
-        configFile: 'src/test/js/config/karma.e2e.js',
-        browsers: ['PhantomJS']
-      }
-    },
+    //   //continuous integration mode: run tests once in PhantomJS browser.
+    //   unitOnce: {
+    //     singleRun: true,
+    //     autoWatch: false,
+    //     configFile: 'src/test/js/config/karma.unit.js',
+    //     browsers: ['PhantomJS']
+    //   },
+    //   e2eOnce: {
+    //     singleRun: true,
+    //     autoWatch: false,
+    //     configFile: 'src/test/js/config/karma.e2e.js',
+    //     browsers: ['PhantomJS']
+    //   }
+    // },
 
     jsdoc : {
       dist : {
@@ -340,8 +344,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-jsdoc');
   grunt.loadNpmTasks('grunt-bower-task');
-  grunt.loadNpmTasks('grunt-karma');
-  // grunt.loadNpmTasks('grunt-newer');
+  // grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-newer');
 
   // custom task for ngDefine minification
   grunt.registerMultiTask('ngr', 'Minifies the angular related scripts', function() {
@@ -378,10 +382,10 @@ module.exports = function(grunt) {
     }
     else {
       tasks = tasks.concat([
-        // 'newer:copy:assets',
-        // 'newer:copy:development'
-        'copy:assets',
-        'copy:development'
+        'newer:copy:assets',
+        'newer:copy:development'
+        // 'copy:assets',
+        // 'copy:development'
       ]);
     }
 

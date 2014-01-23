@@ -25,11 +25,9 @@ To get the [livereload](http://livereload.com/) feature, use:
 `grunt watch:servedAssets`
 
 And then the browser should reload automatically when a change is made.
+You can set the port used by livereload by setting a environment variable like this
 
-Note about the livereload feature:
-It will only work when the `location.hostname` is `localhost`.
-It uses the default livereload port (35729), if you need to run several livereload servers,
-you may need to change that in `src/main/webapp/require-conf.js`.
+`LIVERELOAD_PORT=8082 grunt watch:servedAssets`
 
 
 Documentation

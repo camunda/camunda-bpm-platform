@@ -39,25 +39,26 @@
       </td>
       <td>
         <span ng-show="incident.linkable">
-          <a href="#/process-instance/{{ processInstance.id }}?activityIds={{ incident.activityId }}">
+          <a ng-click="selectActivity(incident.activityId, $event)"
+             ng-href="#/process-instance/{{ processInstance.id }}?activityIds={{ incident.activityId }}&amp;detailsTab=job-definition-table">
             {{ incident.activityName }}
           </a>
         </span>
         <span ng-hide="incident.linkable">
           {{ incident.activityName }}
         </span>
-        
+
       </td>
       <td>
         <span ng-show="incident.causeIncidentProcessInstanceId !== incident.processInstanceId" >
-          <a href="#/process-instance/{{incident.causeIncidentProcessInstanceId}}?activityIds={{ incident.causeIncidentActivityId }}&detailsTab=incidents-tab">
+          <a href="#/process-instance/{{incident.causeIncidentProcessInstanceId}}?activityIds={{ incident.causeIncidentActivityId }}&amp;detailsTab=incidents-tab">
             {{ incident.causeIncidentProcessInstanceId | shorten:8}}
           </a>
         </span>
       </td>
       <td>
         <span ng-show="incident.rootCauseIncidentProcessInstanceId !== incident.processInstanceId" >
-          <a href="#/process-instance/{{incident.rootCauseIncidentProcessInstanceId}}?activityIds={{ incident.rootCauseIncidentActivityId }}&detailsTab=incidents-tab">
+          <a href="#/process-instance/{{incident.rootCauseIncidentProcessInstanceId}}?activityIds={{ incident.rootCauseIncidentActivityId }}&amp;detailsTab=incidents-tab">
             {{ incident.rootCauseIncidentProcessInstanceId | shorten:8}}
           </a>
         </span>
@@ -79,8 +80,8 @@
       <td colspan="7">
         <i class="icon-loading"></i> loading incidents...
       </td>
-    </tr>    
-  
+    </tr>
+
     <tr ng-if="incidents && !incidents.length">
       <td  colspan="7">
         No incidents
