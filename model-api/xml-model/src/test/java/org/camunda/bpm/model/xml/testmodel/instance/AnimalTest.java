@@ -22,11 +22,12 @@ import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import javax.xml.XMLConstants;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -35,7 +36,6 @@ import static org.junit.runners.Parameterized.Parameters;
 /**
  * @author Sebastian Menski
  */
-@RunWith(Parameterized.class)
 public class AnimalTest extends TestModelTest {
 
   private Animal tweety;
@@ -99,7 +99,7 @@ public class AnimalTest extends TestModelTest {
   }
 
   @Before
-  public void copyModel() {
+  public void copyModelInstance() {
     modelInstance = cloneModelInstance();
 
     tweety = (Animal) modelInstance.getModelElementById("tweety");

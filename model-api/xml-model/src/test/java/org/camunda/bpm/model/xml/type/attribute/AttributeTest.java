@@ -24,15 +24,11 @@ import org.camunda.bpm.model.xml.testmodel.instance.AnimalTest;
 import org.camunda.bpm.model.xml.testmodel.instance.Animals;
 import org.camunda.bpm.model.xml.testmodel.instance.Bird;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.camunda.bpm.model.xml.type.reference.Reference;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
@@ -40,7 +36,6 @@ import static org.junit.runners.Parameterized.Parameters;
 /**
  * @author Sebastian Menski
  */
-@RunWith(Parameterized.class)
 public class AttributeTest extends TestModelTest {
 
   private Bird tweety;
@@ -73,7 +68,7 @@ public class AttributeTest extends TestModelTest {
 
   @Before
   @SuppressWarnings("unchecked")
-  public void copyModel() {
+  public void copyModelInstance() {
     modelInstance = cloneModelInstance();
 
     tweety = (Bird) modelInstance.getModelElementById("tweety");
@@ -85,8 +80,14 @@ public class AttributeTest extends TestModelTest {
 
   @Test
   public void testOwningElementType() {
-    AttributeImpl<String> idAttr = (AttributeImpl<String>) idAttribute;
-    assertThat(idAttr.getOwningElementType().getTypeName()).isEqualTo("animal");
+    AttributeImpl<String> idAttributeImpl = (AttributeImpl<String>) idAttribute;
+    AttributeImpl<String> nameAttributeImpl = (AttributeImpl<String>) nameAttribute;
+    AttributeImpl<String> fatherAttributeImpl = (AttributeImpl<String>) fatherAttribute;
+    ModelElementType animalType = modelInstance.getModel().getType(Animal.class);
+
+    assertThat(idAttributeImpl.getOwningElementType()).isEqualTo(animalType);
+    assertThat(nameAttributeImpl.getOwningElementType()).isEqualTo(animalType);
+    assertThat(fatherAttributeImpl.getOwningElementType()).isEqualTo(animalType);
   }
 
   @Test

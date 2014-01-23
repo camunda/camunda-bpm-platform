@@ -18,6 +18,8 @@ import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.testmodel.instance.*;
 import org.junit.After;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.w3c.dom.Document;
 
 import java.io.InputStream;
@@ -25,6 +27,7 @@ import java.io.InputStream;
 /**
  * @author Sebastian Menski
  */
+@RunWith(Parameterized.class)
 public abstract class TestModelTest {
 
   private final ModelInstance testModelInstance;

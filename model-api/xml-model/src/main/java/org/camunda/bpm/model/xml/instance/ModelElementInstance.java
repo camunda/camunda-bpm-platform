@@ -24,23 +24,23 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  */
 public interface ModelElementInstance {
 
-  void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue, boolean isIdAttribute);
+  String getAttributeValue(String attributeName);
 
   void setAttributeValue(String attributeName, String xmlValue, boolean isIdAttribute);
 
+  void removeAttribute(String attributeName);
+
   String getAttributeValueNs(String attributeName, String namespaceUri);
 
-  String getAttributeValue(String attributeName);
+  void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue, boolean isIdAttribute);
+
+  void removeAttributeNs(String attributeName, String namespaceUri);
 
   ModelElementType getElementType();
 
   ModelElementInstance getParentElement();
 
   ModelInstance getModelInstance();
-
-  void removeAttribute(String attributeName);
-
-  void removeAttributeNs(String attributeName, String namespaceUri);
 
   /**
    * Replaces this element with a new element and updates references.

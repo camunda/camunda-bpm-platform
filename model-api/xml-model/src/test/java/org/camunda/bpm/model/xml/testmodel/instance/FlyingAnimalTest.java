@@ -21,8 +21,6 @@ import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import javax.xml.XMLConstants;
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ import static org.junit.runners.Parameterized.Parameters;
 /**
  * @author Sebastian Menski
  */
-@RunWith(Parameterized.class)
 public class FlyingAnimalTest extends TestModelTest {
 
   private FlyingAnimal tweety;
@@ -85,7 +82,7 @@ public class FlyingAnimalTest extends TestModelTest {
   }
 
   @Before
-  public void copyModel() {
+  public void copyModelInstance() {
     modelInstance = cloneModelInstance();
     tweety = (FlyingAnimal) modelInstance.getModelElementById("tweety");
     hedwig = (FlyingAnimal) modelInstance.getModelElementById("hedwig");
