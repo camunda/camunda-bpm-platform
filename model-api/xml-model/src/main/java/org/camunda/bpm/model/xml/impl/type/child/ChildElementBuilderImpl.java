@@ -12,10 +12,13 @@
  */
 package org.camunda.bpm.model.xml.impl.type.child;
 
+import org.camunda.bpm.model.xml.impl.type.reference.ElementReferenceBuilderImpl;
+import org.camunda.bpm.model.xml.impl.type.reference.QNameElementReferenceBuilderImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.reference.ElementReferenceBuilder;
 
 /**
  * @author Daniel Meyer
@@ -29,6 +32,20 @@ public class ChildElementBuilderImpl<T extends ModelElementInstance> extends Chi
 
   public ChildElementBuilderImpl(Class<T> childElementType, ModelElementType containingType) {
     super(childElementType, containingType);
+  }
+
+  public <V extends ModelElementInstance> ElementReferenceBuilder<V, T> qNameElementReference(final Class<V> referenceTargetType) {
+    ChildElementImpl<T> child = (ChildElementImpl<T>) build();
+    QNameElementReferenceBuilderImpl<V,T> builder = new QNameElementReferenceBuilderImpl<V, T>(childElementType, referenceTargetType, child);
+    setReferenceBuilder(builder);
+    return builder;
+  }
+
+  public <V extends ModelElementInstance> ElementReferenceBuilder<V, T> idElementReference(final Class<V> referenceTargetType) {
+    ChildElementImpl<T> child = (ChildElementImpl<T>) build();
+    ElementReferenceBuilderImpl<V, T> builder = new ElementReferenceBuilderImpl<V, T>(childElementType, referenceTargetType, child);
+    setReferenceBuilder(builder);
+    return builder;
   }
 
   public ChildElement<T> build() {

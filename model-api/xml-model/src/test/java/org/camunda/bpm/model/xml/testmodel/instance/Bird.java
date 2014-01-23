@@ -18,7 +18,7 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
-import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
+import org.camunda.bpm.model.xml.type.reference.ElementReference;
 
 import java.util.Collection;
 
@@ -31,7 +31,7 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.*;
 public class Bird extends FlyingAnimal {
 
   private static ChildElementCollection<Egg> eggColl;
-  private static ElementReferenceCollection<Bird, SpouseRef> spouseRefsColl;
+  private static ElementReference<Bird, SpouseRef> spouseRefsColl;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Bird.class, ELEMENT_NAME_BIRD)
@@ -51,7 +51,7 @@ public class Bird extends FlyingAnimal {
       .build();
 
     spouseRefsColl = sequence.element(SpouseRef.class, ELEMENT_NAME_SPOUSE_REF)
-      .qNameElementReferenceCollection(Bird.class)
+      .qNameElementReference(Bird.class)
       .build();
 
     typeBuilder.build();
@@ -67,19 +67,19 @@ public class Bird extends FlyingAnimal {
   }
 
   public Bird getSpouse() {
-    return spouseRefsColl.getFirstReferenceTargetElement(this);
+    return spouseRefsColl.getReferenceTargetElement(this);
   }
 
   public void setSpouse(Bird bird) {
-    spouseRefsColl.setSingleTargetElement(this, bird);
+    spouseRefsColl.setReferenceTargetElement(this, bird);
   }
 
   public void removeSpouse() {
     spouseRefsColl.getReferenceTargetElements(this).clear();
   }
 
-  public Collection<SpouseRef> getSpouseRefs() {
-    return spouseRefsColl.getReferenceSourceCollection().get(this);
+  public SpouseRef getSpouseRef() {
+    return spouseRefsColl.getReferenceSource(this);
   }
 
 }

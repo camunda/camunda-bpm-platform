@@ -118,37 +118,13 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
       String identifier = getReferenceIdentifier(referenceSourceElement);
       Element referenceTargetElement = DomUtil.findElementById(document, identifier);
       if (referenceTargetElement != null) {
-        try {
-          referenceTargetElements.add(referenceTargetElement);
-        }
-        catch (ClassCastException e) {
-          throw new ModelException("Reference found for element type " + referenceTargetElement.getClass()
-            + " but expected " + referenceTargetElement.getClass());
-        }
+        referenceTargetElements.add(referenceTargetElement);
       }
       else {
         throw new ModelException("Unable to find a model element instance for id " + identifier);
       }
     }
     return referenceTargetElements;
-  }
-
-  public Target getFirstReferenceTargetElement(final ModelElementInstanceImpl referenceSourceParentElement) {
-    Collection<Target> referenceTargetElements = getReferenceTargetElements(referenceSourceParentElement);
-    if (!referenceTargetElements.isEmpty()) {
-      return referenceTargetElements.iterator().next();
-    }
-    else {
-      return null;
-    }
-  }
-
-  public void setSingleTargetElement(final ModelElementInstanceImpl referenceSourceParentElement, Target referenceTargetElement) {
-    Collection<Target> referenceTargetElements = getReferenceTargetElements(referenceSourceParentElement);
-    if (!referenceTargetElements.isEmpty()) {
-      referenceTargetElements.clear();
-    }
-    referenceTargetElements.add(referenceTargetElement);
   }
 
   public Collection<Target> getReferenceTargetElements(final ModelElementInstanceImpl referenceSourceParentElement) {

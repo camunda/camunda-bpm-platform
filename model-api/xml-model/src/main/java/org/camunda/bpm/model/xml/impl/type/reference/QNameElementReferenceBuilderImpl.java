@@ -13,19 +13,17 @@
 
 package org.camunda.bpm.model.xml.impl.type.reference;
 
-import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.type.child.ChildElementCollectionImpl;
+import org.camunda.bpm.model.xml.impl.type.child.ChildElementImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.reference.ElementReference;
 
 /**
  * @author Sebastian Menski
  */
-public class QNameElementReferenceCollectionBuilderImpl<Target extends ModelElementInstance, Source extends ModelElementInstance> extends ElementReferenceCollectionBuilderImpl<Target, Source> {
+public class QNameElementReferenceBuilderImpl<Target extends ModelElementInstance, Source extends ModelElementInstance> extends ElementReferenceBuilderImpl<Target,Source> {
 
-  public QNameElementReferenceCollectionBuilderImpl(Class<Source> childElementType, Class<Target> referenceTargetClass, ChildElementCollectionImpl<Source> collection, ModelElementTypeImpl containingType) {
-    super(childElementType, referenceTargetClass, collection);
-    this.elementReferenceCollectionImpl = new QNameElementReferenceCollectionImpl<Target, Source>(collection);
+  public QNameElementReferenceBuilderImpl(final Class<Source> childElementType, final Class<Target> referenceTargetClass, final ChildElementImpl<Source> child) {
+    super(childElementType, referenceTargetClass, child);
+    this.elementReferenceCollectionImpl = new QNameElementReferenceImpl<Target,Source>(child);
   }
-
 }

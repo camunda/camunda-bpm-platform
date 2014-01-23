@@ -23,10 +23,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.xml.XMLConstants;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
@@ -187,56 +185,28 @@ public class BirdTest extends TestModelTest {
   public void testSetSpouseRefsByHelper() {
     SpouseRef spouseRef = modelInstance.newInstance(SpouseRef.class);
     spouseRef.setTextContent(timmy.getId());
-    tweety.getSpouseRefs().clear();
-    tweety.addChildElement(spouseRef);
+    tweety.getSpouseRef().replaceWithElement(spouseRef);
     assertThat(tweety.getSpouse()).isEqualTo(timmy);
   }
 
   @Test
   public void testSpouseRefsByTextContent() {
-    Collection<SpouseRef> spouseRefs = tweety.getSpouseRefs();
-    Collection<String> textContents = new ArrayList<String>();
-    for (SpouseRef spouseRef : spouseRefs) {
-      String textContent = spouseRef.getTextContent();
-      assertThat(textContent).isNotEmpty();
-      textContents.add(textContent);
-    }
-    assertThat(textContents)
-      .isNotEmpty()
-      .hasSize(1)
-      .containsOnly(hedwig.getId());
+    SpouseRef spouseRef = tweety.getSpouseRef();
+    assertThat(spouseRef.getTextContent()).isEqualTo(hedwig.getId());
   }
 
   @Test
   public void testUpdateSpouseRefsByTextContent() {
-    List<SpouseRef> spouseRefs = new ArrayList<SpouseRef>(tweety.getSpouseRefs());
-    spouseRefs.get(0).setTextContent(timmy.getId());
+    SpouseRef spouseRef = tweety.getSpouseRef();
+    spouseRef.setTextContent(timmy.getId());
     assertThat(tweety.getSpouse()).isEqualTo(timmy);
   }
 
   @Test
   public void testUpdateSpouseRefsByTextContentWithNamespace() {
-    List<SpouseRef> spouseRefs = new ArrayList<SpouseRef>(tweety.getSpouseRefs());
-    spouseRefs.get(0).setTextContent("tns:" + timmy.getId());
+    SpouseRef spouseRef = tweety.getSpouseRef();
+    spouseRef.setTextContent("tns:" + timmy.getId());
     assertThat(tweety.getSpouse()).isEqualTo(timmy);
   }
 
-  @Test
-  public void testUpdateSpouseRefsByRemoveElement() {
-    List<SpouseRef> spouseRefs = new ArrayList<SpouseRef>(tweety.getSpouseRefs());
-    tweety.getSpouseRefs().remove(spouseRefs.get(0));
-    assertThat(tweety.getSpouse()).isNull();
-  }
-
-  @Test
-  public void testClearSpouseRefs() {
-    tweety.getSpouseRefs().clear();
-    assertThat(tweety.getSpouse()).isNull();
-
-    // should not affect animals collection
-    Animals animals = (Animals) modelInstance.getDocumentElement();
-    assertThat(animals.getAnimals())
-      .isNotEmpty()
-      .hasSize(3);
-  }
 }

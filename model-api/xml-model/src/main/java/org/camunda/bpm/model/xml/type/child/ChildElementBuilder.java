@@ -13,12 +13,17 @@
 package org.camunda.bpm.model.xml.type.child;
 
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.type.reference.ElementReferenceBuilder;
 
 /**
  * @author Daniel Meyer
  *
  */
 public interface ChildElementBuilder<T extends ModelElementInstance> extends ChildElementCollectionBuilder<T> {
+
+  <V extends ModelElementInstance> ElementReferenceBuilder<V,T> qNameElementReference(Class<V> referenceTargetType);
+
+  <V extends ModelElementInstance> ElementReferenceBuilder<V, T> idElementReference(Class<V> referenceTargetType);
 
   public ChildElement<T> build();
 

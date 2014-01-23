@@ -15,16 +15,16 @@ package org.camunda.bpm.model.xml.type.reference;
 
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
-
-import java.util.Collection;
 
 /**
  * @author Sebastian Menski
  */
-public interface ElementReferenceCollection<Target extends ModelElementInstance, Source extends ModelElementInstance> extends Reference<Target> {
+public interface ElementReference<Target extends ModelElementInstance, Source extends ModelElementInstance> extends ElementReferenceCollection<Target, Source> {
 
-  ChildElementCollection<Source> getReferenceSourceCollection();
+  Source getReferenceSource(ModelElementInstance referenceSourceParent);
 
-  Collection<Target> getReferenceTargetElements(ModelElementInstanceImpl referenceSourceElement);
+  Target getReferenceTargetElement(ModelElementInstanceImpl referenceSourceParentElement);
+
+  void setReferenceTargetElement(ModelElementInstanceImpl referenceSourceParentElement, Target referenceTargetElement);
+
 }
