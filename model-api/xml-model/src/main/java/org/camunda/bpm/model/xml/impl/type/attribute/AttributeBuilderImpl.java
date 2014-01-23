@@ -26,14 +26,13 @@ import org.camunda.bpm.model.xml.type.attribute.AttributeBuilder;
  */
 public abstract class AttributeBuilderImpl<T> implements AttributeBuilder<T>, ModelBuildOperation {
 
-  final AttributeImpl<T> attribute;
+  private final AttributeImpl<T> attribute;
   private final ModelElementTypeImpl modelType;
 
   AttributeBuilderImpl(String attributeName, ModelElementTypeImpl modelType, AttributeImpl<T> attribute) {
     this.modelType = modelType;
     this.attribute = attribute;
     attribute.setAttributeName(attributeName);
-    modelType.registerAttribute(attribute);
   }
 
   public AttributeBuilder<T> idAttribute() {
@@ -53,6 +52,7 @@ public abstract class AttributeBuilderImpl<T> implements AttributeBuilder<T>, Mo
   }
 
   public Attribute<T> build() {
+    modelType.registerAttribute(attribute);
     return attribute;
   }
 

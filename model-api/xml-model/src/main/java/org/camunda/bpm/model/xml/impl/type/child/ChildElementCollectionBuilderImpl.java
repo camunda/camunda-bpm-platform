@@ -34,9 +34,9 @@ import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollectionBuilde
 public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> implements ChildElementCollectionBuilder<T>, ModelBuildOperation {
 
   /** The {@link ModelElementType} of the element containing the collection */
-  final ModelElementTypeImpl containingType;
+  protected final ModelElementTypeImpl containingType;
   private final ChildElementCollectionImpl<T> collection;
-  final Class<T> childElementType;
+  protected final Class<T> childElementType;
 
   private ElementReferenceCollectionBuilder<?, ?> referenceBuilder;
 
@@ -54,11 +54,11 @@ public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> i
     this.collection = createCollectionInstance(type);
   }
 
-  ChildElementCollectionImpl<T> createCollectionInstance(Class<T> type) {
+  protected ChildElementCollectionImpl<T> createCollectionInstance(Class<T> type) {
     return new TypedChildElementCollectionImpl<T>(type, containingType);
   }
 
-  ChildElementCollectionImpl<T> createCollectionInstance(String localName, String namespaceUri) {
+  protected ChildElementCollectionImpl<T> createCollectionInstance(String localName, String namespaceUri) {
     return new NamedChildElementCollection<T>(localName, namespaceUri, containingType);
   }
 
@@ -82,12 +82,14 @@ public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> i
   }
 
   public <V extends ModelElementInstance> ElementReferenceCollectionBuilder<V,T> qNameElementReferenceCollection(Class<V> referenceTargetType) {
+    ChildElementCollectionImpl<T> collection = (ChildElementCollectionImpl<T>) build();
     QNameElementReferenceCollectionBuilderImpl<V,T> builder = new QNameElementReferenceCollectionBuilderImpl<V,T>(childElementType, referenceTargetType, collection, containingType);
     setReferenceBuilder(builder);
     return builder;
   }
 
   public <V extends ModelElementInstance> ElementReferenceCollectionBuilder<V, T> idElementReferenceCollection(Class<V> referenceTargetType) {
+    ChildElementCollectionImpl<T> collection = (ChildElementCollectionImpl<T>) build();
     ElementReferenceCollectionBuilder<V,T> builder = new ElementReferenceCollectionBuilderImpl<V,T>(childElementType, referenceTargetType, collection);
     setReferenceBuilder(builder);
     return builder;

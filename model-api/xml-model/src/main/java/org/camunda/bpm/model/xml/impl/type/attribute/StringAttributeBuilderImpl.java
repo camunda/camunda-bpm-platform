@@ -42,12 +42,14 @@ public class StringAttributeBuilderImpl extends AttributeBuilderImpl<String> imp
    * @return the new attribute reference builder
    */
   public <V extends ModelElementInstance> AttributeReferenceBuilder<V> qNameAttributeReference(Class<V> referenceTargetElement) {
+    AttributeImpl<String> attribute = (AttributeImpl<String>) build();
     AttributeReferenceBuilderImpl<V> referenceBuilder = new QNameAttributeReferenceBuilderImpl<V>(attribute, referenceTargetElement);
     setAttributeReference(referenceBuilder);
     return referenceBuilder;
   }
 
   public <V extends ModelElementInstance> AttributeReferenceBuilder<V> idAttributeReference(Class<V> referenceTargetElement) {
+    AttributeImpl<String> attribute = (AttributeImpl<String>) build();
     AttributeReferenceBuilderImpl<V> referenceBuilder = new AttributeReferenceBuilderImpl<V>(attribute, referenceTargetElement);
     setAttributeReference(referenceBuilder);
     return referenceBuilder;
