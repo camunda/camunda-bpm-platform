@@ -21,6 +21,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelParseException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -149,6 +150,18 @@ public class DomUtil {
    */
   public static List<Element> filterNodeListByName(NodeList nodeList, String localName, String namespaceUri) {
     return filterNodeList(nodeList, new ElementByNameListFilter(localName, namespaceUri));
+  }
+
+  /**
+   * Filter a {@link NodeList} retaining all elements with a specific type
+   *
+   * @param nodeList  the {@link NodeList} to filter
+   * @param type  the type class to filter for
+   * @param modelInstance  the model instance
+   * @return the list of all Elements which match the filter
+   */
+  public static List<Element> filterNodeListByType(NodeList nodeList, Class<?> type, ModelInstanceImpl modelInstance) {
+    return filterNodeList(nodeList, new ElementByTypeListFilter(type, modelInstance));
   }
 
   /**

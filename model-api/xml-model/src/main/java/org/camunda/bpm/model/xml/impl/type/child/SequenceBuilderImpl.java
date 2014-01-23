@@ -38,28 +38,8 @@ public class SequenceBuilderImpl implements SequenceBuilder, ModelBuildOperation
     this.elementType = modelType;
   }
 
-  public <T extends ModelElementInstance> ChildElementBuilder<T> element(Class<T> childElementType, String localName) {
-    return element(childElementType, localName, elementType.getTypeNamespace());
-  }
-
-  public <T extends ModelElementInstance> ChildElementBuilder<T> element(Class<T> childElementType, String localName, String namespaceUri) {
-    ChildElementBuilderImpl<T> builder = new ChildElementBuilderImpl<T>(childElementType, localName, namespaceUri, elementType);
-    modelBuildOperations.add(builder);
-    return builder;
-  }
-
   public <T extends ModelElementInstance> ChildElementBuilder<T> element(Class<T> childElementType) {
     ChildElementBuilderImpl<T> builder = new ChildElementBuilderImpl<T>(childElementType, elementType);
-    modelBuildOperations.add(builder);
-    return builder;
-  }
-
-  public <T extends ModelElementInstance> ChildElementCollectionBuilder<T> elementCollection(Class<T> childElementType, String localName) {
-    return elementCollection(childElementType, localName, elementType.getTypeNamespace());
-  }
-
-  public <T extends ModelElementInstance> ChildElementCollectionBuilder<T> elementCollection(Class<T> childElementType, String localName, String namespaceUri) {
-    ChildElementCollectionBuilderImpl<T> builder = new ChildElementCollectionBuilderImpl<T>(childElementType, localName, namespaceUri, elementType);
     modelBuildOperations.add(builder);
     return builder;
   }

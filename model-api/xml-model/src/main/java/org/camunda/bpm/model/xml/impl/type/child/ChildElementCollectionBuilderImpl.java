@@ -42,24 +42,15 @@ public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> i
 
   private final List<ModelBuildOperation> modelBuildOperations = new ArrayList<ModelBuildOperation>();
 
-  public ChildElementCollectionBuilderImpl(Class<T> childElementType, String localName, String namespaceUri, ModelElementType containingType) {
-    this.childElementType = childElementType;
-    this.containingType = (ModelElementTypeImpl) containingType;
-    this.collection = createCollectionInstance(localName, namespaceUri);
-  }
-
   public ChildElementCollectionBuilderImpl(Class<T> type, ModelElementType containingType) {
     this.childElementType = type;
     this.containingType = (ModelElementTypeImpl) containingType;
-    this.collection = createCollectionInstance(type);
+    this.collection = createCollectionInstance();
+
   }
 
-  protected ChildElementCollectionImpl<T> createCollectionInstance(Class<T> type) {
-    return new TypedChildElementCollectionImpl<T>(type, containingType);
-  }
-
-  protected ChildElementCollectionImpl<T> createCollectionInstance(String localName, String namespaceUri) {
-    return new NamedChildElementCollection<T>(localName, namespaceUri, containingType);
+  protected ChildElementCollectionImpl<T> createCollectionInstance() {
+    return new ChildElementCollectionImpl<T>(childElementType, containingType);
   }
 
   public ChildElementCollectionBuilder<T> immutable() {
@@ -83,7 +74,7 @@ public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> i
 
   public <V extends ModelElementInstance> ElementReferenceCollectionBuilder<V,T> qNameElementReferenceCollection(Class<V> referenceTargetType) {
     ChildElementCollectionImpl<T> collection = (ChildElementCollectionImpl<T>) build();
-    QNameElementReferenceCollectionBuilderImpl<V,T> builder = new QNameElementReferenceCollectionBuilderImpl<V,T>(childElementType, referenceTargetType, collection, containingType);
+    QNameElementReferenceCollectionBuilderImpl<V,T> builder = new QNameElementReferenceCollectionBuilderImpl<V,T>(childElementType, referenceTargetType, collection);
     setReferenceBuilder(builder);
     return builder;
   }

@@ -40,7 +40,7 @@ public abstract class FlyingAnimal extends Animal {
 
     SequenceBuilder sequence = typeBuilder.sequence();
 
-    flightPartnerRefsColl = sequence.elementCollection(FlightPartnerRef.class, ELEMENT_NAME_FLIGHT_PARTNER_REF)
+    flightPartnerRefsColl = sequence.elementCollection(FlightPartnerRef.class)
       .idElementReferenceCollection(FlyingAnimal.class)
       .build();
 

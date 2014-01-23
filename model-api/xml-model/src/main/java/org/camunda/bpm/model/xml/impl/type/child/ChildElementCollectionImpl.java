@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import org.camunda.bpm.model.xml.UnsupportedModelOperationException;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
+import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.impl.util.DomUtil.ElementNodeListFilter;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
@@ -32,8 +33,9 @@ import org.w3c.dom.NodeList;
  * @author Daniel Meyer
  *
  */
-public abstract class ChildElementCollectionImpl<T extends ModelElementInstance> implements ChildElementCollection<T> {
+public class ChildElementCollectionImpl<T extends ModelElementInstance> implements ChildElementCollection<T> {
 
+  protected final Class<T> elementType;
   /** the minimal count of child elements in the collection
    */
   private int minOccurs = 0;
@@ -41,14 +43,19 @@ public abstract class ChildElementCollectionImpl<T extends ModelElementInstance>
   /** the maximum count of child elements in the collection.
    * An unbounded collection has a negative maxOccurs.
    */
-  int maxOccurs = -1;
+  protected int maxOccurs = -1;
 
   /** indicates whether this collection is mutable.
    */
   private boolean isMutable = true;
 
   /** the containing type of the collection */
-  ModelElementType containingType;
+  private ModelElementType containingType;
+
+  public ChildElementCollectionImpl(Class<T> elementType, ModelElementTypeImpl containingType) {
+    this.elementType = elementType;
+    this.containingType = containingType;
+  }
 
   public void setImmutable() {
     this.isMutable = false;
@@ -60,15 +67,9 @@ public abstract class ChildElementCollectionImpl<T extends ModelElementInstance>
 
   // view /////////////////////////////////////////////////////////
 
-  /**
-   * <p>To be overridden by subclasses: allows subclasses to filter the
-   * actual child elements of the element in order to build the collection of
-   * elements to be contained in the view represented by this collection.</p>
-   *
-   * @param modelElement the element to check
-   * @return true if the element should be contained in the collection. False otherwise.
-   */
-  protected abstract ElementNodeListFilter getFilter(ModelElementInstanceImpl modelElement);
+  protected ElementNodeListFilter getFilter(ModelElementInstanceImpl modelElement) {
+    return new DomUtil.ElementByTypeListFilter(elementType, modelElement.getModelInstance());
+  }
 
   /**
    * Internal method providing access to the view represented by this collection.

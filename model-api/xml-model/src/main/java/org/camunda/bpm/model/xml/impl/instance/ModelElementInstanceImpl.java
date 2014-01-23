@@ -81,6 +81,24 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
   }
 
   /**
+   * Returns a child element with the given type
+   *
+   * @param elementType  the type of the element
+   * @return the child element or null
+   */
+  public ModelElementInstance getUniqueChildElementByType(Class<?> elementType) {
+    NodeList childNodes = domElement.getChildNodes();
+    List<Element> childElements = DomUtil.filterNodeListByType(childNodes, elementType, modelInstance);
+
+    if(!childElements.isEmpty()) {
+      return ModelUtil.getModelElement(childElements.get(0), modelInstance);
+    }
+    else {
+      return null;
+    }
+  }
+
+  /**
    * Adds or replaces a child element by name. replaces an existing Child Element with the same name or adds a new child if no such element exists.
    *
    * @param newChild the child to add

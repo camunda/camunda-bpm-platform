@@ -24,13 +24,10 @@ import org.camunda.bpm.model.xml.type.child.ChildElement;
  * @author Daniel Meyer
  *
  */
-public class ChildElementImpl<T extends ModelElementInstance> extends NamedChildElementCollection<T> implements ChildElement<T> {
+public class ChildElementImpl<T extends ModelElementInstance> extends ChildElementCollectionImpl<T> implements ChildElement<T> {
 
-  private final Class<T> elementType;
-
-  public ChildElementImpl(Class<T> elementType, String localName, String namespaceUri, ModelElementTypeImpl containingType) {
-    super(localName, namespaceUri, containingType);
-    this.elementType = elementType;
+  public ChildElementImpl(Class<T> elementType, ModelElementTypeImpl containingType) {
+    super(elementType, containingType);
     this.maxOccurs = 1;
   }
 
@@ -48,14 +45,12 @@ public class ChildElementImpl<T extends ModelElementInstance> extends NamedChild
   public T getChild(ModelElementInstance element) {
     ModelElementInstanceImpl elementInstanceImpl = (ModelElementInstanceImpl)element;
 
-    ModelElementInstance childElement = elementInstanceImpl.getUniqueChildElementByNameNs(localName, namespaceUri);
+    ModelElementInstance childElement = elementInstanceImpl.getUniqueChildElementByType(elementType);
     if(childElement != null) {
       ModelUtil.ensureInstanceOf(childElement, elementType);
       return (T) childElement;
-
     } else {
       return null;
-
     }
   }
 

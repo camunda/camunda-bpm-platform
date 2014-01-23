@@ -45,12 +45,12 @@ public class Bird extends FlyingAnimal {
 
     SequenceBuilder sequence = typeBuilder.sequence();
 
-    eggColl = sequence.elementCollection(Egg.class, ELEMENT_NAME_EGG)
+    eggColl = sequence.elementCollection(Egg.class)
       .minOccurs(0)
       .maxOccurs(6)
       .build();
 
-    spouseRefsColl = sequence.element(SpouseRef.class, ELEMENT_NAME_SPOUSE_REF)
+    spouseRefsColl = sequence.element(SpouseRef.class)
       .qNameElementReference(Bird.class)
       .build();
 

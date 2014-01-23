@@ -18,6 +18,7 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceBuilder;
 
 /**
@@ -25,10 +26,6 @@ import org.camunda.bpm.model.xml.type.reference.ElementReferenceBuilder;
  *
  */
 public class ChildElementBuilderImpl<T extends ModelElementInstance> extends ChildElementCollectionBuilderImpl<T> implements ChildElementBuilder<T> {
-
-  public ChildElementBuilderImpl(Class<T> childElementType, String localName, String namespaceUri, ModelElementType containingType) {
-    super(childElementType, localName, namespaceUri, containingType);
-  }
 
   public ChildElementBuilderImpl(Class<T> childElementType, ModelElementType containingType) {
     super(childElementType, containingType);
@@ -48,13 +45,12 @@ public class ChildElementBuilderImpl<T extends ModelElementInstance> extends Chi
     return builder;
   }
 
+  @Override
+  protected ChildElementCollectionImpl<T> createCollectionInstance() {
+    return new ChildElementImpl<T>(childElementType, containingType);
+  }
+
   public ChildElement<T> build() {
     return (ChildElement<T>) super.build();
   }
-
-  @Override
-  protected ChildElementCollectionImpl<T> createCollectionInstance(String localName, String namespaceUri) {
-    return new ChildElementImpl<T>(childElementType, localName, namespaceUri, containingType);
-  }
-
 }

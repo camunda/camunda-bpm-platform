@@ -81,7 +81,7 @@ public abstract class Animal extends ModelElementInstanceImpl implements ModelEl
     relationshipDefinitionsColl = sequence.elementCollection(RelationshipDefinition.class)
       .build();
 
-    relationshipDefinitionRefsColl = sequence.elementCollection(RelationshipDefinitionRef.class, ELEMENT_NAME_RELATIONSHIP_DEFINITION_REF)
+    relationshipDefinitionRefsColl = sequence.elementCollection(RelationshipDefinitionRef.class)
       .qNameElementReferenceCollection(RelationshipDefinition.class)
       .build();
 
