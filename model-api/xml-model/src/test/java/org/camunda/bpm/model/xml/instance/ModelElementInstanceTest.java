@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
 
 /**
@@ -140,13 +140,13 @@ public class ModelElementInstanceTest extends TestModelTest {
 
     assertThat(animals.getAnimals())
       .contains(tweety)
-      .excludes(timmy);
+      .doesNotContain(timmy);
 
     tweety.replaceWithElement(timmy);
 
     assertThat(animals.getAnimals())
       .contains(timmy)
-      .excludes(tweety);
+      .doesNotContain(tweety);
   }
 
   @Test

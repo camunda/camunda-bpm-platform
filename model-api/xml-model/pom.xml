@@ -16,10 +16,11 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
-      <groupId>org.easytesting</groupId>
-      <artifactId>fest-assert</artifactId>
-      <version>1.4</version>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>1.5.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

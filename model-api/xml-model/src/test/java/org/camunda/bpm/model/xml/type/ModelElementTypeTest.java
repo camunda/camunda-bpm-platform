@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
@@ -105,7 +105,7 @@ public class ModelElementTypeTest {
     assertThat(animalsType.getExtendingTypes()).isEmpty();
     assertThat(animalType.getExtendingTypes())
       .contains(flyingAnimalType)
-      .excludes(birdType);
+      .doesNotContain(birdType);
     assertThat(flyingAnimalType.getExtendingTypes()).contains(birdType);
     assertThat(birdType.getExtendingTypes()).isEmpty();
   }
