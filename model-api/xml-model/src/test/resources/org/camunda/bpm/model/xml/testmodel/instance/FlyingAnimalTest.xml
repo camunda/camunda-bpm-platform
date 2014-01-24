@@ -5,6 +5,7 @@
   xsi:schemaLocation="http://camunda.org/animals ../Testmodel.xsd ">
 
   <bird id="tweety" gender="Female">
+    <flightInstructor>hedwig</flightInstructor>
     <flightPartnerRef>hedwig</flightPartnerRef>
     <flightPartnerRef>birdo</flightPartnerRef>
     <flightPartnerRef>plucky</flightPartnerRef>

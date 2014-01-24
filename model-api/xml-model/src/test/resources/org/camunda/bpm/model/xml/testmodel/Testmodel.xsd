@@ -32,6 +32,7 @@
     <complexContent>
       <extension base="tns:tAnimal">
         <sequence>
+          <element name="flightInstructor" type="IDREF" minOccurs="0" maxOccurs="1"/>
           <element name="flightPartnerRef" type="IDREF" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
      </extension>

@@ -73,10 +73,13 @@ public class FlyingAnimalTest extends TestModelTest {
     createBird(modelInstance, "timmy", Gender.Male);
     createBird(modelInstance, "daisy", Gender.Female);
 
+    tweety.setFlightInstructor(hedwig);
+
     tweety.getFlightPartnerRefs().add(hedwig);
     tweety.getFlightPartnerRefs().add(birdo);
     tweety.getFlightPartnerRefs().add(plucky);
     tweety.getFlightPartnerRefs().add(fiffy);
+
 
     return new Object[]{modelInstance, modelParser};
   }
@@ -91,6 +94,43 @@ public class FlyingAnimalTest extends TestModelTest {
     fiffy = (FlyingAnimal) modelInstance.getModelElementById("fiffy");
     timmy = (FlyingAnimal) modelInstance.getModelElementById("timmy");
     daisy = (FlyingAnimal) modelInstance.getModelElementById("daisy");
+  }
+
+  @Test
+  public void testSetFlightInstructorByHelper() {
+    tweety.setFlightInstructor(timmy);
+    assertThat(tweety.getFlightInstructor()).isEqualTo(timmy);
+  }
+
+  @Test
+  public void testUpdateFlightInstructorByIdHelper() {
+    hedwig.setId("new-" + hedwig.getId());
+    assertThat(tweety.getFlightInstructor()).isEqualTo(hedwig);
+  }
+
+  @Test
+  public void testUpdateFlightInstructorByIdAttributeName() {
+    hedwig.setAttributeValue("id", "new-" + hedwig.getId(), true);
+    assertThat(tweety.getFlightInstructor()).isEqualTo(hedwig);
+  }
+
+  @Test
+  public void testUpdateFlightInstructorByReplaceElement() {
+    hedwig.replaceWithElement(timmy);
+    assertThat(tweety.getFlightInstructor()).isEqualTo(timmy);
+  }
+
+  @Test
+  public void testUpdateFlightInstructorByRemoveElement() {
+    Animals animals = (Animals) modelInstance.getDocumentElement();
+    animals.getAnimals().remove(hedwig);
+    assertThat(tweety.getFlightInstructor()).isNull();
+  }
+
+  @Test
+  public void testClearFlightInstructor() {
+    tweety.removeFlightInstructor();
+    assertThat(tweety.getFlightInstructor()).isNull();
   }
 
   @Test

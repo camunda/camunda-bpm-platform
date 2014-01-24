@@ -39,6 +39,7 @@ public class TestModel {
       RelationshipDefinition.registerType(modelBuilder);
       RelationshipDefinitionRef.registerType(modelBuilder);
       Egg.registerType(modelBuilder);
+      FlightInstructor.registerType(modelBuilder);
 
       model = modelBuilder.build();
     }

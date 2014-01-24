@@ -16,6 +16,7 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
+import org.camunda.bpm.model.xml.type.reference.ElementReference;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 
 import java.util.Collection;
@@ -28,6 +29,7 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.*;
  */
 public abstract class FlyingAnimal extends Animal {
 
+  private static ElementReference<FlyingAnimal, FlightInstructor> flightInstructorChild;
   // only public for testing (normally private)
   public static ElementReferenceCollection<FlyingAnimal, FlightPartnerRef> flightPartnerRefsColl;
 
@@ -40,6 +42,10 @@ public abstract class FlyingAnimal extends Animal {
 
     SequenceBuilder sequence = typeBuilder.sequence();
 
+    flightInstructorChild = sequence.element(FlightInstructor.class)
+      .idElementReference(FlyingAnimal.class)
+      .build();
+
     flightPartnerRefsColl = sequence.elementCollection(FlightPartnerRef.class)
       .idElementReferenceCollection(FlyingAnimal.class)
       .build();
@@ -50,6 +56,18 @@ public abstract class FlyingAnimal extends Animal {
 
   FlyingAnimal(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
+  }
+
+  public FlyingAnimal getFlightInstructor() {
+    return flightInstructorChild.getReferenceTargetElement(this);
+  }
+
+  public void setFlightInstructor(FlyingAnimal flightInstructor) {
+    flightInstructorChild.setReferenceTargetElement(this, flightInstructor);
+  }
+
+  public void removeFlightInstructor() {
+    flightInstructorChild.clearReferenceTargetElement(this);
   }
 
   public Collection<FlyingAnimal> getFlightPartnerRefs() {
