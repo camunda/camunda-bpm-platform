@@ -14,7 +14,7 @@ package org.camunda.bpm.model.xml;
 
 
 /**
- * <p>An Exception in the Core XML Model.</p>
+ * Thrown when an error is encountered during the model validation.
  *
  * @author Sebastian Menski
  *

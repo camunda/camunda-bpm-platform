@@ -14,6 +14,8 @@ package org.camunda.bpm.model.xml;
 
 
 /**
+ * Thrown when an error is encountered during reference resolving.
+ *
  * @author Sebastian Menski
  *
  */

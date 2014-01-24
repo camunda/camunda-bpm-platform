@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.model.xml.impl.instance;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
@@ -23,39 +20,123 @@ import org.camunda.bpm.model.xml.impl.type.reference.ReferenceImpl;
 import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.reference.Reference;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
- * <p>Base class for implementing Model Elements. </p>
+ * Base class for implementing Model Elements.
  *
  * @author Daniel Meyer
  *
  */
 public abstract class ModelElementInstanceImpl implements ModelElementInstance {
 
+  /** the containing model instance */
+  protected final ModelInstanceImpl modelInstance;
   /** the wrapped DOM {@link Element} */
   private final Element domElement;
-
-  protected final ModelInstanceImpl modelInstance;
-
+  /** the implementing model element type */
   private final ModelElementTypeImpl elementType;
 
-  public ModelElementInstanceImpl(ModelTypeInstanceContext instanceContext) {
+  public ModelElementInstanceImpl(final ModelTypeInstanceContext instanceContext) {
     this.domElement = instanceContext.getDomElement();
     this.modelInstance = instanceContext.getModel();
     this.elementType = instanceContext.getModelType();
   }
 
-  /**
-   * @return the wrapped DOM {@link Element}
-   */
   public Element getDomElement() {
     return domElement;
+  }
+
+  public ModelInstanceImpl getModelInstance() {
+    return modelInstance;
+  }
+
+  public ModelElementInstance getParentElement() {
+    final Element parentDomElement = DomUtil.getParentElement(domElement);
+    if (parentDomElement != null) {
+      return ModelUtil.getModelElement(parentDomElement, modelInstance);
+    }
+    else {
+      return null;
+    }
+  }
+
+  public ModelElementType getElementType() {
+    return elementType;
+  }
+
+  public String getAttributeValue(final String attributeName) {
+    return DomUtil.getAttributeValue(attributeName, domElement);
+  }
+
+  public void setAttributeValue(final String attributeName, final String xmlValue, final boolean isIdAttribute) {
+    final String oldValue = getAttributeValue(attributeName);
+    DomUtil.setAttributeValue(attributeName, xmlValue, domElement);
+    if(isIdAttribute) {
+      DomUtil.setIdAttribute(domElement, attributeName);
+    }
+    final Attribute<?> attribute = elementType.getAttribute(attributeName);
+    if (attribute != null) {
+      ((AttributeImpl<?>) attribute).updateIncomingReferences(this, xmlValue, oldValue);
+    }
+  }
+
+  public void removeAttribute(final String attributeName) {
+    final Attribute<?> attribute = elementType.getAttribute(attributeName);
+    if (attribute != null) {
+      final Object identifier = attribute.getValue(this);
+      if (identifier != null) {
+        ((AttributeImpl<?>) attribute).unlinkReference(this, identifier);
+      }
+    }
+    DomUtil.removeAttribute(domElement, attributeName);
+  }
+
+  public String getAttributeValueNs(final String attributeName, final String namespaceUri) {
+    return DomUtil.getAttributeValueNs(attributeName, namespaceUri, domElement);
+  }
+
+  public void setAttributeValueNs(final String attributeName, final String namespaceUri, final String xmlValue, final boolean isIdAttribute) {
+    final String oldValue = getAttributeValueNs(attributeName, namespaceUri);
+    DomUtil.setAttributeValueNs(attributeName, namespaceUri, xmlValue, domElement);
+    if(isIdAttribute) {
+      DomUtil.setIdAttributeNs(domElement, attributeName, namespaceUri);
+    }
+    final Attribute<?> attribute = elementType.getAttribute(attributeName);
+    if (attribute != null) {
+      ((AttributeImpl<?>) attribute).updateIncomingReferences(this, xmlValue, oldValue);
+    }
+  }
+
+  public void removeAttributeNs(final String attributeName, final String namespaceUri) {
+    final Attribute<?> attribute = elementType.getAttribute(attributeName);
+    if (attribute != null) {
+      final Object identifier = attribute.getValue(this);
+      if (identifier != null) {
+        ((AttributeImpl<?>) attribute).unlinkReference(this, identifier);
+      }
+    }
+    DomUtil.removeAttributeNs(domElement, attributeName, namespaceUri);
+  }
+
+  public String getTextContent() {
+    return getRawTextContent().trim();
+  }
+
+  public void setTextContent(final String textContent) {
+    DomUtil.setTextContent(domElement, textContent);
+  }
+
+  public String getRawTextContent() {
+    return DomUtil.getTextContent(domElement);
   }
 
   /**
@@ -65,18 +146,14 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
    * @param namespaceUri the namespace of the element
    * @return the child element or null.
    */
-  public ModelElementInstance getUniqueChildElementByNameNs(String elementName, String namespaceUri) {
-
-    NodeList childNodes = domElement.getChildNodes();
-
-    List<Element> childElements = DomUtil.filterNodeListByName(childNodes, elementName, namespaceUri);
+  public ModelElementInstance getUniqueChildElementByNameNs(final String elementName, final String namespaceUri) {
+    final NodeList childNodes = domElement.getChildNodes();
+    final List<Element> childElements = DomUtil.filterNodeListByName(childNodes, elementName, namespaceUri);
 
     if(!childElements.isEmpty()) {
       return ModelUtil.getModelElement(childElements.get(0), modelInstance);
-
     } else {
       return null;
-
     }
   }
 
@@ -86,9 +163,9 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
    * @param elementType  the type of the element
    * @return the child element or null
    */
-  public ModelElementInstance getUniqueChildElementByType(Class<?> elementType) {
-    NodeList childNodes = domElement.getChildNodes();
-    List<Element> childElements = DomUtil.filterNodeListByType(childNodes, elementType, modelInstance);
+  public ModelElementInstance getUniqueChildElementByType(final Class<?> elementType) {
+    final NodeList childNodes = domElement.getChildNodes();
+    final List<Element> childElements = DomUtil.filterNodeListByType(childNodes, elementType, modelInstance);
 
     if(!childElements.isEmpty()) {
       return ModelUtil.getModelElement(childElements.get(0), modelInstance);
@@ -99,24 +176,22 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
   }
 
   /**
-   * Adds or replaces a child element by name. replaces an existing Child Element with the same name or adds a new child if no such element exists.
+   * Adds or replaces a child element by name. Replaces an existing Child Element with the same name
+   * or adds a new child if no such element exists.
    *
    * @param newChild the child to add
    */
-  public void setUniqueChildElementByNameNs(ModelElementInstance newChild) {
+  public void setUniqueChildElementByNameNs(final ModelElementInstance newChild) {
     ModelUtil.ensureInstanceOf(newChild, ModelElementInstanceImpl.class);
-    ModelElementInstanceImpl newChildElement = (ModelElementInstanceImpl) newChild;
+    final ModelElementInstanceImpl newChildElement = (ModelElementInstanceImpl) newChild;
 
-    Element childElement = newChildElement.getDomElement();
-    ModelElementInstance existingChild = getUniqueChildElementByNameNs(childElement.getNodeName(), childElement.getNamespaceURI());
+    final Element childElement = newChildElement.getDomElement();
+    final ModelElementInstance existingChild = getUniqueChildElementByNameNs(childElement.getNodeName(), childElement.getNamespaceURI());
     if(existingChild == null) {
       addChildElement(newChild);
-
     } else {
       replaceChildElement((ModelElementInstanceImpl) existingChild, newChildElement);
-
     }
-
   }
 
   /**
@@ -125,33 +200,42 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
    * @param existingChild the child element to replace
    * @param newChild the new child element
    */
-  @SuppressWarnings("unchecked")
-  void replaceChildElement(ModelElementInstanceImpl existingChild, ModelElementInstanceImpl newChild) {
+  protected void replaceChildElement(final ModelElementInstanceImpl existingChild, final ModelElementInstanceImpl newChild) {
+    final Element existingChildDomElement = existingChild.getDomElement();
+    final Element newChildDomElement = newChild.getDomElement();
 
-    Element existingChildDomElement = existingChild.getDomElement();
-    Element newChildDomElement = newChild.getDomElement();
-
+    // unlink (remove all references) of child elements
     existingChild.unlinkAllChildReferences();
 
-    String oldId = existingChild.getAttributeValue("id");
-    if (oldId != null) {
-      Collection<Attribute<?>> attributes = ((ModelElementTypeImpl) newChild.getElementType()).getAllAttributes();
-      for (Attribute<?> attribute : attributes) {
-        if (attribute.isIdAttribute()) {
-          Attribute<String> idAttribute = (Attribute<String>) attribute;
-          for (Reference<?> incomingReference : attribute.getIncomingReferences()) {
-            ((ReferenceImpl<ModelElementInstance>) incomingReference).referencedElementUpdated(newChild, oldId, idAttribute.getValue(newChild));
-          }
-        }
-      }
-    }
+    // update incoming references from old to new child element
+    updateIncomingReferences(existingChild, newChild);
 
     // replace the existing child with the new child in the DOM
     domElement.replaceChild(newChildDomElement, existingChildDomElement);
   }
 
-  public void replaceWithElement(ModelElementInstance newElement) {
-    ModelElementInstanceImpl parentElement = (ModelElementInstanceImpl) getParentElement();
+  @SuppressWarnings("unchecked")
+  private void updateIncomingReferences(final ModelElementInstanceImpl oldInstance, final ModelElementInstanceImpl newInstance) {
+    final String oldId = oldInstance.getAttributeValue("id");
+    final String newId = newInstance.getAttributeValue("id");
+
+    if (oldId == null || newId == null) {
+      return;
+    }
+
+    final Collection<Attribute<?>> attributes = ((ModelElementTypeImpl) oldInstance.getElementType()).getAllAttributes();
+    for (Attribute<?> attribute : attributes) {
+      if (attribute.isIdAttribute()) {
+        for (Reference<?> incomingReference : attribute.getIncomingReferences()) {
+          ((ReferenceImpl<ModelElementInstance>) incomingReference).referencedElementUpdated(newInstance, oldId, newId);
+        }
+      }
+    }
+
+  }
+
+  public void replaceWithElement(final ModelElementInstance newElement) {
+    final ModelElementInstanceImpl parentElement = (ModelElementInstanceImpl) getParentElement();
     if (parentElement != null) {
       parentElement.replaceChildElement(this, (ModelElementInstanceImpl) newElement);
     }
@@ -160,82 +244,26 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
     }
   }
 
-  public ModelElementInstance getParentElement() {
-    Element parentDomElement = DomUtil.getParentElement(domElement);
-    if (parentDomElement != null) {
-      return ModelUtil.getModelElement(parentDomElement, modelInstance);
-    }
-    else {
-      return null;
-    }
-  }
-
   /**
    * Appends a new child element to the children of this element. Updates the underlying DOM element tree.
    *
    * @param newChild the new child element
    */
-  public void addChildElement(ModelElementInstance newChild) {
+  public void addChildElement(final ModelElementInstance newChild) {
     ModelUtil.ensureInstanceOf(newChild, ModelElementInstanceImpl.class);
-    ModelElementInstanceImpl newChildElement = (ModelElementInstanceImpl) newChild;
-    Element newChildDomElement = newChildElement.getDomElement();
+    final ModelElementInstanceImpl newChildElement = (ModelElementInstanceImpl) newChild;
 
-    // add new element to the DOM
-    NodeList childDomElements = domElement.getChildNodes();
-    Node beforeNewChildDomElement = null;
-    Node childDomElement;
-    List<ModelElementType> childElementTypes = elementType.getChildElementTypes();
-    int newChildTypeIndex = ModelUtil.getIndexOfElementType(newChild, childElementTypes);
-    if (newChildTypeIndex == -1) {
-      throw new ModelException("New child for " + elementType.getTypeName() + " is not a valid child element type: " + newChild.getElementType().getTypeName() +"; valid types are: " + childElementTypes);
-    }
-    for (int i = 0; i < childDomElements.getLength(); i++) {
-      childDomElement = childDomElements.item(i);
-      if (childDomElement.getNodeType() != Node.ELEMENT_NODE) {
-        // skip not element nodes like comments
-        continue;
-      }
-      // get model element wrapper for current DOM child element
-      ModelElementInstance currentChild = ModelUtil.getModelElement((Element) childDomElement, modelInstance);
-      // compare child element type with new child element type
-      int childTypeIndex = ModelUtil.getIndexOfElementType(currentChild, childElementTypes);
-      if (childTypeIndex == -1) {
-        throw new ModelException("Child element " + currentChild.getElementType().getTypeName() + " is not a valid child element for " + elementType.getTypeName() +"; valid types are: " + childElementTypes);
-      }
-      if (childTypeIndex > newChildTypeIndex) {
-        break;
-      }
-      else {
-        beforeNewChildDomElement = childDomElement;
-      }
-    }
-
-    // add new element to the DOM in the correct position
-    if (beforeNewChildDomElement == null) {
-      if (domElement.getFirstChild() == null) {
-        domElement.appendChild(newChildDomElement);
-      }
-      else {
-        domElement.insertBefore(newChildDomElement, domElement.getFirstChild());
-      }
-    }
-    else if (beforeNewChildDomElement.getNextSibling() == null) {
-      domElement.appendChild(newChildDomElement);
-    }
-    else {
-      domElement.insertBefore(newChildDomElement, beforeNewChildDomElement.getNextSibling());
-    }
-  }
-
-  public ModelInstanceImpl getModelInstance() {
-    return modelInstance;
+    final ModelElementInstance elementToInsertAfter = findElementToInsertAfter(newChild);
+    insertElementAfter(newChild, elementToInsertAfter);
   }
 
   /**
-   * @param child the child element to remove
-   * @return true if the child element could be removed.
+   * Removes the child element from this.
+   *
+   * @param child  the child element to remove
+   * @return true if the child element could be removed
    */
-  public boolean removeChildElement(ModelElementInstanceImpl child) {
+  public boolean removeChildElement(final ModelElementInstanceImpl child) {
     child.unlinkAllReferences();
     child.unlinkAllChildReferences();
     return DomUtil.removeChild(domElement, child.getDomElement());
@@ -247,134 +275,86 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
    * @param childElementType the child element type to search for
    * @return a collection of elements of the given type
    */
-  Collection<ModelElementInstance> getChildElementsByType(ModelElementType childElementType) {
-    List<Element> elements = DomUtil.filterNodeListByName(DomUtil.getChildNodes(domElement), childElementType.getTypeName(), childElementType.getTypeNamespace());
+  private Collection<ModelElementInstance> getChildElementsByType(final ModelElementType childElementType) {
+    final List<Element> elements = DomUtil.filterNodeListByName(DomUtil.getChildNodes(domElement), childElementType.getTypeName(), childElementType.getTypeNamespace());
     return ModelUtil.getModelElementCollection(elements, modelInstance);
   }
 
   /**
-   * Return the attribute value for the attribute name
+   * Returns the element after which the new element should be inserted in the DOM document.
    *
-   * @param attributeName the name of the attribute
-   * @return the value of the attribute
+   * @param elementToInsert  the new element to insert
+   * @return the element to insert after or null
    */
-  public String getAttributeValue(String attributeName) {
-    return DomUtil.getAttributeValue(attributeName, domElement);
-  }
+  private ModelElementInstance findElementToInsertAfter(final ModelElementInstance elementToInsert) {
+    final List<ModelElementType> childElementTypes = elementType.getChildElementTypes();
+    final List<Element> childDomElements = DomUtil.filterNodeList(domElement.getChildNodes(), new DomUtil.ElementNodeListFilter());
+    final Collection<ModelElementInstance> childElements = ModelUtil.getModelElementCollection(childDomElements, modelInstance);
 
-  /**
-   * Return the attribute value for the given attribute name and namespace URI
-   *
-   * @param attributeName the attribute name of the attribute
-   * @param namespaceUri the namespace URI of the attribute
-   * @return the value of the attribute
-   */
-  public String getAttributeValueNs(String attributeName, String namespaceUri) {
-    return DomUtil.getAttributeValueNs(attributeName, namespaceUri, domElement);
-  }
-
-  /**
-   * Set attribute value
-   *
-   * @param attributeName the name of the attribute
-   * @param xmlValue the value to set
-   * @param isIdAttribute is the attribute an ID attribute
-   */
-  public void setAttributeValue(String attributeName, String xmlValue, boolean isIdAttribute) {
-    String oldValue = getAttributeValue(attributeName);
-    DomUtil.setAttributeValue(attributeName, xmlValue, domElement);
-    if(isIdAttribute) {
-      DomUtil.setIdAttribute(domElement, attributeName);
-    }
-    Attribute<?> attribute = elementType.getAttribute(attributeName);
-    if (attribute != null) {
-      ((AttributeImpl<?>) attribute).updateIncomingReferences(this, xmlValue, oldValue);
-    }
-  }
-
-  public void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue, boolean isIdAttribute) {
-    String oldValue = getAttributeValueNs(attributeName, namespaceUri);
-    DomUtil.setAttributeValueNs(attributeName, namespaceUri, xmlValue, domElement);
-    if(isIdAttribute) {
-      DomUtil.setIdAttributeNs(domElement, attributeName, namespaceUri);
-    }
-    Attribute<?> attribute = elementType.getAttribute(attributeName);
-    if (attribute != null) {
-      ((AttributeImpl<?>) attribute).updateIncomingReferences(this, xmlValue, oldValue);
-    }
-  }
-
-  public void removeAttribute(String attributeName) {
-    Attribute<?> attribute = elementType.getAttribute(attributeName);
-    if (attribute != null) {
-      Object identifier = attribute.getValue(this);
-      if (identifier != null) {
-        ((AttributeImpl<?>) attribute).unlinkReference(this, identifier);
+    ModelElementInstance insertAfterElement = null;
+    final int newElementTypeIndex = ModelUtil.getIndexOfElementType(elementToInsert, childElementTypes);
+    for (ModelElementInstance childElement : childElements) {
+      final int childElementTypeIndex = ModelUtil.getIndexOfElementType(childElement, childElementTypes);
+      if (newElementTypeIndex >= childElementTypeIndex) {
+        insertAfterElement = childElement;
+      }
+      else {
+        break;
       }
     }
-    DomUtil.removeAttribute(domElement, attributeName);
+    return insertAfterElement;
   }
 
-  public void removeAttributeNs(String attributeName, String namespaceUri) {
-    Attribute<?> attribute = elementType.getAttribute(attributeName);
-    if (attribute != null) {
-      Object identifier = attribute.getValue(this);
-      if (identifier != null) {
-        ((AttributeImpl<?>) attribute).unlinkReference(this, identifier);
+  /**
+   * Inserts the new element after the given element or at the beginning if the given element is null.
+   *
+   * @param elementToInsert  the new element to insert
+   * @param insertAfterElement  the element to insert after or null
+   */
+  private void insertElementAfter(final ModelElementInstance elementToInsert, final ModelElementInstance insertAfterElement) {
+    final Element domElementToInsert = elementToInsert.getDomElement();
+    if (insertAfterElement == null) {
+      final Node firstChild = domElement.getFirstChild();
+      if (firstChild == null) {
+        domElement.appendChild(domElementToInsert);
+      }
+      else {
+        domElement.insertBefore(domElementToInsert, firstChild);
       }
     }
-    DomUtil.removeAttributeNs(domElement, attributeName, namespaceUri);
-  }
-
-  public ModelElementType getElementType() {
-    return elementType;
-  }
-
-  /**
-   * Return the text content of the DOM element without leading and trailing spaces. For
-   * raw text content see {@link ModelElementInstanceImpl#getRawTextContent()}.
-   *
-   * @return text content of underlying DOM element with leading and trailing whitespace trimmed
-   */
-  public String getTextContent() {
-    return getRawTextContent().trim();
+    else {
+      final Node insertBeforeElement = insertAfterElement.getDomElement().getNextSibling();
+      if (insertBeforeElement == null) {
+        domElement.appendChild(domElementToInsert);
+      }
+      else {
+        domElement.insertBefore(domElementToInsert, insertBeforeElement);
+      }
+    }
   }
 
   /**
-   * Return the text content of the DOM element
-   *
-   * @return text content of underlying DOM element
+   * Removes all reference to this.
    */
-  public String getRawTextContent() {
-    return DomUtil.getTextContent(domElement);
-  }
-
-  /**
-   * Set the text content of the DOM element
-   *
-   * @param textContent the new text content
-   */
-  public void setTextContent(String textContent) {
-    DomUtil.setTextContent(domElement, textContent);
-  }
-
-  void unlinkAllReferences() {
-    Collection<Attribute<?>> attributes = elementType.getAllAttributes();
+  private void unlinkAllReferences() {
+    final Collection<Attribute<?>> attributes = elementType.getAllAttributes();
     for (Attribute<?> attribute : attributes) {
-      Object identifier = attribute.getValue(this);
+      final Object identifier = attribute.getValue(this);
       if (identifier != null) {
         ((AttributeImpl<?>) attribute).unlinkReference(this, identifier);
       }
     }
   }
 
-  void unlinkAllChildReferences() {
-    List<ModelElementType> childElementTypes = elementType.getChildElementTypes();
+  /**
+   * Removes every reference to children of this.
+   */
+  private void unlinkAllChildReferences() {
+    final List<ModelElementType> childElementTypes = elementType.getChildElementTypes();
     for (ModelElementType type : childElementTypes) {
-      Collection<ModelElementInstance> childElementsForType = getChildElementsByType(type);
+      final Collection<ModelElementInstance> childElementsForType = getChildElementsByType(type);
       for (ModelElementInstance childElement : childElementsForType) {
         ((ModelElementInstanceImpl) childElement).unlinkAllReferences();
-
       }
     }
   }

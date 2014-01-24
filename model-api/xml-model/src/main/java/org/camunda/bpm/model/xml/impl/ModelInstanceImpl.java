@@ -12,11 +12,6 @@
  */
 package org.camunda.bpm.model.xml.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelInstance;
@@ -29,7 +24,14 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
 /**
+ * An instance of a model
+ *
  * @author Daniel Meyer
  * @author Sebastian Menski
  *
@@ -39,46 +41,32 @@ public class ModelInstanceImpl implements ModelInstance {
   private final Document document;
   private final ModelImpl model;
 
-  public ModelInstanceImpl(ModelImpl model, Document document) {
+  public ModelInstanceImpl(final ModelImpl model, final Document document) {
     this.model = model;
     this.document = document;
   }
 
-  /**
-   * @return the wrapped DOM {@link Document}
-   */
   public Document getDocument() {
     return document;
   }
 
-  /**
-   * @return the {@link ModelElementInstanceImpl ModelElement} corresponding to the document
-   * element of this model or null if no document element exists.
-   */
   public ModelElementInstance getDocumentElement() {
-    Element documentElement = DomUtil.getDocumentElement(document);
+    final Element documentElement = DomUtil.getDocumentElement(document);
     if(documentElement != null) {
       return ModelUtil.getModelElement(documentElement, this);
-
     } else {
       return null;
-
     }
   }
 
-  /**
-   *1 Updates the document element.
-   *
-   * @param modelElement the new document element to set
-   */
-  public void setDocumentElement(ModelElementInstance modelElement) {
+  public void setDocumentElement(final ModelElementInstance modelElement) {
     ModelUtil.ensureInstanceOf(modelElement, ModelElementInstanceImpl.class);
-    Element domElement = ((ModelElementInstanceImpl)modelElement).getDomElement();
+    final Element domElement = ((ModelElementInstanceImpl)modelElement).getDomElement();
     DomUtil.setDocumentElement(document, domElement);
   }
 
-  public <T extends ModelElementInstance> T newInstance(Class<T> type) {
-    ModelElementType modelElementType = model.getType(type);
+  public <T extends ModelElementInstance> T newInstance(final Class<T> type) {
+    final ModelElementType modelElementType = model.getType(type);
     if(modelElementType != null) {
       return newInstance(modelElementType);
     } else {
@@ -87,7 +75,7 @@ public class ModelInstanceImpl implements ModelInstance {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends ModelElementInstance> T newInstance(ModelElementType type) {
+  public <T extends ModelElementInstance> T newInstance(final ModelElementType type) {
     return (T) type.newInstance(this);
   }
 
@@ -95,12 +83,12 @@ public class ModelInstanceImpl implements ModelInstance {
     return model;
   }
 
-  public ModelElementInstance getModelElementById(String id) {
+  public ModelElementInstance getModelElementById(final String id) {
     if (id == null) {
       return null;
     }
 
-    Element element = DomUtil.findElementById(document, id);
+    final Element element = DomUtil.findElementById(document, id);
     if(element != null) {
       return ModelUtil.getModelElement(element, this);
     } else {
@@ -109,11 +97,11 @@ public class ModelInstanceImpl implements ModelInstance {
   }
 
   public Collection<ModelElementInstance> getModelElementsByType(ModelElementType type) {
-    HashSet<ModelElementType> extendingTypes = new HashSet<ModelElementType>();
+    final HashSet<ModelElementType> extendingTypes = new HashSet<ModelElementType>();
     extendingTypes.add(type);
     ((ModelElementTypeImpl)type).resolveExtendingTypes(extendingTypes);
 
-    List<ModelElementInstance> instances = new ArrayList<ModelElementInstance>();
+    final List<ModelElementInstance> instances = new ArrayList<ModelElementInstance>();
     for (ModelElementType modelElementType : extendingTypes) {
       if(!modelElementType.isAbstract()) {
         instances.addAll(modelElementType.getInstances(this));
@@ -122,7 +110,12 @@ public class ModelInstanceImpl implements ModelInstance {
     return instances;
   }
 
-  @Override
+  /**
+   * Clones the model instance but not the model. So only the wrapped DOM document is cloned.
+   * Changes of the model are persistent between multiple model instances.
+   *
+   * @return the new model instance
+   */
   public Object clone() {
     return new ModelInstanceImpl(model, (Document) document.cloneNode(true));
   }

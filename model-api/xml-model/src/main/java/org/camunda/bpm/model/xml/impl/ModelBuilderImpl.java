@@ -12,16 +12,18 @@
  */
 package org.camunda.bpm.model.xml.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeBuilderImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
+ * This builder is used to define and create a new model.
+ *
  * @author Daniel Meyer
  *
  */
@@ -30,12 +32,12 @@ public class ModelBuilderImpl extends ModelBuilder {
   private final List<ModelElementTypeBuilderImpl> typeBuilders = new ArrayList<ModelElementTypeBuilderImpl>();
   private final ModelImpl model;
 
-  public ModelBuilderImpl(String modelName) {
+  public ModelBuilderImpl(final String modelName) {
     model = new ModelImpl(modelName);
   }
 
-  public ModelElementTypeBuilder defineType(Class<? extends ModelElementInstance> modelInstanceType, String typeName) {
-    ModelElementTypeBuilderImpl typeBuilder = new ModelElementTypeBuilderImpl(modelInstanceType, typeName, model);
+  public ModelElementTypeBuilder defineType(final Class<? extends ModelElementInstance> modelInstanceType, final String typeName) {
+    final ModelElementTypeBuilderImpl typeBuilder = new ModelElementTypeBuilderImpl(modelInstanceType, typeName, model);
     typeBuilders.add(typeBuilder);
     return typeBuilder;
   }

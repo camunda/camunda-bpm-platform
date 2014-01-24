@@ -13,7 +13,7 @@
 package org.camunda.bpm.model.xml;
 
 /**
- * <p>An Exception in the Core XML Model.</p>
+ * An Exception in the Core XML Model.
  *
  * @author Daniel Meyer
  *

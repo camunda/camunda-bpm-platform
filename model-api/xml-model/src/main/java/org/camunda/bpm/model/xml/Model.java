@@ -12,13 +12,14 @@
  */
 package org.camunda.bpm.model.xml;
 
-import java.util.Collection;
-
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 
+import java.util.Collection;
+
 /**
- * Use {@link ModelBuilder} to create an instance of a {@link Model}.
+ * A model contains all defined types and the relationship between them.
+ * See {@link ModelBuilder#createInstance} to create a new model.
  *
  * @author Daniel Meyer
  *

@@ -12,31 +12,82 @@
  */
 package org.camunda.bpm.model.xml;
 
-import java.util.Collection;
-
+import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.w3c.dom.Document;
+
+import java.util.Collection;
 
 /**
- * An instance of a Model
+ * An instance of a model
  *
  * @author Daniel Meyer
  *
  */
 public interface ModelInstance {
 
-  <T extends ModelElementInstance> T newInstance(Class<T> type);
+  /**
+   * Returns the wrapped DOM {@link Document}.
+   *
+   * @return the DOM document
+   */
+  Document getDocument();
 
-  <T extends ModelElementInstance> T newInstance(ModelElementType type);
-
+  /**
+   * Returns the {@link ModelElementInstanceImpl ModelElement} corresponding to the document
+   * element of this model or null if no document element exists.
+   *
+   * @return the document element or null
+   */
   ModelElementInstance getDocumentElement();
 
+  /**
+   * Updates the document element.
+   *
+   * @param documentElement  the new document element to set
+   */
   void setDocumentElement(ModelElementInstance documentElement);
 
+  /**
+   * Creates a new instance of type class.
+   *
+   * @param type  the class of the type to create
+   * @param <T>   instance type
+   * @return the new created instance
+   */
+  <T extends ModelElementInstance> T newInstance(Class<T> type);
+
+  /**
+   * Creates a new instance of type.
+   *
+   * @param type  the type to create
+   * @param <T>   instance type
+   * @return the new created instance
+   */
+  <T extends ModelElementInstance> T newInstance(ModelElementType type);
+
+  /**
+   * Returns the underlying model.
+   *
+   * @return the model
+   */
   Model getModel();
 
+  /**
+   * Find a unique element of the model by id.
+   *
+   * @param id  the id of the element
+   * @return the element with the id or null
+   */
   ModelElementInstance getModelElementById(String id);
 
+  /**
+   * Find all elements of a type.
+   *
+   * @param referencingType  the type of the elements
+   * @return the collection of elements of the type
+   */
   Collection<ModelElementInstance> getModelElementsByType(ModelElementType referencingType);
 
 }

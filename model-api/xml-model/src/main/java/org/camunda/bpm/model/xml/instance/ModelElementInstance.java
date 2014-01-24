@@ -13,34 +13,118 @@
 package org.camunda.bpm.model.xml.instance;
 
 import org.camunda.bpm.model.xml.ModelInstance;
-import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
+import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.w3c.dom.Element;
 
 /**
- * An instance of a {@link ModelElementTypeImpl}
+ * An instance of a {@link ModelElementType}
  *
  * @author Daniel Meyer
  *
  */
 public interface ModelElementInstance {
 
-  String getAttributeValue(String attributeName);
+  /**
+   * Returns the represented DOM {@link Element}.
+   *
+   * @return the DOM element
+   */
+  Element getDomElement();
 
-  void setAttributeValue(String attributeName, String xmlValue, boolean isIdAttribute);
-
-  void removeAttribute(String attributeName);
-
-  String getAttributeValueNs(String attributeName, String namespaceUri);
-
-  void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue, boolean isIdAttribute);
-
-  void removeAttributeNs(String attributeName, String namespaceUri);
-
-  ModelElementType getElementType();
-
-  ModelElementInstance getParentElement();
+  /**
+   * Returns the model instance which contains this type instance.
+   *
+   * @return the model instance
+   */
 
   ModelInstance getModelInstance();
+  /**
+   * Returns the parent element of this.
+   *
+   * @return the parent element
+   */
+  ModelElementInstance getParentElement();
+
+  /**
+   * Returns the element type of this.
+   *
+   * @return the element type
+   */
+  ModelElementType getElementType();
+
+  /**
+   * Returns the attribute value for the attribute name.
+   *
+   * @param attributeName  the name of the attribute
+   * @return the value of the attribute
+   */
+  String getAttributeValue(String attributeName);
+
+  /**
+   * Sets attribute value by name.
+   *
+   * @param attributeName  the name of the attribute
+   * @param xmlValue  the value to set
+   * @param isIdAttribute  true if the attribute is an ID attribute, false otherwise
+   */
+  void setAttributeValue(String attributeName, String xmlValue, boolean isIdAttribute);
+
+  /**
+   * Removes attribute by name.
+   *
+   * @param attributeName  the name of the attribute
+   */
+  void removeAttribute(String attributeName);
+
+  /**
+   * Returns the attribute value for the given attribute name and namespace URI.
+   *
+   * @param attributeName  the attribute name of the attribute
+   * @param namespaceUri  the namespace URI of the attribute
+   * @return the value of the attribute
+   */
+  String getAttributeValueNs(String attributeName, String namespaceUri);
+
+  /**
+   * Sets the attribute value by name and namespace.
+   *
+   * @param attributeName  the name of the attribute
+   * @param namespaceUri  the namespace URI of the attribute
+   * @param xmlValue  the XML value to set
+   * @param isIdAttribute  true if the attribute is an ID attribute, false otherwise
+   */
+  void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue, boolean isIdAttribute);
+
+  /**
+   * Removes the attribute by name and namespace.
+   *
+   * @param attributeName  the name of the attribute
+   * @param namespaceUri  the namespace URI of the attribute
+   */
+  void removeAttributeNs(String attributeName, String namespaceUri);
+
+  /**
+   * Returns the text content of the DOM element without leading and trailing spaces. For
+   * raw text content see {@link ModelElementInstanceImpl#getRawTextContent()}.
+   *
+   * @return text content of underlying DOM element with leading and trailing whitespace trimmed
+   */
+  String getTextContent();
+
+  /**
+   * Returns the raw text content of the DOM element including all whitespaces.
+   *
+   * @return raw text content of underlying DOM element
+   */
+  String getRawTextContent();
+
+  /**
+   * Sets the text content of the DOM element
+   *
+   * @param  textContent the new text content
+   */
+  void setTextContent(String textContent);
 
   /**
    * Replaces this element with a new element and updates references.
@@ -48,10 +132,4 @@ public interface ModelElementInstance {
    * @param newElement  the new element to replace with
    */
   void replaceWithElement(ModelElementInstance newElement);
-
-  String getTextContent();
-
-  String getRawTextContent();
-
-  void setTextContent(String textContent);
 }

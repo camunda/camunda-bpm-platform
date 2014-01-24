@@ -170,7 +170,7 @@ public class ModelUtil {
         return index;
       }
     }
-    return -1;
+    throw new ModelException("New child is not a valid child element type: " + modelElement.getElementType().getTypeName() + "; valid types are: " + childElementTypes);
   }
 
   /**

@@ -14,7 +14,7 @@ package org.camunda.bpm.model.xml;
 
 
 /**
- * <p>Thrown when an error is encountered during Xml parsing</p>
+ * Thrown when an error is encountered during XML parsing
  *
  * @author Daniel Meyer
  *

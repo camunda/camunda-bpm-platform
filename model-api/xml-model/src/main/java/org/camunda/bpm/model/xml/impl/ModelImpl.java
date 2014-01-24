@@ -12,21 +12,20 @@
  */
 package org.camunda.bpm.model.xml.impl;
 
+import org.camunda.bpm.model.xml.Model;
+import org.camunda.bpm.model.xml.impl.util.ModelUtil;
+import org.camunda.bpm.model.xml.impl.util.QName;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.type.ModelElementType;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.model.xml.Model;
-import org.camunda.bpm.model.xml.impl.type.ModelElementTypeBuilderImpl;
-import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
-import org.camunda.bpm.model.xml.impl.util.ModelUtil;
-import org.camunda.bpm.model.xml.impl.util.QName;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
-
 /**
+ * A model contains all defined types and the relationship between them.
+ *
  * @author Daniel Meyer
  *
  */
@@ -40,7 +39,7 @@ public class ModelImpl implements Model {
    * Create a new {@link Model} with a model name.
    * @param modelName  the model name to identify the model
    */
-  public ModelImpl(String modelName) {
+  public ModelImpl(final String modelName) {
     this.modelName = modelName;
   }
 
@@ -48,15 +47,15 @@ public class ModelImpl implements Model {
     return new ArrayList<ModelElementType>(typesByName.values());
   }
 
-  public ModelElementType getType(Class<? extends ModelElementInstance> instanceClass) {
+  public ModelElementType getType(final Class<? extends ModelElementInstance> instanceClass) {
     return typesByClass.get(instanceClass);
   }
 
-  public ModelElementType getTypeForName(String typeName) {
+  public ModelElementType getTypeForName(final String typeName) {
     return getTypeForName(typeName, null);
   }
 
-  public ModelElementType getTypeForName(String typeName, String namespaceUri) {
+  public ModelElementType getTypeForName(final String typeName, final String namespaceUri) {
     return typesByName.get(ModelUtil.getQName(typeName, namespaceUri));
   }
 
@@ -66,8 +65,8 @@ public class ModelImpl implements Model {
    * @param modelElementType  the element type to register
    * @param instanceType  the instance class of the type to register
    */
-  public void registerType(ModelElementType modelElementType, Class<? extends ModelElementInstance> instanceType) {
-    QName qName = ModelUtil.getQName(modelElementType.getTypeName(), modelElementType.getTypeNamespace());
+  public void registerType(final ModelElementType modelElementType, final Class<? extends ModelElementInstance> instanceType) {
+    final QName qName = ModelUtil.getQName(modelElementType.getTypeName(), modelElementType.getTypeNamespace());
     typesByName.put(qName, modelElementType);
     typesByClass.put(instanceType, modelElementType);
   }

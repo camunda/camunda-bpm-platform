@@ -15,9 +15,9 @@ package org.camunda.bpm.model.xml;
 import java.util.Collection;
 
 /**
- * <p>Exception thrown if a user attempts to perform an unsupported
+ * Exception thrown if a user attempts to perform an unsupported
  * model operation. Example: call {@link Collection#add(Object)} on an
- * immutable collection.</p>
+ * immutable collection.
  *
  * @author Daniel Meyer
  *
@@ -27,7 +27,7 @@ public class UnsupportedModelOperationException extends UnsupportedOperationExce
   private static final long serialVersionUID = 1L;
 
   public UnsupportedModelOperationException(String operationName, String reason) {
-    super("The operation "+operationName+" is unsupported: "+reason+".");
+    super("The operation " + operationName + " is unsupported: " + reason + ".");
   }
 
 }
