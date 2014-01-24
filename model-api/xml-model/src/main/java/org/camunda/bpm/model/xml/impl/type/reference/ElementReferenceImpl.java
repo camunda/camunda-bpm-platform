@@ -83,4 +83,11 @@ public class ElementReferenceImpl<Target extends ModelElementInstance, Source ex
       setReferenceIdentifier(referenceSourceElement, identifier);
     }
   }
+
+  public void clearReferenceTargetElement(final ModelElementInstanceImpl referenceSourceParentElement) {
+    Source referenceSource = getReferenceSource(referenceSourceParentElement);
+    Element parentDomElement = referenceSourceParentElement.getDomElement();
+    Element childDomElement = ((ModelElementInstanceImpl) referenceSource).getDomElement();
+    DomUtil.removeChild(parentDomElement, childDomElement);
+  }
 }

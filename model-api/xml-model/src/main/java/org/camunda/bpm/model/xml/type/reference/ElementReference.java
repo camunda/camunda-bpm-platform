@@ -27,4 +27,6 @@ public interface ElementReference<Target extends ModelElementInstance, Source ex
 
   void setReferenceTargetElement(ModelElementInstanceImpl referenceSourceParentElement, Target referenceTargetElement);
 
+  void clearReferenceTargetElement(ModelElementInstanceImpl referenceSourceParentElement);
+
 }

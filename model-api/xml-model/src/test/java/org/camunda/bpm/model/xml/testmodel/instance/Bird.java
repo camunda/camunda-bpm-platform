@@ -75,7 +75,7 @@ public class Bird extends FlyingAnimal {
   }
 
   public void removeSpouse() {
-    spouseRefsColl.getReferenceTargetElements(this).clear();
+    spouseRefsColl.clearReferenceTargetElement(this);
   }
 
   public SpouseRef getSpouseRef() {
