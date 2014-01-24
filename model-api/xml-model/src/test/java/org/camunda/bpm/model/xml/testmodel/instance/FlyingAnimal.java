@@ -29,8 +29,8 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.*;
  */
 public abstract class FlyingAnimal extends Animal {
 
-  private static ElementReference<FlyingAnimal, FlightInstructor> flightInstructorChild;
   // only public for testing (normally private)
+  public static ElementReference<FlyingAnimal, FlightInstructor> flightInstructorChild;
   public static ElementReferenceCollection<FlyingAnimal, FlightPartnerRef> flightPartnerRefsColl;
 
   public static void registerType(ModelBuilder modelBuilder) {

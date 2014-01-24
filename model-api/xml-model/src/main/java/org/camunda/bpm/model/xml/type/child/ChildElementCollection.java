@@ -14,6 +14,7 @@ package org.camunda.bpm.model.xml.type.child;
 
 import java.util.Collection;
 
+import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 
@@ -55,9 +56,17 @@ public interface ChildElementCollection<T extends ModelElementInstance> {
   /**
    * Get the model element type of the elements contained in this collection
    *
+   * @param model  the model of the element
    * @return the containing {@link org.camunda.bpm.model.xml.type.ModelElementType}
    */
-  ModelElementType getContainingType();
+  ModelElementType getChildElementType(Model model);
+
+  /**
+   * Get the model element type of the element owns the collection
+   *
+   * @return the parent element of the collection
+   */
+  ModelElementType getParentElementType();
 
   /** returns a {@link Collection} containing all or a subset of the child elements of
    * a  {@link ModelElementInstance}.  */

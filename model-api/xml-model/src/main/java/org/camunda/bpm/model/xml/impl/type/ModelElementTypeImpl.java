@@ -204,7 +204,7 @@ public class ModelElementTypeImpl implements ModelElementType {
    * Test if a element type is a base type of this type. So this type extends the given element type.
    *
    * @param elementType the element type to test
-   * @return true if {@code elementType} is a base type of this type, else otherwise
+   * @return true if {@code childElementTypeClass} is a base type of this type, else otherwise
    */
   public boolean isBaseTypeOf(ModelElementType elementType) {
     if (this.equals(elementType)) {

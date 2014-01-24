@@ -34,7 +34,7 @@ import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollectionBuilde
 public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> implements ChildElementCollectionBuilder<T>, ModelBuildOperation {
 
   /** The {@link ModelElementType} of the element containing the collection */
-  protected final ModelElementTypeImpl containingType;
+  protected final ModelElementTypeImpl parentElementType;
   private final ChildElementCollectionImpl<T> collection;
   protected final Class<T> childElementType;
 
@@ -42,15 +42,15 @@ public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> i
 
   private final List<ModelBuildOperation> modelBuildOperations = new ArrayList<ModelBuildOperation>();
 
-  public ChildElementCollectionBuilderImpl(Class<T> type, ModelElementType containingType) {
-    this.childElementType = type;
-    this.containingType = (ModelElementTypeImpl) containingType;
+  public ChildElementCollectionBuilderImpl(Class<T> childElementTypeClass, ModelElementType parentElementType) {
+    this.childElementType = childElementTypeClass;
+    this.parentElementType = (ModelElementTypeImpl) parentElementType;
     this.collection = createCollectionInstance();
 
   }
 
   protected ChildElementCollectionImpl<T> createCollectionInstance() {
-    return new ChildElementCollectionImpl<T>(childElementType, containingType);
+    return new ChildElementCollectionImpl<T>(childElementType, parentElementType);
   }
 
   public ChildElementCollectionBuilder<T> immutable() {
@@ -97,9 +97,9 @@ public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> i
   public void performModelBuild(Model model) {
     ModelElementType elementType = model.getType(childElementType);
     if(elementType == null) {
-      throw new ModelException(containingType+" declares undefined child element of type "+childElementType+".");
+      throw new ModelException(parentElementType +" declares undefined child element of type "+childElementType+".");
     }
-    containingType.registerChildElementType(elementType);
+    parentElementType.registerChildElementType(elementType);
     for (ModelBuildOperation modelBuildOperation : modelBuildOperations) {
       modelBuildOperation.performModelBuild(model);
     }

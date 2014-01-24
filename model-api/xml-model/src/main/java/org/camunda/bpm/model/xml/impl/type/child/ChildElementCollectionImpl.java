@@ -15,6 +15,7 @@ package org.camunda.bpm.model.xml.impl.type.child;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.UnsupportedModelOperationException;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
@@ -35,7 +36,7 @@ import org.w3c.dom.NodeList;
  */
 public class ChildElementCollectionImpl<T extends ModelElementInstance> implements ChildElementCollection<T> {
 
-  protected final Class<T> elementType;
+  protected final Class<T> childElementTypeClass;
   /** the minimal count of child elements in the collection
    */
   private int minOccurs = 0;
@@ -50,15 +51,19 @@ public class ChildElementCollectionImpl<T extends ModelElementInstance> implemen
   private boolean isMutable = true;
 
   /** the containing type of the collection */
-  private ModelElementType containingType;
+  private ModelElementType parentElementType;
 
-  public ChildElementCollectionImpl(Class<T> elementType, ModelElementTypeImpl containingType) {
-    this.elementType = elementType;
-    this.containingType = containingType;
+  public ChildElementCollectionImpl(Class<T> childElementTypeClass, ModelElementTypeImpl parentElementType) {
+    this.childElementTypeClass = childElementTypeClass;
+    this.parentElementType = parentElementType;
   }
 
   public void setImmutable() {
-    this.isMutable = false;
+    setMutable(false);
+  }
+
+  public void setMutable(final boolean isMutable) {
+    this.isMutable = isMutable;
   }
 
   public boolean isImmutable() {
@@ -68,7 +73,7 @@ public class ChildElementCollectionImpl<T extends ModelElementInstance> implemen
   // view /////////////////////////////////////////////////////////
 
   protected ElementNodeListFilter getFilter(ModelElementInstanceImpl modelElement) {
-    return new DomUtil.ElementByTypeListFilter(elementType, modelElement.getModelInstance());
+    return new DomUtil.ElementByTypeListFilter(childElementTypeClass, modelElement.getModelInstance());
   }
 
   /**
@@ -93,8 +98,12 @@ public class ChildElementCollectionImpl<T extends ModelElementInstance> implemen
     return maxOccurs;
   }
 
-  public ModelElementType getContainingType() {
-    return containingType;
+  public ModelElementType getChildElementType(Model model) {
+    return model.getType(childElementTypeClass);
+  }
+
+  public ModelElementType getParentElementType() {
+    return parentElementType;
   }
 
   public void setMaxOccurs(int maxOccurs) {
