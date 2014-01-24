@@ -58,10 +58,39 @@ module.exports = function(grunt) {
         options: {
           process: function(content, srcpath) {
             return content
-              .replace(/\/\* live-reload/, '/** live-reload */')
+              .replace(/\/\* live-reload/, '/* live-reload */')
               .replace(/LIVERELOAD_PORT/g, livereloadPort);
           }
         }
+      },
+
+      // for now, copy as development, but leave the livereload comment
+      production: {
+        files: [
+          {
+            expand: true,
+            cwd: 'src/main/webapp/WEB-INF',
+            src: ['*'],
+            dest: 'target/webapp/WEB-INF'
+          },
+          {
+            expand: true,
+            cwd: 'src/main/webapp/',
+            src: [
+              'require-conf.js',
+              'index.html'
+            ],
+            dest: 'target/webapp/'
+          },
+          {
+            expand: true,
+            cwd: 'src/main/webapp/',
+            src: [
+              '{app,plugin,develop,common}/{,**/}*.{js,html}'
+            ],
+            dest: 'target/webapp/'
+          }
+        ]
       },
 
       assets: {
@@ -377,7 +406,7 @@ module.exports = function(grunt) {
         // - Minifaction: https://app.camunda.com/jira/browse/CAM-1667
         // - Bug in ngDefine: https://app.camunda.com/jira/browse/CAM-1713
         'copy:assets',
-        'copy:development'
+        'copy:production'
       ]);
     }
     else {
