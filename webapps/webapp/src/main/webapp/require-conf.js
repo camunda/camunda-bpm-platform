@@ -165,7 +165,7 @@
   require(['jquery'], function($) {
     $('body').append('<script src="//localhost:LIVERELOAD_PORT/livereload.js?snipver=1"></script>');
   });
-  /**/
+  /* */
 
   return conf;
 }));

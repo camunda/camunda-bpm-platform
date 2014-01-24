@@ -151,7 +151,7 @@
             </goals>
             <phase>generate-resources</phase>
             <configuration>
-              <arguments>build</arguments>
+              <arguments>build:production</arguments>
             </configuration>
           </execution>
 
