@@ -40,7 +40,7 @@
       <td>
         <span ng-show="incident.linkable">
           <a ng-click="selectActivity(incident.activityId, $event)"
-             ng-href="#/process-instance/{{ processInstance.id }}?activityIds={{ incident.activityId }}&amp;detailsTab=job-definition-table">
+             ng-href="#/process-instance/{{ processInstance.id }}?activityIds={{ incident.activityId }}&amp;detailsTab=incidents-tab">
             {{ incident.activityName }}
           </a>
         </span>
