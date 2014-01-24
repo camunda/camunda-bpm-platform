@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.identity.Group;
@@ -58,19 +59,6 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Provides mocks for the basic engine entities, such as
@@ -169,6 +157,16 @@ public abstract class MockProvider {
   // statistics
   public static final int EXAMPLE_FAILED_JOBS = 42;
   public static final int EXAMPLE_INSTANCES = 123;
+
+  public static final long EXAMPLE_INSTANCES_LONG = 123;
+  public static final long EXAMPLE_FINISHED_LONG = 124;
+  public static final long EXAMPLE_CANCELED_LONG = 125;
+  public static final long EXAMPLE_COMPLETE_SCOPE_LONG = 126;
+
+  public static final long ANOTHER_EXAMPLE_INSTANCES_LONG = 127;
+  public static final long ANOTHER_EXAMPLE_FINISHED_LONG = 128;
+  public static final long ANOTHER_EXAMPLE_CANCELED_LONG = 129;
+  public static final long ANOTHER_EXAMPLE_COMPLETE_SCOPE_LONG = 130;
 
   public static final String EXAMPLE_INCIDENT_TYPE = "anIncidentType";
   public static final int EXAMPLE_INCIDENT_COUNT = 1;
@@ -727,6 +725,30 @@ public abstract class MockProvider {
     return mock;
   }
 
+  public static List<HistoricActivityStatistics> createMockHistoricActivityStatistics() {
+    HistoricActivityStatistics statistics = mock(HistoricActivityStatistics.class);
+
+    when(statistics.getId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+    when(statistics.getInstances()).thenReturn(EXAMPLE_INSTANCES_LONG);
+    when(statistics.getCanceled()).thenReturn(EXAMPLE_CANCELED_LONG);
+    when(statistics.getFinished()).thenReturn(EXAMPLE_FINISHED_LONG);
+    when(statistics.getCompleteScope()).thenReturn(EXAMPLE_COMPLETE_SCOPE_LONG);
+
+    HistoricActivityStatistics anotherStatistics = mock(HistoricActivityStatistics.class);
+
+    when(anotherStatistics.getId()).thenReturn(ANOTHER_EXAMPLE_ACTIVITY_ID);
+    when(anotherStatistics.getInstances()).thenReturn(ANOTHER_EXAMPLE_INSTANCES_LONG);
+    when(anotherStatistics.getCanceled()).thenReturn(ANOTHER_EXAMPLE_CANCELED_LONG);
+    when(anotherStatistics.getFinished()).thenReturn(ANOTHER_EXAMPLE_FINISHED_LONG);
+    when(anotherStatistics.getCompleteScope()).thenReturn(ANOTHER_EXAMPLE_COMPLETE_SCOPE_LONG);
+
+    List<HistoricActivityStatistics> activityResults = new ArrayList<HistoricActivityStatistics>();
+    activityResults.add(statistics);
+    activityResults.add(anotherStatistics);
+
+    return activityResults;
+  }
+
   public static List<HistoricProcessInstance> createMockHistoricProcessInstances() {
     List<HistoricProcessInstance> mockList = new ArrayList<HistoricProcessInstance>();
     mockList.add(createMockHistoricProcessInstance());
@@ -785,6 +807,9 @@ public abstract class MockProvider {
 
     return mock;
   }
+
+
+
   public static List<ProcessInstance> createAnotherMockProcessInstanceList() {
   	List<ProcessInstance> mockProcessInstanceList = new ArrayList<ProcessInstance>();
   	mockProcessInstanceList.add(createMockInstance());
