@@ -388,7 +388,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testMultipleRunningTasks.bpmn20.xml")
-  public void testQueryByCompleteMultipleRunningTasks() {
+  public void testQueryByCompleteScopeMultipleRunningTasks() {
     String processDefinitionId = getProcessDefinitionId();
 
     startProcesses(5);
@@ -462,39 +462,31 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
   public void testQueryByCanceledAfterCancelingSomeInstances() {
     String processDefinitionId = getProcessDefinitionId();
 
-    // start five instances
-    startProcesses(5);
+    startProcesses(3);
 
-    // complete two task, so that two process instances are finished
-    List<Task> tasks = taskService.createTaskQuery().list();
-    for (int i = 0; i < 2; i++) {
-      taskService.complete(tasks.get(i).getId());
+    // cancel running process instances
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+    for (ProcessInstance processInstance : processInstances) {
+      runtimeService.deleteProcessInstance(processInstance.getId(), "test");
     }
+
+    startProcesses(2);
 
     HistoricActivityStatisticsQuery query = historyService
         .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCompleteScope()
-        .orderByActivityId()
-        .asc();
+        .includeCanceled();
 
     List<HistoricActivityStatistics> statistics = query.list();
 
-    assertEquals(2, query.count());
-    assertEquals(2, statistics.size());
-
-    // end
-    HistoricActivityStatistics end = statistics.get(0);
-
-    assertEquals("end", end.getId());
-    assertEquals(0, end.getInstances());
-    assertEquals(2, end.getCompleteScope());
+    assertEquals(1, query.count());
+    assertEquals(1, statistics.size());
 
     // task
-    HistoricActivityStatistics task = statistics.get(1);
+    HistoricActivityStatistics task = statistics.get(0);
 
     assertEquals("task", task.getId());
-    assertEquals(3, task.getInstances());
-    assertEquals(0, task.getCompleteScope());
+    assertEquals(2, task.getInstances());
+    assertEquals(3, task.getCanceled());
 
     completeProcessInstances();
   }
