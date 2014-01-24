@@ -416,7 +416,7 @@
                 <exclude>**/*TestCase.java</exclude>
                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
                 <exclude>**/Historic*InstanceTest.java</exclude>
-                <exclude>**/HistoricActivityInstanceStateTest.java</exclude>
+                <exclude>**/HistoricActivity*Test.java</exclude>
                 <exclude>**/HistoryServiceTest.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
               </excludes>
@@ -441,7 +441,7 @@
                 <exclude>**/*TestCase.java</exclude>
                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
                 <exclude>**/Historic*InstanceTest.java</exclude>
-                <exclude>**/HistoricActivityInstanceStateTest.java</exclude>
+                <exclude>**/HistoricActivity*Test.java</exclude>
                 <exclude>**/HistoryServiceTest.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
               </excludes>
