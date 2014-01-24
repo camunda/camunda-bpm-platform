@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionStatisticsEntity">
+
+  <!-- RESULTMAP -->
+
+  <resultMap id="historicActivityStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityStatisticsImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="instances" column="INSTANCE_COUNT_" jdbcType="INTEGER" />
+    <result property="finished" column="FINISHED_COUNT_" jdbcType="INTEGER" />
+    <result property="canceled" column="CANCELED_COUNT_" jdbcType="INTEGER" />
+    <result property="completeScope" column="COMPLETE_SCOPE_COUNT_" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <!-- HistoricActivity statistics -->
+
+  <select id ="selectHistoricActivityStatistics" resultMap="historicActivityStatisticsResultMap" 
+    parameterType="org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectHistoricActivityStatisticsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+  <select id ="selectHistoricActivityStatisticsCount" resultType="long" 
+    parameterType="org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl">
+    select count(RES.ID_)
+    <include refid="selectHistoricActivityStatisticsByQueryCriteriaSql"/>
+  </select>
+   
+  <sql id="selectHistoricActivityStatisticsByQueryCriteriaSql">
+    from (
+      select ACTIVITY.ACT_ID_ as ID_
+      , INSTANCE_COUNT_
+      <if test="includeFinished">
+      , FINISHED_COUNT_
+      </if>
+      <if test="includeCanceled">
+      , CANCELED_COUNT_
+      </if>
+      <if test="includeCompleteScope">
+      , COMPLETE_SCOPE_COUNT_
+      </if>
+
+      from
+
+        (
+          select distinct ACT_ID_
+          from ${prefix}ACT_HI_ACTINST
+          where PROC_DEF_ID_ = #{processDefinitionId}
+          and (END_TIME_ is null
+          <if test="includeFinished">
+          or END_TIME_ is not null
+          </if>
+          <if test="includeCanceled">
+          or ACT_INST_STATE_ = 2
+          </if>
+          <if test="includeCompleteScope">
+          or ACT_INST_STATE_ = 1
+          </if>
+          )
+        ) ACTIVITY
+
+        left outer join
+
+        (
+          select ACT_ID_, count(ACT_ID_) as INSTANCE_COUNT_
+          from ${prefix}ACT_HI_ACTINST
+          where END_TIME_ is null
+          group by ACT_ID_
+        ) INSTANCE
+        on ACTIVITY.ACT_ID_ = INSTANCE.ACT_ID_
+
+        <if test="includeFinished">
+        left outer join
+
+        (
+          select ACT_ID_, count(ACT_ID_) as FINISHED_COUNT_
+          from ${prefix}ACT_HI_ACTINST
+          where END_TIME_ is not null
+          group by ACT_ID_
+        ) FINISHED
+        on FINISHED.ACT_ID_ = ACTIVITY.ACT_ID_
+        </if>
+        
+        <if test="includeCanceled">
+        left outer join
+
+        (
+          select ACT_ID_, count(ACT_ID_) as CANCELED_COUNT_
+          from ${prefix}ACT_HI_ACTINST
+          where ACT_INST_STATE_ = 2
+          group by ACT_ID_
+        ) CANCELED
+        on CANCELED.ACT_ID_ = ACTIVITY.ACT_ID_
+        </if>
+      
+        <if test="includeCompleteScope">
+        left outer join
+
+        (
+          select ACT_ID_, count(ACT_ID_) as COMPLETE_SCOPE_COUNT_
+          from ${prefix}ACT_HI_ACTINST
+          where ACT_INST_STATE_ = 1
+          group by ACT_ID_
+        ) COMPLETE
+        on COMPLETE.ACT_ID_ = ACTIVITY.ACT_ID_
+        </if>
+      
+      ) RES
+  </sql>
+  
+</mapper>

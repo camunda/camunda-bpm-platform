@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -41,6 +42,10 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     return new HistoricActivityInstanceQueryImpl(commandExecutor);
   }
 
+  public HistoricActivityStatisticsQuery createHistoricActivityStatisticsQuery(String processDefinitionId) {
+    return new HistoricActivityStatisticsQueryImpl(processDefinitionId, commandExecutor);
+  }
+
   public HistoricTaskInstanceQuery createHistoricTaskInstanceQuery() {
     return new HistoricTaskInstanceQueryImpl(commandExecutor);
   }
@@ -52,7 +57,7 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
   public HistoricVariableInstanceQuery createHistoricVariableInstanceQuery() {
     return new HistoricVariableInstanceQueryImpl(commandExecutor);
   }
-  
+
   public void deleteHistoricTaskInstance(String taskId) {
     commandExecutor.execute(new DeleteHistoricTaskInstanceCmd(taskId));
   }
