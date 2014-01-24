@@ -261,6 +261,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_BEFORE = "2013-01-23T13:42:43";
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_AFTER = "2013-01-23T13:42:43";
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_BEFORE = "2013-04-23T13:42:43";
+  public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED = true;
+  public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE = true;
 
 
   // tasks
@@ -694,6 +696,8 @@ public abstract class MockProvider {
     when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate());
     when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME).toDate());
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION);
+    when(mock.isCanceled()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED);
+    when(mock.isCompleteScope()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE);
 
     return mock;
   }
@@ -807,8 +811,6 @@ public abstract class MockProvider {
 
     return mock;
   }
-
-
 
   public static List<ProcessInstance> createAnotherMockProcessInstanceList() {
   	List<ProcessInstance> mockProcessInstanceList = new ArrayList<ProcessInstance>();

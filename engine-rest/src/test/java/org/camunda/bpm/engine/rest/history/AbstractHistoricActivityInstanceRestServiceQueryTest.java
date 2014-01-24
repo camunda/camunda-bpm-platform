@@ -342,6 +342,8 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     Date returnedStartTime = DateTimeUtil.parseDateTime(from(content).getString("[0].startTime")).toDate();
     Date returnedEndTime = DateTimeUtil.parseDateTime(from(content).getString("[0].endTime")).toDate();
     long returnedDurationInMillis = from(content).getLong("[0].durationInMillis");
+    boolean canceled = from(content).getBoolean("[0].canceled");
+    boolean completeScope = from(content).getBoolean("[0].completeScope");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_PARENT_ACTIVITY_INSTANCE_ID, returnedParentActivityInstanceId);
@@ -357,6 +359,8 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate(), returnedStartTime);
     Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME).toDate(), returnedEndTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION, returnedDurationInMillis);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED, canceled);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE, completeScope);
   }
 
   @Test
@@ -390,6 +394,37 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     verifyStringParameterQueryInvocations();
   }
 
+  @Test
+  public void testBooleanParameters() {
+    Map<String, Boolean> params = getCompleteBooleanQueryParameters();
+
+    given()
+      .queryParams(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_ACTIVITY_INSTANCE_RESOURCE_URL);
+
+    verifyBooleanParameterQueryInvocations();
+  }
+
+  @Test
+  public void testBooleanParametersAsPost() {
+    Map<String, Boolean> params = getCompleteBooleanQueryParameters();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(HISTORIC_ACTIVITY_INSTANCE_RESOURCE_URL);
+
+    verifyBooleanParameterQueryInvocations();
+  }
+
   private Map<String, String> getCompleteStringQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
 
@@ -405,6 +440,15 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     return parameters;
   }
 
+  private Map<String, Boolean> getCompleteBooleanQueryParameters() {
+    Map<String, Boolean> parameters = new HashMap<String, Boolean>();
+
+    parameters.put("canceled", MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED);
+    parameters.put("completeScope", MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE);
+
+    return parameters;
+  }
+
   private void verifyStringParameterQueryInvocations() {
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
 
@@ -416,6 +460,15 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     verify(mockedQuery).activityName(stringQueryParameters.get("activityName"));
     verify(mockedQuery).activityType(stringQueryParameters.get("activityType"));
     verify(mockedQuery).taskAssignee(stringQueryParameters.get("taskAssignee"));
+
+    verify(mockedQuery).list();
+  }
+
+  private void verifyBooleanParameterQueryInvocations() {
+    Map<String, Boolean> booleanParams = getCompleteBooleanQueryParameters();
+
+    verify(mockedQuery).canceled();
+    verify(mockedQuery).completeScope();
 
     verify(mockedQuery).list();
   }
@@ -545,7 +598,7 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
     Assert.assertNull(returnedActivityEndTime);
   }
-  
+
   @Test
   public void testHistoricBeforeAndAfterStartTimeQuery() {
     given()

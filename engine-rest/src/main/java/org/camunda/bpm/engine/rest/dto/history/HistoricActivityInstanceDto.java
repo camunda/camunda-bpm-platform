@@ -32,6 +32,8 @@ public class HistoricActivityInstanceDto {
   private Date startTime;
   private Date endTime;
   private Long durationInMillis;
+  private Boolean canceled;
+  private Boolean completeScope;
 
   public String getId() {
     return id;
@@ -89,6 +91,14 @@ public class HistoricActivityInstanceDto {
     return durationInMillis;
   }
 
+  public Boolean getCanceled() {
+    return canceled;
+  }
+
+  public Boolean getCompleteScope() {
+    return completeScope;
+  }
+
   public static HistoricActivityInstanceDto fromHistoricActivityInstance(HistoricActivityInstance historicActivityInstance) {
 
     HistoricActivityInstanceDto dto = new HistoricActivityInstanceDto();
@@ -107,6 +117,8 @@ public class HistoricActivityInstanceDto {
     dto.startTime = historicActivityInstance.getStartTime();
     dto.endTime = historicActivityInstance.getEndTime();
     dto.durationInMillis = historicActivityInstance.getDurationInMillis();
+    dto.canceled = historicActivityInstance.isCanceled();
+    dto.completeScope = historicActivityInstance.isCompleteScope();
 
     return dto;
   }
