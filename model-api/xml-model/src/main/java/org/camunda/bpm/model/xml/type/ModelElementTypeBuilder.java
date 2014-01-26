@@ -44,7 +44,7 @@ public interface ModelElementTypeBuilder {
   ModelElementType build();
 
 
-  public static interface ModelTypeInstanceProvider<T extends ModelElementInstance> {
+  interface ModelTypeInstanceProvider<T extends ModelElementInstance> {
     T newInstance(ModelTypeInstanceContext instanceContext);
   }
 

@@ -39,7 +39,7 @@ public class ModelImpl implements Model {
    * Create a new {@link Model} with a model name.
    * @param modelName  the model name to identify the model
    */
-  public ModelImpl(final String modelName) {
+  public ModelImpl(String modelName) {
     this.modelName = modelName;
   }
 
@@ -47,15 +47,15 @@ public class ModelImpl implements Model {
     return new ArrayList<ModelElementType>(typesByName.values());
   }
 
-  public ModelElementType getType(final Class<? extends ModelElementInstance> instanceClass) {
+  public ModelElementType getType(Class<? extends ModelElementInstance> instanceClass) {
     return typesByClass.get(instanceClass);
   }
 
-  public ModelElementType getTypeForName(final String typeName) {
+  public ModelElementType getTypeForName(String typeName) {
     return getTypeForName(typeName, null);
   }
 
-  public ModelElementType getTypeForName(final String typeName, final String namespaceUri) {
+  public ModelElementType getTypeForName(String typeName, String namespaceUri) {
     return typesByName.get(ModelUtil.getQName(typeName, namespaceUri));
   }
 
@@ -65,8 +65,8 @@ public class ModelImpl implements Model {
    * @param modelElementType  the element type to register
    * @param instanceType  the instance class of the type to register
    */
-  public void registerType(final ModelElementType modelElementType, final Class<? extends ModelElementInstance> instanceType) {
-    final QName qName = ModelUtil.getQName(modelElementType.getTypeName(), modelElementType.getTypeNamespace());
+  public void registerType(ModelElementType modelElementType, Class<? extends ModelElementInstance> instanceType) {
+    QName qName = ModelUtil.getQName(modelElementType.getTypeName(), modelElementType.getTypeNamespace());
     typesByName.put(qName, modelElementType);
     typesByClass.put(instanceType, modelElementType);
   }
@@ -77,7 +77,7 @@ public class ModelImpl implements Model {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
+    int prime = 31;
     int result = 1;
     result = prime * result + ((modelName == null) ? 0 : modelName.hashCode());
     return result;
@@ -85,18 +85,23 @@ public class ModelImpl implements Model {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     ModelImpl other = (ModelImpl) obj;
     if (modelName == null) {
-      if (other.modelName != null)
+      if (other.modelName != null) {
         return false;
-    } else if (!modelName.equals(other.modelName))
+      }
+    } else if (!modelName.equals(other.modelName)) {
       return false;
+    }
     return true;
   }
 }

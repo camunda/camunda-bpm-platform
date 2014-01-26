@@ -19,14 +19,9 @@ import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.ChildElement;
-import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.reference.ElementReference;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.util.Collection;
 
 /**
  * @author Sebastian Menski
@@ -34,7 +29,7 @@ import java.util.Collection;
 public class ElementReferenceImpl<Target extends ModelElementInstance, Source extends ModelElementInstance>  extends ElementReferenceCollectionImpl<Target,Source> implements ElementReference<Target, Source> {
 
 
-  public ElementReferenceImpl(final ChildElement<Source> referenceSourceCollection) {
+  public ElementReferenceImpl(ChildElement<Source> referenceSourceCollection) {
     super(referenceSourceCollection);
   }
 
@@ -42,16 +37,16 @@ public class ElementReferenceImpl<Target extends ModelElementInstance, Source ex
     return (ChildElement<Source>) getReferenceSourceCollection();
   }
 
-  public Source getReferenceSource(final ModelElementInstance referenceSourceParent) {
+  public Source getReferenceSource(ModelElementInstance referenceSourceParent) {
     return getReferenceSourceChild().getChild(referenceSourceParent);
   }
 
-  private void setReferenceSource(final ModelElementInstance referenceSourceParent, final Source referenceSource) {
+  private void setReferenceSource(ModelElementInstance referenceSourceParent, Source referenceSource) {
     getReferenceSourceChild().setChild(referenceSourceParent, referenceSource);
   }
 
   @SuppressWarnings("unchecked")
-  public Target getReferenceTargetElement(final ModelElementInstanceImpl referenceSourceParentElement) {
+  public Target getReferenceTargetElement(ModelElementInstanceImpl referenceSourceParentElement) {
     Source referenceSource = getReferenceSource(referenceSourceParentElement);
     if (referenceSource != null) {
       String identifier = getReferenceIdentifier(referenceSource);
@@ -68,7 +63,7 @@ public class ElementReferenceImpl<Target extends ModelElementInstance, Source ex
     }
   }
 
-  public void setReferenceTargetElement(final ModelElementInstanceImpl referenceSourceParentElement, final Target referenceTargetElement) {
+  public void setReferenceTargetElement(ModelElementInstanceImpl referenceSourceParentElement, Target referenceTargetElement) {
     ModelInstanceImpl modelInstance = referenceSourceParentElement.getModelInstance();
     String identifier = referenceTargetAttribute.getValue(referenceTargetElement);
     ModelElementInstance existingElement = modelInstance.getModelElementById(identifier);
@@ -84,10 +79,10 @@ public class ElementReferenceImpl<Target extends ModelElementInstance, Source ex
     }
   }
 
-  public void clearReferenceTargetElement(final ModelElementInstanceImpl referenceSourceParentElement) {
+  public void clearReferenceTargetElement(ModelElementInstanceImpl referenceSourceParentElement) {
     Source referenceSource = getReferenceSource(referenceSourceParentElement);
     Element parentDomElement = referenceSourceParentElement.getDomElement();
-    Element childDomElement = ((ModelElementInstanceImpl) referenceSource).getDomElement();
+    Element childDomElement = referenceSource.getDomElement();
     DomUtil.removeChild(parentDomElement, childDomElement);
   }
 }

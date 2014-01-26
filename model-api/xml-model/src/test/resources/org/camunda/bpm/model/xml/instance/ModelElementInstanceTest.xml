@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <animals xmlns="http://camunda.org/animals" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:schemaLocation="http://camunda.org/animals Testmodel.xsd ">
+    xsi:schemaLocation="http://camunda.org/animals ../testmodel/Testmodel.xsd ">
 
     <bird id="tweety" gender="Female"/>
     <bird id="donald" gender="Male">some text content</bird>

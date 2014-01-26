@@ -52,7 +52,7 @@ public class ModelElementTypeImpl implements ModelElementType {
 
   private final List<ModelElementType> extendingTypes = new ArrayList<ModelElementType>();
 
-  private List<Attribute<?>> attributes = new ArrayList<Attribute<?>>();
+  private final List<Attribute<?>> attributes = new ArrayList<Attribute<?>>();
 
   private final List<ModelElementType> childElementTypes = new ArrayList<ModelElementType>();
 
@@ -89,7 +89,7 @@ public class ModelElementTypeImpl implements ModelElementType {
     extendingTypes.add(modelType);
   }
 
-  ModelElementInstance createModelElementInstance(ModelTypeInstanceContext instanceContext) {
+  protected ModelElementInstance createModelElementInstance(ModelTypeInstanceContext instanceContext) {
     if (isAbstract) {
       throw new ModelTypeException("Model element type " + getTypeName() + " is abstract and no instances can be created.");
     }
@@ -248,7 +248,7 @@ public class ModelElementTypeImpl implements ModelElementType {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
+    int prime = 31;
     int result = 1;
     result = prime * result + ((model == null) ? 0 : model.hashCode());
     result = prime * result + ((typeName == null) ? 0 : typeName.hashCode());
@@ -258,28 +258,37 @@ public class ModelElementTypeImpl implements ModelElementType {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     ModelElementTypeImpl other = (ModelElementTypeImpl) obj;
     if (model == null) {
-      if (other.model != null)
+      if (other.model != null) {
         return false;
-    } else if (!model.equals(other.model))
+      }
+    } else if (!model.equals(other.model)) {
       return false;
+    }
     if (typeName == null) {
-      if (other.typeName != null)
+      if (other.typeName != null) {
         return false;
-    } else if (!typeName.equals(other.typeName))
+      }
+    } else if (!typeName.equals(other.typeName)) {
       return false;
+    }
     if (typeNamespace == null) {
-      if (other.typeNamespace != null)
+      if (other.typeNamespace != null) {
         return false;
-    } else if (!typeNamespace.equals(other.typeNamespace))
+      }
+    } else if (!typeNamespace.equals(other.typeNamespace)) {
       return false;
+    }
     return true;
   }
 

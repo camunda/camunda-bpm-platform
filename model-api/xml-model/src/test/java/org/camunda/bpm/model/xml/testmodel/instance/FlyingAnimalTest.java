@@ -51,7 +51,7 @@ public class FlyingAnimalTest extends TestModelTest {
 
   @Parameters
   public static Collection<Object[]> models() {
-    Object[][] models = new Object[][]{createModel(), parseModel(FlyingAnimalTest.class)};
+    Object[][] models = {createModel(), parseModel(FlyingAnimalTest.class)};
     return Arrays.asList(models);
   }
 

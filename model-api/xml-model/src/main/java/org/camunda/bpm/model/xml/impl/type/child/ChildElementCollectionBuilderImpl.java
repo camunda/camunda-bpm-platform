@@ -86,7 +86,7 @@ public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> i
     return builder;
   }
 
-  void setReferenceBuilder(ElementReferenceCollectionBuilder<?, ?> referenceBuilder) {
+  protected void setReferenceBuilder(ElementReferenceCollectionBuilder<?, ?> referenceBuilder) {
     if (this.referenceBuilder != null) {
       throw new ModelException("An collection cannot have more than one reference");
     }

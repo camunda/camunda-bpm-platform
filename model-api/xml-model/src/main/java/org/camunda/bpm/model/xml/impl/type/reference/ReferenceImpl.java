@@ -30,7 +30,7 @@ import org.camunda.bpm.model.xml.type.reference.Reference;
  */
 public abstract class ReferenceImpl<T extends ModelElementInstance> implements Reference<T> {
 
-  AttributeImpl<String> referenceTargetAttribute;
+  protected AttributeImpl<String> referenceTargetAttribute;
 
   /** the actual type, may be different (a subtype of) {@link AttributeImpl#getOwningElementType()} */
   private ModelElementTypeImpl referenceTargetElementType;

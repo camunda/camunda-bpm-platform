@@ -67,7 +67,7 @@ public class StringAttributeBuilderImpl extends AttributeBuilderImpl<String> imp
     return referenceBuilder;
   }
 
-  <V extends ModelElementInstance> void setAttributeReference(AttributeReferenceBuilderImpl<V> referenceBuilder) {
+  protected <V extends ModelElementInstance> void setAttributeReference(AttributeReferenceBuilderImpl<V> referenceBuilder) {
     if (this.referenceBuilder != null) {
       throw new ModelException("An attribute cannot have more than one reference");
     }

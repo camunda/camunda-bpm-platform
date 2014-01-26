@@ -42,13 +42,13 @@ public class ModelElementInstanceTest extends TestModelTest {
   private Bird daisy;
   private Bird hedwig;
 
-  public ModelElementInstanceTest(final ModelInstance testModelInstance, final AbstractModelParser modelParser) {
+  public ModelElementInstanceTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
     super(testModelInstance, modelParser);
   }
 
   @Parameters
   public static Collection<Object[]> models() {
-    Object[][] models = new Object[][]{createModel(), parseModel(ModelElementInstanceTest.class)};
+    Object[][] models = {createModel(), parseModel(ModelElementInstanceTest.class)};
     return Arrays.asList(models);
   }
 

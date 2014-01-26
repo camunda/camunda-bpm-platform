@@ -38,7 +38,7 @@ public class SpouseRef extends ModelElementInstanceImpl {
     typeBuilder.build();
   }
 
-  public SpouseRef(final ModelTypeInstanceContext instanceContext) {
+  public SpouseRef(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 }

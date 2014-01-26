@@ -31,9 +31,9 @@ import java.util.*;
  * @author Daniel Meyer
  *
  */
-public class ModelUtil {
+public final class ModelUtil {
 
-  private final static String MODEL_ELEMENT_KEY = "camunda.modelElementRef";
+  private static final String MODEL_ELEMENT_KEY = "camunda.modelElementRef";
 
   /**
    * Returns the {@link ModelElementInstanceImpl ModelElement} for a DOM element.

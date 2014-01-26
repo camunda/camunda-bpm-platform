@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.model.xml.impl.type.reference;
 
-import org.camunda.bpm.model.xml.impl.type.child.ChildElementCollectionImpl;
 import org.camunda.bpm.model.xml.impl.type.child.ChildElementImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
@@ -22,7 +21,7 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
  */
 public class QNameElementReferenceBuilderImpl<Target extends ModelElementInstance, Source extends ModelElementInstance> extends ElementReferenceBuilderImpl<Target,Source> {
 
-  public QNameElementReferenceBuilderImpl(final Class<Source> childElementType, final Class<Target> referenceTargetClass, final ChildElementImpl<Source> child) {
+  public QNameElementReferenceBuilderImpl(Class<Source> childElementType, Class<Target> referenceTargetClass, ChildElementImpl<Source> child) {
     super(childElementType, referenceTargetClass, child);
     this.elementReferenceCollectionImpl = new QNameElementReferenceImpl<Target,Source>(child);
   }

@@ -24,7 +24,6 @@ public class ModelParseException extends ModelException {
   private static final long serialVersionUID = 1L;
 
   public ModelParseException() {
-    super();
   }
 
   public ModelParseException(String message, Throwable cause) {

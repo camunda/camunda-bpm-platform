@@ -23,7 +23,7 @@ import org.camunda.bpm.model.xml.type.child.ChildElement;
  */
 public class QNameElementReferenceImpl<Target extends ModelElementInstance, Source extends ModelElementInstance> extends ElementReferenceImpl<Target,Source> {
 
-  public QNameElementReferenceImpl(final ChildElement<Source> referenceSourceCollection) {
+  public QNameElementReferenceImpl(ChildElement<Source> referenceSourceCollection) {
     super(referenceSourceCollection);
   }
 

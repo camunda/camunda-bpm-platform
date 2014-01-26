@@ -37,21 +37,21 @@ import org.w3c.dom.NodeList;
 public class ChildElementCollectionImpl<T extends ModelElementInstance> implements ChildElementCollection<T> {
 
   protected final Class<T> childElementTypeClass;
-  /** the minimal count of child elements in the collection
-   */
+
+  /** the containing type of the collection */
+  private final ModelElementType parentElementType;
+
+  /** the minimal count of child elements in the collection */
   private int minOccurs = 0;
 
-  /** the maximum count of child elements in the collection.
+  /**
+   * the maximum count of child elements in the collection.
    * An unbounded collection has a negative maxOccurs.
    */
   protected int maxOccurs = -1;
 
-  /** indicates whether this collection is mutable.
-   */
+  /** indicates whether this collection is mutable. */
   private boolean isMutable = true;
-
-  /** the containing type of the collection */
-  private ModelElementType parentElementType;
 
   public ChildElementCollectionImpl(Class<T> childElementTypeClass, ModelElementTypeImpl parentElementType) {
     this.childElementTypeClass = childElementTypeClass;
@@ -62,7 +62,7 @@ public class ChildElementCollectionImpl<T extends ModelElementInstance> implemen
     setMutable(false);
   }
 
-  public void setMutable(final boolean isMutable) {
+  public void setMutable(boolean isMutable) {
     this.isMutable = isMutable;
   }
 
@@ -81,7 +81,7 @@ public class ChildElementCollectionImpl<T extends ModelElementInstance> implemen
    *
    * @return the view represented by this collection
    */
-  Collection<Element> getView(ModelElementInstanceImpl modelElement) {
+  private Collection<Element> getView(ModelElementInstanceImpl modelElement) {
     NodeList childNodes = DomUtil.getChildNodes(modelElement.getDomElement());
     return DomUtil.filterNodeList(childNodes, getFilter(modelElement));
   }
@@ -111,17 +111,17 @@ public class ChildElementCollectionImpl<T extends ModelElementInstance> implemen
   }
 
   /** the "add" operation used by the collection */
-  void performAddOperation(ModelElementInstanceImpl modelElement, T e) {
+  private void performAddOperation(ModelElementInstanceImpl modelElement, T e) {
     modelElement.addChildElement(e);
   }
 
   /** the "remove" operation used by this collection */
-  boolean performRemoveOperation(ModelElementInstanceImpl modelElement, Object e) {
+  private boolean performRemoveOperation(ModelElementInstanceImpl modelElement, Object e) {
     return modelElement.removeChildElement((ModelElementInstanceImpl)e);
   }
 
   /** the "clear" operation used by this collection */
-  void performClearOperation(ModelElementInstanceImpl modelElement, Collection<Element> elementsToRemove) {
+  private void performClearOperation(ModelElementInstanceImpl modelElement, Collection<Element> elementsToRemove) {
     Collection<ModelElementInstance> modelElements = ModelUtil.getModelElementCollection(elementsToRemove, modelElement.getModelInstance());
     for (ModelElementInstance element : modelElements) {
       modelElement.removeChildElement((ModelElementInstanceImpl) element);

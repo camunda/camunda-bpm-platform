@@ -40,13 +40,13 @@ public class BirdTest extends TestModelTest {
   private Egg egg1;
   private Egg egg2;
 
-  public BirdTest(final ModelInstance testModelInstance, final AbstractModelParser modelParser) {
+  public BirdTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
     super(testModelInstance, modelParser);
   }
 
   @Parameters
   public static Collection<Object[]> models() {
-    Object[][] models = new Object[][]{createModel(), parseModel(BirdTest.class)};
+    Object[][] models = {createModel(), parseModel(BirdTest.class)};
     return Arrays.asList(models);
   }
 

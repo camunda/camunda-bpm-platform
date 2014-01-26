@@ -44,7 +44,7 @@ public class Egg extends ModelElementInstanceImpl {
     typeBuilder.build();
   }
 
-  public Egg(final ModelTypeInstanceContext instanceContext) {
+  public Egg(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 

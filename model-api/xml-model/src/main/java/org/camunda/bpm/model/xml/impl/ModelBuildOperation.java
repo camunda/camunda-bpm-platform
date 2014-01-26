@@ -24,6 +24,6 @@ import org.camunda.bpm.model.xml.Model;
  */
 public interface ModelBuildOperation {
 
-  public void performModelBuild(Model model);
+  void performModelBuild(Model model);
 
 }

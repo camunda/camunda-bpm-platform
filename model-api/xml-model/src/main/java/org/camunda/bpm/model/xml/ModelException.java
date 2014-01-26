@@ -23,7 +23,6 @@ public class ModelException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   public ModelException() {
-    super();
   }
 
   public ModelException(String message, Throwable cause) {

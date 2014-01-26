@@ -41,7 +41,7 @@ public class ModelInstanceImpl implements ModelInstance {
   private final Document document;
   private final ModelImpl model;
 
-  public ModelInstanceImpl(final ModelImpl model, final Document document) {
+  public ModelInstanceImpl(ModelImpl model, Document document) {
     this.model = model;
     this.document = document;
   }
@@ -51,7 +51,7 @@ public class ModelInstanceImpl implements ModelInstance {
   }
 
   public ModelElementInstance getDocumentElement() {
-    final Element documentElement = DomUtil.getDocumentElement(document);
+    Element documentElement = DomUtil.getDocumentElement(document);
     if(documentElement != null) {
       return ModelUtil.getModelElement(documentElement, this);
     } else {
@@ -59,14 +59,14 @@ public class ModelInstanceImpl implements ModelInstance {
     }
   }
 
-  public void setDocumentElement(final ModelElementInstance modelElement) {
+  public void setDocumentElement(ModelElementInstance modelElement) {
     ModelUtil.ensureInstanceOf(modelElement, ModelElementInstanceImpl.class);
-    final Element domElement = ((ModelElementInstanceImpl)modelElement).getDomElement();
+    Element domElement = modelElement.getDomElement();
     DomUtil.setDocumentElement(document, domElement);
   }
 
-  public <T extends ModelElementInstance> T newInstance(final Class<T> type) {
-    final ModelElementType modelElementType = model.getType(type);
+  public <T extends ModelElementInstance> T newInstance(Class<T> type) {
+    ModelElementType modelElementType = model.getType(type);
     if(modelElementType != null) {
       return newInstance(modelElementType);
     } else {
@@ -75,7 +75,7 @@ public class ModelInstanceImpl implements ModelInstance {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends ModelElementInstance> T newInstance(final ModelElementType type) {
+  public <T extends ModelElementInstance> T newInstance(ModelElementType type) {
     return (T) type.newInstance(this);
   }
 
@@ -83,12 +83,12 @@ public class ModelInstanceImpl implements ModelInstance {
     return model;
   }
 
-  public ModelElementInstance getModelElementById(final String id) {
+  public ModelElementInstance getModelElementById(String id) {
     if (id == null) {
       return null;
     }
 
-    final Element element = DomUtil.findElementById(document, id);
+    Element element = DomUtil.findElementById(document, id);
     if(element != null) {
       return ModelUtil.getModelElement(element, this);
     } else {
@@ -97,11 +97,11 @@ public class ModelInstanceImpl implements ModelInstance {
   }
 
   public Collection<ModelElementInstance> getModelElementsByType(ModelElementType type) {
-    final HashSet<ModelElementType> extendingTypes = new HashSet<ModelElementType>();
+    HashSet<ModelElementType> extendingTypes = new HashSet<ModelElementType>();
     extendingTypes.add(type);
     ((ModelElementTypeImpl)type).resolveExtendingTypes(extendingTypes);
 
-    final List<ModelElementInstance> instances = new ArrayList<ModelElementInstance>();
+    List<ModelElementInstance> instances = new ArrayList<ModelElementInstance>();
     for (ModelElementType modelElementType : extendingTypes) {
       if(!modelElementType.isAbstract()) {
         instances.addAll(modelElementType.getInstances(this));

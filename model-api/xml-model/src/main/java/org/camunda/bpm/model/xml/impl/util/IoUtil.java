@@ -24,7 +24,7 @@ import java.io.*;
  * @author Sebastian Menski
  *
  */
-public class IoUtil {
+public final class IoUtil {
 
   public static void closeSilently(Closeable closeable) {
     try {
@@ -90,7 +90,7 @@ public class IoUtil {
   }
 
   /**
-   * Converts a {@link org.w3c.dom.Document} to its String representation
+   * Converts a {@link Document} to its String representation
    *
    * @param document  the XML document to convert
    */

@@ -24,11 +24,11 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
  */
 public abstract class ModelBuilder {
 
-  public abstract ModelElementTypeBuilder defineType(final Class<? extends ModelElementInstance> modelInstanceType, final String typeName);
+  public abstract ModelElementTypeBuilder defineType(Class<? extends ModelElementInstance> modelInstanceType, String typeName);
 
   public abstract Model build();
 
-  public static ModelBuilder createInstance(final String modelName) {
+  public static ModelBuilder createInstance(String modelName) {
     return new ModelBuilderImpl(modelName);
   }
 

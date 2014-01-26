@@ -20,7 +20,6 @@ import org.camunda.bpm.model.xml.impl.type.attribute.AttributeImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.reference.AttributeReference;
 import org.camunda.bpm.model.xml.type.reference.AttributeReferenceBuilder;
-import org.camunda.bpm.model.xml.type.reference.ReferenceBuilder;
 
 /**
  * A builder for a attribute model reference based on a QName
@@ -28,7 +27,7 @@ import org.camunda.bpm.model.xml.type.reference.ReferenceBuilder;
  * @author Sebastian Menski
  *
  */
-public class AttributeReferenceBuilderImpl<T extends ModelElementInstance> implements AttributeReferenceBuilder<T>, ModelBuildOperation, ReferenceBuilder<T> {
+public class AttributeReferenceBuilderImpl<T extends ModelElementInstance> implements AttributeReferenceBuilder<T>, ModelBuildOperation {
 
   private final AttributeImpl<String> referenceSourceAttribute;
   protected AttributeReferenceImpl<T> attributeReferenceImpl;

@@ -30,14 +30,14 @@ public class ChildElementBuilderImpl<T extends ModelElementInstance> extends Chi
     super(childElementTypeClass, parentElementType);
   }
 
-  public <V extends ModelElementInstance> ElementReferenceBuilder<V, T> qNameElementReference(final Class<V> referenceTargetType) {
+  public <V extends ModelElementInstance> ElementReferenceBuilder<V, T> qNameElementReference(Class<V> referenceTargetType) {
     ChildElementImpl<T> child = (ChildElementImpl<T>) build();
     QNameElementReferenceBuilderImpl<V,T> builder = new QNameElementReferenceBuilderImpl<V, T>(childElementType, referenceTargetType, child);
     setReferenceBuilder(builder);
     return builder;
   }
 
-  public <V extends ModelElementInstance> ElementReferenceBuilder<V, T> idElementReference(final Class<V> referenceTargetType) {
+  public <V extends ModelElementInstance> ElementReferenceBuilder<V, T> idElementReference(Class<V> referenceTargetType) {
     ChildElementImpl<T> child = (ChildElementImpl<T>) build();
     ElementReferenceBuilderImpl<V, T> builder = new ElementReferenceBuilderImpl<V, T>(childElementType, referenceTargetType, child);
     setReferenceBuilder(builder);

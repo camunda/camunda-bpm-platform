@@ -18,20 +18,17 @@ import org.camunda.bpm.model.xml.UnsupportedModelOperationException;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.impl.type.reference.AttributeReferenceImpl;
 import org.camunda.bpm.model.xml.impl.type.reference.QNameAttributeReferenceImpl;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.testmodel.Gender;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.camunda.bpm.model.xml.testmodel.instance.*;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -54,13 +51,13 @@ public class ReferenceTest extends TestModelTest {
   private AttributeReferenceImpl<Animal> motherReference;
   private ElementReferenceCollection<FlyingAnimal, FlightPartnerRef> flightPartnerRefsColl;
 
-  public ReferenceTest(final ModelInstance testModelInstance, final AbstractModelParser modelParser) {
+  public ReferenceTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
     super(testModelInstance, modelParser);
   }
 
   @Parameters
   public static Collection<Object[]> models() {
-    Object[][] models = new Object[][]{createModel(), parseModel(ReferenceTest.class)};
+    Object[][] models = {createModel(), parseModel(ReferenceTest.class)};
     return Arrays.asList(models);
   }
 

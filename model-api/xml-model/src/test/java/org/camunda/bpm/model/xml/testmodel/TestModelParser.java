@@ -37,12 +37,11 @@ public class TestModelParser extends AbstractModelParser {
   private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
 
   public TestModelParser() {
-    super();
     this.schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA);
     try {
       this.schema = schemaFactory.newSchema(ReflectUtil.getResource(SCHEMA_LOCATION));
     } catch (SAXException e) {
-      throw new ModelValidationException("Unable to parse schema:" + ReflectUtil.getResource(SCHEMA_LOCATION).toString(), e);
+      throw new ModelValidationException("Unable to parse schema:" + ReflectUtil.getResource(SCHEMA_LOCATION), e);
     }
   }
 

@@ -52,13 +52,13 @@ public class AnimalTest extends TestModelTest {
   private RelationshipDefinition timmyRelationship;
   private RelationshipDefinition daisyRelationship;
 
-  public AnimalTest(final ModelInstance modelInstance, final AbstractModelParser modelParser) {
+  public AnimalTest(ModelInstance modelInstance, AbstractModelParser modelParser) {
     super(modelInstance, modelParser);
   }
 
    @Parameters
    public static Collection<Object[]> models() {
-     Object[][] models = new Object[][]{createModel(), parseModel(AnimalTest.class)};
+     Object[][] models = {createModel(), parseModel(AnimalTest.class)};
      return Arrays.asList(models);
    }
 

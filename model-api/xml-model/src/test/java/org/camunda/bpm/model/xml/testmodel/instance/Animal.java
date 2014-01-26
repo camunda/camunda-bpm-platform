@@ -15,7 +15,6 @@ package org.camunda.bpm.model.xml.testmodel.instance;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.testmodel.Gender;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
@@ -32,7 +31,7 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.*;
  * @author Daniel Meyer
  *
  */
-public abstract class Animal extends ModelElementInstanceImpl implements ModelElementInstance {
+public abstract class Animal extends ModelElementInstanceImpl {
 
   private static Attribute<String> idAttr;
   private static Attribute<String> nameAttr;

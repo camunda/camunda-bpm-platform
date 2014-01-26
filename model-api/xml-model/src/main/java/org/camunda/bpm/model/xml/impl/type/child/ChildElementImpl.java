@@ -32,8 +32,7 @@ public class ChildElementImpl<T extends ModelElementInstance> extends ChildEleme
   }
 
   /** the add operation replaces the child */
-  @Override
-  void performAddOperation(ModelElementInstanceImpl modelElement, T e) {
+  private void performAddOperation(ModelElementInstanceImpl modelElement, T e) {
     modelElement.setUniqueChildElementByNameNs(e);
   }
 

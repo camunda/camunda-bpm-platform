@@ -43,8 +43,7 @@ public class ElementReferenceCollectionBuilderImpl<Target extends ModelElementIn
 
   private final Class<Source> childElementType;
   private final Class<Target> referenceTargetClass;
-
-  ElementReferenceCollectionImpl<Target, Source> elementReferenceCollectionImpl;
+  protected ElementReferenceCollectionImpl<Target, Source> elementReferenceCollectionImpl;
 
   public ElementReferenceCollectionBuilderImpl(Class<Source> childElementType, Class<Target> referenceTargetClass, ChildElementCollectionImpl<Source> collection) {
     this.childElementType = childElementType;

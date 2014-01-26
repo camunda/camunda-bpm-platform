@@ -24,7 +24,6 @@ import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.camunda.bpm.model.xml.testmodel.instance.*;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,13 +46,13 @@ public class ChildElementCollectionTest extends TestModelTest {
   private ChildElement<FlightInstructor> flightInstructorChild;
   private ChildElementCollection<FlightPartnerRef> flightPartnerRefCollection;
 
-  public ChildElementCollectionTest(final ModelInstance testModelInstance, final AbstractModelParser modelParser) {
+  public ChildElementCollectionTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
     super(testModelInstance, modelParser);
   }
 
   @Parameters
   public static Collection<Object[]> models() {
-    Object[][] models = new Object[][]{createModel(), parseModel(ChildElementCollectionTest.class)};
+    Object[][] models = {createModel(), parseModel(ChildElementCollectionTest.class)};
     return Arrays.asList(models);
   }
 

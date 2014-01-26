@@ -49,7 +49,7 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
   }
 
   @Override
-  public void setReferenceIdentifier(ModelElementInstance referenceSourceElement, String referenceIdentifier) {
+  protected void setReferenceIdentifier(ModelElementInstance referenceSourceElement, String referenceIdentifier) {
     referenceSourceElement.setTextContent(referenceIdentifier);
   }
 
@@ -232,7 +232,7 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
         else {
           Collection<Element> view = new ArrayList<Element>();
           for (Source referenceSourceElement : referenceSourceCollection.get(referenceSourceParentElement)) {
-            view.add(((ModelElementInstanceImpl) referenceSourceElement).getDomElement());
+            view.add(referenceSourceElement.getDomElement());
           }
           performClearOperation(referenceSourceParentElement, view);
         }

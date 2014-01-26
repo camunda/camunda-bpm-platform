@@ -24,7 +24,6 @@ public class ModelValidationException extends ModelException {
   private static final long serialVersionUID = 1L;
 
   public ModelValidationException() {
-    super();
   }
 
   public ModelValidationException(String message, Throwable cause) {

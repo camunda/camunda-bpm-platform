@@ -17,7 +17,6 @@ import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.impl.type.attribute.AttributeImpl;
 import org.camunda.bpm.model.xml.testmodel.Gender;
-import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.camunda.bpm.model.xml.testmodel.instance.Animal;
@@ -31,7 +30,6 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
 
@@ -41,18 +39,17 @@ import static org.junit.runners.Parameterized.Parameters;
 public class AttributeTest extends TestModelTest {
 
   private Bird tweety;
-  private ModelElementType animalType;
   private Attribute<String> idAttribute;
   private Attribute<String> nameAttribute;
   private Attribute<String> fatherAttribute;
 
-  public AttributeTest(final ModelInstance testModelInstance, final AbstractModelParser modelParser) {
+  public AttributeTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
     super(testModelInstance, modelParser);
   }
 
   @Parameters
   public static Collection<Object[]> models() {
-    Object[][] models = new Object[][]{createModel(), parseModel(AnimalTest.class)};
+    Object[][] models = {createModel(), parseModel(AnimalTest.class)};
     return Arrays.asList(models);
   }
 
@@ -74,7 +71,8 @@ public class AttributeTest extends TestModelTest {
     modelInstance = cloneModelInstance();
 
     tweety = (Bird) modelInstance.getModelElementById("tweety");
-    animalType = modelInstance.getModel().getType(Animal.class);
+
+    ModelElementType animalType = modelInstance.getModel().getType(Animal.class);
     idAttribute = (Attribute<String>) animalType.getAttribute("id");
     nameAttribute = (Attribute<String>) animalType.getAttribute("name");
     fatherAttribute = (Attribute<String>) animalType.getAttribute("father");

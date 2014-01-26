@@ -64,7 +64,7 @@ public class QName {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
+    int prime = 31;
     int result = 1;
     result = prime * result + ((localName == null) ? 0 : localName.hashCode());
     result = prime * result + ((namespaceUri == null) ? 0 : namespaceUri.hashCode());
@@ -73,23 +73,30 @@ public class QName {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     QName other = (QName) obj;
     if (localName == null) {
-      if (other.localName != null)
+      if (other.localName != null) {
         return false;
-    } else if (!localName.equals(other.localName))
+      }
+    } else if (!localName.equals(other.localName)) {
       return false;
+    }
     if (namespaceUri == null) {
-      if (other.namespaceUri != null)
+      if (other.namespaceUri != null) {
         return false;
-    } else if (!namespaceUri.equals(other.namespaceUri))
+      }
+    } else if (!namespaceUri.equals(other.namespaceUri)) {
       return false;
+    }
     return true;
   }
 

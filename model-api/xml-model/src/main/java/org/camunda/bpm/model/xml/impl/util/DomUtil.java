@@ -21,7 +21,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelParseException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -39,7 +38,7 @@ import org.xml.sax.SAXException;
  * @author Sebastian Menski
  *
  */
-public class DomUtil {
+public final class DomUtil {
 
   /**
    * A {@link NodeListFilter} allows to filter a {@link NodeList},
@@ -47,7 +46,7 @@ public class DomUtil {
    *
    * @see DomUtil#filterNodeList(NodeList, NodeListFilter)
    */
-  public static interface NodeListFilter<T extends Node> {
+  public interface NodeListFilter<T extends Node> {
 
     /**
      * Test if node matches the filter
@@ -55,7 +54,7 @@ public class DomUtil {
      * @param node the node to match
      * @return true if the filter does match the node, false otherwise
      */
-    public boolean matches(Node node);
+    boolean matches(Node node);
 
   }
 
@@ -77,8 +76,8 @@ public class DomUtil {
    */
   public static class ElementByNameListFilter extends ElementNodeListFilter {
 
-    final String localName;
-    final String namespaceUri;
+    private final String localName;
+    private final String namespaceUri;
 
     /**
      * @param localName the local name to filter for
@@ -100,8 +99,8 @@ public class DomUtil {
 
   public static class ElementByTypeListFilter extends ElementNodeListFilter {
 
-    final Class<?> type;
-    final ModelInstanceImpl model;
+    private final Class<?> type;
+    private final ModelInstanceImpl model;
 
     public ElementByTypeListFilter(Class<?> type, ModelInstanceImpl modelInstance) {
       this.type =  type;

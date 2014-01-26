@@ -57,7 +57,7 @@ public interface ChildElementCollection<T extends ModelElementInstance> {
    * Get the model element type of the elements contained in this collection
    *
    * @param model  the model of the element
-   * @return the containing {@link org.camunda.bpm.model.xml.type.ModelElementType}
+   * @return the containing {@link ModelElementType}
    */
   ModelElementType getChildElementType(Model model);
 

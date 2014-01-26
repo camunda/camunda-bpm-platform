@@ -36,7 +36,7 @@ public abstract class TestModelTest {
   // cloned model instance for every test method (see subclasses)
   protected ModelInstance modelInstance;
 
-  public TestModelTest(final ModelInstance testModelInstance, final AbstractModelParser modelParser) {
+  public TestModelTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
     this.testModelInstance = testModelInstance;
     this.modelParser = modelParser;
   }
@@ -53,7 +53,7 @@ public abstract class TestModelTest {
     return new Object[]{modelInstance, modelParser};
   }
 
-  public static Bird createBird(final ModelInstance modelInstance, final String id, Gender gender) {
+  public static Bird createBird(ModelInstance modelInstance, String id, Gender gender) {
     Bird bird = modelInstance.newInstance(Bird.class);
     bird.setId(id);
     bird.setGender(gender);
@@ -62,20 +62,20 @@ public abstract class TestModelTest {
     return bird;
   }
 
-  protected static RelationshipDefinition createRelationshipDefinition(final ModelInstance modelInstance, final Animal animalInRelationshipWith, final Class<? extends RelationshipDefinition> relationshipDefinitionClass) {
+  protected static RelationshipDefinition createRelationshipDefinition(ModelInstance modelInstance, Animal animalInRelationshipWith, Class<? extends RelationshipDefinition> relationshipDefinitionClass) {
     RelationshipDefinition relationshipDefinition = modelInstance.newInstance(relationshipDefinitionClass);
     relationshipDefinition.setId("relationship-" + animalInRelationshipWith.getId());
     relationshipDefinition.setAnimal(animalInRelationshipWith);
     return relationshipDefinition;
   }
 
-  public static void addRelationshipDefinition(final Animal animalWithRelationship, final RelationshipDefinition relationshipDefinition) {
+  public static void addRelationshipDefinition(Animal animalWithRelationship, RelationshipDefinition relationshipDefinition) {
     Animal animalInRelationshipWith = relationshipDefinition.getAnimal();
     relationshipDefinition.setId(animalWithRelationship.getId() + "-" + animalInRelationshipWith.getId());
     animalWithRelationship.getRelationshipDefinitions().add(relationshipDefinition);
   }
 
-  public static Egg createEgg(final ModelInstance modelInstance, final String id) {
+  public static Egg createEgg(ModelInstance modelInstance, String id) {
     Egg egg = modelInstance.newInstance(Egg.class);
     egg.setId(id);
     return egg;
@@ -83,7 +83,7 @@ public abstract class TestModelTest {
 
   @After
   public void validateModel() {
-    Document document = ((ModelInstanceImpl) modelInstance).getDocument();
+    Document document = modelInstance.getDocument();
     modelParser.validateModel(document);
   }
 }

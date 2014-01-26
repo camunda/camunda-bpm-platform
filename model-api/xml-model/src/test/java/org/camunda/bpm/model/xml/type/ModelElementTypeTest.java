@@ -16,12 +16,8 @@ package org.camunda.bpm.model.xml.type;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.util.ModelTypeException;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.testmodel.TestModel;
-import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.instance.*;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

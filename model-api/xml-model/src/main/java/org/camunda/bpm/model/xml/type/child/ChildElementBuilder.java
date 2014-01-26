@@ -25,6 +25,6 @@ public interface ChildElementBuilder<T extends ModelElementInstance> extends Chi
 
   <V extends ModelElementInstance> ElementReferenceBuilder<V, T> idElementReference(Class<V> referenceTargetType);
 
-  public ChildElement<T> build();
+  ChildElement<T> build();
 
 }

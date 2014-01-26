@@ -31,7 +31,7 @@ public interface Model {
    *
    * @return the list of all defined element types of this model
    */
-  public Collection<ModelElementType> getTypes();
+  Collection<ModelElementType> getTypes();
 
   /**
    * Gets the defined {@link ModelElementType} of a {@link ModelElementInstance}.
@@ -39,7 +39,7 @@ public interface Model {
    * @param instanceClass  the instance class to find the type for
    * @return the corresponding element type or null if no type is defined for the instance
    */
-  public ModelElementType getType(Class<? extends ModelElementInstance> instanceClass);
+  ModelElementType getType(Class<? extends ModelElementInstance> instanceClass);
 
   /**
    * Gets the defined {@link ModelElementType} for a type by its name.
@@ -47,7 +47,7 @@ public interface Model {
    * @param typeName  the name of the type
    * @return the element type or null if no type is defined for the name
    */
-  public ModelElementType getTypeForName(String typeName);
+  ModelElementType getTypeForName(String typeName);
 
   /**
    * Gets the defined {@link ModelElementType} for a type by its name and namespace URI.
@@ -56,7 +56,7 @@ public interface Model {
    * @param namespaceUri  the namespace URI for the type
    * @return the element type or null if no type is defined for the name and namespace URI
    */
-  public ModelElementType getTypeForName(String typeName, String namespaceUri);
+  ModelElementType getTypeForName(String typeName, String namespaceUri);
 
   /**
    * Returns the model name, which is the identifier of this model.

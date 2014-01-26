@@ -32,12 +32,12 @@ public class ModelBuilderImpl extends ModelBuilder {
   private final List<ModelElementTypeBuilderImpl> typeBuilders = new ArrayList<ModelElementTypeBuilderImpl>();
   private final ModelImpl model;
 
-  public ModelBuilderImpl(final String modelName) {
+  public ModelBuilderImpl(String modelName) {
     model = new ModelImpl(modelName);
   }
 
-  public ModelElementTypeBuilder defineType(final Class<? extends ModelElementInstance> modelInstanceType, final String typeName) {
-    final ModelElementTypeBuilderImpl typeBuilder = new ModelElementTypeBuilderImpl(modelInstanceType, typeName, model);
+  public ModelElementTypeBuilder defineType(Class<? extends ModelElementInstance> modelInstanceType, String typeName) {
+    ModelElementTypeBuilderImpl typeBuilder = new ModelElementTypeBuilderImpl(modelInstanceType, typeName, model);
     typeBuilders.add(typeBuilder);
     return typeBuilder;
   }

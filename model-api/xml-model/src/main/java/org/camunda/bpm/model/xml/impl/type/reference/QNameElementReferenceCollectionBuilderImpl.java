@@ -13,10 +13,8 @@
 
 package org.camunda.bpm.model.xml.impl.type.reference;
 
-import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.type.child.ChildElementCollectionImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.reference.ElementReference;
 
 /**
  * @author Sebastian Menski

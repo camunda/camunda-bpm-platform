@@ -24,7 +24,6 @@ public class ModelReferenceException extends ModelException {
   private static final long serialVersionUID = 1L;
 
   public ModelReferenceException() {
-    super();
   }
 
   public ModelReferenceException(String message, Throwable cause) {

@@ -13,21 +13,17 @@
 
 package org.camunda.bpm.model.xml.impl.type.reference;
 
-import org.camunda.bpm.model.xml.Model;
-import org.camunda.bpm.model.xml.impl.type.child.ChildElementCollectionImpl;
 import org.camunda.bpm.model.xml.impl.type.child.ChildElementImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.reference.ElementReference;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceBuilder;
-import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 
 /**
  * @author Sebastian Menski
  */
 public class ElementReferenceBuilderImpl<Target extends ModelElementInstance, Source extends ModelElementInstance> extends ElementReferenceCollectionBuilderImpl<Target,Source> implements ElementReferenceBuilder<Target, Source> {
 
-  public ElementReferenceBuilderImpl(final Class<Source> childElementType, final Class<Target> referenceTargetClass, final ChildElementImpl<Source> child) {
+  public ElementReferenceBuilderImpl(Class<Source> childElementType, Class<Target> referenceTargetClass, ChildElementImpl<Source> child) {
     super(childElementType, referenceTargetClass, child);
     this.elementReferenceCollectionImpl = new ElementReferenceImpl<Target, Source>(child);
   }

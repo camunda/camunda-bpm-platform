@@ -39,7 +39,7 @@ public class FlightInstructor extends ModelElementInstanceImpl {
     typeBuilder.build();
   }
 
-  public FlightInstructor(final ModelTypeInstanceContext instanceContext) {
+  public FlightInstructor(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
