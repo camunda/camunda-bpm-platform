@@ -144,6 +144,13 @@ public class ModelElementTypeImpl implements ModelElementType {
     return Collections.unmodifiableCollection(extendingTypes);
   }
 
+  public Collection<ModelElementType> getAllExtendingTypes() {
+    HashSet<ModelElementType> extendingTypes = new HashSet<ModelElementType>();
+    extendingTypes.add(this);
+    resolveExtendingTypes(extendingTypes);
+    return extendingTypes;
+  }
+
   /**
    * Resolve all types recursively which are extending this type
    *

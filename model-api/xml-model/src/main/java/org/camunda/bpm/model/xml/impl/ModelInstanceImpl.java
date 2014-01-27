@@ -97,9 +97,7 @@ public class ModelInstanceImpl implements ModelInstance {
   }
 
   public Collection<ModelElementInstance> getModelElementsByType(ModelElementType type) {
-    HashSet<ModelElementType> extendingTypes = new HashSet<ModelElementType>();
-    extendingTypes.add(type);
-    ((ModelElementTypeImpl)type).resolveExtendingTypes(extendingTypes);
+    Collection<ModelElementType> extendingTypes = type.getAllExtendingTypes();
 
     List<ModelElementInstance> instances = new ArrayList<ModelElementInstance>();
     for (ModelElementType modelElementType : extendingTypes) {
