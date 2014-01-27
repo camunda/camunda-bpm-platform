@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,7 +37,7 @@ import java.util.List;
  * @author Daniel Meyer
  *
  */
-public abstract class ModelElementInstanceImpl implements ModelElementInstance {
+public class ModelElementInstanceImpl implements ModelElementInstance {
 
   /** the containing model instance */
   protected final ModelInstanceImpl modelInstance;
@@ -139,14 +140,7 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
     return DomUtil.getTextContent(domElement);
   }
 
-  /**
-   * Returns a child element with the given name or 'null' if no such element exists
-   *
-   * @param elementName the local name of the element
-   * @param namespaceUri the namespace of the element
-   * @return the child element or null.
-   */
-  protected ModelElementInstance getUniqueChildElementByNameNs(String elementName, String namespaceUri) {
+  public ModelElementInstance getUniqueChildElementByNameNs(String elementName, String namespaceUri) {
     NodeList childNodes = domElement.getChildNodes();
     List<Element> childElements = DomUtil.filterNodeListByName(childNodes, elementName, namespaceUri);
 
@@ -157,12 +151,6 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
     }
   }
 
-  /**
-   * Returns a child element with the given type
-   *
-   * @param elementType  the type of the element
-   * @return the child element or null
-   */
   public ModelElementInstance getUniqueChildElementByType(Class<?> elementType) {
     NodeList childNodes = domElement.getChildNodes();
     List<Element> childElements = DomUtil.filterNodeListByType(childNodes, elementType, modelInstance);
@@ -175,12 +163,6 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
     }
   }
 
-  /**
-   * Adds or replaces a child element by name. Replaces an existing Child Element with the same name
-   * or adds a new child if no such element exists.
-   *
-   * @param newChild the child to add
-   */
   public void setUniqueChildElementByNameNs(ModelElementInstance newChild) {
     ModelUtil.ensureInstanceOf(newChild, ModelElementInstanceImpl.class);
     ModelElementInstanceImpl newChildElement = (ModelElementInstanceImpl) newChild;
@@ -190,22 +172,16 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
     if(existingChild == null) {
       addChildElement(newChild);
     } else {
-      replaceChildElement((ModelElementInstanceImpl) existingChild, newChildElement);
+      replaceChildElement(existingChild, newChildElement);
     }
   }
 
-  /**
-   * Replace an existing child element with a new child element. Changes the underlying DOM element tree.
-   *
-   * @param existingChild the child element to replace
-   * @param newChild the new child element
-   */
-  protected void replaceChildElement(ModelElementInstanceImpl existingChild, ModelElementInstanceImpl newChild) {
+  public void replaceChildElement(ModelElementInstance existingChild, ModelElementInstance newChild) {
     Element existingChildDomElement = existingChild.getDomElement();
     Element newChildDomElement = newChild.getDomElement();
 
     // unlink (remove all references) of child elements
-    existingChild.unlinkAllChildReferences();
+    ((ModelElementInstanceImpl) existingChild).unlinkAllChildReferences();
 
     // update incoming references from old to new child element
     updateIncomingReferences(existingChild, newChild);
@@ -215,7 +191,7 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
   }
 
   @SuppressWarnings("unchecked")
-  private void updateIncomingReferences(ModelElementInstanceImpl oldInstance, ModelElementInstanceImpl newInstance) {
+  private void updateIncomingReferences(ModelElementInstance oldInstance, ModelElementInstance newInstance) {
     String oldId = oldInstance.getAttributeValue("id");
     String newId = newInstance.getAttributeValue("id");
 
@@ -237,45 +213,34 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
   public void replaceWithElement(ModelElementInstance newElement) {
     ModelElementInstanceImpl parentElement = (ModelElementInstanceImpl) getParentElement();
     if (parentElement != null) {
-      parentElement.replaceChildElement(this, (ModelElementInstanceImpl) newElement);
+      parentElement.replaceChildElement(this, newElement);
     }
     else {
       throw new ModelException("Unable to remove replace without parent");
     }
   }
 
-  /**
-   * Appends a new child element to the children of this element. Updates the underlying DOM element tree.
-   *
-   * @param newChild the new child element
-   */
   public void addChildElement(ModelElementInstance newChild) {
     ModelUtil.ensureInstanceOf(newChild, ModelElementInstanceImpl.class);
     ModelElementInstance elementToInsertAfter = findElementToInsertAfter(newChild);
     insertElementAfter(newChild, elementToInsertAfter);
   }
 
-  /**
-   * Removes the child element from this.
-   *
-   * @param child  the child element to remove
-   * @return true if the child element could be removed
-   */
-  public boolean removeChildElement(ModelElementInstanceImpl child) {
-    child.unlinkAllReferences();
-    child.unlinkAllChildReferences();
+  public boolean removeChildElement(ModelElementInstance child) {
+    ModelElementInstanceImpl childImpl = (ModelElementInstanceImpl) child;
+    childImpl.unlinkAllReferences();
+    childImpl.unlinkAllChildReferences();
     return DomUtil.removeChild(domElement, child.getDomElement());
   }
 
-  /**
-   * Return all child elements of a given type
-   *
-   * @param childElementType the child element type to search for
-   * @return a collection of elements of the given type
-   */
-  private Collection<ModelElementInstance> getChildElementsByType(ModelElementType childElementType) {
+  public Collection<ModelElementInstance> getChildElementsByType(ModelElementType childElementType) {
+    List<ModelElementInstance> instances = new ArrayList<ModelElementInstance>();
+    for (ModelElementType extendingType : childElementType.getExtendingTypes()) {
+      instances.addAll(getChildElementsByType(extendingType));
+    }
     List<Element> elements = DomUtil.filterNodeListByName(DomUtil.getChildNodes(domElement), childElementType.getTypeName(), childElementType.getTypeNamespace());
-    return ModelUtil.getModelElementCollection(elements, modelInstance);
+    instances.addAll(ModelUtil.getModelElementCollection(elements, modelInstance));
+    return instances;
   }
 
   /**
@@ -303,13 +268,7 @@ public abstract class ModelElementInstanceImpl implements ModelElementInstance {
     return insertAfterElement;
   }
 
-  /**
-   * Inserts the new element after the given element or at the beginning if the given element is null.
-   *
-   * @param elementToInsert  the new element to insert
-   * @param insertAfterElement  the element to insert after or null
-   */
-  private void insertElementAfter(ModelElementInstance elementToInsert, ModelElementInstance insertAfterElement) {
+  public void insertElementAfter(ModelElementInstance elementToInsert, ModelElementInstance insertAfterElement) {
     Element domElementToInsert = elementToInsert.getDomElement();
     if (insertAfterElement == null) {
       Node firstChild = domElement.getFirstChild();

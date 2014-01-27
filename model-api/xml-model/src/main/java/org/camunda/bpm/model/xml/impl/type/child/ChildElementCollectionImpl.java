@@ -124,7 +124,7 @@ public class ChildElementCollectionImpl<T extends ModelElementInstance> implemen
   private void performClearOperation(ModelElementInstanceImpl modelElement, Collection<Element> elementsToRemove) {
     Collection<ModelElementInstance> modelElements = ModelUtil.getModelElementCollection(elementsToRemove, modelElement.getModelInstance());
     for (ModelElementInstance element : modelElements) {
-      modelElement.removeChildElement((ModelElementInstanceImpl) element);
+      modelElement.removeChildElement(element);
     }
   }
 

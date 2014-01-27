@@ -12,10 +12,13 @@
  */
 package org.camunda.bpm.model.xml.instance;
 
+import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.w3c.dom.Element;
+
+import java.util.Collection;
 
 /**
  * An instance of a {@link ModelElementType}
@@ -132,4 +135,71 @@ public interface ModelElementInstance {
    * @param newElement  the new element to replace with
    */
   void replaceWithElement(ModelElementInstance newElement);
+
+  /**
+   * Returns a child element with the given name or 'null' if no such element exists
+   *
+   * @param elementName the local name of the element
+   * @param namespaceUri the namespace of the element
+   * @return the child element or null.
+   */
+  ModelElementInstance getUniqueChildElementByNameNs(String elementName, String namespaceUri);
+
+  /**
+   * Returns a child element with the given type
+   *
+   * @param elementType  the type of the element
+   * @return the child element or null
+   */
+  ModelElementInstance getUniqueChildElementByType(Class<?> elementType);
+
+  /**
+   * Adds or replaces a child element by name. Replaces an existing Child Element with the same name
+   * or adds a new child if no such element exists.
+   *
+   * @param newChild the child to add
+   */
+  void setUniqueChildElementByNameNs(ModelElementInstance newChild);
+
+  /**
+   * Replace an existing child element with a new child element. Changes the underlying DOM element tree.
+   *
+   * @param existingChild the child element to replace
+   * @param newChild the new child element
+   */
+  void replaceChildElement(ModelElementInstance existingChild, ModelElementInstance newChild);
+
+  /**
+   * Adds a new child element to the children of this element. The child
+   * is inserted at the correct position of the allowed child types.
+   * Updates the underlying DOM element tree.
+   *
+   * @param newChild the new child element
+   * @throws ModelException if the new child type is not an allowed child type
+   */
+  void addChildElement(ModelElementInstance newChild);
+
+  /**
+   * Removes the child element from this.
+   *
+   * @param child  the child element to remove
+   * @return true if the child element could be removed
+   */
+  boolean removeChildElement(ModelElementInstance child);
+
+  /**
+   * Return all child elements of a given type
+   *
+   * @param childElementType the child element type to search for
+   * @return a collection of elements of the given type
+   */
+  Collection<ModelElementInstance> getChildElementsByType(ModelElementType childElementType);
+
+  /**
+   * Inserts the new element after the given element or at the beginning if the given element is null.
+   *
+   * @param elementToInsert  the new element to insert
+   * @param insertAfterElement  the element to insert after or null to insert at first position
+   */
+  void insertElementAfter(ModelElementInstance elementToInsert, ModelElementInstance insertAfterElement);
 }
