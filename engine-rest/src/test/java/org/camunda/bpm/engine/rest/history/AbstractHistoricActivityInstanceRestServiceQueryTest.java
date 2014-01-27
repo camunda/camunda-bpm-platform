@@ -466,9 +466,15 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
 
   private void verifyBooleanParameterQueryInvocations() {
     Map<String, Boolean> booleanParams = getCompleteBooleanQueryParameters();
+    Boolean canceled = booleanParams.get("canceled");
+    Boolean completeScope = booleanParams.get("completeScope");
 
-    verify(mockedQuery).canceled();
-    verify(mockedQuery).completeScope();
+    if (canceled != null && canceled) {
+      verify(mockedQuery).canceled();
+    }
+    if (completeScope != null && completeScope) {
+      verify(mockedQuery).completeScope();
+    }
 
     verify(mockedQuery).list();
   }
