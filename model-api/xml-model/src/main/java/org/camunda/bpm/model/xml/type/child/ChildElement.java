@@ -44,4 +44,11 @@ public interface ChildElement<T extends ModelElementInstance> extends ChildEleme
    */
   T getChild(ModelElementInstance element);
 
+  /**
+   * Removes the child element.
+   *
+   * @param element  the parent element of the child element
+   * @return true if the child was remove otherwise false
+   */
+  boolean removeChild(ModelElementInstance element);
 }

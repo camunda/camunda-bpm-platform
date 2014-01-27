@@ -150,6 +150,18 @@ public class ChildElementCollectionTest extends TestModelTest {
   }
 
   @Test
+  public void testRemoveChildElements() {
+    assertThat(flightInstructorChild.getChild(tweety)).isNotNull();
+    assertThat(flightPartnerRefCollection.get(tweety)).isNotEmpty();
+
+    flightInstructorChild.removeChild(tweety);
+    flightPartnerRefCollection.get(tweety).clear();
+
+    assertThat(flightInstructorChild.getChild(tweety)).isNull();
+    assertThat(flightPartnerRefCollection.get(tweety)).isEmpty();
+  }
+
+  @Test
   public void testChildElementsCollection() {
     Collection<FlightPartnerRef> flightPartnerRefs = flightPartnerRefCollection.get(tweety);
 

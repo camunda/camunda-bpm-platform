@@ -53,4 +53,9 @@ public class ChildElementImpl<T extends ModelElementInstance> extends ChildEleme
     }
   }
 
+  public boolean removeChild(ModelElementInstance element) {
+    ModelElementInstanceImpl childElement = (ModelElementInstanceImpl) getChild(element);
+    ModelElementInstanceImpl elementInstanceImpl = (ModelElementInstanceImpl) element;
+    return elementInstanceImpl.removeChildElement(childElement);
+  }
 }
