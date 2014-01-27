@@ -23,10 +23,11 @@ import org.camunda.bpm.model.xml.testmodel.instance.*;
 public final class TestModel {
 
   private static Model model;
+  private static ModelBuilder modelBuilder;
 
   public static Model getTestModel() {
     if(model == null) {
-      ModelBuilder modelBuilder = ModelBuilder.createInstance(TestModelConstants.MODEL_NAME);
+      ModelBuilder modelBuilder = getModelBuilder();
 
       Animals.registerType(modelBuilder);
       Animal.registerType(modelBuilder);
@@ -45,6 +46,13 @@ public final class TestModel {
     }
 
     return model;
+  }
+
+  public static ModelBuilder getModelBuilder() {
+    if (modelBuilder == null) {
+      modelBuilder = ModelBuilder.createInstance(TestModelConstants.MODEL_NAME);
+    }
+    return modelBuilder;
   }
 
 }

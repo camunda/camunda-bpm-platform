@@ -54,7 +54,7 @@ public class TestModelParser extends AbstractModelParser {
 
   @Override
   protected ModelInstance createModelInstance(Document document) {
-    return new ModelInstanceImpl((ModelImpl) TestModel.getTestModel(), document);
+    return new ModelInstanceImpl((ModelImpl) TestModel.getTestModel(), TestModel.getModelBuilder(), document);
   }
 
 }

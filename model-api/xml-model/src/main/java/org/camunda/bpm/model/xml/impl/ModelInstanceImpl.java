@@ -13,10 +13,10 @@
 package org.camunda.bpm.model.xml.impl;
 
 import org.camunda.bpm.model.xml.Model;
+import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
-import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -26,7 +26,6 @@ import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -39,10 +38,12 @@ import java.util.List;
 public class ModelInstanceImpl implements ModelInstance {
 
   private final Document document;
-  private final ModelImpl model;
+  private ModelImpl model;
+  private final ModelBuilder modelBuilder;
 
-  public ModelInstanceImpl(ModelImpl model, Document document) {
+  public ModelInstanceImpl(ModelImpl model, ModelBuilder modelBuilder, Document document) {
     this.model = model;
+    this.modelBuilder = modelBuilder;
     this.document = document;
   }
 
@@ -83,6 +84,12 @@ public class ModelInstanceImpl implements ModelInstance {
     return model;
   }
 
+  public ModelElementType registerGenericType(String localName, String namespaceUri) {
+    ModelElementType elementType = modelBuilder.defineGenericType(localName, namespaceUri);
+    model = (ModelImpl) modelBuilder.build();
+    return elementType;
+  }
+
   public ModelElementInstance getModelElementById(String id) {
     if (id == null) {
       return null;
@@ -115,6 +122,6 @@ public class ModelInstanceImpl implements ModelInstance {
    * @return the new model instance
    */
   public Object clone() {
-    return new ModelInstanceImpl(model, (Document) document.cloneNode(true));
+    return new ModelInstanceImpl(model, modelBuilder, (Document) document.cloneNode(true));
   }
 }

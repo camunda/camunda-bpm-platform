@@ -12,11 +12,7 @@
  */
 package org.camunda.bpm.model.xml.impl.type;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelException;
@@ -122,7 +118,7 @@ public class ModelElementTypeImpl implements ModelElementType {
     if (this.baseType == null) {
       this.baseType = baseType;
     }
-    else {
+    else if (this.baseType != baseType) {
       throw new ModelException("Type can not have multiple base types. " + this.getClass() + " already extends type " + this.baseType.getClass()
           + " and can not also extend type " + baseType.getClass());
     }

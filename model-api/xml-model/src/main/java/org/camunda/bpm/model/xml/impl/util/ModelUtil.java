@@ -51,7 +51,7 @@ public final class ModelUtil {
 
       ModelElementTypeImpl modelType = (ModelElementTypeImpl) modelInstance.getModel().getTypeForName(localName, namespaceUri);
       if(modelType == null) {
-        throw new ModelException("Cannot create model type instance for type "+getQName(localName, namespaceUri)+" no instance type registered.");
+        modelType = (ModelElementTypeImpl) modelInstance.registerGenericType(localName, namespaceUri);
       }
       modelElement = modelType.newInstance(modelInstance, domElement);
       domElement.setUserData(MODEL_ELEMENT_KEY, modelElement, null);

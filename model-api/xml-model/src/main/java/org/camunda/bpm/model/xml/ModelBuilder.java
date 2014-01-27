@@ -14,6 +14,7 @@ package org.camunda.bpm.model.xml;
 
 import org.camunda.bpm.model.xml.impl.ModelBuilderImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 
 /**
@@ -25,6 +26,8 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 public abstract class ModelBuilder {
 
   public abstract ModelElementTypeBuilder defineType(Class<? extends ModelElementInstance> modelInstanceType, String typeName);
+
+  public abstract ModelElementType defineGenericType(String typeName, String typeNamespaceUri);
 
   public abstract Model build();
 
