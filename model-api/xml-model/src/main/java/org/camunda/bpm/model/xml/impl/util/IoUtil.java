@@ -98,11 +98,10 @@ public final class IoUtil {
     StringWriter stringWriter = new StringWriter();
     try {
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      transformerFactory.setAttribute("indent-number", new Integer(2));
+      transformerFactory.setAttribute("indent-number", 2);
       Transformer transformer = transformerFactory.newTransformer();
       transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      //transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
       transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
     } catch (TransformerConfigurationException e) {
       e.printStackTrace();
