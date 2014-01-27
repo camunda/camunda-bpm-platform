@@ -51,6 +51,19 @@
     </complexContent>
   </complexType>
 
+  <element name="unknownAnimal" type="tns:tUnknownAnimal" substitutionGroup="tns:animal"/>
+  <complexType name="tUnknownAnimal" mixed="true">
+    <complexContent>
+      <extension base="tns:tAnimal">
+        <sequence>
+          <element ref="tns:unknownAnimal" minOccurs="0" maxOccurs="unbounded" />
+        </sequence>
+        <attribute name="species" type="string" use="required"/>
+        <attribute name="famous" type="boolean" default="false"/>
+      </extension>
+    </complexContent>
+  </complexType>
+
   <simpleType name="tGender">
     <restriction base="string">
       <enumeration value="Unknown"/>
