@@ -70,7 +70,7 @@ public class AnimalTest extends TestModelTest {
     modelInstance.setDocumentElement(animals);
 
     // add a tns namespace prefix for QName testing
-    animals.setAttributeValueNs("xmlns:tns", XMLConstants.XMLNS_ATTRIBUTE_NS_URI, TestModelConstants.MODEL_NAMESPACE, false);
+    animals.setAttributeValueNs("xmlns:tns", XMLConstants.XMLNS_ATTRIBUTE_NS_URI, TestModelConstants.MODEL_NAMESPACE);
 
     Animal tweety = createBird(modelInstance, "tweety", Gender.Female);
     Animal hedwig = createBird(modelInstance, "hedwig", Gender.Male);
@@ -146,7 +146,7 @@ public class AnimalTest extends TestModelTest {
 
   @Test
   public void testSetNameAttributeByAttributeName() {
-    tweety.setAttributeValue("name", "daisy", false);
+    tweety.setAttributeValue("name", "daisy");
     assertThat(tweety.getName()).isEqualTo("daisy");
   }
 
@@ -164,13 +164,13 @@ public class AnimalTest extends TestModelTest {
 
   @Test
   public void testSetFatherAttributeByAttributeName() {
-    tweety.setAttributeValue("father", timmy.getId(), false);
+    tweety.setAttributeValue("father", timmy.getId());
     assertThat(tweety.getFather()).isEqualTo(timmy);
   }
 
   @Test
   public void testSetFatherAttributeByAttributeNameWithNamespace() {
-    tweety.setAttributeValue("father", "tns:hedwig", false);
+    tweety.setAttributeValue("father", "tns:hedwig");
     assertThat(tweety.getFather()).isEqualTo(hedwig);
   }
 
@@ -206,7 +206,7 @@ public class AnimalTest extends TestModelTest {
 
   @Test
   public void testSetMotherAttributeByAttributeName() {
-    tweety.setAttributeValue("mother", fiffy.getId(), false);
+    tweety.setAttributeValue("mother", fiffy.getId());
     assertThat(tweety.getMother()).isEqualTo(fiffy);
   }
 
@@ -242,7 +242,7 @@ public class AnimalTest extends TestModelTest {
 
   @Test
   public void testSetIsEndangeredAttributeByAttributeName() {
-    tweety.setAttributeValue("isEndangered", "false", false);
+    tweety.setAttributeValue("isEndangered", "false");
     assertThat(tweety.isEndangered()).isFalse();
   }
 
@@ -261,7 +261,7 @@ public class AnimalTest extends TestModelTest {
 
   @Test
   public void testSetGenderAttributeByAttributeName() {
-    tweety.setAttributeValue("gender", Gender.Unknown.toString(), false);
+    tweety.setAttributeValue("gender", Gender.Unknown.toString());
     assertThat(tweety.getGender()).isEqualTo(Gender.Unknown);
   }
 
@@ -291,7 +291,7 @@ public class AnimalTest extends TestModelTest {
 
   @Test
   public void testSetAgeAttributeByAttributeName() {
-    tweety.setAttributeValue("age", "23", false);
+    tweety.setAttributeValue("age", "23");
     assertThat(tweety.getAge()).isEqualTo(23);
   }
 

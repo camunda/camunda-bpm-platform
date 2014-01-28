@@ -78,6 +78,10 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
     return DomUtil.getAttributeValue(attributeName, domElement);
   }
 
+  public void setAttributeValue(String attributeName, String xmlValue) {
+    setAttributeValue(attributeName, xmlValue, false);
+  }
+
   public void setAttributeValue(String attributeName, String xmlValue, boolean isIdAttribute) {
     String oldValue = getAttributeValue(attributeName);
     DomUtil.setAttributeValue(attributeName, xmlValue, domElement);
@@ -103,6 +107,10 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
 
   public String getAttributeValueNs(String attributeName, String namespaceUri) {
     return DomUtil.getAttributeValueNs(attributeName, namespaceUri, domElement);
+  }
+
+  public void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue) {
+    setAttributeValueNs(attributeName, namespaceUri, xmlValue, false);
   }
 
   public void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue, boolean isIdAttribute) {

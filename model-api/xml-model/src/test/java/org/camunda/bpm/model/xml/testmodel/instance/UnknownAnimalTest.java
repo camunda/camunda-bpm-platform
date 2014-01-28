@@ -100,8 +100,8 @@ public class UnknownAnimalTest {
     ModelElementInstance unknownAnimal = modelInstance.newInstance(unknownAnimalType);
     assertThat(unknownAnimal).isNotNull();
     unknownAnimal.setAttributeValue("id", "new-animal", true);
-    unknownAnimal.setAttributeValue("gender", "Unknown", false);
-    unknownAnimal.setAttributeValue("species", "unknown", false);
+    unknownAnimal.setAttributeValue("gender", "Unknown");
+    unknownAnimal.setAttributeValue("species", "unknown");
 
     ModelElementInstance animals = modelInstance.getModelElementsByType(animalsType).iterator().next();
     List<ModelElementInstance> childElementsByType = new ArrayList<ModelElementInstance>(animals.getChildElementsByType(animalType));
@@ -114,7 +114,7 @@ public class UnknownAnimalTest {
     assertThat(flipper.getAttributeValue("famous")).isEqualTo("true");
 
     assertThat(wanda.getAttributeValue("famous")).isNotEqualTo("true");
-    wanda.setAttributeValue("famous", "true", false);
+    wanda.setAttributeValue("famous", "true");
     assertThat(wanda.getAttributeValue("famous")).isEqualTo("true");
   }
 
@@ -122,7 +122,7 @@ public class UnknownAnimalTest {
   public void testAddRelationshipDefinitionToUnknownAnimal() {
     RelationshipDefinition friendRelationshipDefinition = modelInstance.newInstance(FriendRelationshipDefinition.class);
     friendRelationshipDefinition.setId("friend-relationship");
-    friendRelationshipDefinition.setAttributeValue("animalRef", flipper.getAttributeValue("id"), false);
+    friendRelationshipDefinition.setAttributeValue("animalRef", flipper.getAttributeValue("id"));
 
     try {
       wanda.addChildElement(friendRelationshipDefinition);
@@ -161,8 +161,8 @@ public class UnknownAnimalTest {
   public void testReplaceChildOfUnknownAnimal() {
     ModelElementInstance yogi = modelInstance.newInstance(flipper.getElementType());
     yogi.setAttributeValue("id", "yogi-bear", true);
-    yogi.setAttributeValue("gender", "Male", false);
-    yogi.setAttributeValue("species", "bear", false);
+    yogi.setAttributeValue("gender", "Male");
+    yogi.setAttributeValue("species", "bear");
 
     assertThat(wanda.getChildElementsByType(flipper.getElementType())).isEmpty();
     wanda.insertElementAfter(flipper, null);

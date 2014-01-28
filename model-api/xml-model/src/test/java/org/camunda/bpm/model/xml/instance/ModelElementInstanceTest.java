@@ -85,7 +85,7 @@ public class ModelElementInstanceTest extends TestModelTest {
   @Test
   public void testAttribute() {
     String tweetyName = tweety.getId() + "-name";
-    tweety.setAttributeValue("name", tweetyName, false);
+    tweety.setAttributeValue("name", tweetyName);
     assertThat(tweety.getAttributeValue("name")).isEqualTo(tweetyName);
     tweety.removeAttribute("name");
     assertThat(tweety.getAttributeValue("name")).isNull();
@@ -94,7 +94,7 @@ public class ModelElementInstanceTest extends TestModelTest {
   @Test
   public void testAttributeWithNamespace() {
     String tweetyName = tweety.getId() + "-name";
-    tweety.setAttributeValueNs("name", MODEL_NAMESPACE, tweetyName, false);
+    tweety.setAttributeValueNs("name", MODEL_NAMESPACE, tweetyName);
     assertThat(tweety.getAttributeValue("name")).isEqualTo(tweetyName);
     assertThat(tweety.getAttributeValueNs("name", MODEL_NAMESPACE)).isEqualTo(tweetyName);
     tweety.removeAttributeNs("name", MODEL_NAMESPACE);

@@ -65,6 +65,14 @@ public interface ModelElementInstance {
   String getAttributeValue(String attributeName);
 
   /**
+   * Sets the value by name of a non-ID attribute.
+   *
+   * @param attributeName  the name of the attribute
+   * @param xmlValue  the value to set
+   */
+  void setAttributeValue(String attributeName, String xmlValue);
+
+  /**
    * Sets attribute value by name.
    *
    * @param attributeName  the name of the attribute
@@ -88,6 +96,15 @@ public interface ModelElementInstance {
    * @return the value of the attribute
    */
   String getAttributeValueNs(String attributeName, String namespaceUri);
+
+  /**
+   * Sets the value by name and namespace of a non-ID attribute.
+   *
+   * @param attributeName  the name of the attribute
+   * @param namespaceUri  the namespace URI of the attribute
+   * @param xmlValue  the XML value to set
+   */
+  void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue);
 
   /**
    * Sets the attribute value by name and namespace.
