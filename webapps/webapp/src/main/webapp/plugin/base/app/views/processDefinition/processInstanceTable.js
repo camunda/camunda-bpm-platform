@@ -66,6 +66,11 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         pages.total = Math.ceil(data.data.count / pages.size);
       });
     }
+
+    $scope.selectActivity = function(activityId, event) {
+      event.preventDefault();
+      $scope.processData.set('filter', angular.extend({}, $scope.filter, { activityIds: [activityId] }));
+    };
   }];
 
   var Configuration = [ 'ViewsProvider', function(ViewsProvider) {
