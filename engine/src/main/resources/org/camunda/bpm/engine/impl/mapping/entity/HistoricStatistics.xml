@@ -69,10 +69,11 @@
         (
           select ACT_ID_, count(ACT_ID_) as INSTANCE_COUNT_
           from ${prefix}ACT_HI_ACTINST
-          where END_TIME_ is null
+          where PROC_DEF_ID_ = #{processDefinitionId}
+          and END_TIME_ is null
           group by ACT_ID_
         ) INSTANCE
-        on ACTIVITY.ACT_ID_ = INSTANCE.ACT_ID_
+        on INSTANCE.ACT_ID_ = ACTIVITY.ACT_ID_
 
         <if test="includeFinished">
         left outer join
@@ -80,7 +81,8 @@
         (
           select ACT_ID_, count(ACT_ID_) as FINISHED_COUNT_
           from ${prefix}ACT_HI_ACTINST
-          where END_TIME_ is not null
+          where PROC_DEF_ID_ = #{processDefinitionId}
+          and END_TIME_ is not null
           group by ACT_ID_
         ) FINISHED
         on FINISHED.ACT_ID_ = ACTIVITY.ACT_ID_
@@ -92,7 +94,8 @@
         (
           select ACT_ID_, count(ACT_ID_) as CANCELED_COUNT_
           from ${prefix}ACT_HI_ACTINST
-          where ACT_INST_STATE_ = 2
+          where PROC_DEF_ID_ = #{processDefinitionId}
+          and ACT_INST_STATE_ = 2
           group by ACT_ID_
         ) CANCELED
         on CANCELED.ACT_ID_ = ACTIVITY.ACT_ID_
@@ -104,7 +107,8 @@
         (
           select ACT_ID_, count(ACT_ID_) as COMPLETE_SCOPE_COUNT_
           from ${prefix}ACT_HI_ACTINST
-          where ACT_INST_STATE_ = 1
+          where PROC_DEF_ID_ = #{processDefinitionId}
+          and ACT_INST_STATE_ = 1
           group by ACT_ID_
         ) COMPLETE
         on COMPLETE.ACT_ID_ = ACTIVITY.ACT_ID_

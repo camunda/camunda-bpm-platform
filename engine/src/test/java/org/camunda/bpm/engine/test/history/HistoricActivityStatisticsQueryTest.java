@@ -735,6 +735,42 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(1, query.orderByActivityId().desc().count());
   }
 
+  @Deployment(resources= {"org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml",
+      "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testAnotherSingleTask.bpmn20.xml"})
+  public void testDifferentProcessesWithSameActivityId() {
+    String processDefinitionId = getProcessDefinitionId();
+    String anotherProcessDefinitionId = getProcessDefinitionIdByKey("anotherProcess");
+
+    startProcesses(5);
+
+    startProcessesByKey(10, "anotherProcess");
+
+    // first processDefinition
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId);
+
+    List<HistoricActivityStatistics> statistics = query.list();
+
+    assertEquals(1, query.count());
+    assertEquals(1, statistics.size());
+
+    HistoricActivityStatistics task = statistics.get(0);
+    assertEquals(5, task.getInstances());
+
+    // second processDefinition
+    query = historyService
+        .createHistoricActivityStatisticsQuery(anotherProcessDefinitionId);
+
+    statistics = query.list();
+
+    assertEquals(1, query.count());
+    assertEquals(1, statistics.size());
+
+    task = statistics.get(0);
+    assertEquals(10, task.getInstances());
+
+  }
+
   protected void completeProcessInstances() {
     List<Task> tasks = taskService.createTaskQuery().list();
     for (Task task : tasks) {
