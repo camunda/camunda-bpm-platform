@@ -14,7 +14,7 @@
    <dependencySet>
       <outputDirectory>server/</outputDirectory>
       <includes>
-        <include>org.apache.tomcat:apache-tomcat-dist:tar.gz</include>
+        <include>org.apache.tomcat:tomcat:tar.gz</include>
       </includes>
       <unpackOptions>
         <excludes>

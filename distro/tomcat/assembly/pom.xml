@@ -20,7 +20,7 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>apache-tomcat-dist</artifactId>
+      <artifactId>tomcat</artifactId>
       <version>${version.tomcat}</version>
       <type>tar.gz</type>
     </dependency>
@@ -108,17 +108,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <!-- 
-    We need this repository to fetch
-
-      org.apache.tomcat:apache-tomcat-dist:tar.gz:${version.tomcat}
-  -->
-  <repositories>
-    <repository>
-      <id>camunda public</id>
-      <name>camunda</name>
-      <url>https://app.camunda.com/nexus/content/groups/public/</url>
-    </repository>
-  </repositories>
 </project>

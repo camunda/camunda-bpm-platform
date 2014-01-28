@@ -34,7 +34,7 @@
     <!-- application servers -->
     <version.jboss.as>7.2.0.Final</version.jboss.as>
     <version.glassfish>3.1.2</version.glassfish>
-    <version.tomcat>7.0.33</version.tomcat>
+    <version.tomcat>7.0.35</version.tomcat>
 
     <version.arquillian>1.0.0.Final</version.arquillian>
     <version.arquillian.drone>1.0.0.Final</version.arquillian.drone>
@@ -475,7 +475,7 @@
       <dependency>
         <groupId>org.apache.tomcat</groupId>
         <artifactId>catalina</artifactId>
-        <version>6.0.36</version>
+        <version>6.0.37</version>
       </dependency>
 
       <dependency>
