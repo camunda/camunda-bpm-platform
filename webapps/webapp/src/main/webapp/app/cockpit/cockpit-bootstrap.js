@@ -29,6 +29,9 @@
         APP_NAME,
         'domReady!'
       ], function() {
+        $('head title')
+          .attr('ng-model', 'pageTitle')
+          .text('{{ pageTitle }}');
         rjsConf.utils.bootAngular(angular, APP_NAME);
       });
     });
