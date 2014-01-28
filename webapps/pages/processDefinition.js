@@ -161,6 +161,12 @@ ngDefine('cockpit.pages.processDefinition', [
       }
 
       $rootScope.addBreadcrumb({ type: 'processDefinition', processDefinition: definition });
+
+      $rootScope.pageTitle = [
+        'camunda Cockpit',
+        definition.name || definition.id,
+        'Definition View'
+      ].join(' | ');
     });
 
     $scope.instanceStatistics = processData.observe([ 'instances.all', 'instances.current' ], function(allCount, currentCount) {

@@ -15,6 +15,12 @@ define(['angular'], function(angular) {
 
     // reset breadcrumbs
     $rootScope.clearBreadcrumbs();
+
+    // set the page title
+    $rootScope.pageTitle = [
+      'camunda Cockpit',
+      'Dashboard'
+    ].join(' | ');
   }];
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {

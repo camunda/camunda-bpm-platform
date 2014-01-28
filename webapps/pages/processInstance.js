@@ -354,6 +354,12 @@ ngDefine('cockpit.pages.processInstance', [
     processData.observe([ 'processDefinition', 'processInstance'], function (processDefinition, processInstance) {
       $rootScope.addBreadcrumb({'type': 'processDefinition', 'processDefinition': processDefinition});
       $rootScope.addBreadcrumb({'type': 'processInstance', 'processInstance': processInstance,'processDefinition': processDefinition});
+
+      $rootScope.pageTitle = [
+        'camunda Cockpit',
+        $scope.processDefinition.name || $scope.processDefinition.id,
+        'Instance View'
+      ].join(' | ');
     });
 
     $scope.activityInstanceTree = processData.observe('activityInstanceTree', function (activityInstanceTree) {
