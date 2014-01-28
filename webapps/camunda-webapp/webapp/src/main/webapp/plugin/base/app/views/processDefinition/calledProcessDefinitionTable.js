@@ -50,6 +50,11 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
       return result;
     }
+
+    $scope.selectActivity = function(activityId, event) {
+      event.preventDefault();
+      $scope.processData.set('filter', angular.extend({}, $scope.filter, { activityIds: [activityId] }));
+    };
   }];
 
   var Configuration = [ 'ViewsProvider', function(ViewsProvider) {

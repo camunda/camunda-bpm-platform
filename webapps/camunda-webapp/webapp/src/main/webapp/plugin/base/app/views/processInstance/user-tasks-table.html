@@ -2,7 +2,7 @@
   <thead>
     <tr>
       <th>Activity</th>
-      <th>Asignee</th>
+      <th>Assignee</th>
       <th>Owner</th>
       <th>Creation Date</th>
       <th>Due Date</th>
@@ -14,7 +14,8 @@
   <tbody>
     <tr ng-repeat="userTask in userTasks">
       <td>
-        <a href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
+        <a ng-click="selectActivity(userTask.instance.id, $event)"
+           ng-href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
       </td>
       <td>
         <div ng-if="!userTask.inEditMode">

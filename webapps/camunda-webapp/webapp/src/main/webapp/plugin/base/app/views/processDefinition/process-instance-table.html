@@ -3,9 +3,7 @@
     <tr>
       <th>ID</th>
       <th>Start Time</th>
-      <th>
-        Business Key
-      </th>
+      <th>Business Key</th>
       <th>State</th>
     </tr>
   </thead>
@@ -21,7 +19,8 @@
       <td colspan="2">
         <a state-circle 
            incidents="processInstance.incidents"
-           href="#/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
+           ng-click="selectActivity(processInstance.id, $event)"
+           ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
         <span class="badge badge-warning badge-suspended" ng-show="processInstance.suspended" title="Currently suspended">
           <i class="icon-suspended white"></i>
         </span>

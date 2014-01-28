@@ -36,6 +36,14 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         $scope.calledProcessInstances = response.data;
       });
     }
+
+    $scope.selectActivity = function(activityId, event) {
+      event.preventDefault();
+      $scope.processData.set('filter', angular.extend({}, $scope.filter, {
+          activityInstanceIds: [activityId],
+          activityIds: [activityId.split(':').shift()]
+        }));
+    };
   };
 
   module.controller('CalledProcessInstanceController', [ '$scope', 'PluginProcessInstanceResource', CalledProcessInstanceController ]);
