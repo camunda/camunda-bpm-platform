@@ -1,3 +1,4 @@
+<!-- # CE - src/main/webapp/plugin/base/app/views/processInstance/variable-instances-tab.html -->
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
@@ -24,7 +25,7 @@
         <form class="inline-edit" name="editVariableForm" ng-if="variable.inEditMode" ng-submit="submit(variable, this.editVariableForm)" novalidate request-aware>
 
           <fieldset>
-          
+
             <div variable="getCopy(variable.id)" inline-edit autofocus></div>
 
           </fieldset>
@@ -53,14 +54,14 @@
           </div>
 
         </form>
-        
+
       </td>
       <td class="variable-type">
         <select ng-show="variable.inEditMode" name="variableType"
                 ng-options="variableType for variableType in variableTypes" ng-model="getCopy(variable.id).type"
                 class="select-variable-type">
         </select>
-        <span ng-hide="variable.inEditMode">{{ variable.type }}</span>       
+        <span ng-hide="variable.inEditMode">{{ variable.type }}</span>
       </td>
       <td class="variable-scope">
         <a href="#/process-instance/{{ processInstance.id }}?activityInstanceIds={{ variable.instance.id }}" title="{{ variable.instance.id }}">
@@ -73,8 +74,8 @@
       <td colspan="4">
         <i class="icon-loading"></i> loading process variables ...
       </td>
-    </tr>    
-  
+    </tr>
+
     <tr ng-if="variables && !variables.length">
       <td  colspan="4">
         No process variables
@@ -84,3 +85,4 @@
 </table>
 
 <div paginator total-pages="pages.total" current-page="pages.current"></div>
+<!-- / CE - src/main/webapp/plugin/base/app/views/processInstance/variable-instances-tab.html -->

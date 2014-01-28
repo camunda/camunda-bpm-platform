@@ -1,3 +1,4 @@
+<!-- # CE - src/main/webapp/plugin/app/base/views/processInstance/user-tasks-table.html -->
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
@@ -52,10 +53,10 @@
       </td>
       <td>
         {{ userTask.owner }}
-      </td>      
+      </td>
       <td>
         {{ userTask.created }}
-      </td>            
+      </td>
       <td>
         {{ userTask.due }}
       </td>
@@ -67,15 +68,15 @@
       </td>
       <td>
         {{ userTask.id }}
-      </td>            
+      </td>
     </tr>
 
     <tr ng-if="!userTasks">
       <td colspan="8">
         <i class="icon-loading"></i> loading user tasks...
       </td>
-    </tr>    
-  
+    </tr>
+
     <tr ng-if="userTasks && !userTasks.length">
       <td  colspan="8">
         No user tasks
@@ -85,3 +86,4 @@
 </table>
 
 <div paginator total-pages="pages.total" current-page="pages.current"></div>
+<!-- / CE - src/main/webapp/plugin/app/base/views/processInstance/user-tasks-table.html -->
