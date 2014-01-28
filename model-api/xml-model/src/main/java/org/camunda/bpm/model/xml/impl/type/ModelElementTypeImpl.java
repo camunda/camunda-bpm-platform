@@ -25,10 +25,12 @@ import org.camunda.bpm.model.xml.impl.util.ModelTypeException;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
 /**
  * @author Daniel Meyer
@@ -52,7 +54,9 @@ public class ModelElementTypeImpl implements ModelElementType {
 
   private final List<ModelElementType> childElementTypes = new ArrayList<ModelElementType>();
 
-  private ModelElementTypeBuilder.ModelTypeInstanceProvider<?> instanceProvider;
+  private final List<ChildElementCollection<?>> childElementCollections = new ArrayList<ChildElementCollection<?>>();
+
+  private ModelTypeInstanceProvider<?> instanceProvider;
 
   private boolean isAbstract;
 
@@ -79,6 +83,10 @@ public class ModelElementTypeImpl implements ModelElementType {
 
   public void registerChildElementType(ModelElementType childElementType) {
     childElementTypes.add(childElementType);
+  }
+
+  public void registerChildElementCollection(ChildElementCollection<?> childElementCollection) {
+    childElementCollections.add(childElementCollection);
   }
 
   public void registerExtendingType(ModelElementType modelType) {
@@ -124,10 +132,9 @@ public class ModelElementTypeImpl implements ModelElementType {
     }
   }
 
-  public void setInstanceProvider(ModelElementTypeBuilder.ModelTypeInstanceProvider<?> instanceProvider) {
+  public void setInstanceProvider(ModelTypeInstanceProvider<?> instanceProvider) {
     this.instanceProvider = instanceProvider;
   }
-
   public boolean isAbstract() {
     return isAbstract;
   }
@@ -184,12 +191,29 @@ public class ModelElementTypeImpl implements ModelElementType {
   }
 
   public List<ModelElementType> getChildElementTypes() {
+    return childElementTypes;
+  }
+
+  public List<ModelElementType> getAllChildElementTypes() {
     List<ModelElementType> allChildElementTypes = new ArrayList<ModelElementType>();
     if (baseType != null) {
-      allChildElementTypes.addAll(baseType.getChildElementTypes());
+      allChildElementTypes.addAll(baseType.getAllChildElementTypes());
     }
     allChildElementTypes.addAll(childElementTypes);
     return allChildElementTypes;
+  }
+
+  public List<ChildElementCollection<?>> getChildElementCollections() {
+    return childElementCollections;
+  }
+
+  public List<ChildElementCollection<?>> getAllChildElementCollections() {
+    List<ChildElementCollection<?>> allChildElementCollections = new ArrayList<ChildElementCollection<?>>();
+    if (baseType != null) {
+      allChildElementCollections.addAll(baseType.getAllChildElementCollections());
+    }
+    allChildElementCollections.addAll(childElementCollections);
+    return allChildElementCollections;
   }
 
   public Collection<ModelElementInstance> getInstances(ModelInstance modelInstance) {
@@ -244,6 +268,15 @@ public class ModelElementTypeImpl implements ModelElementType {
     for (Attribute<?> attribute : getAllAttributes()) {
       if (attribute.getAttributeName().equals(attributeName)) {
         return attribute;
+      }
+    }
+    return null;
+  }
+
+  public ChildElementCollection<?> getChildElementCollection(ModelElementType childElementType) {
+    for (ChildElementCollection<?> childElementCollection : getChildElementCollections()) {
+      if (childElementType.equals(childElementCollection.getChildElementType(model))) {
+        return childElementCollection;
       }
     }
     return null;

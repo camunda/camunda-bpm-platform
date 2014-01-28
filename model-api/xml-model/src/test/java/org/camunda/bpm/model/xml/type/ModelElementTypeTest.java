@@ -158,13 +158,13 @@ public class ModelElementTypeTest {
     ModelElementType eggType = model.getType(Egg.class);
     ModelElementType spouseRefType = model.getType(SpouseRef.class);
 
-    assertThat(animalsType.getChildElementTypes())
+    assertThat(animalsType.getAllChildElementTypes())
       .containsSequence(animalType);
-    assertThat(animalType.getChildElementTypes())
+    assertThat(animalType.getAllChildElementTypes())
       .containsSequence(relationshipDefinitionType, relationshipDefinitionRefType);
-    assertThat(flyingAnimalType.getChildElementTypes())
+    assertThat(flyingAnimalType.getAllChildElementTypes())
       .containsSequence(flightPartnerRefType);
-    assertThat(birdType.getChildElementTypes())
+    assertThat(birdType.getAllChildElementTypes())
       .containsSequence(eggType, spouseRefType);
   }
 

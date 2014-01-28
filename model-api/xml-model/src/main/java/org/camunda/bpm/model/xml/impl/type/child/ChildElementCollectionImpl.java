@@ -102,6 +102,10 @@ public class ChildElementCollectionImpl<T extends ModelElementInstance> implemen
     return model.getType(childElementTypeClass);
   }
 
+  public Class<T> getChildElementTypeClass() {
+    return childElementTypeClass;
+  }
+
   public ModelElementType getParentElementType() {
     return parentElementType;
   }

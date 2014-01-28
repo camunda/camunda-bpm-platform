@@ -258,7 +258,7 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
    * @return the element to insert after or null
    */
   private ModelElementInstance findElementToInsertAfter(ModelElementInstance elementToInsert) {
-    List<ModelElementType> childElementTypes = elementType.getChildElementTypes();
+    List<ModelElementType> childElementTypes = elementType.getAllChildElementTypes();
     List<Element> childDomElements = DomUtil.filterNodeList(domElement.getChildNodes(), new DomUtil.ElementNodeListFilter());
     Collection<ModelElementInstance> childElements = ModelUtil.getModelElementCollection(childDomElements, modelInstance);
 
@@ -315,7 +315,7 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
    * Removes every reference to children of this.
    */
   private void unlinkAllChildReferences() {
-    List<ModelElementType> childElementTypes = elementType.getChildElementTypes();
+    List<ModelElementType> childElementTypes = elementType.getAllChildElementTypes();
     for (ModelElementType type : childElementTypes) {
       Collection<ModelElementInstance> childElementsForType = getChildElementsByType(type);
       for (ModelElementInstance childElement : childElementsForType) {

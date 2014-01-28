@@ -52,4 +52,6 @@ public interface ModelElementType {
 
   List<ModelElementType> getChildElementTypes();
 
+  List<ModelElementType> getAllChildElementTypes();
+
 }

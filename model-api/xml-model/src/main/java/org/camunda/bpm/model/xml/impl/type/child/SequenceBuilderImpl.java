@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.model.xml.impl.type.child;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.impl.ModelBuildOperation;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
@@ -22,6 +19,9 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.child.ChildElementBuilder;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollectionBuilder;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Daniel Meyer

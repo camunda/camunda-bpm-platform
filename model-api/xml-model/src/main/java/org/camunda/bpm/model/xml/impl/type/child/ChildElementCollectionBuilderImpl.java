@@ -100,6 +100,7 @@ public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> i
       throw new ModelException(parentElementType +" declares undefined child element of type "+childElementType+".");
     }
     parentElementType.registerChildElementType(elementType);
+    parentElementType.registerChildElementCollection(collection);
     for (ModelBuildOperation modelBuildOperation : modelBuildOperations) {
       modelBuildOperation.performModelBuild(model);
     }

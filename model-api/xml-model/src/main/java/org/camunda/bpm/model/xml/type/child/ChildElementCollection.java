@@ -54,12 +54,19 @@ public interface ChildElementCollection<T extends ModelElementInstance> {
   int getMaxOccurs();
 
   /**
-   * Get the model element type of the elements contained in this collection
+   * Get the model element type of the elements contained in this collection.
    *
    * @param model  the model of the element
    * @return the containing {@link ModelElementType}
    */
   ModelElementType getChildElementType(Model model);
+
+  /**
+   * Get the class of the elements contained in this collection.
+   *
+   * @return the class of contained types
+   */
+  Class<T> getChildElementTypeClass();
 
   /**
    * Get the model element type of the element owns the collection
