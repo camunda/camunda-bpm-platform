@@ -81,7 +81,7 @@ public class ModelElementTypeAssert extends AbstractAssert<ModelElementTypeAsser
     ModelElementType actualBaseType = actual.getBaseType();
 
     if (!actualBaseType.equals(baseType)) {
-      failWithMessage("Expected element type <%s> to extend type <%s> but extends <%s>", typeName, actualBaseType, baseType);
+      failWithMessage("Expected element type <%s> to extend type <%s> but extends <%s>", typeName, actualBaseType.getTypeName(), baseType.getTypeName());
     }
 
     return this;
@@ -93,7 +93,7 @@ public class ModelElementTypeAssert extends AbstractAssert<ModelElementTypeAsser
     ModelElementType actualBaseType = actual.getBaseType();
 
     if (actualBaseType != null) {
-      failWithMessage("Expected element type <%s> to not extend any type but extends <%s>", typeName, actualBaseType);
+      failWithMessage("Expected element type <%s> to not extend any type but extends <%s>", typeName, actualBaseType.getTypeName());
     }
 
     return this;

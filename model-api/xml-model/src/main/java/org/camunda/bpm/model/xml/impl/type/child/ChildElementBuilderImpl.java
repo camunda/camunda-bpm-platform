@@ -18,6 +18,7 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollectionBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceBuilder;
 
 /**
@@ -28,6 +29,35 @@ public class ChildElementBuilderImpl<T extends ModelElementInstance> extends Chi
 
   public ChildElementBuilderImpl(Class<T> childElementTypeClass, ModelElementType parentElementType) {
     super(childElementTypeClass, parentElementType);
+  }
+
+  @Override
+  protected ChildElementCollectionImpl<T> createCollectionInstance() {
+    return new ChildElementImpl<T>(childElementType, parentElementType);
+  }
+
+  public ChildElementBuilder<T> immutable() {
+    super.immutable();
+    return this;
+  }
+
+  public ChildElementBuilder<T> required() {
+    super.required();
+    return this;
+  }
+
+  public ChildElementBuilder<T> minOccurs(int i) {
+    super.minOccurs(i);
+    return this;
+  }
+
+  public ChildElementBuilder<T> maxOccurs(int i) {
+    super.maxOccurs(i);
+    return this;
+  }
+
+  public ChildElement<T> build() {
+    return (ChildElement<T>) super.build();
   }
 
   public <V extends ModelElementInstance> ElementReferenceBuilder<V, T> qNameElementReference(Class<V> referenceTargetType) {
@@ -42,14 +72,5 @@ public class ChildElementBuilderImpl<T extends ModelElementInstance> extends Chi
     ElementReferenceBuilderImpl<V, T> builder = new ElementReferenceBuilderImpl<V, T>(childElementType, referenceTargetType, child);
     setReferenceBuilder(builder);
     return builder;
-  }
-
-  @Override
-  protected ChildElementCollectionImpl<T> createCollectionInstance() {
-    return new ChildElementImpl<T>(childElementType, parentElementType);
-  }
-
-  public ChildElement<T> build() {
-    return (ChildElement<T>) super.build();
   }
 }

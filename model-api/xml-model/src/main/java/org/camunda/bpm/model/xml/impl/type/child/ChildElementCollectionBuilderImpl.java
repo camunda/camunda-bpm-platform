@@ -58,6 +58,11 @@ public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> i
     return this;
   }
 
+  public ChildElementCollectionBuilder<T> required() {
+    collection.setMinOccurs(1);
+    return this;
+  }
+
   public ChildElementCollectionBuilder<T> maxOccurs(int i) {
     collection.setMaxOccurs(i);
     return this;

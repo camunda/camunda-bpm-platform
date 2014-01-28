@@ -21,10 +21,18 @@ import org.camunda.bpm.model.xml.type.reference.ElementReferenceBuilder;
  */
 public interface ChildElementBuilder<T extends ModelElementInstance> extends ChildElementCollectionBuilder<T> {
 
+  ChildElementBuilder<T> immutable();
+
+  ChildElementBuilder<T> required();
+
+  ChildElementBuilder<T> minOccurs(int i);
+
+  ChildElementBuilder<T> maxOccurs(int i);
+
+  ChildElement<T> build();
+
   <V extends ModelElementInstance> ElementReferenceBuilder<V,T> qNameElementReference(Class<V> referenceTargetType);
 
   <V extends ModelElementInstance> ElementReferenceBuilder<V, T> idElementReference(Class<V> referenceTargetType);
-
-  ChildElement<T> build();
 
 }

@@ -23,6 +23,8 @@ public interface ChildElementCollectionBuilder<T extends ModelElementInstance> {
 
   ChildElementCollectionBuilder<T> immutable();
 
+  ChildElementCollectionBuilder<T> required();
+
   ChildElementCollectionBuilder<T> minOccurs(int i);
 
   ChildElementCollectionBuilder<T> maxOccurs(int i);
