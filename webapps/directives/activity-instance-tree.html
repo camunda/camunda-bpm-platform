@@ -1,16 +1,17 @@
-<div class="tree-node" 
+<!-- # CE - src/main/webapp/app/cockpit/directives/activity-instance-tree.html -->
+<div class="tree-node"
      ng-class="{ 'selected' : node.isSelected }">
 
   <div class="tree-node-label">
     <button class="btn btn-link btn-control-link btn-toggle" ng-if="node.children.length" ng-click="toggleOpen()">
       <i ng-class="{ 'icon-chevron-right' : !node.isOpen, 'icon-chevron-down' : node.isOpen }"></i>
     </button>
-    
+
     <button class="btn btn-link btn-control-link btn-control remove"
             ng-click="deselect($event)">
       <i class="icon-remove"></i>
     </button>
-    
+
     <a id="{{ node.id }}"
        ng-click="select($event)">
       {{ node.name }}
@@ -19,9 +20,10 @@
 
   <ul class="unstyled" ng-show="node.isOpen" ng-if="node.children.length">
     <li ng-repeat="child in node.children | orderBy:'name'">
-      <div activity-instance-tree="child" 
+      <div activity-instance-tree="child"
            selection="selection"
            on-element-click="propogateSelection(id, activityId, $event)" />
     </li>
   </ul>
 </div>
+<!-- / CE - src/main/webapp/app/cockpit/directives/activity-instance-tree.html -->
