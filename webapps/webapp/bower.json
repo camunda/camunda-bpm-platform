@@ -32,7 +32,6 @@
     "jquery": "~1.10",
     "jquery-mousewheel": "~3.1.9",
     "jquery-overscroll": "~1.7.3",
-    "jquery-ui": "~1.10.3",
     "jquery-ui": "./src/main/webapp/assets/patched/jquery-ui-1.10.3.custom.min.js",
     "requirejs-angular-define": "camunda/requirejs-angular-define",
     "requirejs": "~2.1.10",
