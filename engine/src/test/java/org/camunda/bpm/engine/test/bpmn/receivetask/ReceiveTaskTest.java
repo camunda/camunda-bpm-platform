@@ -135,6 +135,10 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     // expect: no event subscription left
     assertEquals(0, getEventSubscriptionList().size());
 
+    // expect: one user task is created
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
     // expect: this ends the process instance
     assertProcessEnded(processInstance.getId());
   }
@@ -200,6 +204,10 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
 
     // expect: no event subscription left
     assertEquals(0, getEventSubscriptionList().size());
+
+    // expect: one user task is created
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
 
     // expect: this ends the process instance
     assertProcessEnded(processInstance.getId());
