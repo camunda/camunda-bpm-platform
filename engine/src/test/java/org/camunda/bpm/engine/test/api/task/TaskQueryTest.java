@@ -562,6 +562,12 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().taskVariableValueLike("stringVar", "stringVar%").count());
     assertEquals(0, taskService.createTaskQuery().taskVariableValueLike("stringVar", "stringVal").count());
     assertEquals(0, taskService.createTaskQuery().taskVariableValueLike("nonExistingVar", "string%").count());
+    
+    // test with null value
+    try {
+      taskService.createTaskQuery().taskVariableValueLike("stringVar", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
   }
   
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testTaskVariableValueEquals.bpmn20.xml")
@@ -626,11 +632,40 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("stringVar", "aa").count());
     
     // test with null value
-    // TODO: why this returns 1 instead of 0?
-    assertEquals(1, taskService.createTaskQuery().taskVariableValueGreaterThan("nullVar", null).count());
-    assertEquals(1, taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("nullVar", null).count());
-    assertEquals(1, taskService.createTaskQuery().taskVariableValueLessThan("nullVar", null).count());
-    assertEquals(1, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("nullVar", null).count());
+    try {
+      taskService.createTaskQuery().taskVariableValueGreaterThan("nullVar", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueLessThan("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueLessThanOrEquals("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    
+ // test with boolean value
+    try {
+      taskService.createTaskQuery().taskVariableValueGreaterThan("nullVar", true).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("nullVar", false).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueLessThan("nullVar", true).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueLessThanOrEquals("nullVar", false).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
     
  // test non existing variable
     assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("nonExisting", 123).count());
@@ -717,6 +752,12 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().processVariableValueLike("stringVar", "stringVar%").count());
     assertEquals(0, taskService.createTaskQuery().processVariableValueLike("stringVar", "stringVal").count());
     assertEquals(0, taskService.createTaskQuery().processVariableValueLike("nonExistingVar", "string%").count());
+    
+    // test with null value
+    try {
+      taskService.createTaskQuery().processVariableValueLike("stringVar", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
   }
   
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml")
@@ -778,11 +819,40 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().processVariableValueLessThanOrEquals("stringVar", "aa").count());
     
     // test with null value
-    // TODO: why this returns 1 instead of 0?
-    assertEquals(1, taskService.createTaskQuery().processVariableValueGreaterThan("nullVar", null).count());
-    assertEquals(1, taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("nullVar", null).count());
-    assertEquals(1, taskService.createTaskQuery().processVariableValueLessThan("nullVar", null).count());
-    assertEquals(1, taskService.createTaskQuery().processVariableValueLessThanOrEquals("nullVar", null).count());
+    try {
+      taskService.createTaskQuery().processVariableValueGreaterThan("nullVar", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueLessThan("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueLessThanOrEquals("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    
+ // test with boolean value
+    try {
+      taskService.createTaskQuery().processVariableValueGreaterThan("nullVar", true).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("nullVar", false).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueLessThan("nullVar", true).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueLessThanOrEquals("nullVar", false).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
     
     // test non existing variable
     assertEquals(0, taskService.createTaskQuery().processVariableValueLessThanOrEquals("nonExisting", 123).count());
@@ -1161,5 +1231,4 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     return ids;
   }
-
 }

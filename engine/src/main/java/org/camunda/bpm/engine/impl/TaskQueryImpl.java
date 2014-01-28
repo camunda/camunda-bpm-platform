@@ -310,26 +310,41 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
   
   public TaskQuery taskVariableValueLike(String variableName, String variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'like' condition");
+	}
 	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LIKE, true));
 	return this;
   }
   
   public TaskQuery taskVariableValueGreaterThan(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'greater than' condition");
+	}
 	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.GREATER_THAN, true));
 	return this;
   }
   
   public TaskQuery taskVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'greater than or equal' condition");
+	}
 	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, true));
 	return this;
   }
   
   public TaskQuery taskVariableValueLessThan(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'less than' condition");
+	}
 	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LESS_THAN, true));
 	return this;
   }
   
   public TaskQuery taskVariableValueLessThanOrEquals(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'less than or equal' condition");
+	}
 	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, true));
 	return this;
   }
@@ -345,26 +360,41 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
   
   public TaskQuery processVariableValueLike(String variableName, String variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'like' condition");
+	}
 	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LIKE, false));
 	return this;
   }
   
   public TaskQuery processVariableValueGreaterThan(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'greater than' condition");
+	}
 	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.GREATER_THAN, false));
 	return this;
   }
 
   public TaskQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'greater than or equal' condition");
+	}
 	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, false));
 	return this;
   }
 
   public TaskQuery processVariableValueLessThan(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'less than' condition");
+	}
 	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LESS_THAN, false));
 	return this;
   }
 
   public TaskQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'less than or equal' condition");
+	}
 	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, false));
 	return this;
   }
@@ -467,6 +497,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       var.initialize(types);
     }
   }
+  
+  private boolean isBoolean(Object value) {
+	if (value == null) {
+	  return false;
+	}
+	return Boolean.class.isAssignableFrom(value.getClass()) || boolean.class.isAssignableFrom(value.getClass());
+	}
 
   //ordering ////////////////////////////////////////////////////////////////
   
