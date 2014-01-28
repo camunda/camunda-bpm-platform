@@ -35,7 +35,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
   protected String processDefinitionId;
+  protected String processDefinitionName;
+  protected String processDefinitionNameLike;
   protected String businessKey;
+  protected String businessKeyLike;
   protected boolean finished = false;
   protected boolean unfinished = false;
   protected String startedBy;
@@ -85,8 +88,23 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return this;
   }
 
+  public HistoricProcessInstanceQuery processDefinitionName(String processDefinitionName) {
+    this.processDefinitionName = processDefinitionName;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery processDefinitionNameLike(String nameLike) {
+    this.processDefinitionNameLike = nameLike;
+    return this;
+  }
+
   public HistoricProcessInstanceQuery processInstanceBusinessKey(String businessKey) {
     this.businessKey = businessKey;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike) {
+    this.businessKeyLike = businessKeyLike;
     return this;
   }
 
@@ -180,6 +198,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public String getBusinessKey() {
     return businessKey;
   }
+  public String getBusinessKeyLike() {
+    return businessKeyLike;
+  }
   public boolean isOpen() {
     return unfinished;
   }
@@ -191,6 +212,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
   public String getProcessDefinitionIdLike() {
     return processDefinitionKey + ":%:%";
+  }
+  public String getProcessDefinitionName() {
+    return processDefinitionName;
+  }
+  public String getProcessDefinitionNameLike() {
+    return processDefinitionNameLike;
   }
   public String getProcessInstanceId() {
     return processInstanceId;
@@ -223,7 +250,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public Date getFinishedBefore() {
     return finishedBefore;
   }
-
 
   // below is deprecated and to be removed in 5.12
 
