@@ -64,7 +64,7 @@
         <span ng-hide="variable.inEditMode">{{ variable.type }}</span>
       </td>
       <td class="variable-scope">
-        <a ng-click="selectActivity(variable.instance.activityId, $event)" 
+        <a cam-select-activity="variable.instance.activityId" 
            ng-href="#/process-instance/{{ processInstance.id }}?activityInstanceIds={{ variable.instance.id }}" title="{{ variable.instance.id }}">
           {{ variable.instance.name }}
         </a>

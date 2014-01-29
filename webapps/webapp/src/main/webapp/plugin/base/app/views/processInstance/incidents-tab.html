@@ -40,7 +40,7 @@
       </td>
       <td>
         <span ng-show="incident.linkable">
-          <a ng-click="selectActivity(incident.activityId, $event)"
+          <a cam-select-activity="incident.activityId"
              ng-href="#/process-instance/{{ processInstance.id }}?activityIds={{ incident.activityId }}&amp;detailsTab=incidents-tab">
             {{ incident.activityName }}
           </a>

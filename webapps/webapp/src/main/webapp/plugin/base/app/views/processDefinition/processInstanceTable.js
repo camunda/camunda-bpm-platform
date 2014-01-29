@@ -66,16 +66,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         pages.total = Math.ceil(data.data.count / pages.size);
       });
     }
-
-    // TODO: refactor into service
-    $scope.selectActivity = function(activityId, event) {
-      event.preventDefault();
-
-      // refresh view with selected activity instance id
-      $scope.processData.set('filter', {
-        activityIds: [activityId]
-      });
-    };
   }];
 
   var Configuration = [ 'ViewsProvider', function(ViewsProvider) {

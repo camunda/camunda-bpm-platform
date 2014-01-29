@@ -1,7 +1,10 @@
 ngDefine('cockpit.pages.processDefinition', [
   'angular',
+  'cockpit/util/routeUtil',
   'module:dataDepend:angular-data-depend'
 ], function(module, angular) {
+
+  var routeUtil = require('cockpit/util/routeUtil');
 
   var Controller = [
     '$scope', '$rootScope', 'search', '$q', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition',
@@ -28,8 +31,8 @@ ngDefine('cockpit.pages.processDefinition', [
           if (c !== undefined) {
             result.push(c);
           }
-        } catch (e) {
-          ; // safe collect -> error skips element
+        } catch (ex) {
+          // safe collect -> error skips element
         }
       });
 
@@ -486,7 +489,7 @@ ngDefine('cockpit.pages.processDefinition', [
           try {
             variable = Variables.parse(text);
           } catch (e) {
-            ; // ok, failed to parse variable
+            // ok, failed to parse variable
           }
 
           ngModel.$setValidity('processVariableFilter', !!variable);
@@ -496,7 +499,7 @@ ngDefine('cockpit.pages.processDefinition', [
         ngModel.$parsers.push(parseText);
         ngModel.$formatters.push(Variables.toString);
       }
-    }
+    };
   }];
 
   var RouteConfig = [
@@ -509,17 +512,7 @@ ngDefine('cockpit.pages.processDefinition', [
 
     $routeProvider
     .when('/process-definition/:id', {
-      redirectTo: function(params, currentPath, currentSearch) {
-        var redirectUrl = currentPath + '/live',
-            search = [],
-            key;
-
-        for (key in currentSearch) {
-          search.push(key + '=' + currentSearch[key]);
-        }
-
-        return redirectUrl + (search.length ? '?' + search.join('&') : '');
-      }
+      redirectTo: routeUtil.redirectToLive
     })
     .when('/process-definition/:id/live', {
       templateUrl: 'pages/process-definition.html',

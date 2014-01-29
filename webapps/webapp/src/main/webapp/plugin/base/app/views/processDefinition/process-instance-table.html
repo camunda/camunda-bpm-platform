@@ -20,7 +20,6 @@
       <td colspan="2">
         <a state-circle
            incidents="processInstance.incidents"
-           ng-click="selectActivity(processInstance.id, $event)"
            ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
         <span class="badge badge-warning badge-suspended" ng-show="processInstance.suspended" title="Currently suspended">
           <i class="icon-suspended white"></i>
