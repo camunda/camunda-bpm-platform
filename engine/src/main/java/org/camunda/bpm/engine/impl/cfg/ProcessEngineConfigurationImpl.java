@@ -152,6 +152,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceMa
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
@@ -712,6 +713,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           properties.put("falseConstant", DbSqlSessionFactory.databaseSpecificFalseConstant.get(databaseType));
 
           properties.put("dbSpecificDummyTable" , DbSqlSessionFactory.databaseSpecificDummyTable.get(databaseType));
+
+          Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
+          for (Entry<String, String> entry : constants.entrySet()) {
+            properties.put(entry.getKey(), entry.getValue());
+          }
+
         }
         XMLConfigBuilder parser = new XMLConfigBuilder(reader,"", properties);
         Configuration configuration = parser.getConfiguration();
@@ -763,8 +770,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(HistoricStatisticsManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricDetailManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricProcessInstanceManager.class));
-      addSessionFactory(new GenericManagerFactory(HistoricVariableInstanceManager.class));
+      addSessionFactory(new GenericManagerFactory(UserOperationLogManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricTaskInstanceManager.class));
+      addSessionFactory(new GenericManagerFactory(HistoricVariableInstanceManager.class));
       addSessionFactory(new GenericManagerFactory(IdentityInfoManager.class));
       addSessionFactory(new GenericManagerFactory(IdentityLinkManager.class));
       addSessionFactory(new GenericManagerFactory(JobManager.class));

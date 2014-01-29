@@ -67,3 +67,23 @@ SET
         WHERE
             PD.ID_ = J.PROCESS_DEF_ID_
     );
+
+-- add Hist OP Log table --
+
+create table ACT_HI_OP_LOG (
+    ID_ varchar(64) not null,
+    PROC_DEF_ID_ varchar(64),
+    PROC_INST_ID_ varchar(64),
+    EXECUTION_ID_ varchar(64),
+    TASK_ID_ varchar(64),
+    USER_ID_ varchar(255),
+    TIMESTAMP_ timestamp not null,
+    OPERATION_TYPE_ varchar(64),
+    OPERATION_ID_ varchar(64),
+    ENTITY_TYPE_ varchar(30),
+    PROPERTY_ varchar(64),
+    ORG_VALUE_ varchar(4000),
+    NEW_VALUE_ varchar(4000),
+    primary key (ID_)
+);
+

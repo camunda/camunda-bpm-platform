@@ -54,7 +54,7 @@ public class CompleteTaskCmd implements Command<Void>, Serializable {
     }
     
     completeTask(task);
-    
+
     return null;
   }
   

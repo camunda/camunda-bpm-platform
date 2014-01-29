@@ -15,12 +15,15 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Event;
 
@@ -54,18 +57,16 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
     }
         
     if (attachment.getTaskId()!=null) {
-      CommentManager commentManager = commandContext.getCommentManager();
-      if (commentManager.isHistoryEnabled()) {
-        String authenticatedUserId = commandContext.getAuthenticatedUserId();
-        CommentEntity comment = new CommentEntity();
-        comment.setUserId(authenticatedUserId);
-        comment.setType(CommentEntity.TYPE_EVENT);
-        comment.setTime(ClockUtil.getCurrentTime());
-        comment.setAction(Event.ACTION_DELETE_ATTACHMENT);
-        comment.setMessage(attachment.getName());
-        comment.setTaskId(attachment.getTaskId());
-        commentManager.insert(comment);
-      }
+      TaskEntity task = commandContext
+          .getTaskManager()
+          .findTaskById(attachment.getTaskId());
+
+      final String authenticatedUserId = commandContext.getAuthenticatedUserId();
+
+      PropertyChange propertyChange = new PropertyChange("name", null, attachment.getName());
+
+      commandContext.getOperationLogManager()
+          .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, authenticatedUserId, task, propertyChange);
     }
 
     return null;

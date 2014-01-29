@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -193,6 +194,12 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   }
 
   protected void assertParamNotNull(String paramName, String value) {
+    if(value == null) {
+      throw new ProcessEngineException(paramName +" is null");
+    }
+  }
+
+  protected void assertParamNotNull(String paramName, Date value) {
     if(value == null) {
       throw new ProcessEngineException(paramName +" is null");
     }

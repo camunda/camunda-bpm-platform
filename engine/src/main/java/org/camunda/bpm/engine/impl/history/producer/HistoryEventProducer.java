@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableScopeImpl;
 
@@ -105,6 +106,20 @@ public interface HistoryEventProducer {
   public HistoryEvent createTaskInstanceCompleteEvt(DelegateTask task, String deleteReason);
 
 
+  /**
+   * Creates the history event fired when a task detail is <strong>changed</strong>.
+   *
+   * @param entityType the type of the entity which has been changed. (is usually "task"
+   *        but may also be a task related entity such as "Identity Link" or "attachment".
+   * @param userId that operates on the task
+   * @param operationId that identifies multiple changes
+   * @param operation that changes a property
+   * @param propertyChange the property change (orgValue, newValue)
+   * @param task
+   * @return the history event
+   */
+  public HistoryEvent createTaskOperationLogEvt(String entityType, String userId, String operationId, String operation, PropertyChange propertyChange, DelegateTask task);
+
   // HistoricVariableUpdateEventEntity //////////////////////
 
   /**
@@ -146,4 +161,5 @@ public interface HistoryEventProducer {
    * @return the history event
    */
   public HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, Object propertyValue, String taskId);
+
 }

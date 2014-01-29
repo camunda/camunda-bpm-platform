@@ -23,7 +23,7 @@ create table ACT_HI_ACTINST (
     EXECUTION_ID_ varchar(64) not null,
     ACT_ID_ varchar(255) not null,
     TASK_ID_ varchar(64),
-   	CALL_PROC_INST_ID_ varchar(64),
+    CALL_PROC_INST_ID_ varchar(64),
     ACT_NAME_ varchar(255),
     ACT_TYPE_ varchar(255) not null,
     ASSIGNEE_ varchar(64),
@@ -114,6 +114,23 @@ create table ACT_HI_ATTACHMENT (
     PROC_INST_ID_ varchar(64),
     URL_ varchar(4000),
     CONTENT_ID_ varchar(64),
+    primary key (ID_)
+);
+
+create table ACT_HI_OP_LOG (
+    ID_ varchar(64) not null,
+    PROC_DEF_ID_ varchar(64),
+    PROC_INST_ID_ varchar(64),
+    EXECUTION_ID_ varchar(64),
+    TASK_ID_ varchar(64),
+    USER_ID_ varchar(255),
+    TIMESTAMP_ timestamp not null,
+    OPERATION_TYPE_ varchar(64),
+    OPERATION_ID_ varchar(64),
+    ENTITY_TYPE_ varchar(30),
+    PROPERTY_ varchar(64),
+    ORG_VALUE_ varchar(4000),
+    NEW_VALUE_ varchar(4000),
     primary key (ID_)
 );
 

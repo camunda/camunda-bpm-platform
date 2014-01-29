@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -28,7 +30,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 
 /** Service which provides access to {@link Task} and form related operations.
- * 
+ *
  * @author Tom Baeyens
  * @author Joram Barrez
  */
@@ -36,14 +38,14 @@ public interface TaskService {
 
 	/**
 	 * Creates a new task that is not related to any process instance.
-	 * 
+	 *
 	 * The returned task is transient and must be saved with {@link #saveTask(Task)} 'manually'.
 	 */
   Task newTask();
-  
+
   /** create a new task with a user defined task id */
   Task newTask(String taskId);
-	
+
 	/**
 	 * Saves the given task to the persistent data store. If the task is already
 	 * present in the persistent store, it is updated.
@@ -52,7 +54,7 @@ public interface TaskService {
 	 * @param task the task, cannot be null.
 	 */
 	void saveTask(Task task);
-	
+
 	/**
 	 * Deletes the given task, not deleting historic information that is related to this task.
 	 * @param taskId The id of the task that will be deleted, cannot be null. If no task
@@ -61,9 +63,9 @@ public interface TaskService {
    *   of a running process.
 	 */
 	void deleteTask(String taskId);
-	
+
 	/**
-	 * Deletes all tasks of the given collection, not deleting historic information that is related 
+	 * Deletes all tasks of the given collection, not deleting historic information that is related
 	 * to these tasks.
 	 * @param taskIds The id's of the tasks that will be deleted, cannot be null. All
 	 * id's in the list that don't have an existing task will be ignored.
@@ -71,7 +73,7 @@ public interface TaskService {
    *  is part of a running process.
 	 */
 	void deleteTasks(Collection<String> taskIds);
-	
+
   /**
    * Deletes the given task.
    * @param taskId The id of the task that will be deleted, cannot be null. If no task
@@ -81,7 +83,7 @@ public interface TaskService {
    *   of a running process.
    */
   void deleteTask(String taskId, boolean cascade);
-  
+
   /**
    * Deletes all tasks of the given collection.
    * @param taskIds The id's of the tasks that will be deleted, cannot be null. All
@@ -93,7 +95,7 @@ public interface TaskService {
    *  is part of a running process.
    */
   void deleteTasks(Collection<String> taskIds, boolean cascade);
-  
+
   /**
    * Deletes the given task, not deleting historic information that is related to this task..
    * @param taskId The id of the task that will be deleted, cannot be null. If no task
@@ -103,7 +105,7 @@ public interface TaskService {
    *  of a running process
    */
   void deleteTask(String taskId, String deleteReason);
-  
+
   /**
    * Deletes all tasks of the given collection, not deleting historic information that is related to these tasks.
    * @param taskIds The id's of the tasks that will be deleted, cannot be null. All
@@ -113,11 +115,11 @@ public interface TaskService {
    *  is part of a running process.
    */
   void deleteTasks(Collection<String> taskIds, String deleteReason);
-  
+
   /**
    * Claim responsibility for a task:
    * the given user is made {@link Task#getAssignee() assignee} for the task.
-   * The difference with {@link #setAssignee(String, String)} is that here 
+   * The difference with {@link #setAssignee(String, String)} is that here
    * a check is done if the task already has a user assigned to it.
    * No check is done whether the user is known by the identity component.
    * @param taskId task to claim, cannot be null.
@@ -127,7 +129,7 @@ public interface TaskService {
    * is already claimed by another user.
    */
   void claim(String taskId, String userId);
-  
+
   /**
    * Marks a task as done and continues process execution.
    *
@@ -138,7 +140,7 @@ public interface TaskService {
    * @throws ProcessEngineException when no task exists with the given id or when this task is {@link DelegationState#PENDING} delegation.
    */
   void complete(String taskId);
-  
+
   /**
    * Delegates the task to another user.
    *
@@ -155,7 +157,7 @@ public interface TaskService {
    * @throws ProcessEngineException when no task exists with the given id.
    */
   void delegateTask(String taskId, String userId);
-  
+
   /**
    * Marks that the {@link Task#getAssignee() assignee} is done with the task
    * {@link TaskService#delegateTask(String, String) delegated}
@@ -168,7 +170,7 @@ public interface TaskService {
    * @throws ProcessEngineException when no task exists with the given id.
    */
   void resolveTask(String taskId);
-  
+
   /**
    * Marks that the {@link Task#getAssignee() assignee} is done with the task
    * {@link TaskService#delegateTask(String, String) delegated}
@@ -205,7 +207,7 @@ public interface TaskService {
    * @throws ProcessEngineException when the task or user doesn't exist.
    */
   void setAssignee(String taskId, String userId);
-  
+
   /**
    * Transfers ownership of this task to another user.
    * No check is done whether the user is known by the identity component.
@@ -214,14 +216,14 @@ public interface TaskService {
    * @throws ProcessEngineException when the task or user doesn't exist.
    */
   void setOwner(String taskId, String userId);
-  
+
   /**
    * Retrieves the {@link IdentityLink}s associated with the given task.
    * Such an {@link IdentityLink} informs how a certain identity (eg. group or user)
    * is associated with a certain task (eg. as candidate, assignee, etc.)
    */
   List<IdentityLink> getIdentityLinksForTask(String taskId);
-  
+
   /**
    * Convenience shorthand for {@link #addUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
    * @param taskId id of the task, cannot be null.
@@ -229,7 +231,7 @@ public interface TaskService {
    * @throws ProcessEngineException when the task or user doesn't exist.
    */
   void addCandidateUser(String taskId, String userId);
-  
+
   /**
    * Convenience shorthand for {@link #addGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
    * @param taskId id of the task, cannot be null.
@@ -237,7 +239,7 @@ public interface TaskService {
    * @throws ProcessEngineException when the task or group doesn't exist.
    */
   void addCandidateGroup(String taskId, String groupId);
-  
+
   /**
    * Involves a user with a task. The type of identity link is defined by the
    * given identityLinkType.
@@ -247,7 +249,7 @@ public interface TaskService {
    * @throws ProcessEngineException when the task or user doesn't exist.
    */
   void addUserIdentityLink(String taskId, String userId, String identityLinkType);
-  
+
   /**
    * Involves a group with a task. The type of identityLink is defined by the
    * given identityLink.
@@ -257,7 +259,7 @@ public interface TaskService {
    * @throws ProcessEngineException when the task or group doesn't exist.
    */
   void addGroupIdentityLink(String taskId, String groupId, String identityLinkType);
-  
+
   /**
    * Convenience shorthand for {@link #deleteUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
    * @param taskId id of the task, cannot be null.
@@ -265,7 +267,7 @@ public interface TaskService {
    * @throws ProcessEngineException when the task or user doesn't exist.
    */
   void deleteCandidateUser(String taskId, String userId);
-  
+
   /**
    * Convenience shorthand for {@link #deleteGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
    * @param taskId id of the task, cannot be null.
@@ -273,7 +275,7 @@ public interface TaskService {
    * @throws ProcessEngineException when the task or group doesn't exist.
    */
   void deleteCandidateGroup(String taskId, String groupId);
-  
+
   /**
    * Removes the association between a user and a task for the given identityLinkType.
    * @param taskId id of the task, cannot be null.
@@ -282,7 +284,7 @@ public interface TaskService {
    * @throws ProcessEngineException when the task or user doesn't exist.
    */
   void deleteUserIdentityLink(String taskId, String userId, String identityLinkType);
-  
+
   /**
    * Removes the association between a group and a task for the given identityLinkType.
    * @param taskId id of the task, cannot be null.
@@ -291,43 +293,43 @@ public interface TaskService {
    * @throws ProcessEngineException when the task or group doesn't exist.
    */
   void deleteGroupIdentityLink(String taskId, String groupId, String identityLinkType);
-  
+
   /**
    * Changes the priority of the task.
-   * 
+   *
    * Authorization: actual owner / business admin
-   * 
+   *
    * @param taskId id of the task, cannot be null.
    * @param priority the new priority for the task.
    * @throws ProcessEngineException when the task doesn't exist.
    */
   void setPriority(String taskId, int priority);
-  
+
   /**
    * Returns a new {@link TaskQuery} that can be used to dynamically query tasks.
    */
   TaskQuery createTaskQuery();
-  
+
   /**
-   * Returns a new 
+   * Returns a new
    */
   NativeTaskQuery createNativeTaskQuery();
 
-  /** set variable on a task.  If the variable is not already existing, it will be created in the 
-   * most outer scope.  This means the process instance in case this task is related to an 
+  /** set variable on a task.  If the variable is not already existing, it will be created in the
+   * most outer scope.  This means the process instance in case this task is related to an
    * execution. */
   void setVariable(String taskId, String variableName, Object value);
 
-  /** set variables on a task.  If the variable is not already existing, it will be created in the 
-   * most outer scope.  This means the process instance in case this task is related to an 
+  /** set variables on a task.  If the variable is not already existing, it will be created in the
+   * most outer scope.  This means the process instance in case this task is related to an
    * execution. */
   void setVariables(String taskId, Map<String, ? extends Object> variables);
 
-  /** set variable on a task.  If the variable is not already existing, it will be created in the 
+  /** set variable on a task.  If the variable is not already existing, it will be created in the
    * task.  */
   void setVariableLocal(String taskId, String variableName, Object value);
 
-  /** set variables on a task.  If the variable is not already existing, it will be created in the 
+  /** set variables on a task.  If the variable is not already existing, it will be created in the
    * task.  */
   void setVariablesLocal(String taskId, Map<String, ? extends Object> variables);
 
@@ -337,13 +339,13 @@ public interface TaskService {
   /** get a variables and only search in the task scope.  */
   Object getVariableLocal(String taskId, String variableName);
 
-  /** get all variables and search in the task scope and if available also the execution scopes. 
-   * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)} 
+  /** get all variables and search in the task scope and if available also the execution scopes.
+   * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
    * for better performance.*/
   Map<String, Object> getVariables(String taskId);
 
   /** get all variables and search only in the task scope.
-  * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)} 
+  * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
   * for better performance.*/
   Map<String, Object> getVariablesLocal(String taskId);
 
@@ -352,7 +354,7 @@ public interface TaskService {
 
   /** get a variable on a task */
   Map<String, Object> getVariablesLocal(String taskId, Collection<String> variableNames);
-  
+
   /**
    * Removes the variable from the task.
    * When the variable does not exist, nothing happens.
@@ -383,7 +385,15 @@ public interface TaskService {
   /** The comments related to the given task. */
   List<Comment> getTaskComments(String taskId);
 
-  /** The all events related to the given task. */
+  /** The all events related to the given task.
+   *
+   *  <p><strong>Deprecation</strong>
+   * This method has been deprecated as of camunda BPM 7.1. It has been replaced with
+   * the operation log. See {@link UserOperationLogEntry} and {@link UserOperationLogQuery}.</p>
+   *
+   * @see HistoryService#createUserOperationLogQuery()
+   */
+  @Deprecated
   List<Event> getTaskEvents(String taskId);
 
   /** The comments related to the given process instance. */
@@ -394,16 +404,16 @@ public interface TaskService {
 
   /** Add a new attachment to a task and/or a process instance and use an url as the content */
   Attachment createAttachment(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, String url);
-  
+
   /** Update the name and decription of an attachment */
   void saveAttachment(Attachment attachment);
-  
+
   /** Retrieve a particular attachment */
   Attachment getAttachment(String attachmentId);
-  
+
   /** Retrieve stream content of a particular attachment */
   InputStream getAttachmentContent(String attachmentId);
-  
+
   /** The list of attachments associated to a task */
   List<Attachment> getTaskAttachments(String taskId);
 

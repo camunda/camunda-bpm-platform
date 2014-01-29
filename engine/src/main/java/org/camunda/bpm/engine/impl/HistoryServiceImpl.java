@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricActivityInstanceQuery;
@@ -52,6 +53,10 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
 
   public HistoricDetailQuery createHistoricDetailQuery() {
     return new HistoricDetailQueryImpl(commandExecutor);
+  }
+
+  public UserOperationLogQuery createUserOperationLogQuery() {
+    return new UserOperationLogQueryImpl(commandExecutor);
   }
 
   public HistoricVariableInstanceQuery createHistoricVariableInstanceQuery() {

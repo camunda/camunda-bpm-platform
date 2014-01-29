@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,14 +22,18 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cmd.AddCommentCmd;
-import org.camunda.bpm.engine.impl.cmd.AddIdentityLinkCmd;
+import org.camunda.bpm.engine.impl.cmd.AddGroupIdentityLinkCmd;
+import org.camunda.bpm.engine.impl.cmd.AddUserIdentityLinkCmd;
+import org.camunda.bpm.engine.impl.cmd.AssignTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.ClaimTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.DelegateTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteAttachmentCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteGroupIdentityLinkCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteUserIdentityLinkCmd;
 import org.camunda.bpm.engine.impl.cmd.GetAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.GetAttachmentContentCmd;
 import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForTaskCmd;
@@ -45,6 +49,7 @@ import org.camunda.bpm.engine.impl.cmd.RemoveTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.ResolveTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskOwnerCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -67,25 +72,25 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   public Task newTask() {
     return newTask(null);
   }
-  
+
   public Task newTask(String taskId) {
     TaskEntity task = TaskEntity.create();
     task.setId(taskId);
     return task;
   }
-  
+
   public void saveTask(Task task) {
     commandExecutor.execute(new SaveTaskCmd(task));
   }
-  
+
   public void deleteTask(String taskId) {
     commandExecutor.execute(new DeleteTaskCmd(taskId, null, false));
   }
-  
+
   public void deleteTasks(Collection<String> taskIds) {
     commandExecutor.execute(new DeleteTaskCmd(taskIds, null, false));
   }
-  
+
   public void deleteTask(String taskId, boolean cascade) {
     commandExecutor.execute(new DeleteTaskCmd(taskId, null, cascade));
   }
@@ -93,68 +98,67 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   public void deleteTasks(Collection<String> taskIds, boolean cascade) {
     commandExecutor.execute(new DeleteTaskCmd(taskIds, null, cascade));
   }
-  
+
   public void deleteTask(String taskId, String deleteReason) {
     commandExecutor.execute(new DeleteTaskCmd(taskId, deleteReason, false));
   }
-  
+
   public void deleteTasks(Collection<String> taskIds, String deleteReason) {
     commandExecutor.execute(new DeleteTaskCmd(taskIds, deleteReason, false));
   }
 
   public void setAssignee(String taskId, String userId) {
-    commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, null, IdentityLinkType.ASSIGNEE));
+    commandExecutor.execute(new AssignTaskCmd(taskId, userId));
   }
-  
+
   public void setOwner(String taskId, String userId) {
-    commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, null, IdentityLinkType.OWNER));
+    commandExecutor.execute(new SetTaskOwnerCmd(taskId, userId));
   }
-  
+
   public void addCandidateUser(String taskId, String userId) {
-    commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, null, IdentityLinkType.CANDIDATE));
+    commandExecutor.execute(new AddUserIdentityLinkCmd(taskId, userId, IdentityLinkType.CANDIDATE));
   }
-  
+
   public void addCandidateGroup(String taskId, String groupId) {
-    commandExecutor.execute(new AddIdentityLinkCmd(taskId, null, groupId, IdentityLinkType.CANDIDATE));
+    commandExecutor.execute(new AddGroupIdentityLinkCmd(taskId, groupId, IdentityLinkType.CANDIDATE));
   }
-  
+
   public void addUserIdentityLink(String taskId, String userId, String identityLinkType) {
-    commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, null, identityLinkType));
+    commandExecutor.execute(new AddUserIdentityLinkCmd(taskId, userId, identityLinkType));
   }
 
   public void addGroupIdentityLink(String taskId, String groupId, String identityLinkType) {
-    commandExecutor.execute(new AddIdentityLinkCmd(taskId, null, groupId, identityLinkType));
+    commandExecutor.execute(new AddGroupIdentityLinkCmd(taskId, groupId, identityLinkType));
   }
-  
+
   public void deleteCandidateGroup(String taskId, String groupId) {
-    commandExecutor.execute(new DeleteIdentityLinkCmd(taskId, null, groupId, IdentityLinkType.CANDIDATE));
+    commandExecutor.execute(new DeleteGroupIdentityLinkCmd(taskId, groupId, IdentityLinkType.CANDIDATE));
   }
 
   public void deleteCandidateUser(String taskId, String userId) {
-    commandExecutor.execute(new DeleteIdentityLinkCmd(taskId, userId, null, IdentityLinkType.CANDIDATE));
+    commandExecutor.execute(new DeleteUserIdentityLinkCmd(taskId, userId, IdentityLinkType.CANDIDATE));
   }
 
   public void deleteGroupIdentityLink(String taskId, String groupId, String identityLinkType) {
-    commandExecutor.execute(new DeleteIdentityLinkCmd(taskId, null, groupId, identityLinkType));
+    commandExecutor.execute(new DeleteGroupIdentityLinkCmd(taskId, groupId, identityLinkType));
   }
 
   public void deleteUserIdentityLink(String taskId, String userId, String identityLinkType) {
-    commandExecutor.execute(new DeleteIdentityLinkCmd(taskId, userId, null, identityLinkType));
+    commandExecutor.execute(new DeleteUserIdentityLinkCmd(taskId, userId, identityLinkType));
   }
-  
+
   public List<IdentityLink> getIdentityLinksForTask(String taskId) {
     return commandExecutor.execute(new GetIdentityLinksForTaskCmd(taskId));
   }
-  
+
   public void claim(String taskId, String userId) {
-    ClaimTaskCmd cmd = new ClaimTaskCmd(taskId, userId);
-    commandExecutor.execute(cmd);
+    commandExecutor.execute(new ClaimTaskCmd(taskId, userId));
   }
 
   public void complete(String taskId) {
     commandExecutor.execute(new CompleteTaskCmd(taskId, null));
   }
-  
+
   public void complete(String taskId, Map<String, Object> variables) {
     commandExecutor.execute(new CompleteTaskCmd(taskId, variables));
   }
@@ -174,15 +178,15 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   public void setPriority(String taskId, int priority) {
     commandExecutor.execute(new SetTaskPriorityCmd(taskId, priority) );
   }
-  
+
   public TaskQuery createTaskQuery() {
     return new TaskQueryImpl(commandExecutor);
   }
- 
+
   public NativeTaskQuery createNativeTaskQuery() {
     return new NativeTaskQueryImpl(commandExecutor);
   }
-  
+
   public Map<String, Object> getVariables(String executionId) {
     return commandExecutor.execute(new GetTaskVariablesCmd(executionId, null, false));
   }
@@ -202,11 +206,11 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   public Object getVariable(String executionId, String variableName) {
     return commandExecutor.execute(new GetTaskVariableCmd(executionId, variableName, false));
   }
-  
+
   public Object getVariableLocal(String executionId, String variableName) {
     return commandExecutor.execute(new GetTaskVariableCmd(executionId, variableName, true));
   }
-  
+
   public void setVariable(String executionId, String variableName, Object value) {
     if(variableName == null) {
       throw new ProcessEngineException("variableName is null");
@@ -215,7 +219,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     variables.put(variableName, value);
     commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, false));
   }
-  
+
   public void setVariableLocal(String executionId, String variableName, Object value) {
     if(variableName == null) {
       throw new ProcessEngineException("variableName is null");

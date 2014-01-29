@@ -117,6 +117,23 @@ create table ACT_HI_ATTACHMENT (
     primary key (ID_)
 );
 
+create table ACT_HI_OP_LOG (
+    ID_ nvarchar(64) not null,
+    PROC_DEF_ID_ nvarchar(64),
+    PROC_INST_ID_ nvarchar(64),
+    EXECUTION_ID_ nvarchar(64),
+    TASK_ID_ nvarchar(64),
+    USER_ID_ nvarchar(255),
+    TIMESTAMP_ datetime2 not null,
+    OPERATION_TYPE_ nvarchar(64),
+    OPERATION_ID_ nvarchar(64),
+    ENTITY_TYPE_ nvarchar(30),
+    PROPERTY_ nvarchar(64),
+    ORG_VALUE_ nvarchar(4000),
+    NEW_VALUE_ nvarchar(4000),
+    primary key (ID_)
+);
+
 create index ACT_IDX_HI_PRO_INST_END on ACT_HI_PROCINST(END_TIME_);
 create index ACT_IDX_HI_PRO_I_BUSKEY on ACT_HI_PROCINST(BUSINESS_KEY_);
 create index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST(START_TIME_);

@@ -21,6 +21,8 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -61,6 +63,9 @@ public interface HistoryService {
 
   /** Creates a new programmatic query to search for {@link HistoricVariableInstance}s. */
   HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
+
+  /** Creates a new programmatic query to search for {@link UserOperationLogEntry} instances. */
+  UserOperationLogQuery createUserOperationLogQuery();
 
   /** Deletes historic task instance.  This might be useful for tasks that are
    * {@link TaskService#newTask() dynamically created} and then {@link TaskService#complete(String) completed}.

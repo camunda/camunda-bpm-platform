@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -24,25 +25,27 @@ import org.camunda.bpm.engine.task.Task;
  * @author Joram Barrez
  */
 public class SaveTaskCmd implements Command<Void>, Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-  
+
 	protected TaskEntity task;
-	
+
 	public SaveTaskCmd(Task task) {
 		this.task = (TaskEntity) task;
 	}
-	
+
 	public Void execute(CommandContext commandContext) {
 	  if(task == null) {
 	    throw new ProcessEngineException("task is null");
 	  }
-	  
+
     if (task.getRevision()==0) {
       task.insert(null);
       commandContext.getHistoricTaskInstanceManager().createHistoricTask(task);
+      task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_CREATE);
     } else {
       task.update();
+      task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_UPDATE);
     }
 
     return null;

@@ -37,13 +37,15 @@ public class DeleteIdentityLinkCmd implements Command<Void>, Serializable {
   private static final long serialVersionUID = 1L;
 
   protected String userId;
-  
+
   protected String groupId;
-  
+
   protected String type;
-  
+
   protected String taskId;
-  
+
+  protected TaskEntity task;
+
   public DeleteIdentityLinkCmd(String taskId, String userId, String groupId, String type) {
     validateParams(userId, groupId, type, taskId);
     this.taskId = taskId;
@@ -51,21 +53,21 @@ public class DeleteIdentityLinkCmd implements Command<Void>, Serializable {
     this.groupId = groupId;
     this.type = type;
   }
-  
+
   protected void validateParams(String userId, String groupId, String type, String taskId) {
-    if(taskId == null) {
+    if (taskId == null) {
       throw new ProcessEngineException("taskId is null");
     }
-    
+
     if (type == null) {
       throw new ProcessEngineException("type is required when adding a new task identity link");
     }
-    
+
     // Special treatment for assignee and owner: group cannot be used and userId may be null
     if (IdentityLinkType.ASSIGNEE.equals(type) || IdentityLinkType.OWNER.equals(type)) {
       if (groupId != null) {
         throw new ProcessEngineException("Incompatible usage: cannot use type '" + type
-                + "' together with a groupId");
+            + "' together with a groupId");
       }
     } else {
       if (userId == null && groupId == null) {
@@ -73,47 +75,29 @@ public class DeleteIdentityLinkCmd implements Command<Void>, Serializable {
       }
     }
   }
-  
+
   public Void execute(CommandContext commandContext) {
-    if(taskId == null) {
+    if (taskId == null) {
       throw new ProcessEngineException("taskId is null");
     }
-    
-    TaskEntity task = commandContext
-      .getTaskManager()
-      .findTaskById(taskId);
-    
+
+    task = commandContext
+        .getTaskManager()
+        .findTaskById(taskId);
+
     if (task == null) {
       throw new ProcessEngineException("Cannot find task with id " + taskId);
     }
-    
+
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       task.setAssignee(null);
     } else if (IdentityLinkType.OWNER.equals(type)) {
-        task.setOwner(null);
+      task.setOwner(null);
     } else {
       task.deleteIdentityLink(userId, groupId, type);
     }
-    
-    CommentManager commentManager = commandContext.getCommentManager();
-    if (commentManager.isHistoryEnabled()) {
-      String authenticatedUserId = commandContext.getAuthenticatedUserId();
-      CommentEntity comment = new CommentEntity();
-      comment.setUserId(authenticatedUserId);
-      comment.setType(CommentEntity.TYPE_EVENT);
-      comment.setTime(ClockUtil.getCurrentTime());
-      comment.setTaskId(taskId);
-      if (userId!=null) {
-        comment.setAction(Event.ACTION_DELETE_USER_LINK);
-        comment.setMessage(new String[]{userId, type});
-      } else {
-        comment.setAction(Event.ACTION_DELETE_GROUP_LINK);
-        comment.setMessage(new String[]{groupId, type});
-      }
-      commentManager.insert(comment);
-    }
-    
-    return null;  
+
+    return null;
   }
-  
+
 }

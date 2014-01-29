@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -73,6 +74,11 @@ public class TaskManager extends AbstractManager {
         commandContext
           .getHistoricTaskInstanceManager()
           .markTaskInstanceEnded(taskId, deleteReason);
+        if (TaskEntity.DELETE_REASON_COMPLETED.equals(deleteReason)) {
+          task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
+        } else {
+          task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+        }
       }
 
       getDbSqlSession().delete(task);

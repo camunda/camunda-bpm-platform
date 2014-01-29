@@ -19,11 +19,13 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableScopeImpl;
@@ -127,6 +129,15 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       ByteArrayEntity byteArrayValue = variableInstance.getByteArrayValue();
       evt.setByteValue(byteArrayValue.getBytes());
     }
+  }
+
+  protected void initTaskOperationLogEvent(UserOperationLogEntryEventEntity evt, TaskEntity entity, String entityType) {
+    evt.setEntityType(entityType);
+    evt.setTimestamp(ClockUtil.getCurrentTime());
+    evt.setProcessDefinitionId(entity.getProcessDefinitionId());
+    evt.setProcessInstanceId(entity.getProcessInstanceId());
+    evt.setExecutionId(entity.getExecutionId());
+    evt.setTaskId(entity.getId());
   }
 
   protected HistoryEvent createHistoricVariableEvent(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl, String eventType) {
@@ -334,6 +345,25 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // set delete reason
     evt.setDeleteReason(deleteReason);
+
+    return evt;
+  }
+
+  public HistoryEvent createTaskOperationLogEvt(String entityType, String userId, String operationId, String operation, PropertyChange propertyChange, DelegateTask task) {
+    UserOperationLogEntryEventEntity evt = new UserOperationLogEntryEventEntity();
+
+    initTaskOperationLogEvent(evt, (TaskEntity) task, entityType);
+
+    evt.setUserId(userId);
+    evt.setOperationId(operationId);
+    evt.setOperationType(operation);
+    evt.setProperty(propertyChange.getPropertyName());
+
+    String orgValue = propertyChange.getOrgValueString();
+    String newValue = propertyChange.getNewValueString();
+
+    evt.setOrgValue(orgValue);
+    evt.setNewValue(newValue);
 
     return evt;
   }

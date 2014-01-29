@@ -46,7 +46,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
     final DbSqlSession dbSqlSession = getDbSqlSession();
 
     String eventType = historyEvent.getEventType();
-    if(isInitialEvent(eventType)) {
+    if(eventType == null || isInitialEvent(eventType)) {
       dbSqlSession.insert(historyEvent);
     } else {
       if(dbSqlSession.findInCache(historyEvent.getClass(), historyEvent.getId()) == null) {
