@@ -217,7 +217,16 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       console.log(param);
     };
 
-  };
+    // TODO: refactor into service
+    $scope.selectActivity = function(activityId, event) {
+      event.preventDefault();
+
+      // refresh view with selected activity instance id
+      $scope.processData.set('filter', {
+        activityIds: [activityId]
+      });
+    };
+  }
 
   module.controller('VariableInstancesController', [ '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', VariableInstancesController ]);
 

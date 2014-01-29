@@ -104,12 +104,16 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
 
       };
 
-      $scope.selectActivity = function(activityId, event) {
+      // TODO: refactor into service
+      $scope.selectActivity = function(activityId, activityInstanceId, event) {
         event.preventDefault();
-        $scope.processData.set('filter', angular.extend({}, $scope.filter, { activityIds: [activityId] }));
-      };
 
-  }];
+        // refresh view with selected activity instance id
+        $scope.processData.set('filter', {
+          activityIds: [activityId]
+        });
+      };
+    }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 

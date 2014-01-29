@@ -10,15 +10,13 @@ ngDefine('cockpit.pages.processInstance', [
     $scope.processInstance = processInstance;
 
     var currentFilter;
-    var controllerInitialized = false;
 
     var processData = $scope.processData = dataDepend.create($scope);
 
     // utilities ///////////////////////
 
     $scope.$on('$routeChanged', function() {
-      var filter = completeFilter(parseFilterFromUri(), $scope.instanceIdToInstanceMap, $scope.activityIdToInstancesMap);
-      processData.set('filter', filter);
+      processData.set('filter', parseFilterFromUri());
     });
 
     function collect(elements, fn) {
@@ -31,15 +29,13 @@ ngDefine('cockpit.pages.processInstance', [
           if (c !== undefined) {
             result.push(c);
           }
-        } catch (e) {
-          ; // safe collect -> error skips element
+        } catch (ex) {
+          // safe collect -> error skips element
         }
       });
 
       return result;
     }
-
-    var currentFilter = null;
 
     function parseFilterFromUri() {
 
@@ -62,10 +58,8 @@ ngDefine('cockpit.pages.processInstance', [
       currentFilter = {
         activityIds: activityIdsParam,
         activityInstanceIds: activityInstanceIdsParam,
-        page: parseInt(params.page) || undefined
+        page: parseInt(params.page, 10) || undefined
       };
-
-      $scope.filter = currentFilter;
 
       return currentFilter;
     }
@@ -86,11 +80,31 @@ ngDefine('cockpit.pages.processInstance', [
       $scope.filter = currentFilter = filter;
     }
 
-    function completeFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap) {
-      var activityIds = angular.copy(filter.activityIds) || [],
-          activityInstanceIds = angular.copy(filter.activityInstanceIds) || [],
-          page = parseInt(filter.page) || undefined,
-          scrollToBpmnElement;
+    /**
+     * Auto complete a filter based on the given filter data.
+     *
+     * It performs the following logic
+     * 
+     *   - If activity instances are selected, select the associated activities unless they are explicitly specified.
+     *   - If an activity is selected, select the associated activity instances unless they are explicitly specified.
+     * 
+     * @param  {Object} filter the filter to auto complete
+     * @param  {Object} instanceIdToInstanceMap a activity instance id -> activity instance map
+     * @param  {[type]} activityIdToInstancesMap a activity id -> activity instance map
+     */
+    function autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap) {
+
+      // only perform complete if filter change was triggered 
+      // from external component
+      if ($scope.currentFilter === filter) {
+        return;
+      }
+
+      var changed = false,
+          activityIds = filter.activityIds || [],
+          activityInstanceIds = filter.activityInstanceIds || [],
+          page = parseInt(filter.page, 10) || null,
+          scrollToBpmnElement = filter.scrollToBpmnElement;
 
       angular.forEach(activityInstanceIds, function (instanceId) {
         var instance = instanceIdToInstanceMap[instanceId],
@@ -99,12 +113,13 @@ ngDefine('cockpit.pages.processInstance', [
 
         if (idx === -1) {
           activityIds.push(activityId);
+          changed = true;
         }
       });
 
       angular.forEach(activityIds, function (activityId) {
         var instanceList = activityIdToInstancesMap[activityId],
-            foundAtLeastOne = false,
+            foundOne = false,
             instanceIds = [];
 
         if (instanceList) {
@@ -113,34 +128,48 @@ ngDefine('cockpit.pages.processInstance', [
             var idx = activityInstanceIds.indexOf(instance.id);
 
             if (idx !== -1) {
-              foundAtLeastOne = true;
+              foundOne = true;
               break;
             }
 
             instanceIds.push(instance.id);
           }
 
-          if (!foundAtLeastOne) {
+          if (!foundOne) {
             activityInstanceIds = activityInstanceIds.concat(instanceIds);
+            changed = true;
           }
 
         }
       });
 
       if (activityIds.length > 0) {
-        scrollToBpmnElement = activityIds[activityIds.length-1];
+        var newScrollTo = activityIds[activityIds.length - 1];
+
+        if (newScrollTo !== scrollToBpmnElement) {
+          scrollToBpmnElement = newScrollTo;
+          changed = true;
+        }
       }
 
-      filter = {};
+      // update filter only if actual changes happened above
+      // (auto completion took place)
+      if (changed) {
+        filter = {
+          activityIds: activityIds,
+          activityInstanceIds: activityInstanceIds,
+          scrollToBpmnElement: scrollToBpmnElement,
+          page: page
+        };
 
-      filter['activityIds'] = activityIds;
-      filter['activityInstanceIds'] = activityInstanceIds;
-      filter['scrollToBpmnElement'] = scrollToBpmnElement;
-      filter['page'] = page;
+        processData.set('filter', filter);
+      }
 
-      $scope.filter = currentFilter = filter;
+      // update cached filter
+      $scope.filter = $scope.currentFilter = filter;
 
-      return filter;
+      // serialize filter to url
+      serializeFilterToUri(filter);
     }
 
     // end utilities ///////////////////////
@@ -331,21 +360,7 @@ ngDefine('cockpit.pages.processInstance', [
 
     // /////// Begin usage of definied process data
 
-    processData.observe([ 'filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'], function (filter, instanceIdToInstanceMap, activityIdToInstancesMap) {
-      if (!controllerInitialized) {
-        filter = completeFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap)
-        processData.set('filter', filter);
-
-        controllerInitialized = true;
-      }
-    });
-
-    processData.observe('filter',  function(filter) {
-      if (filter != currentFilter) {
-        serializeFilterToUri(filter);
-        $scope.filter = filter;
-      }
-    });
+    processData.observe([ 'filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'], autoCompleteFilter);
 
     $scope.processDefinition = processData.observe('processDefinition', function (processDefinition) {
       $scope.processDefinition = processDefinition;
@@ -592,7 +607,17 @@ ngDefine('cockpit.pages.processInstance', [
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
 
     $routeProvider.when('/process-instance/:id', {
-      redirectTo: '/process-instance/:id/live'
+      redirectTo: function(params, currentPath, currentSearch) {
+        var redirectUrl = currentPath + '/live',
+            search = [],
+            key;
+
+        for (key in currentSearch) {
+          search.push(key + '=' + currentSearch[key]);
+        }
+
+        return redirectUrl + (search.length ? '?' + search.join('&') : '');
+      }
     });
 
     $routeProvider.when('/process-instance/:id/live', {

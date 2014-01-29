@@ -15,7 +15,7 @@
   <tbody>
     <tr ng-repeat="userTask in userTasks">
       <td>
-        <a ng-click="selectActivity(userTask.instance.id, $event)"
+        <a ng-click="selectActivity(userTask.instance.activityId, $event)"
            ng-href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
       </td>
       <td>

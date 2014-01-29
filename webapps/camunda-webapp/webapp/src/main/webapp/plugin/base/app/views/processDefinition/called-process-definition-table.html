@@ -7,8 +7,7 @@
   <tbody>
     <tr ng-repeat="calledProcessDefinition in calledProcessDefinitions">
       <td>
-        <a ng-click="selectActivity(activity.id, $event)"
-           ng-href="#/process-definition/{{ calledProcessDefinition.id }}?parentProcessDefinitionId={{ processDefinition.id }}&amp;detailsTab=call-process-definitions-table">
+        <a ng-href="#/process-definition/{{ calledProcessDefinition.id }}?parentProcessDefinitionId={{ processDefinition.id }}&amp;detailsTab=call-process-definitions-table">
           {{ calledProcessDefinition.name }}
         </a>
       </td>
@@ -22,7 +21,7 @@
         <span ng-show="calledProcessDefinition.calledFromActivities.length > 1">
           <ul>
             <li ng-repeat="activity in calledProcessDefinition.calledFromActivities">
-              <a ng-click="selectActivity(calledProcessDefinition.calledFromActivities[0].id, $event)"
+              <a ng-click="selectActivity(activity.id, $event)"
                  ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ activity.id }}&amp;detailsTab=call-process-definitions-table">
                 {{ activity.name }}
               </a>
