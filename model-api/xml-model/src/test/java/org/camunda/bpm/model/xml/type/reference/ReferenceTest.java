@@ -30,7 +30,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.xml.test.assertions.ModelAssertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.runners.Parameterized.Parameters;
 
@@ -109,34 +109,34 @@ public class ReferenceTest extends TestModelTest {
 
   @Test
   public void testReferenceIdentifier() {
-    assertThat(fatherReference.getReferenceIdentifier(tweety)).isEqualTo(daffy.getId());
-    assertThat(motherReference.getReferenceIdentifier(tweety)).isEqualTo(daisy.getId());
-    assertThat(flightPartnerRefsColl.getReferenceIdentifier(flightPartnerRef)).isEqualTo(daffy.getId());
+    assertThat(fatherReference).hasIdentifier(tweety, daffy.getId());
+    assertThat(motherReference).hasIdentifier(tweety, daisy.getId());
+    assertThat(flightPartnerRefsColl).hasIdentifier(tweety, daffy.getId());
   }
 
   @Test
   public void testReferenceTargetElement() {
-    assertThat(fatherReference.getReferenceTargetElement(tweety)).isEqualTo(daffy);
-    assertThat(motherReference.getReferenceTargetElement(tweety)).isEqualTo(daisy);
-    assertThat(flightPartnerRefsColl.getReferenceTargetElement(flightPartnerRef)).isEqualTo(daffy);
+    assertThat(fatherReference).hasTargetElement(tweety, daffy);
+    assertThat(motherReference).hasTargetElement(tweety, daisy);
+    assertThat(flightPartnerRefsColl).hasTargetElement(tweety, daffy);
 
     fatherReference.setReferenceTargetElement(tweety, plucky);
     motherReference.setReferenceTargetElement(tweety, birdo);
     flightPartnerRefsColl.setReferenceTargetElement(flightPartnerRef, daisy);
 
-    assertThat(fatherReference.getReferenceTargetElement(tweety)).isEqualTo(plucky);
-    assertThat(motherReference.getReferenceTargetElement(tweety)).isEqualTo(birdo);
-    assertThat(flightPartnerRefsColl.getReferenceTargetElement(flightPartnerRef)).isEqualTo(daisy);
+    assertThat(fatherReference).hasTargetElement(tweety, plucky);
+    assertThat(motherReference).hasTargetElement(tweety, birdo);
+    assertThat(flightPartnerRefsColl).hasTargetElement(tweety, daisy);
   }
 
   @Test
   public void testReferenceTargetAttribute() {
     Attribute<?> idAttribute = animalType.getAttribute("id");
-    assertThat(idAttribute.getIncomingReferences()).contains(fatherReference, motherReference);
+    assertThat(idAttribute).hasIncomingReferences(fatherReference, motherReference);
 
-    assertThat(fatherReference.getReferenceTargetAttribute()).isEqualTo(idAttribute);
-    assertThat(motherReference.getReferenceTargetAttribute()).isEqualTo(idAttribute);
-    assertThat(flightPartnerRefsColl.getReferenceTargetAttribute()).isEqualTo(idAttribute);
+    assertThat(fatherReference).hasTargetAttribute(idAttribute);
+    assertThat(motherReference).hasTargetAttribute(idAttribute);
+    assertThat(flightPartnerRefsColl).hasTargetAttribute(idAttribute);
   }
 
   @Test
@@ -144,17 +144,19 @@ public class ReferenceTest extends TestModelTest {
     Attribute<?> fatherAttribute = animalType.getAttribute("father");
     Attribute<?> motherAttribute = animalType.getAttribute("mother");
 
-    assertThat(fatherReference.getReferenceSourceAttribute()).isEqualTo(fatherAttribute);
-    assertThat(motherReference.getReferenceSourceAttribute()).isEqualTo(motherAttribute);
+    assertThat(fatherReference).hasSourceAttribute(fatherAttribute);
+    assertThat(motherReference).hasSourceAttribute(motherAttribute);
   }
 
   @Test
   public void testRemoveReference() {
     fatherReference.referencedElementRemoved(daffy, daffy.getId());
-    assertThat(fatherReference.getReferenceTargetElement(tweety)).isNull();
+
+    assertThat(fatherReference).hasNoTargetElement(tweety);
     assertThat(tweety.getFather()).isNull();
+
     motherReference.referencedElementRemoved(daisy, daisy.getId());
-    assertThat(motherReference.getReferenceTargetElement(tweety)).isNull();
+    assertThat(motherReference).hasNoTargetElement(tweety);
     assertThat(tweety.getMother()).isNull();
   }
 

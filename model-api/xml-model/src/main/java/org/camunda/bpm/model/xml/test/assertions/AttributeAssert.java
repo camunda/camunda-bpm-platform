@@ -14,12 +14,12 @@
 package org.camunda.bpm.model.xml.test.assertions;
 
 import org.assertj.core.api.AbstractAssert;
-import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.reference.Reference;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -191,6 +191,19 @@ public class AttributeAssert extends AbstractAssert<AttributeAssert, Attribute<?
     return this;
   }
 
+  public AttributeAssert hasIncomingReferences(Reference<?>... references) {
+    isNotNull();
+
+    List<Reference<?>> incomingReferences = Arrays.asList(references);
+    List<Reference<?>> actualIncomingReferences = actual.getIncomingReferences();
+
+    if (!actualIncomingReferences.containsAll(incomingReferences)) {
+      failWithMessage("Expected attribute <%s> to have incoming references <%s> but has <%s>", attributeName, incomingReferences, actualIncomingReferences);
+    }
+
+    return this;
+  }
+
   public AttributeAssert hasNoIncomingReferences() {
     isNotNull();
 
@@ -215,6 +228,19 @@ public class AttributeAssert extends AbstractAssert<AttributeAssert, Attribute<?
     return this;
   }
 
+  public AttributeAssert hasOutgoingReferences(Reference<?>... references) {
+    isNotNull();
+
+    List<Reference<?>> outgoingReferences = Arrays.asList(references);
+    List<Reference<?>> actualOutgoingReferences = actual.getOutgoingReferences();
+
+    if (!actualOutgoingReferences.containsAll(outgoingReferences)) {
+      failWithMessage("Expected attribute <%s> to have outgoing references <%s> but has <%s>", attributeName, outgoingReferences, actualOutgoingReferences);
+    }
+
+    return this;
+  }
+
   public AttributeAssert hasNoOutgoingReferences() {
     isNotNull();
 
@@ -226,5 +252,4 @@ public class AttributeAssert extends AbstractAssert<AttributeAssert, Attribute<?
 
     return this;
   }
-
 }

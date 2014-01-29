@@ -13,19 +13,29 @@
 
 package org.camunda.bpm.model.xml.test.assertions;
 
-import org.assertj.core.api.AbstractAssert;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.reference.AttributeReference;
-import org.camunda.bpm.model.xml.type.reference.Reference;
 
 /**
  * @author Sebastian Menski
  */
-public class AttributeReferenceAssert extends AbstractAssert<AttributeReferenceAssert, AttributeReference<?>> {
+public class AttributeReferenceAssert extends AbstractReferenceAssert<AttributeReferenceAssert, AttributeReference<?>> {
 
   protected AttributeReferenceAssert(AttributeReference<?> actual) {
     super(actual, AttributeReferenceAssert.class);
   }
 
+  public AttributeReferenceAssert hasSourceAttribute(Attribute<?> sourceAttribute) {
+    isNotNull();
+
+    Attribute<String> actualSourceAttribute = actual.getReferenceSourceAttribute();
+
+    if (!sourceAttribute.equals(actualSourceAttribute)) {
+      failWithMessage("Expected reference <%s> to have source attribute <%s> but was <%s>", actual, sourceAttribute, actualSourceAttribute);
+    }
+
+    return this;
+  }
 
 
 }

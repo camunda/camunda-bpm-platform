@@ -17,6 +17,8 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
+import org.camunda.bpm.model.xml.type.reference.AttributeReference;
+import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 
 /**
  * @author Sebastian Menski
@@ -33,6 +35,14 @@ public class ModelAssertions extends Assertions {
 
   public static ChildElementAssert assertThat(ChildElementCollection<?> actual) {
     return new ChildElementAssert(actual);
+  }
+
+  public static AttributeReferenceAssert assertThat(AttributeReference<?> actual) {
+    return new AttributeReferenceAssert(actual);
+  };
+
+  public static ElementReferenceCollectionAssert assertThat(ElementReferenceCollection<?,?> actual) {
+    return new ElementReferenceCollectionAssert(actual);
   }
 
 }

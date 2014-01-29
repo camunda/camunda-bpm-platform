@@ -18,8 +18,6 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 
-import java.util.Collection;
-
 /**
  * @author Sebastian Menski
  */
