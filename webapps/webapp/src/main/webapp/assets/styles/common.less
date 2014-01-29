@@ -1,14 +1,15 @@
+@import "_vars.less";
 /**
  * loaded to remove angular template flicker on site load
  * @see http://docs.angularjs.org/api/ng.directive:ngCloak
  */
 [ng\:cloak], [ng-cloak], .ng-cloak {
-    display: none;
+  display: none;
 }
 
 /** loading icon integration */
 .icon-loading {
-  background-image: url(../img/ajax-loader.gif);
+  background-image: url(../../img/ajax-loader.gif);
   width: 16px;
   height: 16px;
   line-height: 16px;
@@ -18,14 +19,14 @@
 
 /** suspended icon integration */
 .icon-suspended {
-  background-image: url(../img/suspended.png);
+  background-image: url(../../img/suspended.png);
   width: 18px;
   height: 14px;
   background-position: 0px 0px;
 }
 
 .icon-suspended.white {
-  background-image: url(../img/suspended-white.png);
+  background-image: url(../../img/suspended-white.png);
 }
 
 .badge.badge-suspended {
