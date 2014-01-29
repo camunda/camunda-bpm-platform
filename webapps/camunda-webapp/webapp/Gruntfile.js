@@ -238,25 +238,25 @@ module.exports = function(grunt) {
       // },
 
       // TODO: add that when using less
-      // styles: {
-      //   files: [
-      //     'src/main/webapp/styles/{**/,}*.less'
-      //   ],
-      //   tasks: [
-      //     'newer:less:development'
-      //   ]
-      // },
-
-      // TODO: remove that when using less
-      css: {
+      styles: {
         files: [
-          'src/main/webapp/assets/css/**/*.css'
+          'src/main/webapp/assets/styles/**/*.less'
         ],
         tasks: [
-          'newer:copy:css'
-          // 'copy:css'
+          'less:development'
         ]
       },
+
+      // TODO: remove that when using less
+      // css: {
+      //   files: [
+      //     'src/main/webapp/assets/css/**/*.css'
+      //   ],
+      //   tasks: [
+      //     'newer:copy:css'
+      //     // 'copy:css'
+      //   ]
+      // },
 
       servedAssets: {
         options: {
@@ -419,32 +419,32 @@ module.exports = function(grunt) {
       }
     },
 
-    // less: {
-    //   options: {
-    //     // paths: []
-    //   },
+    less: {
+      options: {
+        // paths: []
+      },
 
-    //   dist: {
-    //     options: {
-    //       cleancss: true
-    //     },
-    //     files: {
-    //       'target/webapp/assets/css/common.css': 'src/main/webapp/styles/common.less',
-    //       'target/webapp/assets/css/cockpit/loader.css': 'src/main/webapp/styles/cockpit/loader.less',
-    //       'target/webapp/assets/css/admin/loader.css': 'src/main/webapp/styles/admin/loader.less',
-    //       'target/webapp/assets/css/tasklist/loader.css': 'src/main/webapp/styles/tasklist/loader.less'
-    //     }
-    //   },
+      dist: {
+        options: {
+          cleancss: true
+        },
+        files: {
+          'target/webapp/assets/css/common.css': 'src/main/webapp/assets/styles/common.less',
+          'target/webapp/assets/css/cockpit/loader.css': 'src/main/webapp/assets/styles/cockpit/loader.less',
+          'target/webapp/assets/css/admin/loader.css': 'src/main/webapp/assets/styles/admin/loader.less',
+          'target/webapp/assets/css/tasklist/loader.css': 'src/main/webapp/assets/styles/tasklist/loader.less'
+        }
+      },
 
-    //   development: {
-    //     files: {
-    //       'target/webapp/assets/css/common.css': 'src/main/webapp/styles/common.less',
-    //       'target/webapp/assets/css/cockpit/loader.css': 'src/main/webapp/styles/cockpit/loader.less',
-    //       'target/webapp/assets/css/admin/loader.css': 'src/main/webapp/styles/admin/loader.less',
-    //       'target/webapp/assets/css/tasklist/loader.css': 'src/main/webapp/styles/tasklist/loader.less'
-    //     }
-    //   }
-    // }
+      development: {
+        files: {
+          'target/webapp/assets/css/common.css': 'src/main/webapp/assets/styles/common.less',
+          'target/webapp/assets/css/cockpit/loader.css': 'src/main/webapp/assets/styles/cockpit/loader.less',
+          'target/webapp/assets/css/admin/loader.css': 'src/main/webapp/assets/styles/admin/loader.less',
+          'target/webapp/assets/css/tasklist/loader.css': 'src/main/webapp/assets/styles/tasklist/loader.less'
+        }
+      }
+    }
   });
 
   // custom task for ngDefine minification
@@ -480,7 +480,8 @@ module.exports = function(grunt) {
 
   // Aimed to hold more complex build processes
   grunt.registerTask('build', 'Build the frontend assets', function(target) {
-    var defaultTasks = [
+    console.info();
+    var tasks = [
       'clean',
       'bower'
     ];
@@ -490,21 +491,20 @@ module.exports = function(grunt) {
       // - Minifaction: https://app.camunda.com/jira/browse/CAM-1667
       // - Bug in ngDefine: https://app.camunda.com/jira/browse/CAM-1713
 
-      return grunt.task.run(defaultTasks.concat([
+      tasks = tasks.concat([
         'copy:assets',
         'copy:dist'
-      ]));
+      ]);
     }
 
-    // tasks.push('newer:less:'+ this.target);
-    // tasks.push('less:'+ this.target);
 
-    return grunt.task.run(defaultTasks.concat([
+    tasks = tasks.concat([
+      'less:'+ target,
       'newer:copy:assets',
-      'newer:copy:development'
-      // 'copy:assets',
-      // 'copy:development'
-    ]));
+      'newer:copy:'+ target
+    ]);
+
+    return grunt.task.run(tasks);
   });
 
   grunt.registerTask('test', []);
