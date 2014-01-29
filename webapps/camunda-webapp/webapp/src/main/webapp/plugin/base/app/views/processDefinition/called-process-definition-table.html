@@ -21,7 +21,7 @@
         <span ng-show="calledProcessDefinition.calledFromActivities.length > 1">
           <ul>
             <li ng-repeat="activity in calledProcessDefinition.calledFromActivities">
-              <a ng-click="selectActivity(activity.id, $event)"
+              <a cam-select-activity="activity.id"
                  ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ activity.id }}&amp;detailsTab=call-process-definitions-table">
                 {{ activity.name }}
               </a>

@@ -1,7 +1,10 @@
 ngDefine('cockpit.pages.processInstance', [
   'require',
+  'cockpit/util/routeUtil',
   'module:dataDepend:angular-data-depend'
 ], function(module, require) {
+
+  var routeUtil = require('cockpit/util/routeUtil');
 
   function ProcessInstanceController ($scope, $rootScope, $location, $filter, $dialog, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Data, Transform, processInstance, dataDepend) {
 
@@ -9,7 +12,7 @@ ngDefine('cockpit.pages.processInstance', [
 
     $scope.processInstance = processInstance;
 
-    var currentFilter;
+    var filter;
 
     var processData = $scope.processData = dataDepend.create($scope);
 
@@ -55,18 +58,18 @@ ngDefine('cockpit.pages.processInstance', [
         return collect(vars, Variables.parse);
       }
 
-      currentFilter = {
+      $scope.filter = filter = {
         activityIds: activityIdsParam,
         activityInstanceIds: activityInstanceIdsParam,
         page: parseInt(params.page, 10) || undefined
       };
 
-      return currentFilter;
+      return filter;
     }
 
-    function serializeFilterToUri(filter) {
-      var activityIds = filter.activityIds,
-          activityInstanceIds = filter.activityInstanceIds;
+    function serializeFilterToUri(newFilter) {
+      var activityIds = newFilter.activityIds,
+          activityInstanceIds = newFilter.activityInstanceIds;
 
       function nonEmpty(array) {
         return array && array.length;
@@ -77,7 +80,7 @@ ngDefine('cockpit.pages.processInstance', [
         activityInstanceIds: nonEmpty(activityInstanceIds) ? activityInstanceIds.join(',') : null
       });
 
-      $scope.filter = currentFilter = filter;
+      $scope.filter = filter = newFilter;
     }
 
     /**
@@ -92,19 +95,17 @@ ngDefine('cockpit.pages.processInstance', [
      * @param  {Object} instanceIdToInstanceMap a activity instance id -> activity instance map
      * @param  {[type]} activityIdToInstancesMap a activity id -> activity instance map
      */
-    function autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap) {
+    function autoCompleteFilter(newFilter, instanceIdToInstanceMap, activityIdToInstancesMap) {
 
-      // only perform complete if filter change was triggered 
-      // from external component
-      if ($scope.currentFilter === filter) {
-        return;
-      }
-
-      var changed = false,
-          activityIds = filter.activityIds || [],
-          activityInstanceIds = filter.activityInstanceIds || [],
-          page = parseInt(filter.page, 10) || null,
-          scrollToBpmnElement = filter.scrollToBpmnElement;
+      var activityIds = newFilter.activityIds || [],
+          activityInstanceIds = newFilter.activityInstanceIds || [],
+          page = parseInt(newFilter.page, 10) || null,
+          scrollToBpmnElement = newFilter.scrollToBpmnElement,
+          // if filter has been changed from outside this component, 
+          // newFilter is different from cached filter
+          externalUpdate = newFilter !== filter,
+          changed,
+          completedFilter;
 
       angular.forEach(activityInstanceIds, function (instanceId) {
         var instance = instanceIdToInstanceMap[instanceId],
@@ -152,24 +153,33 @@ ngDefine('cockpit.pages.processInstance', [
         }
       }
 
+      completedFilter = {
+        activityIds: activityIds,
+        activityInstanceIds: activityInstanceIds,
+        scrollToBpmnElement: scrollToBpmnElement,
+        page: page
+      };
+
+      changed = !angular.equals(completedFilter, newFilter);
+
       // update filter only if actual changes happened above
       // (auto completion took place)
       if (changed) {
-        filter = {
-          activityIds: activityIds,
-          activityInstanceIds: activityInstanceIds,
-          scrollToBpmnElement: scrollToBpmnElement,
-          page: page
-        };
 
+        // update cached filters
+        $scope.filter = filter = completedFilter;
+
+        // notify external components of filter change
         processData.set('filter', filter);
       }
 
-      // update cached filter
-      $scope.filter = $scope.currentFilter = filter;
+      // update uri only if filter change is triggered from
+      // external view component
+      if (externalUpdate) {
 
-      // serialize filter to url
-      serializeFilterToUri(filter);
+        // serialize filter to url
+        serializeFilterToUri(filter);
+      }
     }
 
     // end utilities ///////////////////////
@@ -393,18 +403,18 @@ ngDefine('cockpit.pages.processInstance', [
     // /////// End of usage of definied process data
 
     $scope.handleBpmnElementSelection = function (id, $event) {
+      
       if (!id) {
-        var filter = {activityIds: null, activityInstanceIds: null};
-        processData.set('filter', filter);
+        processData.set('filter', {});
         return;
       }
 
       var ctrlKey = $event.ctrlKey,
-          activityIds = angular.copy(currentFilter.activityIds) || [],
-          activityInstanceIds = angular.copy(currentFilter.activityInstanceIds) || [],
+          activityIds = angular.copy(filter.activityIds) || [],
+          activityInstanceIds = angular.copy(filter.activityInstanceIds) || [],
           idx = activityIds.indexOf(id),
           instanceList = $scope.activityIdToInstancesMap[id],
-          filter = {};
+          newFilter;
 
       if (!ctrlKey) {
         activityIds = [ id ];
@@ -438,25 +448,27 @@ ngDefine('cockpit.pages.processInstance', [
         }
       }
 
-      filter['activityIds'] = activityIds;
-      filter['activityInstanceIds'] = activityInstanceIds;
+      newFilter = {
+        activityIds: activityIds,
+        activityInstanceIds: activityInstanceIds
+      };
 
-      processData.set('filter', filter);
+      processData.set('filter', newFilter);
     };
 
     $scope.handleActivityInstanceSelection = function (id, activityId, $event) {
+
       if (!id) {
-        var filter = {activityIds: null, activityInstanceIds: null};
-        processData.set('filter', filter);
+        processData.set('filter', {});
         return;
       }
 
       var ctrlKey = $event.ctrlKey,
-          activityIds = angular.copy(currentFilter.activityIds) || [],
-          activityInstanceIds = angular.copy(currentFilter.activityInstanceIds) || [],
+          activityIds = angular.copy(filter.activityIds) || [],
+          activityInstanceIds = angular.copy(filter.activityInstanceIds) || [],
           idx = activityInstanceIds.indexOf(id),
           instanceList = $scope.activityIdToInstancesMap[activityId],
-          filter = {};
+          newFilter;
 
       if (!ctrlKey) {
         activityIds = [ activityId ];
@@ -473,9 +485,7 @@ ngDefine('cockpit.pages.processInstance', [
           if (index === -1) {
             activityIds.push(activityId);
           }
-        } else
-
-        if (idx !== -1) {
+        } else {
           activityInstanceIds.splice(idx, 1);
 
           var foundAnotherActivityInstance = false;
@@ -497,11 +507,13 @@ ngDefine('cockpit.pages.processInstance', [
         }
       }
 
-      filter['activityIds'] = activityIds;
-      filter['activityInstanceIds'] = activityInstanceIds;
-      filter['scrollToBpmnElement'] = activityId;
+      newFilter = {
+        activityIds: activityIds,
+        activityInstanceIds: activityInstanceIds,
+        scrollToBpmnElement: activityId
+      };
 
-      processData.set('filter', filter);
+      processData.set('filter', newFilter);
     };
 
     $scope.$on('$routeChangeStart', function () {
@@ -607,17 +619,7 @@ ngDefine('cockpit.pages.processInstance', [
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
 
     $routeProvider.when('/process-instance/:id', {
-      redirectTo: function(params, currentPath, currentSearch) {
-        var redirectUrl = currentPath + '/live',
-            search = [],
-            key;
-
-        for (key in currentSearch) {
-          search.push(key + '=' + currentSearch[key]);
-        }
-
-        return redirectUrl + (search.length ? '?' + search.join('&') : '');
-      }
+      redirectTo: routeUtil.redirectToLive
     });
 
     $routeProvider.when('/process-instance/:id/live', {

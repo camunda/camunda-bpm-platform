@@ -8,7 +8,8 @@ ngDefine('cockpit.directives', [
   './sidebarContainer',
   './stateCircle',
   './variable',
-  './viewPills'
+  './viewPills',
+  './selectActivity'
 ], function(module) {
 
 });
