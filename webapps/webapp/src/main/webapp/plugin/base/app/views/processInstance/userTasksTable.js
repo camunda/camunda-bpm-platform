@@ -1,6 +1,6 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
 
-   function UserTaskController ($scope, search, TaskResource, Notifications) {
+  function UserTaskController ($scope, search, TaskResource, Notifications) {
 
     // input: processInstance, processData
 
@@ -106,7 +106,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       }
 
       return true;
-    }
+    };
 
     $scope.submit = function (editAssigneeFrom, userTask) {
       if (!isValid(editAssigneeFrom)) {
@@ -144,14 +144,16 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       return taskIdIdToExceptionMessageMap[userTask.id];
     };
 
+    // TODO: refactor into service
     $scope.selectActivity = function(activityId, event) {
       event.preventDefault();
-      $scope.processData.set('filter', angular.extend({}, $scope.filter, {
-        activityInstanceIds: [activityId],
-        activityIds: [activityId.split(':').shift()]
-      }));
+
+      // refresh view with selected activity instance id
+      $scope.processData.set('filter', {
+        activityIds: [activityId]
+      });
     };
-  };
+  }
 
   module.controller('UserTaskController', [ '$scope', 'search', 'TaskResource', 'Notifications', UserTaskController ]);
 
