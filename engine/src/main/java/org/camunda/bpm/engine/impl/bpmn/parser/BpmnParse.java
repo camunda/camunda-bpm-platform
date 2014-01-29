@@ -2247,6 +2247,8 @@ public class BpmnParse extends Parse {
       // scope of the boundary event is the parent of the activity to which it is attached.
       nestedActivity.setScope(parentActivity.getParentScope());
       nestedActivity.setActivityBehavior(behavior);
+
+      parseExecutionListenersOnScope(boundaryEventElement, nestedActivity);
     }
   }
 
