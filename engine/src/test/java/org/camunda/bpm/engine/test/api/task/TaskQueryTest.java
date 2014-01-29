@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -244,6 +245,18 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertNotNull(query.singleResult());
 
     query = taskService.createTaskQuery().taskAssignee("kermit");
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+    assertNull(query.singleResult());
+  }
+  
+  public void testQueryByAssigneeLike() {
+    TaskQuery query = taskService.createTaskQuery().taskAssigneeLike("gonz%");
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+    assertNotNull(query.singleResult());
+
+    query = taskService.createTaskQuery().taskAssignee("gonz");
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
     assertNull(query.singleResult());
@@ -534,6 +547,130 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     
   }
   
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testTaskVariableValueEquals.bpmn20.xml")
+  public void testTaskVariableValueLike() throws Exception {
+    
+	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+	Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    
+	Map<String, Object> variables = new HashMap<String, Object>();
+	variables.put("stringVar", "stringValue");
+    
+	taskService.setVariablesLocal(task.getId(), variables);
+    
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueLike("stringVar", "stringVal%").count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLike("stringVar", "stringVar%").count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLike("stringVar", "stringVal").count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLike("nonExistingVar", "string%").count());
+    
+    // test with null value
+    try {
+      taskService.createTaskQuery().taskVariableValueLike("stringVar", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+  }
+  
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testTaskVariableValueEquals.bpmn20.xml")
+  public void testTaskVariableValueCompare() throws Exception {
+    
+	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+	Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+		
+	Map<String, Object> variables = new HashMap<String, Object>();
+	variables.put("numericVar", 928374);
+	Date date = new GregorianCalendar(2014, 2, 2, 2, 2, 2).getTime();
+	variables.put("dateVar", date);
+	variables.put("stringVar", "ab");
+	variables.put("nullVar", null);
+	    
+	taskService.setVariablesLocal(task.getId(), variables);
+    
+    // test compare methods with numeric values
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueGreaterThan("numericVar", 928373).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueGreaterThan("numericVar", 928374).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueGreaterThan("numericVar", 928375).count());
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("numericVar", 928374).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("numericVar", 928375).count());
+    
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueLessThan("numericVar", 928375).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThan("numericVar", 928374).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThan("numericVar", 928373).count());
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("numericVar", 928374).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("numericVar", 928373).count());
+    
+    // test compare methods with date values
+    Date before = new GregorianCalendar(2014, 2, 2, 2, 2, 1).getTime();
+    Date after = new GregorianCalendar(2014, 2, 2, 2, 2, 3).getTime();
+ 
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueGreaterThan("dateVar", before).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueGreaterThan("dateVar", date).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueGreaterThan("dateVar", after).count());
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("dateVar", before).count());
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("dateVar", date).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("dateVar", after).count());
+    
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueLessThan("dateVar", after).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThan("dateVar", date).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThan("dateVar", before).count());
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("dateVar", after).count());
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("dateVar", date).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("dateVar", before).count());
+    
+    //test with string values
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueGreaterThan("stringVar", "aa").count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueGreaterThan("stringVar", "ab").count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueGreaterThan("stringVar", "ba").count());
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("stringVar", "aa").count());
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("stringVar", "ab").count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("stringVar", "ba").count());
+    
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueLessThan("stringVar", "ba").count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThan("stringVar", "ab").count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThan("stringVar", "aa").count());
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("stringVar", "ba").count());
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("stringVar", "ab").count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("stringVar", "aa").count());
+    
+    // test with null value
+    try {
+      taskService.createTaskQuery().taskVariableValueGreaterThan("nullVar", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueLessThan("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueLessThanOrEquals("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    
+ // test with boolean value
+    try {
+      taskService.createTaskQuery().taskVariableValueGreaterThan("nullVar", true).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueGreaterThanOrEquals("nullVar", false).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueLessThan("nullVar", true).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().taskVariableValueLessThanOrEquals("nullVar", false).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    
+ // test non existing variable
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLessThanOrEquals("nonExisting", 123).count());
+  }
+  
   @Deployment
   public void testProcessVariableValueEquals() throws Exception {
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -604,6 +741,123 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
             .count());
   }
   
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml")
+  public void testProcessVariableValueLike() throws Exception {
+    
+	Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("stringVar", "stringValue");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+
+    assertEquals(1, taskService.createTaskQuery().processVariableValueLike("stringVar", "stringVal%").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLike("stringVar", "stringVar%").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLike("stringVar", "stringVal").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLike("nonExistingVar", "string%").count());
+    
+    // test with null value
+    try {
+      taskService.createTaskQuery().processVariableValueLike("stringVar", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+  }
+  
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml")
+  public void testProcessVariableValueCompare() throws Exception {
+    
+	Map<String, Object> variables = new HashMap<String, Object>();
+	variables.put("numericVar", 928374);
+	Date date = new GregorianCalendar(2014, 2, 2, 2, 2, 2).getTime();
+	variables.put("dateVar", date);
+	variables.put("stringVar", "ab");
+	variables.put("nullVar", null);
+	    
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    
+    // test compare methods with numeric values
+    assertEquals(1, taskService.createTaskQuery().processVariableValueGreaterThan("numericVar", 928373).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueGreaterThan("numericVar", 928374).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueGreaterThan("numericVar", 928375).count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("numericVar", 928374).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("numericVar", 928375).count());
+    
+    assertEquals(1, taskService.createTaskQuery().processVariableValueLessThan("numericVar", 928375).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLessThan("numericVar", 928374).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLessThan("numericVar", 928373).count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueLessThanOrEquals("numericVar", 928374).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLessThanOrEquals("numericVar", 928373).count());
+    
+    // test compare methods with date values
+    Date before = new GregorianCalendar(2014, 2, 2, 2, 2, 1).getTime();
+    Date after = new GregorianCalendar(2014, 2, 2, 2, 2, 3).getTime();
+ 
+    assertEquals(1, taskService.createTaskQuery().processVariableValueGreaterThan("dateVar", before).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueGreaterThan("dateVar", date).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueGreaterThan("dateVar", after).count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("dateVar", before).count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("dateVar", date).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("dateVar", after).count());
+    
+    assertEquals(1, taskService.createTaskQuery().processVariableValueLessThan("dateVar", after).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLessThan("dateVar", date).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLessThan("dateVar", before).count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueLessThanOrEquals("dateVar", after).count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueLessThanOrEquals("dateVar", date).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLessThanOrEquals("dateVar", before).count());
+    
+    //test with string values
+    assertEquals(1, taskService.createTaskQuery().processVariableValueGreaterThan("stringVar", "aa").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueGreaterThan("stringVar", "ab").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueGreaterThan("stringVar", "ba").count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("stringVar", "aa").count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("stringVar", "ab").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("stringVar", "ba").count());
+    
+    assertEquals(1, taskService.createTaskQuery().processVariableValueLessThan("stringVar", "ba").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLessThan("stringVar", "ab").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLessThan("stringVar", "aa").count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueLessThanOrEquals("stringVar", "ba").count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueLessThanOrEquals("stringVar", "ab").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLessThanOrEquals("stringVar", "aa").count());
+    
+    // test with null value
+    try {
+      taskService.createTaskQuery().processVariableValueGreaterThan("nullVar", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueLessThan("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueLessThanOrEquals("nullVar", null).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    
+ // test with boolean value
+    try {
+      taskService.createTaskQuery().processVariableValueGreaterThan("nullVar", true).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueGreaterThanOrEquals("nullVar", false).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueLessThan("nullVar", true).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    try {
+  	  taskService.createTaskQuery().processVariableValueLessThanOrEquals("nullVar", false).count();
+  	  fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+    
+    // test non existing variable
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLessThanOrEquals("nonExisting", 123).count());
+  }
+  
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testProcessDefinitionId() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -637,6 +891,18 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     
     assertEquals(0, taskService.createTaskQuery().processDefinitionName("unexisting").count());
   }
+  
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  public void testProcessDefinitionNameLike() throws Exception {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    
+    List<Task> tasks = taskService.createTaskQuery().processDefinitionNameLike("The One Task%").list();
+    assertEquals(1, tasks.size());
+    assertEquals(processInstance.getId(), tasks.get(0).getProcessInstanceId());
+    
+    assertEquals(0, taskService.createTaskQuery().processDefinitionNameLike("The One Task").count());
+    assertEquals(0, taskService.createTaskQuery().processDefinitionNameLike("The Other Task%").count());
+  }
  
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testProcessInstanceBusinessKey() throws Exception {
@@ -645,6 +911,16 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().processDefinitionName("The One Task Process").processInstanceBusinessKey("BUSINESS-KEY-1").list().size());
     assertEquals(1, taskService.createTaskQuery().processInstanceBusinessKey("BUSINESS-KEY-1").list().size());    
     assertEquals(0, taskService.createTaskQuery().processInstanceBusinessKey("NON-EXISTING").count());
+  }
+  
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  public void testProcessInstanceBusinessKeyLike() throws Exception {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-1");
+    
+    assertEquals(1, taskService.createTaskQuery().processDefinitionName("The One Task Process").processInstanceBusinessKey("BUSINESS-KEY-1").list().size());
+    assertEquals(1, taskService.createTaskQuery().processInstanceBusinessKeyLike("BUSINESS-KEY%").list().size());    
+    assertEquals(0, taskService.createTaskQuery().processInstanceBusinessKeyLike("BUSINESS-KEY").count());
+    assertEquals(0, taskService.createTaskQuery().processInstanceBusinessKeyLike("BUZINESS-KEY%").count());
   }
  
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
@@ -955,5 +1231,4 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     return ids;
   }
-
 }

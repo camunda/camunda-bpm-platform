@@ -59,6 +59,10 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks which are assigned to the given user. */
   TaskQuery taskAssignee(String assignee);
   
+  /** Only select tasks which are matching the given user.
+   *  The syntax is that of SQL: for example usage: nameLike(%activiti%)*/
+  TaskQuery taskAssigneeLike(String assignee);
+  
   /** Only select tasks for which the given user is the owner. */
   TaskQuery taskOwner(String owner);
   
@@ -96,6 +100,10 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   
   /** Only select tasks foe the given business key */
   TaskQuery processInstanceBusinessKey(String processInstanceBusinessKey);  
+  
+  /** Only select tasks matching the given business key.
+   *  The syntax is that of SQL: for example usage: nameLike(%activiti%)*/
+  TaskQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey);
 
   /** Only select tasks for the given execution. */
   TaskQuery executionId(String executionId);
@@ -145,6 +153,37 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery taskVariableValueNotEquals(String variableName, Object variableValue);    
   
   /**
+   * Only select tasks which have a local task variable with the given name
+   * matching the given value.
+   * The syntax is that of SQL: for example usage: valueLike(%value%)
+   */
+  TaskQuery taskVariableValueLike(String variableName, String variableValue);
+  
+  /**
+   * Only select tasks which have a local task variable with the given name
+   * and a value greater than the given one.
+   */
+  TaskQuery taskVariableValueGreaterThan(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which have a local task variable with the given name
+   * and a value greater than or equal to the given one.
+   */
+  TaskQuery taskVariableValueGreaterThanOrEquals(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which have a local task variable with the given name
+   * and a value less than the given one.
+   */
+  TaskQuery taskVariableValueLessThan(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which have a local task variable with the given name
+   * and a value less than or equal to the given one.
+   */
+  TaskQuery taskVariableValueLessThanOrEquals(String variableName, Object variableValue);
+  
+  /**
    * Only select tasks which have are part of a process that have a variable
    * with the given name set to the given value.
    */
@@ -157,6 +196,36 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * are not supported.
    */
   TaskQuery processVariableValueNotEquals(String variableName, Object variableValue);  
+  
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and matching the given value.
+   * The syntax is that of SQL: for example usage: valueLike(%value%)*/
+  TaskQuery processVariableValueLike(String variableName, String variableValue);
+  
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value greater than the given one.
+   */
+  TaskQuery processVariableValueGreaterThan(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value greater than or equal to the given one.
+   */
+  TaskQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value less than the given one.
+   */
+  TaskQuery processVariableValueLessThan(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value greater than or equal to the given one.
+   */
+  TaskQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue);
   
   /**
    * Only select tasks which are part of a process instance which has the given
@@ -175,6 +244,10 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * process definition name.
    */
   TaskQuery processDefinitionName(String processDefinitionName);
+  
+  /** Only select tasks which are part of a process instance that match the given parameter.
+   *  The syntax is that of SQL: for example usage: nameLike(%processDefinitionName%)*/
+  TaskQuery processDefinitionNameLike(String processDefinitionName);
   
   /**
    * Only select tasks with the given due date.

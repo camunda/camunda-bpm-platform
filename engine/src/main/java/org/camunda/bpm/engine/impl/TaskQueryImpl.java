@@ -45,6 +45,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Integer minPriority;
   protected Integer maxPriority;
   protected String assignee;
+  protected String assigneeLike;
   protected String involvedUser;
   protected String owner;
   protected boolean unassigned = false;
@@ -64,7 +65,9 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String processDefinitionKey;
   protected String processDefinitionId;
   protected String processDefinitionName;
+  protected String processDefinitionNameLike;
   protected String processInstanceBusinessKey;
+  protected String processInstanceBusinessKeyLike;
   protected List<TaskQueryVariableValue> variables = new ArrayList<TaskQueryVariableValue>();
   protected Date dueDate;
   protected Date dueBefore;
@@ -153,6 +156,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
     this.assignee = assignee;
     return this;
+  }
+  
+  public TaskQuery taskAssigneeLike(String assignee) {
+	  if (assignee == null) {
+	      throw new ProcessEngineException("Assignee is null");
+	    }
+	    this.assigneeLike = assignee;
+	    return this;
   }
   
   public TaskQueryImpl taskOwner(String owner) {
@@ -248,6 +259,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
   
+  public TaskQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey) {
+	this.processInstanceBusinessKeyLike = processInstanceBusinessKey;
+	return this;
+  }
+  
   public TaskQueryImpl executionId(String executionId) {
     this.executionId = executionId;
     return this;
@@ -292,6 +308,46 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.NOT_EQUALS, true));
     return this;
   }
+  
+  public TaskQuery taskVariableValueLike(String variableName, String variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'like' condition");
+	}
+	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LIKE, true));
+	return this;
+  }
+  
+  public TaskQuery taskVariableValueGreaterThan(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'greater than' condition");
+	}
+	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.GREATER_THAN, true));
+	return this;
+  }
+  
+  public TaskQuery taskVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'greater than or equal' condition");
+	}
+	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, true));
+	return this;
+  }
+  
+  public TaskQuery taskVariableValueLessThan(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'less than' condition");
+	}
+	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LESS_THAN, true));
+	return this;
+  }
+  
+  public TaskQuery taskVariableValueLessThanOrEquals(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'less than or equal' condition");
+	}
+	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, true));
+	return this;
+  }
 
   public TaskQuery processVariableValueEquals(String variableName, Object variableValue) {
     variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, false));
@@ -301,6 +357,46 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQuery processVariableValueNotEquals(String variableName, Object variableValue) {
     variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.NOT_EQUALS, false));
     return this;
+  }
+  
+  public TaskQuery processVariableValueLike(String variableName, String variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'like' condition");
+	}
+	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LIKE, false));
+	return this;
+  }
+  
+  public TaskQuery processVariableValueGreaterThan(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'greater than' condition");
+	}
+	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.GREATER_THAN, false));
+	return this;
+  }
+
+  public TaskQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'greater than or equal' condition");
+	}
+	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, false));
+	return this;
+  }
+
+  public TaskQuery processVariableValueLessThan(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'less than' condition");
+	}
+	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LESS_THAN, false));
+	return this;
+  }
+
+  public TaskQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue) {
+	if(variableValue == null || isBoolean(variableValue)) {
+	  throw new ProcessEngineException("Booleans and null cannot be used in 'less than or equal' condition");
+	}
+	variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, false));
+	return this;
   }
 
   public TaskQuery processDefinitionKey(String processDefinitionKey) {
@@ -316,6 +412,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQuery processDefinitionName(String processDefinitionName) {
     this.processDefinitionName = processDefinitionName;
     return this;
+  }
+  
+  public TaskQuery processDefinitionNameLike(String processDefinitionName) {
+	this.processDefinitionNameLike = processDefinitionName;
+	return this;
   }
   
   public TaskQuery dueDate(Date dueDate) {
@@ -396,6 +497,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       var.initialize(types);
     }
   }
+  
+  private boolean isBoolean(Object value) {
+	if (value == null) {
+	  return false;
+	}
+	return Boolean.class.isAssignableFrom(value.getClass()) || boolean.class.isAssignableFrom(value.getClass());
+	}
 
   //ordering ////////////////////////////////////////////////////////////////
   
@@ -468,6 +576,9 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public String getAssignee() {
     return assignee;
   }
+  public String getAssigneeLike() {
+	return assigneeLike;
+  }
   public boolean getUnassigned() {
     return unassigned;
   }
@@ -534,8 +645,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public String getProcessDefinitionName() {
     return processDefinitionName;
   }
+  public String getProcessDefinitionNameLike() {
+	return processDefinitionNameLike;
+  }
   public String getProcessInstanceBusinessKey() {
     return processInstanceBusinessKey;
+  }
+  public String getProcessInstanceBusinessKeyLike() {
+	return processInstanceBusinessKeyLike;
   }
   public boolean getExcludeSubtasks() {
     return excludeSubtasks;
