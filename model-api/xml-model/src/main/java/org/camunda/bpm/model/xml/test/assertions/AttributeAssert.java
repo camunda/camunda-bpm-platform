@@ -14,22 +14,31 @@
 package org.camunda.bpm.model.xml.test.assertions;
 
 import org.assertj.core.api.AbstractAssert;
+import org.camunda.bpm.model.xml.ModelInstance;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
+import org.camunda.bpm.model.xml.type.reference.Reference;
+
+import java.util.List;
 
 /**
  * @author Sebastian Menski
  */
 public class AttributeAssert extends AbstractAssert<AttributeAssert, Attribute<?>> {
 
+  private final String attributeName;
+
   protected AttributeAssert(Attribute<?> actual) {
     super(actual, AttributeAssert.class);
+    attributeName = actual.getAttributeName();
   }
 
   public AttributeAssert isRequired() {
     isNotNull();
 
     if (!actual.isRequired()) {
-      failWithMessage("Expected attribute <%s> to be required but was not", actual.getAttributeName());
+      failWithMessage("Expected attribute <%s> to be required but was not", attributeName);
     }
 
     return this;
@@ -39,7 +48,7 @@ public class AttributeAssert extends AbstractAssert<AttributeAssert, Attribute<?
     isNotNull();
 
     if (actual.isRequired()) {
-      failWithMessage("Expected attribute <%s> to be optional but was required", actual.getAttributeName());
+      failWithMessage("Expected attribute <%s> to be optional but was required", attributeName);
     }
 
     return this;
@@ -49,7 +58,7 @@ public class AttributeAssert extends AbstractAssert<AttributeAssert, Attribute<?
     isNotNull();
 
     if (!actual.isIdAttribute()) {
-      failWithMessage("Expected attribute <%s> to be an ID attribute but was not", actual.getAttributeName());
+      failWithMessage("Expected attribute <%s> to be an ID attribute but was not", attributeName);
     }
 
     return this;
@@ -59,19 +68,19 @@ public class AttributeAssert extends AbstractAssert<AttributeAssert, Attribute<?
     isNotNull();
 
     if (actual.isIdAttribute()) {
-      failWithMessage("Expected attribute <%s> to be not an ID attribute but was", actual.getAttributeName());
+      failWithMessage("Expected attribute <%s> to be not an ID attribute but was", attributeName);
     }
 
     return this;
   }
 
-  public AttributeAssert hasDefaultValue(Object value) {
+  public AttributeAssert hasDefaultValue(Object defaultValue) {
     isNotNull();
 
-    Object defaultValue = actual.getDefaultValue();
+    Object actualDefaultValue = actual.getDefaultValue();
 
-    if (!value.equals(defaultValue)) {
-      failWithMessage("Expected attribute <%s> to have default value <%s> but was <%s>", actual.getAttributeName(), value, defaultValue);
+    if (!defaultValue.equals(actualDefaultValue)) {
+      failWithMessage("Expected attribute <%s> to have default value <%s> but was <%s>", attributeName, defaultValue, actualDefaultValue);
     }
 
     return this;
@@ -80,10 +89,139 @@ public class AttributeAssert extends AbstractAssert<AttributeAssert, Attribute<?
   public AttributeAssert hasNoDefaultValue() {
     isNotNull();
 
-    Object defaultValue = actual.getDefaultValue();
+    Object actualDefaultValue = actual.getDefaultValue();
 
-    if (defaultValue != null) {
-      failWithMessage("Expected attribute <%s> to have no default value but was <%s>", actual.getAttributeName(), defaultValue);
+    if (actualDefaultValue != null) {
+      failWithMessage("Expected attribute <%s> to have no default value but was <%s>", attributeName, actualDefaultValue);
+    }
+
+    return this;
+  }
+
+  public AttributeAssert hasOwningElementType(ModelElementType owningElementType) {
+    isNotNull();
+
+    ModelElementType actualOwningElementType = actual.getOwningElementType();
+
+    if (!owningElementType.equals(actualOwningElementType)) {
+      failWithMessage("Expected attribute <%s> to have owning element type <%s> but was <%s>", attributeName, owningElementType, actualOwningElementType);
+    }
+
+    return this;
+  }
+
+  public AttributeAssert hasValue(ModelElementInstance modelElementInstance) {
+    isNotNull();
+
+    Object actualValue = actual.getValue(modelElementInstance);
+
+    if (actualValue == null) {
+      failWithMessage("Expected attribute <%s> to have a value but has not", attributeName);
+    }
+
+    return this;
+  }
+
+  public AttributeAssert hasValue(ModelElementInstance modelElementInstance, Object value) {
+    isNotNull();
+
+    Object actualValue = actual.getValue(modelElementInstance);
+
+    if (!value.equals(actualValue)) {
+      failWithMessage("Expected attribute <%s> to have value <%s> but was <%s>", attributeName, value, actualValue);
+    }
+
+    return this;
+  }
+
+  public AttributeAssert hasNoValue(ModelElementInstance modelElementInstance) {
+    isNotNull();
+
+    Object actualValue = actual.getValue(modelElementInstance);
+
+    if (actualValue != null) {
+      failWithMessage("Expected attribute <%s> to have no value but was <%s>", attributeName, actualValue);
+    }
+
+    return this;
+  }
+  public AttributeAssert hasAttributeName(String attributeName) {
+    isNotNull();
+
+    if (!attributeName.equals(this.attributeName)) {
+      failWithMessage("Expected attribute to have attribute name <%s> but was <%s>", attributeName, this.attributeName);
+    }
+
+    return this;
+  }
+
+  public AttributeAssert hasNamespaceUri(String namespaceUri) {
+    isNotNull();
+
+    String actualNamespaceUri1 = actual.getNamespaceUri();
+
+    if (!namespaceUri.equals(actualNamespaceUri1)) {
+      failWithMessage("Expected attribute <%s> to have namespace URI <%s> but was <%s>", attributeName, namespaceUri, actualNamespaceUri1);
+    }
+
+    return this;
+  }
+
+  public AttributeAssert hasNoNamespaceUri() {
+    isNotNull();
+
+    String actualNamespaceUri = actual.getNamespaceUri();
+
+    if (actualNamespaceUri != null) {
+      failWithMessage("Expected attribute <%s> to have no namespace URI but was <%s>", attributeName, actualNamespaceUri);
+    }
+
+    return this;
+  }
+
+  public AttributeAssert hasIncomingReferences() {
+    isNotNull();
+
+    List<Reference<?>> actualIncomingReferences = actual.getIncomingReferences();
+
+    if (actualIncomingReferences.isEmpty()) {
+      failWithMessage("Expected attribute <%s> to have incoming references but has not", attributeName);
+    }
+
+    return this;
+  }
+
+  public AttributeAssert hasNoIncomingReferences() {
+    isNotNull();
+
+    List<Reference<?>> actualIncomingReferences = actual.getIncomingReferences();
+
+    if (!actualIncomingReferences.isEmpty()) {
+      failWithMessage("Expected attribute <%s> to have no incoming references but has <%s>", attributeName, actualIncomingReferences);
+    }
+
+    return this;
+  }
+
+  public AttributeAssert hasOutgoingReferences() {
+    isNotNull();
+
+    List<Reference<?>> actualOutgoingReferences = actual.getOutgoingReferences();
+
+    if (actualOutgoingReferences.isEmpty()) {
+      failWithMessage("Expected attribute <%s> to have outgoing references but has not", attributeName);
+    }
+
+    return this;
+  }
+
+  public AttributeAssert hasNoOutgoingReferences() {
+    isNotNull();
+
+    List<Reference<?>> actualOutgoingReferences = actual.getOutgoingReferences();
+
+    if (!actualOutgoingReferences.isEmpty()) {
+      failWithMessage("Expected attribute <%s> to have no outgoing references but has <%s>", attributeName, actualOutgoingReferences);
     }
 
     return this;

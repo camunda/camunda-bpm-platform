@@ -14,11 +14,15 @@
 package org.camunda.bpm.model.xml.test.assertions;
 
 import org.assertj.core.api.AbstractAssert;
+import org.camunda.bpm.model.xml.Model;
+import org.camunda.bpm.model.xml.impl.util.QName;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,15 +30,36 @@ import java.util.List;
  */
 public class ModelElementTypeAssert extends AbstractAssert<ModelElementTypeAssert, ModelElementType> {
 
+  private final String typeName;
+
   protected ModelElementTypeAssert(ModelElementType actual) {
     super(actual, ModelElementTypeAssert.class);
+    typeName = actual.getTypeName();
+  }
+
+  private List<String> getActualAttributeNames() {
+    List<String> actualAttributeNames = new ArrayList<String>();
+    for (Attribute<?> attribute : actual.getAttributes()) {
+      actualAttributeNames.add(attribute.getAttributeName());
+    }
+    return actualAttributeNames;
+  }
+
+  private Collection<String> getTypeNames(Collection<ModelElementType> elementTypes) {
+    List<String> typeNames = new ArrayList<String>();
+    QName qName;
+    for (ModelElementType elementType : elementTypes) {
+      qName = new QName(elementType.getTypeName(), elementType.getTypeNamespace());
+      typeNames.add(qName.toString());
+    }
+    return typeNames;
   }
 
   public ModelElementTypeAssert isAbstract() {
     isNotNull();
 
     if (!actual.isAbstract()) {
-      failWithMessage("Expected to be abstract but was not");
+      failWithMessage("Expected element type <%s> to be abstract but was not", typeName);
     }
 
     return this;
@@ -44,17 +69,19 @@ public class ModelElementTypeAssert extends AbstractAssert<ModelElementTypeAsser
     isNotNull();
 
     if (actual.isAbstract()) {
-      failWithMessage("Expected not to be abstract but was");
+      failWithMessage("Expected element type <%s> not to be abstract but was", typeName);
     }
 
     return this;
   }
 
-  public ModelElementTypeAssert extendsType(ModelElementType type) {
+  public ModelElementTypeAssert extendsType(ModelElementType baseType) {
     isNotNull();
 
-    if (!actual.getBaseType().equals(type)) {
-      failWithMessage("Expected to extend type <%s> but extends <%s>", actual.getBaseType(), type);
+    ModelElementType actualBaseType = actual.getBaseType();
+
+    if (!actualBaseType.equals(baseType)) {
+      failWithMessage("Expected element type <%s> to extend type <%s> but extends <%s>", typeName, actualBaseType, baseType);
     }
 
     return this;
@@ -63,8 +90,10 @@ public class ModelElementTypeAssert extends AbstractAssert<ModelElementTypeAsser
   public ModelElementTypeAssert extendsNoType() {
     isNotNull();
 
-    if (actual.getBaseType() != null) {
-      failWithMessage("Expected to not extend any type but extends <%s>", actual.getBaseType());
+    ModelElementType actualBaseType = actual.getBaseType();
+
+    if (actualBaseType != null) {
+      failWithMessage("Expected element type <%s> to not extend any type but extends <%s>", typeName, actualBaseType);
     }
 
     return this;
@@ -73,24 +102,22 @@ public class ModelElementTypeAssert extends AbstractAssert<ModelElementTypeAsser
   public ModelElementTypeAssert hasAttributes() {
     isNotNull();
 
-    if (actual.getAttributes().isEmpty()) {
-      failWithMessage("Expected to have attributes but has none");
+    List<Attribute<?>> actualAttributes = actual.getAttributes();
+
+    if (actualAttributes.isEmpty()) {
+      failWithMessage("Expected element type <%s> to have attributes but has none", typeName);
     }
 
     return this;
   }
 
-  public ModelElementTypeAssert hasAttributes(String... names) {
+  public ModelElementTypeAssert hasAttributes(String... attributeNames) {
     isNotNull();
 
-    List<Attribute<?>> attributes = actual.getAttributes();
-    List<String> attributeNames = new ArrayList<String>();
-    for (Attribute<?> attribute : attributes) {
-      attributeNames.add(attribute.getAttributeName());
-    }
+    List<String> actualAttributeNames = getActualAttributeNames();
 
-    if (!attributeNames.containsAll(Arrays.asList(names))) {
-      failWithMessage("Expected to have attributes <%s> but has <%s>", names, attributeNames);
+    if (!actualAttributeNames.containsAll(Arrays.asList(attributeNames))) {
+      failWithMessage("Expected element type <%s> to have attributes <%s> but has <%s>", typeName, attributeNames, actualAttributeNames);
     }
 
     return this;
@@ -99,8 +126,10 @@ public class ModelElementTypeAssert extends AbstractAssert<ModelElementTypeAsser
   public ModelElementTypeAssert hasNoAttributes() {
     isNotNull();
 
-    if (!actual.getAttributes().isEmpty()) {
-      failWithMessage("Expected to have no attributes but has <%s>", actual.getAttributes());
+    List<String> actualAttributeNames = getActualAttributeNames();
+
+    if (!actualAttributeNames.isEmpty()) {
+      failWithMessage("Expected element type <%s> to have no attributes but has <%s>", typeName, actualAttributeNames);
     }
 
     return this;
@@ -109,8 +138,10 @@ public class ModelElementTypeAssert extends AbstractAssert<ModelElementTypeAsser
   public ModelElementTypeAssert hasChildElements() {
     isNotNull();
 
-    if (actual.getChildElementTypes().isEmpty()) {
-      failWithMessage("Expected to have child elements but has non");
+    List<ModelElementType> childElementTypes = actual.getChildElementTypes();
+
+    if (childElementTypes.isEmpty()) {
+      failWithMessage("Expected element type <%s> to have child elements but has non", typeName);
     }
 
     return this;
@@ -119,10 +150,13 @@ public class ModelElementTypeAssert extends AbstractAssert<ModelElementTypeAsser
   public ModelElementTypeAssert hasChildElements(ModelElementType... types) {
     isNotNull();
 
-    List<ModelElementType> childElementTypes = actual.getChildElementTypes();
+    List<ModelElementType> childElementTypes = Arrays.asList(types);
+    List<ModelElementType> actualChildElementTypes = actual.getChildElementTypes();
 
-    if (!childElementTypes.containsAll(Arrays.asList(types))) {
-      failWithMessage("Expected to have child elements <%s> but has <%s>", types, childElementTypes);
+    if (!actualChildElementTypes.containsAll(childElementTypes)) {
+      Collection<String> typeNames = getTypeNames(childElementTypes);
+      Collection<String> actualTypeNames = getTypeNames(actualChildElementTypes);
+      failWithMessage("Expected element type <%s> to have child elements <%s> but has <%s>", typeName, typeNames, actualTypeNames);
     }
 
     return this;
@@ -131,8 +165,118 @@ public class ModelElementTypeAssert extends AbstractAssert<ModelElementTypeAsser
   public ModelElementTypeAssert hasNoChildElements() {
     isNotNull();
 
-    if (!actual.getChildElementTypes().isEmpty()) {
-      failWithMessage("Expected to have no child elements but has <%s>", actual.getAllChildElementTypes());
+    Collection<String> actualChildElementTypeNames = getTypeNames(actual.getChildElementTypes());
+
+    if (!actualChildElementTypeNames.isEmpty()) {
+      failWithMessage("Expected element type <%s> to have no child elements but has <%s>", typeName, actualChildElementTypeNames);
+    }
+
+    return this;
+  }
+
+  public ModelElementTypeAssert hasTypeName(String typeName) {
+    isNotNull();
+
+    if (!typeName.equals(this.typeName)) {
+      failWithMessage("Expected element type to have name <%s> but was <%s>", typeName, this.typeName);
+    }
+
+    return this;
+  }
+
+  public ModelElementTypeAssert hasTypeNamespace(String typeNamespace) {
+    isNotNull();
+
+    String actualTypeNamespace = actual.getTypeNamespace();
+
+    if (!typeNamespace.equals(actualTypeNamespace)) {
+      failWithMessage("Expected element type <%s> has type namespace <%s> but was <%s>", typeName, typeNamespace, actualTypeNamespace);
+    }
+
+    return this;
+  }
+
+  public ModelElementTypeAssert hasInstanceType(Class<? extends ModelElementInstance> instanceType) {
+    isNotNull();
+
+    Class<? extends ModelElementInstance> actualInstanceType = actual.getInstanceType();
+
+    if (!instanceType.equals(actualInstanceType)) {
+      failWithMessage("Expected element type <%s> has instance type <%s> but was <%s>", typeName, instanceType, actualInstanceType);
+    }
+
+    return this;
+  }
+
+  public ModelElementTypeAssert isExtended() {
+    isNotNull();
+
+    Collection<ModelElementType> actualExtendingTypes = actual.getExtendingTypes();
+
+    if (actualExtendingTypes.isEmpty()) {
+      failWithMessage("Expected element type <%s> to be extended by types but was not", typeName);
+    }
+
+    return this;
+  }
+
+  public ModelElementTypeAssert isExtendedBy(ModelElementType... types) {
+    isNotNull();
+
+    List<ModelElementType> extendingTypes = Arrays.asList(types);
+    Collection<ModelElementType> actualExtendingTypes = actual.getExtendingTypes();
+
+    if (!actualExtendingTypes.containsAll(extendingTypes)) {
+      Collection<String> typeNames = getTypeNames(extendingTypes);
+      Collection<String> actualTypeNames = getTypeNames(actualExtendingTypes);
+      failWithMessage("Expected element type <%s> to be extended by types <%s> but is extended by <%s>", typeName, typeNames, actualTypeNames);
+    }
+
+    return this;
+  }
+
+  public ModelElementTypeAssert isNotExtended() {
+    isNotNull();
+
+    Collection<String> actualExtendingTypeNames = getTypeNames(actual.getExtendingTypes());
+
+    if (!actualExtendingTypeNames.isEmpty()) {
+      failWithMessage("Expected element type <%s> to be not extend but is extended by <%s>", typeName, actualExtendingTypeNames);
+    }
+
+    return this;
+  }
+
+  public ModelElementTypeAssert isNotExtendedBy(ModelElementType... types) {
+    isNotNull();
+
+    List<ModelElementType> notExtendingTypes = Arrays.asList(types);
+    Collection<ModelElementType> actualExtendingTypes = actual.getExtendingTypes();
+
+    List<ModelElementType> errorTypes = new ArrayList<ModelElementType>();
+
+    for (ModelElementType notExtendingType : notExtendingTypes) {
+      if (actualExtendingTypes.contains(notExtendingType)) {
+        errorTypes.add(notExtendingType);
+      }
+    }
+
+    if (!errorTypes.isEmpty()) {
+      Collection<String> errorTypeNames = getTypeNames(errorTypes);
+      Collection<String> notExtendingTypeNames = getTypeNames(notExtendingTypes);
+      failWithMessage("Expected element type <%s> to be not extended by types <%s> but is extended by <%s>", typeName, notExtendingTypeNames, errorTypeNames);
+    }
+
+    return this;
+  }
+
+  public ModelElementTypeAssert isPartOfModel(Model model) {
+    isNotNull();
+
+    Model actualModel = actual.getModel();
+
+    if (!model.equals(actualModel)) {
+      failWithMessage("Expected element type <%s> to be part of model <%s> but was part of <%s>", typeName, model.getModelName(), actualModel.getModelName());
     }
 
     return this;

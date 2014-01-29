@@ -30,7 +30,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.xml.test.assertions.ModelAssertions.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
 
 /**
@@ -80,90 +80,98 @@ public class AttributeTest extends TestModelTest {
 
   @Test
   public void testOwningElementType() {
-    AttributeImpl<String> idAttributeImpl = (AttributeImpl<String>) idAttribute;
-    AttributeImpl<String> nameAttributeImpl = (AttributeImpl<String>) nameAttribute;
-    AttributeImpl<String> fatherAttributeImpl = (AttributeImpl<String>) fatherAttribute;
     ModelElementType animalType = modelInstance.getModel().getType(Animal.class);
 
-    assertThat(idAttributeImpl.getOwningElementType()).isEqualTo(animalType);
-    assertThat(nameAttributeImpl.getOwningElementType()).isEqualTo(animalType);
-    assertThat(fatherAttributeImpl.getOwningElementType()).isEqualTo(animalType);
+    assertThat(idAttribute).hasOwningElementType(animalType);
+    assertThat(nameAttribute).hasOwningElementType(animalType);
+    assertThat(fatherAttribute).hasOwningElementType(animalType);
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void testSetAttributeValue() {
     String identifier = "new-" + tweety.getId();
     idAttribute.setValue(tweety, identifier);
-    assertThat(idAttribute.getValue(tweety)).isEqualTo(identifier);
+    assertThat(idAttribute).hasValue(tweety, identifier);
   }
 
   @Test
   public void testSetDefaultValue() {
     String defaultName = "default-name";
     assertThat(tweety.getName()).isNull();
-    assertThat(nameAttribute.getDefaultValue()).isNull();
+    assertThat(nameAttribute).hasNoDefaultValue();
+
     ((AttributeImpl<String>) nameAttribute).setDefaultValue(defaultName);
+    assertThat(nameAttribute).hasDefaultValue(defaultName);
     assertThat(tweety.getName()).isEqualTo(defaultName);
+
     tweety.setName("not-" + defaultName);
     assertThat(tweety.getName()).isNotEqualTo(defaultName);
+
     tweety.removeAttribute("name");
     assertThat(tweety.getName()).isEqualTo(defaultName);
     ((AttributeImpl<String>) nameAttribute).setDefaultValue(null);
-    assertThat(nameAttribute.getDefaultValue()).isNull();
+    assertThat(nameAttribute).hasNoDefaultValue();
   }
 
   @Test
   public void testRequired() {
     tweety.removeAttribute("name");
-    assertThat(nameAttribute.isRequired()).isFalse();
+    assertThat(nameAttribute).isOptional();
+
     ((AttributeImpl<String>) nameAttribute).setRequired(true);
-    assertThat(nameAttribute.isRequired()).isTrue();
+    assertThat(nameAttribute).isRequired();
+
     ((AttributeImpl<String>) nameAttribute).setRequired(false);
   }
 
   @Test
   public void testSetNamespaceUri() {
     String testNamespace = "http://camunda.org/test";
+
     ((AttributeImpl<String>) idAttribute).setNamespaceUri(testNamespace);
-    assertThat(idAttribute.getNamespaceUri()).isEqualTo(testNamespace);
+    assertThat(idAttribute).hasNamespaceUri(testNamespace);
+
     ((AttributeImpl<String>) idAttribute).setNamespaceUri(null);
+    assertThat(idAttribute).hasNoNamespaceUri();
   }
 
   @Test
   public void testIdAttribute() {
-    assertThat(idAttribute.isIdAttribute()).isTrue();
-    assertThat(nameAttribute.isIdAttribute()).isFalse();
-    assertThat(fatherAttribute.isIdAttribute()).isFalse();
+    assertThat(idAttribute).isIdAttribute();
+    assertThat(nameAttribute).isNotIdAttribute();
+    assertThat(fatherAttribute).isNotIdAttribute();
   }
 
   @Test
   public void testAttributeName() {
-    assertThat(idAttribute.getAttributeName()).isEqualTo("id");
-    assertThat(nameAttribute.getAttributeName()).isEqualTo("name");
-    assertThat(fatherAttribute.getAttributeName()).isEqualTo("father");
+    assertThat(idAttribute).hasAttributeName("id");
+    assertThat(nameAttribute).hasAttributeName("name");
+    assertThat(fatherAttribute).hasAttributeName("father");
   }
 
   @Test
   public void testRemoveAttribute() {
     tweety.setName("test");
     assertThat(tweety.getName()).isNotNull();
+    assertThat(nameAttribute).hasValue(tweety);
+
     ((AttributeImpl<String>) nameAttribute).removeAttribute(tweety);
     assertThat(tweety.getName()).isNull();
+    assertThat(nameAttribute).hasNoValue(tweety);
   }
 
   @Test
   public void testIncomingReferences() {
-    assertThat(idAttribute.getIncomingReferences()).isNotEmpty();
-    assertThat(nameAttribute.getIncomingReferences()).isEmpty();
-    assertThat(fatherAttribute.getIncomingReferences()).isEmpty();
+    assertThat(idAttribute).hasIncomingReferences();
+    assertThat(nameAttribute).hasNoIncomingReferences();
+    assertThat(fatherAttribute).hasNoIncomingReferences();
   }
 
   @Test
   public void testOutgoingReferences() {
-    assertThat(idAttribute.getOutgoingReferences()).isEmpty();
-    assertThat(nameAttribute.getOutgoingReferences()).isEmpty();
-    assertThat(fatherAttribute.getOutgoingReferences()).isNotEmpty();
+    assertThat(idAttribute).hasNoOutgoingReferences();
+    assertThat(nameAttribute).hasNoOutgoingReferences();
+    assertThat(fatherAttribute).hasOutgoingReferences();
   }
 
 }

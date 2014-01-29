@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.model.xml.type.child;
 
-import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.UnsupportedModelOperationException;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
@@ -29,7 +28,7 @@ import org.junit.Test;
 
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.xml.test.assertions.ModelAssertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.runners.Parameterized.Parameters;
 
@@ -92,54 +91,50 @@ public class ChildElementCollectionTest extends TestModelTest {
 
   @Test
   public void testImmutable() {
-    assertThat(flightInstructorChild.isImmutable()).isFalse();
-    assertThat(flightPartnerRefCollection.isImmutable()).isFalse();
+    assertThat(flightInstructorChild).isMutable();
+    assertThat(flightPartnerRefCollection).isMutable();
 
     ((ChildElementImpl<FlightInstructor>) flightInstructorChild).setImmutable();
     ((ChildElementCollectionImpl<FlightPartnerRef>) flightPartnerRefCollection).setImmutable();
-    assertThat(flightInstructorChild.isImmutable()).isTrue();
-    assertThat(flightPartnerRefCollection.isImmutable()).isTrue();
+    assertThat(flightInstructorChild).isImmutable();
+    assertThat(flightPartnerRefCollection).isImmutable();
 
     ((ChildElementImpl<FlightInstructor>) flightInstructorChild).setMutable(true);
     ((ChildElementCollectionImpl<FlightPartnerRef>) flightPartnerRefCollection).setMutable(true);
-    assertThat(flightInstructorChild.isImmutable()).isFalse();
-    assertThat(flightPartnerRefCollection.isImmutable()).isFalse();
+    assertThat(flightInstructorChild).isMutable();
+    assertThat(flightPartnerRefCollection).isMutable();
   }
 
   @Test
   public void testMinOccurs() {
-    assertThat(flightInstructorChild.getMinOccurs()).isEqualTo(0);
-    assertThat(flightPartnerRefCollection.getMinOccurs()).isEqualTo(0);
+    assertThat(flightInstructorChild).isOptional();
+    assertThat(flightPartnerRefCollection).isOptional();
   }
 
   @Test
   public void testMaxOccurs() {
-    assertThat(flightInstructorChild.getMaxOccurs()).isEqualTo(1);
-    assertThat(flightPartnerRefCollection.getMaxOccurs()).isEqualTo(-1);
+    assertThat(flightInstructorChild).occursMaximal(1);
+    assertThat(flightPartnerRefCollection).isUnbounded();
   }
 
   @Test
   public void testChildElementType() {
-    Model model = modelInstance.getModel();
-    ModelElementType flightInstructorType = modelInstance.getModel().getType(FlightInstructor.class);
-    ModelElementType flightPartnerRefType = modelInstance.getModel().getType(FlightPartnerRef.class);
-
-    assertThat(flightInstructorChild.getChildElementType(model)).isEqualTo(flightInstructorType);
-    assertThat(flightPartnerRefCollection.getChildElementType(model)).isEqualTo(flightPartnerRefType);
+    assertThat(flightInstructorChild).containsType(FlightInstructor.class);
+    assertThat(flightPartnerRefCollection).containsType(FlightPartnerRef.class);
   }
 
   @Test
   public void testParentElementType() {
     ModelElementType flyingAnimalType = modelInstance.getModel().getType(FlyingAnimal.class);
 
-    assertThat(flightInstructorChild.getParentElementType()).isEqualTo(flyingAnimalType);
-    assertThat(flightPartnerRefCollection.getParentElementType()).isEqualTo(flyingAnimalType);
+    assertThat(flightInstructorChild).hasParentElementType(flyingAnimalType);
+    assertThat(flightPartnerRefCollection).hasParentElementType(flyingAnimalType);
   }
 
   @Test
   public void testGetChildElements() {
-    assertThat(flightInstructorChild.get(tweety)).hasSize(1);
-    assertThat(flightPartnerRefCollection.get(tweety)).hasSize(2);
+    assertThat(flightInstructorChild).hasSize(tweety, 1);
+    assertThat(flightPartnerRefCollection).hasSize(tweety, 2);
 
     FlightInstructor flightInstructor = flightInstructorChild.getChild(tweety);
     assertThat(flightInstructor.getTextContent()).isEqualTo(daffy.getId());
@@ -151,14 +146,14 @@ public class ChildElementCollectionTest extends TestModelTest {
 
   @Test
   public void testRemoveChildElements() {
-    assertThat(flightInstructorChild.getChild(tweety)).isNotNull();
-    assertThat(flightPartnerRefCollection.get(tweety)).isNotEmpty();
+    assertThat(flightInstructorChild).isNotEmpty(tweety);
+    assertThat(flightPartnerRefCollection).isNotEmpty(tweety);
 
     flightInstructorChild.removeChild(tweety);
     flightPartnerRefCollection.get(tweety).clear();
 
-    assertThat(flightInstructorChild.getChild(tweety)).isNull();
-    assertThat(flightPartnerRefCollection.get(tweety)).isEmpty();
+    assertThat(flightInstructorChild).isEmpty(tweety);
+    assertThat(flightPartnerRefCollection).isEmpty(tweety);
   }
 
   @Test

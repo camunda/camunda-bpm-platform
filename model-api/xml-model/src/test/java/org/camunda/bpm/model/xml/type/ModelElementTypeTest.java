@@ -21,8 +21,8 @@ import org.camunda.bpm.model.xml.testmodel.instance.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.camunda.bpm.model.xml.test.assertions.ModelAssertions.assertThat;
 import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
@@ -50,68 +50,68 @@ public class ModelElementTypeTest {
 
   @Test
   public void testTypeName() {
-    assertThat(animalsType.getTypeName()).isEqualTo("animals");
-    assertThat(animalType.getTypeName()).isEqualTo("animal");
-    assertThat(flyingAnimalType.getTypeName()).isEqualTo("flyingAnimal");
-    assertThat(birdType.getTypeName()).isEqualTo("bird");
+    assertThat(animalsType).hasTypeName("animals");
+    assertThat(animalType).hasTypeName("animal");
+    assertThat(flyingAnimalType).hasTypeName("flyingAnimal");
+    assertThat(birdType).hasTypeName("bird");
   }
 
   @Test
   public void testTypeNamespace() {
-    assertThat(animalsType.getTypeNamespace()).isEqualTo(MODEL_NAMESPACE);
-    assertThat(animalType.getTypeNamespace()).isEqualTo(MODEL_NAMESPACE);
-    assertThat(flyingAnimalType.getTypeNamespace()).isEqualTo(MODEL_NAMESPACE);
-    assertThat(birdType.getTypeNamespace()).isEqualTo(MODEL_NAMESPACE);
+    assertThat(animalsType).hasTypeNamespace(MODEL_NAMESPACE);
+    assertThat(animalType).hasTypeNamespace(MODEL_NAMESPACE);
+    assertThat(flyingAnimalType).hasTypeNamespace(MODEL_NAMESPACE);
+    assertThat(birdType).hasTypeNamespace(MODEL_NAMESPACE);
   }
 
   @Test
   public void testInstanceType() {
-    assertThat(animalsType.getInstanceType()).isEqualTo(Animals.class);
-    assertThat(animalType.getInstanceType()).isEqualTo(Animal.class);
-    assertThat(flyingAnimalType.getInstanceType()).isEqualTo(FlyingAnimal.class);
-    assertThat(birdType.getInstanceType()).isEqualTo(Bird.class);
+    assertThat(animalsType).hasInstanceType(Animals.class);
+    assertThat(animalType).hasInstanceType(Animal.class);
+    assertThat(flyingAnimalType).hasInstanceType(FlyingAnimal.class);
+    assertThat(birdType).hasInstanceType(Bird.class);
   }
 
   @Test
-  public void testNumberOfAttributes() {
-    assertThat(animalsType.getAttributes()).hasSize(0);
-    assertThat(animalType.getAttributes()).hasSize(7);
-    assertThat(flyingAnimalType.getAttributes()).hasSize(0);
-    assertThat(birdType.getAttributes()).hasSize(0);
+  public void testAttributes() {
+    assertThat(animalsType).hasNoAttributes();
+    assertThat(animalType).hasAttributes("id", "name", "father", "mother", "isEndangered", "gender", "age");
+    assertThat(flyingAnimalType).hasNoAttributes();
+    assertThat(birdType).hasNoAttributes();
   }
 
   @Test
   public void testBaseType() {
-    assertThat(animalsType.getBaseType()).isNull();
-    assertThat(animalType.getBaseType()).isNull();
-    assertThat(flyingAnimalType.getBaseType()).isEqualTo(animalType);
-    assertThat(birdType.getBaseType()).isEqualTo(flyingAnimalType);
+    assertThat(animalsType).extendsNoType();
+    assertThat(animalType).extendsNoType();
+    assertThat(flyingAnimalType).extendsType(animalType);
+    assertThat(birdType).extendsType(flyingAnimalType);
   }
 
   @Test
   public void testAbstractType() {
-    assertThat(animalsType.isAbstract()).isFalse();
-    assertThat(animalType.isAbstract()).isTrue();
-    assertThat(flyingAnimalType.isAbstract()).isTrue();
-    assertThat(birdType.isAbstract()).isFalse();
+    assertThat(animalsType).isNotAbstract();
+    assertThat(animalType).isAbstract();
+    assertThat(flyingAnimalType).isAbstract();
+    assertThat(birdType).isNotAbstract();
   }
 
   @Test
   public void testExtendingTypes() {
-    assertThat(animalsType.getExtendingTypes()).isEmpty();
-    assertThat(animalType.getExtendingTypes())
-      .contains(flyingAnimalType)
-      .doesNotContain(birdType);
-    assertThat(flyingAnimalType.getExtendingTypes()).contains(birdType);
-    assertThat(birdType.getExtendingTypes()).isEmpty();
+    assertThat(animalsType).isNotExtended();
+    assertThat(animalType)
+      .isExtendedBy(flyingAnimalType)
+      .isNotExtendedBy(birdType);
+    assertThat(flyingAnimalType).isExtendedBy(birdType);
+    assertThat(birdType).isNotExtended();
   }
 
   @Test
   public void testModel() {
-    assertThat(animalsType.getModel()).isEqualTo(model);
-    assertThat(animalType.getModel()).isEqualTo(model);
-    assertThat(flyingAnimalType.getModel()).isEqualTo(model);
-    assertThat(birdType.getModel()).isEqualTo(model);
+    assertThat(animalsType).isPartOfModel(model);
+    assertThat(animalType).isPartOfModel(model);
+    assertThat(flyingAnimalType).isPartOfModel(model);
+    assertThat(birdType).isPartOfModel(model);
   }
 
   @Test
@@ -158,14 +158,10 @@ public class ModelElementTypeTest {
     ModelElementType eggType = model.getType(Egg.class);
     ModelElementType spouseRefType = model.getType(SpouseRef.class);
 
-    assertThat(animalsType.getAllChildElementTypes())
-      .containsSequence(animalType);
-    assertThat(animalType.getAllChildElementTypes())
-      .containsSequence(relationshipDefinitionType, relationshipDefinitionRefType);
-    assertThat(flyingAnimalType.getAllChildElementTypes())
-      .containsSequence(flightPartnerRefType);
-    assertThat(birdType.getAllChildElementTypes())
-      .containsSequence(eggType, spouseRefType);
+    assertThat(animalsType).hasChildElements(animalType);
+    assertThat(animalType).hasChildElements(relationshipDefinitionType, relationshipDefinitionRefType);
+    assertThat(flyingAnimalType).hasChildElements(flightPartnerRefType);
+    assertThat(birdType).hasChildElements(eggType, spouseRefType);
   }
 
 }
