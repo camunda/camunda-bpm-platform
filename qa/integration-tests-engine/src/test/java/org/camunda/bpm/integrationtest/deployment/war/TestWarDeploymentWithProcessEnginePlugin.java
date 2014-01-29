@@ -48,6 +48,8 @@ public class TestWarDeploymentWithProcessEnginePlugin extends AbstractFoxPlatfor
         .addAsResource("org/camunda/bpm/integrationtest/deployment/war/groovy.bpmn20.xml")
         .addAsResource("org/camunda/bpm/integrationtest/deployment/war/groovyAsync.bpmn20.xml")
         .addAsLibraries(Maven.resolver()
+            .offline()
+            .loadPomFromFile("pom.xml")
             .resolve("org.codehaus.groovy:groovy-all:2.2.1")
             .withoutTransitivity()
             .as(JavaArchive.class));
