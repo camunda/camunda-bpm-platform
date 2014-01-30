@@ -87,13 +87,13 @@ ngDefine('cockpit.pages.processInstance', [
      * Auto complete a filter based on the given filter data.
      *
      * It performs the following logic
-     * 
+     *
      *   - If activity instances are selected, select the associated activities unless they are explicitly specified.
      *   - If an activity is selected, select the associated activity instances unless they are explicitly specified.
-     * 
+     *
      * @param  {Object} filter the filter to auto complete
      * @param  {Object} instanceIdToInstanceMap a activity instance id -> activity instance map
-     * @param  {[type]} activityIdToInstancesMap a activity id -> activity instance map
+     * @param  {*} activityIdToInstancesMap a activity id -> activity instance map
      */
     function autoCompleteFilter(newFilter, instanceIdToInstanceMap, activityIdToInstancesMap) {
 
@@ -101,7 +101,7 @@ ngDefine('cockpit.pages.processInstance', [
           activityInstanceIds = newFilter.activityInstanceIds || [],
           page = parseInt(newFilter.page, 10) || null,
           scrollToBpmnElement = newFilter.scrollToBpmnElement,
-          // if filter has been changed from outside this component, 
+          // if filter has been changed from outside this component,
           // newFilter is different from cached filter
           externalUpdate = newFilter !== filter,
           changed,
@@ -403,7 +403,7 @@ ngDefine('cockpit.pages.processInstance', [
     // /////// End of usage of definied process data
 
     $scope.handleBpmnElementSelection = function (id, $event) {
-      
+
       if (!id) {
         processData.set('filter', {});
         return;
