@@ -10,14 +10,19 @@
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-watch": "~0.5.0",
+    "grunt-newer": "~0.6.1",
     "grunt-contrib-requirejs": "*",
     "grunt-jsdoc": "~0.5.0",
     "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-less": "~0.9.0",
+    "grunt-bower-task": "~0.3.4",
+    "grunt-open": "~0.2.0",
+    "load-grunt-tasks": "~0.2.0",
+    "time-grunt": "~0.2.1",
     "requirejs": "~2.1.0",
     "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define.git",
     "bower": "~1.2.8",
     "underscore": "~1.5.2",
-    "grunt-contrib-less": "~0.9.0",
     "karma": "~0.10.0",
     "karma-chrome-launcher": "~0.1.0",
     "karma-firefox-launcher": "~0.1.0",
@@ -27,8 +32,6 @@
     "karma-jasmine": "~0.1.0",
     "karma-ng-scenario": "*",
     "karma-requirejs": "~0.2.0",
-    "karma-html2js-preprocessor": "~0.1.0",
-    "grunt-bower-task": "~0.3.4",
-    "grunt-newer": "~0.6.1"
+    "karma-html2js-preprocessor": "~0.1.0"
   }
 }

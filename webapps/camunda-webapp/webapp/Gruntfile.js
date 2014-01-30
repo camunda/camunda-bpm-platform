@@ -4,15 +4,13 @@ var _ = require('underscore');
 
 var rjsConf = require('./src/main/webapp/require-conf');
 
-var livereloadPort = parseInt(process.env.LIVERELOAD_PORT || 8081, 10);
-
 var commentLineExp = /^[\s]*<!-- (\/|#) (CE|EE)/;
 
 function productionFileProcessing(content, srcpath) {
   // removes the template comments
   content = content
             .split('\n').filter(function(line) {
-              console.info(line.slice(0, 10), !commentLineExp.test(line));
+              // console.info(line.slice(0, 10), !commentLineExp.test(line));
               return !commentLineExp.test(line);
             }).join('\n');
 
@@ -21,6 +19,8 @@ function productionFileProcessing(content, srcpath) {
 
 
 function developmentFileProcessing(content, srcpath) {
+  console.log(this, grunt);
+
   // Unfortunately, this might (in some cases) make angular complaining about template having no single root element (when the "replace" option is set to "true").
 
   // if (/\.html$/.test(srcpath)) {
@@ -32,21 +32,28 @@ function developmentFileProcessing(content, srcpath) {
   if (/require-conf.js$/.test(srcpath)) {
     content = content
               .replace(/\/\* live-reload/, '/* live-reload */')
-              .replace(/LIVERELOAD_PORT/g, livereloadPort);
+              .replace(/LIVERELOAD_PORT/g, "<%= app.liveReloadPort %>");
   }
   return content;
 }
 
 module.exports = function(grunt) {
+
+  // Load grunt tasks automatically
+  require('load-grunt-tasks')(grunt);
+
+  // Time how long tasks take. Can help when optimizing build times
+  require('time-grunt')(grunt);
+
   var packageJSON = grunt.file.readJSON('package.json');
 
   // Project configuration.
   grunt.initConfig({
     pkg: packageJSON,
 
-    build: {
-      production: {},
-      development: {}
+    app: {
+      port: parseInt(process.env.APP_PORT || 8080, 10),
+      liveReloadPort: parseInt(process.env.LIVERELOAD_PORT || 8081, 10)
     },
 
     clean: {
@@ -87,9 +94,12 @@ module.exports = function(grunt) {
         ],
         options: {
           process: function(content, srcpath) {
+
+            var liveReloadPort = grunt.config('app.liveReloadPort');
+
             return content
               .replace(/\/\* live-reload/, '/* live-reload */')
-              .replace(/LIVERELOAD_PORT/g, livereloadPort);
+              .replace(/LIVERELOAD_PORT/g, liveReloadPort);
           }
         }
       },
@@ -243,7 +253,7 @@ module.exports = function(grunt) {
 
       servedAssets: {
         options: {
-          livereload: livereloadPort
+          livereload: '<%= app.liveReloadPort %>'
         },
         files: [
           'target/webapp/assets/{css,img}/**/*.{css,jpg,png,html}',
@@ -393,8 +403,13 @@ module.exports = function(grunt) {
           exclude: []
         }]
       }
-    }
+    },
 
+    open: {
+      server: {
+        url: 'http://localhost:<%= app.port %>/camunda'
+      }
+    },
 
     // less: {
     //   options: {
@@ -424,18 +439,6 @@ module.exports = function(grunt) {
     // }
   });
 
-  // Load the plugin that provides the "uglify" task.
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  // grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-requirejs');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-jsdoc');
-  grunt.loadNpmTasks('grunt-bower-task');
-  // grunt.loadNpmTasks('grunt-karma');
-  grunt.loadNpmTasks('grunt-newer');
-
   // custom task for ngDefine minification
   grunt.registerMultiTask('ngr', 'Minifies the angular related scripts', function() {
     var done = this.async();
@@ -453,39 +456,51 @@ module.exports = function(grunt) {
     });
   });
 
+  // automatically (re-)build web assets
+  grunt.registerTask('auto-build', 'Continuously (re-)build front-end assets', function (target) {
+
+    if (target === 'dist') {
+      throw new Error('dist target not yet supported');
+    }
+
+    grunt.task.run([
+      'build',
+      'open',
+      'watch'
+    ]);
+  });
+
   // Aimed to hold more complex build processes
-  grunt.registerMultiTask('build', 'Build the frontend assets', function() {
-    var tasks = [
+  grunt.registerTask('build', 'Build the frontend assets', function(target) {
+    var defaultTasks = [
       'clean',
       'bower'
     ];
 
-    if (this.target === 'production') {
-      tasks = tasks.concat([
-        // TODO: minification using ngr:
-        // - Minifaction: https://app.camunda.com/jira/browse/CAM-1667
-        // - Bug in ngDefine: https://app.camunda.com/jira/browse/CAM-1713
+    if (target === 'dist') {
+      // TODO: minification using ngr:
+      // - Minifaction: https://app.camunda.com/jira/browse/CAM-1667
+      // - Bug in ngDefine: https://app.camunda.com/jira/browse/CAM-1713
+      
+      return grunt.task.run(defaultTasks.concat([
         'copy:assets',
         'copy:production'
-      ]);
-    }
-    else {
-      tasks = tasks.concat([
-        'newer:copy:assets',
-        'newer:copy:development'
-        // 'copy:assets',
-        // 'copy:development'
-      ]);
+      ]));
     }
 
     // tasks.push('newer:less:'+ this.target);
     // tasks.push('less:'+ this.target);
 
-    grunt.task.run(tasks);
+    return grunt.task.run(defaultTasks.concat([
+      'newer:copy:assets',
+      'newer:copy:development'
+      // 'copy:assets',
+      // 'copy:development'
+    ]));
   });
 
   grunt.registerTask('test', []);
 
   // Default task(s).
-  grunt.registerTask('default', ['build:production']);
+  grunt.registerTask('default', ['build:dist']);
 };
