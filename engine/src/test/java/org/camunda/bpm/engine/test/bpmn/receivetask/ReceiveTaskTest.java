@@ -47,6 +47,22 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
         .processInstanceId(processInstanceId).activityId(activityId).singleResult().getId();
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.simpleReceiveTask.bpmn20.xml")
+  public void testReceiveTaskWithoutMessageReference() {
+
+    // given: a process instance waiting in the receive task
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // expect: there is no message event subscription created for a receive task without a message reference
+    assertEquals(0, getEventSubscriptionList().size());
+
+    // then: we can signal the waiting receive task
+    runtimeService.signal(getExecutionId(processInstance.getId(), "waitState"));
+
+    // expect: this ends the process instance
+    assertProcessEnded(processInstance.getId());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.singleReceiveTask.bpmn20.xml")
   public void testSupportsLegacySignalingOnSingleReceiveTask() {
 
@@ -423,4 +439,24 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.parallelGatewayReceiveTask.bpmn20.xml")
+  public void testSupportsCorrelateMessageOnReceiveTaskBehindParallelGateway() {
+
+    // given: a process instance waiting in two receive tasks
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // expect: there are two message event subscriptions
+    List<EventSubscription> subscriptions = getEventSubscriptionList();
+    assertEquals(2, subscriptions.size());
+
+    // then: we can trigger both receive task event subscriptions
+    runtimeService.correlateMessage(subscriptions.get(0).getEventName());
+    runtimeService.correlateMessage(subscriptions.get(1).getEventName());
+
+    // expect: subscriptions are removed
+    assertEquals(0, getEventSubscriptionList().size());
+
+    // expect: this ends the process instance
+    assertProcessEnded(processInstance.getId());
+  }
 }
