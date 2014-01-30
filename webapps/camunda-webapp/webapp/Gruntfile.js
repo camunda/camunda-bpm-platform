@@ -6,7 +6,7 @@ var rjsConf = require('./src/main/webapp/require-conf');
 
 var commentLineExp = /^[\s]*<!-- (\/|#) (CE|EE)/;
 
-function productionFileProcessing(content, srcpath) {
+function distFileProcessing(content, srcpath) {
   // removes the template comments
   content = content
             .split('\n').filter(function(line) {
@@ -19,9 +19,9 @@ function productionFileProcessing(content, srcpath) {
 
 
 function developmentFileProcessing(content, srcpath) {
-  console.log(this, grunt);
-
-  // Unfortunately, this might (in some cases) make angular complaining about template having no single root element (when the "replace" option is set to "true").
+  // Unfortunately, this might (in some cases) make angular complaining
+  // about template having no single root element
+  // (when the "replace" option is set to "true").
 
   // if (/\.html$/.test(srcpath)) {
   //   content = '<!-- # CE - auto-comment - '+ srcpath +' -->\n'+
@@ -103,7 +103,7 @@ module.exports = function(grunt) {
           }
         }
       },
-      production: {
+      dist: {
         files: [
           {
             expand: true,
@@ -130,12 +130,12 @@ module.exports = function(grunt) {
           }
         ],
         options: {
-          process: productionFileProcessing
+          process: distFileProcessing
         }
       },
 
       // for now, copy as development, but leave the livereload comment
-      production: {
+      dist: {
         files: [
           {
             expand: true,
@@ -423,7 +423,7 @@ module.exports = function(grunt) {
     //     // paths: []
     //   },
 
-    //   production: {
+    //   dist: {
     //     options: {
     //       cleancss: true
     //     },
@@ -488,10 +488,10 @@ module.exports = function(grunt) {
       // TODO: minification using ngr:
       // - Minifaction: https://app.camunda.com/jira/browse/CAM-1667
       // - Bug in ngDefine: https://app.camunda.com/jira/browse/CAM-1713
-      
+
       return grunt.task.run(defaultTasks.concat([
         'copy:assets',
-        'copy:production'
+        'copy:dist'
       ]));
     }
 
