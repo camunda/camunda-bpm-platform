@@ -301,7 +301,8 @@ footer .version {
 }
 
 @media (min-width: 979px) {
-  .ctn-wrapper > .notifications-panel {
+  .ctn-wrapper > .notifications-panel,
+  .ctn-wrapper > [notifications-panel] {
     position: fixed;
     bottom: 40px;
     right: 20px;
@@ -311,7 +312,8 @@ footer .version {
     border-radius: 10px;
   }
 
-  .ctn-wrapper > .notifications-panel .alert {
+  .ctn-wrapper > .notifications-panel .alert,
+  .ctn-wrapper > [notifications-panel] .alert {
     margin: 10px;
   }
 

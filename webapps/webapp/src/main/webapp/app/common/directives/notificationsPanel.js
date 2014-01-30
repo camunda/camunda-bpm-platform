@@ -1,8 +1,17 @@
+/* global ngDefine: false */
 ngDefine('camunda.common.directives.notificationsPanel', [
   'angular',
   'jquery',
   'module:ngSanitize'
 ], function(module, angular, $) {
+  /**
+   * @name notificationsPanel
+   * @memberof cam.common.directives
+   * @type angular.directive
+   * @description Provides a widget for user notifications
+   * @example
+      TODO
+   */
 
   var notificationsTemplate =
 '<div class="notifications">' +
@@ -14,7 +23,7 @@ ngDefine('camunda.common.directives.notificationsPanel', [
 
   module.directive('notificationsPanel', function(Notifications, $filter) {
     return {
-      restrict: 'EAC',
+      restrict: 'EA',
       scope: {
         filter: '=notificationsFilter'
       },

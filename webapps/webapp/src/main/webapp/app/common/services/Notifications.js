@@ -1,9 +1,10 @@
+/* global ngDefine: false */
 /**
  * A notifications module to be used in client side applications.
  *
  */
 ngDefine('camunda.common.services.notifications', [ 'angular' ], function(module, angular) {
-
+  'use strict';
   var ServiceProducer = function ServiceProducer($filter, $timeout) {
     return {
       notifications : [],
@@ -83,7 +84,7 @@ ngDefine('camunda.common.services.notifications', [ 'angular' ], function(module
           notification = { status: notification };
         }
 
-        var removeCandidates = $filter('filter')(notifications, notification);
+        removeCandidates = $filter('filter')(notifications, notification);
         removeCandidates.push(notification);
 
         angular.forEach(removeCandidates, function(e) {

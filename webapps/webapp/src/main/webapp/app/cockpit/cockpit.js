@@ -1,3 +1,8 @@
+/* global ngDefine: false */
+
+/**
+ * @namespace cam.cockpit
+ */
 (function(window) {
 
   var cockpitCore = [

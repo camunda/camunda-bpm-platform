@@ -1,6 +1,6 @@
-'use strict';
-
+/* global define: false */
 define(['angular'], function(angular) {
+  'use strict';
 
   var module = angular.module('cockpit.pages');
 
@@ -17,7 +17,12 @@ define(['angular'], function(angular) {
     $rootScope.clearBreadcrumbs();
 
     // set the page title
-    $rootScope.pageTitle = [
+    // $rootScope.pageTitle = [
+    //   'camunda Cockpit',
+    //   'Dashboard'
+    // ].join(' | ');
+    $rootScope.page = $rootScope.page || {};
+    $rootScope.page.title = [
       'camunda Cockpit',
       'Dashboard'
     ].join(' | ');

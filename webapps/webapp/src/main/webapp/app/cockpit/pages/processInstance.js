@@ -1,8 +1,11 @@
+/* global ngDefine: false */
 ngDefine('cockpit.pages.processInstance', [
   'require',
+  'angular',
   'cockpit/util/routeUtil',
   'module:dataDepend:angular-data-depend'
-], function(module, require) {
+], function(module, require, angular) {
+  'use strict';
 
   var routeUtil = require('cockpit/util/routeUtil');
 
@@ -22,23 +25,23 @@ ngDefine('cockpit.pages.processInstance', [
       processData.set('filter', parseFilterFromUri());
     });
 
-    function collect(elements, fn) {
-      var result = [];
+    // function collect(elements, fn) {
+    //   var result = [];
 
-      angular.forEach(elements, function(e) {
-        try {
-          var c = fn(e);
+    //   angular.forEach(elements, function(e) {
+    //     try {
+    //       var c = fn(e);
 
-          if (c !== undefined) {
-            result.push(c);
-          }
-        } catch (ex) {
-          // safe collect -> error skips element
-        }
-      });
+    //       if (c !== undefined) {
+    //         result.push(c);
+    //       }
+    //     } catch (ex) {
+    //       // safe collect -> error skips element
+    //     }
+    //   });
 
-      return result;
-    }
+    //   return result;
+    // }
 
     function parseFilterFromUri() {
 
@@ -54,9 +57,9 @@ ngDefine('cockpit.pages.processInstance', [
         return str.split(/,/);
       }
 
-      function parseVariables(vars) {
-        return collect(vars, Variables.parse);
-      }
+      // function parseVariables(vars) {
+      //   return collect(vars, Variables.parse);
+      // }
 
       $scope.filter = filter = {
         activityIds: activityIdsParam,
@@ -287,17 +290,17 @@ ngDefine('cockpit.pages.processInstance', [
         var transitions = instance.childTransitionInstances;
         if (transitions && transitions.length > 0) {
 
-          for (var i = 0, transition; !!(transition = transitions[i]); i++) {
-            var activityId = transition.targetActivityId,
-                bpmnElement = bpmnElements[activityId],
-                instances = activityIdToInstancesMap[activityId] || [];
+          for (var t = 0, transition; !!(transition = transitions[t]); t++) {
+            var targetActivityId = transition.targetActivityId,
+                transitionBpmnElement = bpmnElements[targetActivityId],
+                transitionInstances = activityIdToInstancesMap[targetActivityId] || [];
 
-            transition.name = getActivityName(bpmnElement);
-            activityIdToInstancesMap[activityId] = instances;
+            transition.name = getActivityName(transitionBpmnElement);
+            activityIdToInstancesMap[targetActivityId] = transitionInstances;
             if(!instanceIdToInstanceMap[transition.id]) {
               instanceIdToInstanceMap[transition.id] = transition;
             }
-            instances.push(transition);
+            transitionInstances.push(transition);
           }
         }
       }
@@ -320,8 +323,8 @@ ngDefine('cockpit.pages.processInstance', [
             executionId = instance.executionId;
 
         if (executionIds) {
-          for (var i = 0, executionId; !!(executionId = executionIds[i]); i++) {
-            executionIdToInstanceMap[executionId] = instance;
+          for (var i = 0, execId; !!(execId = executionIds[i]); i++) {
+            executionIdToInstanceMap[execId] = instance;
           }
         }
 
@@ -334,7 +337,7 @@ ngDefine('cockpit.pages.processInstance', [
     }]);
 
     // incidents
-    processData.provide('incidents', ['processInstance', 'filter', function (processInstance, filter) {
+    processData.provide('incidents', ['processInstance', 'filter', function (processInstance) {
       return IncidentResource.query({ id : processInstance.id }).$promise;
     }]);
 
@@ -485,24 +488,25 @@ ngDefine('cockpit.pages.processInstance', [
           if (index === -1) {
             activityIds.push(activityId);
           }
-        } else {
+        }
+        else {
           activityInstanceIds.splice(idx, 1);
 
           var foundAnotherActivityInstance = false;
           if (instanceList) {
             for (var i = 0, instance; !!(instance = instanceList[i]); i++) {
               var instanceId = instance.id,
-                  index = activityInstanceIds.indexOf(instanceId);
+                  instanceIndex = activityInstanceIds.indexOf(instanceId);
 
-              if (index !== -1) {
+              if (instanceIndex !== -1) {
                 foundAnotherActivityInstance = true;
               }
             }
           }
 
           if (!foundAnotherActivityInstance) {
-            var index = activityIds.indexOf(activityId);
-            activityIds.splice(index, 1);
+            var otherIndex = activityIds.indexOf(activityId);
+            activityIds.splice(otherIndex, 1);
           }
         }
       }
@@ -597,7 +601,7 @@ ngDefine('cockpit.pages.processInstance', [
       processData.set('filter', filterData.filter);
     };
 
-  };
+  }
 
   module
     .controller('ProcessInstanceController', [ '$scope',

@@ -1,3 +1,8 @@
+/* global ngDefine: false */
+
+/**
+ * @namespace cam.cockpit.plugin.base.views
+ */
 ngDefine('cockpit.plugin.base.views', [
   // dashboard
   './dashboard/processDefinitionList',
@@ -25,6 +30,4 @@ ngDefine('cockpit.plugin.base.views', [
   './processInstance/updateSuspensionStateAction',
   './processInstance/updateSuspensionStateDialog',
   './processInstance/activityInstanceStatisticsOverlay'
-], function(module) {
-
-});
+], function() {});
