@@ -1,6 +1,6 @@
-@import url('./../bootstrap.min.css');
-@import url('./../bootstrap-responsive.min.css');
-@import url('./../bootstrap-slider.css');
+@import url('../bootstrap.min.patched.css');
+@import url('../../vendor/bootstrap/css/bootstrap-responsive.min.css');
+@import url('../../vendor/bootstrap-slider/slider.css');
 
 @import url('../common.css');
 @import url('app.css');
