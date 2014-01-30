@@ -19,8 +19,6 @@
     "angular-resource": "./src/main/webapp/assets/local/angular-resource-patched.js",
     "angular-sanitize": "http://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-sanitize.js",
     "angular-cookies": "http://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-cookies.js",
-    "angular-loader": "http://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-loader.js",
-    "angular-mobile": "http://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-mobile.js",
     "angular-data-depend": "camunda/angular-data-depend",
     "angular-ui": "./src/main/webapp/assets/local/ui-bootstrap-dialog-tpls-0.5.0.js",
     "better-dom": "~1.6.6",
