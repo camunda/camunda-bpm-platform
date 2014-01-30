@@ -10,6 +10,7 @@
       <th>Priority</th>
       <th>Delegation State</th>
       <th>Task ID</th>
+      <th>Action</th>
     </tr>
   </thead>
   <tbody>
@@ -18,67 +19,56 @@
         <a cam-select-activity="userTask.instance.activityId"
            ng-href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
       </td>
-      <td>
-        <div ng-if="!userTask.inEditMode">
-          {{ userTask.assignee }}
-          <span class="edit-toggle" ng-click="editAssignee(userTask)">
-            <i class="icon-pencil"></i>
-          </span>
-        </div>
 
-        <form ng-if="userTask.inEditMode" class="inline-edit" name="editAssigneeFrom" ng-submit="submit(this.editAssigneeFrom, userTask)" novalidate request-aware>
-
-          <fieldset>
-            <input name="editAssignee" type="text" class="in-place-edit" ng-model="getCopy(userTask.id).assignee" autofocus required>
-          </fieldset>
-
-          <div class="inline-edit-footer">
-
-            <p class="invalid" ng-show="getExceptionForUserTask(userTask)">
-              The assignee could not be changed: {{ getExceptionForUserTask(userTask).message }}.
-            </p>
-
-            <div class="btn-group">
-              <button type="submit" class="btn btn-primary" ng-disabled="!isValid(this.editAssigneeFrom, userTask)">
-                <i class="icon-ok icon-white"></i>
-              </button>
-              <button type="button" class="btn" ng-click="closeInPlaceEditing(userTask)">
-                <i class="icon-ban-circle"></i>
-              </button>
-            </div>
-          </div>
-
-        </form>
-
+      <td class="assignee">
+        <cam-in-place-text-field
+          submit="submitAssigneeChange"
+          context="userTask"
+          property="assignee" />
       </td>
-      <td>
+
+      <td class="owner">
         {{ userTask.owner }}
       </td>
-      <td>
+
+      <td class="created">
         {{ userTask.created }}
       </td>
-      <td>
+      <td class="due">
         {{ userTask.due }}
       </td>
-      <td>
+      <td class="priority">
         {{ userTask.priority }}
       </td>
-      <td>
+      <td class="delegation-state">
         {{ userTask.delegationState }}
       </td>
-      <td>
+      <td class="id">
         {{ userTask.id }}
+      </td>
+
+      <td class="group">
+        <a ng-click="changeGroups()"
+           ng-model="userTask"
+           class="btn"
+           help
+           help-placement="'left'"
+           help-text="Manage group(s) for '{{ userTask.name || userTask.id }}'">
+          <i class="icon-user"></i>
+        </a>
       </td>
     </tr>
 
     <tr ng-if="!userTasks">
-      <td colspan="8">
+      <td class="tasks-loading"
+          colspan="9">
         <i class="icon-loading"></i> loading user tasks...
       </td>
     </tr>
 
     <tr ng-if="userTasks && !userTasks.length">
-      <td  colspan="8">
+      <td class="tasks-empty"
+          colspan="9">
         No user tasks
       </td>
     </tr>

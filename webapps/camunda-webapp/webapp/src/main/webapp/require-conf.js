@@ -1,3 +1,6 @@
+/**
+ * @namespace cam
+ */
 (function(factory) {
   'use strict';
   if (typeof module !== 'undefined' && module.exports) {
