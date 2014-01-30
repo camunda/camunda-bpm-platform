@@ -37,7 +37,7 @@
    * {@link http://requirejs.org/docs/api.html#config-baseUrl|See the require.js docs for baseUrl configuration}
    * @type {string}
    */
-  conf.baseUrl = '/camunda/',
+  conf.baseUrl = '/camunda/';
 
   /**
    * Keys are module names and values are paths or URLs.
@@ -47,18 +47,17 @@
   conf.paths = {
     'ngDefine':              'assets/vendor/requirejs-angular-define/src/ngDefine',
     'ngParse':               'assets/vendor/requirejs-angular-define/src/ngParse',
-    'domReady':              'assets/vendor/requirejs-domready/domReady',
-    'jquery':                'assets/vendor/jquery/jquery',
+    'domReady':              'assets/vendor/requirejs-domready/index',
+    'jquery':                'assets/vendor/jquery/index',
     'jquery-mousewheel':     'assets/vendor/jquery-mousewheel/jquery.mousewheel',
     'jquery-overscroll':     'assets/vendor/jquery-overscroll/src/jquery.overscroll',
-    // 'jquery-ui':             'assets/vendor/jquery-ui/ui/jquery-ui',
     'jquery-ui':             'assets/vendor/jquery-ui/index',
-    'bootstrap':             'assets/vendor/bootstrap/docs/assets/js/bootstrap',
+    'bootstrap':             'assets/vendor/bootstrap/js/bootstrap',
     'bootstrap-slider':      'assets/vendor/bootstrap-slider/bootstrap-slider',
     'angular':               'assets/vendor/angular/index',
     'angular-resource':      'assets/vendor/angular-resource/index',
     'angular-sanitize':      'assets/vendor/angular-sanitize/index',
-    'angular-ui':            'app/common/ui-bootstrap-dialog-tpls-0.5.0',
+    'angular-ui':            'assets/vendor/angular-ui/index',
     'angular-data-depend':   'assets/vendor/angular-data-depend/src/dataDepend'
   };
 
