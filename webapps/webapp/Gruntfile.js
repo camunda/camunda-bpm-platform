@@ -165,10 +165,17 @@ module.exports = function(grunt) {
 
       assets: {
         files: [
+          // requirejs
+          {
+            src: 'src/main/webapp/assets/vendor/requirejs/index.js',
+            dest: 'target/webapp/assets/vendor/requirejs/require.js'
+          },
+          // others
           {
             expand: true,
             cwd: 'src/main/webapp/assets',
             src: [
+              '!vendor/requirejs/**/*',
               'css/**/*',
               'img/**/*',
               'vendor/**/*.{js,css,jpg,png,gif,html,eot,ttf,svg,woff}'
