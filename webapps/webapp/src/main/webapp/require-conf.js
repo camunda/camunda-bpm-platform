@@ -12,7 +12,7 @@
    * A UMD module that provides some configuration for
    * {@link http://requirejs.org/docs/api.html#config|require.js}.
    *
-   * @module require-conf
+   * @exports require-conf
    *
    * @example
    *    require(['../../require-conf'], function(rjsConf) {
@@ -28,43 +28,22 @@
    *        // ...to do something
    *      });
    *    });
-   *
-   *
-   * @property {string} conf.baseUrl
-   *  For CommonJS modules (following the CommonJS scaffolding guid lines).
-   *  {@link http://requirejs.org/docs/api.html#config-packages|See the require.js docs for packages configuration}
-   *
-   * @property {Object.<String, String>} conf.paths
-   *  Keys are module names and values are paths or URLs.
-   *  {@link http://requirejs.org/docs/api.html#config-paths|See the require.js docs for paths configuration}
-   *
-   * @property {Object.<String, (Object|Array)>} conf.shim
-   *  Keys are module names and values are information on how to shim the modules.
-   *  {@link http://requirejs.org/docs/api.html#config-shim|See the require.js docs for shim configuration}
-   *
-   * @property {Array.<Object>} conf.packages
-   *  For CommonJS modules (following the CommonJS scaffolding guide lines).
-   *  {@link http://requirejs.org/docs/api.html#config-packages|See the require.js docs for packages configuration}
-   *
-   * @property {object} conf.utils
-   *  Holder for project setup utilities
-   *
-   * @property conf.utils.ensureScenarioCompatibility
-   *  Utility to ensure compatibility of test scenarios loaded with require.js
-   *  {@link http://stackoverflow.com/questions/15499997/how-to-use-angular-scenario-with-requirejs}
-   * @static
-   *
-   * @property conf.utils.bootAngular
-   *  Utility function to bootsrap angular applications
-   * @param angular {Object} - angular, obviously
-   * @param appName {string} - the package name of the application
-   * @static
    */
   var conf = {};
 
-
+  /**
+   * The base path/URL used by require.js to build the URL
+   * of the different modules to be loaded.
+   * {@link http://requirejs.org/docs/api.html#config-baseUrl|See the require.js docs for baseUrl configuration}
+   * @type {string}
+   */
   conf.baseUrl = '/camunda/',
 
+  /**
+   * Keys are module names and values are paths or URLs.
+   * {@link http://requirejs.org/docs/api.html#config-paths|See the require.js docs for paths configuration}
+   * @type {Object.<string, string>}
+   */
   conf.paths = {
     'ngDefine':              'assets/vendor/requirejs-angular-define/src/ngDefine',
     'ngParse':               'assets/vendor/requirejs-angular-define/src/ngParse',
@@ -83,6 +62,11 @@
     'angular-data-depend':   'assets/vendor/angular-data-depend/src/dataDepend'
   };
 
+  /**
+   * Keys are module names and values are information on how to shim the modules.
+   * {@link http://requirejs.org/docs/api.html#config-shim|See the require.js docs for shim configuration}
+   * @type {Object.<string, (Object|array)>}
+   */
   conf.shim = {
     'jquery-mousewheel' :     ['jquery'],
     'jquery-overscroll' :     ['jquery'],
@@ -98,6 +82,11 @@
     'angular-ui':             ['angular']
   };
 
+  /**
+   * For CommonJS modules (following the CommonJS scaffolding guid lines).
+   * {@link http://requirejs.org/docs/api.html#config-packages|See the require.js docs for packages configuration}
+   * @type {Object.<string, Object>}
+   */
   conf.packages = [
     {
       name: 'admin',
@@ -138,9 +127,19 @@
     }
   ];
 
+
+  /**
+   * A set of utilities to bootstrap applications
+   */
   conf.utils = {};
 
-  function ensureScenarioCompatibility(appName) {
+  /**
+   * Utility to ensure compatibility of test scenarios loaded with require.js
+   * {@link http://stackoverflow.com/questions/15499997/how-to-use-angular-scenario-with-requirejs}
+   *
+   * @param {string} appName - The "angular app name"
+   */
+  conf.utils.ensureScenarioCompatibility = function (appName) {
     var html = document.getElementsByTagName('html')[0];
 
     html.setAttribute('ng-app', appName);
@@ -152,12 +151,17 @@
       window.parent.postMessage({ type: 'loadamd' }, '*');
     }
   };
-  conf.utils.ensureScenarioCompatibility = ensureScenarioCompatibility;
 
+  /**
+   * Utility function to bootsrap angular applications
+   *
+   * @param angular {Object} - angular, obviously
+   * @param appName {string} - the package name of the application
+   */
   conf.utils.bootAngular = function(angular, appName) {
     angular.bootstrap(document, [ appName ]);
 
-    ensureScenarioCompatibility(appName);
+    conf.utils.ensureScenarioCompatibility(appName);
   };
 
   /* live-reload
