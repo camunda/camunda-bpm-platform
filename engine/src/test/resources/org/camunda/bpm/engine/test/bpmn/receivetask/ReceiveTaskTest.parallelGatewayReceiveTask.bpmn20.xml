@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="TestProcess">
 
-  <message id="newInvoice" name="newInvoiceMessage"/>
+  <message id="message1" name="Message 1"/>
+  <message id="message2" name="Message 2"/>
 
   <process id="testProcess" isExecutable="true">
     <startEvent id="theStart"/>
@@ -11,10 +12,10 @@
     <sequenceFlow sourceRef="fork" targetRef="waitState1"/>
     <sequenceFlow sourceRef="fork" targetRef="waitState2"/>
 
-    <receiveTask id="waitState1" name="Wait State 1" messageRef="newInvoice"/>
+    <receiveTask id="waitState1" name="Wait State 1" messageRef="message1"/>
     <sequenceFlow sourceRef="waitState1" targetRef="join"/>
 
-    <receiveTask id="waitState2" name="Wait State 2" messageRef="newInvoice"/>
+    <receiveTask id="waitState2" name="Wait State 2" messageRef="message2"/>
     <sequenceFlow sourceRef="waitState2" targetRef="join"/>
 
     <parallelGateway id="join"/>
