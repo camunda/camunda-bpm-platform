@@ -1,6 +1,6 @@
-'use strict';
-
+/* global ngDefine: false */
 ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
+  'use strict';
 
   function DirectiveController($scope, $element, $attrs, $rootScope, ProcessInstanceResource, ProcessDefinitionResource) {
 
@@ -18,18 +18,19 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
     };
 
     $rootScope.addBreadcrumb = function (breadcrumb) {
+      var processDefinition;
 
       switch (breadcrumb.type) {
         case 'processDefinition':
-          var processDefinition = breadcrumb.processDefinition;
+          processDefinition = breadcrumb.processDefinition;
           breadcrumb.label = processDefinition.name || processDefinition.key || processDefinition.id;
           breadcrumb.href = '/process-definition/' + processDefinition.id;
           breadcrumb.divider = '/';
           $rootScope.breadcrumbs.push(breadcrumb);
           return;
-        case 'processInstance': 
+        case 'processInstance':
           var processInstance = breadcrumb.processInstance;
-          var processDefinition = breadcrumb.processDefinition;
+          processDefinition = breadcrumb.processDefinition;
 
           breadcrumb.label = processInstance.id;
           breadcrumb.href = '/process-instance/' + processInstance.id;
@@ -54,7 +55,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           var superProcessInstance = response.data[0];
 
           ProcessDefinitionResource.get({'id': superProcessInstance.definitionId}).$then(function (response) {
-            var processDefinition = response.data;            
+            var processDefinition = response.data;
 
             var processDefinitionBreadcrumb = {
               'type': 'processDefinition',
@@ -85,7 +86,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
 
   var breadcrumpsTemplate =
     '<ul class="breadcrumb">' +
-      '<li>' + 
+      '<li>' +
         '<a href="#">Home</a>' +
       '</li>' +
       '<li ng-repeat="breadcrumb in breadcrumbs" ng-class="{ active: $last }" ng-switch="breadcrumb.type">' +
@@ -99,7 +100,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           '<span ng-if="$last" title="{{ breadcrumb.label }}">{{ breadcrumb.label | shorten:8 }}</span>' +
         '</span>' +
         '<span ng-switch-when="expand">' +
-          '<a ng-click="expand(breadcrumb)" href title="Expand">...</a>' +   
+          '<a ng-click="expand(breadcrumb)" href title="Expand">...</a>' +
         '</span>' +
       '</li>' +
     '</ul>';
@@ -116,5 +117,5 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
 
   module
     .directive('breadcrumbsPanel', Directive);
-  
+
 });

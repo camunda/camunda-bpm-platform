@@ -1,7 +1,7 @@
 (function(document, window, require) {
   /**
    * A helper module to prepare the cockpit plugin for bootstrap.
-   * @module cockpit-bootstrap
+   * @exports cockpit-bootstrap
    */
 
   var baseUrl = '../../../';
@@ -29,9 +29,6 @@
         APP_NAME,
         'domReady!'
       ], function() {
-        $('head title')
-          .attr('ng-model', 'pageTitle')
-          .text('{{ pageTitle }}');
         rjsConf.utils.bootAngular(angular, APP_NAME);
       });
     });

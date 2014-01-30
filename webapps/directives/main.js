@@ -1,3 +1,8 @@
+/* global ngDefine: false */
+
+/**
+ * @namespace cam.cockpit.directives
+ */
 ngDefine('cockpit.directives', [
   './breadcrumbs',
   './numeric',
@@ -10,6 +15,4 @@ ngDefine('cockpit.directives', [
   './variable',
   './viewPills',
   './selectActivity'
-], function(module) {
-
-});
+], function() {});
