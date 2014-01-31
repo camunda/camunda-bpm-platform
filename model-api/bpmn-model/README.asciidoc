@@ -38,7 +38,7 @@ modelInstance.setDocumentElement(definitions);
 
 === Validate a BPMN model
 
-At any time you can validate your model against the BPMN2.0 specification.
+At any time you can validate your model against the BPMN 2.0 specification.
 
 [source,java]
 ----
