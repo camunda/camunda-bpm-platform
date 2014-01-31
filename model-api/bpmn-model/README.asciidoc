@@ -1,105 +1,147 @@
-= camunda BPMN Model API
+= camunda BPMN model API
 
-The camunda BPMN Model API is a simple, lightweight Java library for parsing, creating and editing BPMN 2.0 Xml files. It is licensed under the Apache 2.0 license and does not depend on any external libraries.
+The camunda BPMN model API is a simple, lightweight Java library for parsing, creating and editing BPMN 2.0 XML files. It is licensed under the Apache 2.0 license.
+
+* Web Site: http://www.camunda.org/
+* Issue Tracker: https://app.camunda.com/jira
+* Contribution Guidelines: http://www.camunda.org/community/contribute.html
+* License: Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
+
+== Components
+
+The model API currently consists of two Components.
+
+=== XML model API
+
+The XML model API is the foundation of the BPMN model API. It is a generic XML API to read, edit and write
+XML files.
+
+=== BPMN model API
+
+The main component the BPMN model API extends the XML model API by the BPMN 2.0 elements. It allows the
+simple access of the attributes and child elements of a BPMN element.
 
 == Features
 
-=== Parse BPMN 2.0 XML files into a Java Object Model
+=== Create an empty BPMN model
 
-Open an existing BPMN 2.0 process model from a file (or an input stream) and parse it into a Java Object Model. The model can than be inspected using a high level Java API:
+You can easily create a new empty BPMN model.
 
 [source,java]
 ----
-// read existing model from file (or input stream):
-BpmnModelInstance model = Bpmn.readModelFromFile("path/to/my/Process.bpmn20.xml");
+BpmnModelInstance modelInstance = Bpmn.createEmptyModel();
+Definitions definitions = modelInstance.newInstance(Definitions.class);
+definitions.setTargetNamespace("http://camunda.org/examples");
+modelInstance.setDocumentElement(definitions);
+----
 
-// The definitions element is the root element of a BPMN model
-Definitions definitions = model.getDefinitions();
+=== Validate a BPMN model
 
-// iterate all processes
-Collection<Process> processes = definitions.getProcesses();
-for(Process process : processes) {
+At any time you can validate your model against the BPMN2.0 specification.
 
-  // iterate all activities
-  Collection<Activity> activities = process.getActivities();
-  for(Activity activity : activities) {
-    LOG.info("Model contains activity with name "+activity.getName());
+[source,java]
+----
+BpmnModelInstance modelInstance = [...]
+Bpmn.validateModel(modelInstance);
+----
+
+=== Create a simple Process
+
+Currently not all BPMN 2.0 elements are supported. But basic elements like
+StartEvent, EndEvent, Tasks, Parallel- and ExclusiveGateways are already
+implemented. For the current list of implemented elements please visit
+link:bpmn-model/src/main/java/org/camunda/bpm/model/bpmn/instance[org.camunda.bpm.model.bpmn.instance]
+package.
+
+The following code creates a simple Process as a jUnit4 test. See link:bpmn-model/src/test/java/org/camunda/bpm/model/bpmn/CreateModelTest.java[CreateModelTest.java] for
+another example with ParallelGateways.
+
+[source,java]
+----
+public class CreateProcessTest {
+
+  public BpmnModelInstance modelInstance;
+  public Definitions definitions;
+  public Process process;
+
+  @Before
+  public void createEmptyModel() {
+    modelInstance = Bpmn.createEmptyModel();
+    definitions = modelInstance.newInstance(Definitions.class);
+    definitions.setTargetNamespace("http://camunda.org/examples");
+    modelInstance.setDocumentElement(definitions);
+  }
+
+  protected <T extends BpmnModelElementInstance> T createElement(BpmnModelElementInstance parentElement, String id, Class<T> elementClass) {
+    T element = modelInstance.newInstance(elementClass);
+    element.setAttributeValue("id", id, true);
+    parentElement.addChildElement(element);
+    return element;
+  }
+
+  public SequenceFlow createSequenceFlow(Process process, FlowNode from, FlowNode to) {
+    SequenceFlow sequenceFlow = createElement(process, from.getId() + "-" + to.getId(), SequenceFlow.class);
+    process.addChildElement(sequenceFlow);
+    sequenceFlow.setSource(from);
+    from.getOutgoing().add(sequenceFlow);
+    sequenceFlow.setTarget(to);
+    to.getIncoming().add(sequenceFlow);
+    return sequenceFlow;
+  }
+
+  @Test
+  public void createProcessWithOneTask() {
+    // create process
+    Process process = createElement(definitions, "process-with-one-task", Process.class);
+
+    // create elements
+    StartEvent startEvent = createElement(process, "start", StartEvent.class);
+    UserTask task1 = createElement(process, "task1", UserTask.class);
+    EndEvent endEvent = createElement(process, "end", EndEvent.class);
+
+    // create flows
+    createSequenceFlow(process, startEvent, task1);
+    createSequenceFlow(process, task1, endEvent);
+  }
+
+  @After
+  public void validateModel() {
+    Bpmn.validateModel(modelInstance);
+    Bpmn.writeModelToFile(new File("/tmp/process.xml"), modelInstance);
   }
 
 }
 ----
 
-=== Custom Elements and Extensions
+=== Save the BPMN model
 
-BPMN 2.0 XML files can be extended using custom attributes and elements in custom namespaces:
-
-[source,xml]
-----
-<definitions 
-  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:custom="http://example.org/monitoring"
-  targetNamespace="Examples">
-  ...
-  <userTask id="myTask" name="Review Order" custom:monitoringEnabled="true">
-    <extensionElements>
-      <custom:monitoringData maxDuration="6h" severity="high" />
-    </extensionElements>
-  </userTask>
-  ...
-</definitions>
-----
-
-The camunda model API provides generic read/write access to extension attributes and elements: 
+The model API allows you to save your model in several ways
 
 [source,java]
 ----
-final String customNs = "http://example.org/monitoring";
+// create BPMN model
+BpmnModelInstance modelInstance = [...]
 
-// find user task in model
-UserTask userTask = ...; 
+// convert to string
+String xmlString = Bpmn.convertToString(modelInstance);
 
-// use generic API to get monitoring data from UserTask element
-if(userTask.getBooleanAttribute("monitoringEnabled", customNs)) {
-  ModelElementInstance monitoringData = userTask.getExtensionElements().getChildElement("monitoringData", customNs);
-  String maxDuration = monitoringData.getAttribute("maxDuration");
-}
+// write to output stream
+OutputStream outputStream = new OutputStream(...);
+Bpmn.writeModelToStream(outputStream, modelInstance);
+
+// write to file
+File file = new File("/tmp/process.xml");
+Bpmn.writeModelToFile(file, modelInstance);
+
 ----
 
-On top of this, it is also possible to extend the model with a custom user task implementation and 
-provide a custom high-level API for such extended tasks. In this case the model elements can be casted to your custom extended types:
+== Planned features
 
-[source,java]
-----
+* complete read, edit and write support for BPMN 2.0 models
+* a fluent builder API to create simple models
+* JSON import and export
+* extended validation support like integrity checks for broken references
 
-// find user task in model
-UserTask userTask = ...; 
-// cast to extended type:
-CustomUserTask customUserTask = (CustomUserTask) userTask;
-
-// use high level API to get monitoring data from CustomUserTask element
-if(customUserTask.isMonitoringEnabled()) {
-  String maxDuration = customUserTask.getMonitoringMaxDuration();
-}
-----
-
-=== Edit / update existing BPMN 2.0 XML Models
-
-camunda BPMN model API supports the complete model editing roundtrip: importing a BPMN XML file, doing some changes on the model and updating the XML file with the changes. Updating an existing file preseves existing formatting as much as possible and does not remove any non-BPMN elements.
-
-=== Fluent DSL for creating Models
-
-TODO.
-
-=== JSON Import and Export
-
-Full support for importing / exporting a BPMN model to JSON is provided. Just as the editing capabilites, the JSON import/export does not remove any custom elements and attributes.
-
-=== Support for Validation
-
-Support for validation is provided. Validation can be used for performing
-
-* Syntax Checks: _Are all required attributes provided?_, _Are all required child elements provided?_, ...
-* Integrity Checks: _Are there any broken references (ie. a Boundary event which references a non-existing Task)?_, _Are all element IDs unique?_, ...
 
 == FAQ
 
@@ -107,14 +149,10 @@ Support for validation is provided. Validation can be used for performing
 
 Read the http://camunda.org/bpmn/tutorial.html[BPMN 2.0 Tutorial on camunda.org].
 
-=== Which third party libraries are required?
-
-None :)
-
 === Which Java (JRE) Version is required?
 
-Java JRE 1.6+ is required. We test camunda BPMN Model API on Oracle and IBM JVMs.
+Java JRE 1.6+ is required. We test camunda BPMN model API on the Oracle JVM.
 
-=== Under which License is camunda BPMN Model API distributed?
+=== Under which License is camunda BPMN model API distributed?
 
 Apache License 2.0.
