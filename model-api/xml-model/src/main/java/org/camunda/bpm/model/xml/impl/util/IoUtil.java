@@ -96,18 +96,42 @@ public final class IoUtil {
    */
   public static String convertXmlDocumentToString(Document document) {
     StringWriter stringWriter = new StringWriter();
-    try {
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      transformerFactory.setAttribute("indent-number", 2);
-      Transformer transformer = transformerFactory.newTransformer();
-      transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
-    } catch (TransformerConfigurationException e) {
-      e.printStackTrace();
-    } catch (TransformerException e) {
-      e.printStackTrace();
-    }
+    StreamResult result = new StreamResult(stringWriter);
+    transformDocumentToXml(document, result);
     return stringWriter.toString();
   }
+
+  /**
+   * Writes a {@link Document} to an {@link OutputStream} by transforming the DOM to XML.
+   *
+   * @param document  the DOM document to write
+   * @param outputStream  the {@link OutputStream} to write to
+   */
+  public static void writeDocumentToOutputStream(Document document, OutputStream outputStream) {
+    StreamResult result = new StreamResult(outputStream);
+    transformDocumentToXml(document, result);
+  }
+
+  /**
+   * Transforms a {@link Document} to XML output.
+   *
+   * @param document  the DOM document to transform
+   * @param result  the {@link StreamResult} to write to
+   */
+  public static void transformDocumentToXml(Document document, StreamResult result) {
+    TransformerFactory transformerFactory = TransformerFactory.newInstance();
+    Transformer transformer = null;
+    try {
+      transformer = transformerFactory.newTransformer();
+      transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+      transformer.transform(new DOMSource(document), result);
+    } catch (TransformerConfigurationException e) {
+      throw new ModelIoException("Unable to create a transformer for the model", e);
+    } catch (TransformerException e) {
+      throw new ModelIoException("Unable to transform model to xml", e);
+    }
+  }
+
 }
