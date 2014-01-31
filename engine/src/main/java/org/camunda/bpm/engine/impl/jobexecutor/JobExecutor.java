@@ -224,7 +224,7 @@ public abstract class JobExecutor {
   
   protected void startJobAcquisitionThread() {
 		if (jobAcquisitionThread == null) {
-			jobAcquisitionThread = new Thread(acquireJobsRunnable);
+			jobAcquisitionThread = new Thread(acquireJobsRunnable, getName());
 			jobAcquisitionThread.start();
 		}
 	}
