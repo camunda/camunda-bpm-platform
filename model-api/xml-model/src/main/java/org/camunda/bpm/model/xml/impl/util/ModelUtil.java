@@ -197,4 +197,8 @@ public final class ModelUtil {
     return baseTypes;
   }
 
+  public static String getUniqueIdentifier(ModelElementType type) {
+    return type.getTypeName() + "_" + UUID.randomUUID();
+  }
+
 }

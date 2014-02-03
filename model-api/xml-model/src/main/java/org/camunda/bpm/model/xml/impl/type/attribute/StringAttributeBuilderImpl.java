@@ -35,6 +35,10 @@ public class StringAttributeBuilderImpl extends AttributeBuilderImpl<String> imp
     super(attributeName, modelType, new StringAttribute(modelType));
   }
 
+  public StringAttributeBuilder namespace(String namespaceUri) {
+    return (StringAttributeBuilder) super.namespace(namespaceUri);
+  }
+
   public StringAttributeBuilder defaultValue(String defaultValue) {
     return (StringAttributeBuilder) super.defaultValue(defaultValue);
   }

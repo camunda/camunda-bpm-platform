@@ -35,6 +35,11 @@ public abstract class AttributeBuilderImpl<T> implements AttributeBuilder<T>, Mo
     attribute.setAttributeName(attributeName);
   }
 
+  public AttributeBuilder<T> namespace(String namespaceUri) {
+    attribute.setNamespaceUri(namespaceUri);
+    return this;
+  }
+
   public AttributeBuilder<T> idAttribute() {
     attribute.setId();
     return this;

@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.model.xml.type.attribute;
 
+import org.camunda.bpm.model.xml.impl.type.attribute.StringAttribute;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.reference.AttributeReferenceBuilder;
 
@@ -20,6 +21,8 @@ import org.camunda.bpm.model.xml.type.reference.AttributeReferenceBuilder;
  *
  */
 public interface StringAttributeBuilder extends AttributeBuilder<String> {
+
+  StringAttributeBuilder namespace(String namespaceUri);
 
   StringAttributeBuilder defaultValue(String defaultValue);
 

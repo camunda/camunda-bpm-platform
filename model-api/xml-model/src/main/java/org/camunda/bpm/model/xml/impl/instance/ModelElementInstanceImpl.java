@@ -115,6 +115,7 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
 
   public void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue, boolean isIdAttribute) {
     String oldValue = getAttributeValueNs(attributeName, namespaceUri);
+    String prefix = domElement.getOwnerDocument().getDocumentElement().lookupPrefix(namespaceUri);
     DomUtil.setAttributeValueNs(attributeName, namespaceUri, xmlValue, domElement);
     if(isIdAttribute) {
       DomUtil.setIdAttributeNs(domElement, attributeName, namespaceUri);

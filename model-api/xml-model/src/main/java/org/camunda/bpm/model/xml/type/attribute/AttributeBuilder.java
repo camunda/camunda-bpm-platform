@@ -20,6 +20,8 @@ package org.camunda.bpm.model.xml.type.attribute;
  */
 public interface AttributeBuilder<T> {
 
+  AttributeBuilder<T> namespace(String namespaceUri);
+
   AttributeBuilder<T> defaultValue(T defaultValue);
 
   AttributeBuilder<T> required();
