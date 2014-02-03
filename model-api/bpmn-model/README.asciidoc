@@ -33,7 +33,7 @@ You can easily create a new empty BPMN model.
 BpmnModelInstance modelInstance = Bpmn.createEmptyModel();
 Definitions definitions = modelInstance.newInstance(Definitions.class);
 definitions.setTargetNamespace("http://camunda.org/examples");
-modelInstance.setDocumentElement(definitions);
+modelInstance.setDefinitions(definitions);
 ----
 
 === Validate a BPMN model
@@ -70,7 +70,7 @@ public class CreateProcessTest {
     modelInstance = Bpmn.createEmptyModel();
     definitions = modelInstance.newInstance(Definitions.class);
     definitions.setTargetNamespace("http://camunda.org/examples");
-    modelInstance.setDocumentElement(definitions);
+    modelInstance.setDefinitions(definitions);
   }
 
   protected <T extends BpmnModelElementInstance> T createElement(BpmnModelElementInstance parentElement, String id, Class<T> elementClass) {
