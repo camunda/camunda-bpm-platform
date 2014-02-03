@@ -129,7 +129,7 @@
               <goal>test-jar</goal>
             </goals>
             <configuration>
-              <forceCreate>true</forceCreate>
+              <forceCreation>true</forceCreation>
             </configuration>
           </execution>
         </executions>
