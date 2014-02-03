@@ -206,6 +206,10 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
     // getting the variable cache does not empty it:
     assertEquals(Collections.singletonMap("anotherVariableName", "aVariableValue"), businessProcess.getVariableLocalCache());
 
+    // Flushing and re-getting should retain the value (CAM-1806):
+    businessProcess.flushVariableCache();
+    assertTrue(businessProcess.getVariableLocalCache().isEmpty());
+    assertEquals("aVariableValue", businessProcess.getVariableLocal("anotherVariableName"));
   }
 
   @Test
