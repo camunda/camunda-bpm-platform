@@ -4,7 +4,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="dbSchemaPrefixTestHelper" class="org.camunda.bpm.cockpit.plugin.base.util.DbSchemaPrefixTestHelper" />
+  <bean id="dbSchemaPrefixTestHelper" class="org.camunda.bpm.webapp.test.util.DbSchemaPrefixTestHelper" />
 
   <bean id="idGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />
 

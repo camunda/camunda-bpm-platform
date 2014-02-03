@@ -24,6 +24,7 @@
 
         <module>core</module>
         <module>webapp</module>
+        <module>test-utility</module>
 
       </modules>
     </profile>
@@ -78,4 +79,5 @@
       </dependency>
       </dependencies>
   </dependencyManagement>
+
 </project>
