@@ -35,10 +35,12 @@ import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -57,7 +59,6 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
-import org.joda.time.DateTime;
 
 /**
  * Provides mocks for the basic engine entities, such as
@@ -137,6 +138,7 @@ public abstract class MockProvider {
   public static final String NON_EXISTING_PROCESS_DEFINITION_ID = "aNonExistingProcDefId";
   public static final String EXAMPLE_PROCESS_DEFINITION_NAME = "aName";
   public static final String EXAMPLE_PROCESS_DEFINITION_KEY = "aKey";
+  public static final String NON_EXISTING_PROCESS_DEFINITION_KEY = "aNonExistingKey";
   public static final String EXAMPLE_PROCESS_DEFINITION_CATEGORY = "aCategory";
   public static final String EXAMPLE_PROCESS_DEFINITION_DESCRIPTION = "aDescription";
   public static final int EXAMPLE_PROCESS_DEFINITION_VERSION = 42;
@@ -155,6 +157,16 @@ public abstract class MockProvider {
   // statistics
   public static final int EXAMPLE_FAILED_JOBS = 42;
   public static final int EXAMPLE_INSTANCES = 123;
+
+  public static final long EXAMPLE_INSTANCES_LONG = 123;
+  public static final long EXAMPLE_FINISHED_LONG = 124;
+  public static final long EXAMPLE_CANCELED_LONG = 125;
+  public static final long EXAMPLE_COMPLETE_SCOPE_LONG = 126;
+
+  public static final long ANOTHER_EXAMPLE_INSTANCES_LONG = 127;
+  public static final long ANOTHER_EXAMPLE_FINISHED_LONG = 128;
+  public static final long ANOTHER_EXAMPLE_CANCELED_LONG = 129;
+  public static final long ANOTHER_EXAMPLE_COMPLETE_SCOPE_LONG = 130;
 
   public static final String EXAMPLE_INCIDENT_TYPE = "anIncidentType";
   public static final int EXAMPLE_INCIDENT_COUNT = 1;
@@ -249,13 +261,15 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_BEFORE = "2013-01-23T13:42:43";
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_AFTER = "2013-01-23T13:42:43";
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_BEFORE = "2013-04-23T13:42:43";
+  public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED = true;
+  public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE = true;
 
 
   // tasks
   public static Task createMockTask() {
     Task mockTask = new MockTaskBuilder().id(EXAMPLE_TASK_ID).name(EXAMPLE_TASK_NAME).assignee(EXAMPLE_TASK_ASSIGNEE_NAME)
-        .createTime(DateTime.parse(EXAMPLE_TASK_CREATE_TIME).toDate()).dueDate(DateTime.parse(EXAMPLE_TASK_DUE_DATE).toDate())
-        .followUpDate(DateTime.parse(EXAMPLE_FOLLOW_UP_DATE).toDate())
+        .createTime(DateTimeUtil.parseDateTime(EXAMPLE_TASK_CREATE_TIME).toDate()).dueDate(DateTimeUtil.parseDateTime(EXAMPLE_TASK_DUE_DATE).toDate())
+        .followUpDate(DateTimeUtil.parseDateTime(EXAMPLE_FOLLOW_UP_DATE).toDate())
         .delegationState(EXAMPLE_TASK_DELEGATION_STATE).description(EXAMPLE_TASK_DESCRIPTION).executionId(EXAMPLE_TASK_EXECUTION_ID).owner(EXAMPLE_TASK_OWNER)
         .parentTaskId(EXAMPLE_TASK_PARENT_TASK_ID).priority(EXAMPLE_TASK_PRIORITY).processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
         .processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID).taskDefinitionKey(EXAMPLE_TASK_DEFINITION_KEY).build();
@@ -403,7 +417,7 @@ public abstract class MockProvider {
     when(mock.getExecutionId()).thenReturn(EXAMPLE_EXECUTION_ID);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
-    when(mock.getCreated()).thenReturn(DateTime.parse(EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE).toDate());
+    when(mock.getCreated()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE).toDate());
 
     return mock;
   }
@@ -551,7 +565,7 @@ public abstract class MockProvider {
       .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
       .retries(EXAMPLE_JOB_RETRIES)
       .exceptionMessage(EXAMPLE_JOB_NO_EXCEPTION_MESSAGE)
-      .dueDate(DateTime.parse(EXAMPLE_DUE_DATE).toDate())
+      .dueDate(DateTimeUtil.parseDateTime(EXAMPLE_DUE_DATE).toDate())
       .suspended(EXAMPLE_JOB_IS_SUSPENDED)
       .build();
     return mock;
@@ -679,9 +693,11 @@ public abstract class MockProvider {
     when(mock.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(mock.getCalledProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID);
     when(mock.getAssignee()).thenReturn(EXAMPLE_TASK_ASSIGNEE_NAME);
-    when(mock.getStartTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate());
-    when(mock.getEndTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME).toDate());
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate());
+    when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME).toDate());
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION);
+    when(mock.isCanceled()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED);
+    when(mock.isCompleteScope()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE);
 
     return mock;
   }
@@ -706,11 +722,35 @@ public abstract class MockProvider {
     when(mock.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(mock.getCalledProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID);
     when(mock.getAssignee()).thenReturn(EXAMPLE_TASK_ASSIGNEE_NAME);
-    when(mock.getStartTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate());
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate());
     when(mock.getEndTime()).thenReturn(null);
     when(mock.getDurationInMillis()).thenReturn(null);
 
     return mock;
+  }
+
+  public static List<HistoricActivityStatistics> createMockHistoricActivityStatistics() {
+    HistoricActivityStatistics statistics = mock(HistoricActivityStatistics.class);
+
+    when(statistics.getId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+    when(statistics.getInstances()).thenReturn(EXAMPLE_INSTANCES_LONG);
+    when(statistics.getCanceled()).thenReturn(EXAMPLE_CANCELED_LONG);
+    when(statistics.getFinished()).thenReturn(EXAMPLE_FINISHED_LONG);
+    when(statistics.getCompleteScope()).thenReturn(EXAMPLE_COMPLETE_SCOPE_LONG);
+
+    HistoricActivityStatistics anotherStatistics = mock(HistoricActivityStatistics.class);
+
+    when(anotherStatistics.getId()).thenReturn(ANOTHER_EXAMPLE_ACTIVITY_ID);
+    when(anotherStatistics.getInstances()).thenReturn(ANOTHER_EXAMPLE_INSTANCES_LONG);
+    when(anotherStatistics.getCanceled()).thenReturn(ANOTHER_EXAMPLE_CANCELED_LONG);
+    when(anotherStatistics.getFinished()).thenReturn(ANOTHER_EXAMPLE_FINISHED_LONG);
+    when(anotherStatistics.getCompleteScope()).thenReturn(ANOTHER_EXAMPLE_COMPLETE_SCOPE_LONG);
+
+    List<HistoricActivityStatistics> activityResults = new ArrayList<HistoricActivityStatistics>();
+    activityResults.add(statistics);
+    activityResults.add(anotherStatistics);
+
+    return activityResults;
   }
 
   public static List<HistoricProcessInstance> createMockHistoricProcessInstances() {
@@ -726,8 +766,8 @@ public abstract class MockProvider {
     when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
     when(mock.getDeleteReason()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON);
-    when(mock.getEndTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME).toDate());
-    when(mock.getStartTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME).toDate());
+    when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME).toDate());
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME).toDate());
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS);
     when(mock.getStartUserId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_USER_ID);
     when(mock.getStartActivityId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_ACTIVITY_ID);
@@ -749,7 +789,7 @@ public abstract class MockProvider {
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
     when(mock.getDeleteReason()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON);
     when(mock.getEndTime()).thenReturn(null);
-    when(mock.getStartTime()).thenReturn(DateTime.parse(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME).toDate());
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME).toDate());
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS);
     return mock;
   }
@@ -771,6 +811,7 @@ public abstract class MockProvider {
 
     return mock;
   }
+
   public static List<ProcessInstance> createAnotherMockProcessInstanceList() {
   	List<ProcessInstance> mockProcessInstanceList = new ArrayList<ProcessInstance>();
   	mockProcessInstanceList.add(createMockInstance());

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
  * @author Tom Baeyens
  */
 public abstract class AbstractEventAtomicOperation implements AtomicOperation {
-  
+
   public boolean isAsync(InterpretableExecution execution) {
     return false;
   }
@@ -34,13 +34,13 @@ public abstract class AbstractEventAtomicOperation implements AtomicOperation {
     ScopeImpl scope = getScope(execution);
     List<ExecutionListener> exectionListeners = scope.getExecutionListeners(getEventName());
     int executionListenerIndex = execution.getExecutionListenerIndex();
-    
+
     if(executionListenerIndex == 0) {
-      eventNotificationsStarted(execution);
+      execution = eventNotificationsStarted(execution);
     }
-    
-    if(!isSkipNotifyListeners(execution)) {      
-      
+
+    if(!isSkipNotifyListeners(execution)) {
+
       if (exectionListeners.size()>executionListenerIndex) {
         execution.setEventName(getEventName());
         execution.setEventSource(scope);
@@ -54,18 +54,18 @@ public abstract class AbstractEventAtomicOperation implements AtomicOperation {
         }
         execution.setExecutionListenerIndex(executionListenerIndex+1);
         execution.performOperationSync(this);
-  
+
       } else {
         execution.setExecutionListenerIndex(0);
         execution.setEventName(null);
         execution.setEventSource(null);
-        
+
         eventNotificationsCompleted(execution);
       }
-      
+
     } else {
       eventNotificationsCompleted(execution);
-      
+
     }
   }
 
@@ -73,8 +73,9 @@ public abstract class AbstractEventAtomicOperation implements AtomicOperation {
     return false;
   }
 
-  protected void eventNotificationsStarted(InterpretableExecution execution) {
+  protected InterpretableExecution eventNotificationsStarted(InterpretableExecution execution) {
     // do nothing
+    return execution;
   }
 
   protected abstract ScopeImpl getScope(InterpretableExecution execution);

@@ -16,10 +16,12 @@ package org.camunda.bpm.engine.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceState;
 
 
 /**
@@ -43,6 +45,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   protected Date startedAfter;
   protected Date finishedBefore;
   protected Date finishedAfter;
+  protected ActivityInstanceState activityInstanceState;
 
   public HistoricActivityInstanceQueryImpl() {
   }
@@ -113,6 +116,23 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
 
   public HistoricActivityInstanceQueryImpl unfinished() {
     this.unfinished = true;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl completeScope() {
+    if (activityInstanceState != null) {
+      throw new ProcessEngineException("Already querying for activity instance state <" + activityInstanceState + ">");
+    }
+
+    this.activityInstanceState = ActivityInstanceState.SCOPE_COMPLETE;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl canceled() {
+    if (activityInstanceState != null) {
+      throw new ProcessEngineException("Already querying for activity instance state <" + activityInstanceState + ">");
+    }
+    this.activityInstanceState = ActivityInstanceState.CANCELED;
     return this;
   }
 
@@ -222,6 +242,12 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   }
   public boolean isUnfinished() {
     return unfinished;
+  }
+  public boolean isCompleteScope() {
+    return ActivityInstanceState.SCOPE_COMPLETE.equals(activityInstanceState);
+  }
+  public boolean isCanceled() {
+    return ActivityInstanceState.CANCELED.equals(activityInstanceState);
   }
   public String getActivityInstanceId() {
     return activityInstanceId;

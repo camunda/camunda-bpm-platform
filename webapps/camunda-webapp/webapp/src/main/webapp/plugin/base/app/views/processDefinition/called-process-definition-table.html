@@ -1,3 +1,4 @@
+<!-- # CE - src/main/webapp/plugin/base/views/processDefinition/called-process-definition-table.html -->
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <th>Called Process Definition</th>
@@ -6,20 +7,22 @@
   <tbody>
     <tr ng-repeat="calledProcessDefinition in calledProcessDefinitions">
       <td>
-        <a href="#/process-definition/{{ calledProcessDefinition.id }}?parentProcessDefinitionId={{ processDefinition.id }}">
+        <a ng-href="#/process-definition/{{ calledProcessDefinition.id }}?parentProcessDefinitionId={{ processDefinition.id }}&amp;detailsTab=call-process-definitions-table">
           {{ calledProcessDefinition.name }}
         </a>
       </td>
       <td>
         <span ng-show="calledProcessDefinition.calledFromActivities.length === 1">
-          <a href="#/process-definition/{{ processDefinition.id }}?activityIds={{ calledProcessDefinition.calledFromActivities[0].id }}">
+          <a ng-click="selectActivity(calledProcessDefinition.calledFromActivities[0].id, $event)"
+             ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ calledProcessDefinition.calledFromActivities[0].id }}&amp;detailsTab=call-process-definitions-table">
             {{ calledProcessDefinition.calledFromActivities[0].name }}
           </a>
         </span>
         <span ng-show="calledProcessDefinition.calledFromActivities.length > 1">
           <ul>
             <li ng-repeat="activity in calledProcessDefinition.calledFromActivities">
-              <a href="#/process-definition/{{ processDefinition.id }}?activityIds={{ activity.id }}">
+              <a cam-select-activity="activity.id"
+                 ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ activity.id }}&amp;detailsTab=call-process-definitions-table">
                 {{ activity.name }}
               </a>
             </li>
@@ -42,3 +45,4 @@
 
   </tbody>
 </table>
+<!-- / CE - src/main/webapp/plugin/base/views/processDefinition/called-process-definition-table.html -->

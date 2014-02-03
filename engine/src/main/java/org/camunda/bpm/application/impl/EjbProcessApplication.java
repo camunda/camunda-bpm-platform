@@ -12,12 +12,6 @@
  */
 package org.camunda.bpm.application.impl;
 
-import java.util.concurrent.Callable;
-
-import javax.ejb.SessionContext;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.ProcessApplicationInterface;
@@ -25,6 +19,12 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
+
+import javax.ejb.SessionContext;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.util.concurrent.Callable;
 
 /**
  * <p>Common base class for writing EJB process applications.</p>
@@ -120,16 +120,26 @@ public class EjbProcessApplication extends AbstractProcessApplication {
   protected Class<? extends ProcessApplicationInterface> getBusinessInterface() {
     return ProcessApplicationInterface.class;
   }
-  
+
   public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
+    ClassLoader originalClassloader = ClassLoaderUtil.getContextClassloader();
+    ClassLoader processApplicationClassloader = getProcessApplicationClassloader();
+
     try {
+      if (originalClassloader != processApplicationClassloader) {
+        ClassLoaderUtil.setContextClassloader(processApplicationClassloader);
+      }
+
       return callable.call();
+
     } catch(Exception e) {
       throw new ProcessApplicationExecutionException(e);
+
+    } finally {
+      ClassLoaderUtil.setContextClassloader(originalClassloader);
     }
   }
-  
-  
+
   protected void ensureInitialized() {
     if(selfReference == null) {
       selfReference = lookupSelfReference();

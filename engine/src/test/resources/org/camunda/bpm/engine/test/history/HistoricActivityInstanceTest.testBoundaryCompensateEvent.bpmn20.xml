@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="process">
+    
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="serviceTask1" />
+    
+    <serviceTask id="serviceTask1" camunda:expression="true" />
+    
+    <sequenceFlow sourceRef="serviceTask1" targetRef="throwCompensate" />
+    
+    <intermediateThrowEvent id="throwCompensate">
+      <compensateEventDefinition />
+    </intermediateThrowEvent>
+
+    <sequenceFlow sourceRef="throwCompensate" targetRef="end" />
+    
+    <endEvent id="end" />
+    
+    <boundaryEvent id="compensate" attachedToRef="serviceTask1">
+      <compensateEventDefinition />
+    </boundaryEvent>
+    
+    <serviceTask id="compensationServiceTask" camunda:expression="true" isForCompensation="true" />
+    
+    <association sourceRef="compensate" targetRef="compensationServiceTask" />
+  
+  </process>
+
+</definitions>

@@ -1,7 +1,10 @@
 ngDefine('cockpit.pages.processDefinition', [
   'angular',
+  'cockpit/util/routeUtil',
   'module:dataDepend:angular-data-depend'
 ], function(module, angular) {
+
+  var routeUtil = require('cockpit/util/routeUtil');
 
   var Controller = [
     '$scope', '$rootScope', 'search', '$q', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition',
@@ -28,8 +31,8 @@ ngDefine('cockpit.pages.processDefinition', [
           if (c !== undefined) {
             result.push(c);
           }
-        } catch (e) {
-          ; // safe collect -> error skips element
+        } catch (ex) {
+          // safe collect -> error skips element
         }
       });
 
@@ -38,9 +41,54 @@ ngDefine('cockpit.pages.processDefinition', [
 
     var currentFilter = null;
 
+    /**
+     * Auto complete a filter based on input and 
+     * make the change persistent by serializing it into the url.
+     * 
+     * @param  {Object} filter the filter to auto complete
+     */
+    function autoCompleteFilter(filter) {
+
+      // only apply when external (non completed)
+      // filter changes occur
+      if (currentFilter === filter) {
+        return;
+      }
+
+      var activityIds = filter.activityIds,
+          scrollTo = null,
+          changed = false;
+
+      if (activityIds && activityIds.length) {
+        scrollTo = activityIds[activityIds.length - 1];
+      }
+
+      if (filter.scrollToBpmnElement !== scrollTo) {
+        changed = true;
+      }
+
+      if (filter != currentFilter) {
+        serializeFilterToUri(filter);
+      }
+
+      $scope.filter = currentFilter = angular.extend({}, filter, {
+        scrollToBpmnElement: scrollTo
+      });
+
+
+      if (changed) {
+        // update filter
+        processData.set('filter', currentFilter);
+      }
+
+      // serialize to uri
+      serializeFilterToUri(currentFilter);
+    }
+
     function parseFilterFromUri() {
 
-      var params = search();
+      var params = search(),
+          filter;
 
       function parseArray(str) {
         if (!str) {
@@ -54,23 +102,17 @@ ngDefine('cockpit.pages.processDefinition', [
         return collect(vars, Variables.parse);
       }
 
-      var activityIds = parseArray(params.activityIds),
-          scrollToBpmnElement;
+      var activityIds = parseArray(params.activityIds);
 
-      if (activityIds.length > 0) {
-        scrollToBpmnElement = activityIds[activityIds.length-1];
-      }
-
-      currentFilter = {
+      filter = {
         activityIds: activityIds,
         parentProcessDefinitionId: params.parentProcessDefinitionId,
         businessKey: params.businessKey,
         variables: parseVariables(parseArray(params.variables)),
-        scrollToBpmnElement: scrollToBpmnElement,
         page: parseInt(params.page) || undefined
       };
 
-      return currentFilter;
+      return filter;
     }
 
     function serializeFilterToUri(filter) {
@@ -161,6 +203,12 @@ ngDefine('cockpit.pages.processDefinition', [
       }
 
       $rootScope.addBreadcrumb({ type: 'processDefinition', processDefinition: definition });
+
+      $rootScope.pageTitle = [
+        'camunda Cockpit',
+        definition.name || definition.id,
+        'Definition View'
+      ].join(' | ');
     });
 
     $scope.instanceStatistics = processData.observe([ 'instances.all', 'instances.current' ], function(allCount, currentCount) {
@@ -172,13 +220,7 @@ ngDefine('cockpit.pages.processDefinition', [
       $scope.processDiagram = processDiagram;
     });
 
-    processData.observe('filter', function(filter) {
-      if (filter != currentFilter) {
-        serializeFilterToUri(filter);
-      }
-
-      $scope.filter = filter;
-    });
+    processData.observe('filter', autoCompleteFilter);
 
     $scope.handleBpmnElementSelection = function(activityId, event) {
       var newFilter = angular.copy(currentFilter),
@@ -447,7 +489,7 @@ ngDefine('cockpit.pages.processDefinition', [
           try {
             variable = Variables.parse(text);
           } catch (e) {
-            ; // ok, failed to parse variable
+            // ok, failed to parse variable
           }
 
           ngModel.$setValidity('processVariableFilter', !!variable);
@@ -457,16 +499,22 @@ ngDefine('cockpit.pages.processDefinition', [
         ngModel.$parsers.push(parseText);
         ngModel.$formatters.push(Variables.toString);
       }
-    }
+    };
   }];
 
-  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
+  var RouteConfig = [
+    '$routeProvider',
+    'AuthenticationServiceProvider',
+  function(
+    $routeProvider,
+    AuthenticationServiceProvider
+  ) {
 
-    $routeProvider.when('/process-definition/:id', {
-      redirectTo: '/process-definition/:id/live'
-    });
-
-    $routeProvider.when('/process-definition/:id/live', {
+    $routeProvider
+    .when('/process-definition/:id', {
+      redirectTo: routeUtil.redirectToLive
+    })
+    .when('/process-definition/:id/live', {
       templateUrl: 'pages/process-definition.html',
       controller: Controller,
       resolve: {

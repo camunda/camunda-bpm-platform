@@ -10,14 +10,14 @@
     baseUrl: '/base/',
     paths: {
       'ngDefine' : 'main/webapp/assets/vendor/requirejs-angular-define/ngDefine',
-      'jquery' : 'main/webapp/assets/vendor/jquery-1.7.2.min',
+      'jquery' : 'main/webapp/assets/vendor/jquery/jquery',
       'angular' : 'main/webapp/assets/vendor/angular/angular',
       'angular-resource' : 'main/webapp/assets/vendor/angular/angular-resource',
       'angular-sanitize' : 'main/webapp/assets/vendor/angular/angular-sanitize',
       'angular-mocks': 'test/js/lib/angular/angular-mocks',
       'bootstrap-slider': 'main/webapp/assets/vendor/bootstrap-slider/bootstrap-slider',
-      'jquery-overscroll' : 'main/webapp/assets/vendor/jquery.overscroll',
-      'jquery-mousewheel' : 'main/webapp/assets/vendor/jquery.mousewheel'
+      'jquery-overscroll' : 'main/webapp/assets/vendor/jquery/jquery.overscroll',
+      'jquery-mousewheel' : 'main/webapp/assets/vendor/jquery/jquery.mousewheel'
     },
     shim: {
       'angular' : { deps: [ 'jquery' ], exports: 'angular' },
@@ -59,7 +59,7 @@
 
     tests.unshift('/base/test/js/unit/browserTrigger.js');
     tests.unshift('/base/test/js/unit/testabilityPatch.js');
-    
+
     require(tests, function() {
       window.__karma__.start();
     });

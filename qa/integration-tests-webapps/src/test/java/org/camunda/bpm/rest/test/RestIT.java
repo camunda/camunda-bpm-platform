@@ -62,7 +62,7 @@ public class RestIT extends AbstractWebappIntegrationTest {
     Assert.assertEquals("http://www.omg.org/spec/BPMN/20100524/MODEL", definitionJson.getString("category"));
     Assert.assertEquals("invoice receipt", definitionJson.getString("name"));
     Assert.assertTrue(definitionJson.isNull("description"));
-    Assert.assertEquals("invoice.bpmn", definitionJson.getString("resource"));
+    Assert.assertTrue(definitionJson.getString("resource").contains("invoice.bpmn"));
     Assert.assertFalse(definitionJson.getBoolean("suspended"));
 
     response.close();

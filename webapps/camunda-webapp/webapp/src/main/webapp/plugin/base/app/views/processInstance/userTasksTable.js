@@ -1,6 +1,6 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
 
-   function UserTaskController ($scope, search, TaskResource, Notifications) {
+  function UserTaskController ($scope, search, TaskResource, Notifications) {
 
     // input: processInstance, processData
 
@@ -106,7 +106,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       }
 
       return true;
-    }
+    };
 
     $scope.submit = function (editAssigneeFrom, userTask) {
       if (!isValid(editAssigneeFrom)) {
@@ -143,8 +143,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     $scope.getExceptionForUserTask = function (userTask) {
       return taskIdIdToExceptionMessageMap[userTask.id];
     };
-
-  };
+  }
 
   module.controller('UserTaskController', [ '$scope', 'search', 'TaskResource', 'Notifications', UserTaskController ]);
 

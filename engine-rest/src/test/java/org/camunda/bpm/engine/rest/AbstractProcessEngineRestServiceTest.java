@@ -29,6 +29,8 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricActivityStatistics;
+import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -79,7 +81,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String HISTORY_ACTIVITY_INSTANCE_URL = HISTORY_URL + "/activity-instance";
   protected static final String HISTORY_PROCESS_INSTANCE_URL = HISTORY_URL + "/process-instance";
   protected static final String HISTORY_VARIABLE_INSTANCE_URL = HISTORY_URL + "/variable-instance";
-
+  protected static final String HISTORY_ACTIVITY_STATISTICS_URL = HISTORY_URL + "/process-definition/{id}/statistics";
 
   protected String EXAMPLE_ENGINE_NAME = "anEngineName";
 
@@ -89,7 +91,6 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   private TaskService mockTaskService;
   private IdentityService mockIdentityService;
   private ManagementService mockManagementService;
-
   private HistoryService mockHistoryService;
 
   @Before
@@ -100,7 +101,6 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     mockTaskService = mock(TaskService.class);
     mockIdentityService = mock(IdentityService.class);
     mockManagementService = mock(ManagementService.class);
-
     mockHistoryService = mock(HistoryService.class);
 
     when(namedProcessEngine.getRepositoryService()).thenReturn(mockRepoService);
@@ -108,7 +108,6 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(namedProcessEngine.getTaskService()).thenReturn(mockTaskService);
     when(namedProcessEngine.getIdentityService()).thenReturn(mockIdentityService);
     when(namedProcessEngine.getManagementService()).thenReturn(mockManagementService);
-
     when(namedProcessEngine.getHistoryService()).thenReturn(mockHistoryService);
 
     createProcessDefinitionMock();
@@ -122,6 +121,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createHistoricActivityInstanceMock();
     createHistoricProcessInstanceMock();
     createHistoricVariableInstanceMock();
+    createHistoricActivityStatisticsMock();
   }
 
 
@@ -222,7 +222,6 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(mockHistoryService.createHistoricProcessInstanceQuery()).thenReturn(mockHistoricProcessInstanceQuery);
   }
 
-
   private void createHistoricVariableInstanceMock() {
     List<HistoricVariableInstance> variables = new ArrayList<HistoricVariableInstance>();
     HistoricVariableInstance mockInstance = MockProvider.createMockHistoricVariableInstance();
@@ -233,6 +232,13 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(mockHistoryService.createHistoricVariableInstanceQuery()).thenReturn(mockHistoricVariableInstanceQuery);
   }
 
+  private void createHistoricActivityStatisticsMock() {
+    List<HistoricActivityStatistics> statistics = MockProvider.createMockHistoricActivityStatistics();
+
+    HistoricActivityStatisticsQuery query = mock(HistoricActivityStatisticsQuery.class);
+    when(mockHistoryService.createHistoricActivityStatisticsQuery(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(query);
+    when(query.list()).thenReturn(statistics);
+  }
 
   @Test
   public void testNonExistingEngineAccess() {
@@ -408,6 +414,21 @@ public abstract class AbstractProcessEngineRestServiceTest extends
         .get(HISTORY_VARIABLE_INSTANCE_URL);
 
     verify(mockHistoryService).createHistoricVariableInstanceQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testHistoryServiceEngineAccess_HistoricActivityStatistics() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORY_ACTIVITY_STATISTICS_URL);
+
+    verify(mockHistoryService).createHistoricActivityStatisticsQuery(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     verifyZeroInteractions(processEngine);
   }
 

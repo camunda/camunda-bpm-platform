@@ -1,17 +1,22 @@
 package org.camunda.bpm.engine.rest.standalone;
 
-import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
 import org.camunda.bpm.engine.rest.util.ResteasyTomcatServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.rules.TemporaryFolder;
 
 public class ServletAuthenticationFilterTest extends AbstractAuthenticationFilterTest {
 
-  protected static EmbeddedServerBootstrap serverBootstrap;
+  protected static ResteasyTomcatServerBootstrap serverBootstrap;
+
+  @ClassRule
+  public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @BeforeClass
   public static void setUpEmbeddedRuntime() {
-    serverBootstrap = new ResteasyTomcatServerBootstrap("runtime/resteasy/auth-filter-servlet-web.xml");
+    serverBootstrap = new ResteasyTomcatServerBootstrap("runtime/resteasy/auth-filter-no-servlet-web.xml");
+    serverBootstrap.setWorkingDir(temporaryFolder.getRoot().getAbsolutePath());
     serverBootstrap.start();
   }
 

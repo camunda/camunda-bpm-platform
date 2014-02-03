@@ -1,0 +1,410 @@
+/**
+ * loaded to remove angular template flicker on site load
+ * @see http://docs.angularjs.org/api/ng.directive:ngCloak
+ */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+    display: none;
+}
+
+/** loading icon integration */
+.icon-loading {
+  background-image: url(../img/ajax-loader.gif);
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  background-position: 0px 0px;
+  opacity: 1.0;
+}
+
+/** suspended icon integration */
+.icon-suspended {
+  background-image: url(../img/suspended.png);
+  width: 18px;
+  height: 14px;
+  background-position: 0px 0px;
+}
+
+.icon-suspended.white {
+  background-image: url(../img/suspended-white.png);
+}
+
+.badge.badge-suspended {
+  line-height: 13px;
+}
+
+.badge.badge-suspended .icon-suspended {
+  -webkit-background-size: contain;
+  -moz-background-size: contain;
+  -o-background-size: contain;
+  background-size: contain;
+
+  width: 16px;
+  height: 12px;
+  background-repeat: no-repeat;
+}
+
+/* apply a natural box layout model to box elements */
+div, textarea, .inline-edit input {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+      box-sizing: border-box;
+}
+
+.navbar-inner {
+      box-sizing: content-box;
+  moz-box-sizing: content-box;
+}
+
+/** inline editing of elements */
+form.inline-edit {
+  margin-bottom: 35px;
+}
+
+.inline-edit input:not([type=radio]) {
+  min-height: 30px;
+}
+
+.inline-edit-footer {
+  position: relative;
+  width: 100%;
+  padding-right: 80px;
+}
+
+.inline-edit-footer .btn-group {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+.inline {
+  display: inline;
+}
+
+/** ---- in-place editing ----**/
+
+.in-place-edit {
+  width: 100%;
+}
+
+textarea.in-place-edit {
+  resize: vertical;
+}
+
+/** help system */
+.help-toggle {
+  display: inline-block;
+  margin-left: 5px;
+  cursor: help;
+  opacity: 0.6;
+}
+
+.help-toggle:hover {
+  opacity: 1;
+}
+/** end help system */
+
+/** edit system */
+.edit-toggle {
+  float: right;
+  display: inline-block;
+  margin-left: 5px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.edit-toggle:hover {
+  opacity: 1;
+}
+/** end help system */
+
+/** utilities */
+/** for image replacement */
+.ir {
+  display: block;
+  text-indent: -999em;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  text-align: left;
+  direction: ltr;
+}
+/** end utilities */
+
+/**
+ * shared style declarations
+ */
+html, body {
+  height: 100%;
+  min-height: 100%;
+}
+
+/** navbar brand */
+.navbar .brand {
+   display: block;
+   float: left;
+   background: no-repeat;
+   height: 39px;
+   padding: 0;
+}
+
+/**
+ * form styling
+ */
+
+input.ng-invalid.ng-dirty {
+  border-color: #E9322D;
+  -webkit-box-shadow: 0 0 6px #F8B9B7;
+  -moz-box-shadow: 0 0 6px #f8b9b7;
+  box-shadow: 0 0 6px #F8B9B7;
+}
+
+.modal-body {
+  max-height: 480px;
+}
+
+/** make sure that if screen res is 600px high or below, modal dialoges are scrollable */
+@media screen and (max-height: 600px){
+  .modal {
+    position: absolute;
+  }
+}
+
+/**----------------
+Headlines
+-------------------**/
+
+h1 {
+  font-size: 30px;
+}
+
+/**----------------
+Pagination
+-------------------**/
+
+.pagination li {
+  cursor: pointer;
+}
+
+.pagination .active, .pagination .disabled {
+  cursor: auto;
+}
+
+/**----------------
+Icons
+-------------------**/
+
+.circle {
+  width: 20px;
+  height: 20px;
+  background-color: #999999;
+  top: 100%;
+  float: left;
+  margin-right: 4px;
+
+  -webkit-border-radius: 50%;
+   -moz-border-radius: 50%;
+        border-radius: 50%;
+}
+
+.circle-red {
+  background-color: #b94a48;
+}
+
+.circle-green {
+  background-color: #468847;
+}
+
+.circle-tiles {
+  float: right;
+  margin-top: 5px;
+}
+
+/**
+Utilities
+**/
+.table {
+  .row-select {
+    width: 20px;
+    text-align: center;
+  }
+
+  .row-select input[type=checkbox] {
+    margin: 0;
+  }
+}
+
+/****************************\
+ * LAYOUT
+ ****************************/
+
+@media (min-width: 979px) {
+  .ctn-main {
+    position: absolute;
+    top: 41px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+
+    overflow: auto;
+  }
+
+  .ctn-wrapper {
+    min-height: 100%;
+    height: auto !important; /* ie7 fix */
+    height: 100%;
+    margin: 0 auto -64px;
+  }
+}
+
+@media (max-width: 979px) {
+  .ctn-main {
+    top: 51px;
+  }
+}
+
+
+.ctn-push-down {
+  height: 32px;
+}
+
+footer {
+  margin-top: 32px;
+  padding: 5px 10px;
+}
+
+@media (max-width: 767px) {
+  footer {
+    margin-left: -20px;
+    margin-right: -20px;
+  }
+}
+
+/** layout ui tweaks */
+
+footer {
+  border-top: 1px solid #E5E5E5;
+  background-color: whiteSmoke;
+}
+
+footer > div {
+  font-size: 0.83em;
+  text-align: right;
+
+  opacity: 0.7;
+}
+
+footer:hover > div {
+  opacity: 1.0;
+}
+
+footer .version {
+  font-family: monospace;
+}
+
+@media (min-width: 979px) {
+  .ctn-wrapper > .notifications-panel {
+    position: fixed;
+    bottom: 40px;
+    right: 20px;
+    width: 400px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+  }
+
+  .ctn-wrapper > .notifications-panel .alert {
+    margin: 10px;
+  }
+
+  .breadcrumb {
+    margin: 0 0 20px;
+    background-color: inherit;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    line-height: 29px;
+    padding: 0 10px 0 10px;
+    font-size: 0.85em;
+  }
+}
+
+/** end layout ui tweaks */
+
+.ctn-scroll::-webkit-scrollbar{width:8px;height:8px;}
+.ctn-scroll::-webkit-scrollbar-button:start:decrement,
+.ctn-scroll::-webkit-scrollbar-button:end:increment{display:block;height:0;background-color:transparent;}
+.ctn-scroll::-webkit-scrollbar-track-piece{background-color:#FAFAFA;-webkit-border-radius:0;-webkit-border-bottom-right-radius:3px;-webkit-border-bottom-left-radius:3px;}
+.ctn-scroll::-webkit-scrollbar-thumb:vertical{height:50px;background-color:#999;-webkit-border-radius:3px;}
+.ctn-scroll::-webkit-scrollbar-thumb:horizontal{width:50px;background-color:#999;-webkit-border-radius:3px;}
+
+/** input tweaks */
+
+.navbar-search select {
+  margin-bottom: 4px;
+}
+
+/** end input tweaks */
+
+/*---------modal dialog -------------*/
+.modal-body {
+  max-height: 480px;
+}
+
+/** make sure that if screen res is 600px high or below, modal dialoges are scrollable */
+@media screen and (max-height: 600px){
+  .modal {
+    position:absolute;
+  }
+}
+
+/** signin form */
+
+@media(min-width: 976px) {
+  .form-signin-container {
+    padding: 20px;
+  }
+}
+
+.form-signin {
+  max-width: 300px;
+  padding: 19px 29px 29px;
+  margin: 20px auto;
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+  -webkit-border-radius: 5px;
+     -moz-border-radius: 5px;
+          border-radius: 5px;
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+          box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  .form-signin-heading,
+  .checkbox {
+    margin-bottom: 10px;
+  }
+  input[type="text"],
+  input[type="password"] {
+    font-size: 16px;
+    height: auto;
+    margin-bottom: 15px;
+    padding: 7px 9px;
+  }
+}
+
+/*-----------action button-----------*/
+
+.action-button {
+  opacity: 0.7;
+  padding: 0px 6px;
+}
+
+.action-button:hover {
+  opacity: 1.0;
+}
+
+.btn.action-button:first-child {
+  padding: 0px 8px;
+}
+
+/*----------popover--------------*/
+.tooltip {
+  z-index: 1060;
+}

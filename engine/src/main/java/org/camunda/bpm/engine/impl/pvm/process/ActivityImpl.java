@@ -20,12 +20,14 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
 public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds {
 
@@ -38,6 +40,10 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   protected boolean isScope;
   protected boolean isAsync;
   protected boolean isExclusive;
+  protected boolean isCancelScope = false;
+  protected boolean isConcurrent = false;
+  protected PvmScope scope;
+
 
   // Graphical information
   protected int x = -1;
@@ -94,6 +100,10 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     this.parent = parent;
   }
 
+  public void setScope(PvmScope scope) {
+    this.scope = scope;
+  }
+
   protected void setIncomingTransitions(List<TransitionImpl> incomingTransitions) {
     this.incomingTransitions = incomingTransitions;
   }
@@ -115,6 +125,14 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   public ScopeImpl getParent() {
     return parent;
+  }
+
+  public PvmScope getScope() {
+    if(scope == null) {
+      return parent;
+    } else {
+      return scope;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -185,6 +203,22 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   public ScopeImpl getParentScope() {
     return parent;
+  }
+
+  public boolean isCancelScope() {
+    return isCancelScope;
+  }
+
+  public void setCancelScope(boolean isInterrupting) {
+    this.isCancelScope = isInterrupting;
+  }
+
+  public boolean isConcurrent() {
+    return isConcurrent;
+  }
+
+  public void setConcurrent(boolean isConcurrent) {
+    this.isConcurrent = isConcurrent;
   }
 
 }

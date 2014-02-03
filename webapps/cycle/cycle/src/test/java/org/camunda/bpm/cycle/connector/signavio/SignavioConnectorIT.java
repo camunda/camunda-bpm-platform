@@ -41,16 +41,15 @@ import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -143,22 +142,22 @@ public class SignavioConnectorIT {
   @Test
   public void testRoundtripWithMessageEvents() throws Exception {
     bpmnSimplePoolExtractionRoundtripWithDevFriendlyEngineDeploy("testRoundtripWithMessageEvents.sgx",
-            "<serviceTask\\sid=\"(test(_\\d*))\"\\sname=\"test\"/>",
-            "<serviceTask id=\"testTwitter\" name=\"testTwitter\" activiti:class=\"org.camunda.bpm.demo.twitter.TweetContentDelegate\" />");
+            "<serviceTask\\sid=\"(test(_\\d*))\"\\sname=\"test\">",
+            "<serviceTask id=\"testTwitter\" name=\"testTwitter\" activiti:class=\"org.camunda.bpm.demo.twitter.TweetContentDelegate\" >");
   }
   
   @Test
   public void test_HEMERA_1319() throws Exception {
     bpmnSimplePoolExtractionRoundtripWithDevFriendlyEngineDeploy("HEMERA-1319.sgx",
-            "<serviceTask\\sid=\"(Task(_\\d*))\"/>",
-            "<serviceTask id=\"Task_abc\" name=\"Task_abc\" activiti:class=\"org.camunda.bpm.demo.pdf.SavePdfDelegate\" />");
+            "<serviceTask\\sid=\"(Task(_\\d*))\">",
+            "<serviceTask id=\"Task_abc\" name=\"Task_abc\" activiti:class=\"org.camunda.bpm.demo.pdf.SavePdfDelegate\" >");
   }
   
   @Test
   public void test_HEMERA_1610() throws Exception {
     bpmnSimplePoolExtractionRoundtripWithDevFriendlyEngineDeploy("HEMERA-1610.sgx",
-      "<serviceTask\\sid=\"(PDF_in_SVN_ablegen(_\\d*))\"\\sname=\"PDF\\sin\\sSVN\\sablegen\"/>",
-      "<serviceTask id=\"PDF_in_SVN_ablegen_abc\" name=\"PDF in SVN ablegen\" activiti:class=\"org.camunda.bpm.demo.pdf.SavePdfDelegate\" />");
+      "<serviceTask\\sid=\"(PDF_in_SVN_ablegen(_\\d*))\"\\sname=\"PDF\\sin\\sSVN\\sablegen\">",
+      "<serviceTask id=\"PDF_in_SVN_ablegen_abc\" name=\"PDF in SVN ablegen\" activiti:class=\"org.camunda.bpm.demo.pdf.SavePdfDelegate\" >");
   }
   
   @Test
@@ -435,15 +434,7 @@ public class SignavioConnectorIT {
       Diff diff = XMLUnit.compareXML(expectedRawBpmn20Xml, actualRawBpmn20Xml);
       DetailedDiff details = new DetailedDiff(diff);
       details.overrideDifferenceListener(new SignavioBpmn20XmlDifferenceListener());
-      details.overrideElementQualifier(new ElementNameAndAttributeQualifier() {
-        @Override
-        public boolean qualifyForComparison(Element control, Element test) {
-          if (test.getLocalName().equals("outgoing")) {
-            return super.qualifyForComparison(control, test) && control.getTextContent().equals(test.getTextContent());  
-          }
-          return super.qualifyForComparison(control, test);
-        }
-      });
+      details.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
       return details;
     } catch (SAXException e) {
       throw new RuntimeException("Exception during XML comparison.", e);

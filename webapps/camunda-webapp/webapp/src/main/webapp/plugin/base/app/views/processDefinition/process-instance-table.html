@@ -1,11 +1,10 @@
+<!-- # CE - src/main/webapp/plugin/base/views/processDefinition/process-instance-table.html -->
 <table class="table table-bordered table-hover table-condensed table-filter">
   <thead>
     <tr>
       <th>ID</th>
       <th>Start Time</th>
-      <th>
-        Business Key
-      </th>
+      <th>Business Key</th>
       <th>State</th>
     </tr>
   </thead>
@@ -19,9 +18,9 @@
       <td>{{ processInstance.startTime }}</td>
       <td>{{ processInstance.businessKey }}</td>
       <td colspan="2">
-        <a state-circle 
+        <a state-circle
            incidents="processInstance.incidents"
-           href="#/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
+           ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
         <span class="badge badge-warning badge-suspended" ng-show="processInstance.suspended" title="Currently suspended">
           <i class="icon-suspended white"></i>
         </span>
@@ -44,3 +43,4 @@
 </table>
 
 <div paginator total-pages="pages.total" current-page="pages.current"></div>
+<!-- / CE - src/main/webapp/plugin/base/views/processDefinition/process-instance-table.html -->

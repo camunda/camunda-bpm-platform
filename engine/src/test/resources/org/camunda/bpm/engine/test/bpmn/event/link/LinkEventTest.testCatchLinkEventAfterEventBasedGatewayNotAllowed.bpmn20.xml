@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd"
+  id="_ZeSZENg2EeKYYcWBkDaPIQ" targetNamespace="http://activiti.org/bpmn">
+  <process id="linkEventInvalid" isExecutable="true">
+    
+    <eventBasedGateway id="gw1" />
+    
+    <sequenceFlow sourceRef="gw1" targetRef="IntermediateCatchEvent_2"/>
+    
+    <intermediateCatchEvent id="IntermediateCatchEvent_2" name="LinkA">
+      <linkEventDefinition id="LinkEventDefinition_4" name="LinkA" />
+    </intermediateCatchEvent>
+
+  </process>
+</definitions>

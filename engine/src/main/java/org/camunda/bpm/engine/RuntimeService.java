@@ -251,14 +251,14 @@ public interface RuntimeService {
 
   /** Delete an existing runtime process instance.
    * @param processInstanceId id of process instance to delete, cannot be null.
-   * @param deleteReason reason for deleting, can be null.
+   * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
    * @throws ProcessEngineException when no process instance is found with the given id.
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason);
 
   /** Finds the activity ids for all executions that are waiting in activities.
    * This is a list because a single activity can be active multiple times.
-   * @param executionId id of the execution, cannot be null.
+   * @param executionId id of the process instance or the execution, cannot be null.
    * @throws ProcessEngineException when no execution exists with the given executionId.
    */
   List<String> getActiveActivityIds(String executionId);
@@ -310,13 +310,21 @@ public interface RuntimeService {
   ActivityInstance getActivityInstance(String processInstanceId);
 
   /** Sends an external trigger to an activity instance that is waiting inside the given execution.
-   * @param executionId id of execution to signal, cannot be null.
+   *
+   * Note that you need to provide the exact execution that is waiting for the signal
+   * if the process instance contains multiple executions.
+   *
+   * @param executionId id of process instance or execution to signal, cannot be null.
    * @throws ProcessEngineException when no execution is found for the given executionId.
    */
   void signal(String executionId);
 
   /** Sends an external trigger to an activity instance that is waiting inside the given execution.
-   * @param executionId id of execution to signal, cannot be null.
+   *
+   * Note that you need to provide the exact execution that is waiting for the signal
+   * if the process instance contains multiple executions.
+   *
+   * @param executionId id of process instance or execution to signal, cannot be null.
    * @param processVariables a map of process variables
    * @throws ProcessEngineException when no execution is found for the given executionId.
    */
@@ -325,7 +333,7 @@ public interface RuntimeService {
   // Variables ////////////////////////////////////////////////////////////////////
 
   /** All variables visible from the given execution scope (including parent scopes).
-   * @param executionId id of execution, cannot be null.
+   * @param executionId id of process instance or execution, cannot be null.
    * @return the variables or an empty map if no such variables are found.
    * @throws ProcessEngineException when no execution is found for the given executionId. */
   Map<String, Object> getVariables(String executionId);
@@ -339,7 +347,7 @@ public interface RuntimeService {
    Map<String, Object> getVariablesLocal(String executionId);
 
    /** The variable values for all given variableNames, takes all variables into account which are visible from the given execution scope (including parent scopes).
-   * @param executionId id of execution, cannot be null.
+   * @param executionId id of process instance or execution, cannot be null.
    * @param variableNames the collection of variable names that should be retrieved.
    * @return the variables or an empty map if no such variables are found.
    * @throws ProcessEngineException when no execution is found for the given executionId. */
@@ -354,7 +362,7 @@ public interface RuntimeService {
 
   /** The variable value.  Searching for the variable is done in all scopes that are visible to the given execution (including parent scopes).
    * Returns null when no variable value is found with the given name or when the value is set to null.
-   * @param executionId id of execution, cannot be null.
+   * @param executionId id of process instance or execution, cannot be null.
    * @param variableName name of variable, cannot be null.
    * @return the variable value or null if the variable is undefined or the value of the variable is null.
    * @throws ProcessEngineException when no execution is found for the given executionId. */
@@ -366,7 +374,7 @@ public interface RuntimeService {
 
   /** Update or create a variable for an execution.  If the variable is not already existing somewhere in the execution hierarchy,
    * it will be created in the process instance (which is the root execution).
-   * @param executionId id of execution to set variable in, cannot be null.
+   * @param executionId id of process instance or execution to set variable in, cannot be null.
    * @param variableName name of variable to set, cannot be null.
    * @param value value to set. When null is passed, the variable is not removed,
    * only it's value will be set to null.
@@ -385,7 +393,7 @@ public interface RuntimeService {
 
   /** Update or create given variables for an execution (including parent scopes). If the variables are not already existing, they will be created in the process instance
    * (which is the root execution).
-   * @param executionId id of the execution, cannot be null.
+   * @param executionId id of the process instance or the execution, cannot be null.
    * @param variables map containing name (key) and value of variables, can be null.
    * @throws ProcessEngineException when no execution is found for the given executionId.  */
   void setVariables(String executionId, Map<String, ? extends Object> variables);
@@ -398,7 +406,7 @@ public interface RuntimeService {
 
   /**
    * Removes a variable for an execution.
-   * @param executionId id of execution to remove variable in.
+   * @param executionId id of process instance or execution to remove variable in.
    * @param variableName name of variable to remove.
    */
   void removeVariable(String executionId, String variableName);
@@ -412,7 +420,7 @@ public interface RuntimeService {
 
   /**
    * Removes variables for an execution.
-   * @param executionId id of execution to remove variable in.
+   * @param executionId id of process instance or execution to remove variable in.
    * @param variableNames collection containing name of variables to remove.
    */
   void removeVariables(String executionId, Collection<String> variableNames);
@@ -622,10 +630,13 @@ public interface RuntimeService {
    * execution referenced by 'executionId'.
    * The waiting execution is notified synchronously.
    *
+   * Note that you need to provide the exact execution that is waiting for the signal
+   * if the process instance contains multiple executions.
+   *
    * @param signalName
    *          the name of the signal event
    * @param executionId
-   *          the id of the execution to deliver the signal to
+   *          id of the process instance or the execution to deliver the signal to
    * @throws ProcessEngineException if no such execution exists or if the execution
    *          has not subscribed to the signal
    */
@@ -637,10 +648,13 @@ public interface RuntimeService {
    * execution referenced by 'executionId'.
    * The waiting execution is notified synchronously.
    *
+   * Note that you need to provide the exact execution that is waiting for the signal
+   * if the process instance contains multiple executions.
+   *
    * @param signalName
    *          the name of the signal event
    * @param executionId
-   *          the id of the execution to deliver the signal to
+   *          the id of the process instance or the execution to deliver the signal to
    * @param processVariables
    *          a map of variables added to the execution(s)
    * @throws ProcessEngineException if no such execution exists or if the execution
@@ -654,10 +668,13 @@ public interface RuntimeService {
    *
    * The waiting execution is notified synchronously.
    *
+   * Note that you need to provide the exact execution that is waiting for the message
+   * if the process instance contains multiple executions.
+   *
    * @param messageName
    *          the name of the message event
    * @param executionId
-   *          the id of the execution to deliver the message to
+   *          the id of the process instance or the execution to deliver the message to
    * @throws ProcessEngineException if no such execution exists or if the execution
    *          has not subscribed to the signal
    */
@@ -669,10 +686,13 @@ public interface RuntimeService {
    *
    * The waiting execution is notified synchronously.
    *
+   * Note that you need to provide the exact execution that is waiting for the message
+   * if the process instance contains multiple executions.
+   *
    * @param messageName
    *          the name of the message event
    * @param executionId
-   *          the id of the execution to deliver the message to
+   *          the id of the process instance or the execution to deliver the message to
    * @param processVariables
    *          a map of variables added to the execution
    * @throws ProcessEngineException if no such execution exists or if the execution

@@ -1,3 +1,4 @@
+<!-- # CE - src/main/webapp/app/cockpit/pages/process-definition.html -->
 <div class="ctn-fixed-view">
 
   <div class="ctn-header">
@@ -15,7 +16,7 @@
     <div class="view-pills" id="cockpit.processDefinition.view"></div>
   </div>
 
-  <div class="ctn-content-container ctn-collapsable-parent">
+  <div class="ctn-content-container" ctn-collapsable-parent="sidebar">
 
     <!-- tool bar -->
     <div class="ctn-toolbar">
@@ -27,7 +28,7 @@
     </div>
 
     <!-- sidebar -->
-    <div class="ctn-column ctn-sidebar ctn-collapsable ctn-scroll" collapsable="left">
+    <div class="ctn-column ctn-sidebar ctn-scroll" ctn-collapsable="left">
 
       <div class="filters" ng-controller="ProcessDefinitionFilterController">
         <h5>
@@ -206,7 +207,7 @@
       <a class="hide-collapsable pull-right"></a>
     </div>
 
-    <div class="ctn-column ctn-content ctn-collapsable-parent">
+    <div class="ctn-column ctn-content" ctn-collapsable-parent="tabs">
 
       <!-- content top pane -->
       <div class="ctn-row ctn-content-top">
@@ -214,7 +215,7 @@
       </div>
 
       <!-- content bottom pane -->
-      <div class="ctn-row ctn-content-bottom ctn-tabbed ctn-collapsable" collapse="bottom">
+      <div class="ctn-row ctn-content-bottom ctn-tabbed" ctn-collapsable="bottom">
         <div ng-show="processDefinitionTabs.length">
           <ul class="nav nav-tabs">
             <li ng-class="{ active: selectedTab == tabProvider }" ng-repeat="tabProvider in processDefinitionTabs">
@@ -233,3 +234,4 @@
   </div>
 
 </div><!-- end .ctn-fixed-view -->
+<!-- / CE - src/main/webapp/app/cockpit/pages/process-definition.html -->

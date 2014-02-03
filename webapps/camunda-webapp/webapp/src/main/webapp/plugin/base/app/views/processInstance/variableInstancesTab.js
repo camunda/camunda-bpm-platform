@@ -216,8 +216,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     $scope.isDateValueValid = function (param) {
       console.log(param);
     };
-
-  };
+  }
 
   module.controller('VariableInstancesController', [ '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', VariableInstancesController ]);
 

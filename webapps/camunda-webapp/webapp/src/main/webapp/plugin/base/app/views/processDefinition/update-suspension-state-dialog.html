@@ -1,3 +1,4 @@
+<!-- # CE - src/main/webapp/plugin/base/app/views/processDefinition/update-suspension-state-dialog.html -->
 <div class="modal-header">
   <h3 ng-show="processDefinition.suspended">Activate Process Definition</h3>
   <h3 ng-hide="processDefinition.suspended">Suspend Process Definition</h3>
@@ -36,9 +37,9 @@
                   help
                   help-text="Including the process instances means that all existing process instances of this process definition will be suspended too, if the value is set to true."
                   help-placement="'right'"
-                  ng-hide="processDefinition.suspended">   
+                  ng-hide="processDefinition.suspended">
               <i class="icon-question-sign"></i>
-            </span>   
+            </span>
           </label>
           <div class="controls">
             <input id="includeInstancesValueId" name="includeInstancesValue" type="checkbox" ng-model="includeInstances">
@@ -58,9 +59,9 @@
                   help
                   help-text="Decide whether the suspension of this process definition should be executed immediately or delayed. If the suspension should happen delayed then an execution date must be provided on which the suspension will be scheduled."
                   help-placement="'right'"
-                  ng-hide="processDefinition.suspended">   
+                  ng-hide="processDefinition.suspended">
               <i class="icon-question-sign"></i>
-            </span>  
+            </span>
           </label>
           <div class="controls">
             <label class="radio">
@@ -109,7 +110,7 @@
     </p>
     <p ng-show="!processDefinition.suspended && !executeImmediately">
       The suspension of the process definition has been scheduled to {{ executionDate }} successfully.
-    </p>    
+    </p>
   </div>
 
   <div ng-show="status === 'FAIL'">
@@ -124,7 +125,7 @@
     </p>
     <p ng-show="!processDefinition.suspended && !executeImmediately">
       The suspension of the process definition could not be scheduled to {{ executionDate }} successfully.
-    </p> 
+    </p>
   </div>
 
 </div>
@@ -144,3 +145,4 @@
   <button class="btn btn-primary" ng-click="close(status)"
           ng-show="status === 'SUCCESS' || status === 'FAIL'">OK</button>
 </div>
+<!-- / CE - src/main/webapp/plugin/base/app/views/processDefinition/update-suspension-state-dialog.html -->

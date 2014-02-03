@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-engine name="groovy">
+    <job-acquisition>default</job-acquisition>
+    <datasource>java:jboss/datasources/ProcessEngine</datasource>
+
+    <properties>
+      <property name="history">full</property>
+    </properties>
+
+    <plugins>
+      <plugin>
+        <class>org.camunda.bpm.integrationtest.deployment.war.beans.GroovyProcessEnginePlugin</class>
+      </plugin>
+    </plugins>
+  </process-engine>
+
+  <process-archive>
+    <process-engine>groovy</process-engine>
+    <properties>
+      <property name="isDeleteUponUndeploy">true</property>
+      <property name="isScanForProcessDefinitions">true</property>
+    </properties>
+  </process-archive>
+
+</process-application>

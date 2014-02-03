@@ -1,10 +1,10 @@
 package org.camunda.bpm.integrationtest.functional.ejb.beans;
 
-import javax.ejb.Stateless;
-import javax.inject.Named;
-
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import javax.ejb.Stateless;
+import javax.inject.Named;
 
 /**
  * A SLSB acting as a {@link JavaDelegate}
@@ -17,7 +17,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 public class SLSBDelegate implements JavaDelegate {
 
   public void execute(DelegateExecution execution) throws Exception {
-    execution.setVariable(getClass().getName(), true);    
+    execution.setVariable(SLSBDelegate.class.getName(), true);
   }
 
 }

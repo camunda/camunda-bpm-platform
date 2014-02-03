@@ -16,6 +16,7 @@ package org.camunda.bpm.engine;
 
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -28,13 +29,13 @@ import org.camunda.bpm.engine.history.NativeHistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 
-/** 
+/**
  * Service exposing information about ongoing and past process instances.  This is different
- * from the runtime information in the sense that this runtime information only contains 
- * the actual runtime state at any given moment and it is optimized for runtime 
- * process execution performance.  The history information is optimized for easy 
+ * from the runtime information in the sense that this runtime information only contains
+ * the actual runtime state at any given moment and it is optimized for runtime
+ * process execution performance.  The history information is optimized for easy
  * querying and remains permanent in the persistent storage.
- * 
+ *
  * @author Christian Stettler
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -46,22 +47,27 @@ public interface HistoryService {
 
   /** Creates a new programmatic query to search for {@link HistoricActivityInstance}s. */
   HistoricActivityInstanceQuery createHistoricActivityInstanceQuery();
-  
+
+  /**
+   * Query for the number of historic activity instances aggregated by activities of a single process definition.
+   */
+  HistoricActivityStatisticsQuery createHistoricActivityStatisticsQuery(String processDefinitionId);
+
   /** Creates a new programmatic query to search for {@link HistoricTaskInstance}s. */
   HistoricTaskInstanceQuery createHistoricTaskInstanceQuery();
 
   /** Creates a new programmatic query to search for {@link HistoricDetail}s. */
   HistoricDetailQuery createHistoricDetailQuery();
-  
+
   /** Creates a new programmatic query to search for {@link HistoricVariableInstance}s. */
   HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
 
-  /** Deletes historic task instance.  This might be useful for tasks that are 
-   * {@link TaskService#newTask() dynamically created} and then {@link TaskService#complete(String) completed}. 
-   * If the historic task instance doesn't exist, no exception is thrown and the 
+  /** Deletes historic task instance.  This might be useful for tasks that are
+   * {@link TaskService#newTask() dynamically created} and then {@link TaskService#complete(String) completed}.
+   * If the historic task instance doesn't exist, no exception is thrown and the
    * method returns normal.*/
   void deleteHistoricTaskInstance(String taskId);
-  
+
   /**
    * Deletes historic process instance. All historic activities, historic task and
    * historic details (variable updates, form properties) are deleted as well.

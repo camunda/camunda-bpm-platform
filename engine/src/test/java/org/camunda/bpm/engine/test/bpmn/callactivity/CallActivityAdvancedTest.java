@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.test.bpmn.callactivity;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -203,17 +202,16 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTimerOnCallActivity.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
   public void testTimerOnCallActivity() {
-    Date startTime = ClockUtil.getCurrentTime();
-
     // After process start, the task in the subprocess should be active
     runtimeService.startProcessInstanceByKey("timerOnCallActivity");
     TaskQuery taskQuery = taskService.createTaskQuery();
     Task taskInSubProcess = taskQuery.singleResult();
     assertEquals("Task in subprocess", taskInSubProcess.getName());
 
-    // When the timer on the subprocess is fired, the complete subprocess is destroyed
-    ClockUtil.setCurrentTime(new Date(startTime.getTime() + (6 * 60 * 1000))); // + 6 minutes, timer fires on 5 minutes
-    waitForJobExecutorToProcessAllJobs(10000);
+    Job timer = managementService.createJobQuery().singleResult();
+    assertNotNull(timer);
+
+    managementService.executeJob(timer.getId());
 
     Task escalatedTask = taskQuery.singleResult();
     assertEquals("Escalated Task", escalatedTask.getName());

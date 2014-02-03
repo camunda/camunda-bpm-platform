@@ -21,7 +21,6 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessInstanceResource;
-import org.camunda.bpm.cockpit.plugin.base.util.JobExecutorHelper;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -32,6 +31,7 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.webapp.test.util.JobExecutorHelper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -216,7 +216,7 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     helper.waitForJobExecutorToProcessAllJobs(15000);
 
     ProcessInstanceQueryDto queryParameter1 = new ProcessInstanceQueryDto();
-    
+
     String[] activityInstanceIds1 = {firstActivityInstanceId};
     queryParameter1.setActivityInstanceIdIn(activityInstanceIds1);
 

@@ -1,8 +1,9 @@
+<!-- # CE - src/main/webapp/plugin/app/base/views/processInstance/user-tasks-table.html -->
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
       <th>Activity</th>
-      <th>Asignee</th>
+      <th>Assignee</th>
       <th>Owner</th>
       <th>Creation Date</th>
       <th>Due Date</th>
@@ -14,7 +15,8 @@
   <tbody>
     <tr ng-repeat="userTask in userTasks">
       <td>
-        <a href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
+        <a cam-select-activity="userTask.instance.activityId"
+           ng-href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
       </td>
       <td>
         <div ng-if="!userTask.inEditMode">
@@ -51,10 +53,10 @@
       </td>
       <td>
         {{ userTask.owner }}
-      </td>      
+      </td>
       <td>
         {{ userTask.created }}
-      </td>            
+      </td>
       <td>
         {{ userTask.due }}
       </td>
@@ -66,15 +68,15 @@
       </td>
       <td>
         {{ userTask.id }}
-      </td>            
+      </td>
     </tr>
 
     <tr ng-if="!userTasks">
       <td colspan="8">
         <i class="icon-loading"></i> loading user tasks...
       </td>
-    </tr>    
-  
+    </tr>
+
     <tr ng-if="userTasks && !userTasks.length">
       <td  colspan="8">
         No user tasks
@@ -84,3 +86,4 @@
 </table>
 
 <div paginator total-pages="pages.total" current-page="pages.current"></div>
+<!-- / CE - src/main/webapp/plugin/app/base/views/processInstance/user-tasks-table.html -->

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn"
+	targetNamespace="Examples">
+
+	<process id="timerOnConcurrentMiTasks">
+
+		<startEvent id="theStart" />
+
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+    
+        <parallelGateway id="fork" />
+        
+        <sequenceFlow sourceRef="fork" targetRef="firstTask" />
+        <sequenceFlow sourceRef="fork" targetRef="secondTask" />
+
+		<userTask id="firstTask" name="First Task">
+            <multiInstanceLoopCharacteristics>
+                <loopCardinality>5</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+        
+        <userTask id="secondTask" name="Second Task" />
+        
+        <sequenceFlow sourceRef="firstTask" targetRef="join" />
+        <sequenceFlow sourceRef="secondTask" targetRef="join" />
+        <parallelGateway id="join" />
+        <sequenceFlow sourceRef="join" targetRef="theEnd" />
+        
+		<endEvent id="theEnd" />
+
+		<!-- Non Interrupting timer -->
+
+		<boundaryEvent id="escalationTimer1" cancelActivity="false" attachedToRef="firstTask">
+			<timerEventDefinition>
+				<timeDuration>PT1H</timeDuration>
+			</timerEventDefinition>
+		</boundaryEvent>
+
+		<sequenceFlow id="flow3" sourceRef="escalationTimer1" targetRef="escalationTask" />
+
+		<userTask id="escalationTask" name="Escalation Task 1" />
+
+		<sequenceFlow id="flow4" sourceRef="escalationTask" targetRef="escalatedEnd" />
+
+		<endEvent id="escalatedEnd" />
+
+	</process>
+</definitions>

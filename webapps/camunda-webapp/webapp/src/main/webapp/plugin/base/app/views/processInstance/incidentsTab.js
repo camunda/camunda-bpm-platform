@@ -100,11 +100,10 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
             // refresh filter and all views
             $scope.processData.set('filter', angular.extend({}, $scope.filter));
           }
-        });      
+        });
 
       };
-
-  }];
+    }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 

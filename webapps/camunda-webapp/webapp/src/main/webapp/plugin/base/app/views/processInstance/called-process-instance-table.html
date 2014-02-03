@@ -1,3 +1,4 @@
+<!-- # CE - src/main/webapp/plugin/base/app/views/processInstnace/called-process-instance-table.html -->
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <th>Called Process Instance</th>
@@ -17,7 +18,8 @@
         </a>
       </td>
       <td>
-        <a href="#/process-instance/{{ processInstance.id }}?activityInstanceIds={{ calledProcessInstance.instance.id }}">
+        <a ng-click="selectActivity(calledProcessInstance.instance.id, $event)"
+           ng-href="#/process-instance/{{ processInstance.id }}?activityInstanceIds={{ calledProcessInstance.instance.id }}">
           {{ calledProcessInstance.instance.name }}
         <a>
       </td>
@@ -37,3 +39,4 @@
 
   </tbody>
 </table>
+<!-- / CE - src/main/webapp/plugin/base/app/views/processInstnace/called-process-instance-table.html -->

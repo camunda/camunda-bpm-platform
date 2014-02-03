@@ -13,10 +13,11 @@
 package org.camunda.bpm.engine.rest.wink;
 
 import org.camunda.bpm.engine.rest.AbstractAuthorizationRestServiceInteractionTest;
-import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
 import org.camunda.bpm.engine.rest.util.WinkTomcatServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * @author Daniel Meyer
@@ -24,11 +25,15 @@ import org.junit.BeforeClass;
  */
 public class AuthorizationRestServiceInteractionTest extends AbstractAuthorizationRestServiceInteractionTest {
 
-  protected static EmbeddedServerBootstrap serverBootstrap;  
-  
+  protected static WinkTomcatServerBootstrap serverBootstrap;
+
+  @ClassRule
+  public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+
   @BeforeClass
   public static void setUpEmbeddedRuntime() {
     serverBootstrap = new WinkTomcatServerBootstrap();
+    serverBootstrap.setWorkingDir(temporaryFolder.getRoot().getAbsolutePath());
     serverBootstrap.start();
   }
   

@@ -137,6 +137,7 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
 
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
+    persistentState.put("executionId", executionId);
     persistentState.put("lockOwner", lockOwner);
     persistentState.put("lockExpirationTime", lockExpirationTime);
     persistentState.put("retries", retries);

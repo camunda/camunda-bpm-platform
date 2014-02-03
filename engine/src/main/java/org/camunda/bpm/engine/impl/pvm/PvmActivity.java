@@ -24,6 +24,30 @@ public interface PvmActivity extends PvmScope {
 
   boolean isAsync();
 
+  /**
+   * Indicates whether this activity is interrupting. If true, the activity
+   * will interrupt and cancel all other activities inside the same scope
+   * before it is executed.
+   *
+   * @return true if this activity is interrupting. False otherwise.
+   */
+  boolean isCancelScope();
+
+  /**
+   * Indicates whether this activity is concurrent. If true, the activity
+   * will be executed concurrently to other activities which are part of
+   * the same scope.
+   *
+   * @return true if this activity is concurrent. False otherwise.
+   */
+  boolean isConcurrent();
+
+  /** returns the scope of this activity. Must contain this activity but may or
+   * may not be the direct parent. */
+  PvmScope getScope();
+
+  boolean isScope();
+
   @Deprecated
   boolean isExclusive();
 

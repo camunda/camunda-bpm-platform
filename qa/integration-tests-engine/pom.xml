@@ -93,6 +93,14 @@
       <version>1.1.10.Final</version>
     </dependency>
 
+    <!-- required for TestWarDeploymentWithProcessEnginePlugin -->
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>2.2.1</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -204,6 +212,8 @@
                 <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
                 <excludes>**/SpringServletPALifecycleTest.java</excludes>
                 <excludes>**/ManagedDomainTestCase_JBOSS.java</excludes>
+                <!-- CAM-1778 -->
+                <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
               </excludes>
              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
@@ -322,6 +332,8 @@
                 <excludes>**/jboss/**</excludes>
                 <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
                 <excludes>**/SpringServletPALifecycleTest.java</excludes>
+                <!-- CAM-1778 -->
+                <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
@@ -719,6 +731,7 @@
                 <exclude>**/ejb/**</exclude>
                 <exclude>**/jar/**</exclude>
                 <exclude>**/transactions/**</exclude>
+                <exclude>**/jpa/**</exclude>
                 <!-- No EJB RequestContext available -->
                 <exclude>**/JobExecutorRequestContextTest.java</exclude>
                 <!-- Not supported by arquillian tomcat container -->

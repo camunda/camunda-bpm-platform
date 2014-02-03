@@ -1,36 +1,102 @@
-camunda webapp
-==============
+# camunda web application
 
-The camunda webapplication.
+This folder contains the sources of the camunda web application. The application includes
 
-
-Development Setup
------------------
-
-For developing the application you can use the `develop` profile.
-It will bootstrap the application in an embedded jetty and allows it to reload web resources on the fly.
-
-Start the application on an embedded jetty by executing `mvn clean jetty:run -Pdevelop` from within the `camunda-webapp` folder.
+-   __cockpit__, a process monitoring tool
+-   __tasklist__, a simple task list
+-   __admin__, a administration interface
 
 
-Test Suite
-----------
+## Building the Project
+
+To develop the application you need [Maven](https://maven.apache.org/) and [Grunt](http://gruntjs.com). 
 
 
-### Server side
+### Development Setup
 
-Run tests via `mvn clean test`.
+To run the development setup you need to execute
+
+```
+mvn clean jetty:run -Pdevelop
+```
+
+This bootstraps [Jetty](http://www.eclipse.org/jetty/), an embedded web server that serves the application on [localhost:8080/camunda](http://localhost:8080/camunda).
+You may configure the port the server runs on by passing the argument `-Djetty.port=WHICH_PORT` to the command line.
+
+In another shell execute
+
+```
+grunt auto-build
+```
+
+This continuously builds the web assets using [Grunt](http://gruntjs.com) and automatically reloads the web application when done.
+If you changed the port Jetty runs on, expose that via the environment variable `APP_PORT=WHICH_PORT`.
 
 
-### Client side
+### Testing
 
-> Requires [NodeJS](http://nodejs.org/) and [karma](http://karma-runner.github.com).
->
-> Install karma `npm -g install karma@canary` + dependencies `npm update --dev`.
->
-> Additionally paths to browser runtimes may need to be defined in environment variables:
-> <code>PHANTOMJS_BIN</code>, <code>FIREFOX_BIN</code>, <code>CHROME_BIN</code>.
+#### Server Side
 
-Run unit tests via `karma start src/test/js/config/karma.unit.js`.
+```
+mvn clean test
+```
 
-Run end-to-end tests via `karma start src/test/js/config/karma.e2e.js` (requires the develop environment to be running).
+#### Client Side
+
+```
+grunt test
+```
+
+You may need to expose the location of your browser executable(s) via the environment variables `(PHANTOMJS|FIREFOX|CHROME|IE)_BIN`.
+
+
+### Packaging
+
+```
+mvn clean (package|install)
+```
+
+
+## Build Tasks
+
+### Grunt
+
+There are a few [grunt tasks](http://gruntjs.com/) that aid you when developing the application.
+
+-   Continuously rebuild the web resources on changes and [live reload](http://livereload.com/) the app when finished:
+
+    ```
+    grunt auto-build
+    ```
+
+    Configure the port used by live reload in the environment variable `LIVERELOAD_PORT=LIVE_RELOAD_PORT`.
+
+-   Execute a single development build of the web resources and provide them to maven build / embedded [Jetty](http://www.eclipse.org/jetty/):
+
+    ```
+    grunt build
+    ```
+
+-   Execute a single production build of the web resources and provide them to the maven build / embedded server:
+    
+    ```
+    grunt build:dist
+    ```
+
+
+## Additional Resources
+
+### Extending the Application through Plug-ins
+
+Parts of the application (read: _cockpit_) can be extended through plug-ins.
+Read more about [cockpit plug-ins and how to develop them](http://docs.camunda.org/latest/real-life/how-to/#cockpit-how-to-develop-a-cockpit-plugin) in the [docs](http://docs.camunda.org/latest/real-life/how-to/#cockpit-how-to-develop-a-cockpit-plugin).
+
+### Generate Documentation for the Application
+
+You can also generated the documentation using [JSDoc](http://usejsdoc.org/) with the following command:
+
+```
+jsdoc -c ./jsdoc-conf.json -d doc
+```
+
+This will put the documentation into the `doc` folder.

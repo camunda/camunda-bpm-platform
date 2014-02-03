@@ -9,9 +9,9 @@
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-root</artifactId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../../parent</relativePath>
     <version>7.1.0-SNAPSHOT</version>
-    <relativePath>../..</relativePath>
   </parent>
 
   <profiles>
@@ -24,6 +24,7 @@
 
         <module>core</module>
         <module>webapp</module>
+        <module>test-utility</module>
 
       </modules>
     </profile>
@@ -78,4 +79,5 @@
       </dependency>
       </dependencies>
   </dependencyManagement>
+
 </project>

@@ -1,0 +1,18 @@
+{
+  "opts": {
+    "recurse": true
+  },
+  "source": {
+    "include": [
+      "README.md",
+      "src/main/webapp/require-conf.js",
+      "src/main/webapp/app",
+      "src/main/webapp/develop",
+      "src/main/webapp/plugin"
+    ],
+    "includePattern": ".+\\.js$"
+  },
+  "plugins": [
+    "plugins/markdown"
+  ]
+}

@@ -15,8 +15,8 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResourceImpl;
 
@@ -45,8 +46,29 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     super(engineName);
   }
 
+	@Override
+	public ProcessDefinitionResource getProcessDefinitionByKey(String processDefinitionKey) {
+    if(processDefinitionKey == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Query parameter 'processDefinitionKey' cannot be null");
+    }
+
+    ProcessDefinitionQuery processDefinitionQuery = getProcessEngine().getRepositoryService().createProcessDefinitionQuery();
+    processDefinitionQuery = processDefinitionQuery.processDefinitionKey(processDefinitionKey);
+
+    ProcessDefinition processDefinition = processDefinitionQuery.latestVersion().singleResult();
+
+    if (processDefinition == null) {
+      String errorMessage = String.format("No matching process definition with key: %s ", processDefinitionKey);
+      throw new RestException(Status.NOT_FOUND, errorMessage);
+    }
+
+    ProcessDefinitionResource processDefinitionResource = getProcessDefinitionById(processDefinition.getId());
+
+    return processDefinitionResource;
+  }
+
   @Override
-  public ProcessDefinitionResource getProcessDefinition(
+  public ProcessDefinitionResource getProcessDefinitionById(
       String processDefinitionId) {
     return new ProcessDefinitionResourceImpl(getProcessEngine(), processDefinitionId, relativeRootResourcePath);
   }
