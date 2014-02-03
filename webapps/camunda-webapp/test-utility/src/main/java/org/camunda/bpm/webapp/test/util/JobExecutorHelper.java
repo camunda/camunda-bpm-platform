@@ -1,11 +1,22 @@
-package org.camunda.bpm.cockpit.plugin.base.util;
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.camunda.bpm.webapp.test.util;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
@@ -17,7 +28,7 @@ import org.camunda.bpm.engine.runtime.Job;
 
 /**
  * Provides the {@link JobExecutor} related features of {@link AbstractProcessEngineTestCase}.
- * 
+ *
  * @author nico.rehwaldt
  */
 public class JobExecutorHelper {
@@ -66,7 +77,7 @@ public class JobExecutorHelper {
     JobExecutor jobExecutor = getProcessEngineConfiguration().getJobExecutor();
     jobExecutor.start();
     long intervalMillis = 1000;
-    
+
     try {
       Timer timer = new Timer();
       InteruptTask task = new InteruptTask(Thread.currentThread());
@@ -104,10 +115,6 @@ public class JobExecutorHelper {
 
   private ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
     return processEngine.getProcessEngineConfiguration();
-  }
-
-  private ManagementService getManagementService() {
-    return processEngine.getManagementService();
   }
 
   private static class InteruptTask extends TimerTask {
