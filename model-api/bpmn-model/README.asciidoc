@@ -106,9 +106,10 @@ public class CreateProcessTest {
   }
 
   @After
-  public void validateModel() {
+  public void validateModel() throws IOException {
     Bpmn.validateModel(modelInstance);
-    Bpmn.writeModelToFile(new File("/tmp/process.xml"), modelInstance);
+    File tempFile = File.createTempFile("bpmn-model-api-", ".bpmn");
+    Bpmn.writeModelToFile(tempFile, modelInstance);
   }
 
 }
@@ -143,7 +144,7 @@ OutputStream outputStream = new OutputStream(...);
 Bpmn.writeModelToStream(outputStream, modelInstance);
 
 // write to file
-File file = new File("/tmp/process.xml");
+File file = new File(...);
 Bpmn.writeModelToFile(file, modelInstance);
 
 ----
