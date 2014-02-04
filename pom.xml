@@ -115,6 +115,8 @@
         <module>engine-spring</module>
         <module>engine-rest</module>
 
+        <module>javaee/ejb-client</module>
+
         <module>identity/identity-ldap</module>
   
         <module>parent</module>
