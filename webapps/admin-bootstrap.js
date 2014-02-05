@@ -1,8 +1,5 @@
-/**
- * bootstrap script of the admin application
- */
-
 (function(document, window, require) {
+  'use strict';
 
   var baseUrl = '../../../';
   var APP_NAME = 'admin';
