@@ -9,9 +9,7 @@ ngDefine('cockpit.pages.processInstance', [
 
   var routeUtil = require('cockpit/util/routeUtil');
 
-  function ProcessInstanceController ($scope, $rootScope, $location, $filter, $dialog, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Data, Transform, processInstance, dataDepend) {
-
-    $rootScope.clearBreadcrumbs();
+  function ProcessInstanceController ($scope, $rootScope, $location, $filter, $dialog, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Data, Transform, processInstance, dataDepend, breadcrumbs) {
 
     $scope.processInstance = processInstance;
 
@@ -380,10 +378,25 @@ ngDefine('cockpit.pages.processInstance', [
     });
 
     processData.observe([ 'processDefinition', 'processInstance'], function (processDefinition, processInstance) {
-      $rootScope.addBreadcrumb({'type': 'processDefinition', 'processDefinition': processDefinition});
-      $rootScope.addBreadcrumb({'type': 'processInstance', 'processInstance': processInstance,'processDefinition': processDefinition});
+      breadcrumbs
+        .clear()
+        .add([
+          {
+            label: processDefinition.name || processDefinition.key || processDefinition.id,
+            href: '#/process-definition/'+ (processDefinition.id) +'/live',
+            type: 'processDefinition',
+            processDefinition: processDefinition
+          },
+          {
+            label: processInstance.name || processInstance.key || processInstance.id,
+            href: '#/process-instance/'+ (processInstance.id) +'/live',
+            type: 'processInstance',
+            processInstance: processInstance,
+            processDefinition: processDefinition
+          }
+        ]);
 
-      $rootScope.pageTitle = [
+      $rootScope.page.title = [
         'camunda Cockpit',
         $scope.processDefinition.name || $scope.processDefinition.id,
         'Instance View'
@@ -521,7 +534,7 @@ ngDefine('cockpit.pages.processInstance', [
     };
 
     $scope.$on('$routeChangeStart', function () {
-      $rootScope.clearBreadcrumbs();
+      breadcrumbs.clear();
     });
 
     $scope.processInstanceVars = { read: [ 'processInstance', 'processData', 'filter' ] };
@@ -617,7 +630,8 @@ ngDefine('cockpit.pages.processInstance', [
                                                'Data',
                                                'Transform',
                                                'processInstance',
-                                               'dataDepend', ProcessInstanceController ])
+                                               'dataDepend',
+                                               'breadcrumbs', ProcessInstanceController ])
     .controller('ProcessInstanceFilterController', ['$scope', ProcessInstanceFilterController]);
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
