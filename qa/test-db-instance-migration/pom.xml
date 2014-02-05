@@ -132,7 +132,23 @@
       </activation>
       <dependencies>
         <dependency>
-          <groupId>postgresql</groupId>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>postgres93</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>postgres93</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.postgresql</groupId>
           <artifactId>postgresql</artifactId>
         </dependency>
       </dependencies>

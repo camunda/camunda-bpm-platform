@@ -74,21 +74,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.sourceforge.jtds</groupId>
-      <artifactId>jtds</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
       <scope>provided</scope>
@@ -601,7 +586,7 @@
        </dependencies>
     </profile>
 
-      <profile>
+    <profile>
       <id>mssql12</id>
         <activation>
         <property>
@@ -645,7 +630,24 @@
       </activation>
       <dependencies>
         <dependency>
-          <groupId>postgresql</groupId>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>test</scope>
+        </dependency>
+       </dependencies>
+    </profile>
+
+    <profile>
+      <id>postgresql93</id>
+        <activation>
+        <property>
+          <name>database</name>
+          <value>postgresql93</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.postgresql</groupId>
           <artifactId>postgresql</artifactId>
           <scope>test</scope>
         </dependency>

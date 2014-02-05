@@ -464,7 +464,7 @@
                 <version>${version.mssql}</version>
               </dependency>
               <dependency>
-                <groupId>postgresql</groupId>
+                <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${version.postgre}</version>
               </dependency>
@@ -604,7 +604,7 @@
                 <version>${version.mssql}</version>
               </dependency>
               <dependency>
-                <groupId>postgresql</groupId>
+                <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${version.postgre}</version>
               </dependency>
@@ -870,7 +870,7 @@
           <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>postgresql</groupId>
+          <groupId>org.postgresql</groupId>
           <artifactId>postgresql</artifactId>
           <scope>test</scope>
         </dependency>
@@ -936,7 +936,7 @@
                 <version>${version.mssql}</version>
               </dependency>
               <dependency>
-                <groupId>postgresql</groupId>
+                <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${version.postgre}</version>
               </dependency>

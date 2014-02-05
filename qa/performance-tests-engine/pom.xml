@@ -230,7 +230,7 @@
       <id>postgres</id>
       <dependencies>
         <dependency>
-          <groupId>postgresql</groupId>
+          <groupId>org.postgresql</groupId>
           <artifactId>postgresql</artifactId>
         </dependency>
       </dependencies>
