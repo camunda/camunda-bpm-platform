@@ -1,4 +1,6 @@
+/* global ngDefine: false */
 ngDefine('camunda.common.services.uri', [ 'angular' ], function(module, angular) {
+  'use strict';
 
   var UriProvider = function() {
 
@@ -68,7 +70,7 @@ ngDefine('camunda.common.services.uri', [ 'angular' ], function(module, angular)
   /**
    * A filter to be used in views to replace tokens in a url
    *
-   * Example: 
+   * Example:
    * <pre>
    *   <a ng-href="{{ 'engine://foo' | uri }}">Perform Foo</a>
    * </pre>

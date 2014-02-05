@@ -1,8 +1,5 @@
-/**
- * bootstrap script of the tasklist application
- */
-
 (function(document, window, require) {
+  'use strict';
 
   var baseUrl = '../../../';
   var APP_NAME = 'tasklist';

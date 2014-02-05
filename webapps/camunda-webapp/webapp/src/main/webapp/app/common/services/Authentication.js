@@ -1,5 +1,13 @@
+/* global ngDefine: false */
 ngDefine('camunda.common.services.authentication', function(module) {
+  'use strict';
 
+  /**
+   * An authentication service
+   * @name Authentication
+   * @memberof cam.common.services
+   * @type angular.service
+   */
   var AuthenticationProducer = [ '$rootScope', function($rootScope) {
 
     var user = null;
@@ -27,9 +35,9 @@ ngDefine('camunda.common.services.authentication', function(module) {
     }
 
     var authentication = {
-      username: username, 
+      username: username,
       canAccess: canAccess,
-      clear: clear, 
+      clear: clear,
       update: update,
       user: user
     };
@@ -40,13 +48,19 @@ ngDefine('camunda.common.services.authentication', function(module) {
     return authentication;
   }];
 
+  /**
+   * An authentication provider
+   * @name AuthenticationService
+   * @memberof cam.common.services
+   * @type angular.provider
+   */
   var AuthenticationServiceProvider = function() {
 
     this.requireAuthenticatedUser = [ 'AuthenticationService', function(AuthenticationService) {
       return AuthenticationService.requireAuthenticatedUser();
     }];
 
-    this.$get = [ '$rootScope', '$q', '$http', '$location', '$window', 'Authentication', 'Notifications', 'Uri', 
+    this.$get = [ '$rootScope', '$q', '$http', '$location', '$window', 'Authentication', 'Notifications', 'Uri',
           function($rootScope, $q, $http, $location, $window, Authentication, Notifications, Uri) {
 
       var promise = null;
@@ -123,7 +137,7 @@ ngDefine('camunda.common.services.authentication', function(module) {
       function addError(error) {
         error.http = true;
         error.exclusive = [ 'http' ];
-        
+
         Notifications.addError(error);
       }
 
@@ -134,7 +148,7 @@ ngDefine('camunda.common.services.authentication', function(module) {
           }
 
           addError({ status: 'Unauthorized', message: 'Login is required to access the resource' });
-          
+
           $location.path('/login');
 
           return $q.reject(new Error('no user'));
@@ -161,6 +175,7 @@ ngDefine('camunda.common.services.authentication', function(module) {
   };
 
   module
+    .service('Authentication', AuthenticationProducer)
     .provider('AuthenticationService', AuthenticationServiceProvider)
-    .service('Authentication', AuthenticationProducer);
+  ;
 });

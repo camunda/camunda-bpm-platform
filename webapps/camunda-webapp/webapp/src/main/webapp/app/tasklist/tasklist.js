@@ -1,5 +1,20 @@
-(function(window) {
+/* global ngDefine: false */
 
+/**
+ * @module tasklist
+ *
+ */
+
+/**
+ * @namespace cam.tasklist
+ */
+(function() {
+  'use strict';
+
+  /**
+   * @memberof cam
+   * @name tasklist
+   */
   var core = [
     'module:tasklist.pages:./pages/main',
     'module:tasklist.services:./services/main',
@@ -55,7 +70,7 @@
 
       $scope.processDefinitions = EngineApi.getProcessDefinitions().query(queryObject);
     }];
-    
+
     module.controller('ProcessDefinitionsController', ProcessDefinitionsController);
   });
 

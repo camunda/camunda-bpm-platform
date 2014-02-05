@@ -1,21 +1,50 @@
+/* global ngDefine: false, require: false */
 ngDefine('cockpit.pages.processDefinition', [
   'angular',
   'cockpit/util/routeUtil',
-  'module:dataDepend:angular-data-depend'
+  'module:dataDepend:angular-data-depend',
+  'module:camunda.common.services:camunda-common/services/main'
 ], function(module, angular) {
+  'use strict';
 
   var routeUtil = require('cockpit/util/routeUtil');
 
   var Controller = [
-    '$scope', '$rootScope', 'search', '$q', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition',
-    function($scope, $rootScope, search, $q, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Data, Transform, Variables, dataDepend, processDefinition) {
+    '$scope',
+    '$rootScope',
+    '$q',
+    'search',
+    'Notifications',
+    'ProcessDefinitionResource',
+    'ProcessInstanceResource',
+    'Views',
+    'Data',
+    'Transform',
+    'Variables',
+    'dataDepend',
+    'processDefinition',
+    'breadcrumbs',
+  function(
+    $scope,
+    $rootScope,
+    $q,
+    search,
+    Notifications,
+    ProcessDefinitionResource,
+    ProcessInstanceResource,
+    Views,
+    Data,
+    Transform,
+    Variables,
+    dataDepend,
+    processDefinition,
+    breadcrumbs
+  ) {
 
     var processData = $scope.processData = dataDepend.create($scope);
 
 
     // utilities ///////////////////////
-
-    var internalUpdateLocation;
 
     $scope.$on('$routeChanged', function() {
       processData.set('filter', parseFilterFromUri());
@@ -42,9 +71,9 @@ ngDefine('cockpit.pages.processDefinition', [
     var currentFilter = null;
 
     /**
-     * Auto complete a filter based on input and 
+     * Auto complete a filter based on input and
      * make the change persistent by serializing it into the url.
-     * 
+     *
      * @param  {Object} filter the filter to auto complete
      */
     function autoCompleteFilter(filter) {
@@ -196,15 +225,25 @@ ngDefine('cockpit.pages.processDefinition', [
     // begin data usage ////////////////////////////
 
     $scope.breadcrumbData = processData.observe([ 'processDefinition', 'parent' ], function(definition, parent) {
-      $rootScope.clearBreadcrumbs();
+      breadcrumbs.clear();
 
       if (parent) {
-        $rootScope.addBreadcrumb({ type: 'processDefinition', processDefinition: parent });
+        breadcrumbs.add({
+          type: 'processDefinition',
+          label: parent.name || parent.id,
+          href: '#/process-instance/'+ parent.id +'/live',
+          processDefinition: parent
+        });
       }
 
-      $rootScope.addBreadcrumb({ type: 'processDefinition', processDefinition: definition });
+      breadcrumbs.add({
+        type: 'processDefinition',
+        label: definition.name || definition.id,
+        href: '#/process-definition/'+ definition.id +'/live',
+        processDefinition: definition
+      });
 
-      $rootScope.pageTitle = [
+      $rootScope.page.title = [
         'camunda Cockpit',
         definition.name || definition.id,
         'Definition View'
@@ -333,13 +372,12 @@ ngDefine('cockpit.pages.processDefinition', [
   var ProcessDefinitionFilterController = [ '$scope', 'debounce', 'Variables', function($scope, debounce, Variables) {
 
     var processData = $scope.processData.newChild($scope),
-        filterData,
-        cachedFilter;
+        filterData;
 
     function createRefs(elements) {
       var result = [];
 
-      angular.forEach(elements, function(e, i) {
+      angular.forEach(elements, function(e) {
         result.push({
           value: e
         });
@@ -433,7 +471,7 @@ ngDefine('cockpit.pages.processDefinition', [
 
     $scope.toggleVariableFilterHelp = function() {
       $scope.showVariableFilterHelp = !$scope.showVariableFilterHelp;
-    }
+    };
 
     $scope.addVariableFilter = function() {
       filterData.variables.push({});

@@ -1,5 +1,20 @@
-(function() {
+/* global ngDefine: false */
 
+/**
+ * @module admin
+ *
+ */
+
+/**
+ * @namespace cam.admin
+ */
+(function() {
+  'use strict';
+
+  /**
+   * @memberof cam
+   * @name admin
+   */
   var adminCore = [
     'module:admin.pages:./pages/main',
     'module:admin.directives:./directives/main',
@@ -17,7 +32,6 @@
   var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ui.bootstrap:angular-ui' ].concat(commons, adminCore);
 
   ngDefine('admin', dependencies, function(module, $, angular) {
-  
     var ModuleConfig = [ '$routeProvider', 'UriProvider', function($routeProvider, UriProvider) {
       $routeProvider.otherwise({ redirectTo: '/users' });
 

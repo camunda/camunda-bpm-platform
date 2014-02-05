@@ -1,9 +1,15 @@
+/* global ngDefine: false */
 ngDefine('camunda.common.services.debounce', function(module) {
+  'use strict';
 
   var DebounceFactory = [ '$timeout', function($timeout) {
 
     /**
      * Debounce a function call, making it callable an arbitrary number of times before it is actually executed once.
+     *
+     * @memberof cam.common.services
+     * @name debounce
+     * @type angular.factory
      *
      * @param fn {function} the function to debounce
      * @param wait {number} the timeout after which the function is actually called
@@ -35,5 +41,5 @@ ngDefine('camunda.common.services.debounce', function(module) {
     };
   }];
 
-  module.factory("debounce", DebounceFactory);
+  module.factory('debounce', DebounceFactory);
 });

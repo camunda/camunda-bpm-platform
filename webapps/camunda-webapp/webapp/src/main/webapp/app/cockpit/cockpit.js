@@ -1,10 +1,24 @@
 /* global ngDefine: false */
 
 /**
+ * Cockpit app
+ *
+ * TODO:
+ * - describe the plugin mechanisms
+ *
+ * @module cockpit
+ */
+
+/**
  * @namespace cam.cockpit
  */
 (function(window) {
+  'use strict';
 
+  /**
+   * @memberof cam
+   * @name cockpit
+   */
   var cockpitCore = [
     'module:cockpit.plugin:cockpit-plugin',
     'module:cockpit.services:./services/main',
@@ -59,6 +73,8 @@
     }];
 
     module.config(ModuleConfig);
+
+    return module;
   });
 
 })(window || this);

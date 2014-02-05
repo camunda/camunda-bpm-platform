@@ -1,5 +1,27 @@
 /**
+ * @namespace angular
+ * @description Angular.js {@link http://docs.angularjs.org/api|documentation won't help much}
+ */
+
+/**
+ * @name Module
+ * @memberof angular
+ * @description {@link http://docs.angularjs.org/api/angular.Module|The angular.js Module class}
+ */
+
+/**
+ * @name Service
+ * @memberof angular
+ * @description No idea what angular.js Services **really** are?  
+ * Me neither, update welcome.
+ */
+
+/**
  * @namespace cam
+ */
+
+/**
+ * @namespace cam.common
  */
 (function(factory) {
   'use strict';
@@ -36,15 +58,15 @@
 
   /**
    * The base path/URL used by require.js to build the URL
-   * of the different modules to be loaded.
-   * {@link http://requirejs.org/docs/api.html#config-baseUrl|See the require.js docs for baseUrl configuration}
+   * of the different modules to be loaded.  
+   * {@link http://requirejs.org/docs/api.html#config-baseUrl|See the require.js docs for **baseUrl** configuration}
    * @type {string}
    */
   conf.baseUrl = '/camunda/';
 
   /**
-   * Keys are module names and values are paths or URLs.
-   * {@link http://requirejs.org/docs/api.html#config-paths|See the require.js docs for paths configuration}
+   * Keys are module names and values are paths or URLs.  
+   * {@link http://requirejs.org/docs/api.html#config-paths|See the require.js docs for **paths** configuration}
    * @type {Object.<string, string>}
    */
   conf.paths = {
@@ -66,7 +88,7 @@
 
   /**
    * Keys are module names and values are information on how to shim the modules.
-   * {@link http://requirejs.org/docs/api.html#config-shim|See the require.js docs for shim configuration}
+   * {@link http://requirejs.org/docs/api.html#config-shim|See the require.js docs for **shim** configuration}
    * @type {Object.<string, (Object|array)>}
    */
   conf.shim = {
@@ -85,8 +107,8 @@
   };
 
   /**
-   * For CommonJS modules (following the CommonJS scaffolding guid lines).
-   * {@link http://requirejs.org/docs/api.html#config-packages|See the require.js docs for packages configuration}
+   * For CommonJS modules (following the CommonJS scaffolding guid lines).  
+   * {@link http://requirejs.org/docs/api.html#config-packages|See the require.js docs for **packages** configuration}
    * @type {Object.<string, Object>}
    */
   conf.packages = [
@@ -136,7 +158,7 @@
   conf.utils = {};
 
   /**
-   * Utility to ensure compatibility of test scenarios loaded with require.js
+   * Utility to ensure compatibility of test scenarios loaded with require.js  
    * {@link http://stackoverflow.com/questions/15499997/how-to-use-angular-scenario-with-requirejs}
    *
    * @param {string} appName - The "angular app name"
