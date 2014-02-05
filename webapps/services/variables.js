@@ -1,9 +1,11 @@
+/* global ngDefine: false */
 ngDefine('cockpit.services', function(module) {
-  
+  'use strict';
+
   var VariablesFactory = [ function() {
 
     // variable specific stuff //////////////
-    
+
     function reverse(hash) {
       var result = {};
 
@@ -33,9 +35,9 @@ ngDefine('cockpit.services', function(module) {
       lteq : '<=',
       like: ' like '
     };
-    
+
     var SYM_TO_OPS = reverse(OPS);
-    
+
     function operatorName(op) {
       return OPS[op];
     }
@@ -44,7 +46,7 @@ ngDefine('cockpit.services', function(module) {
 
     /**
      * Tries to guess the type of the input string
-     * and returns the appropriate representation 
+     * and returns the appropriate representation
      * in the guessed type.
      *
      * @param value {string}

@@ -1,8 +1,5 @@
 (function(document, window, require) {
-  /**
-   * A helper module to prepare the cockpit plugin for bootstrap.
-   * @exports cockpit-bootstrap
-   */
+  'use strict';
 
   var baseUrl = '../../../';
   var APP_NAME = 'cockpit';

@@ -1,8 +1,8 @@
-'use strict';
-
+/* global ngDefine: false */
 ngDefine('cockpit.services', function(module) {
-  
-  var Service = function($filter) { 
+  'use strict';
+
+  var Service = function($filter) {
 
     /**
      * Travers over the activityInstances and collect in an array
@@ -26,7 +26,7 @@ ngDefine('cockpit.services', function(module) {
         for (var i = 0; i < children.length; i++) {
           var child = children[i];
           aggregateActivityInstancesHelper(child, result);
-          
+
           var mappings = result[child.activityId];
           if (!mappings) {
             mappings = [];
@@ -40,14 +40,14 @@ ngDefine('cockpit.services', function(module) {
       if (transitions) {
         for (var i = 0; i < transitions.length; i++) {
           var transition = transitions[i];
-          
+
           var mappings = result[transition.targetActivityId];
           if (!mappings) {
             mappings = [];
             result[transition.targetActivityId] = mappings;
           }
           mappings.push(transition);
-        };        
+        };
       }
 
     }
@@ -55,7 +55,7 @@ ngDefine('cockpit.services', function(module) {
     /**
      * Creates a activity instance tree from the assigned activity instances. There the child activity instances
      * and child transitions will be merged to a certain list of children of parent node.<p>
-     * 
+     *
      * Furthermore, the assigned map <code>activityIdToNodeMap</code> will be filled during the creation of the node,
      * so that for each activity id the corresponding nodes will be collected. The map could look like this:
      * <code>{ServiceTask_1: [{id: 'instanceId_1', label: 'Service Task', ...}, {id: 'instanceId_2', label: 'Service Task', ...}], ...}</code>
@@ -80,16 +80,16 @@ ngDefine('cockpit.services', function(module) {
 
       // create and decorate root
       var root = createNode(activityInstances.id, model.id, getActivityName(model, model.id));
-      
+
       // add new node to activityIdToNodeMap
       addNodeToMap(root, activityIdToNodeMap);
-      
+
       // add children
       addChildren(root, model, activityInstances, activityIdToNodeMap);
-      
+
       return root;
     }
-    
+
     /**
      * Add the parent the children, i.e. merge the childTransitions and childActivityInstances of
      * the assigned <code>activityInstance</code> to one list containing the corresponding nodes.
@@ -102,28 +102,28 @@ ngDefine('cockpit.services', function(module) {
      **/
     function addChildren(parent, semantic, activityInstance, activityIdToNodeMap) {
       angular.forEach(activityInstance.childActivityInstances, function(childActivityInstance) {
-        
+
         // create and decorate child node
         var childNode = createNode(childActivityInstance.id, childActivityInstance.activityId, getActivityName(semantic, childActivityInstance.activityId));
 
         // add new node to activityIdToNodeMap
         addNodeToMap(childNode, activityIdToNodeMap);
-        
+
         // add parent the child node
         parent.children.push(childNode);
-        
+
         // call recursive add children for child node as parent
         addChildren(childNode, semantic, childActivityInstance, activityIdToNodeMap);
       });
-      
+
       angular.forEach(activityInstance.childTransitionInstances, function(childTransitionInstance) {
-        
+
         // create and decorate child node
         var childNode = createNode(childTransitionInstance.id, childTransitionInstance.targetActivityId, getActivityName(semantic, childTransitionInstance.targetActivityId));
-    
+
         // add new node to activityIdToNodeMap
         addNodeToMap(childNode, activityIdToNodeMap);
-        
+
         // add parent the child node
         parent.children.push(childNode);
       });
@@ -138,26 +138,26 @@ ngDefine('cockpit.services', function(module) {
       if (!instanceList) {
         instanceList = activityIdToNodeMap[node.activityId] = [];
       }
-        
-      instanceList.push(node);   
+
+      instanceList.push(node);
     }
-    
+
     /**
      * Creates a new node and decorates it with the assigned parameters.
      *
      **/
     function createNode(id, activityId, label) {
       var childNode = {};
-      
+
       childNode.id = id;
       childNode.label = label;
       childNode.activityId = activityId;
       childNode.children = [];
       childNode.isOpen = true;
-      
+
       return childNode;
     }
-    
+
     /**
      * Returns the corresponding name to the assigned activity id
      * from the assigned element (i.e. bpmn model).
@@ -181,16 +181,16 @@ ngDefine('cockpit.services', function(module) {
           name = getActivityName(currentElement, activityId);
           if (name) {
             return name;
-          }   
-        }        
+          }
+        }
       }
     }
- 
+
     return {
       aggregateActivityInstances: aggregateActivityInstances,
       createActivityInstanceTree: createActivityInstanceTree
     };
-    
+
   };
 
   module.factory('ActivityInstance', [ '$filter' , Service ]);
