@@ -3,6 +3,7 @@
 The camunda BPMN model API is a simple, lightweight Java library for parsing, creating and editing BPMN 2.0 XML files. It is licensed under the Apache 2.0 license.
 
 * Web Site: http://www.camunda.org/
+* Quickstarts: link:https://github.com/camunda/camunda-quickstarts/tree/master/bpmn-model-api[https://github.com/camunda/camunda-quickstarts]
 * Issue Tracker: link:https://app.camunda.com/jira/secure/RapidBoard.jspa?rapidView=39&selectedIssue=CAM-1799&quickFilter=156[https://app.camunda.com/jira]
 * Contribution Guidelines: http://www.camunda.org/community/contribute.html
 * License: Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
