@@ -20,7 +20,7 @@
           <tr ng-repeat="(delta, group) in groups">
             <td>{{ group.groupId }}</td>
             <td class="text-right">
-              <span class="btn"
+              <span class="btn action-button"
                     ng-click="removeItem()">
                 <i class="icon-ban-circle"></i>
               </span>
@@ -35,10 +35,12 @@
       <div class="input-append">
         <input type="text"
                ng-model="newItem"
-               name="newItem" />
+               name="newItem"
+               required />
         <button ng-click="addItem()"
                 type="submit"
-                class="btn btn-primary">
+                class="btn btn-primary"
+                ng-disabled="invalid()">
           <i class="icon-plus icon-white"></i>
         </button>
       </div>

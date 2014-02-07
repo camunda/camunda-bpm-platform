@@ -9,7 +9,7 @@ ngDefine('cockpit.pages.processInstance', [
 
   var routeUtil = require('cockpit/util/routeUtil');
 
-  function ProcessInstanceController ($scope, $rootScope, $location, $filter, $dialog, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Data, Transform, processInstance, dataDepend, breadcrumbs) {
+  function ProcessInstanceController ($scope, $rootScope, $location, $filter, $dialog, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Data, Transform, processInstance, dataDepend, page) {
 
     $scope.processInstance = processInstance;
 
@@ -378,9 +378,9 @@ ngDefine('cockpit.pages.processInstance', [
     });
 
     processData.observe([ 'processDefinition', 'processInstance'], function (processDefinition, processInstance) {
-      breadcrumbs
-        .clear()
-        .add([
+      page
+        .breadcrumbsClear()
+        .breadcrumbsAdd([
           {
             label: processDefinition.name || processDefinition.key || processDefinition.id,
             href: '#/process-definition/'+ (processDefinition.id) +'/live',
@@ -396,11 +396,11 @@ ngDefine('cockpit.pages.processInstance', [
           }
         ]);
 
-      $rootScope.page.title = [
+      page.titleSet([
         'camunda Cockpit',
         $scope.processDefinition.name || $scope.processDefinition.id,
         'Instance View'
-      ].join(' | ');
+      ].join(' | '));
     });
 
     $scope.activityInstanceTree = processData.observe('activityInstanceTree', function (activityInstanceTree) {
@@ -534,7 +534,7 @@ ngDefine('cockpit.pages.processInstance', [
     };
 
     $scope.$on('$routeChangeStart', function () {
-      breadcrumbs.clear();
+      page.breadcrumbsClear();
     });
 
     $scope.processInstanceVars = { read: [ 'processInstance', 'processData', 'filter' ] };
@@ -631,7 +631,7 @@ ngDefine('cockpit.pages.processInstance', [
                                                'Transform',
                                                'processInstance',
                                                'dataDepend',
-                                               'breadcrumbs', ProcessInstanceController ])
+                                               'page', ProcessInstanceController ])
     .controller('ProcessInstanceFilterController', ['$scope', ProcessInstanceFilterController]);
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
