@@ -2,101 +2,19 @@
 ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
   'use strict';
 
-  function DirectiveController($scope, $element, $attrs, $rootScope, ProcessInstanceResource, ProcessDefinitionResource) {
-
-    $rootScope.breadcrumbs = [];
-
-    $scope.expand = function (breadcrumb) {
-      if (breadcrumb.processInstance) {
-        $rootScope.breadcrumbs.splice($rootScope.breadcrumbs.indexOf(breadcrumb), 1);
-        fetchAllSuperProcessInstances(breadcrumb.processInstance.id);
-      }
-    };
-
-    $rootScope.clearBreadcrumbs = function () {
-      $rootScope.breadcrumbs = [];
-    };
-
-    $rootScope.addBreadcrumb = function (breadcrumb) {
-      var processDefinition;
-
-      switch (breadcrumb.type) {
-        case 'processDefinition':
-          processDefinition = breadcrumb.processDefinition;
-          breadcrumb.label = processDefinition.name || processDefinition.key || processDefinition.id;
-          breadcrumb.href = '/process-definition/' + processDefinition.id;
-          breadcrumb.divider = '/';
-          $rootScope.breadcrumbs.push(breadcrumb);
-          return;
-        case 'processInstance':
-          var processInstance = breadcrumb.processInstance;
-          processDefinition = breadcrumb.processDefinition;
-
-          breadcrumb.label = processInstance.id;
-          breadcrumb.href = '/process-instance/' + processInstance.id;
-          breadcrumb.divider = ':';
-
-          ProcessInstanceResource.count({ subProcessInstance: processInstance.id }).$then(function(response) {
-            var count = response.data.count;
-            if (count === 1) {
-              $rootScope.breadcrumbs.unshift({ type: 'expand', divider: '/', processInstance: processInstance});
-            }
-          });
-
-          $rootScope.breadcrumbs.push(breadcrumb);
-          return;
-      }
-    };
-
-    function fetchAllSuperProcessInstances (subProcessInstanceId) {
-      ProcessInstanceResource.query({'subProcessInstance': subProcessInstanceId}).$then(function (response) {
-
-        if (response.data.length > 0) {
-          var superProcessInstance = response.data[0];
-
-          ProcessDefinitionResource.get({'id': superProcessInstance.definitionId}).$then(function (response) {
-            var processDefinition = response.data;
-
-            var processDefinitionBreadcrumb = {
-              'type': 'processDefinition',
-              'processDefinition': processDefinition,
-              'label': processDefinition.name || processDefinition.key || processDefinition.id,
-              'href': '/process-definition/' + processDefinition.id,
-              'divider': '/'
-            };
-
-            var processInstanceBreadcrumb = {
-              'type': 'processInstance',
-              'processDefinition': processDefinition,
-              'processInstance': superProcessInstance,
-              'label': superProcessInstance.id,
-              'divider': ':',
-              'href': '/process-instance/' + superProcessInstance.id
-            };
-
-            $rootScope.breadcrumbs.unshift(processInstanceBreadcrumb);
-            $rootScope.breadcrumbs.unshift(processDefinitionBreadcrumb);
-
-            return fetchAllSuperProcessInstances(superProcessInstance.id);
-          });
-        }
-      });
-    }
-  }
-
   var breadcrumpsTemplate =
     '<ul class="breadcrumb">' +
       '<li>' +
         '<a href="#">Home</a>' +
       '</li>' +
       '<li ng-repeat="breadcrumb in breadcrumbs" ng-class="{ active: $last }" ng-switch="breadcrumb.type">' +
-        '<span class="divider">{{ breadcrumb.divider }}</span>' +
+        '<span class="divider">{{ breadcrumb.divider || divider }}</span>' +
         '<span ng-switch-when="processDefinition">' +
-         '<a ng-if="!$last" href="#{{ breadcrumb.href }}">{{ breadcrumb.label }}</a>' +
+         '<a ng-if="!$last" href="{{ breadcrumb.href }}">{{ breadcrumb.label }}</a>' +
          '<span ng-if="$last">{{breadcrumb.label}}</span>' +
         '</span>' +
         '<span ng-switch-when="processInstance">' +
-         '<a ng-if="!$last" href="#{{ breadcrumb.href }}" title="{{ breadcrumb.label }}">{{breadcrumb.label | shorten:8 }}</a>' +
+         '<a ng-if="!$last" href="{{ breadcrumb.href }}" title="{{ breadcrumb.label }}">{{breadcrumb.label | shorten:8 }}</a>' +
           '<span ng-if="$last" title="{{ breadcrumb.label }}">{{ breadcrumb.label | shorten:8 }}</span>' +
         '</span>' +
         '<span ng-switch-when="expand">' +
@@ -105,17 +23,93 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
       '</li>' +
     '</ul>';
 
-  var Directive = function (ProcessInstanceResource, ProcessDefinitionResource) {
+
+  module.directive('camBreadcrumbsPanel', [
+  function () {
     return {
-      restrict: 'EAC',
+      scope: {
+        divider: '@'
+      },
+      restrict: 'A',
       template: breadcrumpsTemplate,
-      controller: DirectiveController
+
+      link: function(scope) {
+        // event triggered by the breadcrumbs service when the breadcrumbs are alterated
+        scope.$on('page.breadcrumbs.changed', function(ev, breadcrumbs) {
+          scope.breadcrumbs = breadcrumbs;
+        });
+      },
+
+      controller: [
+        '$scope',
+        'page',
+        'ProcessInstanceResource',
+        'ProcessDefinitionResource',
+      function(
+        $scope,
+        page,
+        ProcessInstanceResource,
+        ProcessDefinitionResource
+      ) {
+        // initialize the $scope breadcrumbs from the service
+        $scope.breadcrumbs = page.breadcrumbsGet();
+        
+        $scope.expand = function (crumb) {
+          if (crumb.processInstance) {
+            $scope.breadcrumbs.splice($scope.breadcrumbs.indexOf(crumb), 1);
+            fetchAllSuperProcessInstances(crumb.processInstance.id);
+          }
+        };
+
+        /**
+         * Fetch the information about potential super processes
+         * NOTE: I believe this should go into the page service
+         * @param {string} subProcessInstanceId - the id of the child/sub process
+         */
+        function fetchAllSuperProcessInstances (subProcessInstanceId) {
+          // makes a HTTP request
+          ProcessInstanceResource.query({'subProcessInstance': subProcessInstanceId}).$then(function (response) {
+            // no need to go further
+            if (!response.data.length) {
+              return;
+            }
+
+            // use the first responded record of a super instance...
+            var superProcessInstance = response.data[0];
+
+            // ... and fetch its process definition
+            ProcessDefinitionResource.get({'id': superProcessInstance.definitionId}).$then(function (response) {
+              var processDefinition = response.data;
+
+              // prepend (concat) ...
+              $scope.breadcrumbs = [
+                // ... the process definition link ...
+                {
+                  'type': 'processDefinition',
+                  'processDefinition': processDefinition,
+                  'label': processDefinition.name || processDefinition.key || processDefinition.id,
+                  'href': '#/process-definition/' + processDefinition.id,
+                  'divider': '/'
+                },
+                // ... the process instance link ...
+                {
+                  'type': 'processInstance',
+                  'processDefinition': processDefinition,
+                  'processInstance': superProcessInstance,
+                  'label': superProcessInstance.id,
+                  'divider': ':',
+                  'href': '#/process-instance/' + superProcessInstance.id
+                }
+                // ... to the actual breacrumbs
+              ].concat($scope.breadcrumbs);
+
+              // and continue so further
+              return fetchAllSuperProcessInstances(superProcessInstance.id);
+            });
+          });
+        }
+      }]
     };
-  };
-
-  Directive.$inject = [ 'ProcessInstanceResource', 'ProcessDefinitionResource' ];
-
-  module
-    .directive('breadcrumbsPanel', Directive);
+  }]);
 
 });
