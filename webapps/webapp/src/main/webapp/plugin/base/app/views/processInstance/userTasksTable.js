@@ -258,7 +258,24 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       });
     };
 
+    dialogScope.invalid = function() {
+      var editForm = this.editForm;
+      if (editForm.$invalid) {
+        return true;
+      }
+
+      var exists;
+      var newItem = editForm.newItem.$modelValue;
+      angular.forEach(dialogScope.groups, function(group) {
+        exists = (exists || (group.groupId === newItem));
+      });
+
+      return exists;
+    };
+
     dialogScope.addItem = function() {
+      var editForm = this;
+
       var newGroup = {
         type: 'candidate',
         groupId: dialogScope.newItem

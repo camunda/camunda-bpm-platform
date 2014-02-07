@@ -23,7 +23,7 @@ ngDefine('cockpit.pages.processDefinition', [
     'Variables',
     'dataDepend',
     'processDefinition',
-    'breadcrumbs',
+    'page',
   function(
     $scope,
     $rootScope,
@@ -38,7 +38,7 @@ ngDefine('cockpit.pages.processDefinition', [
     Variables,
     dataDepend,
     processDefinition,
-    breadcrumbs
+    page
   ) {
 
     var processData = $scope.processData = dataDepend.create($scope);
@@ -256,10 +256,10 @@ ngDefine('cockpit.pages.processDefinition', [
     // begin data usage ////////////////////////////
 
     $scope.breadcrumbData = processData.observe([ 'processDefinition', 'parent' ], function(definition, parent) {
-      breadcrumbs.clear();
+      page.breadcrumbsClear();
 
       if (parent) {
-        breadcrumbs.add({
+        page.breadcrumbsAdd({
           type: 'processDefinition',
           label: parent.name || parent.id,
           href: '#/process-instance/'+ parent.id +'/live',
@@ -267,18 +267,18 @@ ngDefine('cockpit.pages.processDefinition', [
         });
       }
 
-      breadcrumbs.add({
+      page.breadcrumbsAdd({
         type: 'processDefinition',
         label: definition.name || definition.id,
         href: '#/process-definition/'+ definition.id +'/live',
         processDefinition: definition
       });
 
-      $rootScope.page.title = [
+      page.titleSet([
         'camunda Cockpit',
         definition.name || definition.id,
         'Definition View'
-      ].join(' | ');
+      ].join(' | '));
     });
 
     $scope.instanceStatistics = processData.observe([ 'instances.all', 'instances.current' ], function(allCount, currentCount) {
