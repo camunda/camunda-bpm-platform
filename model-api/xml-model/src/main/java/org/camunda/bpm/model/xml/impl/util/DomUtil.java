@@ -23,6 +23,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.camunda.bpm.model.xml.ModelParseException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
+import org.camunda.bpm.model.xml.impl.instance.DomDocumentImpl;
+import org.camunda.bpm.model.xml.impl.instance.DomElementImpl;
+import org.camunda.bpm.model.xml.instance.DomDocument;
+import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -46,7 +50,7 @@ public final class DomUtil {
    *
    * @see DomUtil#filterNodeList(NodeList, NodeListFilter)
    */
-  public interface NodeListFilter<T extends Node> {
+  public interface NodeListFilter {
 
     /**
      * Test if node matches the filter
@@ -62,7 +66,7 @@ public final class DomUtil {
    * Filter retaining only Nodes of type {@link Node#ELEMENT_NODE}
    *
    */
-  public static class ElementNodeListFilter implements NodeListFilter<Element> {
+  public static class ElementNodeListFilter implements NodeListFilter {
 
     public boolean matches(Node node) {
       return node.getNodeType() == Node.ELEMENT_NODE;
@@ -112,7 +116,7 @@ public final class DomUtil {
       if (! super.matches(node)) {
         return false;
       }
-      ModelElementInstance modelElement = ModelUtil.getModelElement((Element) node, model);
+      ModelElementInstance modelElement = ModelUtil.getModelElement(new DomElementImpl((Element) node), model);
       return type.isAssignableFrom(modelElement.getClass());
     }
   }
@@ -125,13 +129,13 @@ public final class DomUtil {
    * @return the List of all Nodes which match the filter
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Node> List<T> filterNodeList(NodeList nodeList, NodeListFilter<T> filter) {
+  public static List<DomElement> filterNodeList(NodeList nodeList, NodeListFilter filter) {
 
-    List<T> filteredList = new ArrayList<T>();
+    List<DomElement> filteredList = new ArrayList<DomElement>();
     for(int i = 0; i< nodeList.getLength(); i++) {
       Node node = nodeList.item(i);
       if(filter.matches(node)) {
-        filteredList.add((T) node);
+        filteredList.add(new DomElementImpl((Element) node));
       }
     }
 
@@ -140,91 +144,42 @@ public final class DomUtil {
   }
 
   /**
+   * Filters a {@link NodeList} retaining all elements
+   *
+   * @param nodeList  the the {@link NodeList} to filter
+   * @return the list of all elements
+   */
+  public static List<DomElement> filterNodeListForElements(NodeList nodeList) {
+    return filterNodeList(nodeList, new ElementNodeListFilter());
+  }
+
+  /**
    * Filter a {@link NodeList} retaining all elements with a specific name
    *
+   *
    * @param nodeList the {@link NodeList} to filter
-   * @param localName the local element name to filter for
    * @param namespaceUri the namespace for the elements
+   * @param localName the local element name to filter for
    * @return the List of all Elements which match the filter
    */
-  public static List<Element> filterNodeListByName(NodeList nodeList, String localName, String namespaceUri) {
+  public static List<DomElement> filterNodeListByName(NodeList nodeList, String namespaceUri, String localName) {
     return filterNodeList(nodeList, new ElementByNameListFilter(localName, namespaceUri));
   }
 
   /**
    * Filter a {@link NodeList} retaining all elements with a specific type
    *
+   *
    * @param nodeList  the {@link NodeList} to filter
-   * @param type  the type class to filter for
    * @param modelInstance  the model instance
+   * @param type  the type class to filter for
    * @return the list of all Elements which match the filter
    */
-  public static List<Element> filterNodeListByType(NodeList nodeList, Class<?> type, ModelInstanceImpl modelInstance) {
+  public static List<DomElement> filterNodeListByType(NodeList nodeList, ModelInstanceImpl modelInstance, Class<?> type) {
     return filterNodeList(nodeList, new ElementByTypeListFilter(type, modelInstance));
   }
 
-  /**
-   * Returns the Document element for a Document
-   *
-   * @param document the document to retrieve the element for
-   * @return the Element
-   */
-  public static Element getDocumentElement(Document document) {
-    return document.getDocumentElement();
-  }
 
-  /**
-   * Set the document element of DOM document. Replace an existing if necessary
-   *
-   * @param document the DOM document to set the document element
-   * @param domElement the new document element
-   */
-  public static void setDocumentElement(Document document, Element domElement) {
-    Element existingDocumentElement = getDocumentElement(document);
-    if(existingDocumentElement != null) {
-      document.replaceChild(domElement, existingDocumentElement);
-    }
-    else {
-      document.appendChild(domElement);
-    }
-  }
-
-  /**
-   * Get all child nodes of a DOM element
-   *
-   * @param domElement the DOM element to get the child nodes for
-   * @return the list of all child nodes
-   */
-  public static NodeList getChildNodes(Element domElement) {
-    return domElement.getChildNodes();
-  }
-
-  /**
-   * Remove a child element of a DOM element
-   *
-   * @param domElement the DOM element to remove the child from
-   * @param element the child element to remove
-   * @return true if the child was removed, else false
-   */
-  public static boolean removeChild(Element domElement, Element element) {
-    try {
-      domElement.removeChild(element);
-      return true;
-
-    } catch(DOMException e) {
-      return false;
-    }
-  }
-
-  /**
-   * Get the namespace URI of a DOM element
-   *
-   * @param domElement the DOM element to get the URI for
-   * @return the namespace URI of the element
-   */
-  public static String getNamespaceUri(Element domElement) {
-    return domElement.getNamespaceURI();
-  }
 
   /**
    * Get an empty DOM document
@@ -233,11 +188,11 @@ public final class DomUtil {
    * @return the new empty document
    * @throws ModelParseException if unable to create a new document
    */
-  public static Document getEmptyDocument(DocumentBuilderFactory documentBuilderFactory) {
+  public static DomDocument getEmptyDocument(DocumentBuilderFactory documentBuilderFactory) {
     DocumentBuilder documentBuilder;
     try {
       documentBuilder = documentBuilderFactory.newDocumentBuilder();
-      return documentBuilder.newDocument();
+      return new DomDocumentImpl(documentBuilder.newDocument());
     } catch (ParserConfigurationException e) {
       throw new ModelParseException("Unable to create a new document", e);
     }
@@ -251,10 +206,10 @@ public final class DomUtil {
    * @return the new DOM document
    * @throws ModelParseException if a parsing or IO error is triggered
    */
-  public static Document parseInputStream(DocumentBuilderFactory documentBuilderFactory, InputStream inputStream) {
+  public static DomDocument parseInputStream(DocumentBuilderFactory documentBuilderFactory, InputStream inputStream) {
     try {
       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-      return documentBuilder.parse(inputStream);
+      return new DomDocumentImpl(documentBuilder.parse(inputStream));
 
     } catch (ParserConfigurationException e) {
       throw new ModelParseException("ParserConfigurationException while parsing input stream", e);
@@ -266,183 +221,6 @@ public final class DomUtil {
       throw new ModelParseException("IOException while parsing input stream", e);
 
     }
-  }
-
-
-  /**
-   * Returns the value for an attribute or 'null' if no such attribute exists.
-   *
-   * @param attributeName the name of the attribute to return the value for
-   * @param domElement the element to get the attribute from
-   * @return the value or 'null' if no such attribute exists
-   */
-  public static String getAttributeValue(String attributeName, Element domElement) {
-    if(domElement.hasAttribute(attributeName)) {
-      return domElement.getAttribute(attributeName);
-    } else {
-      return null;
-    }
-  }
-
-  /**
-   * Returns the value for an attribute or 'null' if no such attribute exists.
-   *
-   * @param attributeName the name of the attribute to return the value for
-   * @param namespaceUri the namespace URI of the attribute
-   * @param domElement the element to get the attribute from
-   * @return the value or 'null' if no such attribute exists
-   */
-  public static String getAttributeValueNs(String attributeName, String namespaceUri, Element domElement) {
-    if(domElement.hasAttributeNS(namespaceUri, attributeName)) {
-      return domElement.getAttributeNS(namespaceUri, attributeName);
-    } else {
-      return null;
-    }
-  }
-
-  /**
-   * Sets the value for an attribute
-   *
-   * @param attributeName the name of the attribute to set the value for
-   * @param xmlValue the value to set
-   * @param domElement the DOM element to set the value on
-   */
-  public static void setAttributeValue(String attributeName, String xmlValue, Element domElement) {
-    domElement.setAttribute(attributeName, xmlValue);
-  }
-
-  /**
-   * Sets the value for an attribute
-   *
-   * @param attributeName the name of the attribute to set the value for
-   * @param namespaceUri the namespace URI
-   * @param xmlValue the value to set
-   * @param domElement the DOM element to set the value on
-   */
-  public static void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue, Element domElement) {
-    domElement.setAttributeNS(namespaceUri, attributeName, xmlValue);
-  }
-
-  /**
-   * Find an element by Id
-   *
-   * @param id the id of the element to find
-   * @param document the DOM document to search
-   * @return the element or null if no such element exists
-   */
-  public static Element findElementById(Document document, String id) {
-    return document.getElementById(id);
-  }
-
-  /**
-   * Get the document for a DOM element
-   * @param domNode the element to get the document for
-   * @return the Document for a DOM element
-   */
-  public static Document getDocument(Node domNode) {
-    return domNode.getOwnerDocument();
-  }
-
-  /**
-   * Returns the namespace URI for the given prefix.
-   *
-   * @param prefix
-   *          the prefix to resolve
-   * @param scope
-   *          the node from which the prefix should be resolved. The DOM
-   *          implementation will start from this element and recursively check
-   *          the parents of this node for a namespace declaration. returns the
-   *          namespace URI for the given prefix
-   * @return the resolved namespace URI
-   */
-  public static String getNamespaceUriForPrefix(Node scope, String prefix) {
-    return scope.lookupNamespaceURI(prefix);
-  }
-
-  /**
-   * Set the id property of an attribute by name
-   *
-   * @param domElement the DOM element of the attribute
-   * @param attributeName the attribute name which is a id attribute
-   */
-  public static void setIdAttribute(Element domElement, String attributeName) {
-    domElement.setIdAttribute(attributeName, true);
-  }
-
-  /**
-   * Set the id property of an attribute by name and namespace URI
-   *
-   * @param domElement the DOM element of the attribute
-   * @param attributeName the attribute name which is a id attribute
-   * @param namespaceUri the namespace for the element
-   */
-  public static void setIdAttributeNs(Element domElement, String attributeName, String namespaceUri) {
-    domElement.setIdAttributeNS(namespaceUri, attributeName, true);
-  }
-
-  /**
-   * Remove an attribute from a DOM element by name
-   *
-   * @param domElement the DOM element of the attribute
-   * @param attributeName the attribute name which should be removed
-   */
-  public static void removeAttribute(Element domElement, String attributeName) {
-    domElement.removeAttribute(attributeName);
-  }
-
-  /**
-   * Remove an attribute from a DOM element by name and namespace URI
-   *
-   * @param domElement the DOM element of the attribute
-   * @param attributeName the attribute name which should be removed
-   * @param namespaceUri the namespace URI of the attribute
-   */
-  public static void removeAttributeNs(Element domElement, String attributeName, String namespaceUri) {
-    domElement.removeAttributeNS(namespaceUri, attributeName);
-  }
-
-  /**
-   * Find all elements in a DOM document by name and namespace
-   *
-   * @param document the DOM document to search
-   * @param typeName the name of the element type
-   * @param typeNamespace the namespace of the element type
-   * @return the list of matching DOM elements
-   */
-  public static List<Element> findElementByNameNs(Document document, String typeName, String typeNamespace) {
-    NodeList elementList = document.getElementsByTagNameNS(typeNamespace, typeName);
-    return filterNodeList(elementList, new ElementNodeListFilter());
-  }
-
-  /**
-   * Get the text content of a DOM element
-   *
-   * @param domElement the DOM element to get the text content for
-   * @return the text content of the DOM element and its descendants
-   */
-  public static String getTextContent(Element domElement) {
-    return domElement.getTextContent();
-  }
-
-  /**
-   * Get the text content of a DOM element
-   *
-   * @param domElement the DOM element to set the text content for
-   * @param textContent the text content to set
-   */
-  public static void setTextContent(Element domElement, String textContent) {
-    domElement.setTextContent(textContent);
-  }
-
-
-  /**
-   * Get parent node of DOM element
-   *
-   * @param domElement the DOM element to find the parent for
-   * @return the parent of the DOM element
-   */
-  public static Element getParentElement(Element domElement) {
-    return (Element) domElement.getParentNode();
   }
 
 }

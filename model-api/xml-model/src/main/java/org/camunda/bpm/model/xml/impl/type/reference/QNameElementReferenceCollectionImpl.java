@@ -31,7 +31,7 @@ public class QNameElementReferenceCollectionImpl<Target extends ModelElementInst
   public String getReferenceIdentifier(ModelElementInstance referenceSourceElement) {
     String identifier = super.getReferenceIdentifier(referenceSourceElement);
     if (identifier != null) {
-      QName qName = QName.parseQName(identifier, (ModelElementInstanceImpl) referenceSourceElement);
+      QName qName = QName.parseQName(identifier);
       return qName.getLocalName();
     }
     else {

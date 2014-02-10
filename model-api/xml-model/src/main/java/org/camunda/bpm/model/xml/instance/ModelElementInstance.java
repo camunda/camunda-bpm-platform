@@ -16,7 +16,6 @@ import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.w3c.dom.Element;
 
 import java.util.Collection;
 
@@ -29,11 +28,11 @@ import java.util.Collection;
 public interface ModelElementInstance {
 
   /**
-   * Returns the represented DOM {@link Element}.
+   * Returns the represented DOM {@link DomElement}.
    *
    * @return the DOM element
    */
-  Element getDomElement();
+  DomElement getDomElement();
 
   /**
    * Returns the model instance which contains this type instance.
@@ -91,38 +90,38 @@ public interface ModelElementInstance {
   /**
    * Returns the attribute value for the given attribute name and namespace URI.
    *
-   * @param attributeName  the attribute name of the attribute
    * @param namespaceUri  the namespace URI of the attribute
+   * @param attributeName  the attribute name of the attribute
    * @return the value of the attribute
    */
-  String getAttributeValueNs(String attributeName, String namespaceUri);
+  String getAttributeValueNs(String namespaceUri, String attributeName);
 
   /**
    * Sets the value by name and namespace of a non-ID attribute.
    *
-   * @param attributeName  the name of the attribute
    * @param namespaceUri  the namespace URI of the attribute
+   * @param attributeName  the name of the attribute
    * @param xmlValue  the XML value to set
    */
-  void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue);
+  void setAttributeValueNs(String namespaceUri, String attributeName, String xmlValue);
 
   /**
    * Sets the attribute value by name and namespace.
    *
-   * @param attributeName  the name of the attribute
    * @param namespaceUri  the namespace URI of the attribute
+   * @param attributeName  the name of the attribute
    * @param xmlValue  the XML value to set
    * @param isIdAttribute  true if the attribute is an ID attribute, false otherwise
    */
-  void setAttributeValueNs(String attributeName, String namespaceUri, String xmlValue, boolean isIdAttribute);
+  void setAttributeValueNs(String namespaceUri, String attributeName, String xmlValue, boolean isIdAttribute);
 
   /**
    * Removes the attribute by name and namespace.
    *
-   * @param attributeName  the name of the attribute
    * @param namespaceUri  the namespace URI of the attribute
+   * @param attributeName  the name of the attribute
    */
-  void removeAttributeNs(String attributeName, String namespaceUri);
+  void removeAttributeNs(String namespaceUri, String attributeName);
 
   /**
    * Returns the text content of the DOM element without leading and trailing spaces. For
@@ -168,7 +167,7 @@ public interface ModelElementInstance {
    * @param elementType  the type of the element
    * @return the child element or null
    */
-  ModelElementInstance getUniqueChildElementByType(Class<?> elementType);
+  ModelElementInstance getUniqueChildElementByType(Class<? extends ModelElementInstance> elementType);
 
   /**
    * Adds or replaces a child element by name. Replaces an existing Child Element with the same name

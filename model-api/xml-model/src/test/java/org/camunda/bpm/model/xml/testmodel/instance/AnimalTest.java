@@ -71,7 +71,7 @@ public class AnimalTest extends TestModelTest {
     modelInstance.setDocumentElement(animals);
 
     // add a tns namespace prefix for QName testing
-    animals.setAttributeValueNs("xmlns:tns", XMLConstants.XMLNS_ATTRIBUTE_NS_URI, TestModelConstants.MODEL_NAMESPACE);
+    animals.setAttributeValueNs(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:tns", TestModelConstants.MODEL_NAMESPACE);
 
     Animal tweety = createBird(modelInstance, "tweety", Gender.Female);
     Animal hedwig = createBird(modelInstance, "hedwig", Gender.Male);

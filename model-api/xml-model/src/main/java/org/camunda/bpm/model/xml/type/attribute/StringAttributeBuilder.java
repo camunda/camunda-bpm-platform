@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.model.xml.type.attribute;
 
-import org.camunda.bpm.model.xml.impl.type.attribute.StringAttribute;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.reference.AttributeReferenceBuilder;
 

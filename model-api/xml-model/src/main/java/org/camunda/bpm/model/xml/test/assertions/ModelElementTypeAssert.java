@@ -49,7 +49,7 @@ public class ModelElementTypeAssert extends AbstractAssert<ModelElementTypeAsser
     List<String> typeNames = new ArrayList<String>();
     QName qName;
     for (ModelElementType elementType : elementTypes) {
-      qName = new QName(elementType.getTypeName(), elementType.getTypeNamespace());
+      qName = new QName(elementType.getTypeNamespace(), elementType.getTypeName());
       typeNames.add(qName.toString());
     }
     return typeNames;

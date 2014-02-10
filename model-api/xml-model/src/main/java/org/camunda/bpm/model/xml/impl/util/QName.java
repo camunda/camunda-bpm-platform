@@ -12,54 +12,60 @@
  */
 package org.camunda.bpm.model.xml.impl.util;
 
-import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
-
 /**
  * @author Daniel Meyer
  *
  */
 public class QName {
 
-  private final String namespaceUri;
+  private final String qualifier;
   private final String localName;
 
   public QName(String localName) {
-    this(localName, null);
+    this(null, localName);
   }
 
-  public QName(String localName, String namespaceUri) {
+  public QName(String qualifier, String localName) {
     this.localName = localName;
-    this.namespaceUri = namespaceUri;
+    this.qualifier = qualifier;
   }
 
-  public String getNamespaceUri() {
-    return namespaceUri;
+  public String getQualifier() {
+    return qualifier;
   }
 
   public String getLocalName() {
     return localName;
   }
 
-  public static QName parseQName(String identifier, ModelElementInstanceImpl modelElement) {
-    String localPart;
-    String namespaceUri = null;
+  public static QName parseQName(String identifier) {
+    String qualifier;
+    String localName;
 
     String[] split = identifier.split(":", 2);
     if(split.length == 2) {
-      localPart = split[1];
-      namespaceUri = DomUtil.getNamespaceUriForPrefix(modelElement.getDomElement(), split[0]);
-
+      qualifier = split[0];
+      localName = split[1];
     } else {
-      localPart = split[0];
+      qualifier = null;
+      localName = split[0];
     }
 
-    return new QName(localPart, namespaceUri);
-
+    return new QName(localName, qualifier);
   }
 
   @Override
   public String toString() {
-    return ((namespaceUri == null) ? "" : (namespaceUri + ":")) + localName;
+    return combine(qualifier, localName);
+  }
+
+  public static String combine(String qualifier, String localName) {
+    if (qualifier == null || qualifier.isEmpty()) {
+      return localName;
+    }
+    else {
+      return qualifier + ":" + localName;
+    }
   }
 
   @Override
@@ -67,7 +73,7 @@ public class QName {
     int prime = 31;
     int result = 1;
     result = prime * result + ((localName == null) ? 0 : localName.hashCode());
-    result = prime * result + ((namespaceUri == null) ? 0 : namespaceUri.hashCode());
+    result = prime * result + ((qualifier == null) ? 0 : qualifier.hashCode());
     return result;
   }
 
@@ -90,11 +96,11 @@ public class QName {
     } else if (!localName.equals(other.localName)) {
       return false;
     }
-    if (namespaceUri == null) {
-      if (other.namespaceUri != null) {
+    if (qualifier == null) {
+      if (other.qualifier != null) {
         return false;
       }
-    } else if (!namespaceUri.equals(other.namespaceUri)) {
+    } else if (!qualifier.equals(other.qualifier)) {
       return false;
     }
     return true;

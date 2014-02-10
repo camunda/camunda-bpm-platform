@@ -16,11 +16,11 @@ package org.camunda.bpm.model.xml.testmodel;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
+import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.testmodel.instance.*;
 import org.junit.After;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.w3c.dom.Document;
 
 import java.io.InputStream;
 
@@ -85,7 +85,7 @@ public abstract class TestModelTest {
 
   @After
   public void validateModel() {
-    Document document = modelInstance.getDocument();
+    DomDocument document = modelInstance.getDocument();
     modelParser.validateModel(document);
   }
 }

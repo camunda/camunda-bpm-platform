@@ -12,21 +12,18 @@
  */
 package org.camunda.bpm.model.xml.impl.type.child;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.UnsupportedModelOperationException;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
-import org.camunda.bpm.model.xml.impl.util.DomUtil;
-import org.camunda.bpm.model.xml.impl.util.DomUtil.ElementNodeListFilter;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
+import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * <p>This collection is a view on an the children of a Model Element.</p>
@@ -72,18 +69,13 @@ public class ChildElementCollectionImpl<T extends ModelElementInstance> implemen
 
   // view /////////////////////////////////////////////////////////
 
-  protected ElementNodeListFilter getFilter(ModelElementInstanceImpl modelElement) {
-    return new DomUtil.ElementByTypeListFilter(childElementTypeClass, modelElement.getModelInstance());
-  }
-
   /**
    * Internal method providing access to the view represented by this collection.
    *
    * @return the view represented by this collection
    */
-  private Collection<Element> getView(ModelElementInstanceImpl modelElement) {
-    NodeList childNodes = DomUtil.getChildNodes(modelElement.getDomElement());
-    return DomUtil.filterNodeList(childNodes, getFilter(modelElement));
+  private Collection<DomElement> getView(ModelElementInstanceImpl modelElement) {
+    return modelElement.getDomElement().getChildElementsByType(modelElement.getModelInstance(), childElementTypeClass);
   }
 
   public int getMinOccurs() {
@@ -125,7 +117,7 @@ public class ChildElementCollectionImpl<T extends ModelElementInstance> implemen
   }
 
   /** the "clear" operation used by this collection */
-  private void performClearOperation(ModelElementInstanceImpl modelElement, Collection<Element> elementsToRemove) {
+  private void performClearOperation(ModelElementInstanceImpl modelElement, Collection<DomElement> elementsToRemove) {
     Collection<ModelElementInstance> modelElements = ModelUtil.getModelElementCollection(elementsToRemove, modelElement.getModelInstance());
     for (ModelElementInstance element : modelElements) {
       modelElement.removeChildElement(element);
@@ -206,7 +198,7 @@ public class ChildElementCollectionImpl<T extends ModelElementInstance> implemen
         if(!isMutable) {
           throw new UnsupportedModelOperationException("clear()", "collection is immutable");
         }
-        Collection<Element> view = getView(modelElement);
+        Collection<DomElement> view = getView(modelElement);
         performClearOperation(modelElement, view);
       }
 

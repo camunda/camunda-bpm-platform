@@ -15,10 +15,7 @@ package org.camunda.bpm.model.xml.testmodel.instance;
 
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
-import org.camunda.bpm.model.xml.testmodel.Gender;
-import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
-import org.camunda.bpm.model.xml.testmodel.TestModelParser;
-import org.camunda.bpm.model.xml.testmodel.TestModelTest;
+import org.camunda.bpm.model.xml.testmodel.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
 import static org.junit.runners.Parameterized.Parameters;
 
 /**
@@ -58,7 +56,7 @@ public class BirdTest extends TestModelTest {
     modelInstance.setDocumentElement(animals);
 
     // add a tns namespace prefix for QName testing
-    animals.setAttributeValueNs("xmlns:tns", XMLConstants.XMLNS_ATTRIBUTE_NS_URI, TestModelConstants.MODEL_NAMESPACE);
+    animals.getDomElement().registerNamespace("tns", MODEL_NAMESPACE);
 
     Bird tweety = createBird(modelInstance, "tweety", Gender.Female);
     Bird hedwig = createBird(modelInstance, "hedwig", Gender.Female);

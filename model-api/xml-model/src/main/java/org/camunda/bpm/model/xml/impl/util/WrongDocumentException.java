@@ -13,7 +13,7 @@
 package org.camunda.bpm.model.xml.impl.util;
 
 import org.camunda.bpm.model.xml.ModelException;
-import org.w3c.dom.Document;
+import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.w3c.dom.Node;
 
 /**
@@ -26,7 +26,7 @@ public class WrongDocumentException extends ModelException {
 
   private static final long serialVersionUID = 1L;
 
-  public WrongDocumentException(Node nodeToAdd, Document targetDocument) {
+  public WrongDocumentException(Node nodeToAdd, DomDocument targetDocument) {
     super("Cannot add attribute '"+ nodeToAdd +"' to document '" + targetDocument + "' not created by document.");
   }
 

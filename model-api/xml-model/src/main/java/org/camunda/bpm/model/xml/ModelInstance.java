@@ -13,9 +13,9 @@
 package org.camunda.bpm.model.xml;
 
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
+import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.w3c.dom.Document;
 
 import java.util.Collection;
 
@@ -28,11 +28,11 @@ import java.util.Collection;
 public interface ModelInstance {
 
   /**
-   * Returns the wrapped DOM {@link Document}.
+   * Returns the wrapped {@link DomDocument}.
    *
    * @return the DOM document
    */
-  Document getDocument();
+  DomDocument getDocument();
 
   /**
    * Returns the {@link ModelElementInstanceImpl ModelElement} corresponding to the document

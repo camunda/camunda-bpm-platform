@@ -23,14 +23,13 @@ import org.camunda.bpm.model.xml.UnsupportedModelOperationException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
-import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
+import org.camunda.bpm.model.xml.instance.DomDocument;
+import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * @author Sebastian Menski
@@ -75,9 +74,9 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
     referenceSourceParentElement.removeChildElement((ModelElementInstanceImpl) o);
   }
 
-  private void performClearOperation(ModelElementInstanceImpl referenceSourceParentElement, Collection<Element> elementsToRemove) {
-    for (Element element: elementsToRemove) {
-      DomUtil.removeChild(referenceSourceParentElement.getDomElement(), element);
+  private void performClearOperation(ModelElementInstanceImpl referenceSourceParentElement, Collection<DomElement> elementsToRemove) {
+    for (DomElement element: elementsToRemove) {
+      referenceSourceParentElement.getDomElement().removeChild(element);
     }
   }
 
@@ -110,13 +109,13 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
   }
 
   @SuppressWarnings("unchecked")
-  private Collection<Element> getView(ModelElementInstanceImpl referenceSourceParentElement) {
-    Document document = referenceSourceParentElement.getModelInstance().getDocument();
+  private Collection<DomElement> getView(ModelElementInstanceImpl referenceSourceParentElement) {
+    DomDocument document = referenceSourceParentElement.getModelInstance().getDocument();
     Collection<Source> referenceSourceElements = referenceSourceCollection.get(referenceSourceParentElement);
-    Collection<Element> referenceTargetElements = new ArrayList<Element>();
+    Collection<DomElement> referenceTargetElements = new ArrayList<DomElement>();
     for (Source referenceSourceElement : referenceSourceElements) {
       String identifier = getReferenceIdentifier(referenceSourceElement);
-      Element referenceTargetElement = DomUtil.findElementById(document, identifier);
+      DomElement referenceTargetElement = document.getElementById(identifier);
       if (referenceTargetElement != null) {
         referenceTargetElements.add(referenceTargetElement);
       }
@@ -230,7 +229,7 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
           throw new UnsupportedModelOperationException("clear()", "collection is immutable");
         }
         else {
-          Collection<Element> view = new ArrayList<Element>();
+          Collection<DomElement> view = new ArrayList<DomElement>();
           for (Source referenceSourceElement : referenceSourceCollection.get(referenceSourceParentElement)) {
             view.add(referenceSourceElement.getDomElement());
           }

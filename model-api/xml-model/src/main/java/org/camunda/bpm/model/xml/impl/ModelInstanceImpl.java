@@ -17,12 +17,11 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
-import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
+import org.camunda.bpm.model.xml.instance.DomDocument;
+import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,24 +36,24 @@ import java.util.List;
  */
 public class ModelInstanceImpl implements ModelInstance {
 
-  private final Document document;
+  private final DomDocument document;
   private ModelImpl model;
   private final ModelBuilder modelBuilder;
 
-  public ModelInstanceImpl(ModelImpl model, ModelBuilder modelBuilder, Document document) {
+  public ModelInstanceImpl(ModelImpl model, ModelBuilder modelBuilder, DomDocument document) {
     this.model = model;
     this.modelBuilder = modelBuilder;
     this.document = document;
   }
 
-  public Document getDocument() {
+  public DomDocument getDocument() {
     return document;
   }
 
   public ModelElementInstance getDocumentElement() {
-    Element documentElement = DomUtil.getDocumentElement(document);
-    if(documentElement != null) {
-      return ModelUtil.getModelElement(documentElement, this);
+    DomElement rootElement = document.getRootElement();
+    if(rootElement != null) {
+      return ModelUtil.getModelElement(rootElement, this);
     } else {
       return null;
     }
@@ -62,8 +61,8 @@ public class ModelInstanceImpl implements ModelInstance {
 
   public void setDocumentElement(ModelElementInstance modelElement) {
     ModelUtil.ensureInstanceOf(modelElement, ModelElementInstanceImpl.class);
-    Element domElement = modelElement.getDomElement();
-    DomUtil.setDocumentElement(document, domElement);
+    DomElement domElement = modelElement.getDomElement();
+    document.setRootElement(domElement);
   }
 
   public <T extends ModelElementInstance> T newInstance(Class<T> type) {
@@ -95,7 +94,7 @@ public class ModelInstanceImpl implements ModelInstance {
       return null;
     }
 
-    Element element = DomUtil.findElementById(document, id);
+    DomElement element = document.getElementById(id);
     if(element != null) {
       return ModelUtil.getModelElement(element, this);
     } else {
@@ -122,6 +121,6 @@ public class ModelInstanceImpl implements ModelInstance {
    * @return the new model instance
    */
   public Object clone() {
-    return new ModelInstanceImpl(model, modelBuilder, (Document) document.cloneNode(true));
+    return new ModelInstanceImpl(model, modelBuilder, document.clone());
   }
 }

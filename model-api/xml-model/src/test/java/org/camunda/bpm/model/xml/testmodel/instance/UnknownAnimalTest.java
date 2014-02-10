@@ -17,13 +17,13 @@ import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
+import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class UnknownAnimalTest {
 
   @After
   public void validateModel() {
-    Document document = modelInstance.getDocument();
+    DomDocument document = modelInstance.getDocument();
     modelParser.validateModel(document);
   }
 

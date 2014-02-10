@@ -18,7 +18,7 @@ import org.camunda.bpm.model.xml.impl.ModelImpl;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.impl.util.ReflectUtil;
-import org.w3c.dom.Document;
+import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -53,7 +53,7 @@ public class TestModelParser extends AbstractModelParser {
   }
 
   @Override
-  protected ModelInstance createModelInstance(Document document) {
+  protected ModelInstance createModelInstance(DomDocument document) {
     return new ModelInstanceImpl((ModelImpl) TestModel.getTestModel(), TestModel.getModelBuilder(), document);
   }
 

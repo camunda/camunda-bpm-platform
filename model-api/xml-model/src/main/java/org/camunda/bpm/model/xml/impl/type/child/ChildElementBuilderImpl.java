@@ -18,7 +18,6 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.camunda.bpm.model.xml.type.child.ChildElementCollectionBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceBuilder;
 
 /**

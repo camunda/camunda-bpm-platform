@@ -12,10 +12,9 @@
  */
 package org.camunda.bpm.model.xml.impl.util;
 
-import org.w3c.dom.Document;
+import org.camunda.bpm.model.xml.instance.DomDocument;
 
 import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 
@@ -90,11 +89,11 @@ public final class IoUtil {
   }
 
   /**
-   * Converts a {@link Document} to its String representation
+   * Converts a {@link DomDocument} to its String representation
    *
    * @param document  the XML document to convert
    */
-  public static String convertXmlDocumentToString(Document document) {
+  public static String convertXmlDocumentToString(DomDocument document) {
     StringWriter stringWriter = new StringWriter();
     StreamResult result = new StreamResult(stringWriter);
     transformDocumentToXml(document, result);
@@ -102,23 +101,23 @@ public final class IoUtil {
   }
 
   /**
-   * Writes a {@link Document} to an {@link OutputStream} by transforming the DOM to XML.
+   * Writes a {@link DomDocument} to an {@link OutputStream} by transforming the DOM to XML.
    *
    * @param document  the DOM document to write
    * @param outputStream  the {@link OutputStream} to write to
    */
-  public static void writeDocumentToOutputStream(Document document, OutputStream outputStream) {
+  public static void writeDocumentToOutputStream(DomDocument document, OutputStream outputStream) {
     StreamResult result = new StreamResult(outputStream);
     transformDocumentToXml(document, result);
   }
 
   /**
-   * Transforms a {@link Document} to XML output.
+   * Transforms a {@link DomDocument} to XML output.
    *
    * @param document  the DOM document to transform
    * @param result  the {@link StreamResult} to write to
    */
-  public static void transformDocumentToXml(Document document, StreamResult result) {
+  public static void transformDocumentToXml(DomDocument document, StreamResult result) {
     TransformerFactory transformerFactory = TransformerFactory.newInstance();
     Transformer transformer = null;
     try {
@@ -126,7 +125,7 @@ public final class IoUtil {
       transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-      transformer.transform(new DOMSource(document), result);
+      transformer.transform(document.getDomSource(), result);
     } catch (TransformerConfigurationException e) {
       throw new ModelIoException("Unable to create a transformer for the model", e);
     } catch (TransformerException e) {

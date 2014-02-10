@@ -14,7 +14,7 @@ package org.camunda.bpm.model.xml.impl.instance;
 
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
-import org.w3c.dom.Element;
+import org.camunda.bpm.model.xml.instance.DomElement;
 
 /**
  * @author Daniel Meyer
@@ -24,10 +24,10 @@ import org.w3c.dom.Element;
 public final class ModelTypeInstanceContext {
 
   private final ModelInstanceImpl model;
-  private final Element domElement;
+  private final DomElement domElement;
   private final ModelElementTypeImpl modelType;
 
-  public ModelTypeInstanceContext(Element domElement, ModelInstanceImpl model, ModelElementTypeImpl modelType) {
+  public ModelTypeInstanceContext(DomElement domElement, ModelInstanceImpl model, ModelElementTypeImpl modelType) {
     this.domElement = domElement;
     this.model = model;
     this.modelType = modelType;
@@ -36,7 +36,7 @@ public final class ModelTypeInstanceContext {
   /**
    * @return the dom element
    */
-  public Element getDomElement() {
+  public DomElement getDomElement() {
     return domElement;
   }
 

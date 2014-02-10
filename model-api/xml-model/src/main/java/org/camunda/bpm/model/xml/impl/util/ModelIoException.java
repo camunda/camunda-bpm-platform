@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.model.xml.impl.util;
 
-import javax.xml.transform.TransformerConfigurationException;
-
 /**
  * An exception during IO operations.
  *

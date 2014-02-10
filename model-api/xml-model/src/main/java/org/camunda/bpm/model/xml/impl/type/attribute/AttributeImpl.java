@@ -85,7 +85,7 @@ public abstract class AttributeImpl<T> implements Attribute<T> {
     if(namespaceUri == null) {
       value = modelElement.getAttributeValue(attributeName);
     } else {
-      value = modelElement.getAttributeValueNs(attributeName, namespaceUri);
+      value = modelElement.getAttributeValueNs(namespaceUri, attributeName);
     }
 
     // default value
@@ -106,7 +106,7 @@ public abstract class AttributeImpl<T> implements Attribute<T> {
     if(namespaceUri == null) {
       modelElement.setAttributeValue(attributeName, xmlValue, isIdAttribute);
     } else {
-      modelElement.setAttributeValueNs(attributeName, namespaceUri, xmlValue, isIdAttribute);
+      modelElement.setAttributeValueNs(namespaceUri, attributeName, xmlValue, isIdAttribute);
     }
   }
 
@@ -182,7 +182,7 @@ public abstract class AttributeImpl<T> implements Attribute<T> {
       modelElement.removeAttribute(attributeName);
     }
     else {
-      modelElement.removeAttributeNs(attributeName, namespaceUri);
+      modelElement.removeAttributeNs(namespaceUri, attributeName);
     }
   }
 

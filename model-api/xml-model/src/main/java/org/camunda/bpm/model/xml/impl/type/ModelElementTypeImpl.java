@@ -20,15 +20,14 @@ import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.ModelImpl;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
-import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.impl.util.ModelTypeException;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
+import org.camunda.bpm.model.xml.instance.DomDocument;
+import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
@@ -68,12 +67,12 @@ public class ModelElementTypeImpl implements ModelElementType {
 
   public ModelElementInstance newInstance(ModelInstance modelInstance) {
     ModelInstanceImpl modelInstanceImpl = (ModelInstanceImpl) modelInstance;
-    Document document = modelInstanceImpl.getDocument();
-    Element domElement = document.createElementNS(typeNamespace, typeName);
+    DomDocument document = modelInstanceImpl.getDocument();
+    DomElement domElement = document.createElement(typeNamespace, typeName);
     return newInstance(modelInstanceImpl, domElement);
   }
 
-  public ModelElementInstance newInstance(ModelInstanceImpl modelInstance, Element domElement) {
+  public ModelElementInstance newInstance(ModelInstanceImpl modelInstance, DomElement domElement) {
     return createModelElementInstance(new ModelTypeInstanceContext(domElement, modelInstance, this));
   }
 
@@ -218,10 +217,10 @@ public class ModelElementTypeImpl implements ModelElementType {
 
   public Collection<ModelElementInstance> getInstances(ModelInstance modelInstance) {
     ModelInstanceImpl modelInstanceImpl = (ModelInstanceImpl) modelInstance;
-    Document document = modelInstanceImpl.getDocument();
-    List<Element> elements = DomUtil.findElementByNameNs(document, typeName, typeNamespace);
+    DomDocument document = modelInstanceImpl.getDocument();
+    List<DomElement> elements = document.getElementsByNameNs(typeNamespace, typeName);
     List<ModelElementInstance> resultList = new ArrayList<ModelElementInstance>();
-    for (Element element : elements) {
+    for (DomElement element : elements) {
       resultList.add(ModelUtil.getModelElement(element, modelInstanceImpl));
     }
     return resultList;

@@ -17,11 +17,9 @@ import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
+import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import java.util.*;
 
@@ -33,8 +31,6 @@ import java.util.*;
  */
 public final class ModelUtil {
 
-  private static final String MODEL_ELEMENT_KEY = "camunda.modelElementRef";
-
   /**
    * Returns the {@link ModelElementInstanceImpl ModelElement} for a DOM element.
    * If the model element does not yet exist, it is created and linked to the DOM.
@@ -42,8 +38,8 @@ public final class ModelUtil {
    * @param domElement the child element to create a new {@link ModelElementInstanceImpl ModelElement} for
    * @return the child model element
    */
-  public static ModelElementInstance getModelElement(Element domElement, ModelInstanceImpl modelInstance) {
-    ModelElementInstance modelElement = (ModelElementInstance) domElement.getUserData(MODEL_ELEMENT_KEY);
+  public static ModelElementInstance getModelElement(DomElement domElement, ModelInstanceImpl modelInstance) {
+    ModelElementInstance modelElement = domElement.getModelElementInstance();
     if(modelElement == null) {
 
       String namespaceUri = domElement.getNamespaceURI();
@@ -54,25 +50,13 @@ public final class ModelUtil {
         modelType = (ModelElementTypeImpl) modelInstance.registerGenericType(localName, namespaceUri);
       }
       modelElement = modelType.newInstance(modelInstance, domElement);
-      domElement.setUserData(MODEL_ELEMENT_KEY, modelElement, null);
+      domElement.setModelElementInstance(modelElement);
     }
     return modelElement;
   }
 
-  public static void ensureSameDocument(Node nodeToAdd, Document targetDocument) {
-    if(DomUtil.getDocument(nodeToAdd) == targetDocument) {
-      throw new WrongDocumentException(nodeToAdd, targetDocument);
-    }
-  }
-
-  public static void ensureNotNull(Object newElement, String name) {
-    if(newElement == null) {
-      throw new ModelException(name + " cannot be null.");
-    }
-  }
-
   public static QName getQName(String localName, String namespaceUri) {
-    return new QName(localName, namespaceUri);
+    return new QName(namespaceUri, localName);
   }
 
   public static void ensureInstanceOf(Object instance, Class<?> type) {
@@ -149,9 +133,9 @@ public final class ModelUtil {
    * @return the collection of model element instances of the view
    */
   @SuppressWarnings("unchecked")
-  public static <T extends ModelElementInstance> Collection<T> getModelElementCollection(Collection<Element> view, ModelInstanceImpl model) {
+  public static <T extends ModelElementInstance> Collection<T> getModelElementCollection(Collection<DomElement> view, ModelInstanceImpl model) {
     List<ModelElementInstance> resultList = new ArrayList<ModelElementInstance>();
-    for (Element element : view) {
+    for (DomElement element : view) {
       resultList.add(getModelElement(element, model));
     }
     return (Collection<T>) resultList;
@@ -166,11 +150,17 @@ public final class ModelUtil {
    */
   public static int getIndexOfElementType(ModelElementInstance modelElement, List<ModelElementType> childElementTypes) {
     for (int index = 0; index < childElementTypes.size(); index++) {
-      if(childElementTypes.get(index).getInstanceType().isAssignableFrom(modelElement.getClass())) {
+      ModelElementType childElementType = childElementTypes.get(index);
+      Class<? extends ModelElementInstance> instanceType = childElementType.getInstanceType();
+      if(instanceType.isAssignableFrom(modelElement.getClass())) {
         return index;
       }
     }
-    throw new ModelException("New child is not a valid child element type: " + modelElement.getElementType().getTypeName() + "; valid types are: " + childElementTypes);
+    Collection<String> childElementTypeNames = new ArrayList<String>();
+    for (ModelElementType childElementType : childElementTypes) {
+      childElementTypeNames.add(childElementType.getTypeName());
+    }
+    throw new ModelException("New child is not a valid child element type: " + modelElement.getElementType().getTypeName() + "; valid types are: " + childElementTypeNames);
   }
 
   /**
