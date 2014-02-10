@@ -16,6 +16,7 @@
     <signavio.baseurl>${env.signavio.baseurl}</signavio.baseurl>
 
     <cargo.timeout>120000</cargo.timeout>
+    <cargo.deploy.timeout>60000</cargo.deploy.timeout>
   </properties>
 
   <dependencies>
@@ -246,6 +247,7 @@
                   <artifactId>camunda-cycle-jboss</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${jboss.http.port}/cycle</pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>cycle</context>
                   </properties>
@@ -255,6 +257,7 @@
                   <artifactId>camunda-engine-rest</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${jboss.http.port}/engine-rest/engine/default/process-definition</pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>engine-rest</context>
                   </properties>
@@ -264,6 +267,7 @@
                   <artifactId>camunda-webapp-jboss</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${jboss.http.port}/camunda</pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>camunda</context>
                   </properties>
@@ -397,6 +401,7 @@
                   <artifactId>camunda-cycle-glassfish</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${http.port}/cycle</pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>cycle</context>
                   </properties>
@@ -406,6 +411,7 @@
                   <artifactId>camunda-engine-rest</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${http.port}/engine-rest/engine/default/process-definition</pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>engine-rest</context>
                   </properties>
@@ -415,6 +421,7 @@
                   <artifactId>camunda-webapp-glassfish</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${http.port}/camunda</pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>camunda</context>
                   </properties>
@@ -517,6 +524,7 @@
                   <artifactId>camunda-cycle-tomcat</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${tomcat6.connector.http.port}/cycle</pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>cycle</context>
                   </properties>
@@ -527,6 +535,7 @@
                   <type>war</type>
                   <classifier>tomcat</classifier>
                   <pingURL>http://localhost:${tomcat6.connector.http.port}/engine-rest/engine/default/process-definition</pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>engine-rest</context>
                   </properties>
@@ -536,6 +545,7 @@
                   <artifactId>camunda-webapp-tomcat</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${tomcat6.connector.http.port}/camunda</pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>camunda</context>
                   </properties>
