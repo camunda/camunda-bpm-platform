@@ -52,15 +52,16 @@ public class AnimalTest extends TestModelTest {
   private RelationshipDefinition timmyRelationship;
   private RelationshipDefinition daisyRelationship;
 
-  public AnimalTest(ModelInstance modelInstance, AbstractModelParser modelParser) {
-    super(modelInstance, modelParser);
+  public AnimalTest(String testName, ModelInstance testModelInstance, AbstractModelParser modelParser) {
+    super(testName, testModelInstance, modelParser);
   }
 
-   @Parameters
-   public static Collection<Object[]> models() {
-     Object[][] models = {createModel(), parseModel(AnimalTest.class)};
-     return Arrays.asList(models);
-   }
+
+  @Parameters(name="Model {0}")
+  public static Collection<Object[]> models() {
+    Object[][] models = {createModel(), parseModel(AnimalTest.class)};
+    return Arrays.asList(models);
+  }
 
   public static Object[] createModel() {
     TestModelParser modelParser = new TestModelParser();
@@ -95,7 +96,7 @@ public class AnimalTest extends TestModelTest {
     tweety.getRelationshipDefinitionRefs().add(pluckyRelationship);
     tweety.getRelationshipDefinitionRefs().add(fiffyRelationship);
 
-    return new Object[]{modelInstance, modelParser};
+    return new Object[]{"created", modelInstance, modelParser};
   }
 
   @Before

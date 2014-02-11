@@ -45,11 +45,11 @@ public class ChildElementCollectionTest extends TestModelTest {
   private ChildElement<FlightInstructor> flightInstructorChild;
   private ChildElementCollection<FlightPartnerRef> flightPartnerRefCollection;
 
-  public ChildElementCollectionTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
-    super(testModelInstance, modelParser);
+  public ChildElementCollectionTest(String testName, ModelInstance testModelInstance, AbstractModelParser modelParser) {
+    super(testName, testModelInstance, modelParser);
   }
 
-  @Parameters
+  @Parameters(name="Model {0}")
   public static Collection<Object[]> models() {
     Object[][] models = {createModel(), parseModel(ChildElementCollectionTest.class)};
     return Arrays.asList(models);
@@ -72,7 +72,7 @@ public class ChildElementCollectionTest extends TestModelTest {
     tweety.getFlightPartnerRefs().add(daisy);
     tweety.getFlightPartnerRefs().add(plucky);
 
-    return new Object[]{modelInstance, modelParser};
+    return new Object[]{"created", modelInstance, modelParser};
   }
 
   @Before

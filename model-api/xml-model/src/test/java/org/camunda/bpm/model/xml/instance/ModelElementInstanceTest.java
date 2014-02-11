@@ -42,11 +42,11 @@ public class ModelElementInstanceTest extends TestModelTest {
   private Bird daisy;
   private Bird hedwig;
 
-  public ModelElementInstanceTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
-    super(testModelInstance, modelParser);
+  public ModelElementInstanceTest(String testName, ModelInstance testModelInstance, AbstractModelParser modelParser) {
+    super(testName, testModelInstance, modelParser);
   }
 
-  @Parameters
+  @Parameters(name="Model {0}")
   public static Collection<Object[]> models() {
     Object[][] models = {createModel(), parseModel(ModelElementInstanceTest.class)};
     return Arrays.asList(models);
@@ -68,7 +68,7 @@ public class ModelElementInstanceTest extends TestModelTest {
     daisy.setTextContent("\n        some text content with outer line breaks\n    ");
     hedwig.setTextContent("\n        some text content with inner\n        line breaks\n    ");
 
-    return new Object[]{modelInstance, modelParser};
+    return new Object[]{"created", modelInstance, modelParser};
   }
 
   @Before

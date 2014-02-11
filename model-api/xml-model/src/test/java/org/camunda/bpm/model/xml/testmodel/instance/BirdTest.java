@@ -40,11 +40,11 @@ public class BirdTest extends TestModelTest {
   private Egg egg1;
   private Egg egg2;
 
-  public BirdTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
-    super(testModelInstance, modelParser);
+  public BirdTest(String testName, ModelInstance testModelInstance, AbstractModelParser modelParser) {
+    super(testName, testModelInstance, modelParser);
   }
 
-  @Parameters
+  @Parameters(name="Model {0}")
   public static Collection<Object[]> models() {
     Object[][] models = {createModel(), parseModel(BirdTest.class)};
     return Arrays.asList(models);
@@ -70,7 +70,7 @@ public class BirdTest extends TestModelTest {
     tweety.getEggs().add(egg1);
     tweety.getEggs().add(egg2);
 
-    return new Object[]{modelInstance, modelParser};
+    return new Object[]{"created", modelInstance, modelParser};
   }
 
   @Before

@@ -43,11 +43,11 @@ public class AttributeTest extends TestModelTest {
   private Attribute<String> nameAttribute;
   private Attribute<String> fatherAttribute;
 
-  public AttributeTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
-    super(testModelInstance, modelParser);
+  public AttributeTest(String testName, ModelInstance testModelInstance, AbstractModelParser modelParser) {
+    super(testName, testModelInstance, modelParser);
   }
 
-  @Parameters
+  @Parameters(name="Model {0}")
   public static Collection<Object[]> models() {
     Object[][] models = {createModel(), parseModel(AnimalTest.class)};
     return Arrays.asList(models);
@@ -62,7 +62,7 @@ public class AttributeTest extends TestModelTest {
 
     createBird(modelInstance, "tweety", Gender.Female);
 
-    return new Object[]{modelInstance, modelParser};
+    return new Object[]{"created", modelInstance, modelParser};
   }
 
   @Before

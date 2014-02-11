@@ -30,13 +30,15 @@ import java.io.InputStream;
 @RunWith(Parameterized.class)
 public abstract class TestModelTest {
 
+  protected final String testName;
   private final ModelInstance testModelInstance;
   private final AbstractModelParser modelParser;
 
   // cloned model instance for every test method (see subclasses)
   protected ModelInstance modelInstance;
 
-  public TestModelTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
+  public TestModelTest(String testName, ModelInstance testModelInstance, AbstractModelParser modelParser) {
+    this.testName = testName;
     this.testModelInstance = testModelInstance;
     this.modelParser = modelParser;
   }
@@ -50,7 +52,7 @@ public abstract class TestModelTest {
     String testXml = test.getSimpleName() + ".xml";
     InputStream testXmlAsStream = test.getResourceAsStream(testXml);
     ModelInstance modelInstance = modelParser.parseModelFromStream(testXmlAsStream);
-    return new Object[]{modelInstance, modelParser};
+    return new Object[]{"parsed", modelInstance, modelParser};
   }
 
   public static Bird createBird(ModelInstance modelInstance, String id, Gender gender) {

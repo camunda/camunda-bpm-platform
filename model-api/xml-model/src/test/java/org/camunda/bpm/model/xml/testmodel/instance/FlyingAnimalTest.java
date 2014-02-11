@@ -44,12 +44,11 @@ public class FlyingAnimalTest extends TestModelTest {
   private FlyingAnimal timmy;
   private FlyingAnimal daisy;
 
-
-  public FlyingAnimalTest(ModelInstance modelInstance, AbstractModelParser modelParser) {
-    super(modelInstance, modelParser);
+  public FlyingAnimalTest(String testName, ModelInstance testModelInstance, AbstractModelParser modelParser) {
+    super(testName, testModelInstance, modelParser);
   }
 
-  @Parameters
+  @Parameters(name="Model {0}")
   public static Collection<Object[]> models() {
     Object[][] models = {createModel(), parseModel(FlyingAnimalTest.class)};
     return Arrays.asList(models);
@@ -81,7 +80,7 @@ public class FlyingAnimalTest extends TestModelTest {
     tweety.getFlightPartnerRefs().add(fiffy);
 
 
-    return new Object[]{modelInstance, modelParser};
+    return new Object[]{"created", modelInstance, modelParser};
   }
 
   @Before

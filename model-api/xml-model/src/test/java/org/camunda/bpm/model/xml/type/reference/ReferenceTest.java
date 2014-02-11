@@ -51,11 +51,11 @@ public class ReferenceTest extends TestModelTest {
   private AttributeReferenceImpl<Animal> motherReference;
   private ElementReferenceCollection<FlyingAnimal, FlightPartnerRef> flightPartnerRefsColl;
 
-  public ReferenceTest(ModelInstance testModelInstance, AbstractModelParser modelParser) {
-    super(testModelInstance, modelParser);
+  public ReferenceTest(String testName, ModelInstance testModelInstance, AbstractModelParser modelParser) {
+    super(testName, testModelInstance, modelParser);
   }
 
-  @Parameters
+  @Parameters(name="Model {0}")
   public static Collection<Object[]> models() {
     Object[][] models = {createModel(), parseModel(ReferenceTest.class)};
     return Arrays.asList(models);
@@ -78,7 +78,7 @@ public class ReferenceTest extends TestModelTest {
 
     tweety.getFlightPartnerRefs().add(daffy);
 
-    return new Object[]{modelInstance, modelParser};
+    return new Object[]{"created", modelInstance, modelParser};
   }
 
   @Before
