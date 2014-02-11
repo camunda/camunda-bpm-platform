@@ -124,9 +124,9 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
       cachedVariablesLocal.put(variableName, value);
     }
 
-	  public Map<String, Object> getCachedVariablesLocal() {
-	    return cachedVariablesLocal;
-	  }
+    public Map<String, Object> getCachedVariablesLocal() {
+      return cachedVariablesLocal;
+    }
 
     public void flushVariableCache() {
       if(task != null) {
