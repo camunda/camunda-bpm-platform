@@ -105,7 +105,11 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
     public <T> T getVariableLocal(String variableName) {
 	    Object value = cachedVariablesLocal.get(variableName);
 	    if(value == null) {
-	      if(execution != null) {
+	    	if(task != null) {
+	    		value = taskService.getVariableLocal(task.getId(), variableName);
+	    		cachedVariablesLocal.put(variableName, value);
+	    	}
+	    	else if(execution != null) {
 	        value = runtimeService.getVariableLocal(execution.getId(), variableName);
 	        cachedVariablesLocal.put(variableName, value);
 	      }
