@@ -15,7 +15,6 @@ package org.camunda.bpm.model.xml.impl;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.impl.util.QName;
-import org.camunda.bpm.model.xml.impl.util.XmlQName;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 

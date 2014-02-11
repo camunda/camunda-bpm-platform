@@ -73,20 +73,20 @@ public interface DomDocument {
   DOMSource getDomSource();
 
   /**
-   * Registers a new namespace for the prefix.
-   *
-   * @param prefix  the prefix of the new namespace
-   * @param namespaceUri  the namespaceUri of the new namespace
-   */
-  void registerNamespace(String prefix, String namespaceUri);
-
-  /**
    * Registers a new namespace with a generic prefix.
    *
    * @param namespaceUri  the namespaceUri of the new namespace
    * @return the used prefix
    */
   String registerNamespace(String namespaceUri);
+
+  /**
+   * Registers a new namespace for the prefix.
+   *
+   * @param prefix  the prefix of the new namespace
+   * @param namespaceUri  the namespaceUri of the new namespace
+   */
+  void registerNamespace(String prefix, String namespaceUri);
 
   /**
    * Clones the DOM document.

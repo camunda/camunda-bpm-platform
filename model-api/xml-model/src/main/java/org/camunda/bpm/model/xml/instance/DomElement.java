@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.model.xml.instance;
 
+import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.w3c.dom.Element;
 
@@ -38,6 +39,13 @@ public interface DomElement {
    * @return the local name
    */
   String getLocalName();
+
+  /**
+   * Returns the prefix of this element.
+   *
+   * @return the prefix
+   */
+  String getPrefix();
 
   /**
    * Returns the DOM document which contains this element.
@@ -93,10 +101,17 @@ public interface DomElement {
   /**
    * Removes a child element of this element.
    *
-   * @param childDomElement  the child element to remove
+   * @param domElement  the child element to remove
    * @return true if the child element was removed otherwise false
    */
   boolean removeChild(DomElement domElement);
+
+  /**
+   * Appends the element to the child elements of this element.
+   *
+   * @param childElement  the element to append
+   */
+  void appendChild(DomElement childElement);
 
   /**
    * Inserts the new child element after another child element. If the child element to
@@ -136,7 +151,7 @@ public interface DomElement {
    * Returns the attribute value for the given namespace.
    *
    * @param namespaceUri  the namespaceUri of the namespace
-   * @param attributeName  the name of the attribute
+   * @param localName  the name of the attribute
    * @return the value of the attribute or the empty string
    */
   String getAttribute(String namespaceUri, String localName);
@@ -219,20 +234,20 @@ public interface DomElement {
   void setModelElementInstance(ModelElementInstance modelElementInstance);
 
   /**
-   * Adds a new namespace with prefix to this element.
-   *
-   * @param prefix  the prefix of the namespace
-   * @param namespaceUri  the namespaceUri of the namespace
-   */
-  void registerNamespace(String prefix, String namespaceUri);
-
-  /**
    * Adds a new namespace with a generated prefix to this element.
    *
    * @param namespaceUri  the namespaceUri of the namespace
    * @return the generated prefix for the new namespace
    */
   String registerNamespace(String namespaceUri);
+
+  /**
+   * Adds a new namespace with prefix to this element.
+   *
+   * @param prefix  the prefix of the namespace
+   * @param namespaceUri  the namespaceUri of the namespace
+   */
+  void registerNamespace(String prefix, String namespaceUri);
 
   /**
    * Returns the prefix of the namespace starting from this node upwards.

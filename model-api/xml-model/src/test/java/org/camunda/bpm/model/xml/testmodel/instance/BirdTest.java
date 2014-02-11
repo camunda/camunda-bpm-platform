@@ -19,7 +19,6 @@ import org.camunda.bpm.model.xml.testmodel.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.xml.XMLConstants;
 import java.util.Arrays;
 import java.util.Collection;
 

@@ -119,9 +119,8 @@ public final class IoUtil {
    */
   public static void transformDocumentToXml(DomDocument document, StreamResult result) {
     TransformerFactory transformerFactory = TransformerFactory.newInstance();
-    Transformer transformer = null;
     try {
-      transformer = transformerFactory.newTransformer();
+      Transformer transformer = transformerFactory.newTransformer();
       transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");

@@ -19,6 +19,8 @@ import org.camunda.bpm.model.xml.instance.DomElement;
 import java.util.HashMap;
 import java.util.Map;
 
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+
 /**
  * @author Sebastian Menski
  */
@@ -30,17 +32,17 @@ public class XmlQName {
     KNOWN_PREFIXES = new HashMap<String, String>();
     KNOWN_PREFIXES.put("http://www.camunda.com/fox", "fox");
     KNOWN_PREFIXES.put("http://activiti.org/bpmn", "camunda");
-    KNOWN_PREFIXES.put("http://www.omg.org/spec/BPMN/20100524/MODEL", "bpmn");
+    KNOWN_PREFIXES.put("http://www.omg.org/spec/BPMN/20100524/MODEL", "");
     KNOWN_PREFIXES.put("http://www.omg.org/spec/BPMN/20100524/DI", "bpmndi");
+    KNOWN_PREFIXES.put(XMLNS_ATTRIBUTE_NS_URI, "");
   }
 
-  private final DomDocument document;
   private final DomElement rootElement;
   private final DomElement element;
 
   private final String localName;
-  private String namespaceUri;
-  private String prefix;
+  private final String namespaceUri;
+  private final String prefix;
 
   public XmlQName(DomDocument document, String namespaceUri, String localName) {
     this(document, null, namespaceUri, localName);
@@ -51,12 +53,11 @@ public class XmlQName {
   }
 
   public XmlQName(DomDocument document, DomElement element, String namespaceUri, String localName) {
-    this.document = document;
     this.rootElement = document.getRootElement();
     this.element = element;
     this.localName = localName;
     this.namespaceUri = namespaceUri;
-    determinePrefixAndNamespaceUri();
+    this.prefix = determinePrefixAndNamespaceUri();
   }
 
   public String getNamespaceUri() {
@@ -71,38 +72,56 @@ public class XmlQName {
     return QName.combine(prefix, localName);
   }
 
-  private void determinePrefixAndNamespaceUri() {
+  public boolean hasGlobalNamespace() {
+    if (rootElement != null) {
+      return rootElement.getNamespaceURI().equals(namespaceUri);
+    }
+    else if (element != null) {
+      return element.getNamespaceURI().equals(namespaceUri);
+    }
+    else {
+      return false;
+    }
+  }
+
+  private String determinePrefixAndNamespaceUri() {
     if (namespaceUri != null) {
       if (rootElement != null && namespaceUri.equals(rootElement.getNamespaceURI())) {
         // global namespaces do not have a prefix or namespace URI
-        prefix = null;
-        namespaceUri = null;
+        return null;
       }
       else {
         // lookup for prefix
-        prefix = lookupPrefix();
-        if (prefix == null && rootElement != null) {
+        String lookupPrefix = lookupPrefix();
+        if (lookupPrefix == null && rootElement != null) {
           // if no prefix is found we generate a new one
-          prefix = rootElement.registerNamespace(namespaceUri);
+          return rootElement.registerNamespace(namespaceUri);
+        }
+        else {
+          return lookupPrefix;
         }
       }
     }
     else {
       // no namespace so no prefix
-      prefix = null;
+      return null;
     }
   }
 
   private String lookupPrefix() {
     if (namespaceUri != null) {
+      String lookupPrefix = null;
       if (element != null) {
-        return element.lookupPrefix(namespaceUri);
+        lookupPrefix = element.lookupPrefix(namespaceUri);
       }
       else if (rootElement != null) {
-        return rootElement.lookupPrefix(namespaceUri);
+        lookupPrefix = rootElement.lookupPrefix(namespaceUri);
+      }
+      if (lookupPrefix == null) {
+        return KNOWN_PREFIXES.get(namespaceUri);
       }
       else {
-        return KNOWN_PREFIXES.get(namespaceUri);
+        return lookupPrefix;
       }
     }
     else {

@@ -8,6 +8,7 @@
   <complexType name="tAnimals">
     <sequence>
       <element ref="tns:animal" minOccurs="0" maxOccurs="unbounded" />
+      <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
     </sequence>
   </complexType>
 

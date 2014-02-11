@@ -16,12 +16,16 @@ package org.camunda.bpm.model.xml.testmodel;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
+import org.camunda.bpm.model.xml.impl.util.IoUtil;
 import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.testmodel.instance.*;
 import org.junit.After;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 
 /**
@@ -84,8 +88,7 @@ public abstract class TestModelTest {
   }
 
   @After
-  public void validateModel() {
-    DomDocument document = modelInstance.getDocument();
-    modelParser.validateModel(document);
+  public void validateModel() throws FileNotFoundException {
+    modelParser.validateModel(modelInstance.getDocument());
   }
 }

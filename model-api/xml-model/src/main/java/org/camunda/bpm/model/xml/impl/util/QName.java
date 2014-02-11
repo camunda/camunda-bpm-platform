@@ -51,7 +51,7 @@ public class QName {
       localName = split[0];
     }
 
-    return new QName(localName, qualifier);
+    return new QName(qualifier, localName);
   }
 
   @Override

@@ -73,7 +73,8 @@ public class ModelElementTypeImpl implements ModelElementType {
   }
 
   public ModelElementInstance newInstance(ModelInstanceImpl modelInstance, DomElement domElement) {
-    return createModelElementInstance(new ModelTypeInstanceContext(domElement, modelInstance, this));
+    ModelTypeInstanceContext modelTypeInstanceContext = new ModelTypeInstanceContext(domElement, modelInstance, this);
+    return createModelElementInstance(modelTypeInstanceContext);
   }
 
   public void registerAttribute(Attribute<?> attribute) {

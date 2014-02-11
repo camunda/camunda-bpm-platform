@@ -25,7 +25,6 @@ import org.w3c.dom.NodeList;
 import javax.xml.transform.dom.DOMSource;
 import java.util.List;
 
-import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
 /**
@@ -87,20 +86,20 @@ public class DomDocumentImpl implements DomDocument {
     return new DOMSource(document);
   }
 
-  public void registerNamespace(String prefix, String namespaceUri) {
+  public String registerNamespace(String namespaceUri) {
     DomElement rootElement = getRootElement();
     if (rootElement != null) {
-      rootElement.registerNamespace(prefix, namespaceUri);
+      return rootElement.registerNamespace(namespaceUri);
     }
     else {
       throw new ModelException("Unable to define a new namespace without a root document element");
     }
   }
 
-  public String registerNamespace(String namespaceUri) {
+  public void registerNamespace(String prefix, String namespaceUri) {
     DomElement rootElement = getRootElement();
     if (rootElement != null) {
-      return rootElement.registerNamespace(namespaceUri);
+      rootElement.registerNamespace(prefix, namespaceUri);
     }
     else {
       throw new ModelException("Unable to define a new namespace without a root document element");
@@ -114,7 +113,7 @@ public class DomDocumentImpl implements DomDocument {
     }
     else {
       for (int i = 0; i < Integer.MAX_VALUE; i++) {
-        if (!documentElement.hasAttributeNS(XMLNS_ATTRIBUTE_NS_URI, XMLNS_ATTRIBUTE + ":" + GENERIC_NS_PREFIX + i)) {
+        if (!documentElement.hasAttributeNS(XMLNS_ATTRIBUTE_NS_URI, GENERIC_NS_PREFIX + i)) {
           return GENERIC_NS_PREFIX + i;
         }
       }
@@ -124,5 +123,21 @@ public class DomDocumentImpl implements DomDocument {
 
   public DomDocument clone() {
     return new DomDocumentImpl((Document) document.cloneNode(true));
+  }
+
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    DomDocumentImpl that = (DomDocumentImpl) o;
+    return document.equals(that.document);
+  }
+
+  public int hashCode() {
+    return document.hashCode();
   }
 }

@@ -39,7 +39,7 @@ public class ModelAssertions extends Assertions {
 
   public static AttributeReferenceAssert assertThat(AttributeReference<?> actual) {
     return new AttributeReferenceAssert(actual);
-  };
+  }
 
   public static ElementReferenceCollectionAssert assertThat(ElementReferenceCollection<?,?> actual) {
     return new ElementReferenceCollectionAssert(actual);

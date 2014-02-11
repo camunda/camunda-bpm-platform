@@ -149,7 +149,7 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
     return domElement.getTextContent();
   }
 
-  public ModelElementInstance getUniqueChildElementByNameNs(String elementName, String namespaceUri) {
+  public ModelElementInstance getUniqueChildElementByNameNs(String namespaceUri, String elementName) {
     List<DomElement> childElements = domElement.getChildElementsByNameNs(namespaceUri, elementName);
 
     if(!childElements.isEmpty()) {
@@ -326,7 +326,7 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
       return false;
     } else {
       ModelElementInstanceImpl other = (ModelElementInstanceImpl) obj;
-      return other.domElement == domElement;
+      return other.domElement.equals(domElement);
     }
   }
 

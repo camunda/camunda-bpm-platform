@@ -16,14 +16,12 @@ package org.camunda.bpm.model.xml.impl.instance;
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.util.DomUtil;
-import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.impl.util.XmlQName;
 import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.w3c.dom.*;
 
-import javax.xml.XMLConstants;
 import java.util.List;
 
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
@@ -52,6 +50,10 @@ public class DomElementImpl implements DomElement {
 
   public String getLocalName() {
     return element.getLocalName();
+  }
+
+  public String getPrefix() {
+    return element.getPrefix();
   }
 
   public DomDocument getDocument() {
@@ -121,11 +123,15 @@ public class DomElementImpl implements DomElement {
     }
   }
 
+  public void appendChild(DomElement childDomElement) {
+    Element childElement = ((DomElementImpl) childDomElement).getElement();
+    element.appendChild(childElement);
+  }
+
   public void insertChildElementAfter(DomElement elementToInsert, DomElement insertAfter) {
     Element newElement = ((DomElementImpl) elementToInsert).getElement();
-
     // find node to insert before
-    Node insertBeforeNode = null;
+    Node insertBeforeNode;
     if (insertAfter == null) {
       insertBeforeNode = element.getFirstChild();
     }
@@ -156,7 +162,20 @@ public class DomElementImpl implements DomElement {
 
 
   public String getAttribute(String namespaceUri, String localName) {
-    return element.getAttributeNS(namespaceUri, localName);
+    XmlQName xmlQName = new XmlQName(this, namespaceUri, localName);
+    String value;
+    if (xmlQName.hasGlobalNamespace()) {
+      value = element.getAttributeNS(null, xmlQName.getLocalName());
+    }
+    else {
+      value = element.getAttributeNS(xmlQName.getNamespaceUri(), xmlQName.getLocalName());
+    }
+    if (value.isEmpty()) {
+      return null;
+    }
+    else {
+      return value;
+    }
   }
 
   public void setAttribute(String localName, String value) {
@@ -164,8 +183,23 @@ public class DomElementImpl implements DomElement {
   }
 
   public void setAttribute(String namespaceUri, String localName, String value) {
+    setAttribute(namespaceUri, localName, value, false);
+  }
+
+  private void setAttribute(String namespaceUri, String localName, String value, boolean isIdAttribute) {
     XmlQName xmlQName = new XmlQName(this, namespaceUri, localName);
-    element.setAttributeNS(xmlQName.getNamespaceUri(), xmlQName.getPrefixedName(), value);
+    if (xmlQName.hasGlobalNamespace()) {
+      element.setAttributeNS(null, xmlQName.getLocalName(), value);
+      if (isIdAttribute) {
+        element.setIdAttributeNS(null, xmlQName.getLocalName(), true);
+      }
+    }
+    else {
+      element.setAttributeNS(xmlQName.getNamespaceUri(), xmlQName.getPrefixedName(), value);
+      if (isIdAttribute) {
+        element.setIdAttributeNS(xmlQName.getNamespaceUri(), xmlQName.getLocalName(), true);
+      }
+    }
   }
 
   public void setIdAttribute(String localName, String value) {
@@ -173,8 +207,7 @@ public class DomElementImpl implements DomElement {
   }
 
   public void setIdAttribute(String namespaceUri, String localName, String value) {
-    setAttribute(namespaceUri, localName, value);
-    element.setIdAttributeNS(namespaceUri, localName, true);
+    setAttribute(namespaceUri, localName, value, true);
   }
 
   public void removeAttribute(String localName) {
@@ -182,7 +215,13 @@ public class DomElementImpl implements DomElement {
   }
 
   public void removeAttribute(String namespaceUri, String localName) {
-    element.removeAttributeNS(namespaceUri, localName);
+    XmlQName xmlQName = new XmlQName(this, namespaceUri, localName);
+    if (xmlQName.hasGlobalNamespace()) {
+      element.removeAttributeNS(null, xmlQName.getLocalName());
+    }
+    else {
+      element.removeAttributeNS(xmlQName.getNamespaceUri(), xmlQName.getLocalName());
+    }
   }
 
   public String getTextContent() {
@@ -201,19 +240,40 @@ public class DomElementImpl implements DomElement {
     element.setUserData(MODEL_ELEMENT_KEY, modelElementInstance, null);
   }
 
-  public void registerNamespace(String prefix, String namespaceUri) {
-    element.setAttributeNS(XMLNS_ATTRIBUTE_NS_URI, XMLNS_ATTRIBUTE + ":" + prefix, namespaceUri);
+  public String registerNamespace(String namespaceUri) {
+    String lookupPrefix = lookupPrefix(namespaceUri);
+    if (lookupPrefix == null) {
+      String prefix = ((DomDocumentImpl) getDocument()).getUnusedGenericNsPrefix();
+      registerNamespace(prefix, namespaceUri);
+      return prefix;
+    }
+    else {
+      return lookupPrefix;
+    }
   }
 
-  public String registerNamespace(String namespaceUri) {
-    String prefix = ((DomDocumentImpl) getDocument()).getUnusedGenericNsPrefix();
-    setAttribute(prefix, namespaceUri);
-    return prefix;
+  public void registerNamespace(String prefix, String namespaceUri) {
+    element.setAttributeNS(XMLNS_ATTRIBUTE_NS_URI, XMLNS_ATTRIBUTE + ":" + prefix, namespaceUri);
   }
 
   public String lookupPrefix(String namespaceUri) {
     return element.lookupPrefix(namespaceUri);
   }
 
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    DomElementImpl that = (DomElementImpl) o;
+    return element.equals(that.element);
+  }
+
+  public int hashCode() {
+    return element.hashCode();
+  }
 
 }

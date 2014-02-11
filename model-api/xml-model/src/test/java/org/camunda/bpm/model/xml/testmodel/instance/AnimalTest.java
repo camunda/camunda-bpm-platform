@@ -17,19 +17,18 @@ import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelValidationException;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.testmodel.Gender;
-import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.xml.XMLConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
 import static org.junit.Assert.fail;
 import static org.junit.runners.Parameterized.Parameters;
 
@@ -71,7 +70,7 @@ public class AnimalTest extends TestModelTest {
     modelInstance.setDocumentElement(animals);
 
     // add a tns namespace prefix for QName testing
-    animals.setAttributeValueNs(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:tns", TestModelConstants.MODEL_NAMESPACE);
+    animals.getDomElement().registerNamespace("tns", MODEL_NAMESPACE);
 
     Animal tweety = createBird(modelInstance, "tweety", Gender.Female);
     Animal hedwig = createBird(modelInstance, "hedwig", Gender.Male);

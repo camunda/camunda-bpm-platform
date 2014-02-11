@@ -28,8 +28,6 @@ import org.camunda.bpm.model.xml.impl.instance.DomElementImpl;
 import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -178,8 +176,6 @@ public final class DomUtil {
   public static List<DomElement> filterNodeListByType(NodeList nodeList, ModelInstanceImpl modelInstance, Class<?> type) {
     return filterNodeList(nodeList, new ElementByTypeListFilter(type, modelInstance));
   }
-
-
 
   /**
    * Get an empty DOM document
