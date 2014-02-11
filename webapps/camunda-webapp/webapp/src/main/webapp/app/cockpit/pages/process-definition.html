@@ -49,6 +49,11 @@
                   by business key
                 </a>
               </li>
+              <li ng-hide="filterData.start.length">
+                <a href ng-click="addStartDateFilter()">
+                  by start date
+                </a>
+              </li>              
             </ul>
           </div>
         </h5>
@@ -115,6 +120,58 @@
               </div>
             </li>
 
+            <li class="filter" ng-if="filterData.start.length">
+              <div class="name">
+                Start Date
+              </div>
+
+              <div class="search search-date" ng-repeat="date in filterData.start">
+
+                <select ng-model="date.type"
+                        ng-options="item as item for item in dateTypeItems"
+                        required
+                        cam-dynamic-name="startDateFilterType{{$index}}"
+                        ng-change="dateFilterTypeChanged(filterForm['startDateFilterType0'], filterForm['startDateFilterType1'])">
+                </select>
+
+                <input type="text"
+                       date
+                       required
+                       ng-change="filterChanged()"
+                       ng-model="date.value"
+                       cam-dynamic-name="startDateFilterValue{{$index}}" />
+
+                <button class="btn btn-link btn-mini btn-control remove-date-filter"
+                        ng-click="removeStartDateFilter(date)">
+                  <i class="icon-remove"></i>
+                </button>
+
+                <div class="note note-error note-small" ng-if="filterForm['startDateFilterValue' + $index].$invalid">
+                  <div ng-show="filterForm['startDateFilterValue' + $index].$error.required">
+                    Field is required.
+                  </div>
+               
+                  <div ng-show="filterForm['startDateFilterValue' + $index].$error.date && !filterForm['startDateFilterValue' + $index].$error.required">
+                    Syntax for a date is <code>yyyy-MM-ddTHH:mm:ss</code>.
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="note note-error note-small" ng-if="filterForm['startDateFilterType0'].$invalid && filterForm['startDateFilterType1'].$invalid">
+                <div ng-show="filterForm['startDateFilterType0'].$error.dateTypeEqual && filterForm['startDateFilterType1'].$error.dateTypeEqual">
+                  The combination <code>after/before</code> is only allowed.
+                </div>              
+              </div>
+
+              <button class="btn btn-mini pull-right"
+                      ng-click="addStartDateFilter()"
+                      ng-disabled="filterData.start.length === 2">
+                <i class="icon-plus"></i>
+              </button>
+
+            </li>
+
             <li class="filter" ng-if="filterData.variables.length">
               <div class="name">
                 Variables <a href ng-click="toggleVariableFilterHelp()" title="Get help on variable filters"><i class="icon-question-sign"></i></a>
@@ -129,7 +186,7 @@
 
                 <input type="text"
                        required
-                       name="variableFilter{{$index}}"
+                       cam-dynamic-name="variableFilter{{$index}}"
                        placeholder="Filter Variable"
                        ng-model="variable.value"
                        ng-change="filterChanged()"
@@ -139,7 +196,7 @@
                   <div ng-show="filterForm['variableFilter' + $index].$error.required">
                     Field is required.
                   </div>
-                  <div ng-show="filterForm['variableFilter' + $index].$error.processVariableFilter">
+                  <div ng-show="filterForm['variableFilter' + $index].$error.processVariableFilter && !filterForm['variableFilter' + $index].$error.required">
                     Syntax for variable filters is <code>variableName OPERATOR value</code>.
                     <a href ng-show="!showVariableFilterHelp" ng-click="toggleVariableFilterHelp()">
                       Learn more.
@@ -147,6 +204,11 @@
                   </div>
                 </div>
               </div>
+
+              <button class="btn btn-mini pull-right"
+                      ng-click="addVariableFilter()">
+                <i class="icon-plus"></i>
+              </button>
 
               <div class="note" ng-show="showVariableFilterHelp">
                 <div class="name">

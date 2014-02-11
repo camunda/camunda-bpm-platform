@@ -97,6 +97,16 @@
       and RES.BUSINESS_KEY_ = #{businessKey}
       </if>
 
+      <!-- startedBefore -->
+      <if test="historyEnabled &amp;&amp; startedBefore != null">
+        and HISTORY.START_TIME_ &lt;= #{startedBefore}
+      </if>
+
+      <!-- startedAfter -->
+      <if test="historyEnabled &amp;&amp; startedAfter != null">
+        and HISTORY.START_TIME_ &gt;= #{startedAfter}
+      </if>
+
       <!-- activityIds -->
       <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
       and EXISTS (

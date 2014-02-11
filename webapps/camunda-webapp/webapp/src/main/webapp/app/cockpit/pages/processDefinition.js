@@ -131,6 +131,23 @@ ngDefine('cockpit.pages.processDefinition', [
         return collect(vars, Variables.parse);
       }
 
+      function parseStartDateFilter(params) {
+        var after = params.startedAfter,
+            before = params.startedBefore;
+
+        var result = [];
+
+        if (after) {
+          result.push({ type: 'after', value: after });
+        }
+
+        if (before) {
+          result.push({ type: 'before', value: before }); 
+        }
+
+        return result;
+      }
+
       var activityIds = parseArray(params.activityIds);
 
       filter = {
@@ -138,6 +155,7 @@ ngDefine('cockpit.pages.processDefinition', [
         parentProcessDefinitionId: params.parentProcessDefinitionId,
         businessKey: params.businessKey,
         variables: parseVariables(parseArray(params.variables)),
+        start: parseStartDateFilter(params),
         page: parseInt(params.page) || undefined
       };
 
@@ -148,17 +166,30 @@ ngDefine('cockpit.pages.processDefinition', [
       var businessKey = filter.businessKey,
           activityIds = filter.activityIds,
           parentProcessDefinitionId = filter.parentProcessDefinitionId,
-          variables = filter.variables;
+          variables = filter.variables,
+          start = filter.start;
 
       function nonEmpty(array) {
         return array && array.length;
+      }
+
+      function getDateValueForType (dateFilters, type) {
+        for (var i = 0; i < dateFilters.length; i++) {
+          var filter = dateFilters[i];
+          if (filter.type === type) {
+            return filter.value;
+          }
+        }
+        return null;
       }
 
       search.updateSilently({
         businessKey: businessKey || null,
         activityIds: nonEmpty(activityIds) ? activityIds.join(',') : null,
         variables: nonEmpty(variables) ? collect(variables, Variables.toString).join(',') : null,
-        parentProcessDefinitionId: parentProcessDefinitionId || null
+        parentProcessDefinitionId: parentProcessDefinitionId || null,
+        startedAfter: nonEmpty(start) ? getDateValueForType(start, 'after') : null ,
+        startedBefore: nonEmpty(start) ? getDateValueForType(start, 'before') : null
       });
 
       currentFilter = filter;
@@ -369,10 +400,20 @@ ngDefine('cockpit.pages.processDefinition', [
     setDefaultTab($scope.processDefinitionTabs);
   }];
 
-  var ProcessDefinitionFilterController = [ '$scope', 'debounce', 'Variables', function($scope, debounce, Variables) {
+  var ProcessDefinitionFilterController = [
+  '$scope',
+  '$filter',
+  'debounce',
+  'Variables',
+
+  function($scope, $filter, debounce, Variables) {
 
     var processData = $scope.processData.newChild($scope),
-        filterData;
+        filterData,
+        dateFilter = $filter('date'),
+        dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
+
+    $scope.dateTypeItems = [ 'after', 'before' ];
 
     function createRefs(elements) {
       var result = [];
@@ -396,6 +437,10 @@ ngDefine('cockpit.pages.processDefinition', [
       return result;
     }
 
+    function createDateFilter (dateFilter) {
+      return angular.copy(dateFilter);
+    }
+
     processData.provide('filterData', [ 'processDefinition', 'allProcessDefinitions', 'filter', 'parent', 'bpmnElements', function(definition, allDefinitions, filter, parent, bpmnElements) {
 
       if (!filterData || filterData.filter != filter) {
@@ -406,7 +451,8 @@ ngDefine('cockpit.pages.processDefinition', [
           parent: parent,
           filter: filter,
           variables: createRefs(filter.variables),
-          activities: createActivities(filter.activityIds, bpmnElements)
+          activities: createActivities(filter.activityIds, bpmnElements),
+          start : createDateFilter(filter.start)
         };
       } else {
         return filterData;
@@ -429,8 +475,10 @@ ngDefine('cockpit.pages.processDefinition', [
           activities = filterData.activities,
           parent = filterData.parent,
           businessKey = filterData.businessKey,
+          start = filterData.start,
           newFilterVariables = [],
           newFilterActivityIds = [],
+          newStart = [],
           newFilter = {};
 
       // business key
@@ -448,6 +496,19 @@ ngDefine('cockpit.pages.processDefinition', [
       if (newFilterVariables.length) {
         newFilter.variables = newFilterVariables;
       }
+
+      // start
+      angular.forEach(start, function (filter) {
+        if (filter.value) {
+          if (filter.type === 'after') {
+            newStart.push({ type: 'after', value: filter.value });
+          } else if (filter.type === 'before') {
+            newStart.push({ type: 'before', value: filter.value });
+          }
+        }
+      });
+
+      newFilter.start = newStart;
 
       // parentId
       if (parent) {
@@ -478,7 +539,24 @@ ngDefine('cockpit.pages.processDefinition', [
     };
 
     $scope.addBusinessKeyFilter = function() {
-      $scope.filterData.businessKey = { };
+      filterData.businessKey = { };
+    };
+
+    $scope.addStartDateFilter = function() {
+      var value = dateFilter(Date.now(), dateFormat)
+
+      if (!filterData.start.length) {
+        filterData.start.push({ type: 'after', value: value });
+
+      } else if (filterData.start.length === 1) {
+        var newType = filterData.start[0].type === 'after' ? 'before' : 'after';
+        filterData.start.push({ type: newType, value: value });
+      } else {
+        // it should not be possible to add more than two startDateFilter.
+        return;
+      }
+
+      $scope.filterChanged();
     };
 
     $scope.removeBusinessKeyFilter = function() {
@@ -512,32 +590,33 @@ ngDefine('cockpit.pages.processDefinition', [
 
       $scope.filterChanged();
     };
-  }];
 
-  var ProcessVariableFilter = [ 'Variables', function(Variables) {
+    $scope.removeStartDateFilter = function (filter) {
+      var start = filterData.start,
+          idx = start.indexOf(filter);
 
-    return {
-
-      require: 'ngModel',
-      link: function (scope, element, attrs, ngModel) {
-
-        function parseText(text) {
-          var variable;
-
-          try {
-            variable = Variables.parse(text);
-          } catch (e) {
-            // ok, failed to parse variable
-          }
-
-          ngModel.$setValidity('processVariableFilter', !!variable);
-          return variable;
-        }
-
-        ngModel.$parsers.push(parseText);
-        ngModel.$formatters.push(Variables.toString);
+      if (idx !== -1) {
+        start.splice(idx, 1);
       }
+
+      $scope.filterChanged();
     };
+
+    $scope.dateFilterTypeChanged = function (firstSelectBox, secondSelectBox) {
+      if (firstSelectBox && secondSelectBox) {
+
+        if (firstSelectBox.$modelValue === secondSelectBox.$modelValue) {
+          firstSelectBox.$setValidity('dateTypeEqual', false);
+          secondSelectBox.$setValidity('dateTypeEqual', false);
+        } else {
+          firstSelectBox.$setValidity('dateTypeEqual', true);
+          secondSelectBox.$setValidity('dateTypeEqual', true);
+        }
+      }
+
+      $scope.filterChanged();
+    };
+
   }];
 
   var RouteConfig = [
@@ -581,7 +660,6 @@ ngDefine('cockpit.pages.processDefinition', [
 
   module
     .controller('ProcessDefinitionFilterController', ProcessDefinitionFilterController)
-    .directive('processVariable', ProcessVariableFilter)
     .config(RouteConfig)
     .config(ViewConfig);
 });

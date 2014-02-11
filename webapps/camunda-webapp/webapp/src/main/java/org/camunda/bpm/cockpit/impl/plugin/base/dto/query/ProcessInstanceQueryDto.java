@@ -13,6 +13,7 @@
 package org.camunda.bpm.cockpit.impl.plugin.base.dto.query;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.impl.variable.VariableTypes;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 
@@ -53,6 +55,8 @@ public class ProcessInstanceQueryDto extends AbstractRestQueryParametersDto<Proc
   protected String[] activityInstanceIdIn;
   protected String businessKey;
   protected String parentProcessInstanceId;
+  protected Date startedBefore;
+  protected Date startedAfter;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -133,6 +137,24 @@ public class ProcessInstanceQueryDto extends AbstractRestQueryParametersDto<Proc
   @CamundaQueryParam(value="businessKey")
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
+  }
+
+  public Date getStartedBefore() {
+    return startedBefore;
+  }
+
+  @CamundaQueryParam(value="startedBefore", converter = DateConverter.class)
+  public void setStartedBefore(Date startedBefore) {
+    this.startedBefore = startedBefore;
+  }
+
+  public Date getStartedAfter() {
+    return startedAfter;
+  }
+
+  @CamundaQueryParam(value="startedAfter", converter = DateConverter.class)
+  public void setStartedAfter(Date startedAfter) {
+    this.startedAfter = startedAfter;
   }
 
   @Override
