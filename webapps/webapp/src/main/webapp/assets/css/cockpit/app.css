@@ -366,6 +366,7 @@ a.expand-collapse:focus {
   min-width: 50px;
 }
 
+.filter select,
 .filter input[type=text] {
   margin: 0 0 5px 0;
   height: 26px;
@@ -373,6 +374,14 @@ a.expand-collapse:focus {
 
   -moz-box-sizing: border-box;
        box-sizing: border-box;
+}
+
+.filter .search-date select {
+  width: 80px;
+}
+
+.filter .search-date input[type=text] {
+  width: 155px;
 }
 
 .filter .name {
@@ -383,6 +392,7 @@ a.expand-collapse:focus {
   line-height: 25px;
   padding: 5px 0;
   border-bottom: dotted 1px #F5D99C;
+  overflow: hidden;
 }
 
 .filter:last-child {
@@ -407,8 +417,16 @@ a.expand-collapse:focus {
   opacity: 0.1;
 }
 
-.filter .search:hover .remove {
+.filter .search:hover .remove,
+.filter .search.search-date:hover .remove-date-filter {
   opacity: 0.9;
+}
+
+.filter .search.search-date .remove-date-filter {
+  height: 26px;
+  display: inline-block;
+  float: none;
+  opacity: 0.1;
 }
 
 .filters .note {
@@ -530,4 +548,11 @@ textarea.variable-type-string {
 .instance-tree .tree-node ul {
   margin-left: 19px;
   margin-bottom: 10px;
+}
+
+select.ng-invalid.ng-invalid-date-type-equal {
+  border-color: #E9322D;
+  box-shadow: 0 0 6px #F8B9B7;
+  -webkit-box-shadow: 0 0 6px #F8B9B7;
+  -moz-box-shadow: 0 0 6px #f8b9b7;
 }

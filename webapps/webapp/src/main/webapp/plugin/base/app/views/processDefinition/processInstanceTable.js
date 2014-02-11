@@ -1,5 +1,6 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
-
+  'use strict';
+  
   var Controller = [ '$scope', 'search', 'PluginProcessInstanceResource',
       function ($scope, search, PluginProcessInstanceResource) {
 
@@ -53,6 +54,18 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       // fix missmatch -> activityIds -> activityIdIn
       countParams.activityIdIn = countParams.activityIds;
       delete countParams.activityIds;
+
+      // fix missmatch -> start -> startedAfter/startedBefore
+      angular.forEach(countParams.start, function (dateFilter) {
+        if (dateFilter.value) {
+          if (dateFilter.type === 'after') {
+            countParams.startedAfter = dateFilter.value;
+          } else if (dateFilter.type === 'before') {
+            countParams.startedBefore = dateFilter.value;
+          }
+        }
+      });
+      delete countParams.start;      
 
       var params = angular.extend({}, countParams, pagingParams);
 

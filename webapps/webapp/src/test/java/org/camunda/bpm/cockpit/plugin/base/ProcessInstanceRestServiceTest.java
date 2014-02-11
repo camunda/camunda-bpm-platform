@@ -22,6 +22,8 @@ import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.NOT_EQU
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,8 @@ import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
@@ -3124,6 +3128,73 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(dto.getId()).isEqualTo(processInstance.getId());
   }
 
+  @Test
+  @Deployment(resources = {
+      "processes/user-task-process.bpmn"
+    })
+  public void testQueryByStartedAfter() {
+    String date = "2014-01-01T13:13:00";
+    Date currentDate = DateTimeUtil.parseDateTime(date).toDate();
+
+    ClockUtil.setCurrentTime(currentDate);
+
+    startProcessInstances("userTaskProcess", 5);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setStartedAfter(currentDate);
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(5);
+  }
+
+  @Test
+  @Deployment(resources = {
+      "processes/user-task-process.bpmn"
+    })
+  public void testQueryByStartedBefore() {
+    String date = "2014-01-01T13:13:00";
+    Date currentDate = DateTimeUtil.parseDateTime(date).toDate();
+
+    ClockUtil.setCurrentTime(currentDate);
+
+    startProcessInstances("userTaskProcess", 5);
+
+    Calendar hourFromNow = Calendar.getInstance();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setStartedBefore(hourFromNow.getTime());
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(5);
+  }
+
+  @Test
+  @Deployment(resources = {
+      "processes/user-task-process.bpmn"
+    })
+  public void testQueryByStartedBetween() {
+    String date = "2014-01-01T13:13:00";
+    Date currentDate = DateTimeUtil.parseDateTime(date).toDate();
+
+    ClockUtil.setCurrentTime(currentDate);
+
+    startProcessInstances("userTaskProcess", 5);
+
+    Calendar hourFromNow = Calendar.getInstance();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setStartedAfter(currentDate);
+    queryParameter.setStartedBefore(hourFromNow.getTime());
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(5);
+  }
+
   private VariableQueryParameterDto createVariableParameter(String name, String operator, Object value) {
     VariableQueryParameterDto variable = new VariableQueryParameterDto();
     variable.setName(name);
@@ -3132,4 +3203,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     return variable;
   }
+
+
 }
