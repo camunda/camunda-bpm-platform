@@ -14,5 +14,10 @@ ngDefine('cockpit.directives', [
   './stateCircle',
   './variable',
   './viewPills',
-  './selectActivity'
-], function() {});
+  './selectActivity',
+  './processVariable',
+  './dynamicName'
+], function(module) {
+
+});
+
