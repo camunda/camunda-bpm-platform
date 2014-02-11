@@ -56,7 +56,12 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       .findJobById(jobId);
 
     if (job == null) {
-      throw new ProcessEngineException("No job found with id '" + jobId + "'");
+      // CAM-1842
+      // Job was acquired but does not exist anymore. This is not a problem.
+      // It usually means that the job has been deleted after it was acquired which can happen if the
+      // the activity instance corresponding to the job is cancelled.
+      log.log(Level.FINE, "Job with Id " + jobId + " was acquired but cannot be found in database.");
+      return null;
     }
 
     final CommandExecutor commandExecutor = Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew();
