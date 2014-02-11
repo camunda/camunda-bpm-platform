@@ -166,7 +166,7 @@ Read the http://camunda.org/bpmn/tutorial.html[BPMN 2.0 Tutorial on camunda.org]
 
 === Which Java (JRE) Version is required?
 
-Java JRE 1.6+ is required. We test camunda BPMN model API on the Oracle JVM.
+Java JRE 1.6+ is required. We test camunda BPMN model API on Oracle and IBM JVMs.
 
 === Under which License is camunda BPMN model API distributed?
 
