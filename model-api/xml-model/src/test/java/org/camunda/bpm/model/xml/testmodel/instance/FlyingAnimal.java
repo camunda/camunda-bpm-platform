@@ -15,6 +15,7 @@ package org.camunda.bpm.model.xml.testmodel.instance;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReference;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
@@ -32,6 +33,7 @@ public abstract class FlyingAnimal extends Animal {
   // only public for testing (normally private)
   public static ElementReference<FlyingAnimal, FlightInstructor> flightInstructorChild;
   public static ElementReferenceCollection<FlyingAnimal, FlightPartnerRef> flightPartnerRefsColl;
+  public static Attribute<Double> wingspanAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
 
@@ -39,6 +41,9 @@ public abstract class FlyingAnimal extends Animal {
       .namespaceUri(MODEL_NAMESPACE)
       .extendsType(Animal.class)
       .abstractType();
+
+    wingspanAttribute = typeBuilder.doubleAttribute(ATTRIBUTE_NAME_WINGSPAN)
+      .build();
 
     SequenceBuilder sequence = typeBuilder.sequence();
 
@@ -56,6 +61,14 @@ public abstract class FlyingAnimal extends Animal {
 
   FlyingAnimal(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
+  }
+
+  public Double getWingspan() {
+    return wingspanAttribute.getValue(this);
+  }
+
+  public void setWingspan(double wingspan) {
+    wingspanAttribute.setValue(this, wingspan);
   }
 
   public FlyingAnimal getFlightInstructor() {

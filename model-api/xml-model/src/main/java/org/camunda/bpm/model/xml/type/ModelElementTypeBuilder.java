@@ -37,6 +37,8 @@ public interface ModelElementTypeBuilder {
 
   AttributeBuilder<Integer> integerAttribute(String attributeName);
 
+  AttributeBuilder<Double> doubleAttribute(String attributeName);
+
   <V extends Enum<V>> AttributeBuilder<V> enumAttribute(String attributeName, Class<V> enumType);
 
   SequenceBuilder sequence();

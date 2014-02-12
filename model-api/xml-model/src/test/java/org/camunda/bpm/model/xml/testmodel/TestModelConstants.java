@@ -43,6 +43,7 @@ public abstract class TestModelConstants {
   public static final String ATTRIBUTE_NAME_GENDER = "gender";
   public static final String ATTRIBUTE_NAME_AGE = "age";
   public static final String ATTRIBUTE_NAME_ANIMAL_REF = "animalRef";
+  public static final String ATTRIBUTE_NAME_WINGSPAN = "wingspan";
 
   private TestModelConstants() {
 

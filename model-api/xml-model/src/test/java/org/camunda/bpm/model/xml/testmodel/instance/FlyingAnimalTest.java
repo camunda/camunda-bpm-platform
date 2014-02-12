@@ -95,6 +95,31 @@ public class FlyingAnimalTest extends TestModelTest {
   }
 
   @Test
+  public void testSetWingspanAttributeByHelper() {
+    double wingspan = 2.123;
+    tweety.setWingspan(wingspan);
+    assertThat(tweety.getWingspan()).isEqualTo(wingspan);
+  }
+
+  @Test
+  public void testSetWingspanAttributeByAttributeName() {
+    Double wingspan = 2.123;
+    tweety.setAttributeValue("wingspan", wingspan.toString(), false);
+    assertThat(tweety.getWingspan()).isEqualTo(wingspan);
+  }
+
+  @Test
+  public void testRemoveWingspanAttribute() {
+    double wingspan = 2.123;
+    tweety.setWingspan(wingspan);
+    assertThat(tweety.getWingspan()).isEqualTo(wingspan);
+
+    tweety.removeAttribute("wingspan");
+
+    assertThat(tweety.getWingspan()).isNull();
+  }
+
+  @Test
   public void testSetFlightInstructorByHelper() {
     tweety.setFlightInstructor(timmy);
     assertThat(tweety.getFlightInstructor()).isEqualTo(timmy);
