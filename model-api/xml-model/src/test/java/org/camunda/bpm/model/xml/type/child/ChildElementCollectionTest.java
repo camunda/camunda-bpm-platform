@@ -26,7 +26,9 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 
 import static org.camunda.bpm.model.xml.test.assertions.ModelAssertions.assertThat;
 import static org.junit.Assert.fail;

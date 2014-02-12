@@ -12,17 +12,17 @@
  */
 package org.camunda.bpm.model.xml.impl.type.reference;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelReferenceException;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.type.attribute.AttributeImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.reference.Reference;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author Sebastian Menski

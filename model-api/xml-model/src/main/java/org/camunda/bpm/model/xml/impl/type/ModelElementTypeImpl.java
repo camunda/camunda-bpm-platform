@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.model.xml.impl.type;
 
-import java.util.*;
-
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelInstance;
@@ -28,6 +26,8 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
+
+import java.util.*;
 
 import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 

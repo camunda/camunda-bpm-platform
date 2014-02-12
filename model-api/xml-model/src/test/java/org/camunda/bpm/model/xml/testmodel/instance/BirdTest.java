@@ -15,7 +15,9 @@ package org.camunda.bpm.model.xml.testmodel.instance;
 
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
-import org.camunda.bpm.model.xml.testmodel.*;
+import org.camunda.bpm.model.xml.testmodel.Gender;
+import org.camunda.bpm.model.xml.testmodel.TestModelParser;
+import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.junit.Before;
 import org.junit.Test;
 

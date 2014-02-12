@@ -16,8 +16,8 @@ import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.junit.Test;
 
-import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAME;
 
 /**
  * @author Daniel Meyer

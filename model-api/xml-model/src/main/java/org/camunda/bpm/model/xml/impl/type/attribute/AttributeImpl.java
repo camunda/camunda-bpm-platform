@@ -12,14 +12,14 @@
  */
 package org.camunda.bpm.model.xml.impl.type.attribute;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.model.xml.impl.type.reference.ReferenceImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.reference.Reference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Base class for implementing primitive value attributes</p>

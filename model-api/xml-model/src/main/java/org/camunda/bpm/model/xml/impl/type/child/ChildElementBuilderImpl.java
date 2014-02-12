@@ -15,9 +15,9 @@ package org.camunda.bpm.model.xml.impl.type.child;
 import org.camunda.bpm.model.xml.impl.type.reference.ElementReferenceBuilderImpl;
 import org.camunda.bpm.model.xml.impl.type.reference.QNameElementReferenceBuilderImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementBuilder;
-import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceBuilder;
 
 /**

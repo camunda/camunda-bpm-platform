@@ -22,7 +22,8 @@ import org.camunda.bpm.model.xml.type.reference.ElementReference;
 
 import java.util.Collection;
 
-import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.*;
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.ELEMENT_NAME_BIRD;
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
 
 /**
  * @author Daniel Meyer

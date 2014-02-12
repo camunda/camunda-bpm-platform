@@ -13,10 +13,6 @@
 
 package org.camunda.bpm.model.xml.impl.type.reference;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelReferenceException;
 import org.camunda.bpm.model.xml.UnsupportedModelOperationException;
@@ -30,6 +26,10 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author Sebastian Menski
