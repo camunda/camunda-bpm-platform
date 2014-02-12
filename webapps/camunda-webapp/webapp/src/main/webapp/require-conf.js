@@ -12,7 +12,7 @@
 /**
  * @name Service
  * @memberof angular
- * @description No idea what angular.js Services **really** are?  
+ * @description No idea what angular.js Services **really** are?
  * Me neither, update welcome.
  */
 
@@ -58,14 +58,14 @@
 
   /**
    * The base path/URL used by require.js to build the URL
-   * of the different modules to be loaded.  
+   * of the different modules to be loaded.
    * {@link http://requirejs.org/docs/api.html#config-baseUrl|See the require.js docs for **baseUrl** configuration}
    * @type {string}
    */
   conf.baseUrl = '/camunda/';
 
   /**
-   * Keys are module names and values are paths or URLs.  
+   * Keys are module names and values are paths or URLs.
    * {@link http://requirejs.org/docs/api.html#config-paths|See the require.js docs for **paths** configuration}
    * @type {Object.<string, string>}
    */
@@ -75,7 +75,8 @@
     'domReady':              'assets/vendor/requirejs-domready/index',
     'jquery':                'assets/vendor/jquery/index',
     'jquery-mousewheel':     'assets/vendor/jquery-mousewheel/jquery.mousewheel',
-    'jquery-overscroll':     'assets/vendor/jquery-overscroll/src/jquery.overscroll',
+    // 'jquery-overscroll':     'assets/vendor/jquery-overscroll/src/jquery.overscroll',
+    'jquery-overscroll':     'assets/vendor/jquery-overscroll-fixed/dist/jquery.overscroll',
     'jquery-ui':             'assets/vendor/jquery-ui/index',
     'bootstrap':             'assets/vendor/bootstrap/js/bootstrap',
     'bootstrap-slider':      'assets/vendor/bootstrap-slider/bootstrap-slider',
@@ -107,7 +108,7 @@
   };
 
   /**
-   * For CommonJS modules (following the CommonJS scaffolding guid lines).  
+   * For CommonJS modules (following the CommonJS scaffolding guid lines).
    * {@link http://requirejs.org/docs/api.html#config-packages|See the require.js docs for **packages** configuration}
    * @type {Object.<string, Object>}
    */
@@ -158,7 +159,7 @@
   conf.utils = {};
 
   /**
-   * Utility to ensure compatibility of test scenarios loaded with require.js  
+   * Utility to ensure compatibility of test scenarios loaded with require.js
    * {@link http://stackoverflow.com/questions/15499997/how-to-use-angular-scenario-with-requirejs}
    *
    * @param {string} appName - The "angular app name"

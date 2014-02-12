@@ -29,7 +29,7 @@
     "dojo": "./src/main/webapp/assets/local/dojo",
     "jquery": "http://code.jquery.com/jquery-1.10.0.js",
     "jquery-mousewheel": "~3.1.9",
-    "jquery-overscroll": "~1.7.3",
+    "jquery-overscroll-fixed": "*",
     "jquery-ui": "./src/main/webapp/assets/local/jquery-ui-1.10.3.custom.min.js",
     "requirejs-angular-define": "camunda/requirejs-angular-define",
     "requirejs": "http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js",
