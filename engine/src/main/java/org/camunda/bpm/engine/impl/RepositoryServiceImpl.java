@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.task.IdentityLink;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 
 /**

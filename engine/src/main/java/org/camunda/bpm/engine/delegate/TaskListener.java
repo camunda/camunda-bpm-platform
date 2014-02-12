@@ -13,10 +13,17 @@
 
 package org.camunda.bpm.engine.delegate;
 
-
-
-
 /**
+ * Listener interface implemented by user code which wants to be notified when a property of a task changes.
+ *
+ * <p>The following Task Events are supported:
+ * <ul>
+ * <li>{@link #EVENTNAME_CREATE}</li>
+ * <li>{@link #EVENTNAME_ASSIGNMENT}</li>
+ * <li>{@link #EVENTNAME_COMPLETE}</li>
+ * </ul>
+ * </p>
+ *
  * @author Tom Baeyens
  */
 public interface TaskListener {
@@ -26,4 +33,5 @@ public interface TaskListener {
   String EVENTNAME_COMPLETE = "complete";
 
   void notify(DelegateTask delegateTask);
+
 }

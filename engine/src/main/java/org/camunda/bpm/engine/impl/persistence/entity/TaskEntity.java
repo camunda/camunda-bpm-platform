@@ -42,6 +42,10 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.type.ModelElementType;
 
 /**
  * @author Tom Baeyens
@@ -226,6 +230,35 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   protected void ensureTaskActive() {
     if (suspensionState == SuspensionState.SUSPENDED.getStateCode()) {
       throw new SuspendedEntityInteractionException("task " + id + " is suspended");
+    }
+  }
+
+  public UserTask getBpmnModelElementInstance() {
+    BpmnModelInstance bpmnModelInstance = getBpmnModelInstance();
+    if(bpmnModelInstance != null) {
+      ModelElementInstance modelElementInstance = bpmnModelInstance.getModelElementById(taskDefinitionKey);
+      try {
+        return (UserTask) modelElementInstance;
+      } catch(ClassCastException e) {
+        ModelElementType elementType = modelElementInstance.getElementType();
+        throw new ProcessEngineException("Cannot cast "+modelElementInstance+" to UserTask. "
+            + "Is of type "+elementType.getTypeName() + " Namespace "
+            + elementType.getTypeNamespace(), e);
+      }
+    } else {
+      return null;
+    }
+  }
+
+  public BpmnModelInstance getBpmnModelInstance() {
+    if(processDefinitionId != null) {
+      return Context.getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findBpmnModelInstanceForProcessDefinition(processDefinitionId);
+
+    } else {
+      return null;
+
     }
   }
 

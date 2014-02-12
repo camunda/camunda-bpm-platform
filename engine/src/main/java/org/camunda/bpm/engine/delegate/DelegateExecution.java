@@ -20,7 +20,7 @@ package org.camunda.bpm.engine.delegate;
  *
  * @author Tom Baeyens
  */
-public interface DelegateExecution extends VariableScope {
+public interface DelegateExecution extends VariableScope, BpmnModelExecutionContext {
 
   /** Unique id of this path of execution that can be used as a handle to provide external signals back into the engine after wait states. */
   String getId();

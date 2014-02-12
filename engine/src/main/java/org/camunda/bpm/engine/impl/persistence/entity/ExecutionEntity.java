@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -59,10 +60,13 @@ import org.camunda.bpm.engine.impl.pvm.runtime.OutgoingExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
-import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.FlowElement;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.type.ModelElementType;
 
 
 
@@ -1730,6 +1734,44 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
    */
   public PvmActivity getNextActivity() {
     return nextActivity;
+  }
+
+  public FlowElement getBpmnModelElementInstance() {
+    BpmnModelInstance bpmnModelInstance = getBpmnModelInstance();
+    if(bpmnModelInstance != null) {
+
+      ModelElementInstance modelElementInstance = null;
+      if(ExecutionListener.EVENTNAME_TAKE.equals(eventName)) {
+        modelElementInstance = bpmnModelInstance.getModelElementById(transition.getId());
+      } else {
+        modelElementInstance = bpmnModelInstance.getModelElementById(activityId);
+      }
+
+      try {
+        return (FlowElement) modelElementInstance;
+
+      } catch(ClassCastException e) {
+        ModelElementType elementType = modelElementInstance.getElementType();
+        throw new ProcessEngineException("Cannot cast "+modelElementInstance+" to FlowElement. "
+            + "Is of type "+elementType.getTypeName() + " Namespace "
+            + elementType.getTypeNamespace(), e);
+      }
+
+    } else {
+      return null;
+    }
+  }
+
+  public BpmnModelInstance getBpmnModelInstance() {
+    if(processDefinitionId != null) {
+      return Context.getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findBpmnModelInstanceForProcessDefinition(processDefinitionId);
+
+    } else {
+      return null;
+
+    }
   }
 
 }

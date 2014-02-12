@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.persistence.deploy;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +22,13 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 
 /**
@@ -32,13 +36,14 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
  * @author Falko Menge
  */
 public class DeploymentCache {
-  
+
   private Logger LOGGER = Logger.getLogger(DeploymentCache.class.getName());
 
-  protected Map<String, ProcessDefinitionEntity> processDefinitionCache = new HashMap<String, ProcessDefinitionEntity>(); 
-  protected Map<String, Object> knowledgeBaseCache = new HashMap<String, Object>(); 
+  protected Map<String, ProcessDefinitionEntity> processDefinitionCache = new HashMap<String, ProcessDefinitionEntity>();
+  protected Map<String, BpmnModelInstance> bpmnModelInstanceCache = new HashMap<String, BpmnModelInstance>();
+  protected Map<String, Object> knowledgeBaseCache = new HashMap<String, Object>();
   protected List<Deployer> deployers;
-  
+
   public void deploy(DeploymentEntity deployment) {
     for (Deployer deployer: deployers) {
       deployer.deploy(deployment);
@@ -83,7 +88,7 @@ public class DeploymentCache {
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
   }
-  
+
   public ProcessDefinitionEntity findDeployedProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey) {
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) Context
       .getCommandContext()
@@ -94,7 +99,7 @@ public class DeploymentCache {
     }
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
-  }  
+  }
 
   public ProcessDefinitionEntity resolveProcessDefinition(ProcessDefinitionEntity processDefinition) {
     String processDefinitionId = processDefinition.getId();
@@ -108,7 +113,7 @@ public class DeploymentCache {
       deployment.setNew(false);
       deploy(deployment);
       cachedProcessDefinition = processDefinitionCache.get(processDefinitionId);
-      
+
       if (cachedProcessDefinition==null) {
         throw new ProcessEngineException("deployment '"+deploymentId+"' didn't put process definition '"+processDefinitionId+"' in the cache");
       }
@@ -117,6 +122,30 @@ public class DeploymentCache {
       cachedProcessDefinition.updateModifiedFieldsFromEntity(processDefinition);
     }
     return cachedProcessDefinition;
+  }
+
+  public BpmnModelInstance findBpmnModelInstanceForProcessDefinition(String processDefinitionId) {
+    BpmnModelInstance bpmnModelInstance = bpmnModelInstanceCache.get(processDefinitionId);
+    if(bpmnModelInstance == null) {
+
+      ProcessDefinitionEntity processDefinition = findDeployedProcessDefinitionById(processDefinitionId);
+      String deploymentId = processDefinition.getDeploymentId();
+      String resourceName = processDefinition.getResourceName();
+
+      InputStream bpmnResourceInputStream = new GetDeploymentResourceCmd(deploymentId, resourceName)
+        .execute(Context.getCommandContext());
+
+      try {
+        bpmnModelInstance = Bpmn.readModelFromStream(bpmnResourceInputStream);
+      }catch(Exception e) {
+        throw new ProcessEngineException("Could not load Bpmn Model for process definition "+processDefinitionId, e);
+      }
+
+      // put model instance into cache.
+      bpmnModelInstanceCache.put(processDefinitionId, bpmnModelInstance);
+
+    }
+    return bpmnModelInstance;
   }
 
   public void addProcessDefinition(ProcessDefinitionEntity processDefinition) {
@@ -134,7 +163,7 @@ public class DeploymentCache {
   public void removeKnowledgeBase(String knowledgeBaseId) {
     knowledgeBaseCache.remove(knowledgeBaseId);
   }
-  
+
   public void discardProcessDefinitionCache() {
     processDefinitionCache.clear();
   }
@@ -144,26 +173,30 @@ public class DeploymentCache {
   }
   // getters and setters //////////////////////////////////////////////////////
 
+  public Map<String, BpmnModelInstance> getBpmnModelInstanceCache() {
+    return bpmnModelInstanceCache;
+  }
+
   public Map<String, ProcessDefinitionEntity> getProcessDefinitionCache() {
     return processDefinitionCache;
   }
-  
+
   public void setProcessDefinitionCache(Map<String, ProcessDefinitionEntity> processDefinitionCache) {
     this.processDefinitionCache = processDefinitionCache;
   }
-  
+
   public Map<String, Object> getKnowledgeBaseCache() {
     return knowledgeBaseCache;
   }
-  
+
   public void setKnowledgeBaseCache(Map<String, Object> knowledgeBaseCache) {
     this.knowledgeBaseCache = knowledgeBaseCache;
   }
-  
+
   public List<Deployer> getDeployers() {
     return deployers;
   }
-  
+
   public void setDeployers(List<Deployer> deployers) {
     this.deployers = deployers;
   }
@@ -176,13 +209,13 @@ public class DeploymentCache {
     for (ProcessDefinition processDefinition : allDefinitionsForDeployment) {
       try {
         removeProcessDefinition(processDefinition.getId());
-        
+
       } catch(Exception e) {
         LOGGER.log(Level.WARNING, "Could not remove process definition with id '"+processDefinition.getId()+"' from the cache.", e);
-        
+
       }
     }
-      
-    
+
+
   }
 }

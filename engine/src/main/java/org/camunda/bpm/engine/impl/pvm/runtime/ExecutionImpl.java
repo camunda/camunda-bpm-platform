@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.delegate.BpmnModelExecutionContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceState;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
@@ -37,6 +38,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.FlowElement;
 
 
 /**
@@ -1090,6 +1093,13 @@ public class ExecutionImpl implements
     } else {
       return null;
     }
+  }
+
+  public FlowElement getBpmnModelElementInstance() {
+    throw new UnsupportedOperationException(BpmnModelExecutionContext.class.getName() +" is unsupported in transient ExecutionImpl");
+  }
+  public BpmnModelInstance getBpmnModelInstance() {
+    throw new UnsupportedOperationException(BpmnModelExecutionContext.class.getName() +" is unsupported in transient ExecutionImpl");
   }
 
 }
