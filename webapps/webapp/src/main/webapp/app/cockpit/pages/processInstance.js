@@ -9,7 +9,33 @@ ngDefine('cockpit.pages.processInstance', [
 
   var routeUtil = require('cockpit/util/routeUtil');
 
-  function ProcessInstanceController ($scope, $rootScope, $location, $filter, $dialog, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Data, Transform, processInstance, dataDepend, page) {
+  var Controller = [
+    '$scope',
+    '$filter',
+    'search',
+    'ProcessDefinitionResource',
+    'ProcessInstanceResource',
+    'IncidentResource',
+    'Views',
+    'Data',
+    'Transform',
+    'processInstance',
+    'dataDepend',
+    'page',
+  function(
+    $scope,
+    $filter,
+    search,
+    ProcessDefinitionResource,
+    ProcessInstanceResource,
+    IncidentResource,
+    Views,
+    Data,
+    Transform,
+    processInstance,
+    dataDepend,
+    page
+  ) {
 
     $scope.processInstance = processInstance;
 
@@ -576,7 +602,7 @@ ngDefine('cockpit.pages.processInstance', [
     }
 
     setDefaultTab($scope.processInstanceTabs);
-  }
+  }];
 
   function ProcessInstanceFilterController ($scope) {
 
@@ -614,24 +640,9 @@ ngDefine('cockpit.pages.processInstance', [
       processData.set('filter', filterData.filter);
     };
 
-  }
+  };
 
   module
-    .controller('ProcessInstanceController', [ '$scope',
-                                               '$rootScope',
-                                               '$location',
-                                               '$filter',
-                                               '$dialog',
-                                               'search',
-                                               'ProcessDefinitionResource',
-                                               'ProcessInstanceResource',
-                                               'IncidentResource',
-                                               'Views',
-                                               'Data',
-                                               'Transform',
-                                               'processInstance',
-                                               'dataDepend',
-                                               'page', ProcessInstanceController ])
     .controller('ProcessInstanceFilterController', ['$scope', ProcessInstanceFilterController]);
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
@@ -642,7 +653,7 @@ ngDefine('cockpit.pages.processInstance', [
 
     $routeProvider.when('/process-instance/:id/live', {
       templateUrl: 'pages/process-instance.html',
-      controller: 'ProcessInstanceController',
+      controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
         processInstance: ['ResourceResolver', 'ProcessInstanceResource',
