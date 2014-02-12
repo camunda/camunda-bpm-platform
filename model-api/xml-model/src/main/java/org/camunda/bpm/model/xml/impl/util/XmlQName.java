@@ -32,7 +32,7 @@ public class XmlQName {
     KNOWN_PREFIXES = new HashMap<String, String>();
     KNOWN_PREFIXES.put("http://www.camunda.com/fox", "fox");
     KNOWN_PREFIXES.put("http://activiti.org/bpmn", "camunda");
-    KNOWN_PREFIXES.put("http://www.omg.org/spec/BPMN/20100524/MODEL", "");
+    KNOWN_PREFIXES.put("http://www.omg.org/spec/BPMN/20100524/MODEL", "bpmn2");
     KNOWN_PREFIXES.put("http://www.omg.org/spec/BPMN/20100524/DI", "bpmndi");
     KNOWN_PREFIXES.put(XMLNS_ATTRIBUTE_NS_URI, "");
   }
@@ -72,11 +72,8 @@ public class XmlQName {
     return QName.combine(prefix, localName);
   }
 
-  public boolean hasGlobalNamespace() {
-    if (rootElement != null) {
-      return rootElement.getNamespaceURI().equals(namespaceUri);
-    }
-    else if (element != null) {
+  public boolean hasLocalNamespace() {
+    if (element != null) {
       return element.getNamespaceURI().equals(namespaceUri);
     }
     else {
@@ -95,7 +92,19 @@ public class XmlQName {
         String lookupPrefix = lookupPrefix();
         if (lookupPrefix == null && rootElement != null) {
           // if no prefix is found we generate a new one
-          return rootElement.registerNamespace(namespaceUri);
+          // search for known prefixes
+          lookupPrefix = KNOWN_PREFIXES.get(namespaceUri);
+          if (lookupPrefix == "") {
+            // ignored namespace
+            return null;
+          }
+          else if (lookupPrefix != null) {
+            rootElement.registerNamespace(lookupPrefix, namespaceUri);
+            return lookupPrefix;
+          }
+          else {
+            return rootElement.registerNamespace(namespaceUri);
+          }
         }
         else {
           return lookupPrefix;
@@ -117,12 +126,7 @@ public class XmlQName {
       else if (rootElement != null) {
         lookupPrefix = rootElement.lookupPrefix(namespaceUri);
       }
-      if (lookupPrefix == null) {
-        return KNOWN_PREFIXES.get(namespaceUri);
-      }
-      else {
-        return lookupPrefix;
-      }
+      return lookupPrefix;
     }
     else {
       return null;

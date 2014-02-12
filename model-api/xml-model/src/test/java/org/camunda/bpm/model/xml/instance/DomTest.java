@@ -39,6 +39,7 @@ public class DomTest extends TestModelTest {
   private static final String UNKNOWN_NS = "http://camunda.org/unknown";
   private static final String CAMUNDA_NS = "http://activiti.org/bpmn";
   private static final String FOX_NS = "http://www.camunda.com/fox";
+  private static final String BPMN_NS = "http://www.omg.org/spec/BPMN/20100524/MODEL";
 
   private DomDocument document;
 
@@ -199,8 +200,12 @@ public class DomTest extends TestModelTest {
     document.getRootElement().appendChild(element);
     element.setIdAttribute("id", "sylvester");
     element.setAttribute(UNKNOWN_NS, "name", "Sylvester");
+    element.setAttribute(BPMN_NS, "id", "test");
     assertThat(element.getAttribute(UNKNOWN_NS, "id")).isEqualTo("sylvester");
     assertThat(element.getAttribute("name")).isEqualTo("Sylvester");
+    assertThat(element.getAttribute(BPMN_NS, "id")).isEqualTo("test");
+    assertThat(element.hasAttribute(XMLNS_ATTRIBUTE_NS_URI, "bpmn2")).isFalse();
+    assertThat(document.getRootElement().hasAttribute(XMLNS_ATTRIBUTE_NS_URI, "bpmn2")).isTrue();
   }
 
 }

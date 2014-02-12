@@ -149,7 +149,7 @@ public class DomElementImpl implements DomElement {
   }
 
   public boolean hasAttribute(String localName) {
-    return hasAttribute(getNamespaceURI(), localName);
+    return hasAttribute(null, localName);
   }
 
   public boolean hasAttribute(String namespaceUri, String localName) {
@@ -157,14 +157,14 @@ public class DomElementImpl implements DomElement {
   }
 
   public String getAttribute(String attributeName) {
-    return getAttribute(getNamespaceURI(), attributeName);
+    return getAttribute(null, attributeName);
   }
 
 
   public String getAttribute(String namespaceUri, String localName) {
     XmlQName xmlQName = new XmlQName(this, namespaceUri, localName);
     String value;
-    if (xmlQName.hasGlobalNamespace()) {
+    if (xmlQName.hasLocalNamespace()) {
       value = element.getAttributeNS(null, xmlQName.getLocalName());
     }
     else {
@@ -179,7 +179,7 @@ public class DomElementImpl implements DomElement {
   }
 
   public void setAttribute(String localName, String value) {
-    setAttribute(getNamespaceURI(), localName, value);
+    setAttribute(null, localName, value);
   }
 
   public void setAttribute(String namespaceUri, String localName, String value) {
@@ -188,7 +188,7 @@ public class DomElementImpl implements DomElement {
 
   private void setAttribute(String namespaceUri, String localName, String value, boolean isIdAttribute) {
     XmlQName xmlQName = new XmlQName(this, namespaceUri, localName);
-    if (xmlQName.hasGlobalNamespace()) {
+    if (xmlQName.hasLocalNamespace()) {
       element.setAttributeNS(null, xmlQName.getLocalName(), value);
       if (isIdAttribute) {
         element.setIdAttributeNS(null, xmlQName.getLocalName(), true);
@@ -216,7 +216,7 @@ public class DomElementImpl implements DomElement {
 
   public void removeAttribute(String namespaceUri, String localName) {
     XmlQName xmlQName = new XmlQName(this, namespaceUri, localName);
-    if (xmlQName.hasGlobalNamespace()) {
+    if (xmlQName.hasLocalNamespace()) {
       element.removeAttributeNS(null, xmlQName.getLocalName());
     }
     else {
