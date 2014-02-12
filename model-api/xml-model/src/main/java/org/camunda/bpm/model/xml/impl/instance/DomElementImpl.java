@@ -243,7 +243,17 @@ public class DomElementImpl implements DomElement {
   public String registerNamespace(String namespaceUri) {
     String lookupPrefix = lookupPrefix(namespaceUri);
     if (lookupPrefix == null) {
-      String prefix = ((DomDocumentImpl) getDocument()).getUnusedGenericNsPrefix();
+      // check if a prefix is known
+      String prefix = XmlQName.KNOWN_PREFIXES.get(namespaceUri);
+      // check if prefix is not already used
+      if (prefix != null && getRootElement() != null &&
+        getRootElement().hasAttribute(XMLNS_ATTRIBUTE_NS_URI, prefix)) {
+        prefix = null;
+      }
+      if (prefix == null) {
+        // generate prefix
+        prefix = ((DomDocumentImpl) getDocument()).getUnusedGenericNsPrefix();
+      }
       registerNamespace(prefix, namespaceUri);
       return prefix;
     }

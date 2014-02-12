@@ -26,7 +26,7 @@ import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
  */
 public class XmlQName {
 
-  private static final Map<String, String> KNOWN_PREFIXES;
+  public static final Map<String, String> KNOWN_PREFIXES;
   static
   {
     KNOWN_PREFIXES = new HashMap<String, String>();
