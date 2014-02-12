@@ -79,6 +79,14 @@
         <artifactId>camunda-ejb-client</artifactId>
         <version>${project.version}</version>
       </dependency>
+      
+      <!-- BPMN Model API -->
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-bpmn-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      
     </dependencies>
   </dependencyManagement>
 
