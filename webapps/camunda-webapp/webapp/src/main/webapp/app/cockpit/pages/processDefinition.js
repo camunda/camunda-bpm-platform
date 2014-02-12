@@ -11,10 +11,7 @@ ngDefine('cockpit.pages.processDefinition', [
 
   var Controller = [
     '$scope',
-    '$rootScope',
-    '$q',
     'search',
-    'Notifications',
     'ProcessDefinitionResource',
     'ProcessInstanceResource',
     'Views',
@@ -26,10 +23,7 @@ ngDefine('cockpit.pages.processDefinition', [
     'page',
   function(
     $scope,
-    $rootScope,
-    $q,
     search,
-    Notifications,
     ProcessDefinitionResource,
     ProcessInstanceResource,
     Views,
