@@ -212,6 +212,14 @@ public interface ModelElementInstance {
   Collection<ModelElementInstance> getChildElementsByType(ModelElementType childElementType);
 
   /**
+   * Return all child elements of a given type
+   *
+   * @param childElementClass  the class of the child element type to search for
+   * @return a collection of elements to the given type
+   */
+  <T extends ModelElementInstance> Collection<T> getChildElementsByType(Class<T> childElementClass);
+
+  /**
    * Inserts the new element after the given element or at the beginning if the given element is null.
    *
    * @param elementToInsert  the new element to insert

@@ -90,4 +90,12 @@ public interface ModelInstance {
    */
   Collection<ModelElementInstance> getModelElementsByType(ModelElementType referencingType);
 
+  /**
+   * Find all elements of a type.
+   *
+   * @param referencingClass  the type class of the elements
+   * @return the collection of elements of the type
+   */
+  <T extends ModelElementInstance> Collection<T> getModelElementsByType(Class<T> referencingClass);
+
 }

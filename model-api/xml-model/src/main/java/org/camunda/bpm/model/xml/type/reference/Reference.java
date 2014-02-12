@@ -15,6 +15,8 @@ package org.camunda.bpm.model.xml.type.reference;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 
+import java.util.Collection;
+
 /**
  *
  * @author Sebastian Menski
@@ -37,4 +39,11 @@ public interface Reference<T extends ModelElementInstance> {
 
   Attribute<String> getReferenceTargetAttribute();
 
+  /**
+   * Find all reference source element instances of the reference target model element instance
+   *
+   * @param referenceTargetElement the reference target model element instance
+   * @return the collection of all reference source element instances
+   */
+  Collection<ModelElementInstance> findReferenceSourceElements(ModelElementInstance referenceTargetElement);
 }

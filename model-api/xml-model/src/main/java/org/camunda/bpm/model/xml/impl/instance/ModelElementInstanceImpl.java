@@ -260,6 +260,11 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
     return instances;
   }
 
+  @SuppressWarnings("unchecked")
+  public <T extends ModelElementInstance> Collection<T> getChildElementsByType(Class<T> childElementClass) {
+    return (Collection<T>) getChildElementsByType(getModelInstance().getModel().getType(childElementClass));
+  }
+
   /**
    * Returns the element after which the new element should be inserted in the DOM document.
    *
