@@ -18,6 +18,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -27,12 +28,16 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
 
 @Path(HistoricProcessInstanceRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface HistoricProcessInstanceRestService {
 
   public static final String PATH = "/process-instance";
+
+  @Path("/{id}")
+  HistoricProcessInstanceResource getHistoricProcessInstance(@PathParam("id") String processInstanceId);
 
   /**
    * Exposes the {@link HistoriProcessInstanceQuery} interface as a REST
