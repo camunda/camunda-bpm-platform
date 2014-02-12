@@ -472,7 +472,7 @@ module.exports = function(grunt) {
     }
 
     grunt.task.run([
-      'build',
+      'build:development',
       'open',
       'watch'
     ]);
@@ -480,7 +480,6 @@ module.exports = function(grunt) {
 
   // Aimed to hold more complex build processes
   grunt.registerTask('build', 'Build the frontend assets', function(target) {
-    console.info();
     var tasks = [
       'clean',
       'bower'
