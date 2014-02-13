@@ -1,22 +1,24 @@
-ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, angular, $) {
+/* global ngDefine: false */
+ngDefine('camunda.common.directives.requestAware', [ 'angular', 'jquery' ], function(module, angular, $) {
+  'use strict';
 
-  var requestAwareDirective = [ function() {    
+  var requestAwareDirective = [ function() {
     return {
       require: 'form',
 
       link: function(scope, element, attrs, ngForm) {
 
         function setFormValidity(valid) {
-          ngForm.$setValidity("request", valid);
+          ngForm.$setValidity('request', valid);
         }
 
         function setFormFieldsEnabled(enabled) {
-          var inputs = $(":input", element);
+          var inputs = $(':input', element);
 
           if (!enabled) {
-            inputs.attr("disabled", "disabled");
+            inputs.attr('disabled', 'disabled');
           } else {
-            inputs.removeAttr("disabled");
+            inputs.removeAttr('disabled');
           }
         }
 
@@ -38,7 +40,7 @@ ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, 
         scope.$on('formLoadStarted', function() {
           setFormEnabled(false);
         });
-        
+
         scope.$on('formLoadFinished', function() {
           setFormEnabled(true);
         });

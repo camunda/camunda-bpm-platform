@@ -11,7 +11,8 @@
       urlArgs:    rjsConf.urlArgs,
       paths:      rjsConf.paths,
       shim:       rjsConf.shim,
-      packages:   rjsConf.packages.concat(pluginPackages)
+      packages:   rjsConf.packages.concat(pluginPackages),
+      urlArgs:    'bust='+ (new Date()).getTime()
     });
 
     require([

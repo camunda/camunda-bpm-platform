@@ -1,28 +1,45 @@
+/* global process: false, require: false, module: false, __dirname: false */
+'use strict';
+/* jshint unused: false */
+
+/**
+  This file is used to configure the [grunt](http://gruntjs.com/) tasks
+  aimed to generate the web frontend of the camunda BPM platform.
+  @author Valentin Vago <valentin.vago@camunda.com>
+  @author Nico Rehwaldt  <nico.rehwaldt@camunda.com>
+ */
+
+var spawn = require('child_process').spawn;
 var path = require('path');
 var fs = require('fs');
 var _ = require('underscore');
 
-var rjsConf = require('./src/main/webapp/require-conf');
-
-var commentLineExp = /^[\s]*<!-- (\/|#) (CE|EE)/;
-var requireConfExp = /require-conf.js$/;
+var commentLineExp =  /^[\s]*<!-- (\/|#) (CE|EE)/;
+var htmlFileExp =     /\.html$/;
+var requireConfExp =  /require-conf.js$/;
+var seleniumJarNameExp = /selenium-server-standalone/;
 
 function distFileProcessing(content, srcpath) {
-  // removes the template comments
-  content = content
-            .split('\n').filter(function(line) {
-              return !commentLineExp.test(line);
-            }).join('\n');
-
-  var date = new Date();
-  var cacheBuster = [date.getFullYear(), date.getMonth(), date.getDate()].join('-');
-  content = content
-            .replace(/\/\* cache-busting /, '/* cache-busting */')
-            .replace(/CACHE_BUSTER/g, requireConfExp.test(srcpath) ? '\''+ cacheBuster +'\'' : cacheBuster);
+  if (htmlFileExp.test(srcpath)) {
+    // removes the template comments
+    content = content
+              .split('\n').filter(function(line) {
+                return !commentLineExp.test(line);
+              }).join('\n');
+  }
 
   return content;
 }
 
+function standaloneSeleniumJar() {
+  if (!fs.existsSync('selenium')) {
+    return false;
+  }
+  var filename = _.find(fs.readdirSync('selenium'), function(filename) {
+    return seleniumJarNameExp.test(filename);
+  });
+  return path.join(__dirname, 'selenium', filename);
+}
 
 module.exports = function(grunt) {
 
@@ -40,7 +57,8 @@ module.exports = function(grunt) {
 
     app: {
       port: parseInt(process.env.APP_PORT || 8080, 10),
-      liveReloadPort: parseInt(process.env.LIVERELOAD_PORT || 8081, 10)
+      liveReloadPort: parseInt(process.env.LIVERELOAD_PORT || 8081, 10),
+      standaloneSeleniumJar: standaloneSeleniumJar
     },
 
     clean: {
@@ -74,25 +92,30 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'src/main/webapp/',
             src: [
-              '{app,plugin,develop,common}/{,**/}*.{js,html}'
+              '{app,plugin,develop,common}/**/*.{js,html}'
             ],
             dest: 'target/webapp/'
           }
         ],
         options: {
           process: function(content, srcpath) {
+            // Unfortunately, this might (in some cases) make angular complaining
+            // about template having no single root element
+            // (when the "replace" option is set to "true").
 
-            var liveReloadPort = grunt.config('app.liveReloadPort');
+            // if (htmlFileExp.test(srcpath)) {
+            //   content = '<!-- # CE - auto-comment - '+ srcpath +' -->\n'+
+            //             content +
+            //             '\n<!-- / CE - auto-comment - '+ srcpath +' -->';
+            // }
 
             if (requireConfExp.test(srcpath)) {
               content = content
-                        .replace(/\/\* live-reload/, '/* live-reload */')
-                        .replace(/LIVERELOAD_PORT/g, liveReloadPort);
+                // .replace(/CACHE_BUST/, 'bust='+ (new Date()).getTime())
+                .replace(/\/\* live-reload/, '/* live-reload */')
+                .replace(/LIVERELOAD_PORT/g, grunt.config('app.liveReloadPort'));
             }
 
-            content = content
-                      .replace(/\/\* cache-busting/, '/* cache-busting */')
-                      .replace(/CACHE_BUSTER/g, (new Date()).getTime());
             return content;
           }
         }
@@ -118,7 +141,7 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'src/main/webapp/',
             src: [
-              '{app,plugin,develop,common}/{,**/}*.{js,html}'
+              '{app,plugin,develop,common}/**/*.{js,html}'
             ],
             dest: 'target/webapp/'
           }
@@ -148,20 +171,6 @@ module.exports = function(grunt) {
             dest: 'target/webapp/assets'
           }
         ]
-      },
-
-      // TODO: remove that when using less
-      css: {
-        files: [
-          {
-            expand: true,
-            cwd: 'src/main/webapp/assets',
-            src: [
-              'css/**/*'
-            ],
-            dest: 'target/webapp/assets'
-          }
-        ]
       }
     },
 
@@ -177,32 +186,35 @@ module.exports = function(grunt) {
           'src/main/webapp/{app,develop,plugin,common}/**/*.{js,html}'
         ],
         tasks: [
-          // 'jshint:scripts',
+          'newer:jshint:scripts',
           'newer:copy:development'
-          // 'copy:development'
         ]
       },
 
-      // watch for source script and test changes
-      // QUESTION:
-      // Does that entry make sense?
-      // We can use `karma:unit` and `karma:e2e` instead of watching
-      // tests: {
-      //   files: [
-      //     'src/main/webapp/require-conf.js',
-      //     'src/main/webapp/{app,develop,plugin,common}/**/*.{js,html}',
-      //     'src/test/js/{config,e2e,test,unit}/{,**/}*.js'
-      //   ],
-      //   tasks: [
-      //     // 'jshint:test',
-      //     // we use the CI versions (who are runned only once)
-      //     // 'karma:testOnce',
-      //     'karma:unitOnce',
-      //     'karma:e2eOnce'
-      //   ]
-      // },
+      unitTests: {
+        files: [
+          'src/main/webapp/require-conf.js',
+          'src/main/webapp/{app,develop,plugin,common}/**/*.{js,html}',
+          'src/test/js/{config,test,unit}/**/*.js'
+        ],
+        tasks: [
+          'newer:jshint:unitTest',
+          'karma:test',
+          'karma:unit'
+        ]
+      },
 
-      // TODO: add that when using less
+      e2eTests: {
+        // runs only when the tests are modified
+        files: [
+          './../../../qa/integration-tests-webapps/src/test/javascript/e2e/**/*.js'
+        ],
+        tasks: [
+          'newer:jshint:e2eTest',
+          'test:e2e'
+        ]
+      },
+
       styles: {
         files: [
           'src/main/webapp/assets/styles/**/*.less'
@@ -211,17 +223,6 @@ module.exports = function(grunt) {
           'less:development'
         ]
       },
-
-      // TODO: remove that when using less
-      // css: {
-      //   files: [
-      //     'src/main/webapp/assets/css/**/*.css'
-      //   ],
-      //   tasks: [
-      //     'newer:copy:css'
-      //     // 'copy:css'
-      //   ]
-      // },
 
       servedAssets: {
         options: {
@@ -235,62 +236,133 @@ module.exports = function(grunt) {
       }
     },
 
-    // jshint: {
-    //   options: {
-    //     browser: true,
-    //     globals: {
-    //       angular: true,
-    //       jQuery: true
-    //     }
-    //   },
-    //   test: {
-    //     files: {
-    //       src: [
-    //         'test/js/{config,e2e,unit}/{,**/}*.js'
-    //       ]
-    //     }
-    //   },
-    //   scripts: {
-    //     files: {
-    //       src: [
-    //         'Gruntfile.js',
-    //         'src/main/webapp/{app,assets,develop,plugin}/{,**/}*.js'
-    //       ]
-    //     }
-    //   }
-    // },
+    jshint: {
+      options: {
+        browser: true,
+        globals: {
+          angular:  false,
+          jQuery:   false,
+          ngDefine: false
+        }
+      },
 
-    // karma: {
-    //   options: {
-    //     browsers: ['Chrome', 'Firefox']//, 'IE']
-    //   },
+      unitTest: {
+        files: {
+          src: [
+            // 'src/test/js/{config,test,unit}/**/*.js'
+          ]
+        }
+      },
 
-    //   // to test the testing environment
-    //   test: {
-    //     configFile: 'src/test/js/config/karma.test.js'
-    //   },
+      e2eTest: {
+        files: {
+          src: [
+            // 'src/test/js/e2e/**/*.js'
+          ]
+        }
+      },
 
-    //   unit: {
-    //     configFile: 'src/test/js/config/karma.unit.js'
-    //   },
-    //   e2e: {
-    //     configFile: 'src/test/js/config/karma.e2e.js'
-    //   },
+      scripts: {
+        files: {
+          src: [
+            'Gruntfile.js',
+            // 'src/main/webapp/{app,assets,develop,plugin}/**/*.js'
+          ]
+        }
+      }
+    },
 
-    //   //continuous integration mode: run tests once in PhantomJS browser.
-    //   unitOnce: {
-    //     singleRun: true,
-    //     autoWatch: false,
-    //     configFile: 'src/test/js/config/karma.unit.js',
-    //     browsers: ['PhantomJS']
-    //   },
-    //   e2eOnce: {
-    //     singleRun: true,
-    //     autoWatch: false,
-    //     configFile: 'src/test/js/config/karma.e2e.js',
-    //     browsers: ['PhantomJS']
-    //   }
-    // },
+    karma: {
+      // to test the testing environment
+      test: {
+        configFile: 'src/test/js/config/karma.test.js'
+      },
+
+      unit: {
+        configFile: 'src/test/js/config/karma.unit.js'
+      }
+    },
+
+    // https://www.npmjs.org/package/grunt-protractor-runner
+    protractor: {
+      options: {
+        singleRun: true,
+        // config like in *.conf.js
+        args: {
+          // use a function(!!!) to determine the path of selenium standalone web-driver
+          seleniumServerJar: '<%= app.standaloneSeleniumJar() %>',
+          specs: [
+            './../../../qa/integration-tests-webapps/src/test/javascript/e2e/**/*.js'
+          ],
+
+          capabilities: {
+            browserName: 'chrome'
+          },
+
+          // // If you would like to run more than one instance of webdriver on the same
+          // // tests, use multiCapabilities, which takes an array of capabilities.
+          // // If this is specified, capabilities will be ignored.
+          // multiCapabilities: [
+          //   {
+          //     browserName: 'chrome'
+          //   },
+          //   {
+          //     browserName: 'phantomjs'
+          //   }
+          // ],
+
+          baseUrl: 'http://localhost:8080',
+
+          // ----- The test framework -----
+          //
+          // Jasmine is fully supported as a test and assertion framework.
+          // Mocha has limited beta support. You will need to include your own
+          // assertion framework if working with mocha.
+          framework: 'jasmine',
+
+          // ----- Options to be passed to minijasminenode -----
+          //
+          // Options to be passed to Jasmine-node.
+          // See the full list at https://github.com/juliemr/minijasminenode
+          jasmineNodeOpts: {
+            defaultTimeoutInterval: 15000, // Default time to wait in ms before a test fails.
+            showColors: true, // Use colors in the command line report.
+            includeStackTrace: true, // If true, include stack traces in failures.
+          }
+        }
+      },
+
+      admin: {
+        options:{
+          args: {
+            baseUrl: 'http://localhost:8080',
+            specs: [
+              './../../../qa/integration-tests-webapps/src/test/javascript/e2e/admin/**/*.js'
+            ]
+          }
+        }
+      },
+      cockpit: {
+        options:{
+          args: {
+            baseUrl: 'http://localhost:8080',
+            specs: [
+              './../../../qa/integration-tests-webapps/src/test/javascript/e2e/cockpit/**/*.js'
+            ]
+          }
+        }
+      },
+      tasklist: {
+        options:{
+          args: {
+            baseUrl: 'http://localhost:8080',
+            specs: [
+              './../../../qa/integration-tests-webapps/src/test/javascript/e2e/tasklist/**/*.js'
+            ]
+          }
+        }
+      }
+    },
 
     jsdoc : {
       dist : {
@@ -301,8 +373,11 @@ module.exports = function(grunt) {
           'src/main/webapp/develop',
           'src/main/webapp/plugin'
         ],
+
         options: {
-          configure: './jsdoc-conf.json',
+          // grunt-jsdoc has a big problem... some kind of double-parsing...
+          // using the `jsdoc -d doc -r -c jsdoc-conf.json` command works fine
+          // configure: './jsdoc-conf.json',
           destination: 'doc'
         }
       }
@@ -310,78 +385,6 @@ module.exports = function(grunt) {
 
     bower: {
       install: {}
-    },
-
-    requirejs: {
-    // ngr: {
-      // see https://github.com/jrburke/r.js/blob/master/build/example.build.js
-      options: {
-        baseUrl: 'src/main/webapp',
-
-        dir: 'target/webapp',
-
-        // Inlines the text for any text! dependencies, to avoid the separate
-        // async XMLHttpRequest calls to load those dependencies.
-        inlineText: true,
-
-        optimize: 'none',
-
-        paths: rjsConf.paths,
-        shim: rjsConf.shim,
-
-        // CommonJS packages support
-        // http://requirejs.org/docs/api.html#packages
-        packages: rjsConf.packages,
-
-        //
-        optimizeCss: 'none'
-      },
-
-      app: {
-        modules: [{
-          name: 'src/main/webapp/app/app',
-          out: 'app/app.js',
-          override: {},
-          exclude: [
-            'ngDefine'
-          ]
-        }]
-      },
-
-      admin: {
-        modules: [{
-          name: 'app/admin/admin',
-          out: 'app/admin.min.js',
-          override: {},
-          exclude: []
-        }]
-      },
-
-      cockpit: {
-        modules: [
-          {
-            name: 'app/cockpit/cockpit',
-            out: 'app/cockpit.min.js',
-            override: {},
-            exclude: []
-          }
-        ]
-      },
-
-      tasklist: {
-        modules: [{
-          name: 'src/main/webapp/app/tasklist/tasklist',
-          out: 'app/tasklist.js',
-          override: {},
-          exclude: []
-        }]
-      }
-    },
-
-    open: {
-      server: {
-        url: 'http://localhost:<%= app.port %>/camunda'
-      }
     },
 
     less: {
@@ -409,29 +412,46 @@ module.exports = function(grunt) {
           'target/webapp/assets/css/tasklist/loader.css': 'src/main/webapp/assets/styles/tasklist/loader.less'
         }
       }
+    },
+
+    open: {
+      server: {
+        url: 'http://localhost:<%= app.port %>/camunda'
+      }
     }
   });
 
-  // custom task for ngDefine minification
-  grunt.registerMultiTask('ngr', 'Minifies the angular related scripts', function() {
+  grunt.registerTask('selenium-install', 'Automate the selenium webdriver installation', function() {
     var done = this.async();
-    var ngr = require('requirejs-angular-define/src/ngr');
+    var stdout = '';
+    var stderr = '';
 
-    var setup = _.extend({}, this.options(), this.data);
-    // console.info('ngr options', setup);
+    var managerPath = './node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager';
+    var args = [
+      'update',
+      '--out_dir',
+      __dirname +'/selenium'
+    ];
 
-    ngr.optimize(setup, function() {
-      console.info('optimized', arguments.length);
+    grunt.log.writeln('selenium-install runs: '+ managerPath +' '+ args.join(' '));
+
+    var install = spawn(managerPath, args);
+
+    install.stdout.on('data', function(data) { stdout += data; });
+    install.stderr.on('data', function(data) { stderr += data; });
+
+    install.on('exit', function (code) {
+      if (code) {
+        return done(new Error('selenium-install exit with code: '+ code));
+      }
+
+      grunt.log.writeln('selenium standalone server installed');
       done();
-    }, function(e) {
-      console.log('Error during minify: ', e);
-      done(new Error('With failures: ' + e));
     });
   });
 
   // automatically (re-)build web assets
   grunt.registerTask('auto-build', 'Continuously (re-)build front-end assets', function (target) {
-
     if (target === 'dist') {
       throw new Error('dist target not yet supported');
     }
@@ -443,9 +463,33 @@ module.exports = function(grunt) {
     ]);
   });
 
+  grunt.registerTask('test', 'Run the tests (by default: karma:unit)', function(target, set) {
+    var tasks = [];
+
+    switch (target) {
+      // test the testing environment
+      case 'test':
+        tasks.push('karma:test');
+        break;
+
+      // should use protractor
+      case 'e2e':
+        tasks.push('selenium-install');
+        tasks.push('protractor'+ (set ? ':'+ set : ''));
+        break;
+
+      // unit testing by default
+      default:
+        tasks.push('karma:unit');
+    }
+
+
+    return grunt.task.run(tasks);
+  });
+
   // Aimed to hold more complex build processes
   grunt.registerTask('build', 'Build the frontend assets', function(target) {
-    var tasks = [
+    var defaultTasks = [
       'clean',
       'bower'
     ];
@@ -455,23 +499,22 @@ module.exports = function(grunt) {
       // - Minifaction: https://app.camunda.com/jira/browse/CAM-1667
       // - Bug in ngDefine: https://app.camunda.com/jira/browse/CAM-1713
 
-      tasks = tasks.concat([
+      return grunt.task.run(defaultTasks.concat([
         'copy:assets',
-        'copy:dist'
-      ]);
+        'copy:production'
+      ]));
     }
 
+    // tasks.push('newer:less:'+ this.target);
+    // tasks.push('less:'+ this.target);
 
-    tasks = tasks.concat([
-      'less:'+ target,
+    return grunt.task.run(defaultTasks.concat([
       'newer:copy:assets',
-      'newer:copy:'+ target
-    ]);
-
-    return grunt.task.run(tasks);
+      'newer:copy:development'
+      // 'copy:assets',
+      // 'copy:development'
+    ]));
   });
-
-  grunt.registerTask('test', []);
 
   // Default task(s).
   grunt.registerTask('default', ['build:dist']);

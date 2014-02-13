@@ -1,7 +1,9 @@
+/* global ngDefine: false */
 ngDefine('camunda.common.services', function(module) {
+  'use strict';
 
-  var HttpStatusInterceptorFactory = 
-    [ '$rootScope', '$q', 'RequestLogger', 
+  var HttpStatusInterceptorFactory =
+    [ '$rootScope', '$q', 'RequestLogger',
       function($rootScope, $q, RequestLogger) {
 
     return function(promise) {

@@ -1,11 +1,13 @@
-ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
+/* global ngDefine: false */
+ngDefine('camunda.common.directives.help', [ 'jquery' ], function(module, $) {
+  'use strict';
 
   var Directive = function() {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        var help = attrs.helpText || scope.$eval(attrs["helpTextVar"]);
-        var p = "right";
+        var help = attrs.helpText || scope.$eval(attrs.helpTextVar);
+        var p = 'right';
 
         if (attrs.helpPlacement) {
           p = scope.$eval(attrs.helpPlacement);
@@ -14,24 +16,26 @@ ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
         var shown;
 
         function show() {
-          var e = this;
+          /*jshint validthis: true */
+          var self = this;
 
           // optimization to work correctly with menues
-          if ($(e).is('.open')) {
+          if ($(self).is('.open')) {
             return;
           }
 
           shown = true;
-          
+
           setTimeout(function() {
             if (shown) {
-              $(e).tooltip('show');
+              $(self).tooltip('show');
             }
           }, 200);
         }
 
         function hide() {
           shown = false;
+          /*jshint validthis: true */
           $(this).tooltip('hide');
         }
 
@@ -43,6 +47,6 @@ ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
     };
   };
 
-  module.directive("help", Directive);
+  module.directive('help', Directive);
 
 });

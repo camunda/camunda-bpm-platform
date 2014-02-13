@@ -10,3 +10,4 @@ test-results.xml
 /src/main/webapp/assets/_css
 /src/main/webapp/assets/vendor
 /doc
+/selenium

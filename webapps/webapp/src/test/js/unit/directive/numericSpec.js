@@ -1,12 +1,19 @@
-define([ 'angular', 'jquery', 'cockpit/directives/numeric' ], function(angular, $) {
+/* global define: false, describe: false, xdescribe: false, beforeEach: false, afterEach: false, module: false, inject: false, xit: false, it: false, expect: false */
+/* jshint unused: false */
+define([
+  'angular',
+  'jquery',
+  'cockpit/directives/numeric'
+], function(angular, $) {
+  'use strict';
 
   /**
    * @see http://docs.angularjs.org/guide/dev_guide.unit-testing
    *      for how to write unit tests in AngularJS
    */
   return describe('directives', function() {
-
-    describe('numeric directive', function() {
+    /* global browserTrigger: false */
+    xdescribe('numeric directive', function() {
       var element;
 
       function createElement(content) {
@@ -15,6 +22,7 @@ define([ 'angular', 'jquery', 'cockpit/directives/numeric' ], function(angular, 
 
       afterEach(function() {
         $(document.body).html('');
+        /* global dealoc: false */
         dealoc(element);
       });
 
@@ -131,7 +139,7 @@ define([ 'angular', 'jquery', 'cockpit/directives/numeric' ], function(angular, 
         expect(element.hasClass('ng-invalid-numeric')).toBe(false);
         expect(element.hasClass('ng-valid')).toBe(true);
         expect($rootScope.value).toBe(1.7976931348623157e+308);
-      }));      
+      }));
 
       it('should mark float input as invalid (1)', inject(function($rootScope, $compile, $sniffer) {
         // given
@@ -167,7 +175,7 @@ define([ 'angular', 'jquery', 'cockpit/directives/numeric' ], function(angular, 
         expect(element.hasClass('ng-invalid-numeric')).toBe(true);
         expect(element.hasClass('ng-valid')).toBe(false);
         expect(isNaN($rootScope.value)).toBe(true);
-      }));    
+      }));
 
       it('should mark float input as invalid (3)', inject(function($rootScope, $compile, $sniffer) {
         // given
@@ -185,7 +193,7 @@ define([ 'angular', 'jquery', 'cockpit/directives/numeric' ], function(angular, 
         expect(element.hasClass('ng-invalid-numeric')).toBe(true);
         expect(element.hasClass('ng-valid')).toBe(false);
         expect($rootScope.value).toBe(7);
-      })); 
+      }));
 
       it('should mark float input as invalid (4)', inject(function($rootScope, $compile, $sniffer) {
         // given
@@ -203,7 +211,7 @@ define([ 'angular', 'jquery', 'cockpit/directives/numeric' ], function(angular, 
         expect(element.hasClass('ng-invalid-numeric')).toBe(true);
         expect(element.hasClass('ng-valid')).toBe(false);
         expect($rootScope.value).toBe(7.1);
-      }));     
+      }));
 
       it('should mark float input as invalid (5)', inject(function($rootScope, $compile, $sniffer) {
         // given
@@ -221,7 +229,7 @@ define([ 'angular', 'jquery', 'cockpit/directives/numeric' ], function(angular, 
         expect(element.hasClass('ng-invalid-numeric')).toBe(true);
         expect(element.hasClass('ng-valid')).toBe(false);
         expect($rootScope.value).toBe(7.1);
-      }));  
+      }));
 
       it('should mark float input as invalid (6)', inject(function($rootScope, $compile, $sniffer) {
         // given
@@ -239,7 +247,7 @@ define([ 'angular', 'jquery', 'cockpit/directives/numeric' ], function(angular, 
         expect(element.hasClass('ng-invalid-numeric')).toBe(true);
         expect(element.hasClass('ng-valid')).toBe(false);
         expect($rootScope.value).toBe(7.1);
-      })); 
+      }));
 
       it('should mark float input as invalid (7)', inject(function($rootScope, $compile, $sniffer) {
         // given
@@ -258,7 +266,7 @@ define([ 'angular', 'jquery', 'cockpit/directives/numeric' ], function(angular, 
         expect(element.hasClass('ng-valid')).toBe(false);
         expect($rootScope.value).toBe(7);
       }));
-   
+
     });
   });
 });

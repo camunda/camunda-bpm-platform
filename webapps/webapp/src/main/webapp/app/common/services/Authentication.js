@@ -1,5 +1,5 @@
 /* global ngDefine: false */
-ngDefine('camunda.common.services.authentication', function(module) {
+ngDefine('camunda.common.services.authentication', ['angular', 'jquery'], function(module, angular, $) {
   'use strict';
 
   /**
@@ -16,9 +16,9 @@ ngDefine('camunda.common.services.authentication', function(module) {
       user = null;
     }
 
-    function loaded() {
-      return loaded;
-    }
+    // function loaded() {
+    //   return loaded;
+    // }
 
     function username() {
       return user ? user.name : null;
@@ -83,11 +83,11 @@ ngDefine('camunda.common.services.authentication', function(module) {
       }
 
       function login(username, password) {
-        var form = $.param({ 'username': username, 'password': password });
-
+        var data = { 'username': username, 'password': password };
+        var form = $.param(data);
         var promise = $http({
           method: 'POST',
-          url: Uri.appUri("admin://auth/user/:engine/login/:appName"),
+          url: Uri.appUri('admin://auth/user/:engine/login/:appName'),
           data: form,
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -99,15 +99,14 @@ ngDefine('camunda.common.services.authentication', function(module) {
             Authentication.update(user);
           }
 
-          return user != null;
-        }, function(error) {
+          return user !== null;
+        }, function() {
           return false;
         });
       }
 
       function logout() {
         var promise = $http.post(Uri.appUri('admin://auth/user/:engine/logout'));
-
         return promise.then(function() {
           Authentication.clear();
 
@@ -160,7 +159,7 @@ ngDefine('camunda.common.services.authentication', function(module) {
 
         return promise.then(function(username) {
           return username;
-        }, function(error) {
+        }, function() {
           return null;
         });
       }

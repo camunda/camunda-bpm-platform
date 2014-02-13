@@ -10,7 +10,7 @@ module.exports = function(karma) {
     ],
 
     files: [
-      { pattern: 'target/webapp{,/**}/*.js', included: false },
+      { pattern: 'target/webapp/**/*.js', included: false },
 
       'src/test/js/config/require-test-bootstrap.js',
       { pattern: 'src/test/js/test/**/*.js', included: false },
@@ -18,7 +18,8 @@ module.exports = function(karma) {
 
     browsers: ['PhantomJS'],
 
-    autoWatch: true,
+    singleRun: true,
+    autoWatch: false,
 
     // junitReporter: {
     //   outputFile: '../../../../target/failsafe-reports/e2e.xml',
