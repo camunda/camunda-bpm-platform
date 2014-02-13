@@ -93,17 +93,19 @@ public class XmlQName {
         if (lookupPrefix == null && rootElement != null) {
           // if no prefix is found we generate a new one
           // search for known prefixes
-          lookupPrefix = KNOWN_PREFIXES.get(namespaceUri);
-          if (lookupPrefix == "") {
+         String knownPrefix = KNOWN_PREFIXES.get(namespaceUri);
+          if (knownPrefix == null) {
+            // generate namespace
+            return rootElement.registerNamespace(namespaceUri);
+          }
+          else if (knownPrefix.isEmpty()) {
             // ignored namespace
             return null;
           }
-          else if (lookupPrefix != null) {
-            rootElement.registerNamespace(lookupPrefix, namespaceUri);
-            return lookupPrefix;
-          }
           else {
-            return rootElement.registerNamespace(namespaceUri);
+            // register known prefix
+            rootElement.registerNamespace(knownPrefix, namespaceUri);
+            return knownPrefix;
           }
         }
         else {
