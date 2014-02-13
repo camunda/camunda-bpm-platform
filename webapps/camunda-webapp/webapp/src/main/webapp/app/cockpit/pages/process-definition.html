@@ -53,7 +53,7 @@
                 <a href ng-click="addStartDateFilter()">
                   by start date
                 </a>
-              </li>              
+              </li>
             </ul>
           </div>
         </h5>
@@ -134,23 +134,25 @@
                         ng-change="dateFilterTypeChanged(filterForm['startDateFilterType0'], filterForm['startDateFilterType1'])">
                 </select>
 
-                <input type="text"
-                       date
-                       required
-                       ng-change="filterChanged()"
-                       ng-model="date.value"
-                       cam-dynamic-name="startDateFilterValue{{$index}}" />
+                <div class="removable-input">
+                  <input type="text"
+                         date
+                         required
+                         ng-change="filterChanged()"
+                         ng-model="date.value"
+                         cam-dynamic-name="startDateFilterValue{{$index}}" />
 
-                <button class="btn btn-link btn-mini btn-control remove-date-filter"
-                        ng-click="removeStartDateFilter(date)">
-                  <i class="icon-remove"></i>
-                </button>
+                  <button class="btn btn-link btn-mini btn-control remove-date-filter"
+                          ng-click="removeStartDateFilter(date)">
+                    <i class="icon-remove"></i>
+                  </button>
+                </div>
 
                 <div class="note note-error note-small" ng-if="filterForm['startDateFilterValue' + $index].$invalid">
                   <div ng-show="filterForm['startDateFilterValue' + $index].$error.required">
                     Field is required.
                   </div>
-               
+
                   <div ng-show="filterForm['startDateFilterValue' + $index].$error.date && !filterForm['startDateFilterValue' + $index].$error.required">
                     Syntax for a date is <code>yyyy-MM-ddTHH:mm:ss</code>.
                   </div>
@@ -161,7 +163,7 @@
               <div class="note note-error note-small" ng-if="filterForm['startDateFilterType0'].$invalid && filterForm['startDateFilterType1'].$invalid">
                 <div ng-show="filterForm['startDateFilterType0'].$error.dateTypeEqual && filterForm['startDateFilterType1'].$error.dateTypeEqual">
                   The combination <code>after/before</code> is only allowed.
-                </div>              
+                </div>
               </div>
 
               <button class="btn btn-mini pull-right"
