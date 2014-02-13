@@ -1,5 +1,5 @@
 /* global ngDefine: false */
-ngDefine('camunda.common.directives.engine', [
+ngDefine('camunda.common.directives.engineSelect', [
   'angular',
   'require',
   'jquery'

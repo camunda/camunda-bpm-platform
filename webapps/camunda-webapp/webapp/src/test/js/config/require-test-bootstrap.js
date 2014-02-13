@@ -1,5 +1,8 @@
+/* global require: false, ngDefine: false, console: false */
 (function(document, window, require) {
-  var pluginPackages = window.PLUGIN_PACKAGES || [];
+  'use strict';
+
+  // var pluginPackages = window.PLUGIN_PACKAGES || [];
   var projectTestExp = /^\/base\/src\/test\/js.*Spec\.js$/;
 
   require([
@@ -29,7 +32,7 @@
       'angular-resource',
       'angular-sanitize',
       'angular-mocks',
-      'requirejs-angular-define'
+      'ngDefine'
     ], function(angular, $) {
 
       ngDefine.debug = true;
