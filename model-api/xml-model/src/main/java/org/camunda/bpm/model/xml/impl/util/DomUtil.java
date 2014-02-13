@@ -12,15 +12,6 @@
  */
 package org.camunda.bpm.model.xml.impl.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.camunda.bpm.model.xml.ModelParseException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.DomDocumentImpl;
@@ -31,7 +22,18 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Helper methods which abstract some gruesome DOM specifics.
@@ -177,6 +179,30 @@ public final class DomUtil {
     return filterNodeList(nodeList, new ElementByTypeListFilter(type, modelInstance));
   }
 
+  public static class DomErrorHandler implements ErrorHandler {
+
+    private static final Logger LOGGER = Logger.getLogger(DomErrorHandler.class.getName());
+
+    private String getParseExceptionInfo(SAXParseException spe) {
+      return "URI=" + spe.getSystemId() + " Line="
+        + spe.getLineNumber() + ": " + spe.getMessage();
+    }
+
+    public void warning(SAXParseException spe) {
+      LOGGER.warning(getParseExceptionInfo(spe));
+    }
+
+    public void error(SAXParseException spe) throws SAXException {
+      String message = "Error: " + getParseExceptionInfo(spe);
+      throw new SAXException(message);
+    }
+
+    public void fatalError(SAXParseException spe) throws SAXException {
+      String message = "Fatal Error: " + getParseExceptionInfo(spe);
+      throw new SAXException(message);
+    }
+  }
+
   /**
    * Get an empty DOM document
    *
@@ -185,9 +211,8 @@ public final class DomUtil {
    * @throws ModelParseException if unable to create a new document
    */
   public static DomDocument getEmptyDocument(DocumentBuilderFactory documentBuilderFactory) {
-    DocumentBuilder documentBuilder;
     try {
-      documentBuilder = documentBuilderFactory.newDocumentBuilder();
+      DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
       return new DomDocumentImpl(documentBuilder.newDocument());
     } catch (ParserConfigurationException e) {
       throw new ModelParseException("Unable to create a new document", e);
@@ -205,8 +230,8 @@ public final class DomUtil {
   public static DomDocument parseInputStream(DocumentBuilderFactory documentBuilderFactory, InputStream inputStream) {
     try {
       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+      documentBuilder.setErrorHandler(new DomErrorHandler());
       return new DomDocumentImpl(documentBuilder.parse(inputStream));
-
     } catch (ParserConfigurationException e) {
       throw new ModelParseException("ParserConfigurationException while parsing input stream", e);
 
