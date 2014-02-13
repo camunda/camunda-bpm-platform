@@ -1,12 +1,12 @@
-'use strict';
-
+/* global ngDefine: false */
 ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angular, require) {
-  
+  'use strict';
+
   var TEMPLATE_URL = require.toUrl('./activity-instance-tree.html');
 
-  var Directive = [ '$compile', '$http', '$templateCache', 
+  var Directive = [ '$compile', '$http', '$templateCache',
             function ($compile, $http, $templateCache) {
-    
+
     return {
       restrict: 'EAC',
       scope: {
@@ -14,8 +14,8 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
         onElementClick: '&',
         selection: '='
       },
-      link: function(scope, element, attrs, processDiagram) {
-        
+      link: function(scope, element /*, attrs, processDiagram */ ) {
+
         var $nodeElement = element;
 
         function withTemplate(fn) {
@@ -23,7 +23,7 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
             .success(function(content) {
               fn(content);
             }).error(function(response, code, headers, config) {
-              throw Error('Failed to load template: ' + config.url);
+              throw new Error('Failed to load template: ' + config.url);
             });
         }
 
@@ -52,7 +52,7 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
             node.isSelected = true;
           }
         });
-        
+
         scope.deselect = function($event) {
           $event.ctrlKey = true;
           scope.select($event);
@@ -64,15 +64,20 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
 
           $event.stopPropagation();
 
-          var ctrlKey = $event.ctrlKey;
+          // var ctrlKey = $event.ctrlKey;
 
-          scope.onElementClick({ id: node.id, activityId: node.activityId || node.targetActivityId, $event: $event });
+          scope.onElementClick({
+            id: node.id,
+            activityId: node.activityId || node.targetActivityId,
+            $event: $event
+          });
         };
 
         function createTreeNode(node) {
 
           withTemplate(function(template) {
-            node.isOpen = true;
+            // if finished, show collapsed
+            node.isOpen = node.endTime ? false : true;
 
             var newElement = angular.element(template);
             $compile(newElement)(scope);
@@ -82,8 +87,12 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
         }
 
         scope.propogateSelection = function (id, activityId, $event) {
-          scope.onElementClick({id: id, activityId: activityId, $event: $event});
-        }
+          scope.onElementClick({
+            id: id,
+            activityId: activityId,
+            $event: $event
+          });
+        };
 
         scope.toggleOpen = function() {
           var node = scope.node;
@@ -92,8 +101,8 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
       }
     };
   }];
-  
+
   module
     .directive('activityInstanceTree', Directive);
-  
+
 });
