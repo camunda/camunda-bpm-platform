@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * @author Tom Baeyens
@@ -75,6 +77,14 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     resource.setBytes(text.getBytes());
     deployment.addResource(resource);
     return this;
+  }
+
+  public DeploymentBuilder addModelInstance(String resourceName, BpmnModelInstance modelInstance) {
+    if (modelInstance == null) {
+      throw new ProcessEngineException("modelInstance is null");
+    }
+    String processText = Bpmn.convertToString(modelInstance);
+    return addString(resourceName, processText);
   }
 
   public DeploymentBuilder addZipInputStream(ZipInputStream zipInputStream) {
