@@ -52,11 +52,11 @@ public class ModelImpl implements Model {
   }
 
   public ModelElementType getTypeForName(String typeName) {
-    return getTypeForName(typeName, null);
+    return getTypeForName(null, typeName);
   }
 
-  public ModelElementType getTypeForName(String typeName, String namespaceUri) {
-    return typesByName.get(ModelUtil.getQName(typeName, namespaceUri));
+  public ModelElementType getTypeForName(String namespaceUri, String typeName) {
+    return typesByName.get(ModelUtil.getQName(namespaceUri, typeName));
   }
 
   /**
@@ -66,7 +66,7 @@ public class ModelImpl implements Model {
    * @param instanceType  the instance class of the type to register
    */
   public void registerType(ModelElementType modelElementType, Class<? extends ModelElementInstance> instanceType) {
-    QName qName = ModelUtil.getQName(modelElementType.getTypeName(), modelElementType.getTypeNamespace());
+    QName qName = ModelUtil.getQName(modelElementType.getTypeNamespace(), modelElementType.getTypeName());
     typesByName.put(qName, modelElementType);
     typesByClass.put(instanceType, modelElementType);
   }

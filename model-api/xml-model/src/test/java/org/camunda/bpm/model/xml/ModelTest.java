@@ -59,7 +59,7 @@ public class ModelTest {
   public void testGetTypeForName() {
     ModelElementType birdType = model.getTypeForName(ELEMENT_NAME_BIRD);
     assertThat(birdType).isNull();
-    birdType = model.getTypeForName(ELEMENT_NAME_BIRD, MODEL_NAMESPACE);
+    birdType = model.getTypeForName(MODEL_NAMESPACE, ELEMENT_NAME_BIRD);
     assertThat(birdType.getInstanceType()).isEqualTo(Bird.class);
   }
 

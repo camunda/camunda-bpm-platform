@@ -45,7 +45,7 @@ public final class ModelUtil {
       String namespaceUri = domElement.getNamespaceURI();
       String localName = domElement.getLocalName();
 
-      ModelElementTypeImpl modelType = (ModelElementTypeImpl) modelInstance.getModel().getTypeForName(localName, namespaceUri);
+      ModelElementTypeImpl modelType = (ModelElementTypeImpl) modelInstance.getModel().getTypeForName(namespaceUri, localName);
       if(modelType == null) {
         modelType = (ModelElementTypeImpl) modelInstance.registerGenericType(namespaceUri, localName);
       }
@@ -55,7 +55,7 @@ public final class ModelUtil {
     return modelElement;
   }
 
-  public static QName getQName(String localName, String namespaceUri) {
+  public static QName getQName(String namespaceUri, String localName) {
     return new QName(namespaceUri, localName);
   }
 

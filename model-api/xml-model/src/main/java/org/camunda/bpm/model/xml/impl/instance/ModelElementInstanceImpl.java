@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.model.xml.impl.instance;
 
+import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
@@ -21,6 +22,7 @@ import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.reference.Reference;
 
@@ -42,6 +44,13 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
   private final DomElement domElement;
   /** the implementing model element type */
   private final ModelElementTypeImpl elementType;
+
+  public static void registerType(ModelBuilder modelBuilder) {
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ModelElementInstance.class, "")
+      .abstractType();
+
+    typeBuilder.build();
+  }
 
   public ModelElementInstanceImpl(ModelTypeInstanceContext instanceContext) {
     this.domElement = instanceContext.getDomElement();

@@ -52,11 +52,12 @@ public interface Model {
   /**
    * Gets the defined {@link ModelElementType} for a type by its name and namespace URI.
    *
-   * @param typeName  the name of the type
+   *
    * @param namespaceUri  the namespace URI for the type
+   * @param typeName  the name of the type
    * @return the element type or null if no type is defined for the name and namespace URI
    */
-  ModelElementType getTypeForName(String typeName, String namespaceUri);
+  ModelElementType getTypeForName(String namespaceUri, String typeName);
 
   /**
    * Returns the model name, which is the identifier of this model.
