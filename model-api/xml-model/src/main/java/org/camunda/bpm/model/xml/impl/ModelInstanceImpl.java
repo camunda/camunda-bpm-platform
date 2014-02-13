@@ -83,7 +83,7 @@ public class ModelInstanceImpl implements ModelInstance {
     return model;
   }
 
-  public ModelElementType registerGenericType(String localName, String namespaceUri) {
+  public ModelElementType registerGenericType(String namespaceUri, String localName) {
     ModelElementType elementType = modelBuilder.defineGenericType(localName, namespaceUri);
     model = (ModelImpl) modelBuilder.build();
     return elementType;

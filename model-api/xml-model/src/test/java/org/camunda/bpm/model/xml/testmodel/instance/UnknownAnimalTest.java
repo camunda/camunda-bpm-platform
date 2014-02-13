@@ -75,7 +75,7 @@ public class UnknownAnimalTest {
   @Test
   public void testGetUnknownAnimalByType() {
     ModelInstanceImpl modelInstanceImpl = (ModelInstanceImpl) modelInstance;
-    ModelElementType unknownAnimalType = modelInstanceImpl.registerGenericType("unknownAnimal", MODEL_NAMESPACE);
+    ModelElementType unknownAnimalType = modelInstanceImpl.registerGenericType(MODEL_NAMESPACE, "unknownAnimal");
     List<ModelElementInstance> unknownAnimals = new ArrayList<ModelElementInstance>(modelInstance.getModelElementsByType(unknownAnimalType));
     assertThat(unknownAnimals).hasSize(2);
 
@@ -93,7 +93,7 @@ public class UnknownAnimalTest {
   @Test
   public void testAddUnknownAnimal() {
     ModelInstanceImpl modelInstanceImpl = (ModelInstanceImpl) modelInstance;
-    ModelElementType unknownAnimalType = modelInstanceImpl.registerGenericType("unknownAnimal", MODEL_NAMESPACE);
+    ModelElementType unknownAnimalType = modelInstanceImpl.registerGenericType(MODEL_NAMESPACE, "unknownAnimal");
     ModelElementType animalsType = modelInstance.getModel().getType(Animals.class);
     ModelElementType animalType = modelInstance.getModel().getType(Animal.class);
 

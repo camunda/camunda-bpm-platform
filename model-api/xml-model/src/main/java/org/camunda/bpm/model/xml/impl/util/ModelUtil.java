@@ -47,7 +47,7 @@ public final class ModelUtil {
 
       ModelElementTypeImpl modelType = (ModelElementTypeImpl) modelInstance.getModel().getTypeForName(localName, namespaceUri);
       if(modelType == null) {
-        modelType = (ModelElementTypeImpl) modelInstance.registerGenericType(localName, namespaceUri);
+        modelType = (ModelElementTypeImpl) modelInstance.registerGenericType(namespaceUri, localName);
       }
       modelElement = modelType.newInstance(modelInstance, domElement);
       domElement.setModelElementInstance(modelElement);
