@@ -263,14 +263,14 @@ ngDefine('cockpit.pages.processDefinition', [
 
       page.breadcrumbsAdd({
         type: 'processDefinition',
-        label: definition.name || definition.id,
+        label: definition.name || definition.key || definition.id,
         href: '#/process-definition/'+ definition.id +'/live',
         processDefinition: definition
       });
 
       page.titleSet([
         'camunda Cockpit',
-        definition.name || definition.id,
+        definition.name || definition.key || definition.id,
         'Definition View'
       ].join(' | '));
     });

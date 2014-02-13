@@ -2,7 +2,7 @@
 <div class="tree-node"
      ng-class="{ 'selected' : node.isSelected }">
 
-  <div class="tree-node-label">
+  <div class="tree-node-label" ng-class="{ 'activity-instance-finished' : node.endTime }">
     <button class="btn btn-link btn-control-link btn-toggle" ng-if="node.children.length" ng-click="toggleOpen()">
       <i ng-class="{ 'icon-chevron-right' : !node.isOpen, 'icon-chevron-down' : node.isOpen }"></i>
     </button>
@@ -19,10 +19,11 @@
   </div>
 
   <ul class="unstyled" ng-show="node.isOpen" ng-if="node.children.length">
-    <li ng-repeat="child in node.children | orderBy:'name'">
+    <li ng-repeat="child in node.children | orderBy: 'id'">
       <div activity-instance-tree="child"
            selection="selection"
-           on-element-click="propogateSelection(id, activityId, $event)" />
+           on-element-click="propogateSelection(id, activityId, $event)">
+      </div>
     </li>
   </ul>
 </div>
