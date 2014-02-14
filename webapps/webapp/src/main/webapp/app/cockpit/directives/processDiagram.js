@@ -1,15 +1,16 @@
-'use strict';
-
+/* global ngDefine: false, console: false */
 ngDefine('cockpit.directives', [
-    'angular',
-    'jquery',
-    'bpmn/Bpmn',
-    'jquery-overscroll',
-    'jquery-mousewheel'
-  ], function(module, angular, $, Bpmn) {
+  'angular',
+  'jquery',
+  'bpmn/Bpmn',
+  'jquery-overscroll',
+  'jquery-mousewheel'
+], function(module, angular, $, Bpmn) {
+  'use strict';
+  /* jshint unused: false */
 
   function DirectiveController($scope, $element, $attrs, $filter, $q, $window, $compile, Views) {
-    
+
     var w = angular.element($window);
 
     $scope.overlayVars = { read: [ 'processData', 'bpmnElement' ] };
@@ -19,23 +20,23 @@ ngDefine('cockpit.directives', [
     var bpmnElements,
         selection,
         scrollToBpmnElementId;
-    
+
     var activityHighligtClass = 'activity-highlight';
     var bpmnRenderer = null;
     var zoomLevel = 1;
-   
+
     $scope.$on('$destroy', function() {
       bpmnRenderer = null;
       $scope.processDiagram = null;
       $scope.overlayProviders = null;
     });
-    
+
     /*------------------- Rendering of process diagram ---------------------*/
 
     /**
      * If the process diagram changes, then the diagram will be rendered.
      */
-    $scope.$watch('processDiagram', function(newValue, oldValue) {
+    $scope.$watch('processDiagram', function(newValue) {
       if (newValue && newValue.$loaded !== false) {
         try {
           bpmnElements = newValue.bpmnElements;
@@ -50,22 +51,22 @@ ngDefine('cockpit.directives', [
           // update scroll to in case it has been provided earlier
           scrollToBpmnElement(scrollToBpmnElementId);
         } catch (exception) {
-          console.log('Unable to render diagram for process definition ' + $scope.processDiagram.processDefinition.id + ', reason: ' + exception.message)
-          $element.html('<p style="text-align: center;margin-top: 100px;">Unable to render process diagram.</p>')
+          console.log('Unable to render diagram for process definition ' + $scope.processDiagram.processDefinition.id + ', reason: ' + exception.message);
+          $element.html('<p style="text-align: center;margin-top: 100px;">Unable to render process diagram.</p>');
         }
       }
     });
-    
+
     function renderDiagram() {
-      
+
       // set the element id to processDiagram_*
       var elementId = 'processDiagram_' + $scope.processDiagram.processDefinition.id.replace(/[.|:]/g, '_');
       $element.attr('id', elementId);
 
-      // clear innerHTML of element in case that the process diagram has changed 
+      // clear innerHTML of element in case that the process diagram has changed
       // and the old one has been rendered.
       $element.empty();
-      
+
       // set the render options
       $element.addClass('process-diagram');
       var options = {
@@ -84,7 +85,7 @@ ngDefine('cockpit.directives', [
       angular.forEach(bpmnElements, function (bpmnElement) {
         var activityId = bpmnElement.id,
             elem = bpmnRenderer.getOverlay(activityId);
-        
+
         if (elem) {
           decorateBpmnElementWithOverlays(bpmnElement, elem);
           decorateBpmnElementWithEventHandlers(bpmnElement, elem);
@@ -94,23 +95,37 @@ ngDefine('cockpit.directives', [
     }
 
     function decorateProcessDiagramWithEventHandlers(bpmnElements) {
-      
-      var moved = false;
-      var mousedown = false;
+
+      var moved = false,
+          mousedown = false;
+
       // register event handler on $element: mousedown, mousemove, mouseup
       $element
         // register mousedown event
-        .mousedown(function($event) {
+        .mousedown(function() {
           mousedown = true;
+
+          // indicates the timestamp, when
+          // the mousemove event was
+          // triggered.
+          var mousemoveTimestamp = 0;
+
+          // The mousemove event will be bind to the
+          // $element only if a mousedown event happened
+          // before.
+          $element.mousemove(function($event) {
+            var now = $event.timeStamp;
+            // mousemoveTimestamp === 0 means,
+            // that the mousemove event was triggered
+            // but no mousemovement happened (this
+            // is a workaround for chrome.)
+            if (mousemoveTimestamp !== 0) {
+              moved = true;
+            }
+            lastMouseMovement = now;
+          });
         })
-        // register mousemove event
-        .mousemove(function($event) {
-          if (mousedown) {
-            // set 'moved' true, when there was
-            // a mousedown event at first.
-            moved = true;
-          }
-        })
+
         // register mouseup event
         .mouseup(function($event) {
           var targetId = $($event.target).attr('data-activity-id'),
@@ -118,7 +133,7 @@ ngDefine('cockpit.directives', [
               ctrlKey = $event.ctrlKey;
 
           if (!ctrlKey) {
-            
+
             if (!moved && mousedown && (!bpmnElement || !bpmnElement.isSelectable)) {
               // if the mouse have not moved, a mousedown happend and the bpmnElement is null
               // or is not selectable, then you have to deselect the current selection.
@@ -129,6 +144,9 @@ ngDefine('cockpit.directives', [
             }
           }
 
+          // unbind the mousemove event
+          $element.unbind('mousemove');
+
           // always reset the values
           moved = false;
           mousedown = false;
@@ -136,8 +154,7 @@ ngDefine('cockpit.directives', [
     }
 
     function decorateBpmnElementWithOverlays(bpmnElement, htmlElement) {
-      var activityId = bpmnElement.id,
-          childScope = $scope.$new();
+      var childScope = $scope.$new();
 
       childScope.bpmnElement = bpmnElement;
 
@@ -154,7 +171,9 @@ ngDefine('cockpit.directives', [
         // register click
         .click(activityId, function ($event) {
           if (bpmnElement.isSelectable) {
-            $scope.onElementClick({id: $event.data, $event: $event});
+            $scope.onElementClick({
+              id: $event.data, $event: $event
+            });
             $scope.$apply();
           }
         })
@@ -167,28 +186,28 @@ ngDefine('cockpit.directives', [
             bpmnRenderer.annotation($event.data).addClasses([ activityHighligtClass ]);
           }
         })
-        
+
         // mouseout
         .mouseout(activityId, function($event){
           if (!bpmnElement.isSelected && bpmnElement.isSelectable) {
             // remove css class to highlight activity
             bpmnRenderer.annotation($event.data).removeClasses([ activityHighligtClass ]);
-          }          
+          }
         });
-    }    
-    
+    }
+
     /*------------------- Handle scroll and zoom ---------------------*/
-    
-    
+
+
     $scope.$watch(function() { return zoomLevel; }, function(newZoomLevel) {
       if (!!newZoomLevel && !!bpmnRenderer) {
         zoom(newZoomLevel);
       }
     });
-    
+
     function initializeScrollAndZoomFunctions() {
       zoom(zoomLevel);
-      
+
       $element.mousewheel(function($event, delta) {
         $event.preventDefault();
         $scope.$apply(function() {
@@ -196,7 +215,7 @@ ngDefine('cockpit.directives', [
         });
       });
     }
-    
+
     function overscroll() {
       $element.overscroll({captureWheel:false});
     }
@@ -210,7 +229,7 @@ ngDefine('cockpit.directives', [
       bpmnRenderer.zoom(zoomFactor);
       overscroll();
     }
-    
+
     function calculateZoomLevel (delta) {
       var minZoomLevelMin = 0.1;
       var maxZoomLevelMax = 5;
@@ -225,14 +244,14 @@ ngDefine('cockpit.directives', [
       }
 
       return newZoomLevel;
-    };
-    
+    }
+
     /*------------------- Handle window resize ---------------------*/
-    
+
     w.bind('resize', function () {
       $scope.$apply();
     });
-    
+
     $scope.$watch(function () {
       return $element.width();
     }, function(newValue, oldValue) {
@@ -240,7 +259,7 @@ ngDefine('cockpit.directives', [
         zoom(zoomLevel);
       }
     });
-    
+
     $scope.$watch(function () {
       return $element.height();
     }, function(newValue, oldValue) {
@@ -248,13 +267,13 @@ ngDefine('cockpit.directives', [
         zoom(zoomLevel);
       }
     });
-    
+
     $scope.$on('resize', function () {
       $scope.$apply();
-    }); 
-    
+    });
+
     /*------------------- Handle selected activity id---------------------*/
-    
+
     $scope.$watch('selection.activityIds', function(newValue, oldValue) {
       updateSelection(newValue);
     });
@@ -289,7 +308,7 @@ ngDefine('cockpit.directives', [
         }
       }
     }
-    
+
     function deselectActivity(bpmnElement) {
       if (bpmnElement) {
         bpmnElement.isSelected = false;
@@ -302,7 +321,7 @@ ngDefine('cockpit.directives', [
     }
 
     /*------------------- Handle scroll to bpmn element ---------------------*/
-    
+
     $scope.$watch('selection.scrollToBpmnElement', function(newValue) {
       if (newValue) {
         scrollToBpmnElement(newValue);
@@ -313,31 +332,31 @@ ngDefine('cockpit.directives', [
       if (bpmnElements) {
         var bpmnElement = bpmnElements[bpmnElementId];
         if (bpmnElement) {
-          scrollTo(bpmnElement)  
+          scrollTo(bpmnElement);
         }
       }
       scrollToBpmnElementId = bpmnElementId;
-    }    
+    }
 
     function scrollTo(element) {
       // parent size
       var parentElementHeight = $element.height();
       var parentElementWidth = $element.width();
-      
+
       // get the bpmn element to scroll to
       var bpmnElement = bpmnRenderer.getOverlay(element.id);
 
       // get the height and width of the bpmn element
       var bpmnElementHeight = bpmnElement.height();
       var bpmnElementWidth = bpmnElement.width();
-      
+
       // get the top and left position of the bpmn element
       var bpmnElementTop = parseInt(bpmnElement.css('top'));
       var bpmnElementLeft = parseInt(bpmnElement.css('left'));
-      
+
       var scrollTop = (bpmnElementTop +  (bpmnElementHeight/2)) - parentElementHeight/2;
       var scrollLeft = (bpmnElementLeft +  (bpmnElementWidth/2)) - parentElementWidth/2;
-      
+
       $element.animate({
         scrollTop: scrollTop,
         scrollLeft: scrollLeft
@@ -347,7 +366,7 @@ ngDefine('cockpit.directives', [
     this.getRenderer = function () {
       return bpmnRenderer;
     };
-    
+
   }
 
   var Directive = function ($window, $compile, Views) {
@@ -364,7 +383,7 @@ ngDefine('cockpit.directives', [
       controller: DirectiveController
     };
   };
-  
+
   Directive.$inject = [ '$window', '$compile', 'Views'];
 
   module
