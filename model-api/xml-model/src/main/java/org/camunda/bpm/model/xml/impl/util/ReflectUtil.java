@@ -38,8 +38,14 @@ public abstract class ReflectUtil {
   }
 
   public static URL getResource(String name) {
-    // Try the current Thread context class loader
-    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    return getResource(name, null);
+  }
+
+  public static URL getResource(String name, ClassLoader classLoader) {
+    if(classLoader == null) {
+      // Try the current Thread context class loader
+      classLoader = Thread.currentThread().getContextClassLoader();
+    }
     URL url = classLoader.getResource(name);
     if (url == null) {
       // Finally, try the class loader for this class
@@ -52,8 +58,8 @@ public abstract class ReflectUtil {
 
   /**
    * Create a new instance of the provided type
-   * 
-   * @param type the class to create a new instance of 
+   *
+   * @param type the class to create a new instance of
    * @param parameters the parameters to pass to the constructor
    * @return the created instance
    */
