@@ -72,6 +72,11 @@
       <groupId>org.camunda.bpm.identity</groupId>
       <artifactId>camunda-identity-ldap</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-bpmn-model</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>

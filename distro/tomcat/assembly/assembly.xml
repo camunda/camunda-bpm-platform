@@ -36,6 +36,8 @@
         <include>org.mybatis:mybatis:jar:*</include>
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
+        
+        <include>org.camunda.bpm.model:*:jar</include>
       </includes>     
     </dependencySet>
 
@@ -43,6 +45,7 @@
         <outputDirectory>lib/</outputDirectory>
         <includes>
           <include>org.camunda.bpm:*:jar</include>
+          <include>org.camunda.bpm.model:*:jar</include>
           <include>org.mybatis:mybatis:jar:*</include>
           <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
           <include>joda-time:joda-time:jar:*</include>

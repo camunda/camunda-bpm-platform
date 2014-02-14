@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,60 +32,72 @@ import org.jboss.msc.service.ServiceName;
 
 /**
  * <p>This Processor creates implicit module dependencies for process applications</p>
- * 
+ *
  * <p>Concretely speaking, this processor adds a module dependency from the process
  * application module (deployment unit) to the process engine module.</p>
- * 
+ *
  * @author Daniel Meyer
- * 
+ *
  */
 public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
-  
+
   public static final int PRIORITY = 0x2300;
-  
+
   public static ModuleIdentifier MODULE_IDENTIFYER_PROCESS_ENGINE = ModuleIdentifier.create("org.camunda.bpm.camunda-engine");
+  public static ModuleIdentifier MODULE_IDENTIFYER_XML_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-xml-model");
+  public static ModuleIdentifier MODULE_IDENTIFYER_BPMN_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-bpmn-model");
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-    
+
     final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
-    
+
     if(!ProcessApplicationAttachments.isProcessApplication(deploymentUnit)) {
       return;
     }
-    
+
     ModuleLoader moduleLoader = Module.getBootModuleLoader();
-    DeploymentUnit parent = deploymentUnit.getParent() == null ? deploymentUnit : deploymentUnit.getParent(); 
-    
+    DeploymentUnit parent = deploymentUnit.getParent() == null ? deploymentUnit : deploymentUnit.getParent();
+
     if(parent != deploymentUnit) {
       // add dependency to all submodules
       AttachmentList<DeploymentUnit> subdeployments = parent.getAttachment(Attachments.SUB_DEPLOYMENTS);
       for (DeploymentUnit subdeploymentUnit : subdeployments) {
         final ModuleSpecification moduleSpecification = subdeploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
-        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, MODULE_IDENTIFYER_PROCESS_ENGINE, false, false, false, false));    
+        addSystemDependencies(moduleLoader, moduleSpecification);
       }
-      
-    }    
-    
+
+    }
+
     final ModuleSpecification moduleSpecification = parent.getAttachment(Attachments.MODULE_SPECIFICATION);
-    moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, MODULE_IDENTIFYER_PROCESS_ENGINE, false, false, false, false));   
-    
+    addSystemDependencies(moduleLoader, moduleSpecification);
+
     // install the pa-module service
     ModuleIdentifier identifyer = deploymentUnit.getAttachment(Attachments.MODULE_IDENTIFIER);
     String moduleName = identifyer.toString();
-    
+
     ProcessApplicationModuleService processApplicationModuleService = new ProcessApplicationModuleService();
     ServiceName serviceName = ServiceNames.forProcessApplicationModuleService(moduleName);
-    
+
     phaseContext.getServiceTarget()
       .addService(serviceName, processApplicationModuleService)
       .addDependency(phaseContext.getPhaseServiceName())
       .setInitialMode(Mode.ACTIVE)
       .install();
-    
+
+  }
+
+  private void addSystemDependencies(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification) {
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_PROCESS_ENGINE);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_XML_MODEL);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_BPMN_MODEL);
+  }
+
+  private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, ModuleIdentifier dependency) {
+    moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, dependency, false, false, false, false));
   }
 
   public void undeploy(DeploymentUnit context) {
 
   }
-  
+
 }

@@ -25,7 +25,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.cmd;
+package org.camunda.bpm.engine.test.api.repository;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
@@ -40,7 +40,7 @@ import java.util.Collection;
 /**
  * @author Sebastian Menski
  */
-public class BpmnModelInstanceCmd extends PluggableProcessEngineTestCase {
+public class BpmnModelInstanceCmdTest extends PluggableProcessEngineTestCase {
 
   private final static String PROCESS_KEY = "process";
   private String deploymentId;
