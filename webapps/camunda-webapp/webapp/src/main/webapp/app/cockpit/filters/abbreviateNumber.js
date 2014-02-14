@@ -1,4 +1,6 @@
+/* global ngDefine: false */
 ngDefine('cockpit.filters.abbreviate.number', function(module) {
+  'use strict';
 
   var AbbreviateNumberFilter = function() {
     return function(number, decimal) {

@@ -82,7 +82,6 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
             return;
           }
 
-
           if (oldValue && oldValue.indexOf(node.id) != -1) {
             node.isSelected = false;
           }
