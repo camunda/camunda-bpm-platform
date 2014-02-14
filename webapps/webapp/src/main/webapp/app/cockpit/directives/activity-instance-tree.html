@@ -19,7 +19,7 @@
   </div>
 
   <ul class="unstyled" ng-show="node.isOpen" ng-if="node.children.length">
-    <li ng-repeat="child in node.children | orderBy: 'id'">
+    <li ng-repeat="child in node.children | orderBy:orderPropertyValue">
       <div activity-instance-tree="child"
            selection="selection"
            on-element-click="propogateSelection(id, activityId, $event)">
