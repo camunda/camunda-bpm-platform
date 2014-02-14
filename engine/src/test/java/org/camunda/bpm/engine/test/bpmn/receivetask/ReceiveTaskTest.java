@@ -29,6 +29,7 @@ import java.util.List;
  *
  * @author Daniel Meyer
  * @author Danny Gräf
+ * @author Falko Menge
  */
 public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
 
@@ -122,6 +123,41 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
 
     // expect: this ends the process instance
     assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.singleReceiveTask.bpmn20.xml")
+  public void testSupportsCorrelateMessageByBusinessKeyOnSingleReceiveTask() {
+
+    // given: a process instance with business key 23 waiting in the receive task
+    ProcessInstance processInstance23 = runtimeService.startProcessInstanceByKey("testProcess", "23");
+
+    // given: a 2nd process instance with business key 42 waiting in the receive task
+    ProcessInstance processInstance42 = runtimeService.startProcessInstanceByKey("testProcess", "42");
+
+    // expect: there is two message event subscriptions for the tasks
+    List<EventSubscription> subscriptionList = getEventSubscriptionList();
+    assertEquals(2, subscriptionList.size());
+
+    // then: we can correlate the event subscription to one of the process instances
+    runtimeService.correlateMessage("newInvoiceMessage", "23");
+
+    // expect: one subscription is removed
+    assertEquals(1, getEventSubscriptionList().size());
+
+    // expect: this ends the process instance with business key 23
+    assertProcessEnded(processInstance23.getId());
+
+    // expect: other process instance is still running
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance42.getId()).count());
+
+    // then: we can correlate the event subscription to the other process instance
+    runtimeService.correlateMessage("newInvoiceMessage", "42");
+
+    // expect: subscription is removed
+    assertEquals(0, getEventSubscriptionList().size());
+
+    // expect: this ends the process instance
+    assertProcessEnded(processInstance42.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.multiSequentialReceiveTask.bpmn20.xml")
