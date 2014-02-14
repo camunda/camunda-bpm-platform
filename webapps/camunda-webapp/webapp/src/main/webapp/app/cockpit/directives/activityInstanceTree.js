@@ -16,7 +16,9 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
       },
       link: function(scope, element /*, attrs, processDiagram */ ) {
 
-        var $nodeElement = element;
+        var $nodeElement = element,
+            nodeSelectedEventName = 'node.selected',
+            nodeOpenedEventName = 'node.opened';
 
         function withTemplate(fn) {
           $http.get(TEMPLATE_URL, { cache: $templateCache })
@@ -37,6 +39,42 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
           createTreeNode(newValue);
         });
 
+        scope.$on(nodeOpenedEventName, function ($event, value) {
+          handleNodeEvents($event, value);
+        });
+
+        scope.$on(nodeSelectedEventName, function ($event, value) {
+          handleNodeEvents($event, value);
+        });
+
+        function handleNodeEvents($event, value) {
+          var node = scope.node,
+              eventName = $event.name;
+
+          if (!node) {
+            return;
+          }
+
+          if (eventName === nodeOpenedEventName || eventName === nodeSelectedEventName) {
+            if (node.id === value.parentActivityInstanceId) {
+              node.isOpen = true;
+              if (node.parentActivityInstanceId) {
+                fireNodeEvent(nodeOpenedEventName, node);
+              }
+            }
+          }
+        }
+
+        function fireNodeEvent(name, node) {
+          var id = node.id,
+              parentActivityInstanceId = node.parentActivityInstanceId;
+
+          scope.$emit(name, {
+            id: id,
+            parentActivityInstanceId: parentActivityInstanceId
+          });
+        }
+
         scope.$watch('selection.activityInstanceIds', function(newValue, oldValue) {
           var node = scope.node;
 
@@ -44,12 +82,17 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
             return;
           }
 
+
           if (oldValue && oldValue.indexOf(node.id) != -1) {
             node.isSelected = false;
           }
 
           if (newValue && newValue.indexOf(node.id) != -1) {
             node.isSelected = true;
+
+            if (node.parentActivityInstanceId) {
+              fireNodeEvent(nodeSelectedEventName, node);
+            }
           }
         });
 
@@ -59,12 +102,9 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
         };
 
         scope.select = function($event) {
-
           var node = scope.node;
 
           $event.stopPropagation();
-
-          // var ctrlKey = $event.ctrlKey;
 
           scope.onElementClick({
             id: node.id,
@@ -98,6 +138,14 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
           var node = scope.node;
           node.isOpen = !node.isOpen;
         };
+
+        scope.orderPropertyValue = function (elem) {
+          var id = elem.id,
+              idx = id.indexOf(':');
+
+          return idx !== -1 ? id.substr(idx + 1, id.length) : id;
+        };
+
       }
     };
   }];
