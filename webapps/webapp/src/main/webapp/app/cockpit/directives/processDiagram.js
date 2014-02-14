@@ -122,7 +122,7 @@ ngDefine('cockpit.directives', [
             if (mousemoveTimestamp !== 0) {
               moved = true;
             }
-            lastMouseMovement = now;
+            mousemoveTimestamp = now;
           });
         })
 
