@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.engine.test.history;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
@@ -29,10 +33,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -708,6 +708,65 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     taskService.complete(task.getId());
 
     assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testScopeActivity() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("userTask");
+    assertEquals(1, query.count());
+
+    HistoricActivityInstance historicActivityInstance = query.singleResult();
+
+    assertEquals(pi.getId(), historicActivityInstance.getParentActivityInstanceId());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testMultiInstanceScopeActivity() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("userTask");
+    assertEquals(5, query.count());
+
+    List<HistoricActivityInstance> result = query.list();
+
+    for (HistoricActivityInstance instance : result) {
+      assertEquals(pi.getId(), instance.getParentActivityInstanceId());
+    }
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testMultiInstanceReceiveActivity() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    query.activityId("receiveTask");
+    assertEquals(5, query.count());
+
+    List<HistoricActivityInstance> result = query.list();
+
+    for (HistoricActivityInstance instance : result) {
+      assertEquals(pi.getId(), instance.getParentActivityInstanceId());
+    }
+
   }
 
 }

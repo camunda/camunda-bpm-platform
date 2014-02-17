@@ -483,7 +483,8 @@ public class ExecutionImpl implements
 
   public String getParentActivityInstanceId() {
     if(isProcessInstance()) {
-      return String.valueOf(System.identityHashCode(getProcessInstance()));
+      return getId();
+
     } else {
       ExecutionImpl parent = getParent();
       ActivityImpl activity = getActivity();
@@ -889,7 +890,7 @@ public class ExecutionImpl implements
   // allow for subclasses to expose a real id /////////////////////////////////
 
   public String getId() {
-    return null;
+    return String.valueOf(System.identityHashCode(this));
   }
 
   // getters and setters //////////////////////////////////////////////////////

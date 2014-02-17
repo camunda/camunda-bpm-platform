@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <message id="messageId" name="messageName" />
+
+  <process id="process">
+
+    <startEvent id="start" />
+
+    <sequenceFlow sourceRef="start" targetRef="receiveTask" />
+
+    <receiveTask id="receiveTask" messageRef="messageId">
+      <multiInstanceLoopCharacteristics>
+        <loopCardinality>5</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </receiveTask>
+
+  </process>
+
+</definitions>

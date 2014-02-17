@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 
@@ -35,7 +36,7 @@ public abstract class AtomicOperationActivityInstanceEnd extends AbstractEventAt
     // execution before calling END listeners.
     ActivityExecution parent = execution.getParent();
     ActivityImpl activity = (ActivityImpl)execution.getActivity();
-    if(parent != null && execution.isScope() && activity != null && activity.isScope()) {
+    if(parent != null && execution.isScope() && activity != null && activity.isScope() && (activity.getActivityBehavior() instanceof CompositeActivityBehavior)) {
 
       if(log.isLoggable(Level.FINE)) {
         log.fine("[LEAVE] "+ execution + ": "+execution.getActivityInstanceId() );
