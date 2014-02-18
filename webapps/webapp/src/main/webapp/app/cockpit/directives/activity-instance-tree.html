@@ -1,21 +1,50 @@
 <!-- # CE - src/main/webapp/app/cockpit/directives/activity-instance-tree.html -->
-<div class="tree-node"
-     ng-class="{ 'selected' : node.isSelected }">
+<div class="tree-node" >
 
-  <div class="tree-node-label" ng-class="{ 'activity-instance-finished' : node.endTime }">
-    <button class="btn btn-link btn-control-link btn-toggle" ng-if="node.children.length" ng-click="toggleOpen()">
-      <i ng-class="{ 'icon-chevron-right' : !node.isOpen, 'icon-chevron-down' : node.isOpen }"></i>
-    </button>
+  <div class="tree-node-group">
 
-    <button class="btn btn-link btn-control-link btn-control remove"
-            ng-click="deselect($event)">
-      <i class="icon-remove"></i>
-    </button>
+    <span class="tree-node-label" ng-class="{ 'selected' : node.isSelected }">
 
-    <a id="{{ node.id }}"
-       ng-click="select($event)">
-      {{ node.name }}
-    </a>
+      <button class="btn btn-link btn-control-link btn-toggle" ng-if="node.children.length" ng-click="toggleOpen()">
+        <i ng-class="{ 'icon-chevron-right' : !node.isOpen, 'icon-chevron-down' : node.isOpen }"></i>
+      </button>
+
+      <button class="btn btn-link btn-control-link btn-control remove"
+              ng-click="deselect($event)">
+        <i class="icon-remove"></i>
+      </button>
+
+      <a id="{{ node.id }}"
+         ng-click="select($event)">
+        {{ node.name }}
+      </a>
+
+    </span>
+
+    <span ng-if="!node.endTime"
+          class="tree-node-addon activity-instance-running"
+          help
+          help-text="Running Activity Instance"
+          help-placement="'right'">
+      <i class="icon-play"></i>
+    </span>
+
+    <span ng-if="node.endTime && !node.canceled"
+          class="tree-node-addon activity-instance-completed"
+          help
+          help-text="Completed Activity Instance"
+          help-placement="'right'">
+      <i class="icon-stop"></i>
+    </span>
+
+    <span ng-if="node.endTime && node.canceled"
+          class="tree-node-addon activity-instance-canceled"
+          help
+          help-text="Canceled Activity Instance"
+          help-placement="'right'">
+      <i class="icon-eject"></i>
+    </span>
+      
   </div>
 
   <ul class="unstyled" ng-show="node.isOpen" ng-if="node.children.length">
