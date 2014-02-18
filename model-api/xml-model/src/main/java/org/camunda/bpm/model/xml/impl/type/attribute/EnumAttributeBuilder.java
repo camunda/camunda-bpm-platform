@@ -24,4 +24,23 @@ public class EnumAttributeBuilder<T extends Enum<T>> extends AttributeBuilderImp
     super(attributeName, modelType, new EnumAttribute<T>(modelType, type));
   }
 
+  @Override
+  public EnumAttributeBuilder<T> namespace(String namespaceUri) {
+    return (EnumAttributeBuilder<T>) super.namespace(namespaceUri);
+  }
+
+  @Override
+  public EnumAttributeBuilder<T> defaultValue(T defaultValue) {
+    return (EnumAttributeBuilder<T>) super.defaultValue(defaultValue);
+  }
+
+  @Override
+  public EnumAttributeBuilder<T> required() {
+    return (EnumAttributeBuilder<T>) super.required();
+  }
+
+  @Override
+  public EnumAttributeBuilder<T> idAttribute() {
+    return (EnumAttributeBuilder<T>) super.idAttribute();
+  }
 }
