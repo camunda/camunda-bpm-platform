@@ -128,7 +128,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     }
 
     $scope.getHref = function (userTask) {
-      return '#/process-instance/' + processInstance.id + '?activityInstanceIds=' + userTask.instance.id;
+      return '#/process-instance/' + processInstance.id + '?detailsTab=user-tasks-tab&activityInstanceIds=' + userTask.instance.id;
     };
 
     $scope.submitAssigneeChange = function(editForm, cb) {
@@ -208,14 +208,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
     $scope.getExceptionForUserTask = function (userTask) {
       return taskIdIdToExceptionMessageMap[userTask.id];
-    };
-
-    $scope.selectActivity = function(activityInstanceId, event) {
-      event.preventDefault();
-      $scope.processData.set('filter', angular.extend({}, $scope.filter, {
-        activityInstanceIds: [activityInstanceId],
-        activityIds: [activityInstanceId.split(':').shift()]
-      }));
     };
   }
 

@@ -13,7 +13,7 @@
       </td>
       <td>
         <span ng-show="calledProcessDefinition.calledFromActivities.length === 1">
-          <a ng-click="selectActivity(calledProcessDefinition.calledFromActivities[0].id, $event)"
+          <a cam-select-activity="calledProcessDefinition.calledFromActivities[0].id"
              ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ calledProcessDefinition.calledFromActivities[0].id }}&amp;detailsTab=call-process-definitions-table">
             {{ calledProcessDefinition.calledFromActivities[0].name }}
           </a>
