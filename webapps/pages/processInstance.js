@@ -47,6 +47,8 @@ ngDefine('cockpit.pages.processInstance', [
 
     $scope.$on('$routeChanged', function() {
       processData.set('filter', parseFilterFromUri());
+      // update tab selection
+      setDefaultTab($scope.processInstanceTabs);
     });
 
     // function collect(elements, fn) {
@@ -282,7 +284,7 @@ ngDefine('cockpit.pages.processInstance', [
         var name = bpmnElement.name;
         if (!name) {
           var shortenFilter = $filter('shorten');
-          name = bpmnElement.type + ' (' + shortenFilter(bpmnElement.id, 8) + '...)';
+          name = bpmnElement.type + ' (' + shortenFilter(bpmnElement.id, 8) + ')';
         }
 
         return name;

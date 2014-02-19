@@ -42,6 +42,8 @@ ngDefine('cockpit.pages.processDefinition', [
 
     $scope.$on('$routeChanged', function() {
       processData.set('filter', parseFilterFromUri());
+      // update tab selection
+      setDefaultTab($scope.processInstanceTabs);
     });
 
     function collect(elements, fn) {
@@ -256,7 +258,7 @@ ngDefine('cockpit.pages.processDefinition', [
         page.breadcrumbsAdd({
           type: 'processDefinition',
           label: parent.name || parent.id,
-          href: '#/process-instance/'+ parent.id +'/live',
+          href: '#/process-definition/'+ parent.id +'/live',
           processDefinition: parent
         });
       }
