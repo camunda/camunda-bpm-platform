@@ -384,6 +384,7 @@
               <excludes>
                 <exclude>**/*TestCase.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
+                <exclude>**/TaskEventsTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -409,6 +410,7 @@
                 <exclude>**/HistoricActivity*Test.java</exclude>
                 <exclude>**/HistoryServiceTest.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
+                <exclude>**/TaskEventsTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -434,6 +436,7 @@
                 <exclude>**/HistoricActivity*Test.java</exclude>
                 <exclude>**/HistoryServiceTest.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
+                <exclude>**/TaskEventsTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
