@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.test.history;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -146,7 +145,6 @@ public class OperationLogTaskProcessTest extends PluggableProcessEngineTestCase 
   }
 
   private void startTestProcess() {
-    processEngineConfiguration.setHistoryLevel(ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL);
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     task = taskService.createTaskQuery().singleResult();
   }

@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.test.history;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -40,9 +39,10 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
   private Execution execution;
   private String processTaskId;
 
-  private Date today = ClockUtil.getCurrentTime();
-  private Date tomorrow = new Date(ClockUtil.getCurrentTime().getTime() + 86400000);
-  private Date yesterday = new Date(ClockUtil.getCurrentTime().getTime() - 86400000);
+  // normalize timestamps for databases which do not provide millisecond presision.
+  private Date today = new Date((ClockUtil.getCurrentTime().getTime() / 1000) * 1000);
+  private Date tomorrow = new Date(((ClockUtil.getCurrentTime().getTime() + 86400000) / 1000) * 1000);
+  private Date yesterday = new Date(((ClockUtil.getCurrentTime().getTime() - 86400000) / 1000) * 1000);
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testQuery() {
@@ -140,7 +140,6 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
    * start process and operate on userTask to create some log entries for the query tests
    */
   private void createLogEntries() {
-    processEngineConfiguration.setHistoryLevel(ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL);
     ClockUtil.setCurrentTime(yesterday);
 
     // create a process with a userTask and work with it
