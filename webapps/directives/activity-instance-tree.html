@@ -26,7 +26,7 @@
           help
           help-text="Running Activity Instance"
           help-placement="'right'">
-      <i class="icon-play"></i>
+      <i class="icon-refresh"></i>
     </span>
 
     <span ng-if="node.endTime && !node.canceled"
@@ -34,7 +34,7 @@
           help
           help-text="Completed Activity Instance"
           help-placement="'right'">
-      <i class="icon-stop"></i>
+      <i class="icon-ok"></i>
     </span>
 
     <span ng-if="node.endTime && node.canceled"
@@ -42,9 +42,9 @@
           help
           help-text="Canceled Activity Instance"
           help-placement="'right'">
-      <i class="icon-eject"></i>
+      <i class="icon-off"></i>
     </span>
-      
+
   </div>
 
   <ul class="unstyled" ng-show="node.isOpen" ng-if="node.children.length">
