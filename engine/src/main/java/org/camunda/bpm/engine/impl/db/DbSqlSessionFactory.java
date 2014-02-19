@@ -108,7 +108,7 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
-    constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
+    constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");
     dbSpecificConstants.put(MYSQL, constants);
 
     //postgres specific
