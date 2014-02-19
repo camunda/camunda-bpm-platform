@@ -64,8 +64,8 @@
         <span ng-hide="variable.inEditMode">{{ variable.type }}</span>
       </td>
       <td class="variable-scope">
-        <a cam-select-activity="variable.instance.activityId" 
-           ng-href="#/process-instance/{{ processInstance.id }}?activityInstanceIds={{ variable.instance.id }}" title="{{ variable.instance.id }}">
+        <a cam-select-activity-instance="variable.instance.id"
+           ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=variables-tab&activityInstanceIds={{ variable.instance.id }}" title="{{ variable.instance.id }}">
           {{ variable.instance.name }}
         </a>
       </td>

@@ -59,11 +59,6 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
       });
 
     };
-
-    $scope.selectActivity = function(activityId, event) {
-      event.preventDefault();
-      $scope.processData.set('filter', angular.extend({}, $scope.filter, { activityIds: [activityId] }));
-    };
   }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
