@@ -401,6 +401,7 @@ a.expand-collapse {
 
   form {
     margin-bottom: 0;
+    overflow: visible;
   }
 }
 
@@ -408,7 +409,7 @@ a.expand-collapse {
   line-height: 25px;
   padding: 5px 0;
   border-bottom: dotted 1px #F5D99C;
-  overflow: hidden;
+  overflow: visible;
 
   select,
   input[type=text] {
@@ -420,8 +421,11 @@ a.expand-collapse {
          box-sizing: border-box;
   }
 
-  .search-date select {
-    width: 80px;
+  .search-date {
+    overflow: hidden;
+    select {
+      width: 80px;
+    }
   }
 
   .removable-input {
@@ -481,6 +485,36 @@ a.expand-collapse {
     line-height: 20px;
     padding: 8px 14px;
   }
+
+
+
+  &.version-filter {
+
+  }
+  &.parent-filter {
+
+  }
+  &.business-key-filter {
+
+  }
+  &.date-filter {
+    overflow: hidden;
+  }
+  &.variable-filter {
+    overflow: hidden;
+  }
+  &.activity-filter {
+
+  }
+
+  label.radio {
+    display: inline-block;
+    input {
+    margin-left: 4px;
+      vertical-align: middle;
+      float: none;
+    }
+  }
 }
 
 
@@ -538,7 +572,7 @@ textarea.variable-type-string {
 
     ul {
       margin-left: 19px;
-      margin-bottom: 10px;  
+      margin-bottom: 10px;
     }
 
     .tree-node-label.selected > .remove {
@@ -591,7 +625,7 @@ textarea.variable-type-string {
 
       .remove {
         display: inline-block;
-        opacity: 0.3;        
+        opacity: 0.3;
       }
     }
 
@@ -603,7 +637,7 @@ textarea.variable-type-string {
 
   .tree-node-addon {
     display: table-cell;
-    vertical-align: middle;    
+    vertical-align: middle;
     padding: 4px 8px;
     line-height: 1;
     background-color: #ffffff;
