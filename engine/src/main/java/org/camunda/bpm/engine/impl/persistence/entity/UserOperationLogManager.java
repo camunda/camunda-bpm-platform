@@ -12,24 +12,28 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_ATTACHMENT;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_IDENTITY_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
-import java.util.Collection;
-import java.util.List;
-
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.*;
-
-
 /**
- * Manager for {@link UserOperationLogEntryEntity} that also provides a generic and some specific log methods.
+ * Manager for {@link UserOperationLogEntryEventEntity} that also provides a generic and some specific log methods.
  *
  * @author Danny Gräf
  */
@@ -52,37 +56,57 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     getDbSqlSession().delete("deleteUserOperationLogEntriesByTaskId", taskId);
   }
 
-  public void logOperation(String entityType, String operation, String operationId, String userId, TaskEntity task, PropertyChange propertyChange) {
-    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+  public void logUserOperations(UserOperationLogContext context) {
+    if (isHistoryLevelFullEnabled()) {
+      ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
-    if (configuration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
-      if (operationId == null) {
-        operationId = configuration.getIdGenerator().getNextId();
-      }
-      final HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
+      HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
+      HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
 
-      HistoryEvent evt = eventProducer.createTaskOperationLogEvt(entityType, userId, operationId, operation, propertyChange, task);
-      eventHandler.handleEvent(evt);
+      List<HistoryEvent> historyEvents = eventProducer.createUserOperationLogEvents(context);
+      eventHandler.handleEvents(historyEvents);
     }
   }
 
-  public void logTaskOperation(String operation, String userId, TaskEntity task, Collection<PropertyChange> propertyChanges) {
-    if (OPERATION_TYPE_CREATE.equals(operation) && propertyChanges.isEmpty()) {
-      logOperation(ENTITY_TYPE_TASK, operation, null, userId, task, PropertyChange.EMPTY_CHANGE);
-    } else {
-      String operationId = Context.getProcessEngineConfiguration().getIdGenerator().getNextId(); // composite ID
-      for (PropertyChange propertyChange : propertyChanges) {
-        logOperation(ENTITY_TYPE_TASK, operation, operationId, userId, task, propertyChange);
-      }
+  public void logTaskOperations(String operation, TaskEntity task, List<PropertyChange> propertyChanges) {
+    if (isHistoryLevelFullEnabled()) {
+      UserOperationLogContext context = createContextForTask(ENTITY_TYPE_TASK, operation, task, propertyChanges);
+      logUserOperations(context);
     }
   }
 
-  public void logLinkOperation(String operation, String userId, TaskEntity task, PropertyChange propertyChange) {
-    logOperation(ENTITY_TYPE_IDENTITY_LINK, operation, null, userId, task, propertyChange);
+  public void logLinkOperation(String operation, TaskEntity task, PropertyChange propertyChange) {
+    if (isHistoryLevelFullEnabled()) {
+      UserOperationLogContext context = createContextForTask(ENTITY_TYPE_IDENTITY_LINK, operation, task, Arrays.asList(propertyChange));
+      logUserOperations(context);
+    }
   }
 
-  public void logAttachmentOperation(String operation, String userId, TaskEntity task, PropertyChange propertyChange) {
-    logOperation(ENTITY_TYPE_ATTACHMENT, operation, null, userId, task, propertyChange);
+  public void logAttachmentOperation(String operation, TaskEntity task, PropertyChange propertyChange) {
+    if (isHistoryLevelFullEnabled()) {
+      UserOperationLogContext context = createContextForTask(ENTITY_TYPE_ATTACHMENT, operation, task, Arrays.asList(propertyChange));
+      logUserOperations(context);
+    }
+  }
+
+  protected UserOperationLogContext createContextForTask(String entityType, String operation, TaskEntity task, List<PropertyChange> propertyChanges) {
+    UserOperationLogContext context = new UserOperationLogContext();
+
+    context.setEntityType(entityType);
+    context.setOperationType(operation);
+
+    if (propertyChanges == null || propertyChanges.isEmpty()) {
+      if (OPERATION_TYPE_CREATE.equals(operation)) {
+        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
+      }
+    }
+    context.setPropertyChanges(propertyChanges);
+
+    context.setProcessDefinitionId(task.getProcessDefinitionId());
+    context.setProcessInstanceId(task.getProcessInstanceId());
+    context.setExecutionId(task.getExecutionId());
+    context.setTaskId(task.getId());
+
+    return context;
   }
 }

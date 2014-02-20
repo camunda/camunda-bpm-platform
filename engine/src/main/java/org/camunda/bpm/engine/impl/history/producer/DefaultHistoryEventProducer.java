@@ -12,17 +12,22 @@
  */
 package org.camunda.bpm.engine.impl.history.producer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
@@ -131,13 +136,22 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
   }
 
-  protected void initTaskOperationLogEvent(UserOperationLogEntryEventEntity evt, TaskEntity entity, String entityType) {
-    evt.setEntityType(entityType);
+  protected void initUserOperationLogEvent(UserOperationLogEntryEventEntity evt, UserOperationLogContext context, PropertyChange propertyChange) {
+    // init properties
+    evt.setEntityType(context.getEntityType());
+    evt.setOperationType(context.getOperationType());
+    evt.setOperationId(context.getOperationId());
+    evt.setUserId(context.getUserId());
+    evt.setProcessDefinitionId(context.getProcessDefinitionId());
+    evt.setProcessInstanceId(context.getProcessInstanceId());
+    evt.setExecutionId(context.getExecutionId());
+    evt.setTaskId(context.getTaskId());
     evt.setTimestamp(ClockUtil.getCurrentTime());
-    evt.setProcessDefinitionId(entity.getProcessDefinitionId());
-    evt.setProcessInstanceId(entity.getProcessInstanceId());
-    evt.setExecutionId(entity.getExecutionId());
-    evt.setTaskId(entity.getId());
+
+    // init property value
+    evt.setProperty(propertyChange.getPropertyName());
+    evt.setOrgValue(propertyChange.getOrgValueString());
+    evt.setNewValue(propertyChange.getNewValueString());
   }
 
   protected HistoryEvent createHistoricVariableEvent(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl, String eventType) {
@@ -349,23 +363,30 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
-  public HistoryEvent createTaskOperationLogEvt(String entityType, String userId, String operationId, String operation, PropertyChange propertyChange, DelegateTask task) {
-    UserOperationLogEntryEventEntity evt = new UserOperationLogEntryEventEntity();
+  // User Operation Logs ///////////////////////////
 
-    initTaskOperationLogEvent(evt, (TaskEntity) task, entityType);
+  public List<HistoryEvent> createUserOperationLogEvents(UserOperationLogContext context) {
+    List<HistoryEvent> historyEvents = new ArrayList<HistoryEvent>();
 
-    evt.setUserId(userId);
-    evt.setOperationId(operationId);
-    evt.setOperationType(operation);
-    evt.setProperty(propertyChange.getPropertyName());
+    String userId = null;
+    CommandContext commandContext = Context.getCommandContext();
+    if (commandContext != null) {
+      userId = commandContext.getAuthenticatedUserId();
+    }
+    context.setUserId(userId);
 
-    String orgValue = propertyChange.getOrgValueString();
-    String newValue = propertyChange.getNewValueString();
+    String operationId = Context.getProcessEngineConfiguration().getIdGenerator().getNextId();
+    context.setOperationId(operationId);
 
-    evt.setOrgValue(orgValue);
-    evt.setNewValue(newValue);
+    for (PropertyChange propertyChange : context.getPropertyChanges()) {
+      UserOperationLogEntryEventEntity evt = new UserOperationLogEntryEventEntity();
 
-    return evt;
+      initUserOperationLogEvent(evt, context, propertyChange);
+
+      historyEvents.add(evt);
+    }
+
+    return historyEvents;
   }
 
   // variables /////////////////////////////////

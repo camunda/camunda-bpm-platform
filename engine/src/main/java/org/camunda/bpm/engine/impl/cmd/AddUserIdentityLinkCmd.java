@@ -32,12 +32,10 @@ public class AddUserIdentityLinkCmd extends AddIdentityLinkCmd {
   public Void execute(CommandContext commandContext) {
     super.execute(commandContext);
 
-    final String authenticatedUserId = commandContext.getAuthenticatedUserId();
-
     PropertyChange propertyChange = new PropertyChange(type, null, userId);
 
     commandContext.getOperationLogManager()
-      .logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_USER_LINK, authenticatedUserId, task, propertyChange);
+      .logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_USER_LINK, task, propertyChange);
 
     return null;
   }

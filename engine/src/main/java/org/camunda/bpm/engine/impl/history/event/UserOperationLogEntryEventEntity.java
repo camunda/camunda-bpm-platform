@@ -14,10 +14,12 @@ package org.camunda.bpm.engine.impl.history.event;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+
 /**
  * @author Danny Gräf
  */
-public class UserOperationLogEntryEventEntity extends HistoryEvent {
+public class UserOperationLogEntryEventEntity extends HistoryEvent implements UserOperationLogEntry {
 
   private static final long serialVersionUID = 1L;
 

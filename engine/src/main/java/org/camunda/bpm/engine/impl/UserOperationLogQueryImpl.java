@@ -97,17 +97,17 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     return this;
   }
 
-  public UserOperationLogQuery afterTimeStamp(Date after) {
+  public UserOperationLogQuery afterTimestamp(Date after) {
     this.timestampAfter = after;
     return this;
   }
 
-  public UserOperationLogQuery beforeTimeStamp(Date before) {
+  public UserOperationLogQuery beforeTimestamp(Date before) {
     this.timestampBefore = before;
     return this;
   }
 
-  public UserOperationLogQuery orderByTimeStamp() {
+  public UserOperationLogQuery orderByTimestamp() {
     return orderBy(OperationLogQueryProperty.TIMESTAMP);
   }
 

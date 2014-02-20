@@ -13,7 +13,16 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -478,13 +487,10 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     this.assignee = assignee;
 
     CommandContext commandContext = Context.getCommandContext();
+    // if there is no command context, then it means that the user is calling the
+    // setAssignee outside a service method.  E.g. while creating a new task.
     if (commandContext!=null) {
-
-      // if there is no command context, then it means that the user is calling the
-      // setAssignee outside a service method.  E.g. while creating a new task.
-      if (commandContext!=null) {
-        fireEvent(TaskListener.EVENTNAME_ASSIGNMENT);
-      }
+      fireEvent(TaskListener.EVENTNAME_ASSIGNMENT);
     }
   }
 
@@ -772,14 +778,11 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
 
   public void createHistoricTaskDetails(String operation) {
     final CommandContext commandContext = Context.getCommandContext();
-    createHistoricTaskDetails(operation, commandContext.getAuthenticatedUserId());
-  }
-
-  protected void createHistoricTaskDetails(String operation, String userId) {
-    final CommandContext commandContext = Context.getCommandContext();
     if (commandContext != null) {
-      commandContext.getOperationLogManager().logTaskOperation(operation, userId, this, propertyChanges.values());
+      List<PropertyChange> values = new ArrayList<PropertyChange>(propertyChanges.values());
+      commandContext.getOperationLogManager().logTaskOperations(operation, this, values);
     }
     propertyChanges.clear();
   }
+
 }

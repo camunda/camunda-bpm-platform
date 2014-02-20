@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,16 +16,11 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.task.Event;
 
 
 /**
@@ -36,7 +31,7 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String attachmentId;
-  
+
   public DeleteAttachmentCmd(String attachmentId) {
     this.attachmentId = attachmentId;
   }
@@ -49,24 +44,22 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
     commandContext
       .getDbSqlSession()
       .delete(attachment);
-	  
+
     if (attachment.getContentId() != null) {
       commandContext
         .getByteArrayManager()
         .deleteByteArrayById(attachment.getContentId());
     }
-        
+
     if (attachment.getTaskId()!=null) {
       TaskEntity task = commandContext
           .getTaskManager()
           .findTaskById(attachment.getTaskId());
 
-      final String authenticatedUserId = commandContext.getAuthenticatedUserId();
-
       PropertyChange propertyChange = new PropertyChange("name", null, attachment.getName());
 
       commandContext.getOperationLogManager()
-          .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, authenticatedUserId, task, propertyChange);
+          .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, task, propertyChange);
     }
 
     return null;

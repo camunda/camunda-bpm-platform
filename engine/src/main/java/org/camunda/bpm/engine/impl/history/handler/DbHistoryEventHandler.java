@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.history.handler;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
@@ -38,6 +40,12 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
       insertOrUpdate(historyEvent);
     }
 
+  }
+
+  public void handleEvents(List<HistoryEvent> historyEvents) {
+    for (HistoryEvent historyEvent : historyEvents) {
+      handleEvent(historyEvent);
+    }
   }
 
   /** general history event insert behavior */

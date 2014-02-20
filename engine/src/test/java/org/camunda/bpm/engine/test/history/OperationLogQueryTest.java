@@ -90,7 +90,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(2, query().property(OWNER).count());
 
     // ascending order results by time
-    List<UserOperationLogEntry> ascLog = query().orderByTimeStamp().asc().list();
+    List<UserOperationLogEntry> ascLog = query().orderByTimestamp().asc().list();
     for (int i = 0; i < 4; i++) {
       assertTrue(yesterday.getTime()<=ascLog.get(i).getTimestamp().getTime());
     }
@@ -102,7 +102,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     }
 
     // descending order results by time
-    List<UserOperationLogEntry> descLog = query().orderByTimeStamp().desc().list();
+    List<UserOperationLogEntry> descLog = query().orderByTimestamp().desc().list();
     for (int i = 0; i < 4; i++) {
       assertTrue(tomorrow.getTime()<=descLog.get(i).getTimestamp().getTime());
     }
@@ -114,13 +114,13 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     }
 
     // filter by time, created yesterday
-    assertEquals(4, query().beforeTimeStamp(today).count());
+    assertEquals(4, query().beforeTimestamp(today).count());
     // filter by time, created today and before
-    assertEquals(11, query().beforeTimeStamp(tomorrow).count());
+    assertEquals(11, query().beforeTimestamp(tomorrow).count());
     // filter by time, created today and later
-    assertEquals(12, query().afterTimeStamp(yesterday).count());
+    assertEquals(12, query().afterTimestamp(yesterday).count());
     // filter by time, created tomorrow
-    assertEquals(5, query().afterTimeStamp(today).count());
+    assertEquals(5, query().afterTimestamp(today).count());
 
     // remove log entries of manually created tasks
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {

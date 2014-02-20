@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.history;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.query.Query;
-
-import java.util.Date;
 
 
 /**
@@ -69,12 +69,12 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
   UserOperationLogQuery property(String property);
 
   /** Query entries after the time stamp. */
-  UserOperationLogQuery afterTimeStamp(Date after);
+  UserOperationLogQuery afterTimestamp(Date after);
 
   /** Query entries before the time stamp. */
-  UserOperationLogQuery beforeTimeStamp(Date before);
+  UserOperationLogQuery beforeTimestamp(Date before);
 
-  /** Order by timestamp (needs to be followed by {@link #asc()} or {@link #desc()}). */
-  UserOperationLogQuery orderByTimeStamp();
+  /** Order by time stamp (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  UserOperationLogQuery orderByTimestamp();
 
 }

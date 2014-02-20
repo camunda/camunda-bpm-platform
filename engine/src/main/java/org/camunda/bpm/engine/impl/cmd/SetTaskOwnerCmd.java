@@ -19,7 +19,9 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 /**
  * @author Danny Gräf
  */
-public class SetTaskOwnerCmd extends  AddIdentityLinkCmd {
+public class SetTaskOwnerCmd extends AddIdentityLinkCmd {
+
+  private static final long serialVersionUID = 1L;
 
   public SetTaskOwnerCmd(String taskId, String userId) {
     super(taskId, userId, null, IdentityLinkType.OWNER);

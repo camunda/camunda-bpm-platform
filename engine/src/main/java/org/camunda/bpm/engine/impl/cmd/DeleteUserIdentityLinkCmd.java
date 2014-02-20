@@ -21,6 +21,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
  */
 public class DeleteUserIdentityLinkCmd extends DeleteIdentityLinkCmd {
 
+  private static final long serialVersionUID = 1L;
+
   public DeleteUserIdentityLinkCmd(String taskId, String userId, String type) {
     super(taskId, userId, null, type);
   }
@@ -29,12 +31,10 @@ public class DeleteUserIdentityLinkCmd extends DeleteIdentityLinkCmd {
   public Void execute(CommandContext commandContext) {
     super.execute(commandContext);
 
-    final String authenticatedUserId = commandContext.getAuthenticatedUserId();
-
     PropertyChange propertyChange = new PropertyChange(type, null, userId);
 
     commandContext.getOperationLogManager()
-        .logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_USER_LINK, authenticatedUserId, task, propertyChange);
+        .logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_USER_LINK, task, propertyChange);
 
     return null;
   }

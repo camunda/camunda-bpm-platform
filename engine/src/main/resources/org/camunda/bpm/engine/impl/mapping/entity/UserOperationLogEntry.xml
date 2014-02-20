@@ -16,7 +16,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.UserUserOperationLogEntryEntity">
+<mapper namespace="org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity">
 
   <!-- OPERATION LOG ENTRY INSERT -->
 
@@ -64,7 +64,7 @@
 
   <!--OPERATION LOG ENTRY RESULT MAP -->
 
-  <resultMap id="UserOperationLogResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogEntryEntity">
+  <resultMap id="UserOperationLogResultMap" type="org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />

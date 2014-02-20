@@ -12,11 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.history.producer;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableScopeImpl;
 
@@ -105,20 +107,17 @@ public interface HistoryEventProducer {
    */
   public HistoryEvent createTaskInstanceCompleteEvt(DelegateTask task, String deleteReason);
 
+  // User Operation Logs ///////////////////////////////
 
   /**
-   * Creates the history event fired when a task detail is <strong>changed</strong>.
+   * Creates the history event fired whenever an operation has been performed by a user. This is
+   * used for logging actions such as creating a new Task, completing a task, canceling a
+   * a process instance, ...
    *
-   * @param entityType the type of the entity which has been changed. (is usually "task"
-   *        but may also be a task related entity such as "Identity Link" or "attachment".
-   * @param userId that operates on the task
-   * @param operationId that identifies multiple changes
-   * @param operation that changes a property
-   * @param propertyChange the property change (orgValue, newValue)
-   * @param task
-   * @return the history event
+   * @param context the {@link UserOperationLogContext} providing the needed informations
+   * @return a {@link List} of {@link HistoryEvent}s
    */
-  public HistoryEvent createTaskOperationLogEvt(String entityType, String userId, String operationId, String operation, PropertyChange propertyChange, DelegateTask task);
+  public List<HistoryEvent> createUserOperationLogEvents(UserOperationLogContext context);
 
   // HistoricVariableUpdateEventEntity //////////////////////
 

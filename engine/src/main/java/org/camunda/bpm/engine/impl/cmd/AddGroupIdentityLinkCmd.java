@@ -32,12 +32,10 @@ public class AddGroupIdentityLinkCmd extends AddIdentityLinkCmd {
   public Void execute(CommandContext commandContext) {
     super.execute(commandContext);
 
-    final String authenticatedUserId = commandContext.getAuthenticatedUserId();
-
     PropertyChange propertyChange = new PropertyChange(type, null, groupId);
 
     commandContext.getOperationLogManager()
-      .logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK, authenticatedUserId, task, propertyChange);
+      .logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK, task, propertyChange);
 
     return null;
   }
