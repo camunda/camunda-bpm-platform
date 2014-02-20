@@ -1,18 +1,19 @@
+/* global ngDefine: false, angular: false */
 ngDefine('camunda.common.pages', function(module) {
-
-  var ResponseErrorHandlerInitializer = [ 
+  'use strict';
+  var ResponseErrorHandlerInitializer = [
     '$rootScope', '$location', 'Notifications', 'Authentication',
     function($rootScope, $location, Notifications, Authentication) {
 
     function addError(error) {
       error.http = true;
       error.exclusive = [ 'http' ];
-      
+
       Notifications.addError(error);
     }
 
     /**
-     * A handler function that handles HTTP error responses, 
+     * A handler function that handles HTTP error responses,
      * i.e. 4XX and 5XX responses by redirecting / notifying the user.
      */
     function handleHttpError(event, error) {
@@ -24,13 +25,13 @@ ngDefine('camunda.common.pages', function(module) {
       case 500:
         if (data && data.message) {
           addError({
-            status: 'Server Error', 
-            message: data.message, 
+            status: 'Server Error',
+            message: data.message,
             exceptionType: data.exceptionType
           });
         } else {
-          addError({ 
-            status: 'Server Error', 
+          addError({
+            status: 'Server Error',
             message: 'The server reported an internal error. Try to refresh the page or login and out of the application.'
           });
         }
@@ -54,28 +55,28 @@ ngDefine('camunda.common.pages', function(module) {
 
       case 403:
         if (data.type == 'AuthorizationException') {
-          addError({ 
-            status: 'Access Denied', 
-            message: 'You are unauthorized to '
-            + data.permissionName.toLowerCase() + ' '
-            + data.resourceName.toLowerCase()
-            + (data.resourceId ? ' ' + data.resourceId : 's')
-            + '.' });
+          addError({
+            status: 'Access Denied',
+            message: 'You are unauthorized to ' +
+            data.permissionName.toLowerCase() + ' ' +
+            data.resourceName.toLowerCase() +
+            (data.resourceId ? ' ' + data.resourceId : 's') +
+            '.' });
         } else {
           addError({
-            status: 'Access Denied', 
+            status: 'Access Denied',
             message: 'Executing an action has been denied by the server. Try to refresh the page.'
           });
         }
         break;
-      
+
       case 404:
         addError({ status: 'Not found', message: 'A resource you requested could not be found.' });
         break;
       default:
-        addError({ 
-          status: 'Communication Error', 
-          message: 'The application received an unexpected ' + status + ' response from the server. Try to refresh the page or login and out of the application.' 
+        addError({
+          status: 'Communication Error',
+          message: 'The application received an unexpected ' + status + ' response from the server. Try to refresh the page or login and out of the application.'
         });
       }
     }
@@ -91,7 +92,7 @@ ngDefine('camunda.common.pages', function(module) {
     var current = Uri.appUri(':engine');
     var enginesByName = {};
 
-    $http.get(Uri.appUri('engine://engine/')).then(function(response) { 
+    $http.get(Uri.appUri('engine://engine/')).then(function(response) {
       $scope.engines = response.data;
 
       angular.forEach($scope.engines , function(engine) {
@@ -102,7 +103,7 @@ ngDefine('camunda.common.pages', function(module) {
 
       if (!$scope.currentEngine) {
         Notifications.addError({ status: 'Not found', message: 'The process engine you are trying to access does not exist' });
-        $location.path('/')
+        $location.path('/');
       }
     });
 
@@ -116,17 +117,18 @@ ngDefine('camunda.common.pages', function(module) {
   var NavigationController = [ '$scope', '$location', function($scope, $location) {
 
       $scope.activeClass = function(link) {
-        var path = $location.absUrl();      
+        var path = $location.absUrl();
         return path.indexOf(link) != -1 ? 'active' : '';
       };
   }];
 
   var AuthenticationController = [
-    '$scope', '$window', '$cacheFactory', 'Notifications', 'AuthenticationService', 'Uri',
-    function($scope, $window, $cacheFactory, Notifications, AuthenticationService, Uri) {
+    '$scope', '$window', '$cacheFactory', 'Notifications', 'AuthenticationService', 'Uri', 'page',
+    function($scope, $window, $cacheFactory, Notifications, AuthenticationService, Uri, page) {
       $scope.logout = function() {
         AuthenticationService.logout().then(function() {
           $cacheFactory.get('$http').removeAll();
+          page.titleSet('camunda Cockpit');
           $window.location.href = Uri.appUri('app://#/login');
         });
       };
