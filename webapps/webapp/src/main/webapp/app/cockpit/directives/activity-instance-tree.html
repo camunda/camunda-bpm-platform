@@ -21,28 +21,31 @@
 
     </span>
 
+    <!-- running -->
     <span ng-if="!node.endTime"
           class="tree-node-addon activity-instance-running"
           help
           help-text="Running Activity Instance"
           help-placement="'right'">
-      <i class="icon-refresh"></i>
+      <i class="icon-adjust"></i>
     </span>
 
+    <!-- completed -->
     <span ng-if="node.endTime && !node.canceled"
           class="tree-node-addon activity-instance-completed"
           help
           help-text="Completed Activity Instance"
           help-placement="'right'">
-      <i class="icon-ok"></i>
+      <i class="icon-ok-circle"></i>
     </span>
 
+    <!-- canceled -->
     <span ng-if="node.endTime && node.canceled"
           class="tree-node-addon activity-instance-canceled"
           help
           help-text="Canceled Activity Instance"
           help-placement="'right'">
-      <i class="icon-off"></i>
+      <i class="icon-ban-circle"></i>
     </span>
 
   </div>
