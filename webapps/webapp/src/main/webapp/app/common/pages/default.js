@@ -1,6 +1,25 @@
 /* global ngDefine: false, angular: false */
 ngDefine('camunda.common.pages', ['jquery'], function(module, $) {
   'use strict';
+
+  function setHeadTitle(url) {
+    var pageTitle = 'camunda Login';
+        
+    if (url.indexOf('/cockpit/') !== -1) {
+      pageTitle = 'camunda Cockpit';
+    } else
+    
+    if (url.indexOf('/tasklist/') !== -1) {
+      pageTitle = 'camunda Tasklist';
+    } else 
+
+    if (url.indexOf('/admin/') !== -1) {
+      pageTitle = 'camunda Admin';
+    }
+    
+    $('head title').text(pageTitle);
+  }
+
   var ResponseErrorHandlerInitializer = [
     '$rootScope', '$location', 'Notifications', 'Authentication',
     function($rootScope, $location, Notifications, Authentication) {
@@ -47,7 +66,7 @@ ngDefine('camunda.common.pages', ['jquery'], function(module, $) {
         if ($location.absUrl().indexOf('/setup/#') == -1) {
           addError({ type: 'warning', status: 'Session ended', message: 'Your session timed out or was ended from another browser window. Please signin again.' });
 
-          $('head title').text('camunda Login');
+          setHeadTitle($location.absUrl());
 
           $location.path('/login');
         } else {
@@ -125,15 +144,12 @@ ngDefine('camunda.common.pages', ['jquery'], function(module, $) {
   }];
 
   var AuthenticationController = [
-    '$scope', '$window', '$cacheFactory', 'Notifications', 'AuthenticationService', 'Uri',
-    function($scope, $window, $cacheFactory, Notifications, AuthenticationService, Uri) {
-    // '$scope', '$window', '$cacheFactory', 'Notifications', 'AuthenticationService', 'Uri', 'page',
-    // function($scope, $window, $cacheFactory, Notifications, AuthenticationService, Uri, page) {
+    '$scope', '$window', '$cacheFactory', '$location', 'Notifications', 'AuthenticationService', 'Uri',
+    function($scope, $window, $cacheFactory, $location, Notifications, AuthenticationService, Uri) {
       $scope.logout = function() {
         AuthenticationService.logout().then(function() {
           $cacheFactory.get('$http').removeAll();
-          // page.titleSet('camunda Cockpit');
-          $('head title').text('camunda Login');
+          setHeadTitle($location.absUrl());
           $window.location.href = Uri.appUri('app://#/login');
         });
       };
