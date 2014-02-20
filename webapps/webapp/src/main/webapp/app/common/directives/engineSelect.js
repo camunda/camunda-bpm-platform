@@ -1,7 +1,10 @@
-ngDefine('camunda.common.directives', [
-  'angular', 
-  'require'
-], function(module, angular, require) {
+/* global ngDefine: false */
+ngDefine('camunda.common.directives.engine', [
+  'angular',
+  'require',
+  'jquery'
+], function(module, angular, require, $) {
+  'use strict';
 
   var ProcessEngineSelectionController = [
     '$scope', '$http', '$location', '$window', 'Uri', 'Notifications',
@@ -21,7 +24,7 @@ ngDefine('camunda.common.directives', [
 
       if (!$scope.currentEngine) {
         Notifications.addError({ status: 'Not found', message: 'The process engine you are trying to access does not exist' });
-        $location.path('/dashboard')
+        $location.path('/dashboard');
       }
     });
   }];
@@ -30,12 +33,12 @@ ngDefine('camunda.common.directives', [
     return {
       templateUrl: require.toUrl('./engineSelect.html'),
       replace: true,
-      controller: ProcessEngineSelectionController, 
+      controller: ProcessEngineSelectionController,
       link: function(scope, element, attrs) {
 
         var divider;
 
-        scope.$watch(attrs['ngShow'], function(newValue) {
+        scope.$watch(attrs.ngShow, function(newValue) {
           if (newValue && !divider) {
             divider = $('<li class="divider-vertical"></li>').insertAfter(element);
           }
