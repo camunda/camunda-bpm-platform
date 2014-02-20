@@ -434,7 +434,7 @@ ngDefine('cockpit.pages.processDefinition', [
     }
 
     function createDateFilter (dateFilter) {
-      return angular.copy(dateFilter);
+      return angular.copy(dateFilter) || [];
     }
 
     processData.provide('filterData', [ 'processDefinition', 'allProcessDefinitions', 'filter', 'parent', 'bpmnElements', function(definition, allDefinitions, filter, parent, bpmnElements) {
@@ -539,14 +539,15 @@ ngDefine('cockpit.pages.processDefinition', [
     };
 
     $scope.addStartDateFilter = function() {
-      var value = dateFilter(Date.now(), dateFormat)
+      var value = dateFilter(Date.now(), dateFormat),
+          start = filterData.start = filterData.start || [];
 
-      if (!filterData.start.length) {
-        filterData.start.push({ type: 'after', value: value });
+      if (start && !start.length) {
+        start.push({ type: 'after', value: value });
 
-      } else if (filterData.start.length === 1) {
-        var newType = filterData.start[0].type === 'after' ? 'before' : 'after';
-        filterData.start.push({ type: newType, value: value });
+      } else if (start.length === 1) {
+        var newType = start[0].type === 'after' ? 'before' : 'after';
+        start.push({ type: newType, value: value });
       } else {
         // it should not be possible to add more than two startDateFilter.
         return;
