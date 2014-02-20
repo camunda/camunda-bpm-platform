@@ -61,7 +61,7 @@
         <form name="filterForm" novalidate ng-submit="filterChanged()">
           <ul class="unstyled">
 
-            <li class="filter">
+            <li class="version-filter filter">
               <span class="name">
                 Version
               </span>
@@ -81,7 +81,7 @@
               </div>
             </li>
 
-            <li class="filter" ng-if="filterData.parent">
+            <li class="parent-filter filter" ng-if="filterData.parent">
               <div class="name">
                 Parent
               </div>
@@ -99,7 +99,7 @@
               </div>
             </li>
 
-            <li class="filter" ng-if="filterData.businessKey">
+            <li class="business-key-filter filter" ng-if="filterData.businessKey">
               <div class="name">
                 Business Key
               </div>
@@ -120,7 +120,7 @@
               </div>
             </li>
 
-            <li class="filter" ng-if="filterData.start.length">
+            <li class="date-filter filter" ng-if="filterData.start.length">
               <div class="name">
                 Start Date
               </div>
@@ -171,10 +171,9 @@
                       ng-disabled="filterData.start.length === 2">
                 <i class="icon-plus"></i>
               </button>
-
             </li>
 
-            <li class="filter" ng-if="filterData.variables.length">
+            <li class="variable-filter filter" ng-if="filterData.variables.length">
               <div class="name">
                 Variables <a href ng-click="toggleVariableFilterHelp()" title="Get help on variable filters"><i class="icon-question-sign"></i></a>
               </div>
@@ -232,7 +231,7 @@
               </div>
             </li>
 
-            <li class="filter" ng-if="filterData.activities.length">
+            <li class="activity-filter filter" ng-if="filterData.activities.length">
               <div class="name">
                 Activity
               </div>
