@@ -426,7 +426,7 @@ module.exports = function(grunt) {
 
       dist: {
         options: {
-          cleancss: true
+          compress: true
         },
         files: {
           'target/webapp/assets/css/common.css': 'src/main/webapp/assets/styles/common.less',
