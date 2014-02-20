@@ -12,7 +12,8 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
       scope: {
         node: '=activityInstanceTree',
         onElementClick: '&',
-        selection: '='
+        selection: '=',
+        quickFilters: '='
       },
       link: function(scope, element /*, attrs, processDiagram */ ) {
 

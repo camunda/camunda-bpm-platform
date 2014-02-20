@@ -1,15 +1,16 @@
-ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
-
+/* global ngDefine: false */
+ngDefine('camunda.common.directives', function(module) {
+  'use strict';
   var Directive = function() {
     return {
       restrict: 'A',
       require: 'ngModel',
       link: function (scope, element, attrs, model) {
-        
+
         var EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        
+
         model.$parsers.unshift(function(viewValue) {
-          if (EMAIL_REGEX.test(viewValue) || viewValue=='') {
+          if (EMAIL_REGEX.test(viewValue) || !viewValue) {
             model.$setValidity('email', true);
             return viewValue;
           } else {
@@ -21,6 +22,6 @@ ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
     };
   };
 
-  module.directive("email", Directive);
+  module.directive('email', Directive);
 
 });

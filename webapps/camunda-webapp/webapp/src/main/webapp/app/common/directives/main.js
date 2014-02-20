@@ -6,6 +6,7 @@
 ngDefine('camunda.common.directives', [
   'module:camunda.common.directives.notificationsPanel:./notificationsPanel',
   './email',
+  './quickFilter',
   './help',
   './requestAware',
   './engineSelect',

@@ -1,0 +1,54 @@
+<!-- # CE - src/main/webapp/app/common/directives/quick-filter.html -->
+<form name="quickFilters"
+      class="quick-filters">
+  <div class="quick-filter name-filter"
+       ng-if="showNameFilter">
+   <label class="input-append">
+     <input ng-keyup="search()"
+            ng-model="name"
+            name="name"
+            type="text" />
+     <span class="add-on"
+           help
+           help-text="Click here to clear the field value.">
+       <i class="icon-search"
+          ng-click="clearName()"></i>
+     </span>
+   </label>
+  </div>
+
+  <div class="quick-filter state-filter"
+       ng-if="showStateFilter">
+    <span class="name">State</span>
+    <ul class="inline">
+      <li>
+        <label class="btn btn-mini">
+          <i class="icon-adjust"></i>
+          <input ng-click="search()"
+                 ng-model="running"
+                 name="running"
+                 type="checkbox" />
+        </label>
+      </li>
+      <li>
+        <label class="btn btn-mini">
+          <i class="icon-ok-circle"></i>
+          <input ng-click="search()"
+                 ng-model="completed"
+                 name="completed"
+                 type="checkbox" />
+        </label>
+      </li>
+      <li>
+        <label class="btn btn-mini">
+          <i class="icon-ban-circle"></i>
+          <input ng-click="search()"
+                 ng-model="canceled"
+                 name="canceled"
+                 type="checkbox" />
+        </label>
+      </li>
+    </ul>
+  </div>
+</form>
+<!-- / CE - src/main/webapp/app/common/directives/quick-filter.html -->

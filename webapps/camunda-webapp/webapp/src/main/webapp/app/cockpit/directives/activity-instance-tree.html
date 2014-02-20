@@ -1,9 +1,11 @@
 <!-- # CE - src/main/webapp/app/cockpit/directives/activity-instance-tree.html -->
 <div class="tree-node" >
 
-  <div class="tree-node-group">
+  <div ng-class="{ 'state-running': !node.endTime, 'state-completed' : node.endTime && !node.canceled, 'state-canceled': node.endTime && node.canceled }"
+       class="tree-node-group">
 
-    <span class="tree-node-label" ng-class="{ 'selected' : node.isSelected }">
+    <span class="tree-node-label"
+          ng-class="{ 'selected' : node.isSelected, 'has-children': node.children.length }">
 
       <button class="btn btn-link btn-control-link btn-toggle" ng-if="node.children.length" ng-click="toggleOpen()">
         <i ng-class="{ 'icon-chevron-right' : !node.isOpen, 'icon-chevron-down' : node.isOpen }"></i>

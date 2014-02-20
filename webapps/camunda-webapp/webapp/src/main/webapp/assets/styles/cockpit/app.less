@@ -414,11 +414,11 @@ a.expand-collapse {
   select,
   input[type=text] {
     margin: 0 0 5px 0;
-    height: 26px;
     width: 100%;
 
-    -moz-box-sizing: border-box;
-         box-sizing: border-box;
+    // height: 26px;
+    // -moz-box-sizing: border-box;
+    //      box-sizing: border-box;
   }
 
   .search-date {
@@ -572,7 +572,7 @@ textarea.variable-type-string {
 
     ul {
       margin-left: 19px;
-      margin-bottom: 10px;
+      // margin-bottom: 10px;
     }
 
     .tree-node-label.selected > .remove {
@@ -591,13 +591,30 @@ textarea.variable-type-string {
 
   .tree-node-group {
     position: relative;
-    display: table;
-    border-collapse: separate;
 
     > .tree-node-label {
       border-radius: 4px 0 0 4px;
       border-right: none;
-      padding: 1px 5px;
+      padding: 0 5px;
+      position: relative;
+      a {
+        padding: 2px 5px;
+        position: absolute;
+        display: block;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1;
+      }
+      button {
+        top: 2px;
+        position: relative;
+        z-index: 2;
+      }
+    }
+    .has-children a {
+      left: 20px;
     }
 
     > .tree-node-addon {
@@ -611,6 +628,7 @@ textarea.variable-type-string {
     width: 100%;
     border-radius: 4px;
     border: solid 1px #CCC;
+    // cursor: pointer;
 
     .remove {
       display: none;
@@ -654,8 +672,31 @@ textarea.variable-type-string {
     }
 
   }
-
 }
+
+.quick-filters {
+  .btn {
+    // [type="checkbox"] {
+    //   display: none;
+    // }
+    input, i {
+      vertical-align: sub;
+    }
+  }
+  .quick-filter {
+    min-height: 40px;
+    position: relative;
+  }
+  .name-filter,
+  .state-filter {
+    margin-top: 3px;
+    position: relative;
+  }
+  .input-append {
+    margin: 0;
+  }
+}
+
 
 select.ng-invalid.ng-invalid-date-type-equal {
   border-color: #E9322D;
