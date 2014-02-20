@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-xml-model</artifactId>
-  <name>camunda XML Model API</name>
+  <name>camunda BPM - XML Model API</name>
   <parent>
     <groupId>org.camunda.bpm.model</groupId>
     <artifactId>camunda-bpmn-model-parent</artifactId>
