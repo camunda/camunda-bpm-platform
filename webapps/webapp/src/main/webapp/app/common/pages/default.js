@@ -47,6 +47,8 @@ ngDefine('camunda.common.pages', ['jquery'], function(module, $) {
         if ($location.absUrl().indexOf('/setup/#') == -1) {
           addError({ type: 'warning', status: 'Session ended', message: 'Your session timed out or was ended from another browser window. Please signin again.' });
 
+          $('head title').text('camunda Login');
+
           $location.path('/login');
         } else {
           $location.path('/setup');
@@ -131,7 +133,7 @@ ngDefine('camunda.common.pages', ['jquery'], function(module, $) {
         AuthenticationService.logout().then(function() {
           $cacheFactory.get('$http').removeAll();
           // page.titleSet('camunda Cockpit');
-          $('head title').text('camunda Cockpit');
+          $('head title').text('camunda Login');
           $window.location.href = Uri.appUri('app://#/login');
         });
       };
