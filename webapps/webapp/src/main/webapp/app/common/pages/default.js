@@ -1,5 +1,5 @@
 /* global ngDefine: false, angular: false */
-ngDefine('camunda.common.pages', function(module) {
+ngDefine('camunda.common.pages', ['jquery'], function(module, $) {
   'use strict';
   var ResponseErrorHandlerInitializer = [
     '$rootScope', '$location', 'Notifications', 'Authentication',
@@ -123,12 +123,15 @@ ngDefine('camunda.common.pages', function(module) {
   }];
 
   var AuthenticationController = [
-    '$scope', '$window', '$cacheFactory', 'Notifications', 'AuthenticationService', 'Uri', 'page',
-    function($scope, $window, $cacheFactory, Notifications, AuthenticationService, Uri, page) {
+    '$scope', '$window', '$cacheFactory', 'Notifications', 'AuthenticationService', 'Uri',
+    function($scope, $window, $cacheFactory, Notifications, AuthenticationService, Uri) {
+    // '$scope', '$window', '$cacheFactory', 'Notifications', 'AuthenticationService', 'Uri', 'page',
+    // function($scope, $window, $cacheFactory, Notifications, AuthenticationService, Uri, page) {
       $scope.logout = function() {
         AuthenticationService.logout().then(function() {
           $cacheFactory.get('$http').removeAll();
-          page.titleSet('camunda Cockpit');
+          // page.titleSet('camunda Cockpit');
+          $('head title').text('camunda Cockpit');
           $window.location.href = Uri.appUri('app://#/login');
         });
       };
