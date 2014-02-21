@@ -207,7 +207,7 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
     // getting the variable cache does not empty it:
     assertEquals(Collections.singletonMap("anotherVariableName", "aVariableValue"), businessProcess.getVariableLocalCache());
   }
-  
+
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
   public void testGetVariableLocal()
@@ -217,13 +217,13 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
     TaskService taskService = getBeanInstance(TaskService.class);
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    
+
     assertNotNull(task);
-    
+
     businessProcess.startTask(task.getId());
-    
+
     businessProcess.setVariableLocal("aVariableName", "aVariableValue");
-    
+
     // Flushing and re-getting should retain the value (CAM-1806):
     businessProcess.flushVariableCache();
     assertTrue(businessProcess.getVariableLocalCache().isEmpty());
@@ -378,6 +378,7 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
     assertNull(taskService.createTaskQuery().taskAssignee("jonny").singleResult());
     // business process is not associated with task:
     assertFalse(businessProcess.isTaskAssociated());
+    assertFalse(businessProcess.isAssociated());
   }
 
 }
