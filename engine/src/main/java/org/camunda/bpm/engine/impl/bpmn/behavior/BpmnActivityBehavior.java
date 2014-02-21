@@ -119,6 +119,10 @@ public class BpmnActivityBehavior {
         } else {
           throw new ProcessEngineException("Default sequence flow '" + defaultSequenceFlow + "' could not be not found");
         }
+
+      } else if (!outgoingTransitions.isEmpty()) {
+        throw new ProcessEngineException("No conditional sequence flow leaving the Flow Node '" + execution.getActivity().getId() + "' could be selected for continuing the process");
+
       } else {
 
         Object isForCompensation = execution.getActivity().getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION);
