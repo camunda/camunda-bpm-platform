@@ -23,5 +23,43 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Import-Package>
+              javax.xml.parsers,
+              javax.xml.transform,
+              javax.xml.transform.dom,javax.xml.transform.stream,
+              javax.xml.validation,
+              org.assertj.core.api;version="[1.5,2)";resolution:=optional,
+              org.w3c.dom,
+              org.xml.sax
+            </Import-Package>
+          </instructions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
