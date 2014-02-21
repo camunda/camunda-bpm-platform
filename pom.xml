@@ -45,8 +45,7 @@
         
         <module>engine</module>
         <module>engine-cdi</module>
-        <module>engine-osgi</module>
-        <module>engine-spring</module>          
+        <module>engine-spring</module>
         <module>engine-rest</module>
 
         <module>examples/invoice</module>
@@ -87,7 +86,6 @@
       <modules>
         <module>engine</module>
         <module>engine-cdi</module>
-        <module>engine-osgi</module>
         <module>engine-spring</module>          
         <module>engine-rest</module>
   
@@ -111,7 +109,6 @@
       <modules>
         <module>engine</module>
         <module>engine-cdi</module>
-        <!--<module>engine-osgi</module>-->
         <module>engine-spring</module>
         <module>engine-rest</module>
 
