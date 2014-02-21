@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,7 +13,9 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.Expression;
@@ -22,37 +24,57 @@ import org.camunda.bpm.engine.impl.bpmn.helper.ClassDelegate;
 import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.delegate.ActivityBehaviorInvocation;
 import org.camunda.bpm.engine.impl.delegate.JavaDelegateInvocation;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 
 
 /**
  * {@link ActivityBehavior} used when 'delegateExpression' is used
  * for a serviceTask.
- * 
+ *
  * @author Joram Barrez
  * @author Josh Long
  * @author Slawomir Wojtasiak (Patch for ACT-1159)
  * @author Falko Menge
  */
 public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityBehavior {
-  
+
   protected Expression expression;
   private final List<FieldDeclaration> fieldDeclarations;
-  
+
   public ServiceTaskDelegateExpressionActivityBehavior(Expression expression, List<FieldDeclaration> fieldDeclarations) {
     this.expression = expression;
     this.fieldDeclarations = fieldDeclarations;
   }
 
   @Override
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-    Object delegate = expression.getValue(execution);
-    if( delegate instanceof SignallableActivityBehavior){
-      ((SignallableActivityBehavior) delegate).signal( execution , signalName , signalData);
+  public void signal(final ActivityExecution execution, final String signalName, final Object signalData) throws Exception {
+    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication((InterpretableExecution) execution);
+
+    if (!ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
+
+      Object delegate = expression.getValue(execution);
+      ClassDelegate.applyFieldDeclaration(fieldDeclarations, delegate);
+      ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution, delegate);
+
+      if (activityBehaviorInstance instanceof SignallableActivityBehavior) {
+        ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
+      }
+
+    } else {
+      Context.executeWithinProcessApplication(new Callable<Void>() {
+
+        public Void call() throws Exception {
+          signal(execution, signalName, signalData);
+          return null;
+        }
+
+      }, targetProcessApplication);
     }
   }
 
@@ -100,6 +122,27 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
       }
 
     }
+  }
+
+  protected ActivityBehavior getActivityBehaviorInstance(ActivityExecution execution, Object delegateInstance) {
+
+    if (delegateInstance instanceof ActivityBehavior) {
+      return determineBehaviour((ActivityBehavior) delegateInstance, execution);
+    } else if (delegateInstance instanceof JavaDelegate) {
+      return determineBehaviour(new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance), execution);
+    } else {
+      throw new ProcessEngineException(delegateInstance.getClass().getName() + " doesn't implement " + JavaDelegate.class.getName() + " nor "
+          + ActivityBehavior.class.getName());
+    }
+  }
+
+  // Adds properties to the given delegation instance (eg multi instance) if needed
+  protected ActivityBehavior determineBehaviour(ActivityBehavior delegateInstance, ActivityExecution execution) {
+    if (hasMultiInstanceCharacteristics()) {
+      multiInstanceActivityBehavior.setInnerActivityBehavior((AbstractBpmnActivityBehavior) delegateInstance);
+      return multiInstanceActivityBehavior;
+    }
+    return delegateInstance;
   }
 
 }
