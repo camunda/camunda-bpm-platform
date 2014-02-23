@@ -73,7 +73,7 @@
     </camunda.osgi.import.pkg>
     <camunda.osgi.activator />
     <camunda.osgi.failok>false</camunda.osgi.failok>
-    <camunda.osgi.export>${camunda.osgi.export.pkg};${camunda.osgi.version};-noimport:=true</camunda.osgi.export>
+    <camunda.osgi.export>!org.camunda.bpm.model*, ${camunda.osgi.export.pkg};${camunda.osgi.version};-noimport:=true</camunda.osgi.export>
     <!--
     <camunda.osgi.export.pkg>!*.impl;${camunda.artifact}*</camunda.osgi.export.pkg>
     <camunda.osgi.private.pkg>${camunda.artifact}*.impl</camunda.osgi.private.pkg>
@@ -645,7 +645,7 @@
              <Bundle-SymbolicName>${camunda.osgi.symbolic.name}</Bundle-SymbolicName>
              <Bundle-Activator>${camunda.osgi.activator}</Bundle-Activator>
              <Export-Package>${camunda.osgi.export}</Export-Package>
-             <Import-Package>org.camunda.bpm.engine.osgi*;resolution:=optional, ${camunda.osgi.import}</Import-Package>
+             <Import-Package>${camunda.osgi.import}</Import-Package>
              <DynamicImport-Package>${camunda.osgi.dynamic}</DynamicImport-Package>
              <Private-Package>${camunda.osgi.private.pkg}</Private-Package>
              <Implementation-Title>camunda</Implementation-Title>
