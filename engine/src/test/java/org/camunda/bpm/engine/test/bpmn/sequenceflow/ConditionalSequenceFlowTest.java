@@ -44,7 +44,7 @@ public class ConditionalSequenceFlowTest extends PluggableProcessEngineTestCase 
   }
 
   /**
-   * Test that Conditional Sequence Flows thow an exception, if no condition
+   * Test that Conditional Sequence Flows throw an exception, if no condition
    * evaluates to true.
    *
    * BPMN 2.0.1 p. 427 (PDF 457):
@@ -57,11 +57,10 @@ public class ConditionalSequenceFlowTest extends PluggableProcessEngineTestCase 
    */
   @Deployment
   public void testNoExpressionTrueThrowsException() {
-    Map<String, Object> variables = CollectionUtil.singletonMap("input", "right");
-    variables = CollectionUtil.singletonMap("input", "non-existing-value");
+    Map<String, Object> variables = CollectionUtil.singletonMap("input", "non-existing-value");
     try {
       runtimeService.startProcessInstanceByKey("condSeqFlowUelExpr", variables);
-      fail("Expected Exception");
+      fail("Expected ProcessEngineException");
     } catch (ProcessEngineException e) {
       assertTextPresent("No conditional sequence flow leaving the Flow Node 'theStart' could be selected for continuing the process", e.getMessage());
     }
