@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -54,10 +55,13 @@ public class DeploymentCache {
     if (processDefinitionId == null) {
       throw new ProcessEngineException("Invalid process definition id : null");
     }
-    ProcessDefinitionEntity processDefinition = Context
-      .getCommandContext()
-      .getProcessDefinitionManager()
-      .findLatestProcessDefinitionById(processDefinitionId);
+    CommandContext commandContext = Context.getCommandContext();
+    ProcessDefinitionEntity processDefinition = commandContext.getDbSqlSession().findInCache(ProcessDefinitionEntity.class, processDefinitionId);
+    if(processDefinition == null) {
+      processDefinition = commandContext
+        .getProcessDefinitionManager()
+        .findLatestProcessDefinitionById(processDefinitionId);
+    }
     if(processDefinition == null) {
       throw new ProcessEngineException("no deployed process definition found with id '" + processDefinitionId + "'");
     }
