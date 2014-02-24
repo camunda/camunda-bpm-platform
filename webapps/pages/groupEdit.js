@@ -4,7 +4,7 @@ define(['angular'], function(angular) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', '$routeParams', 'GroupResource', 'AuthorizationResource', 'Notifications', '$location', '$window', 
+  var Controller = ['$scope', '$routeParams', 'GroupResource', 'AuthorizationResource', 'Notifications', '$location', '$window',
     function ($scope, $routeParams, GroupResource, AuthorizationResource, Notifications, $location, $window) {
 
     $scope.group = null;
@@ -17,7 +17,7 @@ define(['angular'], function(angular) {
 
     /** form must be valid & user must have made some changes */
     var canSubmit = $scope.canSubmit = function(form, modelObject) {
-      return form.$valid 
+      return form.$valid
         && !form.$pristine
         && (modelObject == null || !angular.equals($scope[modelObject], $scope[modelObject+'Copy']));
     };
@@ -35,10 +35,10 @@ define(['angular'], function(angular) {
     GroupResource.OPTIONS({groupId : $routeParams.groupId}).$then(function(response) {
       angular.forEach(response.data.links, function(link){
         $scope.availableOperations[link.rel] = true;
-      });    
+      });
     });
 
-    $scope.updateGroup = function() {      
+    $scope.updateGroup = function() {
 
       GroupResource.update($scope.group).$then(
         function(){
@@ -72,18 +72,18 @@ define(['angular'], function(angular) {
     }
 
     // page controls ////////////////////////////////////
-    
+
     $scope.show = function(fragment) {
       return fragment == $location.search().tab;
     };
 
     $scope.activeClass = function(link) {
-      var path = $location.absUrl();      
+      var path = $location.absUrl();
       return path.indexOf(link) != -1 ? "active" : "";
     };
 
     // initialization ///////////////////////////////////
-    
+
     loadGroup();
 
     if(!$location.search().tab) {
@@ -95,7 +95,7 @@ define(['angular'], function(angular) {
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/groups/:groupId', {
-      templateUrl: 'pages/groupEdit.html',
+      templateUrl: require.toUrl('./app/admin/pages/groupEdit.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
