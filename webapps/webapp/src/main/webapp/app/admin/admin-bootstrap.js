@@ -8,6 +8,7 @@
   require([baseUrl +'require-conf'], function(rjsConf) {
     require({
       baseUrl:    baseUrl,
+      urlArgs:    rjsConf.urlArgs,
       paths:      rjsConf.paths,
       shim:       rjsConf.shim,
       packages:   rjsConf.packages.concat(pluginPackages)

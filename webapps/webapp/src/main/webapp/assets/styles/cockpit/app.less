@@ -597,6 +597,7 @@ textarea.variable-type-string {
       border-right: none;
       padding: 0 5px;
       position: relative;
+
       a {
         padding: 2px 5px;
         position: absolute;
@@ -606,15 +607,24 @@ textarea.variable-type-string {
         left: 0;
         right: 0;
         z-index: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
+
       button {
         top: 2px;
         position: relative;
         z-index: 2;
       }
     }
+
     .has-children a {
       left: 20px;
+    }
+
+    .selected a {
+      right: 20px;
     }
 
     > .tree-node-addon {
@@ -686,14 +696,25 @@ textarea.variable-type-string {
   .quick-filter {
     min-height: 40px;
     position: relative;
+    max-width: 100%;
+    margin-top: 3px;
   }
   .name-filter,
   .state-filter {
-    margin-top: 3px;
-    position: relative;
+  }
+  .name-filter {
+    overflow: hidden;
+    max-width: 100%;
+    input {
+      max-width: 100%;
+    }
   }
   .input-append {
     margin: 0;
+    width: auto;
+    max-width: 100%;
+    left: 0;
+    right: 0;
   }
 }
 

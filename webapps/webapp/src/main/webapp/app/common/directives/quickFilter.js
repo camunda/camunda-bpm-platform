@@ -1,4 +1,4 @@
-/* global ngDefine: false */
+/* global ngDefine: false, require: false */
 /**
   Defines a widget to filter activity instances in the activity tree
 
@@ -55,7 +55,7 @@ ngDefine('camunda.common.directives', ['jquery'], function(module, $) {
 
       restrict: 'A',
 
-      templateUrl: './../../common/directives/quick-filter.html',
+      templateUrl: require.toUrl('./app/common/directives/quick-filter.html'),
 
       link: function(scope, element, attrs) {
         if (!scope.holderSelector) {

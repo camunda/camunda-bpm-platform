@@ -65,6 +65,15 @@
   conf.baseUrl = '/camunda/';
 
   /**
+   * Arguments (query string) used by require.js to build the URL
+   * of the different modules to be loaded.
+   * This property is used to prevent browsers to keep outdated versions of a file.
+   * {@link http://requirejs.org/docs/api.html#config-urlArgs|See the require.js docs for **urlArgs** configuration}
+   * @type {string}
+   */
+  conf.urlArgs = ''/* cache-busting +'bust=' + CACHE_BUSTER /* */;
+
+  /**
    * Keys are module names and values are paths or URLs.
    * {@link http://requirejs.org/docs/api.html#config-paths|See the require.js docs for **paths** configuration}
    * @type {Object.<string, string>}

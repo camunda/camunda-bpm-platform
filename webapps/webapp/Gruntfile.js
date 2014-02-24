@@ -5,37 +5,24 @@ var _ = require('underscore');
 var rjsConf = require('./src/main/webapp/require-conf');
 
 var commentLineExp = /^[\s]*<!-- (\/|#) (CE|EE)/;
+var requireConfExp = /require-conf.js$/;
 
 function distFileProcessing(content, srcpath) {
   // removes the template comments
   content = content
             .split('\n').filter(function(line) {
-              // console.info(line.slice(0, 10), !commentLineExp.test(line));
               return !commentLineExp.test(line);
             }).join('\n');
 
+  var date = new Date();
+  var cacheBuster = [date.getFullYear(), date.getMonth(), date.getDate()].join('-');
+  content = content
+            .replace(/\/\* cache-busting /, '/* cache-busting */')
+            .replace(/CACHE_BUSTER/g, requireConfExp.test(srcpath) ? '\''+ cacheBuster +'\'' : cacheBuster);
+
   return content;
 }
 
-
-function developmentFileProcessing(content, srcpath) {
-  // Unfortunately, this might (in some cases) make angular complaining
-  // about template having no single root element
-  // (when the "replace" option is set to "true").
-
-  // if (/\.html$/.test(srcpath)) {
-  //   content = '<!-- # CE - auto-comment - '+ srcpath +' -->\n'+
-  //             content +
-  //             '\n<!-- / CE - auto-comment - '+ srcpath +' -->';
-  // }
-
-  if (/require-conf.js$/.test(srcpath)) {
-    content = content
-              .replace(/\/\* live-reload/, '/* live-reload */')
-              .replace(/LIVERELOAD_PORT/g, "<%= app.liveReloadPort %>");
-  }
-  return content;
-}
 
 module.exports = function(grunt) {
 
@@ -97,9 +84,16 @@ module.exports = function(grunt) {
 
             var liveReloadPort = grunt.config('app.liveReloadPort');
 
-            return content
-              .replace(/\/\* live-reload/, '/* live-reload */')
-              .replace(/LIVERELOAD_PORT/g, liveReloadPort);
+            if (requireConfExp.test(srcpath)) {
+              content = content
+                        .replace(/\/\* live-reload/, '/* live-reload */')
+                        .replace(/LIVERELOAD_PORT/g, liveReloadPort);
+            }
+
+            content = content
+                      .replace(/\/\* cache-busting/, '/* cache-busting */')
+                      .replace(/CACHE_BUSTER/g, (new Date()).getTime());
+            return content;
           }
         }
       },
@@ -132,35 +126,6 @@ module.exports = function(grunt) {
         options: {
           process: distFileProcessing
         }
-      },
-
-      // for now, copy as development, but leave the livereload comment
-      dist: {
-        files: [
-          {
-            expand: true,
-            cwd: 'src/main/webapp/WEB-INF',
-            src: ['*'],
-            dest: 'target/webapp/WEB-INF'
-          },
-          {
-            expand: true,
-            cwd: 'src/main/webapp/',
-            src: [
-              'require-conf.js',
-              'index.html'
-            ],
-            dest: 'target/webapp/'
-          },
-          {
-            expand: true,
-            cwd: 'src/main/webapp/',
-            src: [
-              '{app,plugin,develop,common}/{,**/}*.{js,html}'
-            ],
-            dest: 'target/webapp/'
-          }
-        ]
       },
 
       assets: {
