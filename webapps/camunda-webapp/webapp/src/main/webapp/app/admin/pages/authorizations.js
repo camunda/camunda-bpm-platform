@@ -2,7 +2,7 @@ define([ 'angular', 'require' ], function(angular, require) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', '$routeParams', '$dialog', 'AuthorizationResource', 'Notifications', '$location', 
+  var Controller = ['$scope', '$routeParams', '$dialog', 'AuthorizationResource', 'Notifications', '$location',
     function ($scope, $routeParams, $dialog, AuthorizationResource, Notifications, $location) {
 
     $scope.allPermissionsValue = 2147483647;
@@ -26,14 +26,14 @@ define([ 'angular', 'require' ], function(angular, require) {
     $scope.typeMap = {
       0: "GLOBAL",
       1: "ALLOW",
-      2: "DENY"      
+      2: "DENY"
     };
 
     $scope.getIdentityId = function(auth) {
       if(!!auth.userId) {
         return auth.userId;
       } else {
-        return auth.groupId; 
+        return auth.groupId;
       }
     };
 
@@ -47,13 +47,13 @@ define([ 'angular', 'require' ], function(angular, require) {
     var getType = $scope.getType = function(authorization) {
       return $scope.typeMap[authorization.type];
     }
-    
-    var getResource = $scope.getResource = function(resourceType) {      
+
+    var getResource = $scope.getResource = function(resourceType) {
       return $scope.resourceMap[resourceType];
     }
 
-    var formatPermissions = $scope.formatPermissions = function(permissionsList) {    
-        
+    var formatPermissions = $scope.formatPermissions = function(permissionsList) {
+
       // custom handling of NONE:
       // (permission NONE is trivially contained in all GRANTs and GLOBALs)
       var nonePos = permissionsList.indexOf("NONE");
@@ -70,7 +70,7 @@ define([ 'angular', 'require' ], function(angular, require) {
         for (var i = 0; i < permissionsList.length; i++) {
           if(i>0) {
             result += ", ";
-          } 
+          }
           result += permissionsList[i];
         };
         return result;
@@ -78,7 +78,7 @@ define([ 'angular', 'require' ], function(angular, require) {
     };
 
     $scope.deleteAuthorization = function(authorization) {
-      
+
       var dialog = $dialog.dialog({
         controller: 'ConfirmDeleteAuthorizationController',
         templateUrl: require.toUrl('./confirm-delete-authorization.html'),
@@ -95,7 +95,7 @@ define([ 'angular', 'require' ], function(angular, require) {
         if (result == 'SUCCESS') {
           loadAuthorizations();
         }
-      });   
+      });
     };
 
     var loadAuthorizations = $scope.loadAuthorizations = function() {
@@ -113,20 +113,20 @@ define([ 'angular', 'require' ], function(angular, require) {
     };
 
     // page controls ////////////////////////////////////
-    
+
     $scope.show = function(fragment) {
       return fragment == $location.search().tab;
     };
 
     $scope.activeClass = function(link) {
-      var path = $location.absUrl();      
+      var path = $location.absUrl();
       return path.indexOf(link) != -1 ? "active" : "";
     };
 
     // init ////////////////////////////////////
 
     createResourceList();
-    
+
     if(!$location.search().resource) {
       $location.search({'resource': 0});
       $location.replace();
@@ -145,7 +145,7 @@ define([ 'angular', 'require' ], function(angular, require) {
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/authorization', {
-      templateUrl: 'pages/authorizations.html',
+      templateUrl: require.toUrl('./pages/authorizations.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,

@@ -138,7 +138,7 @@ ngDefine('cockpit.pages.processDefinition', [
         }
 
         if (before) {
-          result.push({ type: 'before', value: before }); 
+          result.push({ type: 'before', value: before });
         }
 
         return result;
@@ -629,7 +629,8 @@ ngDefine('cockpit.pages.processDefinition', [
       redirectTo: routeUtil.redirectToLive
     })
     .when('/process-definition/:id/live', {
-      templateUrl: 'pages/process-definition.html',
+      templateUrl: require.toUrl('./app/cockpit/pages/process-definition.html'),
+
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,

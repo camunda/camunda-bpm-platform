@@ -3,7 +3,7 @@ ngDefine('tasklist.pages', [
   'bpmn/Bpmn',
 ], function(module, angular, Bpmn) {
 
-  var OverviewController = [ '$rootScope', '$scope', '$location', 'debounce', 'EngineApi', 'Notifications', 'authenticatedUser', 
+  var OverviewController = [ '$rootScope', '$scope', '$location', 'debounce', 'EngineApi', 'Notifications', 'authenticatedUser',
                      function($rootScope, $scope, $location, debounce, EngineApi, Notifications, authenticatedUser) {
 
     var fireTaskListChanged = debounce(function() {
@@ -52,7 +52,7 @@ ngDefine('tasklist.pages', [
     });
 
     $scope.groupInfo = EngineApi.getGroups(authenticatedUser);
-    
+
     function loadTasks(view) {
       var filter = view.filter,
           search = view.search;
@@ -199,11 +199,11 @@ ngDefine('tasklist.pages', [
         return;
       }
 
-      if (task.selected === false) {      
+      if (task.selected === false) {
         $scope.taskList.selection.splice(index, 1);
 
         if ($scope.allTasksSelected === true) {
-          $scope.allTasksSelected = false;  
+          $scope.allTasksSelected = false;
         }
         return;
       }
@@ -265,7 +265,7 @@ ngDefine('tasklist.pages', [
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/overview', {
-      templateUrl: 'pages/overview.html',
+      templateUrl: require.toUrl('./app/tasklist/pages/overview.html'),
       controller: OverviewController,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,

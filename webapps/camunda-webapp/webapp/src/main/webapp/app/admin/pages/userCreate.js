@@ -25,7 +25,7 @@ define(['angular'], function(angular) {
         profile : $scope.profile,
         credentials : { password : $scope.credentials.password }
       }
-      
+
       UserResource.createUser(user).$then(function() {
         Notifications.addMessage({ type: "success", status: "Success", message: "Created new user "+user.profile.id});
         $location.path("/users");
@@ -39,7 +39,7 @@ define(['angular'], function(angular) {
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/user-create', {
-      templateUrl: 'pages/userCreate.html',
+      templateUrl: require.toUrl('./app/admin/pages/userCreate.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,

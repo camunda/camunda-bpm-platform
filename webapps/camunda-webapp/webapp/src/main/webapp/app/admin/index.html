@@ -12,7 +12,7 @@
     <base href="$BASE" admin-api="$APP_ROOT/api/admin/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
 
     <!-- Styles -->
-    <link href="$APP_ROOT/assets/css/admin/loader.css" rel="stylesheet" />
+    <link href="$APP_ROOT/assets/css/admin/loader.css?bust=CACHE_BUSTER" rel="stylesheet" />
 
     <!-- For IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
     <![endif]-->
     <script src="$APP_ROOT/assets/vendor/requirejs/require.js"></script>
 
-    <script src="$APP_ROOT/app/admin/admin-bootstrap.js"></script>
+    <script src="$APP_ROOT/app/admin/admin-bootstrap.js?bust=CACHE_BUSTER"></script>
   </head>
   <body>
     <!-- navigation -->

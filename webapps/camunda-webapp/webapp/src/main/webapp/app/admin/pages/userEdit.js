@@ -97,7 +97,7 @@ define([ 'angular', 'require' ], function(angular, require) {
               Notifications.addError({ status: "Password", message: "Your password is not valid.", exclusive: true });
             }
           } else {
-            Notifications.addError({ status: "Password", message: "Could not change the password." });  
+            Notifications.addError({ status: "Password", message: "Could not change the password." });
           }
         });
     }
@@ -197,7 +197,7 @@ define([ 'angular', 'require' ], function(angular, require) {
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/users/:userId', {
-      templateUrl: 'pages/userEdit.html',
+      templateUrl: require.toUrl('./pages/userEdit.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,

@@ -642,7 +642,7 @@ ngDefine('cockpit.pages.processInstance', [
       processData.set('filter', filterData.filter);
     };
 
-  };
+  }
 
   module
     .controller('ProcessInstanceFilterController', ['$scope', ProcessInstanceFilterController]);
@@ -654,7 +654,7 @@ ngDefine('cockpit.pages.processInstance', [
     });
 
     $routeProvider.when('/process-instance/:id/live', {
-      templateUrl: 'pages/process-instance.html',
+      templateUrl: require.toUrl('./pages/process-instance.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
