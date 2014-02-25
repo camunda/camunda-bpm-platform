@@ -1,5 +1,5 @@
 /* global ngDefine: false */
-ngDefine('camunda.common.directives.password', [], function(module) {
+ngDefine('camunda.common.directives', [], function(module) {
   'use strict';
 
   /**

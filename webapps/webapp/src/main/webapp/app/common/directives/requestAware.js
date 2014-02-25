@@ -1,5 +1,5 @@
 /* global ngDefine: false */
-ngDefine('camunda.common.directives.requestAware', [ 'angular', 'jquery' ], function(module, angular, $) {
+ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, angular, $) {
   'use strict';
 
   var requestAwareDirective = [ function() {

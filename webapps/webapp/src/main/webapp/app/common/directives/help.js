@@ -1,5 +1,5 @@
 /* global ngDefine: false */
-ngDefine('camunda.common.directives.help', [ 'jquery' ], function(module, $) {
+ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
   'use strict';
 
   var Directive = function() {
