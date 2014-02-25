@@ -125,7 +125,7 @@ ngDefine('tasklist.pages', [], function(module) {
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
 
     $routeProvider.when('/task/:id', {
-      templateUrl: 'pages/task.html',
+      templateUrl: require.toUrl('./app/tasklist/pages/task.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
@@ -135,7 +135,7 @@ ngDefine('tasklist.pages', [], function(module) {
     // controller which handles task completion
 
     $routeProvider.when('/task/:id/complete', {
-      templateUrl: 'pages/complete.html',
+      templateUrl: require.toUrl('./app/tasklist/pages/complete.html'),
       controller: CompleteController,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
@@ -146,7 +146,7 @@ ngDefine('tasklist.pages', [], function(module) {
 
     $routeProvider.when('/task/:id/resolve', {
       controller: ResolveController,
-      templateUrl: 'pages/resolve.html',
+      templateUrl: require.toUrl('./app/tasklist/pages/resolve.html'),
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
       }

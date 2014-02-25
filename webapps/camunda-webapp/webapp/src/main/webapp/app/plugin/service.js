@@ -117,7 +117,7 @@ ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
           angular.forEach(viewProviders, function(viewProvider) {
 
             if (viewProvider.url) {
-              viewProvider.url = Uri.appUri(viewProvider.url);
+              viewProvider.url = require.toUrl(Uri.appUri(viewProvider.url));
             }
           });
         });
