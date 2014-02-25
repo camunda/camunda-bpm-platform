@@ -71,7 +71,7 @@ ngDefine('cockpit.directives', [], function(module) {
         defaultValue:         '@default'
       },
 
-      templateUrl: './../../common/directives/in-place-text-field.html',
+      templateUrl: require.toUrl('./app/common/directives/in-place-text-field.html'),
 
       link: function postLink(scope) {
         if (!scope.property) {

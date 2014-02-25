@@ -183,7 +183,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
           groups: function() { return groups; }
         },
         controller: 'UserTaskGroupController',
-        templateUrl: './../../../plugin/base/app/views/processInstance/identity-links-modal.html'
+        templateUrl: require.toUrl('./plugin/base/app/views/processInstance/identity-links-modal.html')
       });
 
       dialog.open();
