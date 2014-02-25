@@ -82,10 +82,10 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   private static Logger log = Logger.getLogger(ExecutionEntity.class.getName());
 
   // Persistent refrenced entities state //////////////////////////////////////
-  protected static final int EVENT_SUBSCRIPTIONS_STATE_BIT = 1;
-  protected static final int TASKS_STATE_BIT = 2;
-  protected static final int JOBS_STATE_BIT = 3;
-  protected static final int INCIDENT_STATE_BIT = 4;
+  public static final int EVENT_SUBSCRIPTIONS_STATE_BIT = 1;
+  public static final int TASKS_STATE_BIT = 2;
+  public static final int JOBS_STATE_BIT = 3;
+  public static final int INCIDENT_STATE_BIT = 4;
 
   // current position /////////////////////////////////////////////////////////
 
@@ -312,6 +312,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     ExecutionEntity newExecution = new ExecutionEntity();
     newExecution.executions = new ArrayList<ExecutionEntity>();
 
+    initializeAssociations(newExecution);
+
     Context
       .getCommandContext()
       .getDbSqlSession()
@@ -337,15 +339,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       }
     }
 
-    // initialize the lists of referenced objects (prevents db queries)
-    variableInstances = new HashMap<String, VariableInstanceEntity>();
-    eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
-    jobs = new ArrayList<JobEntity>();
-    tasks = new ArrayList<TaskEntity>();
-    incidents = new ArrayList<IncidentEntity>();
-
-    // Cached entity-state initialized to null, all bits are zore, indicating NO entities present
-    cachedEntityState = 0;
+    initializeAssociations(this);
 
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
     if (timerDeclarations!=null) {
@@ -362,6 +356,18 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(scope)) {
       declaration.createSubscription(this);
     }
+  }
+
+  protected void initializeAssociations(ExecutionEntity execution) {
+    // initialize the lists of referenced objects (prevents db queries)
+    execution.variableInstances = new HashMap<String, VariableInstanceEntity>();
+    execution.eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
+    execution.jobs = new ArrayList<JobEntity>();
+    execution.tasks = new ArrayList<TaskEntity>();
+    execution.incidents = new ArrayList<IncidentEntity>();
+
+    // Cached entity-state initialized to null, all bits are zore, indicating NO entities present
+    execution.cachedEntityState = 0;
   }
 
   public void start() {
@@ -1572,6 +1578,10 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, JOBS_STATE_BIT, (jobs == null || jobs.size() > 0));
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, INCIDENT_STATE_BIT, (incidents == null || incidents.size() > 0));
 
+    return cachedEntityState;
+  }
+
+  public int getCachedEntityStateRaw() {
     return cachedEntityState;
   }
 
