@@ -1,12 +1,11 @@
 /* global ngDefine: false */
-ngDefine('camunda.common.directives.stateCircle', [], function(module) {
+ngDefine('camunda.common.directives', [], function(module) {
   'use strict';
 
   var CircleDirective = function () {
     return {
       restrict: 'EAC',
       link: function(scope, element, attrs) {
-
         element.addClass('circle');
 
         scope.$watch(attrs.incidents, function() {
