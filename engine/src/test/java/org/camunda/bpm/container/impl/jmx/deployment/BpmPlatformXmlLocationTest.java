@@ -29,7 +29,7 @@ public class BpmPlatformXmlLocationTest {
 
   // myWorkingDir is available through maven surefire configuration in camunda parent pom
   private static final String BPM_PLATFORM_XML_LOCATION_PARENT_DIR = System.getProperty("myWorkingDir") + File.separator +
-      "test-classes" + File.separator + BpmPlatformXmlLocationTest.class.getPackage().getName().replaceAll("\\.", File.separator);
+      "test-classes" + File.separator + BpmPlatformXmlLocationTest.class.getPackage().getName().replace(".", File.separator);
   private static final String BPM_PLATFORM_XML_LOCATION_ABSOLUTE_DIR = BPM_PLATFORM_XML_LOCATION_PARENT_DIR + File.separator + "conf";
   private static final String BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION = BPM_PLATFORM_XML_LOCATION_ABSOLUTE_DIR + File.separator + BPM_PLATFORM_XML_FILE;
 
@@ -71,7 +71,7 @@ public class BpmPlatformXmlLocationTest {
     assertNull("Relative path is invalid.", url);
 
     url = tomcatParseBpmPlatformXmlStep.checkValidFileLocation(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
-    assertEquals("file:" + BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION, url.toString());
+    assertEquals(new File(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION).toURI().toURL(), url);
 
     url = tomcatParseBpmPlatformXmlStep.checkValidFileLocation(BPM_PLATFORM_XML_LOCATION_FILE_INVALID_PATH_WINDOWS);
     assertNull("Path is invalid.", url);
@@ -97,17 +97,17 @@ public class BpmPlatformXmlLocationTest {
   @Test
   public void checkValidBpmPlatformXmlResourceLocation() throws NamingException, MalformedURLException {
       URL url = new TomcatParseBpmPlatformXmlStep().checkValidBpmPlatformXmlResourceLocation(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
-      assertEquals("file:" + BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION, url.toString());
+      assertEquals(new File(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION).toURI().toURL(), url);
   }
 
   @Test
-  public void getBpmPlatformXmlLocationFromJndi() throws NamingException {
+  public void getBpmPlatformXmlLocationFromJndi() throws NamingException, MalformedURLException {
     Context context = new InitialContext();
     context.bind("java:/comp/env/" + BPM_PLATFORM_XML_LOCATION, BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
 
     URL url = new TomcatParseBpmPlatformXmlStep().lookupBpmPlatformXmlLocationFromJndi();
 
-    assertEquals("file:" + BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION, url.toString());
+    assertEquals(new File(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION).toURI().toURL(), url);
   }
 
   @Test
@@ -130,13 +130,13 @@ public class BpmPlatformXmlLocationTest {
   }
 
   @Test
-  public void getBpmPlatformXmlFromEnvironmentVariableAsFileLocation() {
+  public void getBpmPlatformXmlFromEnvironmentVariableAsFileLocation() throws MalformedURLException {
     try {
       System.setProperty(BPM_PLATFORM_XML_ENV_VAR, BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
 
       URL url = new TomcatParseBpmPlatformXmlStep().lookupBpmPlatformXmlLocationFromEnvironmentVariable();
 
-      assertEquals("file:" + BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION, url.toString());
+      assertEquals(new File(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION).toURI().toURL(), url);
     } finally {
       System.clearProperty(BPM_PLATFORM_XML_ENV_VAR);
     }
@@ -145,20 +145,20 @@ public class BpmPlatformXmlLocationTest {
   @Test
   public void getBpmPlatformXmlFromClasspath() {
     String classPathResourceLocation =
-        BpmPlatformXmlLocationTest.class.getPackage().getName().replaceAll("\\.", "/") + "/conf/" + BPM_PLATFORM_XML_FILE;
+        BpmPlatformXmlLocationTest.class.getPackage().getName().replace(".", "/") + "/conf/" + BPM_PLATFORM_XML_FILE;
 
     URL url = new TomcatParseBpmPlatformXmlStep().lookupBpmPlatformXmlFromClassPath(classPathResourceLocation);
     assertNotNull("Url should point to a bpm-platform.xml file.", url);
   }
 
   @Test
-  public void getBpmPlatformXmlFromCatalinaConfDirectory() {
+  public void getBpmPlatformXmlFromCatalinaConfDirectory() throws MalformedURLException {
     String catalinaHomeOld = System.setProperty(CATALINA_HOME, BPM_PLATFORM_XML_LOCATION_PARENT_DIR);
 
     try {
       URL url = new TomcatParseBpmPlatformXmlStep().lookupBpmPlatformXmlFromCatalinaConfDirectory();
 
-      assertEquals("file:" + BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION, url.toString());
+      assertEquals(new File(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION).toURI().toURL(), url);
     } finally {
       if (catalinaHomeOld != null) {
         System.setProperty(CATALINA_HOME, catalinaHomeOld);

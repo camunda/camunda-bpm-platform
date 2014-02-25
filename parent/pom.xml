@@ -542,10 +542,8 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.16</version>
           <configuration>
-            <workingDirectory>${project.build.directory}</workingDirectory>
             <systemPropertyVariables>
               <myWorkingDir>${project.build.directory}</myWorkingDir>
-              <myBaseDir>${project.basedir}</myBaseDir>
             </systemPropertyVariables>
           </configuration>
         </plugin>
