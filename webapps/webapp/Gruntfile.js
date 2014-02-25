@@ -1,6 +1,5 @@
 /* global process: false, require: false, module: false, __dirname: false */
 'use strict';
-/* jshint unused: false */
 
 /**
   This file is used to configure the [grunt](http://gruntjs.com/) tasks
@@ -15,18 +14,22 @@ var fs = require('fs');
 var _ = require('underscore');
 
 var commentLineExp =  /^[\s]*<!-- (\/|#) (CE|EE)/;
-var htmlFileExp =     /\.html$/;
 var requireConfExp =  /require-conf.js$/;
 var seleniumJarNameExp = /selenium-server-standalone/;
 
+
 function distFileProcessing(content, srcpath) {
-  if (htmlFileExp.test(srcpath)) {
-    // removes the template comments
-    content = content
-              .split('\n').filter(function(line) {
-                return !commentLineExp.test(line);
-              }).join('\n');
-  }
+  // removes the template comments
+  content = content
+            .split('\n').filter(function(line) {
+              return !commentLineExp.test(line);
+            }).join('\n');
+
+  var date = new Date();
+  var cacheBuster = [date.getFullYear(), date.getMonth(), date.getDate()].join('-');
+  content = content
+            .replace(/\/\* cache-busting /, '/* cache-busting */')
+            .replace(/CACHE_BUSTER/g, requireConfExp.test(srcpath) ? '\''+ cacheBuster +'\'' : cacheBuster);
 
   return content;
 }
@@ -99,23 +102,18 @@ module.exports = function(grunt) {
         ],
         options: {
           process: function(content, srcpath) {
-            // Unfortunately, this might (in some cases) make angular complaining
-            // about template having no single root element
-            // (when the "replace" option is set to "true").
 
-            // if (htmlFileExp.test(srcpath)) {
-            //   content = '<!-- # CE - auto-comment - '+ srcpath +' -->\n'+
-            //             content +
-            //             '\n<!-- / CE - auto-comment - '+ srcpath +' -->';
-            // }
+            var liveReloadPort = grunt.config('app.liveReloadPort');
 
             if (requireConfExp.test(srcpath)) {
               content = content
-                // .replace(/CACHE_BUST/, 'bust='+ (new Date()).getTime())
-                .replace(/\/\* live-reload/, '/* live-reload */')
-                .replace(/LIVERELOAD_PORT/g, grunt.config('app.liveReloadPort'));
+                        .replace(/\/\* live-reload/, '/* live-reload */')
+                        .replace(/LIVERELOAD_PORT/g, liveReloadPort);
             }
 
+            content = content
+                      .replace(/\/\* cache-busting/, '/* cache-busting */')
+                      .replace(/CACHE_BUSTER/g, (new Date()).getTime());
             return content;
           }
         }
@@ -207,6 +205,8 @@ module.exports = function(grunt) {
       e2eTests: {
         // runs only when the tests are modified
         files: [
+          // 'src/main/webapp/require-conf.js',
+          // 'src/main/webapp/{app,develop,plugin,common}/**/*.{js,html}',
           './../../../qa/integration-tests-webapps/src/test/javascript/e2e/**/*.js'
         ],
         tasks: [
@@ -394,7 +394,7 @@ module.exports = function(grunt) {
 
       dist: {
         options: {
-          compress: true
+          cleancss: true
         },
         files: {
           'target/webapp/assets/css/common.css': 'src/main/webapp/assets/styles/common.less',
@@ -489,7 +489,7 @@ module.exports = function(grunt) {
 
   // Aimed to hold more complex build processes
   grunt.registerTask('build', 'Build the frontend assets', function(target) {
-    var defaultTasks = [
+    var tasks = [
       'clean',
       'bower'
     ];
@@ -499,21 +499,20 @@ module.exports = function(grunt) {
       // - Minifaction: https://app.camunda.com/jira/browse/CAM-1667
       // - Bug in ngDefine: https://app.camunda.com/jira/browse/CAM-1713
 
-      return grunt.task.run(defaultTasks.concat([
+      tasks = tasks.concat([
         'copy:assets',
-        'copy:production'
-      ]));
+        'copy:dist'
+      ]);
     }
 
-    // tasks.push('newer:less:'+ this.target);
-    // tasks.push('less:'+ this.target);
 
-    return grunt.task.run(defaultTasks.concat([
+    tasks = tasks.concat([
+      'less:'+ target,
       'newer:copy:assets',
-      'newer:copy:development'
-      // 'copy:assets',
-      // 'copy:development'
-    ]));
+      'newer:copy:'+ target
+    ]);
+
+    return grunt.task.run(tasks);
   });
 
   // Default task(s).
