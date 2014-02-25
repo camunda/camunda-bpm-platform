@@ -4,16 +4,16 @@
  * @namespace cam.common.directives
  */
 ngDefine('camunda.common.directives', [
-  'module:camunda.common.directives.notificationsPanel:./notificationsPanel',
   './email',
-  './quickFilter',
-  './help',
-  './requestAware',
   './engineSelect',
-  './paginator',
-  'module:camunda.common.directives.ifLoggedIn:./ifLoggedIn',
-  'module:camunda.common.directives.showIfAuthorized:./showIfAuthorized',
-  './password',
+  './help',
   './inPlaceTextField',
-  'module:camunda.common.directives.modal:./modal'
+  './paginator',
+  './password',
+  './quickFilter',
+  './requestAware',
+  'module:camunda.common.directives.ifLoggedIn:./ifLoggedIn',
+  'module:camunda.common.directives.modal:./modal',
+  'module:camunda.common.directives.notificationsPanel:./notificationsPanel',
+  'module:camunda.common.directives.showIfAuthorized:./showIfAuthorized'
 ], function() {});

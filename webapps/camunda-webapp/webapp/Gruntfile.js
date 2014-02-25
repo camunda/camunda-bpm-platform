@@ -118,6 +118,7 @@ module.exports = function(grunt) {
           }
         }
       },
+
       dist: {
         files: [
           {
@@ -184,33 +185,31 @@ module.exports = function(grunt) {
           'src/main/webapp/{app,develop,plugin,common}/**/*.{js,html}'
         ],
         tasks: [
-          'newer:jshint:scripts',
+          // 'newer:jshint:scripts',
           'newer:copy:development'
         ]
       },
 
-      unitTests: {
-        files: [
-          'src/main/webapp/require-conf.js',
-          'src/main/webapp/{app,develop,plugin,common}/**/*.{js,html}',
-          'src/test/js/{config,test,unit}/**/*.js'
-        ],
-        tasks: [
-          'newer:jshint:unitTest',
-          'karma:test',
-          'karma:unit'
-        ]
-      },
+      // unitTests: {
+      //   files: [
+      //     'src/main/webapp/require-conf.js',
+      //     'src/main/webapp/{app,develop,plugin,common}/**/*.{js,html}',
+      //     'src/test/js/{config,test,unit}/**/*.js'
+      //   ],
+      //   tasks: [
+      //     // 'newer:jshint:unitTest',
+      //     'karma:test',
+      //     'karma:unit'
+      //   ]
+      // },
 
       e2eTests: {
         // runs only when the tests are modified
         files: [
-          // 'src/main/webapp/require-conf.js',
-          // 'src/main/webapp/{app,develop,plugin,common}/**/*.{js,html}',
           './../../../qa/integration-tests-webapps/src/test/javascript/e2e/**/*.js'
         ],
         tasks: [
-          'newer:jshint:e2eTest',
+          // 'newer:jshint:e2eTest',
           'test:e2e'
         ]
       },
@@ -249,7 +248,7 @@ module.exports = function(grunt) {
       unitTest: {
         files: {
           src: [
-            // 'src/test/js/{config,test,unit}/**/*.js'
+            'src/test/js/{config,test,unit}/**/*.js'
           ]
         }
       },
@@ -257,7 +256,7 @@ module.exports = function(grunt) {
       e2eTest: {
         files: {
           src: [
-            // 'src/test/js/e2e/**/*.js'
+            'src/test/js/e2e/**/*.js'
           ]
         }
       },
@@ -266,7 +265,7 @@ module.exports = function(grunt) {
         files: {
           src: [
             'Gruntfile.js',
-            // 'src/main/webapp/{app,assets,develop,plugin}/**/*.js'
+            'src/main/webapp/{app,assets,develop,plugin}/**/*.js'
           ]
         }
       }
@@ -480,7 +479,7 @@ module.exports = function(grunt) {
 
       // unit testing by default
       default:
-        tasks.push('karma:unit');
+        // tasks.push('karma:unit');
     }
 
 
