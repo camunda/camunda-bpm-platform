@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -264,6 +265,15 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED = true;
   public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE = true;
 
+  // user operation log
+  public static final String EXAMPLE_USER_OPERATION_LOG_ID = "userOpLogId";
+  public static final String EXAMPLE_USER_OPERATION_ID = "opId";
+  public static final String EXAMPLE_USER_OPERATION_TYPE = UserOperationLogEntry.OPERATION_TYPE_CLAIM;
+  public static final String EXAMPLE_USER_OPERATION_ENTITY = UserOperationLogEntry.ENTITY_TYPE_TASK;
+  public static final String EXAMPLE_USER_OPERATION_PROPERTY = "opProperty";
+  public static final String EXAMPLE_USER_OPERATION_ORG_VALUE = "orgValue";
+  public static final String EXAMPLE_USER_OPERATION_NEW_VALUE = "newValue";
+  public static final String EXAMPLE_USER_OPERATION_TIMESTAMP = "2014-02-20T16:53:37";
 
   // tasks
   public static Task createMockTask() {
@@ -882,5 +892,29 @@ public abstract class MockProvider {
     when(jobDefinition.isSuspended()).thenReturn(EXAMPLE_JOB_DEFINITION_IS_SUSPENDED);
 
     return jobDefinition;
+  }
+
+  public static List<UserOperationLogEntry> createUserOperationLogEntries() {
+    List<UserOperationLogEntry> entries = new ArrayList<UserOperationLogEntry>();
+    entries.add(createUserOperationLogEntry());
+    return entries;
+  }
+
+  private static UserOperationLogEntry createUserOperationLogEntry() {
+    UserOperationLogEntry entry = mock(UserOperationLogEntry.class);
+    when(entry.getId()).thenReturn(EXAMPLE_USER_OPERATION_LOG_ID);
+    when(entry.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+    when(entry.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    when(entry.getExecutionId()).thenReturn(EXAMPLE_EXECUTION_ID);
+    when(entry.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
+    when(entry.getUserId()).thenReturn(EXAMPLE_USER_ID);
+    when(entry.getTimestamp()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_USER_OPERATION_TIMESTAMP).toDate());
+    when(entry.getOperationId()).thenReturn(EXAMPLE_USER_OPERATION_ID);
+    when(entry.getOperationType()).thenReturn(EXAMPLE_USER_OPERATION_TYPE);
+    when(entry.getEntityType()).thenReturn(EXAMPLE_USER_OPERATION_ENTITY);
+    when(entry.getProperty()).thenReturn(EXAMPLE_USER_OPERATION_PROPERTY);
+    when(entry.getOrgValue()).thenReturn(EXAMPLE_USER_OPERATION_ORG_VALUE);
+    when(entry.getNewValue()).thenReturn(EXAMPLE_USER_OPERATION_NEW_VALUE);
+    return entry;
   }
 }
