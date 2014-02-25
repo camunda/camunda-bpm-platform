@@ -78,9 +78,9 @@ ngDefine('camunda.common.directives', ['jquery'], function(module, $) {
         scope.search = function() {
           var searched = $.trim(scope.quickFilters.name.$viewValue);
           var states = {
-            running: !!scope.quickFilters.running.$viewValue,
-            canceled: !!scope.quickFilters.canceled.$viewValue,
-            completed: !!scope.quickFilters.completed.$viewValue
+            running: !!scope.quickFilters.running && !!scope.quickFilters.running.$viewValue,
+            canceled: !!scope.quickFilters.canceled && !!scope.quickFilters.canceled.$viewValue,
+            completed: !!scope.quickFilters.completed && !!scope.quickFilters.completed.$viewValue
           };
 
           $(scope.itemSelector, $holder).each(function() {
