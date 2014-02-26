@@ -10,7 +10,6 @@ ngDefine('camunda.common.directives', [
   './inPlaceTextField',
   './paginator',
   './password',
-  './quickFilter',
   './requestAware',
   'module:camunda.common.directives.ifLoggedIn:./ifLoggedIn',
   'module:camunda.common.directives.modal:./modal',

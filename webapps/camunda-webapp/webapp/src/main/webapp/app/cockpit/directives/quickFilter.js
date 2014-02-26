@@ -17,7 +17,7 @@
          item-selector=".tree-node-group">
     </div>
  */
-ngDefine('camunda.common.directives', ['jquery'], function(module, $) {
+ngDefine('cockpit.directives', ['jquery'], function(module, $) {
   'use strict';
 
   module.directive('camQuickFilter', function() {
@@ -26,6 +26,10 @@ ngDefine('camunda.common.directives', ['jquery'], function(module, $) {
       determine if an element has to be schown
      */
     function showElement(states, searched, $el) {
+      if ($el.find('.selected').length) {
+        return true;
+      }
+
       if (!!states.canceled ||
           !!states.running ||
           !!states.completed) {
@@ -55,7 +59,7 @@ ngDefine('camunda.common.directives', ['jquery'], function(module, $) {
 
       restrict: 'A',
 
-      templateUrl: require.toUrl('./app/common/directives/quick-filter.html'),
+      templateUrl: require.toUrl('./app/cockpit/directives/quick-filter.html'),
 
       link: function(scope, element, attrs) {
         if (!scope.holderSelector) {
@@ -68,6 +72,11 @@ ngDefine('camunda.common.directives', ['jquery'], function(module, $) {
           throw new Error('A item-selector attribute must be specified');
         }
 
+        scope.$root.$on('instance-tree-selection-change', function() {
+          // wait a bit to prevent
+          setTimeout(scope.search, 200);
+        });
+
         var $holder = $(scope.holderSelector);
 
         // activate (or not) a input (name or state)
@@ -76,11 +85,11 @@ ngDefine('camunda.common.directives', ['jquery'], function(module, $) {
         scope.showStateFilter = typeof attrs.stateFilter !== 'undefined';
 
         scope.search = function() {
-          var searched = $.trim(scope.quickFilters.name.$viewValue);
+          var searched = scope.showNameFilter ? $.trim(scope.quickFilters.name.$viewValue) : '';
           var states = {
-            running: !!scope.quickFilters.running && !!scope.quickFilters.running.$viewValue,
-            canceled: !!scope.quickFilters.canceled && !!scope.quickFilters.canceled.$viewValue,
-            completed: !!scope.quickFilters.completed && !!scope.quickFilters.completed.$viewValue
+            running: !!scope.showStateFilter && !!scope.quickFilters.running.$viewValue,
+            canceled: !!scope.showStateFilter && !!scope.quickFilters.canceled.$viewValue,
+            completed: !!scope.showStateFilter && !!scope.quickFilters.completed.$viewValue
           };
 
           $(scope.itemSelector, $holder).each(function() {

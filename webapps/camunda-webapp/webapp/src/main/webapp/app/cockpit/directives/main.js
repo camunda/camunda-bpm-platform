@@ -16,8 +16,7 @@ ngDefine('cockpit.directives', [
   './viewPills',
   './selectActivity',
   './processVariable',
-  './dynamicName'
-], function(module) {
-
-});
+  './dynamicName',
+  './quickFilter'
+], function() {});
 
