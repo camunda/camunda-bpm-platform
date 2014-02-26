@@ -106,6 +106,9 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
 
           $event.stopPropagation();
 
+          // propagate the change for other directives/controllers
+          scope.$emit('instance-tree-selection-change');
+
           scope.onElementClick({
             id: node.id,
             activityId: node.activityId || node.targetActivityId,
