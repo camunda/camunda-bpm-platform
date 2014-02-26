@@ -420,16 +420,47 @@ module.exports = function(grunt) {
     }
   });
 
+
+  /**
+    Download selenium standalone
+   */
   grunt.registerTask('selenium-install', 'Automate the selenium webdriver installation', function() {
     var done = this.async();
+    var seleniumInstallDir = path.join(__dirname, '/selenium');
+
+    if (process.platform === 'win32') {
+      grunt.log.warn('Dude... Windows? Seriously?');
+      
+      var seleniumDownloadURL = packageJSON.setup.seleniumDownloadURL;
+      var seleniumInstallPath = path.join(seleniumInstallDir, path.basename(seleniumDownloadURL));
+      if (fs.existsSync(seleniumInstallPath)) {
+        return done();
+      }
+
+      var http = require('http');
+      return fs.mkdir(seleniumInstallDir, function(err) {
+        if (err && err.errno !== 47) {
+          grunt.log.warn('error while creating the install directory for selenium at '+ seleniumInstallDir, err);
+          return done(err);
+        }
+        var file = fs.createWriteStream(seleniumInstallPath)
+        var req = http.get(seleniumDownloadURL, function(res) {
+          res.pipe(file);
+          file.on('finish', function() {
+            file.close();
+            return done();
+          });
+        });
+      });
+    }
     var stdout = '';
     var stderr = '';
 
-    var managerPath = './node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager';
+    var managerPath = path.resolve('./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager');
     var args = [
       'update',
       '--out_dir',
-      __dirname +'/selenium'
+      seleniumInstallDir
     ];
 
     grunt.log.writeln('selenium-install runs: '+ managerPath +' '+ args.join(' '));
@@ -441,6 +472,7 @@ module.exports = function(grunt) {
 
     install.on('exit', function (code) {
       if (code) {
+        grunt.log.warn('selenium standalone server installation failed:\nstdout:\n'+ stdout +'\nstderr:\n'+ stderr);
         return done(new Error('selenium-install exit with code: '+ code));
       }
 
