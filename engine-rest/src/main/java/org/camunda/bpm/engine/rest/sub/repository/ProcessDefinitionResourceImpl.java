@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -211,6 +212,43 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     } finally {
       IoUtil.closeSilently(processModelIn);
     }
+  }
+
+  @Override
+  public Response getProcessDefinitionDiagram() {
+    ProcessDefinition definition = engine.getRepositoryService().getProcessDefinition(processDefinitionId);
+    InputStream processDiagram = engine.getRepositoryService().getProcessDiagram(processDefinitionId);
+    if (processDiagram == null) {
+      return Response.noContent().build();
+    } else {
+      String fileName = definition.getDiagramResourceName();
+      return Response.ok(processDiagram)
+          .header("Content-Disposition", "attachment; filename=" + fileName)
+          .type(getMediaTypeForFileSuffix(fileName)).build();
+    }
+  }
+
+  /**
+   * Determines an IANA media type based on the file suffix.
+   * Hint: as of Java 7 the method Files.probeContentType() provides an implementation based on file type detection.
+   *
+   * @param fileName
+   * @return content type, defaults to octet-stream
+   */
+  public static String getMediaTypeForFileSuffix(String fileName) {
+    String mediaType = "application/octet-stream"; // default
+    if (fileName.endsWith(".png")) {
+      mediaType = "image/png";
+    } else if (fileName.endsWith(".svg")) {
+      mediaType = "image/svg+xml";
+    } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+      mediaType = "image/jpeg";
+    } else if (fileName.endsWith(".gif")) {
+      mediaType = "image/gif";
+    } else if (fileName.endsWith(".bmp")) {
+      mediaType = "image/bmp";
+    }
+    return mediaType;
   }
 
   @Override
