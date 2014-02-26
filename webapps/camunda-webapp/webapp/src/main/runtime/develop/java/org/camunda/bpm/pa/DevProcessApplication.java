@@ -29,7 +29,7 @@ public class DevProcessApplication extends ServletProcessApplication {
     createCockpitDemoData(engine);
   }
 
-  private void createCockpitDemoData(ProcessEngine engine) throws Exception {
+  private void createCockpitDemoData(final ProcessEngine engine) throws Exception {
     RuntimeService runtimeService = engine.getRuntimeService();
 
     Map<String, Object> vars1 = new HashMap<String, Object>();
@@ -113,7 +113,12 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("executionProcess");
     runtimeService.startProcessInstanceByKey("executionProcess");
 
-    ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
+
+    new Thread(){
+      public void run() {
+        ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
+      }
+    }.start();
   }
 
   private void createAdminDemoData(ProcessEngine engine) throws Exception {
