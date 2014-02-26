@@ -1,16 +1,16 @@
 /* global ngDefine: false */
 
-ngDefine('camunda.common.services.page', ['angular'], function(module, angular) {
+ngDefine('cockpit.services.page', ['angular'], function(module, angular) {
   'use strict';
 
   /**
    * A service to manage a page page.
    *
    * @name page
-   * @memberof cam.common.services
+   * @memberof cam.cockpit.services
    * @type angular.service
    *
-   * @module cam.common.services.page
+   * @module cam.cockpit.services.page
    */
   module.service('page', [
     '$rootScope',
@@ -57,7 +57,7 @@ ngDefine('camunda.common.services.page', ['angular'], function(module, angular) 
       titleGet: function() {
         return page.title;
       },
-      
+
       /**
        * Adds one or more page
        *

@@ -3,7 +3,7 @@
   Defines a widget to filter activity instances in the activity tree
 
   @name quickFilter
-  @memberof cam.common.directives
+  @memberof cam.cockpit.directives
   @type angular.directive
 
   @author Valentin Vago <valentin.vago@camunda.com>
