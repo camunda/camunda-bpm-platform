@@ -86,23 +86,25 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
   }
 
   protected String autoCompleteUrl(String url) {
-    LOGGER.log(Level.INFO, "before: [" + url + "]");
+    if (url != null) {
+      LOGGER.log(Level.FINE, "before: [" + url + "]");
 
-    if (!url.endsWith(BPM_PLATFORM_XML_FILE)) {
-      String appender;
-      if (url.contains("/")) {
-        appender = "/";
-      } else {
-        appender = "\\";
+      if (!url.endsWith(BPM_PLATFORM_XML_FILE)) {
+        String appender;
+        if (url.contains("/")) {
+          appender = "/";
+        } else {
+          appender = "\\";
+        }
+
+        if (!(url.endsWith("/") || url.endsWith("\\\\"))) {
+          url += appender;
+        }
+
+        url += BPM_PLATFORM_XML_FILE;
       }
 
-      if (!(url.endsWith("/") || url.endsWith("\\\\"))) {
-        url += appender;
-      }
-
-      url += BPM_PLATFORM_XML_FILE;
-
-      LOGGER.log(Level.INFO, "after: [" + url + "]");
+      LOGGER.log(Level.FINE, "after: [" + url + "]");
     }
 
     return url;
@@ -123,6 +125,10 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
   }
 
   protected URL checkValidFileLocation(String url) throws MalformedURLException {
+    if (url == null || url.isEmpty()) {
+      return null;
+    }
+
     Pattern filePattern = Pattern.compile("^(/|[A-z]://?|[A-z]:\\\\).*[/|\\\\]bpm-platform\\.xml$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     Matcher fileMatcher = filePattern.matcher(url);
     if (fileMatcher.matches()) {
