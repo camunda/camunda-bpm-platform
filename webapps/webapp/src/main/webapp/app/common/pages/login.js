@@ -9,21 +9,17 @@ ngDefine('camunda.common.pages.login', [ 'angular', 'require', 'module:camunda.c
     'AuthenticationService',
     'Notifications',
     '$location',
-    'page',
   function (
     $scope,
     Authentication,
     AuthenticationService,
     Notifications,
-    $location,
-    page
+    $location
   ) {
 
     if (Authentication.username()) {
       $location.path('/');
     }
-
-    page.titleSet('camunda | login');
 
     $scope.login = function () {
       // possible bug to investigate (when password is remembered, under FF)
