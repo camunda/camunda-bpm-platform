@@ -2,6 +2,9 @@
   "name": "camunda-webapp",
   "version": "1.0.0",
   "private": true,
+  "setup": {
+    "seleniumDownloadURL": "http://selenium-release.storage.googleapis.com/2.40/selenium-server-standalone-2.40.0.jar"
+  },
   "devDependencies": {
     "grunt": "~0.4.0",
     "grunt-cli": "~0.1.0",
