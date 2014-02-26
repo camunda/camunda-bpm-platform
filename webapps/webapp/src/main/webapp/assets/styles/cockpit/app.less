@@ -583,10 +583,6 @@ textarea.variable-type-string {
 
   > .tree-node {
     margin-left: 3px;
-
-    >.tree-node-group > .tree-node-label.selected > .remove {
-      padding: 3px 0;
-    }
   }
 
   .tree-node-group {
@@ -634,11 +630,13 @@ textarea.variable-type-string {
 
   .tree-node-label {
     display: table-cell;
-    position: relative;
+    // position: relative;
     width: 100%;
     border-radius: 4px;
     border: solid 1px #CCC;
     // cursor: pointer;
+    line-height: 20px;
+    height: 23px;
 
     .remove {
       display: none;
