@@ -339,7 +339,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
-                <org.apache.maven.user-settings>../settings/maven/settings.xml</org.apache.maven.user-settings>
+                <org.apache.maven.user-settings>../settings/maven/nexus-settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
               <excludes>
                 <exclude>**/Abstract*</exclude>
@@ -453,7 +453,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
-                <org.apache.maven.user-settings>../settings/maven/settings.xml</org.apache.maven.user-settings>
+                <org.apache.maven.user-settings>../settings/maven/nexus-settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
               <excludes>
                 <exclude>**/Abstract*</exclude>
