@@ -7,5 +7,6 @@ ngDefine('cockpit.services', [
   //'./activityInstance',
   './transform',
   './variables',
-  './search'
+  './search',
+  'module:cockpit.services.page:./page'
 ], function() {});
