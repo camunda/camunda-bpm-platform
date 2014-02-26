@@ -325,6 +325,19 @@ public interface RuntimeService {
    * if the process instance contains multiple executions.
    *
    * @param executionId id of process instance or execution to signal, cannot be null.
+   * @param signalName name of the signal (can be null)
+   * @param signalData additional data of the signal (can be null)
+   * @param processVariables a map of process variables (can be null)
+   * @throws ProcessEngineException when no execution is found for the given executionId.
+   */
+  void signal(String executionId, String signalName, Object signalData, Map<String, Object> processVariables);
+
+ /** Sends an external trigger to an activity instance that is waiting inside the given execution.
+   *
+   * Note that you need to provide the exact execution that is waiting for the signal
+   * if the process instance contains multiple executions.
+   *
+   * @param executionId id of process instance or execution to signal, cannot be null.
    * @param processVariables a map of process variables
    * @throws ProcessEngineException when no execution is found for the given executionId.
    */
