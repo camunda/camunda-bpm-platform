@@ -41,9 +41,11 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
   protected final Logger LOGGER = Logger.getLogger(getClass().getName());
 
   public static final String BPM_PLATFORM_XML_FILE = "bpm-platform.xml";
-  public static final String BPM_PLATFORM_XML_LOCATION = "bpmPlatformConfigLocation";
-  public static final String BPM_PLATFORM_XML_ENV_VAR = "bpm.platform.config.location";
-  public static final String BPM_PLATFORM_RESOURCE_LOCATION = "META-INF/" + BPM_PLATFORM_XML_FILE;
+
+  public static final String BPM_PLATFORM_XML_LOCATION = "bpmPlatformXmlLocation";
+  public static final String BPM_PLATFORM_XML_ENVIRONMENT_VARIABLE = "BPM_PLATFORM_XML_LOCATION";
+  public static final String BPM_PLATFORM_XML_SYSTEM_PROPERTY = "bpm.platform.xml.location";
+  public static final String BPM_PLATFORM_XML_RESOURCE_LOCATION = "META-INF/" + BPM_PLATFORM_XML_FILE;
 
   public String getName() {
     return "Parsing bpm-platform.xml file";
@@ -69,20 +71,20 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
   }
 
   protected URL checkValidBpmPlatformXmlResourceLocation(String url) {
-    URL resourceLocation = null;
-
     url = autoCompleteUrl(url);
 
+    URL fileLocation = null;
+
     try {
-      resourceLocation = checkValidUrlLocation(url);
-      if (resourceLocation == null) {
-        resourceLocation = checkValidFileLocation(url);
+      fileLocation = checkValidUrlLocation(url);
+      if (fileLocation == null) {
+        fileLocation = checkValidFileLocation(url);
       }
     } catch (MalformedURLException e) {
       throw new ProcessEngineException("'" + url + "' is not a valid camunda bpm platform configuration resource location.", e);
     }
 
-    return resourceLocation;
+    return fileLocation;
   }
 
   protected String autoCompleteUrl(String url) {
@@ -148,13 +150,13 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
     try {
       String bpmPlatformXmlLocation = InitialContext.doLookup(jndi);
 
-      URL resource = checkValidBpmPlatformXmlResourceLocation(bpmPlatformXmlLocation);
+      URL fileLocation = checkValidBpmPlatformXmlResourceLocation(bpmPlatformXmlLocation);
 
-      if (resource != null) {
-        LOGGER.log(Level.INFO, "Found camunda bpm platform configuration in JNDI [" + jndi + "].");
+      if (fileLocation != null) {
+        LOGGER.log(Level.INFO, "Found camunda bpm platform configuration in JNDI [" + jndi + "] at " + fileLocation.toString());
       }
 
-      return resource;
+      return fileLocation;
     } catch (NamingException e) {
       LOGGER.log(Level.FINE, "Failed to look up camunda bpm platform configuration in JNDI [" + jndi + "].", e);
     }
@@ -163,29 +165,35 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
   }
 
   protected URL lookupBpmPlatformXmlLocationFromEnvironmentVariable() {
-    String bpmPlatformXmlLocation = System.getProperty(BPM_PLATFORM_XML_ENV_VAR);
+    String bpmPlatformXmlLocation = System.getenv(BPM_PLATFORM_XML_ENVIRONMENT_VARIABLE);
+    String logStatement = "environment variable [" + BPM_PLATFORM_XML_ENVIRONMENT_VARIABLE + "]";
 
-    URL resource = checkValidBpmPlatformXmlResourceLocation(bpmPlatformXmlLocation);
-
-    if (resource != null) {
-      LOGGER.log(Level.INFO, "Found camunda bpm platform configuration in environment variable [" + BPM_PLATFORM_XML_ENV_VAR + "].");
+    if (bpmPlatformXmlLocation == null) {
+      bpmPlatformXmlLocation = System.getProperty(BPM_PLATFORM_XML_SYSTEM_PROPERTY);
+      logStatement = "system property [" + BPM_PLATFORM_XML_SYSTEM_PROPERTY + "]";
     }
 
-    return resource;
+    URL fileLocation = checkValidBpmPlatformXmlResourceLocation(bpmPlatformXmlLocation);
+
+    if (fileLocation != null) {
+      LOGGER.log(Level.INFO, "Found camunda bpm platform configuration through " + logStatement + " at " + fileLocation.toString());
+    }
+
+    return fileLocation;
   }
 
   protected URL lookupBpmPlatformXmlFromClassPath(String resourceLocation) {
-    URL resource = ClassLoaderUtil.getClassloader(getClass()).getResource(resourceLocation);
+    URL fileLocation = ClassLoaderUtil.getClassloader(getClass()).getResource(resourceLocation);
 
-    if (resource != null) {
-      LOGGER.log(Level.INFO, "Found camunda bpm platform configuration in classpath [" + resourceLocation + "].");
+    if (fileLocation != null) {
+      LOGGER.log(Level.INFO, "Found camunda bpm platform configuration in classpath [" + resourceLocation + "] at " + fileLocation.toString());
     }
 
-    return resource;
+    return fileLocation;
   }
 
   protected URL lookupBpmPlatformXmlFromClassPath() {
-    return lookupBpmPlatformXmlFromClassPath(BPM_PLATFORM_RESOURCE_LOCATION);
+    return lookupBpmPlatformXmlFromClassPath(BPM_PLATFORM_XML_RESOURCE_LOCATION);
   }
 
   protected abstract URL getBpmPlatformXmlStream(MBeanDeploymentOperation operationContext);

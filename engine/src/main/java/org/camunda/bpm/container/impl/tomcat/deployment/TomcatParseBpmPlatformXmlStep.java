@@ -36,21 +36,21 @@ public class TomcatParseBpmPlatformXmlStep extends AbstractParseBpmPlatformXmlSt
   public static final String CATALINA_HOME = "catalina.home";
 
   protected URL getBpmPlatformXmlStream(MBeanDeploymentOperation operationcontext) {
-    URL resource = lookupBpmPlatformXmlLocationFromJndi();
+    URL fileLocation = lookupBpmPlatformXmlLocationFromJndi();
 
-    if (resource == null) {
-      resource = lookupBpmPlatformXmlLocationFromEnvironmentVariable();
+    if (fileLocation == null) {
+      fileLocation = lookupBpmPlatformXmlLocationFromEnvironmentVariable();
     }
 
-    if (resource == null) {
-      resource = lookupBpmPlatformXmlFromClassPath();
+    if (fileLocation == null) {
+      fileLocation = lookupBpmPlatformXmlFromClassPath();
     }
 
-    if (resource == null) {
-      resource = lookupBpmPlatformXmlFromCatalinaConfDirectory();
+    if (fileLocation == null) {
+      fileLocation = lookupBpmPlatformXmlFromCatalinaConfDirectory();
     }
 
-    return resource;
+    return fileLocation;
   }
 
   public URL lookupBpmPlatformXmlFromCatalinaConfDirectory() {
@@ -66,7 +66,7 @@ public class TomcatParseBpmPlatformXmlStep extends AbstractParseBpmPlatformXmlSt
       URL fileLocation = checkValidFileLocation(bpmPlatformFileLocation);
 
       if (fileLocation != null) {
-        LOGGER.log(Level.INFO, "Found camunda bpm platform configuration in CATALINA_BASE/CATALINA_HOME conf directory [" + bpmPlatformFileLocation + "].");
+        LOGGER.log(Level.INFO, "Found camunda bpm platform configuration in CATALINA_BASE/CATALINA_HOME conf directory [" + bpmPlatformFileLocation + "] at " + fileLocation.toString());
       }
 
       return fileLocation;

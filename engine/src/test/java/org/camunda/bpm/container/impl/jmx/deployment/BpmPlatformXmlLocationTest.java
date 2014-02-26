@@ -12,9 +12,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep.BPM_PLATFORM_XML_ENV_VAR;
-import static org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep.BPM_PLATFORM_XML_FILE;
-import static org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep.BPM_PLATFORM_XML_LOCATION;
+import static org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep.*;
 import static org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep.CATALINA_HOME;
 import static org.junit.Assert.*;
 
@@ -119,26 +117,26 @@ public class BpmPlatformXmlLocationTest {
   @Test
   public void getBpmPlatformXmlFromEnvironmentVariableAsUrlLocation() {
     try {
-      System.setProperty(BPM_PLATFORM_XML_ENV_VAR, BPM_PLATFORM_XML_LOCATION_URL_HTTP_PROTOCOL);
+      System.setProperty(BPM_PLATFORM_XML_SYSTEM_PROPERTY, BPM_PLATFORM_XML_LOCATION_URL_HTTP_PROTOCOL);
 
       URL url = new TomcatParseBpmPlatformXmlStep().lookupBpmPlatformXmlLocationFromEnvironmentVariable();
 
       assertEquals(BPM_PLATFORM_XML_LOCATION_URL_HTTP_PROTOCOL, url.toString());
     } finally {
-      System.clearProperty(BPM_PLATFORM_XML_ENV_VAR);
+      System.clearProperty(BPM_PLATFORM_XML_SYSTEM_PROPERTY);
     }
   }
 
   @Test
-  public void getBpmPlatformXmlFromEnvironmentVariableAsFileLocation() throws MalformedURLException {
+  public void getBpmPlatformXmlFromSystemPropertyAsFileLocation() throws MalformedURLException {
     try {
-      System.setProperty(BPM_PLATFORM_XML_ENV_VAR, BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
+      System.setProperty(BPM_PLATFORM_XML_SYSTEM_PROPERTY, BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
 
       URL url = new TomcatParseBpmPlatformXmlStep().lookupBpmPlatformXmlLocationFromEnvironmentVariable();
 
       assertEquals(new File(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION).toURI().toURL(), url);
     } finally {
-      System.clearProperty(BPM_PLATFORM_XML_ENV_VAR);
+      System.clearProperty(BPM_PLATFORM_XML_SYSTEM_PROPERTY);
     }
   }
 

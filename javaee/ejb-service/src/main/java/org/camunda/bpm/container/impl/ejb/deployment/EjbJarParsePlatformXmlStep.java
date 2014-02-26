@@ -15,17 +15,17 @@ import java.net.URL;
 public class EjbJarParsePlatformXmlStep extends AbstractParseBpmPlatformXmlStep {
 
   protected URL getBpmPlatformXmlStream(MBeanDeploymentOperation operationContext) {
-    URL resource = lookupBpmPlatformXmlLocationFromJndi();
+    URL fileLocation = lookupBpmPlatformXmlLocationFromJndi();
 
-    if (resource == null) {
-      resource = lookupBpmPlatformXmlLocationFromEnvironmentVariable();
+    if (fileLocation == null) {
+      fileLocation = lookupBpmPlatformXmlLocationFromEnvironmentVariable();
     }
 
-    if (resource == null) {
-      resource = lookupBpmPlatformXmlFromClassPath();
+    if (fileLocation == null) {
+      fileLocation = lookupBpmPlatformXmlFromClassPath();
     }
 
-    return resource;
+    return fileLocation;
   }
 
 }
