@@ -35,13 +35,14 @@ function distFileProcessing(content, srcpath) {
 }
 
 function standaloneSeleniumJar() {
-  if (!fs.existsSync('selenium')) {
+  var installDir = 'selenium';//path.resolve('./node_modules/grunt-protractor-runner/node_modules/protractor/selenium');
+  if (!fs.existsSync(installDir)) {
     return false;
   }
-  var filename = _.find(fs.readdirSync('selenium'), function(filename) {
+  var filename = _.find(fs.readdirSync(installDir), function(filename) {
     return seleniumJarNameExp.test(filename);
   });
-  return path.join(__dirname, 'selenium', filename);
+  return path.join(installDir, filename);
 }
 
 module.exports = function(grunt) {
@@ -61,7 +62,13 @@ module.exports = function(grunt) {
     app: {
       port: parseInt(process.env.APP_PORT || 8080, 10),
       liveReloadPort: parseInt(process.env.LIVERELOAD_PORT || 8081, 10),
-      standaloneSeleniumJar: standaloneSeleniumJar
+      standaloneSeleniumJar: standaloneSeleniumJar,
+      chromeDriverPath: function() {
+        var sPath = standaloneSeleniumJar();
+        var filename = 'chromedriver' + (process.platform === 'win32' ? '.exe' : '');
+        var cdPath = path.join(path.dirname(sPath), filename);
+        return cdPath;
+      }
     },
 
     clean: {
@@ -288,8 +295,13 @@ module.exports = function(grunt) {
         singleRun: true,
         // config like in *.conf.js
         args: {
-          // use a function(!!!) to determine the path of selenium standalone web-driver
-          seleniumServerJar: '<%= app.standaloneSeleniumJar() %>',
+          // --- very odd bug:
+          // specifying those 2 settings will not work under Windows
+          // (probably because it's Windows and it wanted me to stay longer at the office)
+          // seleniumServerJar: '<%= app.standaloneSeleniumJar() %>',
+          // chromeDriver: '<%= app.chromeDriverPath() %>',
+          // ---
+
           specs: [
             './../../../qa/integration-tests-webapps/src/test/javascript/e2e/**/*.js'
           ],
@@ -334,6 +346,8 @@ module.exports = function(grunt) {
       admin: {
         options:{
           args: {
+            seleniumServerJar: '<%= app.standaloneSeleniumJar() %>',
+            chromeDriver: '<%= app.chromeDriverPath() %>',
             baseUrl: 'http://localhost:8080',
             specs: [
               './../../../qa/integration-tests-webapps/src/test/javascript/e2e/admin/**/*.js'
@@ -344,6 +358,8 @@ module.exports = function(grunt) {
       cockpit: {
         options:{
           args: {
+            seleniumServerJar: '<%= app.standaloneSeleniumJar() %>',
+            chromeDriver: '<%= app.chromeDriverPath() %>',
             baseUrl: 'http://localhost:8080',
             specs: [
               './../../../qa/integration-tests-webapps/src/test/javascript/e2e/cockpit/**/*.js'
@@ -354,6 +370,8 @@ module.exports = function(grunt) {
       tasklist: {
         options:{
           args: {
+            seleniumServerJar: '<%= app.standaloneSeleniumJar() %>',
+            chromeDriver: '<%= app.chromeDriverPath() %>',
             baseUrl: 'http://localhost:8080',
             specs: [
               './../../../qa/integration-tests-webapps/src/test/javascript/e2e/tasklist/**/*.js'
@@ -472,7 +490,7 @@ module.exports = function(grunt) {
    */
   grunt.registerTask('selenium-install', 'Automate the selenium webdriver installation', function() {
     var done = this.async();
-    var seleniumInstallDir = path.join(__dirname, '/selenium');
+    var seleniumInstallDir = path.join(__dirname, 'selenium');
 
     if (process.platform === 'win32') {
       return require('async').series([
@@ -515,6 +533,8 @@ module.exports = function(grunt) {
         done(err);
       });
     }
+
+
     var stdout = '';
     var stderr = '';
 
