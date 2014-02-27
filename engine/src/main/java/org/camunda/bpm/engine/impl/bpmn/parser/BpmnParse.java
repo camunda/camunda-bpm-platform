@@ -798,12 +798,14 @@ public class BpmnParse extends Parse {
       } else if (messageEventDefinition != null) {
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseMessageEventDefinition(messageEventDefinition);
         eventSubscriptionDeclaration.setActivityId(startEventActivity.getId());
+        eventSubscriptionDeclaration.setEventScopeActivityId(catchingScope.getId());
         eventSubscriptionDeclaration.setStartEvent(false);
         addEventSubscriptionDeclaration(eventSubscriptionDeclaration, catchingScope, messageEventDefinition);
 
       } else if (signalEventDefinition != null) {
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseSignalEventDefinition(signalEventDefinition);
         eventSubscriptionDeclaration.setActivityId(startEventActivity.getId());
+        eventSubscriptionDeclaration.setEventScopeActivityId(catchingScope.getId());
         eventSubscriptionDeclaration.setStartEvent(false);
         addEventSubscriptionDeclaration(eventSubscriptionDeclaration, catchingScope, signalEventDefinition);
 
@@ -1822,6 +1824,7 @@ public class BpmnParse extends Parse {
       activity.setScope(true);
       EventSubscriptionDeclaration declaration = parseMessageEventDefinition(receiveTaskElement);
       declaration.setActivityId(activity.getActivityId());
+      declaration.setEventScopeActivityId(activity.getActivityId());
       addEventSubscriptionDeclaration(declaration, activity, receiveTaskElement);
     }
 
