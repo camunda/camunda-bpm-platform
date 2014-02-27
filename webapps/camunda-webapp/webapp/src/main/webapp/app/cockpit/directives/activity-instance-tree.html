@@ -1,7 +1,7 @@
 <!-- # CE - src/main/webapp/app/cockpit/directives/activity-instance-tree.html -->
 <div class="tree-node" >
 
-  <div ng-class="{ 'state-running': !node.endTime, 'state-completed' : node.endTime && !node.canceled, 'state-canceled': node.endTime && node.canceled }"
+  <div id="{{ node.id }}" ng-class="{ 'state-running': !node.endTime, 'state-completed' : node.endTime && !node.canceled, 'state-canceled': node.endTime && node.canceled }"
        class="tree-node-group">
 
     <span class="tree-node-label"
@@ -16,8 +16,7 @@
         <i class="icon-remove"></i>
       </button>
 
-      <a id="{{ node.id }}"
-         ng-click="select($event)"
+      <a ng-click="select($event)"
          help
          help-placement="top"
          help-text="{{ node.name }}">
