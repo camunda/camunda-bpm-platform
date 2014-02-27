@@ -101,7 +101,7 @@ public class BpmPlatformXmlLocationTest {
   @Test
   public void getBpmPlatformXmlLocationFromJndi() throws NamingException, MalformedURLException {
     Context context = new InitialContext();
-    context.bind("java:/comp/env/" + BPM_PLATFORM_XML_LOCATION, BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
+    context.bind("java:comp/env/" + BPM_PLATFORM_XML_LOCATION, BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
 
     URL url = new TomcatParseBpmPlatformXmlStep().lookupBpmPlatformXmlLocationFromJndi();
 

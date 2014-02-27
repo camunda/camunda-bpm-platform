@@ -145,7 +145,7 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
   }
 
   protected URL lookupBpmPlatformXmlLocationFromJndi() {
-    String jndi = "java:/comp/env/" + BPM_PLATFORM_XML_LOCATION;
+    String jndi = "java:comp/env/" + BPM_PLATFORM_XML_LOCATION;
 
     try {
       String bpmPlatformXmlLocation = InitialContext.doLookup(jndi);
