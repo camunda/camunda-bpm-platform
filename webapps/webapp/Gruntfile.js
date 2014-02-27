@@ -383,7 +383,11 @@ module.exports = function(grunt) {
     },
 
     bower: {
-      install: {}
+      install: {
+        options: {
+          verbose: true
+        }
+      }
     },
 
     less: {
@@ -393,7 +397,7 @@ module.exports = function(grunt) {
 
       dist: {
         options: {
-          cleancss: true
+          compress: true
         },
         files: {
           'target/webapp/assets/css/common.css': 'src/main/webapp/assets/styles/common.less',
@@ -420,6 +424,48 @@ module.exports = function(grunt) {
     }
   });
 
+  /**
+    Downloads a file located at `downloadURL` using HTTP
+    and saves it in the `directory`.
+   */
+  function download(downloadURL, directory, done) {
+    var destination = path.join(directory, path.basename(downloadURL));
+    fs.exists(destination, function(yepNope) {
+      if (yepNope) {
+        return done();
+      }
+
+      var file = fs.createWriteStream(destination);
+      require('http').get(downloadURL, function(res) {
+        res.pipe(file);
+        file.on('finish', function() {
+          file.close();
+          return done();
+        });
+      });
+    });
+  }
+
+  /**
+    Will download `http://bla-bla-bla.com/folder/file.zip`
+    to `<directory>/file.zip` and extract its content in
+    `directory`
+   */
+  function downloadAndExtract(downloadURL, directory, done) {
+    var downloadedPath = path.join(directory, path.basename(downloadURL));
+    download(downloadURL, directory, function(err) {
+      if (err) {
+        return done(err);
+      }
+
+      var extractor = require('unzip').Extract({ path: directory });
+      extractor.on('error', function(err) {
+        done(err);
+      });
+      extractor.on('close', done);
+      fs.createReadStream(downloadedPath).pipe(extractor);
+    });
+  }
 
   /**
     Download selenium standalone
@@ -429,28 +475,44 @@ module.exports = function(grunt) {
     var seleniumInstallDir = path.join(__dirname, '/selenium');
 
     if (process.platform === 'win32') {
-      grunt.log.warn('Dude... Windows? Seriously?');
-      
-      var seleniumDownloadURL = packageJSON.setup.seleniumDownloadURL;
-      var seleniumInstallPath = path.join(seleniumInstallDir, path.basename(seleniumDownloadURL));
-      if (fs.existsSync(seleniumInstallPath)) {
-        return done();
-      }
-
-      var http = require('http');
-      return fs.mkdir(seleniumInstallDir, function(err) {
-        if (err && err.errno !== 47) {
-          grunt.log.warn('error while creating the install directory for selenium at '+ seleniumInstallDir, err);
-          return done(err);
-        }
-        var file = fs.createWriteStream(seleniumInstallPath)
-        var req = http.get(seleniumDownloadURL, function(res) {
-          res.pipe(file);
-          file.on('finish', function() {
-            file.close();
-            return done();
+      return require('async').series([
+        // make the "selenium" directory
+        function(cb) {
+          grunt.log.writeln('making selenium directory');
+          fs.mkdir(seleniumInstallDir, function(err) {
+            if (err && err.errno !== 47) {
+              grunt.log.warn('error while creating the install directory for selenium at '+ seleniumInstallDir, err);
+              return cb(err);
+            }
+            cb();
           });
-        });
+        },
+
+        // download the selenium standalone .jar file
+        function(cb) {
+          grunt.log.writeln('download selenium standalone');
+          download(packageJSON.setup.seleniumDownloadURL, seleniumInstallDir, cb);
+        },
+
+        // download and extract the chrome driver zip file
+        function(cb) {
+          grunt.log.writeln('download chrome webdriver');
+          downloadAndExtract(packageJSON.setup.chromeDriverDownloadURL, seleniumInstallDir, cb);
+        },
+
+        // download and extract the IE driver zip file
+        function(cb) {
+          grunt.log.writeln('download IE webdriver');
+          downloadAndExtract(packageJSON.setup.internetExplorerDriverDownloadURL, seleniumInstallDir, cb);
+        },
+
+        function(cb) {
+          grunt.log.writeln('noop');
+          cb();
+        }
+      ], function(err) {
+        grunt.log.writeln('everything was downloaded');
+        done(err);
       });
     }
     var stdout = '';
