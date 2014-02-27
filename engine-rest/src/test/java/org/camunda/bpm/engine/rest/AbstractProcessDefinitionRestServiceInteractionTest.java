@@ -203,16 +203,33 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     // compare input stream with response body bytes
     byte[] expected = IoUtil.readInputStream(new FileInputStream(fileName), "process diagram");
     Assert.assertArrayEquals(expected, actual);
-
-    // assert file suffix mapping helper
-    Assert.assertEquals("image/png", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.png"));
-    Assert.assertEquals("image/svg+xml", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.svg"));
-    Assert.assertEquals("image/jpeg", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.jpeg"));
-    Assert.assertEquals("image/jpeg", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.jpg"));
-    Assert.assertEquals("image/gif", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.gif"));
-    Assert.assertEquals("image/bmp", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.bmp"));
-    Assert.assertEquals("application/octet-stream", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.UNKNOWN"));
   }
+
+  @Test
+  public void testProcessDiagramNullFilename() throws FileNotFoundException {
+    // setup additional mock behavior
+    String fileName = this.getClass().getResource("/processes/todo-process.png").getFile();
+    when(repositoryServiceMock.getProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID).getDiagramResourceName())
+      .thenReturn(null);
+    when(repositoryServiceMock.getProcessDiagram(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .thenReturn(new FileInputStream(fileName));
+
+    // call method
+    byte[] actual = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType("application/octet-stream")
+      .header("Content-Disposition", "attachment; filename=" + null)
+      .when().get(DIAGRAM_DEFINITION_URL).getBody().asByteArray();
+
+    // verify service interaction
+    verify(repositoryServiceMock).getProcessDiagram(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    // compare input stream with response body bytes
+    byte[] expected = IoUtil.readInputStream(new FileInputStream(fileName), "process diagram");
+    Assert.assertArrayEquals(expected, actual);
+  }
+
   @Test
   public void testProcessDiagramNotExist() {
     // setup additional mock behavior
@@ -226,6 +243,18 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     // verify service interaction
     verify(repositoryServiceMock).getProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     verify(repositoryServiceMock).getProcessDiagram(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
+  public void testProcessDiagramMediaType() {
+    Assert.assertEquals("image/png", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.png"));
+    Assert.assertEquals("image/png", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.PNG"));
+    Assert.assertEquals("image/svg+xml", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.svg"));
+    Assert.assertEquals("image/jpeg", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.jpeg"));
+    Assert.assertEquals("image/jpeg", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.jpg"));
+    Assert.assertEquals("image/gif", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.gif"));
+    Assert.assertEquals("image/bmp", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.bmp"));
+    Assert.assertEquals("application/octet-stream", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.UNKNOWN"));
   }
 
   @Test

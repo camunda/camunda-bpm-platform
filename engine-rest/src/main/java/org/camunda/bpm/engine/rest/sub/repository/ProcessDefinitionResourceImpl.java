@@ -237,16 +237,19 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
    */
   public static String getMediaTypeForFileSuffix(String fileName) {
     String mediaType = "application/octet-stream"; // default
-    if (fileName.endsWith(".png")) {
-      mediaType = "image/png";
-    } else if (fileName.endsWith(".svg")) {
-      mediaType = "image/svg+xml";
-    } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
-      mediaType = "image/jpeg";
-    } else if (fileName.endsWith(".gif")) {
-      mediaType = "image/gif";
-    } else if (fileName.endsWith(".bmp")) {
-      mediaType = "image/bmp";
+    if (fileName != null) {
+      fileName = fileName.toLowerCase();
+      if (fileName.endsWith(".png")) {
+        mediaType = "image/png";
+      } else if (fileName.endsWith(".svg")) {
+        mediaType = "image/svg+xml";
+      } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+        mediaType = "image/jpeg";
+      } else if (fileName.endsWith(".gif")) {
+        mediaType = "image/gif";
+      } else if (fileName.endsWith(".bmp")) {
+        mediaType = "image/bmp";
+      }
     }
     return mediaType;
   }
