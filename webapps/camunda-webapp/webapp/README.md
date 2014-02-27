@@ -38,6 +38,12 @@ grunt auto-build
 This continuously builds the web assets using [Grunt](http://gruntjs.com) and automatically reloads the web application when done.
 If you changed the port Jetty runs on, expose that via the environment variable `APP_PORT=WHICH_PORT`.
 
+Login credentials:
+* Username: `jonny1`
+* Password: `jonny1`
+
+
+
 
 ### Editor configuration
 
