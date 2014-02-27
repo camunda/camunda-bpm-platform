@@ -14,6 +14,12 @@ To develop the application you need [Maven](https://maven.apache.org/) and [Grun
 
 ### Development Setup
 
+#### Installation
+
+
+
+#### Development
+
 To run the development setup you need to execute
 
 ```
@@ -23,7 +29,7 @@ mvn clean jetty:run -Pdevelop
 This bootstraps [Jetty](http://www.eclipse.org/jetty/), an embedded web server that serves the application on [localhost:8080/camunda](http://localhost:8080/camunda).
 You may configure the port the server runs on by passing the argument `-Djetty.port=WHICH_PORT` to the command line.
 
-In another shell execute
+In a other shell execute
 
 ```
 grunt auto-build
@@ -119,10 +125,38 @@ There are a few [grunt tasks](http://gruntjs.com/) that aid you when developing 
 
 ## Additional Resources
 
-### Extending the Application through Plug-ins
+### Extending the application through plugins
 
-Parts of the application (read: _cockpit_) can be extended through plug-ins.
-Read more about [how cockpit plug-ins work and how to develop them](http://docs.camunda.org/latest/real-life/how-to/#cockpit-how-to-develop-a-cockpit-plugin) in the docs.
+Parts of the application (read: _cockpit_) can be extended through plugins.
+Read more about [how cockpit plugins work and how to develop them](http://docs.camunda.org/latest/real-life/how-to/#cockpit-how-to-develop-a-cockpit-plugin) in the docs.
+
+#### Plugin exclusion
+
+You can exclude some plugins from the interface by adding a `cam-exclude-plugins`
+attribute to the `base` tag of the page loading the interface.
+The content of the attribute is a comma separated list formatted like: `<plugin.key>:<feature.id>`.
+If the feature ID is not provided, the whole plugin will be excluded.
+
+#### Excluding a complete plugin
+
+This example will completely deactivate the action buttons on the right side of the process instance view.
+
+```html
+<base href="/"
+      cam-exclude-plugins="cockpit.processInstance.live.action" />
+```
+
+#### Excluding a plugin feature
+
+In this example, we deactivate the definition list in the cockpit dashboard
+but keep the diagram previews and disable the job retry action button:
+
+```html
+<base href="/"
+      cam-exclude-plugins="cockpit.dashboard:process-definition-tiles,
+                           cockpit.processInstance.live.action:job-retry-action" />
+```
+
 
 ### Generate Documentation for the Application
 

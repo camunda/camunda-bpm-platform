@@ -1,11 +1,17 @@
-'use strict';
-
+/* global ngDefine: false, require: false */
 /* Plugin Services */
 
 ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
+  'use strict';
+
+  function trim(str) {
+    if (String.prototype.trim) {
+      return str.trim();
+    }
+    return str.replace(/^\s+|\s+$/g, '');
+  }
 
   var PluginsProvider = [ function() {
-
     var pluginMap = {};
 
     function addPlugin(plugins, definition) {
@@ -75,6 +81,25 @@ ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
   module.provider('Plugins', PluginsProvider);
 
   var ViewsProvider = [ 'PluginsProvider', function(PluginsProvider) {
+    // the following lines are gathering the IDs of plugins who should be excluded
+    // to exclude a plugin, its key and (optionaly) its id
+    var excludeExp;
+    var expParts = [];
+    var attr = angular.element('base').attr('cam-exclude-plugins') || '';
+    if (attr) {
+      angular.forEach(attr.split(','), function(plugin) {
+        plugin = plugin.split(':');
+        var feature = '*';
+        if (plugin.length >= 2 && !!trim(plugin[1])) {
+          feature = trim(plugin.pop());
+        }
+        plugin = trim(plugin.shift());
+        if (plugin) {
+          expParts.push(plugin +':'+ feature);
+        }
+      });
+      excludeExp = new RegExp('('+ expParts.join('|') +')', 'i');
+    }
 
     /**
      * Registers the given viewProvider for the specified view
@@ -95,6 +120,10 @@ ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
      * @param {Object} viewProvider
      */
     this.registerDefaultView = function(key, viewProvider) {
+      // test if the plugin is excluded
+      if (excludeExp && excludeExp.test(key +':'+ viewProvider.id)) {
+        return;
+      }
       PluginsProvider.registerPlugin('view', key, viewProvider);
     };
 
