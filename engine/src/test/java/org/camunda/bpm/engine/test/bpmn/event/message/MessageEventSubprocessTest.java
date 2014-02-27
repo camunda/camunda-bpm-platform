@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Daniel Meyer
  * @author Falko Menge
+ * @author Danny Gräf
  */
 public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
 
@@ -258,7 +259,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testNonInterruptingInMultiEmbeddedSubprocess() {
+  public void testNonInterruptingInMultiParallelEmbeddedSubprocess() {
     // #################### I. start process and only complete the tasks
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -317,6 +318,33 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     for (Task task : tasks) {
       taskService.complete(task.getId());
     }
+
+    // expect: no subscription is left
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
+
+    // then: complete the last task of the main process
+    taskService.complete(taskService.createTaskQuery().singleResult().getId());
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment
+  public void testNonInterruptingInMultiSequentialEmbeddedSubprocess() {
+    // start process and trigger the first message sub process
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    runtimeService.messageEventReceived("message", runtimeService.createEventSubscriptionQuery().singleResult().getExecutionId());
+
+    // expect: one subscription is remaining for the first instance
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
+
+    // then: complete both tasks (subprocess and message subprocess)
+    taskService.complete(taskService.createTaskQuery().taskName("Message User Task").singleResult().getId());
+    taskService.complete(taskService.createTaskQuery().taskName("Sub User Task").list().get(0).getId());
+
+    // expect: the second instance is started
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
+
+    // then: just complete this
+    taskService.complete(taskService.createTaskQuery().taskName("Sub User Task").list().get(0).getId());
 
     // expect: no subscription is left
     assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
