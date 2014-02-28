@@ -36,7 +36,7 @@
               Invalid date: The date should have the pattern 'yyyy-MM-ddTHH:mm:ss'.
             </p>
             <p class="invalid" ng-show="this.editVariableForm.editIntegerValue.$error.numeric || this.editVariableForm.editFloatValue.$error.numeric">
-              Invalid value: Only a {{ variable.type }} value is allowed.
+              Invalid value: Only a {{ getCopy(variable.id).type }} value is allowed.
             </p>
 
             <p class="invalid" ng-show="getExceptionForVariableId(variable.id)">
