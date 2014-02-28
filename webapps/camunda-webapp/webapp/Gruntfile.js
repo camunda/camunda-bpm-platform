@@ -217,7 +217,7 @@ module.exports = function(grunt) {
         ],
         tasks: [
           // 'newer:jshint:e2eTest',
-          'test:e2e'
+          'test:e2e' +(process.env.E2E_TESTS ? ':'+ process.env.E2E_TESTS : '')
         ]
       },
 

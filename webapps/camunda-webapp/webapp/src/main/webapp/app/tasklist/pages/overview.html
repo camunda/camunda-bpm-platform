@@ -1,3 +1,4 @@
+<!-- # CE - src/main/webapp/app/tasklist/pages/overview.html -->
 <div notifications-panel></div>
 
 <!-- task list -->
@@ -6,7 +7,7 @@
     <tr sortable="taskList.sort">
       <th class="row-select">
         <input type="checkbox" title="Select/Deselect all" ng-model="allTasksSelected" ng-click="selectAllTasks(allTasksSelected)">
-      </th>      
+      </th>
       <th><span sort-by="name">Name</span></th>
       <th><span>Process</span></th>
       <th><span sort-by="created">Created</span></th>
@@ -22,13 +23,13 @@
       <td>-</td>
       <td>-</td>
       <td>-</td>
-    </tr>    
+    </tr>
   </tbody>
   <tbody class="task" ng-repeat="task in taskList.tasks" ng-class="{ selected: isSelected(task) }">
     <tr class="entry">
       <td class="row-select">
         <input type="checkbox" ng-model="task.selected" ng-click="selectTask(task)">
-      </td>      
+      </td>
       <td>{{ task.name }}</td>
       <td>{{ processDefinitions[task.processDefinitionId].name }}</td>
       <td>{{ task.created | date:'medium' }}</td>
@@ -97,3 +98,4 @@
     </tr>
   </tfoot>
 </table>
+<!-- / CE - src/main/webapp/app/tasklist/pages/overview.html -->
