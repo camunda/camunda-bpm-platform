@@ -106,7 +106,7 @@
       <scope>test</scope>
     </dependency>
 
-	<!-- failed-jobs-plugin -->
+    <!-- failed-jobs-plugin -->
     <dependency>
       <groupId>org.camunda.bpm.cockpit.plugin</groupId>
       <artifactId>cockpit-failed-jobs-plugin</artifactId>
