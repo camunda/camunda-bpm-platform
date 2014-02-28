@@ -1,10 +1,11 @@
+<!-- # CE - src/main/webapp/develop/invoice/assign-approver.html -->
 <strong>Who should approve that damn thing?</strong>
 
 <script form-script type="text/form-script">
 
   // may use $scope to bind against the current scope directly
   // or use #inject (see below) to obtain application services
-  
+
   inject([ '$scope', '$http', function($scope, $http) {
 
     $scope.$watch('variablesForm.approver.$valid', function(newValue) {
@@ -29,7 +30,8 @@
 
 <p>
   <small>
-    * must be a valid user, i.e. one of 
+    * must be a valid user, i.e. one of
     <code>demo, john, mary, peter</code>
   </small>
 </p>
+<!-- / CE - src/main/webapp/develop/invoice/assign-approver.html -->
