@@ -1,10 +1,21 @@
+/* global ngDefine: false */
 ngDefine('tasklist.services', [
   'angular'
 ], function(module, angular) {
+  'use strict';
+  var EMBEDDED_KEY = 'embedded:',
+      APP_KEY = 'app:',
+      ENGINE_KEY = 'engine:';
 
-  var EMBEDDED_KEY = "embedded:",
-      APP_KEY = "app:",
-      ENGINE_KEY = "engine:";
+  function compact(arr) {
+    var a = [];
+    for (var ay in arr) {
+      if (arr[ay]) {
+        a.push(arr[ay]);
+      }
+    }
+    return a;
+  }
 
   var FormsProducer = function(Uri) {
 
@@ -12,21 +23,19 @@ ngDefine('tasklist.services', [
       if(!value) {
         return false;
       } else {
-        if(true == value || "true" == value || "TRUE" == value) {
-          return true;
-        } else {
-          return false;
-        }
+        return true === value ||
+               'true' === value ||
+               'TRUE' === value;
       }
-    }
+    };
 
     var numberTypeConverter = function(value) {
       return parseInt(value);
-    }
+    };
 
     var stringTypeConverter = function(value) {
       return value.toString();
-    }
+    };
 
     var typeConverters = {
       'boolean' : booleanTypeConverter,
@@ -60,7 +69,7 @@ ngDefine('tasklist.services', [
             var name = variable.name;
             var value = convertValue(variable);
 
-            variablesMap[name] = {"value" : value};
+            variablesMap[name] = {'value' : value};
           }
         }
         return variablesMap;
@@ -94,20 +103,23 @@ ngDefine('tasklist.services', [
           return;
         }
 
-        if (key.indexOf(EMBEDDED_KEY) == 0) {
+        if (key.indexOf(EMBEDDED_KEY) === 0) {
           key = key.substring(EMBEDDED_KEY.length);
           form.embedded = true;
         } else {
           form.external = true;
         }
 
-        if (key.indexOf(APP_KEY) == 0) {
+        if (key.indexOf(APP_KEY) === 0) {
           if (applicationContextPath) {
-            key = applicationContextPath + "/" + key.substring(APP_KEY.length);
+            key = compact([applicationContextPath, key.substring(APP_KEY.length)])
+              .join('/')
+              // prevents multiple "/" in the URI
+              .replace(/\/([\/]+)/, '/');
           }
         }
 
-        if(key.indexOf(ENGINE_KEY) == 0) {
+        if(key.indexOf(ENGINE_KEY) === 0) {
           // resolve relative prefix
           key = Uri.appUri(key);
         }
@@ -122,7 +134,7 @@ ngDefine('tasklist.services', [
   };
 
 
-  FormsProducer.$inject = ["Uri"];
+  FormsProducer.$inject = ['Uri'];
 
-  module.factory("Forms", FormsProducer);
+  module.factory('Forms', FormsProducer);
 });
