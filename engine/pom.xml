@@ -442,6 +442,7 @@
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>**/TaskEventsTest.java</exclude>
                 <exclude>**/OperationLog*.java</exclude>
+                <exclude>**/HistoricVariableInstanceScopeTest</exclude>
               </excludes>
             </configuration>
           </plugin>
