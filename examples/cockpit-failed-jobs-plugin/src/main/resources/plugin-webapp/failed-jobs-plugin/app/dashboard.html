@@ -1,0 +1,27 @@
+<div>
+	<h1>Cockpit Failed Jobs</h1>
+	<table class="table table-bordered table-hover table-condensed">
+		<thead>
+			<tr>
+				<th>Job ID</th>
+				<th>Process instance ID</th>
+				<th>exception</th>
+			</tr>
+		</thead>
+		<tbody>
+		    <tr ng-show="loading">
+		    	<td colspan="3">
+			       loading....
+			   	</td>
+		    </tr>
+			<tr data-ng-repeat="job in failedJobs">
+				<td>{{ job.id }}</td>
+				<td><a target="new" href="{{livePath(job.processInstanceId)}}">{{
+						job.processInstanceId }}</a></td>
+				<td><a target="new"
+					href="{{jobRestUrl}}/{{ job.id }}/stacktrace">{{
+						job.exceptionMessage || "Exception" }}</a></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
