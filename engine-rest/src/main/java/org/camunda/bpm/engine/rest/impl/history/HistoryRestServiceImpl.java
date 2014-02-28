@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.impl.history;
 
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricActivityStatisticsRestService;
+import org.camunda.bpm.engine.rest.history.HistoricDetailRestService;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricVariableInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoryRestService;
@@ -53,6 +54,11 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
   @Override
   public UserOperationLogRestService getUserOperationLogRestService() {
     return new UserOperationLogRestServiceImpl(getProcessEngine());
+  }
+
+  @Override
+  public HistoricDetailRestService getDetailService() {
+    return new HistoricDetailRestServiceImpl(getProcessEngine());
   }
 
 }

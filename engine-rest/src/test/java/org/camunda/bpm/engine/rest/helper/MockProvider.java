@@ -36,13 +36,17 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
+import org.camunda.bpm.engine.history.HistoricDetail;
+import org.camunda.bpm.engine.history.HistoricFormField;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.variable.StringType;
@@ -274,6 +278,27 @@ public abstract class MockProvider {
   public static final String EXAMPLE_USER_OPERATION_ORG_VALUE = "orgValue";
   public static final String EXAMPLE_USER_OPERATION_NEW_VALUE = "newValue";
   public static final String EXAMPLE_USER_OPERATION_TIMESTAMP = "2014-02-20T16:53:37";
+
+  // historic detail
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_ID = "aHistoricVariableUpdateId";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_PROC_INST_ID = "aProcInst";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_ACT_INST_ID = "anActInst";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_EXEC_ID = "anExecutionId";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_TASK_ID = "aTaskId";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_TIME = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_NAME = "aVariableName";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_TYPE_NAME = "String";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_VALUE = "aValue";
+  public static final int EXAMPLE_HISTORIC_VAR_UPDATE_REVISION = 1;
+
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_ID = "anId";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_PROC_INST_ID = "aProcInst";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_ACT_INST_ID = "anActInst";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID = "anExecutionId";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_TASK_ID = "aTaskId";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_TIME = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID = "aFormFieldId";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_VALUE = "aFormFieldValue";
 
   // tasks
   public static Task createMockTask() {
@@ -824,27 +849,27 @@ public abstract class MockProvider {
   }
 
   public static List<ProcessInstance> createAnotherMockProcessInstanceList() {
-  	List<ProcessInstance> mockProcessInstanceList = new ArrayList<ProcessInstance>();
-  	mockProcessInstanceList.add(createMockInstance());
-  	mockProcessInstanceList.add(createAnotherMockInstance());
-  	return mockProcessInstanceList;
+    List<ProcessInstance> mockProcessInstanceList = new ArrayList<ProcessInstance>();
+    mockProcessInstanceList.add(createMockInstance());
+    mockProcessInstanceList.add(createAnotherMockInstance());
+    return mockProcessInstanceList;
   }
 
   public static ProcessInstance createAnotherMockInstance() {
-  	ProcessInstance mock = mock(ProcessInstance.class);
+    ProcessInstance mock = mock(ProcessInstance.class);
 
-  	when(mock.getId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
-  	when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
-  	when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
-  	when(mock.getProcessInstanceId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
-  	when(mock.isSuspended()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED);
-  	when(mock.isEnded()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_ENDED);
+    when(mock.getId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
+    when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+    when(mock.getProcessInstanceId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mock.isSuspended()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED);
+    when(mock.isEnded()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_ENDED);
 
-  	return mock;
+    return mock;
   }
 
   public static Set<String> createMockSetFromList(String list){
-	  return new HashSet<String>(Arrays.asList(list.split(",")));
+    return new HashSet<String>(Arrays.asList(list.split(",")));
   }
 
   public static IdentityLink createMockUserAssigneeIdentityLink() {
@@ -919,4 +944,57 @@ public abstract class MockProvider {
     return entry;
   }
 
+  // historic detail ////////////////////
+
+  public static HistoricVariableUpdate createMockHistoricVariableUpdate() {
+    HistoricDetailVariableInstanceUpdateEntity variableUpdate = mock(HistoricDetailVariableInstanceUpdateEntity.class);
+
+    when(variableUpdate.getId()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_ID);
+    when(variableUpdate.getProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_PROC_INST_ID);
+    when(variableUpdate.getActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_ACT_INST_ID);
+    when(variableUpdate.getExecutionId()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_EXEC_ID);
+    when(variableUpdate.getTaskId()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_TASK_ID);
+    when(variableUpdate.getTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_VAR_UPDATE_TIME).toDate());
+    when(variableUpdate.getVariableName()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_NAME);
+    when(variableUpdate.getVariableTypeName()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_TYPE_NAME);
+    when(variableUpdate.getVariableType()).thenReturn(new StringType());
+    when(variableUpdate.getValue()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_VALUE);
+    when(variableUpdate.getRevision()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_REVISION);
+
+    return variableUpdate;
+  }
+
+  public static List<HistoricVariableUpdate> createMockHistoricVariableUpdates() {
+    List<HistoricVariableUpdate> entries = new ArrayList<HistoricVariableUpdate>();
+    entries.add(createMockHistoricVariableUpdate());
+    return entries;
+  }
+
+  public static HistoricFormField createMockHistoricFormField() {
+    HistoricFormField historicFromField = mock(HistoricFormField.class);
+
+    when(historicFromField.getId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_ID);
+    when(historicFromField.getProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_PROC_INST_ID);
+    when(historicFromField.getActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_ACT_INST_ID);
+    when(historicFromField.getExecutionId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID);
+    when(historicFromField.getTaskId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_TASK_ID);
+    when(historicFromField.getTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_FORM_FIELD_TIME));
+    when(historicFromField.getFieldId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID);
+    when(historicFromField.getFieldValue()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_VALUE);
+
+    return historicFromField;
+  }
+
+  public static List<HistoricFormField> createMockHistoricFormFields() {
+    List<HistoricFormField> entries = new ArrayList<HistoricFormField>();
+    entries.add(createMockHistoricFormField());
+    return entries;
+  }
+
+  public static List<HistoricDetail> createMockHistoricDetails() {
+    List<HistoricDetail> entries = new ArrayList<HistoricDetail>();
+    entries.add(createMockHistoricVariableUpdate());
+    entries.add(createMockHistoricFormField());
+    return entries;
+  }
 }

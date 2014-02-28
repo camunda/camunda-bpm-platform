@@ -36,4 +36,8 @@ public interface HistoryRestService {
 
   @Path(UserOperationLogRestService.PATH)
   UserOperationLogRestService getUserOperationLogRestService();
+
+  @Path(HistoricDetailRestService.PATH)
+  HistoricDetailRestService getDetailService();
+
 }
