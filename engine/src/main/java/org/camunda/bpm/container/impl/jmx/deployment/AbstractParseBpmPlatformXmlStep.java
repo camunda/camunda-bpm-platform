@@ -89,7 +89,9 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
 
   protected String autoCompleteUrl(String url) {
     if (url != null) {
-      LOGGER.log(Level.FINE, "before: [" + url + "]");
+      if (LOGGER.isLoggable(Level.FINE)) {
+        LOGGER.log(Level.FINE, "Autocompleting url : [" + url + "]");
+      }
 
       if (!url.endsWith(BPM_PLATFORM_XML_FILE)) {
         String appender;
@@ -106,7 +108,9 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
         url += BPM_PLATFORM_XML_FILE;
       }
 
-      LOGGER.log(Level.FINE, "after: [" + url + "]");
+      if (LOGGER.isLoggable(Level.FINE)) {
+        LOGGER.log(Level.FINE, "Autocompleted url : [" + url + "]");
+      }
     }
 
     return url;
