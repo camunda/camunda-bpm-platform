@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.delegate.BpmnModelExecutionContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceState;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -98,6 +99,9 @@ public class ExecutionImpl implements
   /** only available until the process instance is started */
   protected ProcessInstanceStartContext processInstanceStartContext;
 
+  /** only available until the execution is started */
+  protected ExecutionStartContext executionStartContext;
+
   /** the business key */
   protected String businessKey;
   // state/type of execution //////////////////////////////////////////////////
@@ -160,6 +164,11 @@ public class ExecutionImpl implements
 
   /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
   public ExecutionImpl createExecution() {
+    return createExecution(false);
+  }
+
+  /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
+  public ExecutionImpl createExecution(boolean initializeExecutionStartContext) {
     // create the new child execution
     ExecutionImpl createdExecution = newExecution();
 
@@ -175,6 +184,10 @@ public class ExecutionImpl implements
 
     // make created execution start in same activity instance
     createdExecution.activityInstanceId = activityInstanceId;
+
+    if (initializeExecutionStartContext) {
+      createdExecution.executionStartContext = new ExecutionStartContext();
+    }
 
     return createdExecution;
   }
@@ -585,6 +598,11 @@ public class ExecutionImpl implements
     if(activity.isConcurrent()) {
       this.nextActivity = activity;
       performOperation(AtomicOperation.ACTIVITY_START_CONCURRENT);
+
+    } else if(activity.isCancelScope()) {
+      this.nextActivity = activity;
+      performOperation(AtomicOperation.ACTIVITY_START_CANCEL_SCOPE);
+
     } else {
       setActivity((ActivityImpl) activity);
       performOperation(AtomicOperation.ACTIVITY_START);
@@ -1068,8 +1086,16 @@ public class ExecutionImpl implements
     return processInstanceStartContext;
   }
 
+  public ExecutionStartContext getExecutionStartContext() {
+    return executionStartContext;
+  }
+
   public void disposeProcessInstanceStartContext() {
     processInstanceStartContext = null;
+  }
+
+  public void disposeExecutionStartContext() {
+    executionStartContext = null;
   }
 
   public String getActivityInstanceId() {

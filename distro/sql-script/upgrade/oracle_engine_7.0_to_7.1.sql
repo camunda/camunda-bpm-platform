@@ -91,3 +91,10 @@ create table ACT_HI_OP_LOG (
     primary key (ID_)
 );
 
+-- add new column to ACT_HI_VARINST --
+
+alter table ACT_HI_VARINST
+    add ACT_INST_ID_ NVARCHAR2(64);
+
+alter table ACT_HI_DETAIL
+    add VAR_INST_ID_ NVARCHAR2(64);

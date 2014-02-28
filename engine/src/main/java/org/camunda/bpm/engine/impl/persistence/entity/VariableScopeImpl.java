@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,11 +40,11 @@ import org.camunda.bpm.engine.impl.variable.VariableTypes;
  * @author Joram Barrez
  */
 public abstract class VariableScopeImpl implements Serializable, VariableScope {
-  
+
   private static final long serialVersionUID = 1L;
-  
+
   protected Map<String, VariableInstanceEntity> variableInstances = null;
-  
+
   protected ELContext cachedElContext;
 
   protected String id = null;
@@ -66,11 +66,11 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       }
     }
   }
-  
+
   public Map<String, Object> getVariables() {
     return collectVariables(new HashMap<String, Object>());
   }
-  
+
   protected Map<String, Object> collectVariables(HashMap<String, Object> variables) {
     ensureVariableInstancesInitialized();
     VariableScopeImpl parentScope = getParentVariableScope();
@@ -82,7 +82,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     }
     return variables;
   }
-  
+
   public Object getVariable(String variableName) {
     ensureVariableInstancesInitialized();
     VariableInstanceEntity variableInstance = variableInstances.get(variableName);
@@ -95,7 +95,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     }
     return null;
   }
-  
+
   public Object getVariableLocal(String variableName) {
     ensureVariableInstancesInitialized();
     VariableInstanceEntity variableInstance = variableInstances.get(variableName);
@@ -104,7 +104,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     }
     return null;
   }
-  
+
   public boolean hasVariables() {
     ensureVariableInstancesInitialized();
     if (!variableInstances.isEmpty()) {
@@ -153,7 +153,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   public Set<String> getVariableNames() {
     return collectVariableNames(new HashSet<String>());
   }
-  
+
   public Map<String, Object> getVariablesLocal() {
     Map<String, Object> variables = new HashMap<String, Object>();
     ensureVariableInstancesInitialized();
@@ -183,7 +183,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       }
     }
   }
-  
+
   public void setVariablesLocal(Map<String, ? extends Object> variables) {
     if (variables!=null) {
       for (String variableName : variables.keySet()) {
@@ -199,14 +199,14 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       removeVariable(variableName);
     }
   }
-  
+
   public void removeVariablesLocal() {
     List<String> variableNames = new ArrayList<String>(getVariableNamesLocal());
     for (String variableName: variableNames) {
       removeVariableLocal(variableName);
     }
   }
-  
+
   public void deleteVariablesInstanceForLeavingScope() {
     List<String> variableNames = new ArrayList<String>(getVariableNamesLocal());
     for (String variableName: variableNames) {
@@ -216,12 +216,12 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         variableInstance.delete();
 
 //        fireHistoricVariableInstanceDelete(variableInstance, (ExecutionEntity) this);
-//        
+//
 //        fireHistoricVariableInstanceUpdate(variableInstance, (ExecutionEntity)this);
       }
     }
   }
-  
+
   public void removeVariables(Collection<String> variableNames) {
     if (variableNames != null) {
       for (String variableName : variableNames) {
@@ -239,14 +239,14 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   }
 
   public void setVariable(String variableName, Object value) {
-    setVariable(variableName, value, getSourceActivityExecution());
+    setVariable(variableName, value, getSourceActivityVariableScope());
   }
 
-  protected void setVariable(String variableName, Object value, ExecutionEntity sourceActivityExecution) {
+  protected void setVariable(String variableName, Object value, VariableScope sourceActivityExecution) {
     if (hasVariableLocal(variableName)) {
       setVariableLocal(variableName, value, sourceActivityExecution);
       return;
-    } 
+    }
     VariableScopeImpl parentVariableScope = getParentVariableScope();
     if (parentVariableScope!=null) {
       if (sourceActivityExecution==null) {
@@ -256,50 +256,87 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       }
       return;
     }
-    createVariableLocal(variableName, value);
+    createVariableLocal(variableName, value, sourceActivityExecution);
   }
 
   public void setVariableLocal(String variableName, Object value) {
-    setVariableLocal(variableName, value, getSourceActivityExecution());
+    setVariableLocal(variableName, value, getSourceActivityVariableScope());
   }
 
-  protected void setVariableLocal(String variableName, Object value, ExecutionEntity sourceActivityExecution) {
+  protected void setVariableLocal(String variableName, Object value, VariableScope sourceActivityExecution) {
     ensureVariableInstancesInitialized();
     VariableInstanceEntity variableInstance = variableInstances.get(variableName);
     if ((variableInstance != null) && (!variableInstance.getType().isAbleToStore(value))) {
-      // delete variable
-      removeVariable(variableName);
-      variableInstance = null;
+      // it seems that the type has changed -> clear the variable instance
+      clearVariable(variableInstance, value);
     }
     if (variableInstance == null) {
-      createVariableLocal(variableName, value);
+      createVariableLocal(variableName, value, sourceActivityExecution);
     } else {
       updateVariableInstance(variableInstance, value, sourceActivityExecution);
     }
   }
-  
+
+  protected void clearVariable(VariableInstanceEntity variableInstance, Object newValue) {
+    VariableType oldType = variableInstance.getType();
+    VariableType newType = getNewVariableType(newValue);
+
+    // clear the variable only if the types are different
+    if (oldType.getTypeName().equals(newType.getTypeName())) {
+      return;
+    }
+
+    if (variableInstance.getByteArrayValueId() == null) {
+      // reset the current value temporarily to null
+      variableInstance.setValue(null);
+    } else {
+      // the type has changed from (SerializableType||ByteArrayType) -> another type:
+      // the next apparently useless line is probably to ensure consistency in the DbSqlSession
+      // cache, but should be checked and docced here (or removed if it turns out to be unnecessary)
+      variableInstance.getByteArrayValue();
+      Context
+        .getCommandContext()
+        .getByteArrayManager()
+        .deleteByteArrayById(variableInstance.getByteArrayValueId());
+      variableInstance.setByteArrayValueId(null);
+    }
+
+    // set the new type
+    variableInstance.setType(newType);
+  }
+
+  protected VariableType getNewVariableType(Object newValue) {
+    // fetch available variable types
+    VariableTypes variableTypes = Context
+        .getProcessEngineConfiguration()
+        .getVariableTypes();
+
+    // get the corresponding variable type for the new value
+    return variableTypes.findVariableType(newValue);
+  }
+
   protected void createVariableLocal(String variableName, Object value) {
-    createVariableLocal(variableName, value, getSourceActivityExecution());
+    createVariableLocal(variableName, value, getSourceActivityVariableScope());
   }
 
   /** only called when a new variable is created on this variable scope.
-   * This method is also responsible for propagating the creation of this 
+   * This method is also responsible for propagating the creation of this
    * variable to the history. */
-  protected void createVariableLocal(String variableName, Object value, ExecutionEntity sourceActivityExecution) {
+  protected void createVariableLocal(String variableName, Object value, VariableScope sourceActivityExecution) {
     ensureVariableInstancesInitialized();
-    
+
     if (variableInstances.containsKey(variableName)) {
       throw new ProcessEngineException("variable '"+variableName+"' already exists. Use setVariableLocal if you want to overwrite the value");
     }
-    
+
     createVariableInstance(variableName, value, sourceActivityExecution);
   }
 
   public void removeVariable(String variableName) {
-    removeVariable(variableName, getSourceActivityExecution());
+    removeVariable(variableName, getSourceActivityVariableScope());
   }
 
-  protected void removeVariable(String variableName, ExecutionEntity sourceActivityExecution) {
+  protected void removeVariable(String variableName, VariableScope sourceActivityExecution) {
     ensureVariableInstancesInitialized();
     if (variableInstances.containsKey(variableName)) {
       removeVariableLocal(variableName);
@@ -316,14 +353,14 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   }
 
   public void removeVariableLocal(String variableName) {
-    removeVariableLocal(variableName, getSourceActivityExecution());
+    removeVariableLocal(variableName, getSourceActivityVariableScope());
   }
 
-  protected ExecutionEntity getSourceActivityExecution() {
-    return null;
+  protected VariableScope getSourceActivityVariableScope() {
+    return this;
   }
-  
-  protected void removeVariableLocal(String variableName, ExecutionEntity sourceActivityExecution) {
+
+  protected void removeVariableLocal(String variableName, VariableScope sourceActivityExecution) {
     ensureVariableInstancesInitialized();
     VariableInstanceEntity variableInstance = variableInstances.remove(variableName);
     if (variableInstance != null) {
@@ -331,20 +368,19 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     }
   }
 
-  protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
-    
+  protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance, VariableScope sourceActivityExecution) {
+
     // delete variable instance
     variableInstance.delete();
     variableInstance.setValue(null);
-    
+
     // fire DELETE event
     if(isAutoFireHistoryEvents()) {
       fireHistoricVariableInstanceDelete(variableInstance, sourceActivityExecution);
     }
   }
 
-  protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value, ExecutionEntity sourceActivityExecution) {
-    
+  protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value, VariableScope sourceActivityExecution) {
     // update variable instance
     variableInstance.setValue(value);
 
@@ -354,84 +390,80 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     }
   }
 
-  protected VariableInstanceEntity createVariableInstance(String variableName, Object value, ExecutionEntity sourceActivityExecution) {
-    
+  protected VariableInstanceEntity createVariableInstance(String variableName, Object value, VariableScope sourceActivityExecution) {
+
+    VariableType type = getNewVariableType(value);
+
     // create variable instance
-    VariableTypes variableTypes = Context
-      .getProcessEngineConfiguration()
-      .getVariableTypes();
-    
-    VariableType type = variableTypes.findVariableType(value);
- 
     VariableInstanceEntity variableInstance = VariableInstanceEntity.createAndInsert(variableName, type, value);
     initializeVariableInstanceBackPointer(variableInstance);
     variableInstances.put(variableName, variableInstance);
-    
+
     variableInstance.setValue(value);
-    
+
     // fire CREATE event
     if(isAutoFireHistoryEvents()) {
       fireHistoricVariableInstanceCreate(variableInstance, sourceActivityExecution);
     }
-    
+
     return variableInstance;
   }
-  
-  protected void fireHistoricVariableInstanceDelete(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
+
+  protected void fireHistoricVariableInstanceDelete(VariableInstanceEntity variableInstance, VariableScope sourceActivityExecution) {
 
     int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     if (historyLevel >=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      
+
       final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
       final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
       final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
-      
+
       HistoryEvent evt = eventProducer.createHistoricVariableDeleteEvt(variableInstance, sourceActivityExecution);
       eventHandler.handleEvent(evt);
-      
+
     }
-    
+
   }
-  
-  protected void fireHistoricVariableInstanceCreate(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
+
+  protected void fireHistoricVariableInstanceCreate(VariableInstanceEntity variableInstance, VariableScope sourceActivityExecution) {
 
     int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     if (historyLevel >=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      
+
       final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
       final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
       final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
-      
+
       HistoryEvent evt = eventProducer.createHistoricVariableCreateEvt(variableInstance, sourceActivityExecution);
       eventHandler.handleEvent(evt);
-      
+
     }
-    
+
   }
 
-  protected void fireHistoricVariableInstanceUpdate(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
+  protected void fireHistoricVariableInstanceUpdate(VariableInstanceEntity variableInstance, VariableScope sourceActivityExecution) {
 
     int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     if (historyLevel >=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      
+
       final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
       final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
       final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
-      
+
       HistoryEvent evt = eventProducer.createHistoricVariableUpdateEvt(variableInstance, sourceActivityExecution);
       eventHandler.handleEvent(evt);
-      
+
     }
-    
+
   }
-  
+
   /**
    * @return true if this variable scope should automatically fire history events for variable modifications.
    */
   protected boolean isAutoFireHistoryEvents() {
     return true;
   }
-  
+
   // getters and setters //////////////////////////////////////////////////////
 
   public ELContext getCachedElContext() {
@@ -440,11 +472,11 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   public void setCachedElContext(ELContext cachedElContext) {
     this.cachedElContext = cachedElContext;
   }
-  
+
   public String getId() {
     return id;
   }
-  
+
   public void setId(String id) {
     this.id = id;
   }

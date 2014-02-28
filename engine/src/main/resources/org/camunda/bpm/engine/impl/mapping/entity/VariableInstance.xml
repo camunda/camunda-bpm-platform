@@ -31,6 +31,7 @@
     set 
       REV_ = #{revisionNext, jdbcType=INTEGER},
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      TYPE_ = #{type, jdbcType=VARCHAR },
 	    BYTEARRAY_ID_ = #{byteArrayValueId, jdbcType=VARCHAR},
 	    DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
 	    LONG_ = #{longValue, jdbcType=BIGINT},

@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -33,7 +34,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -154,31 +154,52 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setNewValue(propertyChange.getNewValueString());
   }
 
-  protected HistoryEvent createHistoricVariableEvent(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl, String eventType) {
-    ExecutionEntity execution = null;
 
-    if (variableScopeImpl instanceof ExecutionEntity) {
-      execution = (ExecutionEntity) variableScopeImpl;
+  protected HistoryEvent createHistoricVariableEvent(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope, String eventType) {
+    String scopeActivityInstanceId = null;
+    String sourceActivityInstanceId = null;
 
-    } else if (variableScopeImpl instanceof TaskEntity) {
-      execution = ((TaskEntity) variableScopeImpl).getExecution();
+    if(variableInstance.getExecutionId() != null) {
+      ExecutionEntity scopeExecution = Context.getCommandContext()
+        .getDbSqlSession()
+        .selectById(ExecutionEntity.class, variableInstance.getExecutionId());
 
+      if (variableInstance.getTaskId() == null
+          && scopeExecution.isScope()
+          && (scopeExecution.isActive() || (!scopeExecution.isActive() && scopeExecution.getActivityId() == null))) {
+        scopeActivityInstanceId = scopeExecution.getParentActivityInstanceId();
+
+      } else {
+        scopeActivityInstanceId = scopeExecution.getActivityInstanceId();
+      }
+    }
+
+    ExecutionEntity sourceExecution = null;
+    if (sourceVariableScope instanceof ExecutionEntity) {
+      sourceExecution = (ExecutionEntity) sourceVariableScope;
+      sourceActivityInstanceId = sourceExecution.getActivityInstanceId();
+
+    } else if (sourceVariableScope instanceof TaskEntity) {
+      sourceExecution = ((TaskEntity) sourceVariableScope).getExecution();
+      if (sourceExecution != null) {
+        sourceActivityInstanceId = sourceExecution.getActivityInstanceId();
+      }
     }
 
     // create event
-    HistoricVariableUpdateEventEntity evt = newVariableUpdateEventEntity(execution);
+    HistoricVariableUpdateEventEntity evt = newVariableUpdateEventEntity(sourceExecution);
     // initialize
     initHistoricVariableUpdateEvt(evt, variableInstance, eventType);
 
-    if (execution != null) {
-      evt.setActivityInstanceId(execution.getActivityInstanceId());
-    }
+    // set scope activity instance id
+    evt.setScopeActivityInstanceId(scopeActivityInstanceId);
+    // set source activity instance id
+    evt.setActivityInstanceId(sourceActivityInstanceId);
 
     return evt;
   }
 
   // event instance factory ////////////////////////
-
 
   protected HistoricProcessInstanceEventEntity newProcessInstanceEventEntity(ExecutionEntity execution) {
     return new HistoricProcessInstanceEventEntity();
@@ -391,16 +412,16 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   // variables /////////////////////////////////
 
-  public HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl) {
-    return createHistoricVariableEvent(variableInstance, variableScopeImpl, HistoryEvent.VARIABLE_EVENT_TYPE_CREATE);
+  public HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope) {
+    return createHistoricVariableEvent(variableInstance, sourceVariableScope, HistoryEvent.VARIABLE_EVENT_TYPE_CREATE);
   }
 
-  public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl) {
-    return createHistoricVariableEvent(variableInstance, variableScopeImpl, HistoryEvent.VARIABLE_EVENT_TYPE_DELETE);
+  public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope) {
+    return createHistoricVariableEvent(variableInstance, sourceVariableScope, HistoryEvent.VARIABLE_EVENT_TYPE_DELETE);
   }
 
-  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl) {
-    return createHistoricVariableEvent(variableInstance, variableScopeImpl, HistoryEvent.VARIABLE_EVENT_TYPE_UPDATE);
+  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope) {
+    return createHistoricVariableEvent(variableInstance, sourceVariableScope, HistoryEvent.VARIABLE_EVENT_TYPE_UPDATE);
   }
 
   // form Properties ///////////////////////////

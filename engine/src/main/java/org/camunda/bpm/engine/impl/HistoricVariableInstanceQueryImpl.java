@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -32,13 +31,12 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
-  protected String activityInstanceId;
   protected String variableName;
   protected String variableNameLike;
-  protected boolean excludeTaskRelated = false;
   protected QueryVariableValue queryVariableValue;
   protected String[] taskIds;
   protected String[] executionIds;
+  protected String[] activityInstanceIds;
 
   public HistoricVariableInstanceQueryImpl() {
   }
@@ -52,15 +50,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   }
 
   public HistoricVariableInstanceQueryImpl processInstanceId(String processInstanceId) {
-    if (processInstanceId == null) {
-      throw new ProcessEngineException("processInstanceId is null");
-    }
+    assertParamNotNull("processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
-    return this;
-  }
-
-  public HistoricVariableInstanceQuery activityInstanceId(String activityInstanceId) {
-    this.activityInstanceId = activityInstanceId;
     return this;
   }
 
@@ -76,36 +67,29 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return this;
   }
 
+  public HistoricVariableInstanceQuery activityInstanceIdIn(String... activityInstanceIds) {
+    assertParamNotNull("Activity Instance Ids", activityInstanceIds);
+    this.activityInstanceIds = activityInstanceIds;
+    return this;
+  }
+
   public HistoricVariableInstanceQuery variableName(String variableName) {
-    if (variableName == null) {
-      throw new ProcessEngineException("variableName is null");
-    }
+    assertParamNotNull("variableName", variableName);
     this.variableName = variableName;
     return this;
   }
 
   public HistoricVariableInstanceQuery variableValueEquals(String variableName, Object variableValue) {
-    if (variableName == null) {
-      throw new ProcessEngineException("variableName is null");
-    }
-    if (variableValue == null) {
-      throw new ProcessEngineException("variableValue is null");
-    }
+    assertParamNotNull("variableName", variableName);
+    assertParamNotNull("variableValue", variableValue);
     this.variableName = variableName;
     queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
     return this;
   }
 
   public HistoricVariableInstanceQuery variableNameLike(String variableNameLike) {
-    if (variableNameLike == null) {
-      throw new ProcessEngineException("variableNameLike is null");
-    }
+    assertParamNotNull("variableNameLike", variableNameLike);
     this.variableNameLike = variableNameLike;
-    return this;
-  }
-
-  public HistoricVariableInstanceQuery excludeTaskDetails() {
-    this.excludeTaskRelated = true;
     return this;
   }
 
@@ -156,8 +140,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return processInstanceId;
   }
 
-  public String getActivityInstanceId() {
-    return activityInstanceId;
+  public String[] getActivityInstanceIds() {
+    return activityInstanceIds;
   }
 
   public String[] getTaskIds() {
@@ -166,10 +150,6 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public String[] getExecutionIds() {
     return executionIds;
-  }
-
-  public boolean getExcludeTaskRelated() {
-    return excludeTaskRelated;
   }
 
   public String getVariableName() {

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -120,6 +121,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   protected String activityInstanceId;
 
   protected ProcessInstanceStartContext processInstanceStartContext;
+  protected ExecutionStartContext executionStartContext;
 
   // state/type of execution //////////////////////////////////////////////////
 
@@ -246,6 +248,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
   /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
   public ExecutionEntity createExecution() {
+    return createExecution(false);
+  }
+
+  /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
+  public ExecutionEntity createExecution(boolean initializeExecutionStartContext) {
     // create the new child execution
     ExecutionEntity createdExecution = newExecution();
 
@@ -261,6 +268,10 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     // make created execution start in same activity instance
     createdExecution.activityInstanceId = activityInstanceId;
+
+    if (initializeExecutionStartContext) {
+      createdExecution.executionStartContext = new ExecutionStartContext();
+    }
 
     if (log.isLoggable(Level.FINE)) {
       log.fine("Child execution "+createdExecution+" created with parent "+this);
@@ -489,9 +500,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     if(activity.isConcurrent()) {
       this.nextActivity = activity;
       performOperation(AtomicOperation.ACTIVITY_START_CONCURRENT);
+
     } else if(activity.isCancelScope()) {
       this.nextActivity = activity;
       performOperation(AtomicOperation.ACTIVITY_START_CANCEL_SCOPE);
+
     } else {
       setActivity((ActivityImpl) activity);
       performOperation(AtomicOperation.ACTIVITY_START);
@@ -1311,7 +1324,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
 
   /** used to calculate the sourceActivityExecution */
-  protected ExecutionEntity getSourceActivityExecution() {
+  protected VariableScope getSourceActivityVariableScope() {
     return (activityId!=null ? this : null);
   }
 
@@ -1324,7 +1337,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     // has been initialized. The effect is that the activity instance id of the historic variable instances
     // will be the activity instance id of the start event.
 
-    return processInstanceStartContext == null;
+    return processInstanceStartContext == null && executionStartContext == null;
   }
 
   public void fireHistoricVariableInstanceCreateEvents() {
@@ -1719,8 +1732,16 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     return processInstanceStartContext;
   }
 
+  public ExecutionStartContext getExecutionStartContext() {
+    return executionStartContext;
+  }
+
   public void disposeProcessInstanceStartContext() {
     processInstanceStartContext = null;
+  }
+
+  public void disposeExecutionStartContext() {
+    executionStartContext = null;
   }
 
   public String getCurrentActivityId() {

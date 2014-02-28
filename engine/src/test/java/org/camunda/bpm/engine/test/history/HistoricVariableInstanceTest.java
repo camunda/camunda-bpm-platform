@@ -390,4 +390,47 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
       fail("A ProcessEngineExcpetion was expected.");
     } catch (ProcessEngineException e) {}
   }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByActivityInstanceIdIn() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    variables1.put("myVar", "test123");
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    query.activityInstanceIdIn(processInstance1.getId());
+
+    assertEquals(2, query.list().size());
+    assertEquals(2, query.count());
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("myVar", "test123");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+
+    query.activityInstanceIdIn(processInstance1.getId(), processInstance2.getId());
+
+    assertEquals(3, query.list().size());
+    assertEquals(3, query.count());
+  }
+
+  public void testQueryByInvalidActivityInstanceIdIn() {
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    query.taskIdIn("invalid");
+    assertEquals(0, query.count());
+
+    try {
+      query.taskIdIn(null);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (ProcessEngineException e) {}
+
+    try {
+      query.taskIdIn((String)null);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (ProcessEngineException e) {}
+  }
+
 }

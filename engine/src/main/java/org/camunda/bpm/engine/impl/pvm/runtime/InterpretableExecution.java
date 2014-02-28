@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
 
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessElement;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
@@ -97,7 +98,11 @@ public interface InterpretableExecution extends ActivityExecution, ExecutionList
 
   ProcessInstanceStartContext getProcessInstanceStartContext();
 
+  ExecutionStartContext getExecutionStartContext();
+
   void disposeProcessInstanceStartContext();
+
+  void disposeExecutionStartContext();
 
   void setCanceled(boolean canceled);
 
