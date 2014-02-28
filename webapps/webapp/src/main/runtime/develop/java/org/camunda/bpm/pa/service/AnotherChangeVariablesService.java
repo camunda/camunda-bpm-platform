@@ -9,47 +9,42 @@ import java.util.Map;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-public class AddVariablesService implements JavaDelegate {
+public class AnotherChangeVariablesService implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
     Date now = new Date();
-    List<String> serializable = new ArrayList<String>();
-    serializable.add("one");
-    serializable.add("two");
-    serializable.add("three");
-    byte[] bytes = "somebytes".getBytes();
 
-    byte aByte = Byte.parseByte("1", 2); // 2 for binary;
+    List<String> serializable = new ArrayList<String>();
+    serializable.add("seven");
+    serializable.add("eight");
+    serializable.add("nine");
+
+    byte[] bytes = "someAnotherBytes".getBytes();
 
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("shortVar", (short) 123);
-    variables.put("longVar", 928374L);
-    variables.put("integerVar", 1234);
 
-    variables.put("floatVar", (float) Float.MAX_VALUE);
-    variables.put("doubleVar", Double.MAX_VALUE);
+    variables.put("shortVar", (short) 789);
+    variables.put("longVar", 555555L);
+    variables.put("integerVar", 963852);
+
+    variables.put("floatVar", 55.55);
+    variables.put("doubleVar", 6123.2025);
 
     variables.put("trueBooleanVar", true);
     variables.put("falseBooleanVar", false);
 
-    variables.put("stringVar", "coca-cola");
+    variables.put("stringVar", "fanta");
 
     variables.put("dateVar", now);
-
-    variables.put("nullVar", null);
 
     variables.put("serializableVar", serializable);
 
     variables.put("bytesVar", bytes);
-    variables.put("aByteVar", aByte);
-    variables.put("value1", "xyz");
+    variables.put("value1", "blub");
 
     int random = (int)(Math.random() * 100);
     variables.put("random", random);
-
-    CockpitVariable cockpitVar = new CockpitVariable("test", "cockpitVariableValue");
-    variables.put("cockpitVar", cockpitVar);
 
     execution.setVariablesLocal(variables);
   }

@@ -8,6 +8,7 @@
     <configuration>org.camunda.bpm.pa.DevProcessEngineConfiguration</configuration>
     <properties>
       <property name="authorizationEnabled">true</property>
+      <property name="history">full</property>
     </properties>
 
   </process-engine>
