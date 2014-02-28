@@ -818,6 +818,7 @@ public abstract class MockProvider {
     when(mock.getVariableType()).thenReturn(new StringType());
     when(mock.getValue()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_VALUE);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID);
+    when(mock.getActivtyInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID);
 
     return mock;
   }
@@ -917,4 +918,5 @@ public abstract class MockProvider {
     when(entry.getNewValue()).thenReturn(EXAMPLE_USER_OPERATION_NEW_VALUE);
     return entry;
   }
+
 }

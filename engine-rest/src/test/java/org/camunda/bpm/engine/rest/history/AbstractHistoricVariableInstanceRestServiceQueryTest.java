@@ -264,11 +264,13 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
     String returnedVariableValue = from(content).getString("[0].value");
     String returnedVariableType = from(content).getString("[0].type");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
+    String returnedActivityInstanceId = from(content).getString("[0].activityInstanceId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, returnedVariableName);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE, returnedVariableValue);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TYPE, returnedVariableType);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID, returnedProcessInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID, returnedActivityInstanceId);
   }
 
   @Test
@@ -396,6 +398,38 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
 
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId, anotherTaskId);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByActivityInstanceIds() {
+      String anActivityInstanceId = "anActivityInstanceId";
+      String anotherActivityInstanceId = "anotherActivityInstanceId";
+
+      given()
+        .queryParam("activityInstanceIdIn", anActivityInstanceId + "," + anotherActivityInstanceId)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+      verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId, anotherActivityInstanceId);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByActivityInstanceIdsAsPost() {
+    String anActivityInstanceId = "anActivityInstanceId";
+    String anotherActivityInstanceId = "anotherActivityInstanceId";
+
+    List<String> activityInstanceIdIn= new ArrayList<String>();
+    activityInstanceIdIn.add(anActivityInstanceId);
+    activityInstanceIdIn.add(anotherActivityInstanceId);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("activityInstanceIdIn", activityInstanceIdIn);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId, anotherActivityInstanceId);
   }
 
 }
