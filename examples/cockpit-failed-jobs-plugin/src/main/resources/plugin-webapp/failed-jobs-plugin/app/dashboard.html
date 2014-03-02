@@ -1,5 +1,5 @@
 <div>
-	<h1>Cockpit Failed Jobs</h1>
+	<h1>Cockpit Failed Jobs({{failedJobsCount}})</h1>
 	<table class="table table-bordered table-hover table-condensed">
 		<thead>
 			<tr>
@@ -9,19 +9,30 @@
 			</tr>
 		</thead>
 		<tbody>
-		    <tr ng-show="loading">
-		    	<td colspan="3">
-			       loading failed jobs...
-			   	</td>
-		    </tr>
+			<tr ng-show="loading">
+				<td colspan="3"><img src="/camunda/assets/img/ajax-loader.gif" />loading
+					failed jobs...</td>
+			</tr>
 			<tr data-ng-repeat="job in failedJobs">
 				<td>{{ job.id }}</td>
 				<td><a target="new" href="{{livePath(job.processInstanceId)}}">{{
 						job.processInstanceId }}</a></td>
 				<td><a target="new"
 					href="{{jobRestUrl}}/{{ job.id }}/stacktrace">{{
-						job.exceptionMessage || "Exception" }}</a></td>
+						job.exceptionMessage || "..." }}</a></td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<div style="width:250px;margin:auto;">
+						<span ng-show="pageLoading"><img src="/camunda/assets/img/ajax-loader.gif" /></span>
+						<span ng-show="pageNumber > 1" ng-click="goToPrevious()" title="Go to previous" style="cursor:pointer;">&lt;&lt;</span>
+						<span>Go to page</span><input type="text" ng-model="pageNumber" ng-change="goToPage()" style="width:20px;text-align:center;position:relative;top:5px;"/><span> / {{totalPages}}<span>
+						<span ng-show="pageNumber < totalPages" ng-click="goToNext()" title="Go to next" style="cursor:pointer;">&gt;&gt;</span>
+						<span ng-show="pageLoading"><img src="/camunda/assets/img/ajax-loader.gif" /></span>
+					</div>
+				</td>
 			</tr>
 		</tbody>
 	</table>
+	</div>
 </div>
