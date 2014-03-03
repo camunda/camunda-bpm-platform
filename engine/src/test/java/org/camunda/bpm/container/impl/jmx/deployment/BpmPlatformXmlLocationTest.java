@@ -1,20 +1,25 @@
 package org.camunda.bpm.container.impl.jmx.deployment;
 
-import org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep;
-import org.junit.Rule;
-import org.junit.Test;
-import org.springframework.mock.jndi.SimpleNamingContext;
+import static org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep.BPM_PLATFORM_XML_FILE;
+import static org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep.BPM_PLATFORM_XML_LOCATION;
+import static org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep.BPM_PLATFORM_XML_SYSTEM_PROPERTY;
+import static org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep.CATALINA_HOME;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep.*;
-import static org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep.CATALINA_HOME;
-import static org.junit.Assert.*;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep;
+import org.junit.Rule;
+import org.junit.Test;
+import org.springframework.mock.jndi.SimpleNamingContext;
 
 /**
  * Checks the correct retrieval of bpm-platform.xml file through JNDI,
@@ -26,8 +31,7 @@ import static org.junit.Assert.*;
 public class BpmPlatformXmlLocationTest {
 
   // myWorkingDir is available through maven surefire configuration in camunda parent pom
-  private static final String BPM_PLATFORM_XML_LOCATION_PARENT_DIR = System.getProperty("myWorkingDir") + File.separator +
-      "test-classes" + File.separator + BpmPlatformXmlLocationTest.class.getPackage().getName().replace(".", File.separator);
+  private static final String BPM_PLATFORM_XML_LOCATION_PARENT_DIR = BpmPlatformXmlLocationTest.class.getProtectionDomain().getCodeSource().getLocation().getFile() + BpmPlatformXmlLocationTest.class.getPackage().getName().replace(".", File.separator);
   private static final String BPM_PLATFORM_XML_LOCATION_ABSOLUTE_DIR = BPM_PLATFORM_XML_LOCATION_PARENT_DIR + File.separator + "conf";
   private static final String BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION = BPM_PLATFORM_XML_LOCATION_ABSOLUTE_DIR + File.separator + BPM_PLATFORM_XML_FILE;
 
