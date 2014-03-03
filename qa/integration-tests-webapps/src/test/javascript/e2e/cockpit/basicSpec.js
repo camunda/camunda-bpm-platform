@@ -20,10 +20,9 @@ describe('cockpit dashboard', function() {
     expect(loggedInUserMenu.getText()).toEqual(username);
   }
 
-  function expectLoginFailed() {
-    // TODO: check for ERROR-Notification
-    // var notification = element(by.css('.notifications [sem-show-login-information]'));
-    // expect(notification.getText()).toEqual("Wrong credentials or missing access rights to application");
+  function expectLoginFailed() {    
+    var notification = element(by.binding('notification.message'))
+    expect(notification.getText()).toEqual('Wrong credentials or missing access rights to application');    
   }
 
   function checkPluginHeaderName_h1(headerName) {
@@ -79,9 +78,15 @@ describe('cockpit dashboard', function() {
     expect(items.getText()).toEqual('Another Failing Process');
   });    
 
+  it('should count running instances', function() {
+    var runningInstances = element(by.repeater('statistic in statistics').row(4).column('.instances'));
+
+    expect(runningInstances.getText()).toEqual('Running Instances: 4');
+  });  
+
   it('it should select process in Deployed Process (List)', function() {
-    var items = element(by.repeater('statistic in statistics').row(3).column('definition.name'));
-    
+    var items = element(by.repeater('statistic in statistics').row(4).column('definition.name'));
+
     expect(items.getText()).toEqual('Cornercases Process');
     items.click();
 
@@ -106,35 +111,48 @@ describe('cockpit dashboard', function() {
     element(by.repeater('tabProvider in processInstanceTabs').row(3).column('label')).click();
 
     var tabContent = element(by.css('view[provider=selectedTab]')).findElement(by.repeater('userTask in userTasks').row(0).column('name'));    
-    expect(tabContent.getText()).toEqual('Inner Task');
+
+    expect(tabContent.getText()).toEqual('Inner Task');      
   });
 
-  it('should deselect activity in diagram', function() {
-    var ptor = protractor.getInstance();
-    var userTask = element(by.css('.process-diagram *[data-activity-id="UserTask_2"]'));
+  it('should dispaly only variables of selected activity', function() {
+    element(by.css('view[provider=selectedTab]')).findElement(by.repeater('userTask in userTasks').row(0).column('name')).click();
 
-    //TODO deselct UserTask_2 by CTRL + Click() 
+    var items = element.all(by.repeater('userTask in userTasks'));
+    
+    expect(items.count()).toBe(1);
+  });
 
-    //ptor.actions().sendKeys(protractor.Key.CONTROL).perform();
+  it('should deselect activity in instance tree', function() {
+    var treeNodeButton = element(by.css('.instance-tree *[id^="UserTask_2:"] button'));
+    treeNodeButton.click();
 
-    // ptor.actions().keyDown(protractor.Key.CONTROL);
-    //   .click(userTask)
-    //   .keyUp(protractor.Key.CONTROL)
-    //   .perform()
-
-    //verify that element is not highlighted. class="bpmnElement activity-highlight"
     expect(element(by.css('.process-diagram *[data-activity-id="UserTask_2"]')).getAttribute('class')).not.toMatch('activity-highlight');
   });
 
-/*  it('should select Activity in instance details view and highlight element in renderer', function() {
+  it('should select Activity in instance details view and highlight element in renderer', function() {
+    element(by.css('view[provider=selectedTab]')).findElement(by.repeater('userTask in userTasks').row(5).column('name')).click();
 
-    element(by.css('view[provider=selectedTab]')).findElement(by.repeater('userTask in userTasks').row(0).column('name')).click();
+    expect(element(by.css('.process-diagram *[data-activity-id="UserTask_5"]')).getAttribute('class')).toMatch('activity-highlight');
 
+    var items = element.all(by.repeater('userTask in userTasks'));
+    
+    expect(items.count()).toBe(1);
+  });
 
-    element(by.css('view[provider=selectedTab]')).findElement(by.repeater('userTask in userTasks').row(1).column('name')).click();
+  it('should select Activity in diagram and and count tasks in details view', function() {
+    element(by.css('.process-diagram *[data-activity-id="UserTask_5"]')).click();
 
-    expect(element(by.css('.process-diagram *[data-activity-id="UserTask_3"]')).getAttribute('class')).toMatch('activity-highlight');
-  });  */
+    expect(element(by.css('.process-diagram *[data-activity-id="UserTask_5"]')).getAttribute('class')).toMatch('activity-highlight');
+
+    var items = element.all(by.repeater('userTask in userTasks'));
+    
+    expect(items.count()).toBe(5);
+    
+    var tabContent = element(by.css('view[provider=selectedTab]')).findElement(by.repeater('userTask in userTasks').row(0).column('name'));    
+
+    expect(tabContent.getText()).toEqual('Run some service');  
+  });  
 
 });
 
