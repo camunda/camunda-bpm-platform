@@ -701,6 +701,7 @@ textarea.variable-type-string {
   .name-filter {
     overflow: hidden;
     max-width: 100%;
+
     input {
       max-width: 100%;
     }
@@ -711,9 +712,24 @@ textarea.variable-type-string {
     max-width: 100%;
     left: 0;
     right: 0;
+
+    input {
+      line-height: 20px;
+      height: 26px;
+      
+      -moz-box-sizing: border-box;
+           box-sizing: border-box;
+    }
+
+    .add-on {
+      line-height: 20px;
+      height: 26px;
+      padding: 2px 5px;
+      -moz-box-sizing: border-box;
+           box-sizing: border-box;
+    }
   }
 }
-
 
 select.ng-invalid.ng-invalid-date-type-equal {
   border-color: #E9322D;
