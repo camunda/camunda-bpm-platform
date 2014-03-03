@@ -36,15 +36,7 @@ public class TomcatParseBpmPlatformXmlStep extends AbstractParseBpmPlatformXmlSt
   public static final String CATALINA_HOME = "catalina.home";
 
   protected URL getBpmPlatformXmlStream(MBeanDeploymentOperation operationcontext) {
-    URL fileLocation = lookupBpmPlatformXmlLocationFromJndi();
-
-    if (fileLocation == null) {
-      fileLocation = lookupBpmPlatformXmlLocationFromEnvironmentVariable();
-    }
-
-    if (fileLocation == null) {
-      fileLocation = lookupBpmPlatformXmlFromClassPath();
-    }
+    URL fileLocation = lookupBpmPlatformXml();
 
     if (fileLocation == null) {
       fileLocation = lookupBpmPlatformXmlFromCatalinaConfDirectory();

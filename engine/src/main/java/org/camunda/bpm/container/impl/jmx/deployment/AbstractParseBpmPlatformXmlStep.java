@@ -42,9 +42,9 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
 
   public static final String BPM_PLATFORM_XML_FILE = "bpm-platform.xml";
 
-  public static final String BPM_PLATFORM_XML_LOCATION = "bpmPlatformXmlLocation";
-  public static final String BPM_PLATFORM_XML_ENVIRONMENT_VARIABLE = "BPM_PLATFORM_XML_LOCATION";
-  public static final String BPM_PLATFORM_XML_SYSTEM_PROPERTY = "bpm.platform.xml.location";
+  public static final String BPM_PLATFORM_XML_LOCATION = "bpm-platform-xml";
+  public static final String BPM_PLATFORM_XML_ENVIRONMENT_VARIABLE = "BPM_PLATFORM_XML";
+  public static final String BPM_PLATFORM_XML_SYSTEM_PROPERTY = "bpm.platform.xml";
   public static final String BPM_PLATFORM_XML_RESOURCE_LOCATION = "META-INF/" + BPM_PLATFORM_XML_FILE;
 
   public String getName() {
@@ -198,6 +198,20 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
 
   protected URL lookupBpmPlatformXmlFromClassPath() {
     return lookupBpmPlatformXmlFromClassPath(BPM_PLATFORM_XML_RESOURCE_LOCATION);
+  }
+
+  protected URL lookupBpmPlatformXml() {
+    URL fileLocation = lookupBpmPlatformXmlLocationFromJndi();
+
+    if (fileLocation == null) {
+      fileLocation = lookupBpmPlatformXmlLocationFromEnvironmentVariable();
+    }
+
+    if (fileLocation == null) {
+      fileLocation = lookupBpmPlatformXmlFromClassPath();
+    }
+
+    return fileLocation;
   }
 
   protected abstract URL getBpmPlatformXmlStream(MBeanDeploymentOperation operationContext);
