@@ -12,6 +12,19 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ASSIGN;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_COMPLETE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELEGATE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_RESOLVE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_OWNER;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DELEGATION;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DELETE;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
+
+import java.util.HashMap;
+
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -19,9 +32,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.*;
-import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.*;
 
 /**
  * @author Danny Gräf
@@ -140,6 +150,46 @@ public class OperationLogTaskProcessTest extends PluggableProcessEngineTestCase 
 
     // assert: details
     assertEquals(DelegationState.RESOLVED.toString(), query.singleResult().getNewValue());
+
+    completeTestProcess();
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testSubmitTaskForm_Complete() {
+    startTestProcess();
+
+    formService.submitTaskForm(task.getId(), new HashMap<String, Object>());
+
+    // expect: two entries for the resolving (delegation and assignee changed)
+    UserOperationLogQuery query = queryOperationDetails(OPERATION_TYPE_COMPLETE);
+    assertEquals(1, query.count());
+
+    // assert: delete
+    assertFalse(Boolean.parseBoolean(query.property("delete").singleResult().getOrgValue()));
+    assertTrue(Boolean.parseBoolean(query.property("delete").singleResult().getNewValue()));
+
+    assertProcessEnded(process.getId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testSubmitTaskForm_Resolve() {
+    startTestProcess();
+
+    taskService.delegateTask(task.getId(), "demo");
+
+    formService.submitTaskForm(task.getId(), new HashMap<String, Object>());
+
+    // expect: two entries for the resolving (delegation and assignee changed)
+    UserOperationLogQuery query = queryOperationDetails(OPERATION_TYPE_RESOLVE);
+    assertEquals(2, query.count());
+
+    // assert: delegation
+    assertEquals(null, query.property("delegation").singleResult().getOrgValue());
+    assertEquals(DelegationState.RESOLVED.toString(), query.property("delegation").singleResult().getNewValue());
+
+    // assert: assignee
+    assertEquals("demo", query.property("assignee").singleResult().getOrgValue());
+    assertEquals(null, query.property("assignee").singleResult().getNewValue());
 
     completeTestProcess();
   }
