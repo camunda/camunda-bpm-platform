@@ -28,9 +28,9 @@ import org.camunda.bpm.engine.runtime.Incident;
  * via {@link org.camunda.bpm.engine.ProcessEngineConfiguration#setCreateIncidentOnFailedJobEnabled(boolean)}.
  *
  * @see IncidentHandler
- * 
+ *
  * @author nico.rehwaldt
- * @author roman.smirnow
+ * @author roman.smirnov
  */
 public class FailedJobIncidentHandler implements IncidentHandler {
 
