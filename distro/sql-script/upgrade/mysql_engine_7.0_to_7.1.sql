@@ -94,3 +94,6 @@ alter table ACT_HI_VARINST
 
 alter table ACT_HI_DETAIL
     add VAR_INST_ID_ varchar(64);
+
+alter table ACT_HI_TASKINST
+    add ACT_INST_ID_ varchar(64);

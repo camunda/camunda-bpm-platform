@@ -109,6 +109,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setPriority(taskEntity.getPriority());
     evt.setTaskDefinitionKey(taskEntity.getTaskDefinitionKey());
 
+    ExecutionEntity execution = (ExecutionEntity) taskEntity.getExecution();
+    if (execution != null) {
+      evt.setActivityInstanceId(execution.getActivityInstanceId());
+    }
+
   }
 
 
