@@ -83,12 +83,9 @@ ngDefine('tasklist.pages', [], function(module) {
     };
 
     $scope.submit = function() {
-      if ($scope.variablesForm.locked || $scope.variablesForm.$invalid) {
+      if ($scope.variablesForm.$invalid) {
         return;
       }
-
-      // lock the form to prevent double submission
-      $scope.variablesForm.locked = true;
 
       var variablesMap = Forms.variablesToMap(variables);
 
@@ -97,9 +94,6 @@ ngDefine('tasklist.pages', [], function(module) {
       var action = 'submitTaskForm';
 
       taskList[action]({ id: taskId }, { 'variables' : variablesMap }).$then(function() {
-        // unlock the form
-        $scope.variablesForm.locked = false;
-
         $rootScope.$broadcast('tasklist.reload');
         $location.url('/task/' + taskId + '/' + action);
       });

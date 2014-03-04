@@ -9,7 +9,7 @@
 
   <hr />
 
-  <form ng-submit="submit()" name="variablesForm">
+  <form ng-submit="submit()" name="variablesForm" request-aware>
     <div ngm-if="!form.key && !form.generic">
       <p>
         It looks as if no form has been defined for the task.
@@ -33,11 +33,9 @@
 
     <div ng-if="form.embedded || form.generic">
       <button class="btn btn-primary"
-              ng-disabled="variablesForm.$invalid || variablesForm.locked"
+              ng-disabled="variablesForm.$invalid"
               type="submit">
         {{ !task.delegationState || task.delegationState == 'RESOLVED' ? 'Complete Task' : 'Resolve Task' }}
-        <i class="icon-white icon-refresh animate-spin"
-           ng-if="variablesForm.locked"></i>
       </button>
 
       <button class="btn" ng-click="cancel()">Cancel</button>
