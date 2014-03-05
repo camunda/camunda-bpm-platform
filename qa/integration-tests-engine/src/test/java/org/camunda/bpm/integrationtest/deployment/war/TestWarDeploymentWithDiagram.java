@@ -15,8 +15,6 @@
  */
 package org.camunda.bpm.integrationtest.deployment.war;
 
-import java.io.IOException;
-
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.TestHelper;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -24,6 +22,8 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.io.IOException;
 
 
 /**
@@ -38,8 +38,8 @@ public class TestWarDeploymentWithDiagram extends AbstractFoxPlatformIntegration
             .addClass(TestHelper.class)
             .addAsResource("org/camunda/bpm/integrationtest/testDeployProcessArchive.bpmn20.xml")
             .addAsResource("org/camunda/bpm/integrationtest/testDeployProcessArchive.png")
-            .addAsResource("org/camunda/bpm/integrationtest/invoice.bpmn20.xml")
-            .addAsResource("org/camunda/bpm/integrationtest/invoice.jpg");
+            .addAsResource("org/camunda/bpm/integrationtest/invoice-it.bpmn20.xml")
+            .addAsResource("org/camunda/bpm/integrationtest/invoice-it.jpg");
   }
   
   @Test
@@ -51,8 +51,8 @@ public class TestWarDeploymentWithDiagram extends AbstractFoxPlatformIntegration
 
   @Test
   public void testInvoiceProcess() throws IOException {
-    String expectedDiagramResource = "/org/camunda/bpm/integrationtest/invoice.jpg";
-    String processDefinitionKey = "invoice";
+    String expectedDiagramResource = "/org/camunda/bpm/integrationtest/invoice-it.jpg";
+    String processDefinitionKey = "invoice-it";
     TestHelper.assertDiagramIsDeployed(true, getClass(), expectedDiagramResource, processDefinitionKey);
   }
   
