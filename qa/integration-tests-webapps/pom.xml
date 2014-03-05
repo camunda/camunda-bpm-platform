@@ -716,7 +716,7 @@
                 <configuration>
                   <srcFiles>
                     <!-- try dropping the DB if it exists. -->
-                    <srcFile>${project.build.directory}/sql-scripts/cycle/sql/drop/${database.type}_cycle_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/cycle/cycle/sql/drop/${database.type}_cycle.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.engine.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.identity.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.history.sql</srcFile>
@@ -754,7 +754,7 @@
               <goal>test-jar</goal>
             </goals>
             <configuration>
-              <forceCreate>true</forceCreate>
+              <forceCreation>true</forceCreation>
             <!--  <includes>
                 <include>**/com/camunda/fox/platform/test/util/**/*.class</include>
               </includes> -->
