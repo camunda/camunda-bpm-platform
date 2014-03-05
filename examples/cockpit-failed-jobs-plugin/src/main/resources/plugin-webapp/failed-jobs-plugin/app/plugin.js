@@ -5,10 +5,6 @@ ngDefine('cockpit.plugin.failed-jobs-plugin', function(module) {
     $scope.livePath = function(instanceId) {
       return Uri.appUri("app://#/process-instance/" + instanceId + "/live");
     };
-    
-    $scope.processName = function(job) {
-      return job.processDefinitionId.split(":")[0];
-    };
 
     $scope.jobRestUrl = Uri.appUri("engine://engine/default/job");
     $scope.totalPages = 0;
