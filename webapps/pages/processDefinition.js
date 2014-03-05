@@ -374,7 +374,7 @@ ngDefine('cockpit.pages.processDefinition', [
     function setDefaultTab(tabs) {
       var selectedTabId = search().detailsTab;
 
-      if (!tabs.length) {
+      if (!tabs || !tabs.length) {
         return;
       }
 
