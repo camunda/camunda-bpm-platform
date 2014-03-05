@@ -712,16 +712,28 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     propertyChanged(DELEGATION, this.delegationState, delegationState);
     this.delegationState = delegationState;
   }
+
+  public void setDelegationStateWithoutCascade(DelegationState delegationState) {
+    this.delegationState = delegationState;
+  }
+
   public String getDelegationStateString() {
     return (delegationState!=null ? delegationState.toString() : null);
   }
+
+  /**
+   * Setter for mybatis mapper.
+   *
+   * @param delegationState  the delegation state as string
+   */
   public void setDelegationStateString(String delegationState) {
     if (delegationState == null) {
-      setDelegationState(null);
+      setDelegationStateWithoutCascade(null);
     } else {
-      setDelegationState(DelegationState.valueOf(DelegationState.class, delegationState));
+      setDelegationStateWithoutCascade(DelegationState.valueOf(delegationState));
     }
   }
+
   public boolean isDeleted() {
     return isDeleted;
   }

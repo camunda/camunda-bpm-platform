@@ -184,7 +184,7 @@ public class OperationLogTaskProcessTest extends PluggableProcessEngineTestCase 
     assertEquals(2, query.count());
 
     // assert: delegation
-    assertEquals(null, query.property("delegation").singleResult().getOrgValue());
+    assertEquals(DelegationState.PENDING.toString(), query.property("delegation").singleResult().getOrgValue());
     assertEquals(DelegationState.RESOLVED.toString(), query.property("delegation").singleResult().getNewValue());
 
     // assert: assignee
