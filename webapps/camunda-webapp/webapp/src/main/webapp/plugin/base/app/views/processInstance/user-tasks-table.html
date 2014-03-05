@@ -7,6 +7,7 @@
       <th>Owner</th>
       <th>Creation Date</th>
       <th>Due Date</th>
+      <th>Follow Up Date</th>
       <th>Priority</th>
       <th>Delegation State</th>
       <th>Task ID</th>
@@ -37,6 +38,9 @@
       <td class="due">
         {{ userTask.due }}
       </td>
+      <td class="follow-up">
+        {{ userTask.followUp }}
+      </td>      
       <td class="priority">
         {{ userTask.priority }}
       </td>
@@ -61,14 +65,14 @@
 
     <tr ng-if="!userTasks">
       <td class="tasks-loading"
-          colspan="9">
+          colspan="10">
         <i class="icon-loading"></i> loading user tasks...
       </td>
     </tr>
 
     <tr ng-if="userTasks && !userTasks.length">
       <td class="tasks-empty"
-          colspan="9">
+          colspan="10">
         No user tasks
       </td>
     </tr>
