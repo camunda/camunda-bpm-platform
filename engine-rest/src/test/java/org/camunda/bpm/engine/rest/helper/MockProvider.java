@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -299,6 +300,26 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_TIME = "2014-01-01T00:00:00";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID = "aFormFieldId";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_VALUE = "aFormFieldValue";
+
+  // historic task instance
+  public static final String EXAMPLE_HISTORIC_TASK_INST_ID = "aHistoricTaskInstanceId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_PROC_DEF_ID = "aProcDefId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_PROC_INST_ID = "aProcInstId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_EXEC_ID = "anExecId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_ACT_INST_ID = "anActInstId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_NAME = "aName";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_DESCRIPTION = "aDescription";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_DELETE_REASON = "aDeleteReason";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_OWNER = "anOwner";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_ASSIGNEE = "anAssignee";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_START_TIME = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_END_TIME = "2014-01-01T00:00:00";
+  public static final Long EXAMPLE_HISTORIC_TASK_INST_DURATION = 5000L;
+  public static final String EXAMPLE_HISTORIC_TASK_INST_DEF_KEY = "aTaskDefinitionKey";
+  public static final int EXAMPLE_HISTORIC_TASK_INST_PRIORITY = 60;
+  public static final String EXAMPLE_HISTORIC_TASK_INST_DUE_DATE = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_PARENT_TASK_ID = "aParentTaskId";
 
   // tasks
   public static Task createMockTask() {
@@ -995,6 +1016,37 @@ public abstract class MockProvider {
     List<HistoricDetail> entries = new ArrayList<HistoricDetail>();
     entries.add(createMockHistoricVariableUpdate());
     entries.add(createMockHistoricFormField());
+    return entries;
+  }
+
+  public static HistoricTaskInstance createMockHistoricTaskInstance() {
+    HistoricTaskInstance taskInstance = mock(HistoricTaskInstance.class);
+
+    when(taskInstance.getId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ID);
+    when(taskInstance.getProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PROC_INST_ID);
+    when(taskInstance.getActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ACT_INST_ID);
+    when(taskInstance.getExecutionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_EXEC_ID);
+    when(taskInstance.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PROC_DEF_ID);
+    when(taskInstance.getName()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_NAME);
+    when(taskInstance.getDescription()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DESCRIPTION);
+    when(taskInstance.getDeleteReason()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DELETE_REASON);
+    when(taskInstance.getOwner()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_OWNER);
+    when(taskInstance.getAssignee()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ASSIGNEE);
+    when(taskInstance.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_TASK_INST_START_TIME).toDate());
+    when(taskInstance.getEndTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_TASK_INST_END_TIME).toDate());
+    when(taskInstance.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DURATION);
+    when(taskInstance.getTaskDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DEF_KEY);
+    when(taskInstance.getPriority()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PRIORITY);
+    when(taskInstance.getDueDate()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_TASK_INST_DUE_DATE).toDate());
+    when(taskInstance.getFollowUpDate()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE).toDate());
+    when(taskInstance.getParentTaskId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PARENT_TASK_ID);
+
+    return taskInstance;
+  }
+
+  public static List<HistoricTaskInstance> createMockHistoricTaskInstances() {
+    List<HistoricTaskInstance> entries = new ArrayList<HistoricTaskInstance>();
+    entries.add(createMockHistoricTaskInstance());
     return entries;
   }
 }

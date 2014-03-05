@@ -40,4 +40,7 @@ public interface HistoryRestService {
   @Path(HistoricDetailRestService.PATH)
   HistoricDetailRestService getDetailService();
 
+  @Path(HistoricTaskInstanceRestService.PATH)
+  HistoricTaskInstanceRestService getTaskInstanceService();
+
 }
