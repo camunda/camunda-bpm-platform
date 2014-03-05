@@ -264,7 +264,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQueryImpl orderByHistoricActivityInstanceId() {
-    orderBy(HistoricTaskInstanceQueryProperty.PROCESS_DEFINITION_ID);
+    orderBy(HistoricTaskInstanceQueryProperty.ACTIVITY_INSTANCE_ID);
     return this;
   }
 
