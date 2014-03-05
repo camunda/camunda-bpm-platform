@@ -85,11 +85,11 @@ ngDefine('cockpit.directives', ['jquery'], function(module, $) {
         scope.showStateFilter = typeof attrs.stateFilter !== 'undefined';
 
         scope.search = function() {
-          var searched = scope.showNameFilter ? $.trim(scope.quickFilters.name.$viewValue) : '';
+          var searched = scope.showNameFilter && scope.quickFilters.name ? $.trim(scope.quickFilters.name.$viewValue) : '';
           var states = {
-            running: !!scope.showStateFilter && !!scope.quickFilters.running.$viewValue,
-            canceled: !!scope.showStateFilter && !!scope.quickFilters.canceled.$viewValue,
-            completed: !!scope.showStateFilter && !!scope.quickFilters.completed.$viewValue
+            running: !!scope.showStateFilter && !!scope.quickFilters.running && !!scope.quickFilters.running.$viewValue,
+            canceled: !!scope.showStateFilter && !!scope.quickFilters.canceled && !!scope.quickFilters.canceled.$viewValue,
+            completed: !!scope.showStateFilter && !!scope.quickFilters.completed && !!scope.quickFilters.completed.$viewValue
           };
 
           $(scope.itemSelector, $holder).each(function() {
