@@ -65,7 +65,7 @@ public class AttributeReferenceBuilderImpl<T extends ModelElementInstance> imple
       idAttribute.registerIncoming(attributeReferenceImpl);
       attributeReferenceImpl.setReferenceTargetAttribute(idAttribute);
     } else {
-      throw new ModelException();
+      throw new ModelException("Element type " + referenceTargetType.getTypeNamespace() + ":" + referenceTargetType.getTypeName() + " has no id attribute");
     }
   }
 
