@@ -27,6 +27,8 @@
 
 package org.camunda.bpm.engine.test.bpmn.servicetask;
 
+import java.util.Collection;
+
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -36,8 +38,6 @@ import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.camunda.bpm.model.bpmn.instance.Task;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-
-import java.util.Collection;
 
 /**
  * @author Sebastian Menski
@@ -67,14 +67,14 @@ public class ServiceTaskBpmnModelExecutionContextTest extends PluggableProcessEn
 
     ServiceTask serviceTask = ModelExecutionContextServiceTask.serviceTask;
     assertNotNull(serviceTask);
-    assertEquals(ModelExecutionContextServiceTask.class.getName(), serviceTask.getClassName());
+    assertEquals(ModelExecutionContextServiceTask.class.getName(), serviceTask.getCamundaClass());
   }
 
   private void deploy() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
       .startEvent()
       .serviceTask()
-        .className(ModelExecutionContextServiceTask.class.getName())
+        .camundaClass(ModelExecutionContextServiceTask.class.getName())
       .endEvent()
       .done();
 
