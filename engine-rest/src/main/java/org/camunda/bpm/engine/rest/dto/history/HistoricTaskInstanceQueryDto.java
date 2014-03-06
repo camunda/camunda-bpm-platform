@@ -12,24 +12,19 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
-import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
-import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
-import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
-import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
-import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
+import org.camunda.bpm.engine.rest.dto.converter.*;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Roman Smirnov
@@ -50,7 +45,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   private static final String SORT_BY_ASSIGNEE = "assignee";
   private static final String SORT_BY_OWNER = "owner";
   private static final String SORT_BY_DUE_DATE = "dueDate";
-  private static final String SORT_BY_FOLLOW_DATE = "followDate";
+  private static final String SORT_BY_FOLLOW_UP_DATE = "followUpDate";
   private static final String SORT_BY_DELETE_REASON = "deleteReason";
   private static final String SORT_BY_TASK_DEF_KEY = "taskDefinitionKey";
   private static final String SORT_BY_PRIORITY = "priority";
@@ -72,7 +67,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     VALID_SORT_BY_VALUES.add(SORT_BY_ASSIGNEE);
     VALID_SORT_BY_VALUES.add(SORT_BY_OWNER);
     VALID_SORT_BY_VALUES.add(SORT_BY_DUE_DATE);
-    VALID_SORT_BY_VALUES.add(SORT_BY_FOLLOW_DATE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_FOLLOW_UP_DATE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DELETE_REASON);
     VALID_SORT_BY_VALUES.add(SORT_BY_TASK_DEF_KEY);
     VALID_SORT_BY_VALUES.add(SORT_BY_PRIORITY);
@@ -439,7 +434,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
         query.orderByTaskOwner();
       } else if (sortBy.equals(SORT_BY_DUE_DATE)) {
         query.orderByTaskDueDate();
-      } else if (sortBy.equals(SORT_BY_FOLLOW_DATE)) {
+      } else if (sortBy.equals(SORT_BY_FOLLOW_UP_DATE)) {
         query.orderByTaskFollowUpDate();
       } else if (sortBy.equals(SORT_BY_DELETE_REASON)) {
         query.orderByDeleteReason();

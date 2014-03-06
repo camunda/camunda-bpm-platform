@@ -1,25 +1,7 @@
 package org.camunda.bpm.engine.rest.history;
 
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.Response.Status;
-import javax.xml.registry.InvalidRequestException;
-
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -31,10 +13,18 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.xml.registry.InvalidRequestException;
+import java.util.*;
 
-public class AbstractHistoricTaskInstanceRestServiceQueryTest extends AbstractRestServiceTest {
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.*;
+
+public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String HISTORIC_TASK_INSTANCE_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/history/task";
   protected static final String HISTORIC_TASK_INSTANCE_COUNT_RESOURCE_URL = HISTORIC_TASK_INSTANCE_RESOURCE_URL + "/count";
@@ -254,12 +244,12 @@ public class AbstractHistoricTaskInstanceRestServiceQueryTest extends AbstractRe
     inOrder.verify(mockedQuery).desc();
 
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("followDate", "asc", Status.OK);
+    executeAndVerifySorting("followUpDate", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByTaskFollowUpDate();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("followDate", "desc", Status.OK);
+    executeAndVerifySorting("followUpDate", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByTaskFollowUpDate();
     inOrder.verify(mockedQuery).desc();
 
