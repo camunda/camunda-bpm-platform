@@ -39,7 +39,7 @@ public class DelegationCodeBpmnModelRetrievalTest extends AbstractFoxPlatformInt
     BpmnModelInstance process = Bpmn.createExecutableProcess(TEST_PROCESS)
         .startEvent()
         .serviceTask()
-          .delegateExpression("${bpmnElementRetrievalDelegate}")
+          .camundaDelegateExpression("${bpmnElementRetrievalDelegate}")
       .done();
 
     return initWebArchiveDeployment()
