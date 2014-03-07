@@ -15,7 +15,7 @@ package org.camunda.bpm.cockpit.test.plugin;
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimpleCockpitPlugin;
 import org.camunda.bpm.cockpit.test.util.DeploymentHelper;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
@@ -29,15 +29,15 @@ public class PluginArchiveTest {
   @Test
   public void shouldContainCorrectResources() {
 
-    JavaArchive pluginArchive = DeploymentHelper.getTestPluginAsFiles();
+    JavaArchive pluginArchive = DeploymentHelper.getCockpitTestPluginAsFiles();
 
-    String pluginPkg = SimplePlugin.class.getPackage().getName().replaceAll("\\.", "/");
+    String pluginPkg = SimpleCockpitPlugin.class.getPackage().getName().replaceAll("\\.", "/");
 
     String contents = pluginArchive.toString(true);
 
     assertThat(contents)
         .contains("/META-INF/services/" + CockpitPlugin.class.getName())
-        .contains("/" + pluginPkg + "/" + SimplePlugin.class.getSimpleName() + ".class")
+        .contains("/" + pluginPkg + "/" + SimpleCockpitPlugin.class.getSimpleName() + ".class")
         .contains("/plugin-webapp/simple/test.txt")
         .contains("/" + pluginPkg + "/queries/simple.xml");
   }

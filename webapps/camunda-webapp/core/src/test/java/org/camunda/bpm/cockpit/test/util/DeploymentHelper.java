@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.cockpit.test.util;
 
+import org.camunda.bpm.admin.Admin;
+import org.camunda.bpm.admin.plugin.spi.AdminPlugin;
+import org.camunda.bpm.admin.test.sample.simple.SimpleAdminPlugin;
 import org.camunda.bpm.cockpit.test.sample.TestProcessApplication;
 
 import java.io.File;
@@ -20,7 +23,7 @@ import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.core.test.util.TestContainer;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 import org.camunda.bpm.cockpit.plugin.test.application.TestProcessEngineProvider;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimpleCockpitPlugin;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.webapp.AppRuntimeDelegate;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -102,6 +105,35 @@ public class DeploymentHelper {
     return archive;
   }
 
+  public static WebArchive getAdminWar(String archiveName) {
+    String cockpitPkg = Cockpit.class.getPackage().getName();
+    String adminPkg = Admin.class.getPackage().getName();
+    String commonPkg = AppRuntimeDelegate.class.getPackage().getName();
+
+    final WebArchive archive =
+        ShrinkWrap
+          .create(WebArchive.class, archiveName)
+
+            .addPackages(true, commonPkg)
+
+            .addPackage(cockpitPkg)
+            .addPackages(true, cockpitPkg + ".db")
+            .addPackages(true, cockpitPkg + ".impl")
+            .addPackages(true, cockpitPkg + ".plugin")
+            .addPackages(true, cockpitPkg + ".test.sample.web")
+
+            .addPackages(true, adminPkg)
+
+            .addAsLibraries(getMavenDependencies("org.camunda.bpm:camunda-engine-rest:jar:classes"))
+            .addAsServiceProvider(ProcessEngineProvider.class, TestProcessEngineProvider.class);
+
+
+    TestContainer.addContainerSpecificResources(archive);
+
+    return archive;
+  }
+
+
   public static JavaArchive getTestProcessArchiveAsFiles() {
     JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test-process-application.jar")
         .addClass(TestProcessApplication.class);
@@ -118,12 +150,12 @@ public class DeploymentHelper {
     return new File[] { new File("target/test-process-archive.jar") };
   }
 
-  public static JavaArchive getTestPluginAsFiles() {
+  public static JavaArchive getCockpitTestPluginAsFiles() {
     JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test-plugin.jar")
-        .addPackages(true, SimplePlugin.class.getPackage())
-        .addAsServiceProvider(CockpitPlugin.class, SimplePlugin.class);
+        .addPackages(true, SimpleCockpitPlugin.class.getPackage())
+        .addAsServiceProvider(CockpitPlugin.class, SimpleCockpitPlugin.class);
 
-    String pkgName = SimplePlugin.class.getPackage().getName().replaceAll("\\.", "/");
+    String pkgName = SimpleCockpitPlugin.class.getPackage().getName().replaceAll("\\.", "/");
 
     addFiles(archive, pkgName, new File("src/test/resources/" + pkgName));
     addFiles(archive, "plugin-webapp", new File("src/test/resources/plugin-webapp"));
@@ -131,8 +163,25 @@ public class DeploymentHelper {
     return archive;
   }
 
-  public static File[] getTestPluginJar() {
-    getTestPluginAsFiles().as(ZipExporter.class)
+  public static File[] getAdminTestPluginJar() {
+    getAdminTestPluginAsFiles().as(ZipExporter.class)
+        .exportTo(new File("target/test-plugin.jar"), true);
+
+    return new File[] { new File("target/test-plugin.jar") };
+  }
+
+  public static JavaArchive getAdminTestPluginAsFiles() {
+    JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test-plugin.jar")
+        .addPackages(true, SimpleAdminPlugin.class.getPackage())
+        .addAsServiceProvider(AdminPlugin.class, SimpleAdminPlugin.class);
+
+    addFiles(archive, "plugin-webapp", new File("src/test/resources/plugin-webapp"));
+
+    return archive;
+  }
+
+  public static File[] getCockpitTestPluginJar() {
+    getCockpitTestPluginAsFiles().as(ZipExporter.class)
         .exportTo(new File("target/test-plugin.jar"), true);
 
     return new File[] { new File("target/test-plugin.jar") };

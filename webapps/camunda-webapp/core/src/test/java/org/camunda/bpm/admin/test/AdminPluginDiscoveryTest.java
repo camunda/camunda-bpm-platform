@@ -10,18 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.test.plugin;
-
+package org.camunda.bpm.admin.test;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
 
-import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimpleCockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.resources.SimpleCockpitRootResource;
-import org.camunda.bpm.cockpit.test.sample.web.CockpitTestApplication;
-import org.camunda.bpm.cockpit.test.util.AbstractCockpitCoreTest;
+import org.camunda.bpm.admin.Admin;
+import org.camunda.bpm.admin.plugin.spi.AdminPlugin;
+import org.camunda.bpm.admin.test.sample.simple.SimpleAdminPlugin;
+import org.camunda.bpm.admin.test.util.AbstractAdminCoreTest;
 import org.camunda.bpm.cockpit.test.util.DeploymentHelper;
 import org.fest.assertions.Condition;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -32,16 +30,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
+ * @author Daniel Meyer
  *
- * @author nico.rehwaldt
  */
 @RunWith(Arquillian.class)
-public class DiscoveryTest extends AbstractCockpitCoreTest {
+public class AdminPluginDiscoveryTest extends AbstractAdminCoreTest {
 
   @Deployment
   public static Archive<?> createDeployment() {
     WebArchive archive = createBaseDeployment()
-          .addAsLibraries(DeploymentHelper.getCockpitTestPluginJar());
+          .addAsLibraries(DeploymentHelper.getAdminTestPluginJar());
 
     return archive;
   }
@@ -51,7 +49,7 @@ public class DiscoveryTest extends AbstractCockpitCoreTest {
     @Override
     public boolean matches(List<?> value) {
       for (Object o: value) {
-        if (o instanceof SimpleCockpitPlugin) {
+        if (o instanceof SimpleAdminPlugin) {
           return true;
         }
       }
@@ -67,22 +65,10 @@ public class DiscoveryTest extends AbstractCockpitCoreTest {
     // plugin on class path
 
     // when
-    List<CockpitPlugin> plugins = getPluginRegistry().getPlugins();
+    List<AdminPlugin> plugins = Admin.getRuntimeDelegate().getAppPluginRegistry().getPlugins();
 
     // then
     assertThat(plugins).satisfies(CONTAINS_PLUGIN);
   }
 
-  @Test
-  public void shouldAddPluginRestResources() {
-
-    // given
-    // TestPlugin on class path
-
-    // when
-    CockpitTestApplication application = new CockpitTestApplication();
-
-    // then
-    assertThat(application.getClasses()).contains(SimpleCockpitRootResource.class);
-  }
 }

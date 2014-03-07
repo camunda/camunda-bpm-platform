@@ -12,29 +12,26 @@
  */
 package org.camunda.bpm.cockpit.test.sample.plugin.simple.resources;
 
-import java.util.List;
-import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
-import org.camunda.bpm.cockpit.db.QueryParameters;
-import org.camunda.bpm.cockpit.plugin.resource.AbstractPluginResource;
-import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.cockpit.plugin.resource.AbstractPluginRootResource;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimpleCockpitPlugin;
 
 /**
- * A test resource
+ * A test root resource
  *
  * @author nico.rehwaldt
  */
-public class SimpleResource extends AbstractPluginResource {
+@Path("plugin/" + SimpleCockpitPlugin.ID)
+public class SimpleCockpitRootResource extends AbstractPluginRootResource {
 
-  public SimpleResource(String engine) {
-    super(engine);
+  public SimpleCockpitRootResource() {
+    super(SimpleCockpitPlugin.ID);
   }
 
-  @GET
-  public List<Execution> listExecutions() {
-
-    List<Execution> result = getQueryService().executeQuery("cockpit.test.selectExecution", new QueryParameters<Execution>());
-
-    return result;
+  @Path("{engine}/test")
+  public SimpleCockpitResource getTestResource(@PathParam("engine") String engine) {
+    return subResource(new SimpleCockpitResource(engine), engine);
   }
 }

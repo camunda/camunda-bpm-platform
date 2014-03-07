@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimpleCockpitPlugin;
 import org.camunda.bpm.cockpit.test.util.AbstractCockpitCoreTest;
 import org.camunda.bpm.cockpit.test.util.DeploymentHelper;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -45,7 +45,7 @@ public class DeploymentTest extends AbstractCockpitCoreTest {
   public static Archive<?> createDeployment() {
 
     WebArchive archive = createBaseDeployment()
-          .addAsLibraries(DeploymentHelper.getTestPluginJar())
+          .addAsLibraries(DeploymentHelper.getCockpitTestPluginJar())
           .addAsLibraries(DeploymentHelper.getTestProcessArchiveJar());
 
     return archive;
@@ -56,7 +56,7 @@ public class DeploymentTest extends AbstractCockpitCoreTest {
     List<CockpitPlugin> plugins = getPluginRegistry().getPlugins();
     assertThat(plugins).hasSize(1);
 
-    assertThat(plugins.get(0)).isInstanceOf(SimplePlugin.class);
+    assertThat(plugins.get(0)).isInstanceOf(SimpleCockpitPlugin.class);
   }
 
   @Test
