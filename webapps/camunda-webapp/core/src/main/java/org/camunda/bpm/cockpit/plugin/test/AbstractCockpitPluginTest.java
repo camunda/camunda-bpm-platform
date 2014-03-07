@@ -16,7 +16,7 @@ import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.cockpit.db.QueryService;
-import org.camunda.bpm.cockpit.impl.DefaultRuntimeDelegate;
+import org.camunda.bpm.cockpit.impl.DefaultCockpitRuntimeDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.util.LogUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -77,7 +77,7 @@ public abstract class AbstractCockpitPluginTest {
     return Cockpit.getQueryService("default");
   }
 
-  private static class TestCockpitRuntimeDelegate extends DefaultRuntimeDelegate {
+  private static class TestCockpitRuntimeDelegate extends DefaultCockpitRuntimeDelegate {
 
     public ProcessEngine ENGINE;
 

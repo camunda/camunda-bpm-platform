@@ -10,22 +10,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.plugin.resource;
+package org.camunda.bpm.webapp.plugin;
+
+import java.util.List;
+
+import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
 
 /**
- *
- * Deprecated: use {@link AbstractCockpitPluginRootResource}
- *
- * @see AbstractCockpitPluginRootResource
+ * The holder of registered {@link AppPlugin AppPlugins}.
  *
  * @author nico.rehwaldt
- *
  */
-@Deprecated
-public class AbstractPluginRootResource extends AbstractCockpitPluginRootResource {
+public interface AppPluginRegistry<T extends AppPlugin> {
 
-  public AbstractPluginRootResource(String pluginName) {
-    super(pluginName);
-  }
+  /**
+   * Returns all registered plugins
+   *
+   * @return
+   */
+  public List<T> getPlugins();
 
+  /**
+   * Returns the registered plugin with the given name or
+   * <code>null</code> if the plugin does not exist.
+   *
+   * @param id
+   * @return
+   */
+  public T getPlugin(String id);
 }

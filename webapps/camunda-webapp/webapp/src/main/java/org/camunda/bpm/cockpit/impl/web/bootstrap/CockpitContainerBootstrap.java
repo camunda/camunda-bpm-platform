@@ -16,7 +16,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.camunda.bpm.cockpit.Cockpit;
-import org.camunda.bpm.cockpit.impl.DefaultRuntimeDelegate;
+import org.camunda.bpm.cockpit.impl.DefaultCockpitRuntimeDelegate;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 
 /**
@@ -53,7 +53,7 @@ public class CockpitContainerBootstrap implements ServletContextListener {
     }
 
     public void setup() {
-      Cockpit.setCockpitRuntimeDelegate(new DefaultRuntimeDelegate());
+      Cockpit.setCockpitRuntimeDelegate(new DefaultCockpitRuntimeDelegate());
     }
 
     protected RuntimeContainerDelegate getContainerRuntimeDelegate() {
