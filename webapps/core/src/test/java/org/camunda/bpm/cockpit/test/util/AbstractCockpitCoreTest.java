@@ -31,7 +31,7 @@ public class AbstractCockpitCoreTest {
       .addAsLibraries(DeploymentHelper.getFestAssertions())
       .addClass(AbstractCockpitCoreTest.class);
   }
-  
+
   public PluginRegistry getPluginRegistry() {
     return Cockpit.getRuntimeDelegate().getPluginRegistry();
   }

@@ -13,24 +13,14 @@
 package org.camunda.bpm.cockpit.plugin.spi;
 
 import java.util.List;
-import java.util.Set;
+
+import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
 
 /**
  * The service provider interface (SPI) that must be provided by
  * a cockpit plugin.
  *
- * <p>
- *
- * A implementation of this SPI publishes
- *
- * <ul>
- *   <li>a unique name</li>
- *   <li>a number of mybatis mapping files that contain custom engine queries</li>
- *   <li>a directory that contains the plugins client-side assets (HTML + JavaScript files)</li>
- *   <li>a number of resource classes that extend the cockpit restful API</li>
- * </ul>
- *
- * <p>
+ * A cockpit plugin may provide additional MyBatis mapping files, see {@link #getMappingFiles()}.
  *
  * Plugin developers should not use this interface directly but use
  * {@link org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin} as a base class.
@@ -39,18 +29,7 @@ import java.util.Set;
  *
  * @see org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin
  */
-public interface CockpitPlugin {
-
-  /**
-   * Returns a set of JAX-RS resource classes that extend the cockpit rest API.
-   *
-   * <p>
-   *
-   * Typically, a plugin publishes its API via a subclass of {@link org.camunda.bpm.cockpit.plugin.resource.AbstractPluginRootResource}.
-   *
-   * @return the set of resource classes provided by this plugin
-   */
-  public Set<Class<?>> getResourceClasses();
+public interface CockpitPlugin extends AppPlugin {
 
   /**
    * Returns a list of mapping files that define the custom queries
@@ -69,18 +48,4 @@ public interface CockpitPlugin {
    */
   public List<String> getMappingFiles();
 
-  /**
-   * Returns a uri to a plugin resources directory.
-   * The directory must be unique across all plugins.
-   *
-   * @return the directory providing the plugins client side resources
-   */
-  public String getAssetDirectory();
-
-  /**
-   * Returns the id of this plugin.
-   *
-   * @return
-   */
-  public String getId();
 }

@@ -13,13 +13,11 @@
 package org.camunda.bpm.cockpit.impl;
 
 import org.camunda.bpm.cockpit.impl.plugin.DefaultPluginRegistry;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.ServiceLoader;
-import java.util.Set;
 
 import org.camunda.bpm.cockpit.CockpitRuntimeDelegate;
 import org.camunda.bpm.cockpit.plugin.PluginRegistry;
@@ -32,7 +30,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+import org.camunda.bpm.webapp.impl.AbstractAppRuntimeDelegate;
 
 /**
  * <p>This is the default {@link CockpitRuntimeDelegate} implementation that provides
@@ -42,19 +40,13 @@ import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
  * @author roman.smirnov
  * @author nico.rehwaldt
  */
-public class DefaultRuntimeDelegate implements CockpitRuntimeDelegate {
-
-  private final PluginRegistry pluginRegistry;
-
-  private final ProcessEngineProvider processEngineProvider;
+public class DefaultCockpitRuntimeDelegate extends AbstractAppRuntimeDelegate<CockpitPlugin> implements CockpitRuntimeDelegate {
 
   private  Map<String, CommandExecutor> commandExecutors;
 
-  public DefaultRuntimeDelegate() {
-
-    this.pluginRegistry = new DefaultPluginRegistry();
+  public DefaultCockpitRuntimeDelegate() {
+    super(CockpitPlugin.class);
     this.commandExecutors = new HashMap<String, CommandExecutor>();
-    this.processEngineProvider = loadProcessEngineProvider();
   }
 
   @Override
@@ -75,28 +67,12 @@ public class DefaultRuntimeDelegate implements CockpitRuntimeDelegate {
     return commandExecutor;
   }
 
-  @Override
+  /**
+   * Deprecated: use {@link #getAppPluginRegistry()}
+   */
+  @Deprecated
   public PluginRegistry getPluginRegistry() {
-    return pluginRegistry;
-  }
-
-  @Override
-  public ProcessEngine getProcessEngine(String processEngineName) {
-    try {
-      return processEngineProvider.getProcessEngine(processEngineName);
-    } catch (Exception e) {
-      throw new ProcessEngineException("No process engine with name " + processEngineName + " found.", e);
-    }
-  }
-
-  @Override
-  public Set<String> getProcessEngineNames() {
-    return processEngineProvider.getProcessEngineNames();
-  }
-
-  @Override
-  public ProcessEngine getDefaultProcessEngine() {
-    return processEngineProvider.getDefaultProcessEngine();
+    return new DefaultPluginRegistry(pluginRegistry);
   }
 
   /**
@@ -135,19 +111,4 @@ public class DefaultRuntimeDelegate implements CockpitRuntimeDelegate {
     return new CommandExecutorImpl(processEngineConfiguration, mappingFiles);
   }
 
-  /**
-   * Load the {@link ProcessEngineProvider} spi implementation.
-   *
-   * @return
-   */
-  protected ProcessEngineProvider loadProcessEngineProvider() {
-    ServiceLoader<ProcessEngineProvider> loader = ServiceLoader.load(ProcessEngineProvider.class);
-
-    try {
-      return loader.iterator().next();
-    } catch (NoSuchElementException e) {
-      String message = String.format("No implementation for the %s spi found on classpath", ProcessEngineProvider.class.getName());
-      throw new IllegalStateException(message, e);
-    }
-  }
 }

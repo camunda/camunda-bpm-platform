@@ -12,20 +12,24 @@
  */
 package org.camunda.bpm.cockpit.plugin.resource;
 
+import org.camunda.bpm.cockpit.Cockpit;
+import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
+import org.camunda.bpm.webapp.plugin.resource.AbstractAppPluginRootResource;
+
 /**
+ * A resource class that provides a cockpit plugins restful API.
  *
- * Deprecated: use {@link AbstractCockpitPluginRootResource}
- *
- * @see AbstractCockpitPluginRootResource
- *
- * @author nico.rehwaldt
+ * @author Daniel Meyer
  *
  */
-@Deprecated
-public class AbstractPluginRootResource extends AbstractCockpitPluginRootResource {
+public class AbstractCockpitPluginRootResource extends AbstractAppPluginRootResource<CockpitPlugin> {
 
-  public AbstractPluginRootResource(String pluginName) {
-    super(pluginName);
+  /**
+   * @param pluginName
+   * @param runtimeDelegate
+   */
+  public AbstractCockpitPluginRootResource(String pluginName) {
+    super(pluginName, Cockpit.getRuntimeDelegate());
   }
 
 }

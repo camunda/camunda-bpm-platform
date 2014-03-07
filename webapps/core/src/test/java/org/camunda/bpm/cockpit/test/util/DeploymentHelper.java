@@ -13,6 +13,7 @@
 package org.camunda.bpm.cockpit.test.util;
 
 import org.camunda.bpm.cockpit.test.sample.TestProcessApplication;
+
 import java.io.File;
 
 import org.camunda.bpm.cockpit.Cockpit;
@@ -21,6 +22,7 @@ import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 import org.camunda.bpm.cockpit.plugin.test.application.TestProcessEngineProvider;
 import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+import org.camunda.bpm.webapp.AppRuntimeDelegate;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -80,15 +82,18 @@ public class DeploymentHelper {
 
   public static WebArchive getCockpitWar(String archiveName) {
     String cockpitPkg = Cockpit.class.getPackage().getName();
+    String commonPkg = AppRuntimeDelegate.class.getPackage().getName();
 
     final WebArchive archive =
         ShrinkWrap
           .create(WebArchive.class, archiveName)
+            .addPackages(true, commonPkg)
             .addPackage(cockpitPkg)
             .addPackages(true, cockpitPkg + ".db")
             .addPackages(true, cockpitPkg + ".impl")
             .addPackages(true, cockpitPkg + ".plugin")
             .addPackages(true, cockpitPkg + ".test.sample.web")
+
             .addAsLibraries(getMavenDependencies("org.camunda.bpm:camunda-engine-rest:jar:classes"))
             .addAsServiceProvider(ProcessEngineProvider.class, TestProcessEngineProvider.class);;
 

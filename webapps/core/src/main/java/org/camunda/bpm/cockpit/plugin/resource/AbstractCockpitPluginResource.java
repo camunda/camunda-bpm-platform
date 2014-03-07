@@ -10,36 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.service;
+package org.camunda.bpm.cockpit.plugin.resource;
 
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.cockpit.db.QueryService;
-import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
+import org.camunda.bpm.webapp.plugin.resource.AbstractAppPluginResource;
 
 /**
- * Base class for engine aware service and resource
- * implementations.
+ * Base class for implementing a pluigin REST resource.
  *
- * <p>
+ * @author Daniel Meyer
  *
- * Subclasses must implement a constructor that accepts the name of
- * the engine for which cockpit services should be provided.
- *
- * @author nico.rehwaldt
  */
-@Deprecated
-public class AbstractEngineAware {
+public class AbstractCockpitPluginResource extends AbstractAppPluginResource<CockpitPlugin> {
 
-  private final String engineName;
-
-  /**
-   * Creates a engine aware instance for the given engine
-   *
-   * @param engineName
-   */
-  public AbstractEngineAware(String engineName) {
-    this.engineName = engineName;
+  public AbstractCockpitPluginResource(String engineName) {
+    super(Cockpit.getRuntimeDelegate(), engineName);
   }
 
   /**
@@ -62,13 +50,4 @@ public class AbstractEngineAware {
     return Cockpit.getQueryService(engineName);
   }
 
-  /**
-   * Return a {@link ProcessEngine} for the current
-   * engine name to execute queries against the engine.
-   *
-   * @return the process engine
-   */
-  protected ProcessEngine getProcessEngine() {
-    return Cockpit.getProcessEngine(engineName);
-  }
 }
