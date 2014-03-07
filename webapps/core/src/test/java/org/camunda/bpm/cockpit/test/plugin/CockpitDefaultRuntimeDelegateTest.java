@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimpleCockpitPlugin;
 import org.camunda.bpm.cockpit.test.util.AbstractCockpitCoreTest;
 import org.camunda.bpm.cockpit.test.util.DeploymentHelper;
 import org.camunda.bpm.engine.ProcessEngine;

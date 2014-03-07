@@ -48,7 +48,7 @@ public class PluginApiTest extends AbstractCockpitCoreTest {
 
     WebArchive archive = createBaseDeployment()
           .addAsLibraries(DeploymentHelper.getTestProcessArchiveJar())
-          .addAsLibraries(DeploymentHelper.getTestPluginJar());
+          .addAsLibraries(DeploymentHelper.getCockpitTestPluginJar());
 
     return archive;
   }

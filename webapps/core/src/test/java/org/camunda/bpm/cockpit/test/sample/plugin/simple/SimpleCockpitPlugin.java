@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.resources.SimpleRootResource;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.resources.SimpleCockpitRootResource;
 
 /**
  *
  * @author nico.rehwaldt
  */
-public class SimplePlugin extends AbstractCockpitPlugin {
+public class SimpleCockpitPlugin extends AbstractCockpitPlugin {
 
   public static final String ID = "simple";
 
@@ -47,7 +47,7 @@ public class SimplePlugin extends AbstractCockpitPlugin {
   public Set<Class<?>> getResourceClasses() {
     final HashSet<Class<?>> classes = new HashSet<Class<?>>();
 
-    classes.add(SimpleRootResource.class);
+    classes.add(SimpleCockpitRootResource.class);
 
     return classes;
   }
