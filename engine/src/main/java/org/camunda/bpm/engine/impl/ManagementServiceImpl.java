@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.RegisterProcessApplicationCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
+import org.camunda.bpm.engine.impl.cmd.SetPropertyCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendJobCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendJobDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.UnregisterDeploymentCmd;
@@ -123,6 +124,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public Map<String, String> getProperties() {
     return commandExecutor.execute(new GetPropertiesCmd());
+  }
+
+  public void setProperty(String name, String value) {
+    commandExecutor.execute(new SetPropertyCmd(name, value));
   }
 
   public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {

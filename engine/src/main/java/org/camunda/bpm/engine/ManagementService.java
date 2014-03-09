@@ -508,6 +508,13 @@ public interface ManagementService {
   /** get the list of properties. */
   Map<String, String> getProperties();
 
+  /** Set the value for a property.
+   *
+   *  @param name the name of the property.
+   *  @param value the new value for the property.
+   */
+  void setProperty(String name, String value);
+
   /** programmatic schema update on a given connection returning feedback about what happened */
   String databaseSchemaUpgrade(Connection connection, String catalog, String schema);
 
