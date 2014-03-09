@@ -13,10 +13,13 @@
 package org.camunda.bpm.admin.impl.web;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
+import org.camunda.bpm.admin.Admin;
+import org.camunda.bpm.admin.plugin.spi.AdminPlugin;
 import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
@@ -38,11 +41,27 @@ public class AdminApplication extends Application {
     classes.add(JacksonJsonProvider.class);
     classes.add(RestExceptionHandler.class);
     classes.add(ExceptionHandler.class);
-    
+
     classes.add(UserAuthenticationResource.class);
     classes.add(SetupResource.class);
 
+    addPluginResourceClasses(classes);
+
     return classes;
+  }
+
+
+  private void addPluginResourceClasses(Set<Class<?>> classes) {
+
+    List<AdminPlugin> plugins = getPlugins();
+
+    for (AdminPlugin plugin : plugins) {
+      classes.addAll(plugin.getResourceClasses());
+    }
+  }
+
+  private List<AdminPlugin> getPlugins() {
+    return Admin.getRuntimeDelegate().getAppPluginRegistry().getPlugins();
   }
 
 }

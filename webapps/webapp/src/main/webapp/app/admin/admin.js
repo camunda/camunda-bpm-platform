@@ -16,6 +16,7 @@
    * @name admin
    */
   var adminCore = [
+    'module:cockpit.plugin:cockpit-plugin',
     'module:admin.pages:./pages/main',
     'module:admin.directives:./directives/main',
     'module:admin.filters:./filters/main',
@@ -29,7 +30,9 @@
     'module:camunda.common.services:camunda-common/services/main',
     'module:camunda.common.pages:camunda-common/pages/main' ];
 
-  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ui.bootstrap:angular-ui' ].concat(commons, adminCore);
+  var plugins = window.PLUGIN_DEPENDENCIES || [];
+
+  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ui.bootstrap:angular-ui' ].concat(commons, adminCore, plugins);
 
   ngDefine('admin', dependencies, function(module, $, angular) {
     var ModuleConfig = [ '$routeProvider', 'UriProvider', function($routeProvider, UriProvider) {
