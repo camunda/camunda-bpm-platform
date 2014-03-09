@@ -133,8 +133,19 @@ There are a few [grunt tasks](http://gruntjs.com/) that aid you when developing 
 
 ### Extending the application through plugins
 
-Parts of the application (read: _cockpit_) can be extended through plugins.
+Parts of the application (read: _cockpit_ and _admin_) can be extended through plugins.
+
+#### Extending Cockpit through plugins
+
 Read more about [how cockpit plugins work and how to develop them](http://docs.camunda.org/latest/real-life/how-to/#cockpit-how-to-develop-a-cockpit-plugin) in the docs.
+
+#### Extending Admin through plugins
+
+Plugins to the Admin application work in the same way as cockpit plugins. The server side Java plugin SPI interface is `org.camunda.bpm.admin.plugin.spi.AdminPlugin`. 
+
+On the client side, admin supports the following extension points: 
+
+* `admin.system`: Plugins are added to the _System_ section and may provide a settings panel.
 
 #### Plugin exclusion (Client Side)
 

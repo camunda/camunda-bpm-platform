@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.impl.web.filter.plugin;
+package org.camunda.bpm.webapp.impl.filter;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,9 +20,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.camunda.bpm.cockpit.Cockpit;
-import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
+import org.camunda.bpm.webapp.AppRuntimeDelegate;
+import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
 
 /**
  * A filter that injects the environment variables <code>PLUGIN_DEPENDENCIES</code>
@@ -35,16 +34,27 @@ import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
  *
  * @author nico.rehwaldt
  */
-public class ClientPluginsFilter extends AbstractTemplateFilter {
-
-  // accepts two times the plugin name
-  private static final String PLUGIN_PACKAGE_FORMAT = "{ name: 'cockpit-plugin-%s', location: 'api/cockpit/plugin/%s/static/app', main: 'plugin.js' }";
-
-  // accepts two times the plugin name
-  private static final String PLUGIN_DEPENDENCY_FORMAT = "'module:cockpit.plugin.%s:cockpit-plugin-%s'";
+public abstract class AbstractClientPluginsFilter<T extends AppPlugin> extends AbstractTemplateFilter {
 
   private final String PLUGIN_DEPENDENCIES = "window.PLUGIN_DEPENDENCIES";
   private final String PLUGIN_PACKAGES = "window.PLUGIN_PACKAGES";
+
+  // accepts two times the plugin name
+  protected final String pluginPackageFormat;
+
+  // accepts two times the plugin name
+  protected final String pluginDependencyFormat;
+
+  protected final AppRuntimeDelegate<T> runtimeDelegate;
+  protected final String appName;
+
+  public AbstractClientPluginsFilter(String appName, AppRuntimeDelegate<T> runtimeDelegate) {
+    this.runtimeDelegate = runtimeDelegate;
+    this.appName = appName;
+
+    this.pluginPackageFormat = "{ name: '"+appName+"-plugin-%s', location: 'api/"+appName+"/plugin/%s/static/app', main: 'plugin.js' }";
+    this.pluginDependencyFormat = "'module:"+appName+".plugin.%s:"+appName+"-plugin-%s'";
+  }
 
   @Override
   protected void applyFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -61,17 +71,17 @@ public class ClientPluginsFilter extends AbstractTemplateFilter {
     response.getWriter().append(data);
   }
 
-  private CharSequence createPluginPackagesStr() {
-    final List<CockpitPlugin> plugins = getCockpitPlugins();
+  protected CharSequence createPluginPackagesStr() {
+    final List<T> plugins = getPlugins();
 
     StringBuilder builder = new StringBuilder();
 
-    for (CockpitPlugin plugin : plugins) {
+    for (T plugin : plugins) {
       if (builder.length() > 0) {
         builder.append(", ").append("\n");
       }
 
-      String definition = String.format(PLUGIN_PACKAGE_FORMAT, plugin.getId(), plugin.getId());
+      String definition = String.format(pluginPackageFormat, plugin.getId(), plugin.getId());
 
       builder.append(definition);
     }
@@ -79,17 +89,21 @@ public class ClientPluginsFilter extends AbstractTemplateFilter {
     return "[" + builder.toString() + "]";
   }
 
-  private CharSequence createPluginDependenciesStr() {
-    final List<CockpitPlugin> plugins = getCockpitPlugins();
+  protected List<T> getPlugins() {
+    return runtimeDelegate.getAppPluginRegistry().getPlugins();
+  }
+
+  protected CharSequence createPluginDependenciesStr() {
+    final List<T> plugins = getPlugins();
 
     StringBuilder builder = new StringBuilder();
 
-    for (CockpitPlugin plugin : plugins) {
+    for (T plugin : plugins) {
       if (builder.length() > 0) {
         builder.append(", ").append("\n");
       }
 
-      String definition = String.format(PLUGIN_DEPENDENCY_FORMAT, plugin.getId(), plugin.getId());
+      String definition = String.format(pluginDependencyFormat, plugin.getId(), plugin.getId());
 
       builder.append(definition);
     }
@@ -97,7 +111,4 @@ public class ClientPluginsFilter extends AbstractTemplateFilter {
     return "[" + builder.toString() + "]";
   }
 
-  private List<CockpitPlugin> getCockpitPlugins() {
-    return Cockpit.getRuntimeDelegate().getPluginRegistry().getPlugins();
-  }
 }
