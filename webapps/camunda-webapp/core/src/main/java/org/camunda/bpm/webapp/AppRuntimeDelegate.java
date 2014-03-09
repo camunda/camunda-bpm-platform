@@ -12,10 +12,12 @@
  */
 package org.camunda.bpm.webapp;
 
+import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.webapp.plugin.AppPluginRegistry;
+import org.camunda.bpm.webapp.plugin.resource.PluginResourceOverride;
 import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
 
 /**
@@ -55,5 +57,11 @@ public interface AppRuntimeDelegate<T extends AppPlugin> {
    * @return
    */
   public AppPluginRegistry<T> getAppPluginRegistry();
+
+  /**
+   * A list of resource overrides.
+   * @return the list of registered resource overrides
+   */
+  public List<PluginResourceOverride> getResourceOverrides();
 
 }

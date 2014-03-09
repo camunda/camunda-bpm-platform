@@ -12,8 +12,10 @@
  */
 package org.camunda.bpm.webapp.plugin.spi;
 
+import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.webapp.plugin.resource.PluginResourceOverride;
 import org.camunda.bpm.webapp.plugin.spi.impl.AbstractAppPlugin;
 
 /**
@@ -64,6 +66,14 @@ public interface AppPlugin {
    * @return the directory providing the plugins client side resources
    */
   public String getAssetDirectory();
+
+  /**
+   * Allows providing a list of {@link PluginResourceOverride resource overrides}. Resource overrides allow
+   * to conditionally override the static resources provided by other plugins.
+   *
+   * @return a list of {@link PluginResourceOverride} implementations.
+   */
+  public List<PluginResourceOverride> getResourceOverrides();
 
 
 }

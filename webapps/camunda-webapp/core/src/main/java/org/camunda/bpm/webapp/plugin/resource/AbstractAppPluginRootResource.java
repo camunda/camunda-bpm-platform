@@ -13,6 +13,7 @@
 package org.camunda.bpm.webapp.plugin.resource;
 
 import java.io.InputStream;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
@@ -20,8 +21,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.webapp.AppRuntimeDelegate;
 import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
@@ -55,8 +58,18 @@ import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
  */
 public class AbstractAppPluginRootResource<T extends AppPlugin> {
 
+  public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
+  public static final String MIME_TYPE_TEXT_HTML = "text/html";
+  public static final String MIME_TYPE_TEXT_JAVASCRIPT = "text/javascript";
+
   @Context
   private ServletContext servletContext;
+
+  @Context
+  private HttpHeaders headers;
+
+  @Context
+  private UriInfo uriInfo;
 
   private final String pluginName;
 
@@ -92,6 +105,7 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
 
     if (plugin != null) {
       InputStream assetStream = getPluginAssetAsStream(plugin, file);
+      assetStream = applyResourceOverrides(file, assetStream);
       if (assetStream != null) {
         String contentType = getContentType(file);
         return Response.ok(assetStream, contentType).build();
@@ -102,14 +116,26 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
     throw new WebApplicationException(Status.NOT_FOUND);
   }
 
+  /**
+   * @param file
+   * @param assetStream
+   */
+  protected InputStream applyResourceOverrides(String file, InputStream assetStream) {
+    List<PluginResourceOverride> resourceOverrides = runtimeDelegate.getResourceOverrides();
+    for (PluginResourceOverride pluginResourceOverride : resourceOverrides) {
+      assetStream = pluginResourceOverride.filterResource(assetStream, new RequestInfo(headers, servletContext, uriInfo));
+    }
+    return assetStream;
+  }
+
   protected String getContentType(String file) {
     if (file.endsWith(".js")) {
-      return "text/javascript";
+      return MIME_TYPE_TEXT_JAVASCRIPT;
     } else
     if (file.endsWith(".html")) {
-      return "text/html";
+      return MIME_TYPE_TEXT_HTML;
     } else {
-      return "text/plain";
+      return MIME_TYPE_TEXT_PLAIN;
     }
   }
 
@@ -119,7 +145,7 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
    * @param resourceName
    * @return
    */
-  private InputStream getPluginAssetAsStream(AppPlugin plugin, String fileName) {
+  protected InputStream getPluginAssetAsStream(AppPlugin plugin, String fileName) {
 
     String assetDirectory = plugin.getAssetDirectory();
 
@@ -135,13 +161,13 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
     return result;
   }
 
-  private InputStream getWebResourceAsStream(String assetDirectory, String fileName) {
+  protected InputStream getWebResourceAsStream(String assetDirectory, String fileName) {
     String resourceName = String.format("/%s/%s", assetDirectory, fileName);
 
     return servletContext.getResourceAsStream(resourceName);
   }
 
-  private InputStream getClasspathResourceAsStream(AppPlugin plugin, String assetDirectory, String fileName) {
+  protected InputStream getClasspathResourceAsStream(AppPlugin plugin, String assetDirectory, String fileName) {
     String resourceName = String.format("%s/%s", assetDirectory, fileName);
     return plugin.getClass().getClassLoader().getResourceAsStream(resourceName);
   }

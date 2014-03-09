@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.webapp.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -22,6 +24,7 @@ import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.webapp.AppRuntimeDelegate;
 import org.camunda.bpm.webapp.plugin.AppPluginRegistry;
 import org.camunda.bpm.webapp.plugin.impl.DefaultAppPluginRegistry;
+import org.camunda.bpm.webapp.plugin.resource.PluginResourceOverride;
 import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
 
 /**
@@ -32,6 +35,8 @@ public abstract class AbstractAppRuntimeDelegate<T extends AppPlugin> implements
 
   protected final AppPluginRegistry<T> pluginRegistry;
   protected final ProcessEngineProvider processEngineProvider;
+
+  protected List<PluginResourceOverride> resourceOverrides;
 
   public AbstractAppRuntimeDelegate(Class<T> pluginType) {
     pluginRegistry = new DefaultAppPluginRegistry<T>(pluginType);
@@ -71,6 +76,23 @@ public abstract class AbstractAppRuntimeDelegate<T extends AppPlugin> implements
     } catch (NoSuchElementException e) {
       String message = String.format("No implementation for the %s spi found on classpath", ProcessEngineProvider.class.getName());
       throw new IllegalStateException(message, e);
+    }
+  }
+
+  public List<PluginResourceOverride> getResourceOverrides() {
+    if(resourceOverrides == null) {
+      initResourceOverrides();
+    }
+    return resourceOverrides;
+  }
+
+  protected synchronized void initResourceOverrides() {
+    if(resourceOverrides == null) { // double-checked sync, do not remove
+      resourceOverrides = new ArrayList<PluginResourceOverride>();
+      List<T> plugins = pluginRegistry.getPlugins();
+      for (T p : plugins) {
+        resourceOverrides.addAll(p.getResourceOverrides());
+      }
     }
   }
 
