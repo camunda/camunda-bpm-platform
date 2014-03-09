@@ -65,6 +65,11 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       query.processInstanceBusinessKey(businessKey);
     }
 
+    String processInstanceId = correlationSet.getProcessInstanceId();
+    if(processInstanceId != null) {
+      query.processInstanceId(processInstanceId);
+    }
+
     query.messageEventSubscriptionName(messageName);
     List<Execution> matchingExecutions = query.executeList(commandContext, null);
 

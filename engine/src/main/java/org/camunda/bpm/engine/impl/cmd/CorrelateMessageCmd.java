@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -37,6 +38,7 @@ public class CorrelateMessageCmd implements Command<Void> {
   protected final String businessKey;
   protected final Map<String, Object> correlationKeys;
   protected final Map<String, Object> processVariables;
+  protected String processInstanceId;
 
   public CorrelateMessageCmd(String messageName, String businessKey,
       Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
@@ -46,6 +48,19 @@ public class CorrelateMessageCmd implements Command<Void> {
     this.processVariables = processVariables;
   }
 
+  /**
+   * Initialize the command with a builder
+   *
+   * @param messageCorrelationBuilderImpl
+   */
+  public CorrelateMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl) {
+    this.messageName = messageCorrelationBuilderImpl.getMessageName();
+    this.processVariables = messageCorrelationBuilderImpl.getPayloadProcessInstanceVariables();
+    this.correlationKeys = messageCorrelationBuilderImpl.getCorrelationProcessInstanceVariables();
+    this.businessKey = messageCorrelationBuilderImpl.getBusinessKey();
+    this.processInstanceId = messageCorrelationBuilderImpl.getProcessInstanceId();
+  }
+
   public Void execute(CommandContext commandContext) {
     if(messageName == null) {
       throw new ProcessEngineException("messageName cannot be null");
@@ -53,7 +68,7 @@ public class CorrelateMessageCmd implements Command<Void> {
 
     CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
 
-    CorrelationSet correlationSet = new CorrelationSet(businessKey, correlationKeys);
+    CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys);
     MessageCorrelationResult correlationResult = correlationHandler.correlateMessage(commandContext, messageName, correlationSet);
 
     if(correlationResult == null) {

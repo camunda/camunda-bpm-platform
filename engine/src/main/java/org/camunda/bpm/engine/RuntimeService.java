@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
+import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
 import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -699,6 +700,16 @@ public interface RuntimeService {
    *          has not subscribed to the signal
    */
   void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables);
+
+  /**
+   * Define a complex message correlation using a fluent builder.
+   *
+   * @param messageName the name of the message. Corresponds to the 'name' element
+   * of the message defined in BPMN 2.0 Xml.
+   *
+   * @return the fluent builder for defining the message correlation.
+   */
+  MessageCorrelationBuilder createMessageCorrelation(String messageName);
 
   /**
    * Correlates a message to either an execution that is waiting for this message or a process definition
