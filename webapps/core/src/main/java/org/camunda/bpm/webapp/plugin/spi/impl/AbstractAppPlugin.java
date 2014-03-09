@@ -13,8 +13,10 @@
 package org.camunda.bpm.webapp.plugin.spi.impl;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.webapp.plugin.resource.PluginResourceOverride;
 import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
 
 /**
@@ -43,6 +45,10 @@ public abstract class AbstractAppPlugin implements AppPlugin {
 
   public Set<Class<?>> getResourceClasses() {
     return Collections.emptySet();
+  }
+
+  public List<PluginResourceOverride> getResourceOverrides() {
+    return Collections.emptyList();
   }
 
 }

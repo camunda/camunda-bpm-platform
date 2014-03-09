@@ -136,14 +136,14 @@ There are a few [grunt tasks](http://gruntjs.com/) that aid you when developing 
 Parts of the application (read: _cockpit_) can be extended through plugins.
 Read more about [how cockpit plugins work and how to develop them](http://docs.camunda.org/latest/real-life/how-to/#cockpit-how-to-develop-a-cockpit-plugin) in the docs.
 
-#### Plugin exclusion
+#### Plugin exclusion (Client Side)
 
 You can exclude some plugins from the interface by adding a `cam-exclude-plugins`
 attribute to the `base` tag of the page loading the interface.
 The content of the attribute is a comma separated list formatted like: `<plugin.key>:<feature.id>`.
 If the feature ID is not provided, the whole plugin will be excluded.
 
-#### Excluding a complete plugin
+#### Excluding a complete plugin (Client Side)
 
 This example will completely deactivate the action buttons on the right side of the process instance view.
 
@@ -152,7 +152,7 @@ This example will completely deactivate the action buttons on the right side of 
       cam-exclude-plugins="cockpit.processInstance.live.action" />
 ```
 
-#### Excluding a plugin feature
+#### Excluding a plugin feature (Client Side)
 
 In this example, we deactivate the definition list in the cockpit dashboard
 but keep the diagram previews and disable the job retry action button:
@@ -163,6 +163,34 @@ but keep the diagram previews and disable the job retry action button:
                            cockpit.processInstance.live.action:job-retry-action" />
 ```
 
+#### Overriding a Plugin's Resources (Server Side)
+
+It is possible for one plugin to override some of it's own or other plugin's static resources. 
+Static resources are web resources like Html views, Java Script assets, CSS, Images ...
+
+This feature is useful for many usecases such as customizing built-in plugins, securing plugins or 
+deactivating plugins. 
+
+In order to implement a resource override, a plugin must provide an implementation of the 
+`org.camunda.bpm.webapp.plugin.resource.PluginResourceOverride` interface: 
+
+```java
+public class ExampleResourceOverride implements PluginResourceOverride {
+
+  public InputStream filterResource(InputStream inputStream, RequestInfo requestInfo) {
+
+    if(requestInfo.getUriInfo().getPath().endsWith("/path/to/asset/filename.html")) {
+      return ExampleResourceOverride.class.getClassLoader().getResourceAsStream("override.html");
+
+    } else {
+      return inputStream;
+
+    }
+  }
+}
+```
+
+An instance of the implementation can then be returned from a plugin class in the `public List<PluginResourceOverride> getResourceOverrides();` method. 
 
 ### Generate Documentation for the Application
 
