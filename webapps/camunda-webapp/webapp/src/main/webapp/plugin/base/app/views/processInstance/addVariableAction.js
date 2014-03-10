@@ -26,7 +26,7 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.live.action', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.action', {
       id: 'add-variable-action',
       label: 'Add Variable Action',
       url: 'plugin://base/static/app/views/processInstance/add-variable-action.html',

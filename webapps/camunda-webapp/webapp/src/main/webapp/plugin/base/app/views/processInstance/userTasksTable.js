@@ -307,7 +307,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
   UserTaskGroupController]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.processInstance.live.tab', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
       id: 'user-tasks-tab',
       label: 'User Tasks',
       url: 'plugin://base/static/app/views/processInstance/user-tasks-table.html',

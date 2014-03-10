@@ -167,7 +167,7 @@ This example will completely deactivate the action buttons on the right side of 
 
 ```html
 <base href="/"
-      cam-exclude-plugins="cockpit.processInstance.live.action" />
+      cam-exclude-plugins="cockpit.processInstance.runtime.action" />
 ```
 
 #### Excluding a plugin feature (Client Side)
@@ -178,7 +178,7 @@ but keep the diagram previews and disable the job retry action button:
 ```html
 <base href="/"
       cam-exclude-plugins="cockpit.dashboard:process-definition-tiles,
-                           cockpit.processInstance.live.action:job-retry-action" />
+                           cockpit.processInstance.runtime.action:job-retry-action" />
 ```
 
 #### Overriding a Plugin's Resources (Server Side)
