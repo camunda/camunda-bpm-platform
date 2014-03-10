@@ -8,12 +8,10 @@ define(['angular'], function(angular) {
     '$scope', 
     '$location',
     '$routeParams',
-    'GroupResource', 
     'Views',     
     function($scope, 
              $location, 
              $routeParams,
-             GroupResource, 
              Views) {      
 
     $scope.systemSettingsProviders = Views.getProviders({ component: 'admin.system'});

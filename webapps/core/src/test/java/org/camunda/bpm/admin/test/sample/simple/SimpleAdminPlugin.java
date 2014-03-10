@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.camunda.bpm.admin.plugin.spi.impl.AbstractAdminPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.resources.SimpleCockpitRootResource;
+import org.camunda.bpm.admin.test.sample.simple.resources.SimpleAdminRootResource;
 
 /**
  *
@@ -33,7 +33,7 @@ public class SimpleAdminPlugin extends AbstractAdminPlugin {
   public Set<Class<?>> getResourceClasses() {
     final HashSet<Class<?>> classes = new HashSet<Class<?>>();
 
-    classes.add(SimpleCockpitRootResource.class);
+    classes.add(SimpleAdminRootResource.class);
 
     return classes;
   }
