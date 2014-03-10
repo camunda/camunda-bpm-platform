@@ -21,8 +21,8 @@ define([], function() {
    * @param {Object} currentSearch  - The parsed object of the route "search" part
    * @return {string}               - A URL string to be redirected to
    */
-  utils.redirectToLive = function(params, currentPath, currentSearch) {
-    var redirectUrl = currentPath + '/live',
+  utils.redirectToRuntime = function(params, currentPath, currentSearch) {
+    var redirectUrl = currentPath + '/runtime',
         search = [],
         key;
 
