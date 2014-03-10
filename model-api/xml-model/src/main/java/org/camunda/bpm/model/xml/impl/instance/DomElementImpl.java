@@ -78,7 +78,7 @@ public class DomElementImpl implements DomElement {
 
   public DomElement getParentElement() {
     Node parentNode = element.getParentNode();
-    if (parentNode != null) {
+    if (parentNode != null && parentNode instanceof Element) {
       return new DomElementImpl((Element) parentNode);
     }
     else {
