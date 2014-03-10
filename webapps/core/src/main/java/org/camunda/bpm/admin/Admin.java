@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.admin;
 
-import org.camunda.bpm.admin.impl.DefaultAdminRuntimeDelegate;
-
 /**
  * The admin application. Provides access to the admin core services.
  *
@@ -27,7 +25,7 @@ public class Admin {
    * initialized by bootstrapping camunda admin with an specific
    * instance
    */
-  protected static AdminRuntimeDelegate ADMIN_RUNTIME_DELEGATE = new DefaultAdminRuntimeDelegate();
+  protected static AdminRuntimeDelegate ADMIN_RUNTIME_DELEGATE;
 
   /**
    * Returns an instance of {@link AdminRuntimeDelegate}

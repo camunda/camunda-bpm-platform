@@ -7,6 +7,11 @@
   <listener>
     <listener-class>org.camunda.bpm.cockpit.impl.web.bootstrap.CockpitContainerBootstrap</listener-class>
   </listener>
+
+  <!-- admin bootstrap listener -->
+  <listener>
+    <listener-class>org.camunda.bpm.admin.impl.web.bootstrap.AdminContainerBootstrap</listener-class>
+  </listener>
   
   <!-- Authentication filter -->
   <filter>
