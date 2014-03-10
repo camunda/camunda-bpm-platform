@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -1321,11 +1320,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   @Override
   protected VariableScopeImpl getParentVariableScope() {
     return getParent();
-  }
-
-  /** used to calculate the sourceActivityExecution */
-  protected VariableScope getSourceActivityVariableScope() {
-    return (activityId!=null ? this : null);
   }
 
   protected boolean isAutoFireHistoryEvents() {

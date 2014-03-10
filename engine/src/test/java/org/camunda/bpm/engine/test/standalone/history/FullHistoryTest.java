@@ -1248,4 +1248,15 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
       fail("A ProcessEngineExcpetion was expected.");
     } catch (ProcessEngineException e) {}
   }
+
+  @Deployment
+  public void testHistoricDetailActivityInstanceIdForInactiveScopeExecution() {
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    runtimeService.setVariable(pi.getId(), "foo", "bar");
+
+    HistoricDetail historicDetail = historyService.createHistoricDetailQuery().singleResult();
+    assertNotNull(historicDetail.getActivityInstanceId());
+  }
 }
