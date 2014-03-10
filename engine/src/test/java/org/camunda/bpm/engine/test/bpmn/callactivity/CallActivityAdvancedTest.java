@@ -13,10 +13,7 @@
 
 package org.camunda.bpm.engine.test.bpmn.callactivity;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -25,6 +22,16 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
+import org.camunda.bpm.model.bpmn.instance.CallActivity;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -280,6 +287,83 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
+  }
+
+  /**
+   * Test case for handing over process variables without target attribute set
+   */
+  public void testSubProcessWithDataInputOutputWithoutTarget() {
+    String processId = "subProcessDataInputOutputWithoutTarget";
+
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(processId)
+      .startEvent()
+      .callActivity("callActivity")
+        .calledElement("simpleSubProcess")
+      .userTask()
+      .endEvent()
+      .done();
+
+    CallActivityBuilder callActivityBuilder = ((CallActivity) modelInstance.getModelElementById("callActivity")).builder();
+
+    // create camunda:in with source but without target
+    CamundaIn camundaIn = modelInstance.newInstance(CamundaIn.class);
+    camundaIn.setCamundaSource("superVariable");
+    callActivityBuilder.addExtensionElement(camundaIn);
+
+    deployAndExpectException(modelInstance);
+    // set target
+    camundaIn.setCamundaTarget("subVariable");
+
+    // create camunda:in with sourceExpression but without target
+    camundaIn = modelInstance.newInstance(CamundaIn.class);
+    camundaIn.setCamundaSourceExpression("${x+5}");
+    callActivityBuilder.addExtensionElement(camundaIn);
+
+    deployAndExpectException(modelInstance);
+    // set target
+    camundaIn.setCamundaTarget("subVariable2");
+
+    // create camunda:out with source but without target
+    CamundaOut camundaOut = modelInstance.newInstance(CamundaOut.class);
+    camundaOut.setCamundaSource("subVariable");
+    callActivityBuilder.addExtensionElement(camundaOut);
+
+    deployAndExpectException(modelInstance);
+    // set target
+    camundaOut.setCamundaTarget("superVariable");
+
+    // create camunda:out with sourceExpression but without target
+    camundaOut = modelInstance.newInstance(CamundaOut.class);
+    camundaOut.setCamundaSourceExpression("${y+1}");
+    callActivityBuilder.addExtensionElement(camundaOut);
+
+    deployAndExpectException(modelInstance);
+    // set target
+    camundaOut.setCamundaTarget("superVariable2");
+
+    try {
+      String deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
+      repositoryService.deleteDeployment(deploymentId, true);
+    }
+    catch (ProcessEngineException e) {
+      fail("No exception expected");
+    }
+  }
+
+  private void deployAndExpectException(BpmnModelInstance modelInstance) {
+    String deploymentId = null;
+    try {
+      deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
+      fail("Exception expected");
+    }
+    catch (ProcessEngineException e) {
+      assertTextPresent("Missing attribute 'target'", e.getMessage());
+    }
+    finally {
+      if (deploymentId != null) {
+        repositoryService.deleteDeployment(deploymentId, true);
+      }
+    }
   }
 
   /**
