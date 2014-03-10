@@ -17,6 +17,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.admin.Admin;
+import org.camunda.bpm.admin.impl.DefaultAdminRuntimeDelegate;
 import org.camunda.bpm.admin.plugin.spi.AdminPlugin;
 import org.camunda.bpm.admin.test.sample.simple.SimpleAdminPlugin;
 import org.camunda.bpm.admin.test.util.AbstractAdminCoreTest;
@@ -26,6 +27,8 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -58,8 +61,19 @@ public class AdminPluginDiscoveryTest extends AbstractAdminCoreTest {
     }
   };
 
+  @Before
+  public void setup() {
+    Admin.setAdminRuntimeDelegate(new DefaultAdminRuntimeDelegate());
+  }
+
+  @After
+  public void teardown() {
+    Admin.setAdminRuntimeDelegate(null);
+  }
+
   @Test
   public void shouldDiscoverCockpitPlugin() {
+
 
     // given
     // plugin on class path
