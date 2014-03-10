@@ -94,6 +94,13 @@ If you want to run a specific set of tests (available sets are: `admin`, `cockpi
 grunt test:e2e:<set name>
 ```
 
+If you want to work on E2E tests and run only 1 set of tests when a change is made,
+you can do so by setting an environement variable `E2E_TESTS`.
+
+```
+E2E_TESTS=<set name> grunt auto-build
+```
+
 
 ### Packaging
 
