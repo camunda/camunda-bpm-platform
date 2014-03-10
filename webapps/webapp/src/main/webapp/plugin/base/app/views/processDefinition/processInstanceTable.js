@@ -83,7 +83,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
   var Configuration = [ 'ViewsProvider', function(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.live.tab', {
+    ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
       id: 'process-instances-table',
       label: 'Process Instances',
       url: 'plugin://base/static/app/views/processDefinition/process-instance-table.html',

@@ -258,7 +258,7 @@ ngDefine('cockpit.pages.processDefinition', [
         page.breadcrumbsAdd({
           type: 'processDefinition',
           label: parent.name || parent.id,
-          href: '#/process-definition/'+ parent.id +'/live',
+          href: '#/process-definition/'+ parent.id +'/runtime',
           processDefinition: parent
         });
       }
@@ -266,7 +266,7 @@ ngDefine('cockpit.pages.processDefinition', [
       page.breadcrumbsAdd({
         type: 'processDefinition',
         label: definition.name || definition.key || definition.id,
-        href: '#/process-definition/'+ definition.id +'/live',
+        href: '#/process-definition/'+ definition.id +'/runtime',
         processDefinition: definition
       });
 
@@ -354,8 +354,8 @@ ngDefine('cockpit.pages.processDefinition', [
     $scope.processDefinition = processDefinition;
 
     $scope.processDefinitionVars = { read: [ 'processDefinition', 'selection', 'processData', 'filter' ] };
-    $scope.processDefinitionTabs = Views.getProviders({ component: 'cockpit.processDefinition.live.tab' });
-    $scope.processDefinitionActions = Views.getProviders({ component: 'cockpit.processDefinition.live.action' });
+    $scope.processDefinitionTabs = Views.getProviders({ component: 'cockpit.processDefinition.runtime.tab' });
+    $scope.processDefinitionActions = Views.getProviders({ component: 'cockpit.processDefinition.runtime.action' });
 
 
     // extend the current scope to instantiate
@@ -379,7 +379,7 @@ ngDefine('cockpit.pages.processDefinition', [
       }
 
       if (selectedTabId) {
-        var provider = Views.getProvider({ component: 'cockpit.processDefinition.live.tab', id: selectedTabId });
+        var provider = Views.getProvider({ component: 'cockpit.processDefinition.runtime.tab', id: selectedTabId });
         if (provider && tabs.indexOf(provider) != -1) {
           $scope.selectedTab = provider;
           return;
@@ -626,9 +626,9 @@ ngDefine('cockpit.pages.processDefinition', [
 
     $routeProvider
     .when('/process-definition/:id', {
-      redirectTo: routeUtil.redirectToLive
+      redirectTo: routeUtil.redirectToRuntime
     })
-    .when('/process-definition/:id/live', {
+    .when('/process-definition/:id/runtime', {
       templateUrl: require.toUrl('./app/cockpit/pages/process-definition.html'),
 
       controller: Controller,
@@ -650,9 +650,9 @@ ngDefine('cockpit.pages.processDefinition', [
 
   var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
-      id: 'live',
+      id: 'runtime',
       priority: 20,
-      label: 'Live'
+      label: 'Runtime'
     });
   }];
 

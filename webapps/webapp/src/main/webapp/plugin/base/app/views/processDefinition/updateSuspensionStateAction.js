@@ -31,7 +31,7 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
 
   var Configuration = [ 'ViewsProvider', function(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.live.action', {
+    ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.action', {
       id: 'update-suspension-state-action',
       label: 'Update Suspension State',
       url: 'plugin://base/static/app/views/processDefinition/update-suspension-state-action.html',

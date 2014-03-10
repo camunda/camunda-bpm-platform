@@ -24,7 +24,7 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.live.action', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.action', {
       id: 'cancel-process-instance-action',
       label: 'Cancel Process Instance Action',
       url: 'plugin://base/static/app/views/processInstance/cancel-process-instance-action.html',
