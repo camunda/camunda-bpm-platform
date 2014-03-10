@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.runtime;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
+
+import java.util.Map;
 
 /**
  * <p>A fluent builder for defining message correlation</p>
@@ -46,8 +46,7 @@ public interface MessageCorrelationBuilder {
   /**
    * <p>Correlate the message such that a process instance with the given id is selected.</p>
    *
-   * @param variableName the name of the process instance variable to correlate on.
-   * @param variableValue the value of the process instance variable to correalate on.
+   * @param id the id of the process instance to correlate on.
    * @return the builder
    */
   MessageCorrelationBuilder processInstanceId(String id);
@@ -69,7 +68,7 @@ public interface MessageCorrelationBuilder {
    * for passing the message's payload</p>
    *
    * @param variables the map of variables
-   * @return
+   * @return the builder
    */
   MessageCorrelationBuilder setVariables(Map<String, Object> variables);
 
@@ -79,7 +78,7 @@ public interface MessageCorrelationBuilder {
    * <p>This will result in either:
    * <ul>
    * <li>Exactly one waiting execution is notified to continue. The notification is performed synchronously.</li>
-   * <li>Exactly one Process Inance is started in case the message name matches a message start event of a
+   * <li>Exactly one Process Instance is started in case the message name matches a message start event of a
    *     process. The instantiation is performed synchronously.</li>
    * <li>MismatchingMessageCorrelationException is thrown. This means that either too many executions match the
    *     correlation or that no execution matches the correlation.</li>
