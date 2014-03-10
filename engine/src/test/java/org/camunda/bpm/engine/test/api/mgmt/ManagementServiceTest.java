@@ -352,7 +352,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
   public void testGetProperties() {
     Map<String, String> properties = managementService.getProperties();
     assertNotNull(properties);
-    assertTrue(!properties.isEmpty());
+    assertFalse(properties.isEmpty());
   }
 
   public void  testSetProperty() {
