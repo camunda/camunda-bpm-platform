@@ -10,7 +10,7 @@
   "devDependencies": {
     "grunt": "~0.4.0",
     "grunt-cli": "~0.1.0",
-    "grunt-karma": "~0.6.0",
+    "grunt-karma": "~0.7.2",
     "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-clean": "~0.5.0",
@@ -28,7 +28,7 @@
     "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define.git",
     "bower": "~1.2.8",
     "underscore": "~1.5.2",
-    "karma": "~0.10.0",
+    "karma": "~0.11.14",
     "karma-chrome-launcher": "~0.1.0",
     "karma-firefox-launcher": "~0.1.0",
     "karma-phantomjs-launcher": "~0.1.0",
