@@ -382,7 +382,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     execution.tasks = new ArrayList<TaskEntity>();
     execution.incidents = new ArrayList<IncidentEntity>();
 
-    // Cached entity-state initialized to null, all bits are zore, indicating NO entities present
+    // Cached entity-state initialized to null, all bits are zero, indicating NO entities present
     execution.cachedEntityState = 0;
   }
 
