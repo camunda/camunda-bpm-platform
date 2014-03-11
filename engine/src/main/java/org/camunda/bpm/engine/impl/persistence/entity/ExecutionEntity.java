@@ -918,7 +918,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   /** must be called before the activity member field or getActivity() is called */
   protected void ensureActivityInitialized() {
     if ((activity == null) && (activityId != null)) {
-      activity = getProcessDefinition().findActivity(activityId);
+      setActivity(getProcessDefinition().findActivity(activityId));
     }
   }
 
