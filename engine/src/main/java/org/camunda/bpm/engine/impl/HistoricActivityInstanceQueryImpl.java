@@ -213,7 +213,6 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     return this;
   }
 
-
   // getters and setters //////////////////////////////////////////////////////
 
   public String getProcessInstanceId() {
@@ -243,12 +242,6 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   public boolean isUnfinished() {
     return unfinished;
   }
-  public boolean isCompleteScope() {
-    return ActivityInstanceState.SCOPE_COMPLETE.equals(activityInstanceState);
-  }
-  public boolean isCanceled() {
-    return ActivityInstanceState.CANCELED.equals(activityInstanceState);
-  }
   public String getActivityInstanceId() {
     return activityInstanceId;
   }
@@ -263,5 +256,8 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   }
   public Date getFinishedBefore() {
     return finishedBefore;
+  }
+  public ActivityInstanceState getActivityInstanceState() {
+    return activityInstanceState;
   }
 }
