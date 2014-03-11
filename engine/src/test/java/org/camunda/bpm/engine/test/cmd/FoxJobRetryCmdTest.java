@@ -9,9 +9,6 @@ import org.camunda.bpm.engine.test.Deployment;
 
 public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
-  private static final long FIVE_MINUTES_TWO_SECONDS = 302 * 1000;
-  private static final long ONE_HOUR_TWO_SECONDS = 60 * 60 * 1000 + 2000;
-
   private void waitForExecutedJobWithRetriesLeft(final int retriesLeft) {
 
     Job job = managementService.createJobQuery().singleResult();

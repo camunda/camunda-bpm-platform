@@ -1,34 +1,15 @@
 package org.camunda.bpm.engine.test.bpmn.async;
 
-import java.util.List;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 
 public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
-
-  protected void executeJobs() {
-    List<Job> jobs = managementService.createJobQuery().withRetriesLeft().list();
-
-    if (jobs.isEmpty()) {
-      return;
-    }
-
-    for (Job job : jobs) {
-      try {
-        managementService.executeJob(job.getId());
-      } catch (ProcessEngineException e) {};
-    }
-    executeJobs();
-  }
 
   @Deployment
   public void testAsyncStartEvent() {
@@ -39,7 +20,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
 
     Assert.assertEquals(1, runtimeService.createExecutionQuery().activityId("startEvent").count());
 
-    executeJobs();
+    executeAvailableJobs();
     task = taskService.createTaskQuery().singleResult();
 
     Assert.assertEquals(0, runtimeService.createExecutionQuery().activityId("startEvent").count());
@@ -53,7 +34,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
 
     Assert.assertNull(runtimeService.getVariable(instance.getId(), "listener"));
 
-    executeJobs();
+    executeAvailableJobs();
 
     Assert.assertNotNull(runtimeService.getVariable(instance.getId(), "listener"));
   }

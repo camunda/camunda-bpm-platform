@@ -23,28 +23,12 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase {
-
-  protected void executeJobs() {
-    List<Job> jobs = managementService.createJobQuery().withRetriesLeft().list();
-
-    if (jobs.isEmpty()) {
-      return;
-    }
-
-    for (Job job : jobs) {
-      try {
-        managementService.executeJob(job.getId());
-      } catch (ProcessEngineException e) {};
-    }
-    executeJobs();
-  }
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
@@ -55,7 +39,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
 
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    executeJobs();
+    executeAvailableJobs();
 
     ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("ExampleProcess").singleResult();
@@ -80,7 +64,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ActivityStatistics> statistics =
         managementService
@@ -110,7 +94,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ActivityStatistics> statistics =
         managementService
@@ -140,7 +124,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ActivityStatistics> statistics =
         managementService
@@ -161,7 +145,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
   public void testActivityStatisticsQueryWithIncidentsWithoutFailedJobs() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ActivityStatistics> statistics =
         managementService
@@ -304,7 +288,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
   public void testCallActivityActivityStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
-    executeJobs();
+    executeAvailableJobs();
 
     ProcessDefinition definition = repositoryService
         .createProcessDefinitionQuery()

@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.test.incident;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
@@ -31,27 +29,12 @@ import org.camunda.bpm.engine.test.Deployment;
 
 public class IncidentTest extends PluggableProcessEngineTestCase {
 
-  protected void executeJobs() {
-    List<Job> jobs = managementService.createJobQuery().withRetriesLeft().list();
-
-    if (jobs.isEmpty()) {
-      return;
-    }
-
-    for (Job job : jobs) {
-      try {
-        managementService.executeJob(job.getId());
-      } catch (ProcessEngineException e) {};
-    }
-    executeJobs();
-  }
-
   @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateOneIncident.bpmn"})
   public void testShouldCreateOneIncident() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
 
-    executeJobs();
+    executeAvailableJobs();
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
@@ -79,7 +62,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
   public void testShouldCreateOneIncidentAfterSetRetries() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<Incident> incidents = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).list();
 
@@ -93,7 +76,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     // set job retries to 1 -> should fail again and a second incident should be created
     managementService.setJobRetries(job.getId(), 1);
 
-    executeJobs();
+    executeAvailableJobs();
 
     incidents = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).list();
 
@@ -106,7 +89,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
   public void testShouldCreateOneIncidentAfterExecuteJob() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<Incident> incidents = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).list();
 
@@ -136,7 +119,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
   public void testShouldCreateOneIncidentForNestedExecution() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcessWithNestedExecutions");
 
-    executeJobs();
+    executeAvailableJobs();
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(incident);
@@ -165,7 +148,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
   public void testShouldCreateRecursiveIncidents() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callFailingProcess");
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<Incident> incidents = runtimeService.createIncidentQuery().list();
     assertFalse(incidents.isEmpty());
@@ -220,7 +203,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
   public void testShouldCreateRecursiveIncidentsForNestedCallActivity() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callingFailingCallActivity");
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<Incident> incidents = runtimeService.createIncidentQuery().list();
     assertFalse(incidents.isEmpty());
@@ -292,7 +275,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     // start failing process
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
 
-    executeJobs();
+    executeAvailableJobs();
 
     // get the job
     Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -317,7 +300,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     parameters.put("fail", true);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcessWithUserTask", parameters);
 
-    executeJobs();
+    executeAvailableJobs();
 
     // job exists
     Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -334,7 +317,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     // will be executed successfully
     managementService.setJobRetries(job.getId(), 1);
 
-    executeJobs();
+    executeAvailableJobs();
 
     // Update process instance
     processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -355,9 +338,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 302 * 1000));
-
-    executeJobs();
+    executeAvailableJobs();
 
     // job exists
     Job job = managementService.createJobQuery().singleResult();

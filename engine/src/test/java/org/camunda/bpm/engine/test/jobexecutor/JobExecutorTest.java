@@ -14,16 +14,13 @@ package org.camunda.bpm.engine.test.jobexecutor;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
-import org.camunda.bpm.engine.runtime.Job;
 
 
 
@@ -31,21 +28,6 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Tom Baeyens
  */
 public class JobExecutorTest extends JobExecutorTestCase {
-
-  protected void executeJobs() {
-    List<Job> jobs = managementService.createJobQuery().withRetriesLeft().list();
-
-    if (jobs.isEmpty()) {
-      return;
-    }
-
-    for (Job job : jobs) {
-      try {
-        managementService.executeJob(job.getId());
-      } catch (ProcessEngineException e) {};
-    }
-    executeJobs();
-  }
 
   public void testBasicJobExecutorOperation() throws Exception {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
@@ -63,7 +45,7 @@ public class JobExecutorTest extends JobExecutorTestCase {
       }
     });
 
-    executeJobs();
+    executeAvailableJobs();
 
     Set<String> messages = new HashSet<String>(tweetHandler.getMessages());
     Set<String> expectedMessages = new HashSet<String>();

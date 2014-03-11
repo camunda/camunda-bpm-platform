@@ -17,33 +17,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngineTestCase {
-
-  protected void executeJobs() {
-    List<Job> jobs = managementService.createJobQuery().withRetriesLeft().list();
-
-    if (jobs.isEmpty()) {
-      return;
-    }
-
-    for (Job job : jobs) {
-      try {
-        managementService.executeJob(job.getId());
-      } catch (ProcessEngineException e) {};
-    }
-    executeJobs();
-  }
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
@@ -54,7 +37,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ProcessDefinitionStatistics> statistics =
         managementService
@@ -78,7 +61,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ProcessDefinitionStatistics> statistics =
         managementService
@@ -108,7 +91,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ProcessDefinitionStatistics> statistics =
         managementService
@@ -138,7 +121,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ProcessDefinitionStatistics> statistics =
         managementService
@@ -163,7 +146,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ProcessDefinitionStatistics> statistics =
         managementService
@@ -213,7 +196,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   public void testProcessDefinitionStatisticsQueryCount() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
 
-    executeJobs();
+    executeAvailableJobs();
 
     long count =
         managementService
@@ -262,7 +245,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   public void testCallActivityProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ProcessDefinitionStatistics> statistics =
         managementService
@@ -303,7 +286,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
       runtimeService.startProcessInstanceById(definition.getId());
     }
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ProcessDefinitionStatistics> statistics =
         managementService
@@ -350,7 +333,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
       runtimeService.startProcessInstanceById(definition.getId(), parameters);
     }
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ProcessDefinitionStatistics> statistics =
         managementService
@@ -408,7 +391,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
       runtimeService.startProcessInstanceById(definition.getId());
     }
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ProcessDefinitionStatistics> statistics =
         managementService
@@ -465,7 +448,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   public void testProcessDefinitionStatisticsQueryWithIncidentsWithoutFailedJobs() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
-    executeJobs();
+    executeAvailableJobs();
 
     List<ProcessDefinitionStatistics> statistics =
         managementService

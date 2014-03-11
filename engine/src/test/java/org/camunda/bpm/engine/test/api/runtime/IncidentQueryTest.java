@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -48,23 +47,9 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "").getId());
     }
 
-    executeJobs();
+    executeAvailableJobs();
   }
 
-  protected void executeJobs() {
-    List<Job> jobs = managementService.createJobQuery().withRetriesLeft().list();
-
-    if (jobs.isEmpty()) {
-      return;
-    }
-
-    for (Job job : jobs) {
-      try {
-        managementService.executeJob(job.getId());
-      } catch (ProcessEngineException e) {};
-    }
-    executeJobs();
-  }
   protected void tearDown() throws Exception {
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
@@ -287,7 +272,7 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByCauseIncidentId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callFailingProcess");
 
-    executeJobs();
+    executeAvailableJobs();
 
     ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
     assertNotNull(subProcessInstance);
@@ -326,7 +311,7 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByRootCauseIncidentId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callFailingCallActivity");
 
-    executeJobs();
+    executeAvailableJobs();
 
     ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
     assertNotNull(subProcessInstance);
