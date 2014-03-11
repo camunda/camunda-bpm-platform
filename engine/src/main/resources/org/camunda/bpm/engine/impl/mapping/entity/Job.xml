@@ -40,6 +40,9 @@
       <if test="processDefinitionKey != null">
         and PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
       </if>
+      <if test="handlerType != null">
+        and HANDLER_TYPE_ =  #{handlerType, jdbcType=VARCHAR}
+      </if>
     </where>
   </update>  
   

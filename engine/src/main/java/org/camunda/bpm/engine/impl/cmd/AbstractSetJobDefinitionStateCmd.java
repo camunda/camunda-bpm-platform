@@ -13,12 +13,14 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeJobDefinitionSuspensionStateJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.runtime.Job;
@@ -63,6 +65,8 @@ public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
 
   private void updateSuspensionState(CommandContext commandContext) {
     JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
+    JobManager jobManager = commandContext.getJobManager();
+
     SuspensionState suspensionState = getSuspensionState();
 
     if (jobDefinitionId != null) {
@@ -71,10 +75,12 @@ public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
 
     if (processDefinitionId != null) {
       jobDefinitionManager.updateJobDefinitionSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
+      jobManager.updateStartTimerJobSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
     } else
 
     if (processDefinitionKey != null) {
       jobDefinitionManager.updateJobDefinitionSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+      jobManager.updateStartTimerJobSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
     }
 
     if (includeJobs) {
