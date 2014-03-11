@@ -17,6 +17,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -574,6 +576,72 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
 
     // Completing this task end the process instance
     taskService.complete(taskAfterSubProcess.getId());
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testInterruptingEventSubProcessEventSubscriptions.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/interruptingEventSubProcessEventSubscriptions.bpmn20.xml" })
+  public void testInterruptingMessageEventSubProcessEventSubscriptionsInsideCallActivity() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callInterruptingEventSubProcess");
+
+    // one task in the call activity subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskInsideCallActivity = taskQuery.singleResult();
+    assertEquals("taskBeforeInterruptingEventSubprocess", taskInsideCallActivity.getTaskDefinitionKey());
+
+    // we should have no event subscriptions for the parent process
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count());
+    // we should have two event subscriptions for the called process instance, one for message and one for signal
+    String calledProcessInstanceId = taskInsideCallActivity.getProcessInstanceId();
+    EventSubscriptionQuery eventSubscriptionQuery = runtimeService.createEventSubscriptionQuery().processInstanceId(calledProcessInstanceId);
+    List<EventSubscription> subscriptions = eventSubscriptionQuery.list();
+    assertEquals(2, subscriptions.size());
+    
+    // start the message interrupting event sub process
+    runtimeService.correlateMessage("newMessage");
+    Task taskAfterMessageStartEvent = taskQuery.processInstanceId(calledProcessInstanceId).singleResult();
+    assertEquals("taskAfterMessageStartEvent", taskAfterMessageStartEvent.getTaskDefinitionKey());
+
+    // no subscriptions left
+    assertEquals(0, eventSubscriptionQuery.count());
+
+    // Complete the task inside the called process instance
+    taskService.complete(taskAfterMessageStartEvent.getId());
+
+    assertProcessEnded(calledProcessInstanceId);
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testInterruptingEventSubProcessEventSubscriptions.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/interruptingEventSubProcessEventSubscriptions.bpmn20.xml" })
+  public void testInterruptingSignalEventSubProcessEventSubscriptionsInsideCallActivity() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callInterruptingEventSubProcess");
+
+    // one task in the call activity subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskInsideCallActivity = taskQuery.singleResult();
+    assertEquals("taskBeforeInterruptingEventSubprocess", taskInsideCallActivity.getTaskDefinitionKey());
+
+    // we should have no event subscriptions for the parent process
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count());
+    // we should have two event subscriptions for the called process instance, one for message and one for signal
+    String calledProcessInstanceId = taskInsideCallActivity.getProcessInstanceId();
+    EventSubscriptionQuery eventSubscriptionQuery = runtimeService.createEventSubscriptionQuery().processInstanceId(calledProcessInstanceId);
+    List<EventSubscription> subscriptions = eventSubscriptionQuery.list();
+    assertEquals(2, subscriptions.size());
+
+    // start the signal interrupting event sub process
+    runtimeService.signalEventReceived("newSignal");
+    Task taskAfterSignalStartEvent = taskQuery.processInstanceId(calledProcessInstanceId).singleResult();
+    assertEquals("taskAfterSignalStartEvent", taskAfterSignalStartEvent.getTaskDefinitionKey());
+
+    // no subscriptions left
+    assertEquals(0, eventSubscriptionQuery.count());
+
+    // Complete the task inside the called process instance
+    taskService.complete(taskAfterSignalStartEvent.getId());
+
+    assertProcessEnded(calledProcessInstanceId);
     assertProcessEnded(processInstance.getId());
   }
 

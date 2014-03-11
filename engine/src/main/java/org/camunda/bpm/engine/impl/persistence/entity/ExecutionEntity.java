@@ -199,7 +199,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
    * {@link #processDefinition}.
    *
    * @see #activity
-   * @see #setActivity(ActivityImpl)
    * @see #getActivity()
    */
   protected String activityId;
@@ -300,6 +299,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
     subProcessInstance.setProcessInstance(subProcessInstance);
 
+    // create event subscriptions for the current scope
+    for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(subProcessInstance.getScopeActivity())) {
+      declaration.createSubscription(subProcessInstance);
+    }
+
     if(businessKey != null) {
       subProcessInstance.setBusinessKey(businessKey);
     }
@@ -318,7 +322,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       // publish update event for current activity instance (containing the id of the sub process)
       HistoryEvent haie = eventFactory.createActivityInstanceUpdateEvt(this, null);
       eventHandler.handleEvent(haie);
-
     }
 
     return subProcessInstance;
