@@ -70,10 +70,14 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
 
     List<Execution> executions =  runtimeService.createExecutionQuery().activityId("userTask").list();
     for (Execution execution : executions) {
+      int cachedEntityStateRaw = ((ExecutionEntity) execution).getCachedEntityStateRaw();
       if(!((ExecutionEntity)execution).isScope()) {
-        assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.TASKS_STATE_BIT), ((ExecutionEntity) execution).getCachedEntityStateRaw());
+        assertEquals(
+            BitMaskUtil.getMaskForBit(ExecutionEntity.TASKS_STATE_BIT)
+            | BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT)
+            , cachedEntityStateRaw);
       } else {
-        assertEquals(0, ((ExecutionEntity) execution).getCachedEntityStateRaw());
+        assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT), cachedEntityStateRaw);
       }
     }
 
@@ -110,10 +114,14 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
 
     List<Execution> executions =  runtimeService.createExecutionQuery().activityId("ReceiveTask_1").list();
     for (Execution execution : executions) {
+      int cachedEntityStateRaw = ((ExecutionEntity) execution).getCachedEntityStateRaw();
+
       if(!((ExecutionEntity)execution).isScope()) {
-        assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.EVENT_SUBSCRIPTIONS_STATE_BIT), ((ExecutionEntity) execution).getCachedEntityStateRaw());
+        assertEquals(
+            BitMaskUtil.getMaskForBit(ExecutionEntity.EVENT_SUBSCRIPTIONS_STATE_BIT)
+            | BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT), cachedEntityStateRaw);
       } else {
-        assertEquals(0, ((ExecutionEntity) execution).getCachedEntityStateRaw());
+        assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT), cachedEntityStateRaw);
       }
     }
 

@@ -86,6 +86,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   public static final int TASKS_STATE_BIT = 2;
   public static final int JOBS_STATE_BIT = 3;
   public static final int INCIDENT_STATE_BIT = 4;
+  public static final int VARIABLES_STATE_BIT = 5;
+  public static final int SUB_PROCESS_INSTANCE_STATE_BIT = 6;
 
   // current position /////////////////////////////////////////////////////////
 
@@ -121,6 +123,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
   protected ProcessInstanceStartContext processInstanceStartContext;
   protected ExecutionStartContext executionStartContext;
+
+  protected boolean shouldQueryForSubprocessInstance = false;
 
   // state/type of execution //////////////////////////////////////////////////
 
@@ -286,6 +290,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   public PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
     ExecutionEntity subProcessInstance = newExecution();
 
+    shouldQueryForSubprocessInstance = true;
+
     // manage bidirectional super-subprocess relation
     subProcessInstance.setSuperExecution(this);
     this.setSubProcessInstance(subProcessInstance);
@@ -320,7 +326,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
   protected ExecutionEntity newExecution() {
     ExecutionEntity newExecution = new ExecutionEntity();
-    newExecution.executions = new ArrayList<ExecutionEntity>();
 
     initializeAssociations(newExecution);
 
@@ -370,6 +375,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
   protected void initializeAssociations(ExecutionEntity execution) {
     // initialize the lists of referenced objects (prevents db queries)
+    execution.executions = new ArrayList<ExecutionEntity>();
     execution.variableInstances = new HashMap<String, VariableInstanceEntity>();
     execution.eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
     execution.jobs = new ArrayList<JobEntity>();
@@ -379,6 +385,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     // Cached entity-state initialized to null, all bits are zore, indicating NO entities present
     execution.cachedEntityState = 0;
   }
+
 
   public void start() {
     start(null, null);
@@ -760,11 +767,25 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   @SuppressWarnings("unchecked")
   protected void ensureExecutionsInitialized() {
     if (executions==null) {
-      this.executions = (List) Context
-        .getCommandContext()
-        .getExecutionManager()
-        .findChildExecutionsByParentExecutionId(id);
+      if(isExecutionTreePrefetchEnabled()) {
+        ensureExecutionTreeInitialized();
+
+      } else {
+        this.executions = (List) Context
+          .getCommandContext()
+          .getExecutionManager()
+          .findChildExecutionsByParentExecutionId(id);
+      }
+
     }
+  }
+
+  /**
+   * @return true if execution tree prefetching is enabled
+   */
+  protected boolean isExecutionTreePrefetchEnabled() {
+    return Context.getProcessEngineConfiguration()
+      .isExecutionTreePrefetchEnabled();
   }
 
   public void setExecutions(List<ExecutionEntity> executions) {
@@ -861,10 +882,17 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
   protected void ensureProcessInstanceInitialized() {
     if ((processInstance == null) && (processInstanceId != null)) {
-      processInstance =  Context
-        .getCommandContext()
-        .getExecutionManager()
-        .findExecutionById(processInstanceId);
+
+      if(isExecutionTreePrefetchEnabled()) {
+        ensureExecutionTreeInitialized();
+
+      } else {
+        processInstance =  Context
+          .getCommandContext()
+          .getExecutionManager()
+          .findExecutionById(processInstanceId);
+      }
+
     }
   }
 
@@ -1003,10 +1031,15 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
   protected void ensureParentInitialized() {
     if (parent == null && parentId != null) {
-      parent = Context
-        .getCommandContext()
-        .getExecutionManager()
-        .findExecutionById(parentId);
+      if(isExecutionTreePrefetchEnabled()) {
+        ensureExecutionTreeInitialized();
+
+      } else {
+        parent = Context
+          .getCommandContext()
+          .getExecutionManager()
+          .findExecutionById(parentId);
+      }
     }
   }
 
@@ -1059,11 +1092,12 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
 
   public void setSubProcessInstance(InterpretableExecution subProcessInstance) {
+    shouldQueryForSubprocessInstance = subProcessInstance != null;
     this.subProcessInstance = (ExecutionEntity) subProcessInstance;
   }
 
   protected void ensureSubProcessInstanceInitialized() {
-    if (subProcessInstance == null) {
+    if (shouldQueryForSubprocessInstance && subProcessInstance == null) {
       subProcessInstance = Context
         .getCommandContext()
         .getExecutionManager()
@@ -1252,18 +1286,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     // update the related process variables
-    List<VariableInstanceEntity> variables = (List) commandContext
-      .getVariableInstanceManager()
-      .findVariableInstancesByExecutionId(id);
-
-    for (VariableInstanceEntity variable: variables) {
+    ensureVariableInstancesInitialized();
+    for (VariableInstanceEntity variable: variableInstances.values()) {
       variable.setExecutionId(replacedBy.getId());
-    }
-    variables = dbSqlSession.findInCache(VariableInstanceEntity.class);
-    for (VariableInstanceEntity variable: variables) {
-      if (id.equals(variable.getExecutionId())) {
-        variable.setExecutionId(replacedBy.getId());
-      }
     }
 
     // TODO: fire UPDATE activity instance events with new execution?
@@ -1339,6 +1364,52 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     if(variableInstances != null) {
       for (Entry<String, VariableInstanceEntity> variable : variableInstances.entrySet()) {
         fireHistoricVariableInstanceCreate(variable.getValue(), this);
+      }
+    }
+  }
+
+  /**
+   * Fetch all the executions inside the same process instance as list and then
+   * reconstruct the complete execution tree.
+   *
+   * In many cases this is an optimization over fetching the execution tree
+   * lazily. Usually we need all executions anyway and it is preferable to fetch
+   * more data in a single query (maybe even too much data) then to run multiple
+   * queries, each returning a fraction of the data.
+   *
+   * The most important consideration here is network roundtrip:  If the process
+   * engine and database run on separate hosts, network roundtrip has to be added
+   * to each query. Economizing on the number of queries economizes on network
+   * roundtrip. The tradeoff here is network roundtrip vs. throughput: multiple
+   * roundtrips carrying small chucks of data vs. a single roundtrip carrying
+   * more data.
+   *
+   */
+  protected void ensureExecutionTreeInitialized() {
+    List<ExecutionEntity> executions = Context.getCommandContext()
+      .getExecutionManager()
+      .findChildExecutionsByProcessInstanceId(processInstanceId);
+
+    ExecutionEntity processInstance = null;
+
+    Map<String, ExecutionEntity> executionMap = new HashMap<String, ExecutionEntity>();
+    for (ExecutionEntity execution : executions) {
+      execution.executions = new ArrayList<ExecutionEntity>();
+      executionMap.put(execution.getId(), execution);
+      if(execution.isProcessInstance()) {
+        processInstance = execution;
+      }
+    }
+
+    for (ExecutionEntity execution : executions) {
+      String parentId = execution.getParentId();
+      ExecutionEntity parent = executionMap.get(parentId);
+      if(!execution.isProcessInstance()) {
+        execution.processInstance = processInstance;
+        execution.parent = parent;
+        parent.executions.add(execution);
+      } else {
+        execution.processInstance = execution;
       }
     }
   }
@@ -1573,6 +1644,10 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     if(incidents == null && !BitMaskUtil.isBitOn(cachedEntityState, INCIDENT_STATE_BIT)) {
       incidents = new ArrayList<IncidentEntity>();
     }
+    if(variableInstances == null && !BitMaskUtil.isBitOn(cachedEntityState, VARIABLES_STATE_BIT)) {
+      variableInstances = new HashMap<String, VariableInstanceEntity>();
+    }
+    shouldQueryForSubprocessInstance = BitMaskUtil.isBitOn(cachedEntityState, SUB_PROCESS_INSTANCE_STATE_BIT);
   }
 
   public int getCachedEntityState() {
@@ -1584,6 +1659,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, EVENT_SUBSCRIPTIONS_STATE_BIT, (eventSubscriptions == null || eventSubscriptions.size() > 0));
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, JOBS_STATE_BIT, (jobs == null || jobs.size() > 0));
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, INCIDENT_STATE_BIT, (incidents == null || incidents.size() > 0));
+    cachedEntityState = BitMaskUtil.setBit(cachedEntityState, VARIABLES_STATE_BIT, (variableInstances == null || variableInstances.size() > 0));
+    cachedEntityState = BitMaskUtil.setBit(cachedEntityState, SUB_PROCESS_INSTANCE_STATE_BIT, shouldQueryForSubprocessInstance);
 
     return cachedEntityState;
   }

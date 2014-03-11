@@ -365,6 +365,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected HistoryEventHandler historyEventHandler;
 
+  protected boolean isExecutionTreePrefetchEnabled = true;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   public ProcessEngine buildProcessEngine() {
@@ -2084,4 +2086,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return formValidators;
   }
 
+  public boolean isExecutionTreePrefetchEnabled() {
+    return isExecutionTreePrefetchEnabled;
+  }
+
+  public void setExecutionTreePrefetchEnabled(boolean isExecutionTreePrefetchingEnabled) {
+    this.isExecutionTreePrefetchEnabled = isExecutionTreePrefetchingEnabled;
+  }
 }

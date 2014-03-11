@@ -101,3 +101,11 @@ alter table ACT_HI_DETAIL
 
 alter table ACT_HI_TASKINST
     add ACT_INST_ID_ NVARCHAR2(64);
+
+-- set cached entity state to 63 on all executions --
+
+UPDATE
+    ACT_RU_EXECUTION
+SET
+    CACHED_ENT_STATE_ = 63;
+
