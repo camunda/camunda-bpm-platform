@@ -59,7 +59,7 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
           if (eventName === nodeOpenedEventName || eventName === nodeSelectedEventName) {
             if (node.id === value.parentActivityInstanceId) {
               node.isOpen = true;
-              if (node.parentActivityInstanceId) {
+              if (node.parentActivityInstanceId && node.id !== node.parentActivityInstanceId) {
                 fireNodeEvent(nodeOpenedEventName, node);
               }
             }
