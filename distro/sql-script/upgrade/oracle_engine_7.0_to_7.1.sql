@@ -109,3 +109,19 @@ UPDATE
 SET
     CACHED_ENT_STATE_ = 63;
 
+-- align data types
+
+alter table ACT_RE_PROCDEF
+    modify (DGRM_RESOURCE_NAME_ NVARCHAR2(2000));
+
+alter table ACT_RU_AUTHORIZATION
+    modify (ID_ NVARCHAR2(64));
+
+alter table ACT_RU_AUTHORIZATION
+    modify (GROUP_ID NVARCHAR2(255));
+
+alter table ACT_RU_AUTHORIZATION
+    modify (USER_ID NVARCHAR2(255));
+
+alter table ACT_RU_AUTHORIZATION
+    modify (RESOURCE_ID_ NVARCHAR2(64));
