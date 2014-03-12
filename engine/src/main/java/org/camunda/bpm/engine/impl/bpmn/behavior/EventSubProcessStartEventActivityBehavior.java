@@ -33,16 +33,16 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 public class EventSubProcessStartEventActivityBehavior extends NoneStartEventActivityBehavior {
 
   public void execute(ActivityExecution execution) throws Exception {
-    PvmActivity activity = execution.getActivity();
+    PvmActivity parent = (PvmActivity) execution.getActivity().getParent();
 
-    if (activity.isCancelScope()) {
+    if (parent.isCancelScope()) {
 
       // We need to do an interrupt scope in order to remove all jobs (timers ...) and
       // Message / signal event subscriptions created by this or other start events.
 
       // The interrupting event subprocess must only fire once and cancel the Event Handlers
       // created by other event subprocesses.
-      execution.interruptScope("Interrupting event sub process "+ activity + " fired.");
+      execution.interruptScope("Interrupting event sub process "+ parent + " fired.");
     }
 
     super.execute(execution);

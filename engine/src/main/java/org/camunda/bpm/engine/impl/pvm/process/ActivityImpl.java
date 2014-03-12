@@ -43,6 +43,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   protected boolean isCancelScope = false;
   protected boolean isConcurrent = false;
   protected PvmScope scope;
+  protected PvmScope flowScope;
 
 
   // Graphical information
@@ -219,6 +220,24 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   public void setConcurrent(boolean isConcurrent) {
     this.isConcurrent = isConcurrent;
+  }
+
+  /**
+   * @return the scope which should be used for traversing
+   * transitions which originate in this activity.
+   */
+  public PvmScope getFlowScope() {
+    if(flowScope == null) {
+      return getScope();
+
+    } else {
+
+      return flowScope;
+    }
+  }
+
+  public void setFlowScope(PvmScope magicScope) {
+    this.flowScope = magicScope;
   }
 
 }

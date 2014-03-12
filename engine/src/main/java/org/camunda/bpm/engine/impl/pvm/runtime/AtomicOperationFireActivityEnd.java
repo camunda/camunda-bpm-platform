@@ -12,32 +12,31 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
+import org.camunda.bpm.engine.impl.pvm.PvmEvent;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
-
 /**
- * @author Tom Baeyens
+ * <p>This atomic operation simply fires the activity end event</p>
+ *
+ * @author Daniel Meyer
+ *
  */
-public class AtomicOperationTransitionNotifyListenerEnd extends AtomicOperationActivityInstanceEnd {
+public class AtomicOperationFireActivityEnd extends AbstractEventAtomicOperation implements AtomicOperation {
 
-  @Override
+  public String getCanonicalName() {
+    return "fire-activity-end";
+  }
+
   protected ScopeImpl getScope(InterpretableExecution execution) {
     return (ScopeImpl) execution.getActivity();
   }
 
-  @Override
   protected String getEventName() {
-    return org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END;
+    return PvmEvent.EVENTNAME_END;
   }
 
-  @Override
   protected void eventNotificationsCompleted(InterpretableExecution execution) {
-    super.eventNotificationsCompleted(execution);
-    execution.performOperation(TRANSITION_DESTROY_SCOPE);
+    // nothing to do
   }
 
-  @Override
-  public String getCanonicalName() {
-    return "transition-notify-listener-end";
-  }
 }

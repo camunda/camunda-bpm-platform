@@ -30,6 +30,7 @@ public interface AtomicOperation {
   AtomicOperation ACTIVITY_START_CANCEL_SCOPE = new AtomicOperationActivityStartCancelScope();
   AtomicOperation ACTIVITY_EXECUTE = new AtomicOperationActivityExecute();
   AtomicOperation ACTIVITY_END = new AtomicOperationActivityEnd();
+  AtomicOperation FIRE_ACTIVITY_END = new AtomicOperationFireActivityEnd();
 
   AtomicOperation TRANSITION_NOTIFY_LISTENER_END = new AtomicOperationTransitionNotifyListenerEnd();
   AtomicOperation TRANSITION_DESTROY_SCOPE = new AtomicOperationTransitionDestroyScope();

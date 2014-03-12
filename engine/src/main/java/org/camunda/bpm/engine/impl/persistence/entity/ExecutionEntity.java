@@ -456,7 +456,22 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       childExecution.deleteCascade(reason);
     }
 
+    // set activity instance state to cancel
+    setCanceled(true);
+
+    // remove all tasks associated with this execution.
     removeTasks(reason);
+
+    // fire activity end on active activity
+    ActivityImpl activity = getActivity();
+    if(isActive && activity != null) {
+      performOperation(AtomicOperation.FIRE_ACTIVITY_END);
+    }
+
+    // set activity instance state back to 'default'
+    // -> execution will be reused for executing more activities and we want the state to
+    // be default initially.
+    activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
   }
 
   /** removes an execution. if there are nested executions, those will be ended recursively.

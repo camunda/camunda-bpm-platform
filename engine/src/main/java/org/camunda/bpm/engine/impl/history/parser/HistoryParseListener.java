@@ -18,6 +18,7 @@ import java.util.List;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
@@ -134,7 +135,10 @@ public class HistoryParseListener implements BpmnParseListener {
   }
 
   public void parseSubProcess(Element subProcessElement, ScopeImpl scope, ActivityImpl activity) {
-    addActivityHandlers(activity);
+    Object property = activity.getProperty(BpmnParse.PROPERTYNAME_TRIGGERED_BY_EVENT);
+    if(property == null || !(Boolean) property) {
+      addActivityHandlers(activity);
+    }
   }
 
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl activity) {

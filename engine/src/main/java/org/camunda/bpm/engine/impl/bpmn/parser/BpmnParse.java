@@ -709,7 +709,7 @@ public class BpmnParse extends Parse {
 
   protected void parseScopeStartEvent(ActivityImpl startEventActivity, Element startEventElement, Element parentElement, ScopeImpl scope) {
 
-    Object triggeredByEvent = scope.getProperty("triggeredByEvent");
+    Object triggeredByEvent = scope.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT);
     boolean isTriggeredByEvent = triggeredByEvent != null && ((Boolean) triggeredByEvent == true);
 
     Element errorEventDefinition = startEventElement.element("errorEventDefinition");
@@ -726,24 +726,28 @@ public class BpmnParse extends Parse {
       String isInterrupting = startEventElement.attribute("isInterrupting");
       boolean interrupting = isInterrupting.equalsIgnoreCase("true") ? true : false;
 
-      startEventActivity.setCancelScope(interrupting);
-      startEventActivity.setConcurrent(!interrupting);
+      ((ActivityImpl)scope).setCancelScope(interrupting);
+      ((ActivityImpl)scope).setConcurrent(!interrupting);
+
 
       // the scope of the event subscription is the parent of the event
-      // subprocess (subscription must be created when parent is initialized)
+      // subprocess (subscription must be created when parent is initialized).
       ScopeImpl catchingScope = ((ActivityImpl) scope).getParent();
       startEventActivity.setScope(catchingScope);
+      // the flow scope is the event subprocess activity.
+      startEventActivity.setFlowScope(scope);
+
+      if (scope.getProperty(PROPERTYNAME_INITIAL) == null) {
+        scope.setProperty(PROPERTYNAME_INITIAL, startEventActivity);
+      } else {
+        addError("multiple start events not supported for subprocess", startEventElement);
+      }
 
       if (errorEventDefinition != null) {
         if(!interrupting) {
           addError("error start event of event subprocess must be interrupting", startEventElement);
         }
-        if (scope.getProperty(PROPERTYNAME_INITIAL) == null) {
-            scope.setProperty(PROPERTYNAME_INITIAL, startEventActivity);
-            parseErrorStartEventDefinition(errorEventDefinition, startEventActivity, catchingScope);
-          } else {
-            addError("multiple start events not supported for subprocess", startEventElement);
-          }
+        parseErrorStartEventDefinition(errorEventDefinition, startEventActivity, catchingScope);
 
       } else if (messageEventDefinition != null) {
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseMessageEventDefinition(messageEventDefinition);
@@ -2476,8 +2480,8 @@ public class BpmnParse extends Parse {
 
     parseAsynchronousContinuation(subProcessElement, activity);
 
-    Boolean isTriggeredByEvent = parseBooleanAttribute(subProcessElement.attribute("triggeredByEvent"), false);
-    activity.setProperty("triggeredByEvent", isTriggeredByEvent);
+    Boolean isTriggeredByEvent = parseBooleanAttribute(subProcessElement.attribute(PROPERTYNAME_TRIGGERED_BY_EVENT), false);
+    activity.setProperty(PROPERTYNAME_TRIGGERED_BY_EVENT, isTriggeredByEvent);
 
     // event subprocesses are not scopes
     activity.setScope(!isTriggeredByEvent);

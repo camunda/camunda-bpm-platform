@@ -42,10 +42,12 @@ public abstract class AtomicOperationCreateConcurrentExecution implements Atomic
     if(isLeaf(execution)) {
 
       if(execution.getActivity() != null
+         && execution.isScope()
          && !((ActivityImpl)execution.getActivity()).isScope()
-         && concurrencyScope != concurrentActivity.getParent()
+//         && concurrencyScope != concurrentActivity.getParent()
          && concurrencyScope == execution.getActivity().getParent()
-         && !((ActivityImpl)concurrentActivity.getParent()).isScope()) {
+//         && !((ActivityImpl)concurrentActivity.getParent()).isScope()
+         ) {
 
         // Expand tree (1):
         //

@@ -51,12 +51,21 @@ public abstract class AbstractEventHandler implements EventHandler {
     }
 
     ActivityBehavior activityBehavior = activity.getActivityBehavior();
-    if (activityBehavior instanceof BoundaryEventActivityBehavior
-            || activityBehavior instanceof EventSubProcessStartEventActivityBehavior) {
+    if (activityBehavior instanceof BoundaryEventActivityBehavior) {
 
       try {
-
         execution.executeActivity(activity);
+
+      } catch (RuntimeException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new ProcessEngineException("exception while sending signal for event subscription '" + eventSubscription + "':" + e.getMessage(), e);
+      }
+
+    } else if (activityBehavior instanceof EventSubProcessStartEventActivityBehavior) {
+
+      try {
+        execution.executeActivity(activity.getParentActivity());
 
       } catch (RuntimeException e) {
         throw e;
