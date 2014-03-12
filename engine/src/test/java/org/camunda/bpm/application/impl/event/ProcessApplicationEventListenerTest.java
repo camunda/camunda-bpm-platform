@@ -89,6 +89,56 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
   }
 
   @Deployment
+  public void FAILING_testExecutionListenerWithErrorBoundaryEvent() {
+    final AtomicInteger eventCount = new AtomicInteger();
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication() {
+      public ExecutionListener getExecutionListener() {
+        return new ExecutionListener() {
+          public void notify(DelegateExecution execution) throws Exception {
+            eventCount.incrementAndGet();
+          }
+        };
+      }
+    };
+
+    // register app so that it is notified about events
+    managementService.registerProcessApplication(deploymentId, processApplication.getReference());
+
+    // start process instance
+    runtimeService.startProcessInstanceByKey("executionListener");
+
+    /**
+     * 8 events should be received:
+     * - theStart_start
+     * - theStart_end
+     * - theStart_take
+     * - serviceTask_start
+     * - serviceTask_end
+     * - serviceTask_take
+     * - theEnd_start
+     * - theEnd_end
+     */
+
+    /**
+     * 10 events are received:
+     * theStart_start
+     * theStart_end
+     * theStart_take
+     * serviceTask_start
+     * serviceTask_start <-- triggered twice
+     * serviceTask_end
+     * serviceTask_end <-- triggered twice
+     * errorBoundary_start
+     * errorBoundary_end
+     * errorBoundary_take
+     * theEnd_start
+     * theEnd_end
+     */
+    assertEquals(8, eventCount.get());
+  }
+
+  @Deployment
   public void testTaskListener() {
 
     final List<String> events = new ArrayList<String>();
