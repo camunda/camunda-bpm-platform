@@ -143,7 +143,7 @@ create table ACT_HI_INCIDENT (
   PROC_INST_ID_ varchar(64),
   EXECUTION_ID_ varchar(64),
   CREATE_TIME_ timestamp not null,
-  END_TIME_ timestamp,
+  END_TIME_ timestamp null,
   INCIDENT_MSG_ varchar(4000),
   INCIDENT_TYPE_ varchar(255) not null,
   ACTIVITY_ID_ varchar(255),
