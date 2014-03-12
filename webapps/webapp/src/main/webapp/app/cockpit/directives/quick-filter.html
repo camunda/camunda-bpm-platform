@@ -1,4 +1,4 @@
-<!-- # CE - src/main/webapp/app/common/directives/quick-filter.html -->
+<!-- # CE - src/main/webapp/app/cockpit/directives/quick-filter.html -->
 <form name="quickFilters"
       class="quick-filters">
   <div class="quick-filter name-filter"
@@ -13,14 +13,14 @@
          help-text="Click here to clear the field value.">
       <i class="icon-search"
         ng-click="clearName()"></i>
-      </span>  
+      </span>
     </label>
     <button class="btn btn-small btn-link btn-control-link"
             type="button"
             help
             help-text="Filters activity instances that have the entered name.">
       <i class="icon-question-sign"></i>
-    </button>    
+    </button>
   </div>
 
   <div class="quick-filter state-filter"
@@ -28,7 +28,10 @@
     <span class="name">State</span>
     <ul class="inline">
       <li>
-        <label class="btn btn-mini">
+        <label class="btn btn-mini"
+               help
+               help-text="Running Activity Instance"
+               help-placement="'bottom'">
           <i class="icon-adjust"></i>
           <input ng-click="search()"
                  ng-model="running"
@@ -37,7 +40,10 @@
         </label>
       </li>
       <li>
-        <label class="btn btn-mini">
+        <label class="btn btn-mini"
+               help
+               help-text="Completed Activity Instance"
+               help-placement="'bottom'">
           <i class="icon-ok-circle"></i>
           <input ng-click="search()"
                  ng-model="completed"
@@ -46,7 +52,10 @@
         </label>
       </li>
       <li>
-        <label class="btn btn-mini">
+        <label class="btn btn-mini"
+               help
+               help-text="Canceled Activity Instance"
+               help-placement="'bottom'">
           <i class="icon-ban-circle"></i>
           <input ng-click="search()"
                  ng-model="canceled"
@@ -57,4 +66,4 @@
     </ul>
   </div>
 </form>
-<!-- / CE - src/main/webapp/app/common/directives/quick-filter.html -->
+<!-- / CE - src/main/webapp/app/cockpit/directives/quick-filter.html -->
