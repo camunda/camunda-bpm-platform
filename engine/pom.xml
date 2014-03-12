@@ -388,6 +388,7 @@
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>**/TaskEventsTest.java</exclude>
                 <exclude>**/OperationLog*.java</exclude>
+                <exclude>**/HistoricIncident*Test.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -415,6 +416,7 @@
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>**/TaskEventsTest.java</exclude>
                 <exclude>**/OperationLog*.java</exclude>
+                <exclude>**/HistoricIncident*Test.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -443,6 +445,7 @@
                 <exclude>**/TaskEventsTest.java</exclude>
                 <exclude>**/OperationLog*.java</exclude>
                 <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
+                <exclude>**/HistoricIncident*Test.java</exclude>
               </excludes>
             </configuration>
           </plugin>
