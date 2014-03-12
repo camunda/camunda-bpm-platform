@@ -295,6 +295,8 @@ ngDefine('cockpit.directives', [
         }
       }
 
+      $scope.$root.$emit('instance-diagram-selection-change', newSelection);
+
       selection = newSelection;
     }
 

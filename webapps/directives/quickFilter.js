@@ -72,10 +72,11 @@ ngDefine('cockpit.directives', ['jquery'], function(module, $) {
           throw new Error('A item-selector attribute must be specified');
         }
 
-        scope.$root.$on('instance-tree-selection-change', function() {
-          // wait a bit to prevent
+        function refresh() {
           setTimeout(scope.search, 200);
-        });
+        }
+        scope.$root.$on('instance-tree-selection-change', refresh);
+        scope.$root.$on('instance-diagram-selection-change', refresh);
 
         var $holder = $(scope.holderSelector);
 
