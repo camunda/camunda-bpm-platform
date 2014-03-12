@@ -118,10 +118,10 @@ alter table ACT_RU_AUTHORIZATION
     modify (ID_ NVARCHAR2(64));
 
 alter table ACT_RU_AUTHORIZATION
-    modify (GROUP_ID NVARCHAR2(255));
+    modify (GROUP_ID_ NVARCHAR2(255));
 
 alter table ACT_RU_AUTHORIZATION
-    modify (USER_ID NVARCHAR2(255));
+    modify (USER_ID_ NVARCHAR2(255));
 
 alter table ACT_RU_AUTHORIZATION
     modify (RESOURCE_ID_ NVARCHAR2(64));
