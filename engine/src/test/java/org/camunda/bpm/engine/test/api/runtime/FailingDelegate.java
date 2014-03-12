@@ -6,14 +6,12 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 public class FailingDelegate implements JavaDelegate {
 
+  public static final String EXCEPTION_MESSAGE = "Expected exception.";
+
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    throw new ProcessEngineException("Expected exception.");
-    
+    throw new ProcessEngineException(EXCEPTION_MESSAGE);
+
   }
-  
-  
-  
-  
 
 }

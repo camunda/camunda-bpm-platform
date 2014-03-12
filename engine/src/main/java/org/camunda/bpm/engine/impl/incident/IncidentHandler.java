@@ -44,4 +44,9 @@ public interface IncidentHandler {
    */
   public void resolveIncident(String processDefinitionId, String activityId, String executionId, String configuration);
 
+  /**
+   * Delete an incident that arose in the context of an execution.
+   */
+  public void deleteIncident(String processDefinitionId, String activityId, String executionId, String configuration);
+
 }

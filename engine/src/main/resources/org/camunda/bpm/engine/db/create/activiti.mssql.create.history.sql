@@ -137,6 +137,23 @@ create table ACT_HI_OP_LOG (
     primary key (ID_)
 );
 
+create table ACT_HI_INCIDENT (
+  ID_ nvarchar(64) not null,
+  PROC_DEF_ID_ nvarchar(64),
+  PROC_INST_ID_ nvarchar(64),
+  EXECUTION_ID_ nvarchar(64),
+  CREATE_TIME_ datetime2 not null,
+  END_TIME_ datetime2,
+  INCIDENT_MSG_ nvarchar(4000),
+  INCIDENT_TYPE_ nvarchar(255) not null,
+  ACTIVITY_ID_ nvarchar(255),
+  CAUSE_INCIDENT_ID_ nvarchar(64),
+  ROOT_CAUSE_INCIDENT_ID_ nvarchar(64),
+  CONFIGURATION_ nvarchar(255),
+  INCIDENT_STATE_ integer,
+  primary key (ID_)
+);
+
 create index ACT_IDX_HI_PRO_INST_END on ACT_HI_PROCINST(END_TIME_);
 create index ACT_IDX_HI_PRO_I_BUSKEY on ACT_HI_PROCINST(BUSINESS_KEY_);
 create index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST(START_TIME_);

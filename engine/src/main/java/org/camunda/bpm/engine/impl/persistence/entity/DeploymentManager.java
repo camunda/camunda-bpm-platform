@@ -67,20 +67,6 @@ public class DeploymentManager extends AbstractManager {
       String processDefinitionId = processDefinition.getId();
       // remove related authorization parameters in IdentityLink table
       getIdentityLinkManager().deleteIdentityLinksByProcDef(processDefinitionId);
-    }
-
-    // delete process definitions from db
-    getProcessDefinitionManager()
-      .deleteProcessDefinitionsByDeploymentId(deploymentId);
-
-    for (ProcessDefinition processDefinition : processDefinitions) {
-      String processDefinitionId = processDefinition.getId();
-
-      // remove process definitions from cache:
-      Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .removeProcessDefinition(processDefinitionId);
 
       // remove timer start events:
       List<Job> timerStartJobs = Context.getCommandContext()
@@ -97,6 +83,28 @@ public class DeploymentManager extends AbstractManager {
           ((JobEntity)job).delete();
         }
       }
+
+      if (cascade) {
+        // remove historic incidents which are not referenced to a process instance
+        Context
+          .getCommandContext()
+          .getHistoricIncidentManager()
+          .deleteHistoricIncidentsByProcessDefinitionId(processDefinitionId);
+      }
+    }
+
+    // delete process definitions from db
+    getProcessDefinitionManager()
+      .deleteProcessDefinitionsByDeploymentId(deploymentId);
+
+    for (ProcessDefinition processDefinition : processDefinitions) {
+      String processDefinitionId = processDefinition.getId();
+
+      // remove process definitions from cache:
+      Context
+        .getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .removeProcessDefinition(processDefinitionId);
 
       // remove message event subscriptions:
       List<EventSubscriptionEntity> findEventSubscriptionsByConfiguration = Context

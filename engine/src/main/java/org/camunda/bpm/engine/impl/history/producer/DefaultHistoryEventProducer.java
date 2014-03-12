@@ -18,11 +18,13 @@ import java.util.List;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
@@ -36,6 +38,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.Incident;
 
 /**
  * @author Daniel Meyer
@@ -116,7 +119,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   }
 
-
   protected void initHistoricVariableUpdateEvt(HistoricVariableUpdateEventEntity evt, VariableInstanceEntity variableInstance, String eventType) {
 
     // init properties
@@ -157,6 +159,33 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProperty(propertyChange.getPropertyName());
     evt.setOrgValue(propertyChange.getOrgValueString());
     evt.setNewValue(propertyChange.getNewValueString());
+  }
+
+  protected void initHistoricIncidentEvent(HistoricIncidentEventEntity evt, Incident incident, String eventType) {
+    // init properties
+    evt.setId(incident.getId());
+    evt.setProcessDefinitionId(incident.getProcessDefinitionId());
+    evt.setProcessInstanceId(incident.getProcessInstanceId());
+    evt.setExecutionId(incident.getExecutionId());
+    evt.setCreateTime(incident.getIncidentTimestamp());
+    evt.setIncidentType(incident.getIncidentType());
+    evt.setActivityId(incident.getActivityId());
+    evt.setCauseIncidentId(incident.getCauseIncidentId());
+    evt.setRootCauseIncidentId(incident.getRootCauseIncidentId());
+    evt.setConfiguration(incident.getConfiguration());
+    evt.setIncidentMessage(incident.getIncidentMessage());
+
+    // init event type
+    evt.setEventType(eventType);
+
+    // init state
+    IncidentState incidentState = IncidentState.DEFAULT;
+    if (HistoryEvent.INCIDENT_DELETE.equals(eventType)) {
+      incidentState = IncidentState.DELETED;
+    } else if (HistoryEvent.INCIDENT_RESOLVE.equals(eventType)) {
+      incidentState = IncidentState.RESOLVED;
+    }
+    evt.setIncidentState(incidentState.getStateCode());
   }
 
 
@@ -226,6 +255,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return new HistoricFormPropertyEventEntity();
   }
 
+  protected HistoricIncidentEventEntity newIncidentEventEntity(Incident incident) {
+    return new HistoricIncidentEventEntity();
+  }
+
   protected HistoricProcessInstanceEventEntity loadProcessInstanceEventEntity(ExecutionEntity execution) {
     return newProcessInstanceEventEntity(execution);
   }
@@ -236,6 +269,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected HistoricTaskInstanceEventEntity loadTaskInstanceEvent(DelegateTask task) {
     return newTaskInstanceEventEntity(task);
+  }
+
+  protected HistoricIncidentEventEntity loadIncidentEvent(Incident incident) {
+    return newIncidentEventEntity(incident);
   }
 
   // Implementation ////////////////////////////////
@@ -449,6 +486,33 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setTaskId(taskId);
 
     return historicFormPropertyEntity;
+  }
+
+  // Incidents //////////////////////////////////
+
+  public HistoryEvent createHistoricIncidentCreateEvt(Incident incident) {
+    return createHistoricIncidentEvt(incident, HistoryEvent.INCIDENT_CREATE);
+  }
+
+  public HistoryEvent createHistoricIncidentResolveEvt(Incident incident) {
+    return createHistoricIncidentEvt(incident, HistoryEvent.INCIDENT_RESOLVE);
+  }
+
+  public HistoryEvent createHistoricIncidentDeleteEvt(Incident incident) {
+    return createHistoricIncidentEvt(incident, HistoryEvent.INCIDENT_DELETE);
+  }
+
+  protected HistoryEvent createHistoricIncidentEvt(Incident incident, String eventType) {
+    // create event
+    HistoricIncidentEventEntity evt = loadIncidentEvent(incident);
+    // initialize
+    initHistoricIncidentEvent(evt, incident, eventType);
+
+    if (!HistoryEvent.INCIDENT_CREATE.equals(eventType)) {
+      evt.setEndTime(ClockUtil.getCurrentTime());
+    }
+
+    return evt;
   }
 
 }

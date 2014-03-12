@@ -14,6 +14,7 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Group.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricActivityInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricDetail.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricIncident.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricProcessInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricStatistics.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricVariableInstance.xml" />

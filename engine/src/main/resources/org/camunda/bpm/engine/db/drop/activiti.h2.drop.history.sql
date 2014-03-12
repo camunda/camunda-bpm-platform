@@ -19,3 +19,4 @@ drop table ACT_HI_DETAIL if exists;
 drop table ACT_HI_COMMENT if exists;
 drop table ACT_HI_ATTACHMENT if exists;
 drop table ACT_HI_OP_LOG if exists;
+drop table ACT_HI_INCIDENT if exists;

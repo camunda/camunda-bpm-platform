@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.runtime.Incident;
 
 /**
  * <p>The producer for history events. The history event producer is
@@ -160,5 +161,13 @@ public interface HistoryEventProducer {
    * @return the history event
    */
   public HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, Object propertyValue, String taskId);
+
+  // Incidents //////////////////////////////////////////
+
+  public HistoryEvent createHistoricIncidentCreateEvt(Incident incident);
+
+  public HistoryEvent createHistoricIncidentResolveEvt(Incident incident);
+
+  public HistoryEvent createHistoricIncidentDeleteEvt(Incident incident);
 
 }

@@ -30,7 +30,7 @@ public class MessageEntity extends JobEntity {
   @Override
   public void execute(CommandContext commandContext) {
     super.execute(commandContext);
-    delete();
+    delete(true);
   }
 
   public String getRepeat() {

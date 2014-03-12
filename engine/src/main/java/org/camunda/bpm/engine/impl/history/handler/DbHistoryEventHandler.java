@@ -126,7 +126,8 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
   protected boolean isInitialEvent(String eventType) {
     return HistoryEvent.ACTIVITY_EVENT_TYPE_START.equals(eventType)
         || HistoryEvent.TASK_EVENT_TYPE_CREATE.equals(eventType)
-        || HistoryEvent.FORM_PROPERTY_UPDATE.equals(eventType);
+        || HistoryEvent.FORM_PROPERTY_UPDATE.equals(eventType)
+        || HistoryEvent.INCIDENT_CREATE.equals(eventType);
   }
 
   protected DbSqlSession getDbSqlSession() {

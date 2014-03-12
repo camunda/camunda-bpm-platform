@@ -137,6 +137,23 @@ create table ACT_HI_OP_LOG (
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
+create table ACT_HI_INCIDENT (
+  ID_ varchar(64) not null,
+  PROC_DEF_ID_ varchar(64),
+  PROC_INST_ID_ varchar(64),
+  EXECUTION_ID_ varchar(64),
+  CREATE_TIME_ timestamp not null,
+  END_TIME_ timestamp,
+  INCIDENT_MSG_ varchar(4000),
+  INCIDENT_TYPE_ varchar(255) not null,
+  ACTIVITY_ID_ varchar(255),
+  CAUSE_INCIDENT_ID_ varchar(64),
+  ROOT_CAUSE_INCIDENT_ID_ varchar(64),
+  CONFIGURATION_ varchar(255),
+  INCIDENT_STATE_ integer,
+  primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
 create index ACT_IDX_HI_PRO_INST_END on ACT_HI_PROCINST(END_TIME_);
 create index ACT_IDX_HI_PRO_I_BUSKEY on ACT_HI_PROCINST(BUSINESS_KEY_);
 create index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST(START_TIME_);

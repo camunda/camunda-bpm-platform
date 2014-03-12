@@ -106,3 +106,21 @@ UPDATE
 SET
     CACHED_ENT_STATE_ = 63;
 
+-- add new table ACT_HI_INCIDENT --
+
+create table ACT_HI_INCIDENT (
+  ID_ varchar(64) not null,
+  PROC_DEF_ID_ varchar(64),
+  PROC_INST_ID_ varchar(64),
+  EXECUTION_ID_ varchar(64),
+  CREATE_TIME_ timestamp not null,
+  END_TIME_ timestamp,
+  INCIDENT_MSG_ varchar(4000),
+  INCIDENT_TYPE_ varchar(255) not null,
+  ACTIVITY_ID_ varchar(255),
+  CAUSE_INCIDENT_ID_ varchar(64),
+  ROOT_CAUSE_INCIDENT_ID_ varchar(64),
+  CONFIGURATION_ varchar(255),
+  INCIDENT_STATE_ integer,
+  primary key (ID_)
+);
