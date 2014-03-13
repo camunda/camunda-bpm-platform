@@ -210,7 +210,7 @@ sans-serif;
   background-color:#fff
 }
 a{
-  color:#08c;
+  color: @link-color;
   text-decoration:none
 }
 a:hover,
@@ -2471,11 +2471,11 @@ table th[class*="span"],
   color:#fff;
   text-decoration:none;
   background-color:#0081c2;
-  background-image:-moz-linear-gradient(top, #08c, #0077b3);
-  background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#08c), to(#0077b3));
-  background-image:-webkit-linear-gradient(top, #08c, #0077b3);
-  background-image:-o-linear-gradient(top, #08c, #0077b3);
-  background-image:linear-gradient(to bottom, #08c, #0077b3);
+  background-image:-moz-linear-gradient(top,  @link-color, #0077b3);
+  background-image:-webkit-gradient(linear, 0 0, 0 100%, from( @link-color), to(#0077b3));
+  background-image:-webkit-linear-gradient(top,  @link-color, #0077b3);
+  background-image:-o-linear-gradient(top,  @link-color, #0077b3);
+  background-image:linear-gradient(to bottom,  @link-color, #0077b3);
   background-repeat:repeat-x;
   // filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);
 }
@@ -2485,11 +2485,11 @@ table th[class*="span"],
   color:#fff;
   text-decoration:none;
   background-color:#0081c2;
-  background-image:-moz-linear-gradient(top, #08c, #0077b3);
-  background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#08c), to(#0077b3));
-  background-image:-webkit-linear-gradient(top, #08c, #0077b3);
-  background-image:-o-linear-gradient(top, #08c, #0077b3);
-  background-image:linear-gradient(to bottom, #08c, #0077b3);
+  background-image:-moz-linear-gradient(top,  @link-color, #0077b3);
+  background-image:-webkit-gradient(linear, 0 0, 0 100%, from( @link-color), to(#0077b3));
+  background-image:-webkit-linear-gradient(top,  @link-color, #0077b3);
+  background-image:-o-linear-gradient(top,  @link-color, #0077b3);
+  background-image:linear-gradient(to bottom,  @link-color, #0077b3);
   background-repeat:repeat-x;
   outline:0;
   // filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);
@@ -2823,11 +2823,11 @@ input[type="button"].btn-block{
   text-shadow:0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color:#006dcc;
   *background-color:#04c;
-  background-image:-moz-linear-gradient(top, #08c, #04c);
-  background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#08c), to(#04c));
-  background-image:-webkit-linear-gradient(top, #08c, #04c);
-  background-image:-o-linear-gradient(top, #08c, #04c);
-  background-image:linear-gradient(to bottom, #08c, #04c);
+  background-image:-moz-linear-gradient(top,  @link-color, #04c);
+  background-image:-webkit-gradient(linear, 0 0, 0 100%, from( @link-color), to(#04c));
+  background-image:-webkit-linear-gradient(top,  @link-color, #04c);
+  background-image:-o-linear-gradient(top,  @link-color, #04c);
+  background-image:linear-gradient(to bottom,  @link-color, #04c);
   background-repeat:repeat-x;
   border-color:#04c #04c #002a80;
   border-color:rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
@@ -3033,7 +3033,7 @@ input[type="submit"].btn.btn-mini{
   box-shadow:none
 }
 .btn-link{
-  color:#08c;
+  color: @link-color;
   cursor:pointer;
   border-color:transparent;
   -webkit-border-radius:0;
@@ -3377,7 +3377,7 @@ inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
 .nav-list>.active>a:focus{
   color:#fff;
   text-shadow:0 -1px 0 rgba(0, 0, 0, 0.2);
-  background-color:#08c
+  background-color: @link-color
 }
 .nav-list [class^="icon-"],
 .nav-list [class*=" icon-"]{
@@ -3460,7 +3460,7 @@ inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
 .nav-pills>.active>a:hover,
 .nav-pills>.active>a:focus{
   color:#fff;
-  background-color:#08c
+  background-color: @link-color
 }
 .nav-stacked>li{
   float:none
@@ -3516,8 +3516,8 @@ inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
 }
 .nav .dropdown-toggle .caret{
   margin-top:6px;
-  border-top-color:#08c;
-  border-bottom-color:#08c
+  border-top-color: @link-color;
+  border-bottom-color: @link-color
 }
 .nav .dropdown-toggle:hover .caret,
 .nav .dropdown-toggle:focus .caret{
@@ -4731,7 +4731,7 @@ top .3s ease-out
 }
 a.thumbnail:hover,
 a.thumbnail:focus{
-  border-color:#08c;
+  border-color: @link-color;
   -webkit-box-shadow:0 1px 4px rgba(0,
 105, 214, 0.25);
   -moz-box-shadow:0 1px 4px rgba(0,
