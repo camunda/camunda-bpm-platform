@@ -21,7 +21,11 @@
         <a state-circle
            incidents="processInstance.incidents"
            ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
-        <span class="badge badge-warning badge-suspended" ng-show="processInstance.suspended" title="Currently suspended">
+        <span class="badge badge-warning badge-suspended"
+              ng-show="processInstance.suspended"
+              help
+              help-text="Currently suspended"
+              help-placement="left">
           <i class="icon-suspended white"></i>
         </span>
       </td>

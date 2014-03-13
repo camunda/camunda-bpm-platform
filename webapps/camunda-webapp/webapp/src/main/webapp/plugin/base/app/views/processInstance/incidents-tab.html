@@ -16,16 +16,20 @@
       <td>
         <div>
           <span ng-show="incident.incidentType === 'failedJob'">
-            <a href="{{ getJobStacktraceUrl(incident) }}" target="_blank" ng-show="incident.rootCauseIncidentMessage"
+            <a href="{{ getJobStacktraceUrl(incident) }}"
+               target="_blank"
+               ng-show="incident.rootCauseIncidentMessage"
                help
                help-text="Open stacktrace in new window"
-               help-placement="'right'">
+               help-placement="top">
               {{ incident.rootCauseIncidentMessage }}
             </a>
-            <a href="{{ getJobStacktraceUrl(incident) }}" target="_blank" ng-hide="incident.rootCauseIncidentMessage"
+            <a href="{{ getJobStacktraceUrl(incident) }}"
+               target="_blank"
+               ng-hide="incident.rootCauseIncidentMessage"
                help
                help-text="Open stacktrace in new window"
-               help-placement="'right'">
+               help-placement="top">
               <i>Message is null.</i>
             </a>
           </span>
@@ -70,7 +74,7 @@
         <a class="btn action-button" ng-click="openJobRetryDialog(incident)" ng-show="incident.incidentType === 'failedJob' && incident.configuration"
            help
            help-text="Increment Number of Retries of Failed Job"
-           help-placement="'left'">
+           help-placement="left">
           <i class="icon-repeat"></i>
         </a>
       </td>
