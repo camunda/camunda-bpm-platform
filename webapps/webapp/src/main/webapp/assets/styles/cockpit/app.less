@@ -29,6 +29,38 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
+  .badge {
+    font-size: 12px;
+    height: 14px;
+    line-height: 14px;
+    padding: 1px 8px;
+    text-shadow: none;
+    border-width: 1px;
+    border-style: solid;
+
+    background-color: @running-color;
+    border-color: @running-darker;
+    color: @running-darker;
+
+    &.badge-important {
+      background-color: @important-color;
+      border-color: @important-darker;
+      color: @important-darker;
+    }
+
+    &.activity-instance-completed {
+      background-color: @completed-color;
+      border-color: @completed-darker;
+      color: @completed-darker;
+    }
+
+    &.activity-instance-canceled {
+      background-color: @canceled-color;
+      border-color: @canceled-darker;
+      color: @canceled-darker;
+    }
+  }
 }
 
 .activity-top-right-position,
@@ -45,24 +77,10 @@
   bottom: -0.65em;
 }
 
-.activity-instance-completed {
-  text-shadow: -1px -1px 0 #b3b3b3, 1px 1px 0 #e9e9e9;
-  background: url('../../img/stripe.png') #ddd;
-  border: 1px solid #000000;
-  padding: 1px 8px;
-}
-
-.activity-instance-canceled {
-  background-color: #ffffff;
-  color: #000000;
-  border: 1px solid #000000;
-  padding: 1px 8px;
-}
-
 .activity-bottom-left-position {
-   position: absolute;
-   left: -0.9em;
-   bottom: -0.65em
+  position: absolute;
+  left: -0.9em;
+  bottom: -0.65em;
 }
 
 /* IE Highlight Fix */
@@ -673,17 +691,18 @@ textarea.variable-type-string {
     vertical-align: middle;
     padding: 4px 8px;
     line-height: 1;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
+    background-color: @canceled-color;
+    border: 1px solid @canceled-darker;
     border-radius: 4px;
 
     &.activity-instance-completed {
-      border: 1px solid #000000;
+      background-color: @completed-color;
+      border: 1px solid @completed-darker;
     }
 
     &.activity-instance-running {
-      background-color: #999999;
-      border-color: #999999;
+      background-color: @running-color;
+      border-color: @running-darker;
     }
 
   }
@@ -698,11 +717,29 @@ textarea.variable-type-string {
       vertical-align: sub;
     }
   }
+
   .quick-filter {
     min-height: 40px;
     position: relative;
     max-width: 100%;
     margin-top: 3px;
+  }
+
+  label {
+    background-image: none;
+    &.running {
+
+      background-color: @running-color;
+      border-color: @running-darker;
+    }
+    &.completed {
+      background-color: @completed-color;
+      border-color: @completed-darker;
+    }
+    &.canceled {
+      background-color: @canceled-color;
+      border-color: @canceled-darker;
+    }
   }
 
   .name-filter {
@@ -723,7 +760,7 @@ textarea.variable-type-string {
     input {
       line-height: 20px;
       height: 26px;
-      
+
       -moz-box-sizing: border-box;
            box-sizing: border-box;
     }

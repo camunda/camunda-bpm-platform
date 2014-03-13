@@ -12,7 +12,23 @@
 
 // slightly darker variant
 // @main-darker: #9c3930;
-@main-darker:   darken(@main-color, 5%);
+@main-darker:   darken(@main-color, 25%);
+
+@link-color: #08c;
+
+@important-color: #b94a48;
+@important-darker: darken(@important-color, 45%);
+
+
+// process state colors
+@running-color: desaturate(lighten(@link-color, 25%), 40%);
+@running-darker: darken(@running-color, 45%);
+
+@completed-color: #bbb;
+@completed-darker: darken(@completed-color, 45%);
+
+@canceled-color: desaturate(lighten(#f89406, 20%), 25%);
+@canceled-darker: darken(@canceled-color, 45%);
 
 // Logos -------------------------------------------------------------
 
@@ -21,3 +37,4 @@
 @logo-tasklist: '../../img/tasklist/app-logo.png';
 
 @logo-cockpit:  '../../img/cockpit/app-logo.png';
+
