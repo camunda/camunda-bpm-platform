@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,8 +20,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
+import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
@@ -63,13 +63,16 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   }
 
   private String processInstanceBusinessKey;
+  private String processInstanceBusinessKeyLike;
   private String processDefinitionKey;
   private String processDefinitionId;
   private String executionId;
   private String[] activityInstanceIdIn;
   private String processDefinitionName;
+  private String processDefinitionNameLike;
   private String processInstanceId;
   private String assignee;
+  private String assigneeLike;
   private String candidateGroup;
   private String candidateUser;
   private String taskDefinitionKey;
@@ -103,11 +106,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   private List<VariableQueryParameterDto> taskVariables;
   private List<VariableQueryParameterDto> processVariables;
-  
+
   public TaskQueryDto() {
-    
+
   }
-  
+
   public TaskQueryDto(MultivaluedMap<String, String> queryParameters) {
     super(queryParameters);
   }
@@ -115,6 +118,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("processInstanceBusinessKey")
   public void setProcessInstanceBusinessKey(String businessKey) {
     this.processInstanceBusinessKey = businessKey;
+  }
+
+  @CamundaQueryParam("processInstanceBusinessKeyLike")
+  public void setProcessInstanceBusinessKeyLike(String businessKeyLike) {
+    this.processInstanceBusinessKeyLike = businessKeyLike;
   }
 
   @CamundaQueryParam("processDefinitionKey")
@@ -132,14 +140,19 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.executionId = executionId;
   }
 
-  @CamundaQueryParam(value="activityInstanceIdIn", converter = StringArrayConverter.class)  
+  @CamundaQueryParam(value="activityInstanceIdIn", converter = StringArrayConverter.class)
   public void setActivityInstanceIdIn(String[] activityInstanceIdIn) {
     this.activityInstanceIdIn = activityInstanceIdIn;
   }
-  
+
   @CamundaQueryParam("processDefinitionName")
   public void setProcessDefinitionName(String processDefinitionName) {
     this.processDefinitionName = processDefinitionName;
+  }
+
+  @CamundaQueryParam("processDefinitionNameLike")
+  public void setProcessDefinitionNameLike(String processDefinitionNameLike) {
+    this.processDefinitionNameLike = processDefinitionNameLike;
   }
 
   @CamundaQueryParam("processInstanceId")
@@ -150,6 +163,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("assignee")
   public void setAssignee(String assignee) {
     this.assignee = assignee;
+  }
+
+  @CamundaQueryParam("assigneeLike")
+  public void setAssigneeLike(String assigneeLike) {
+    this.assigneeLike = assigneeLike;
   }
 
   @CamundaQueryParam("candidateGroup")
@@ -221,7 +239,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public void setUnassigned(Boolean unassigned) {
     this.unassigned = unassigned;
   }
-  
+
   @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
   public void setActive(Boolean active) {
     this.active = active;
@@ -312,6 +330,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (processInstanceBusinessKey != null) {
       query.processInstanceBusinessKey(processInstanceBusinessKey);
     }
+    if (processInstanceBusinessKeyLike != null) {
+      query.processInstanceBusinessKeyLike(processInstanceBusinessKeyLike);
+    }
     if (processDefinitionKey != null) {
       query.processDefinitionKey(processDefinitionKey);
     }
@@ -323,15 +344,21 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (activityInstanceIdIn != null && activityInstanceIdIn.length > 0) {
       query.activityInstanceIdIn(activityInstanceIdIn);
-    }    
+    }
     if (processDefinitionName != null) {
       query.processDefinitionName(processDefinitionName);
+    }
+    if (processDefinitionNameLike != null) {
+      query.processDefinitionNameLike(processDefinitionNameLike);
     }
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
     }
     if (assignee != null) {
       query.taskAssignee(assignee);
+    }
+    if (assigneeLike != null) {
+      query.taskAssigneeLike(assigneeLike);
     }
     if (candidateGroup != null) {
       query.taskCandidateGroup(candidateGroup);
@@ -425,6 +452,16 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.taskVariableValueEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
           query.taskVariableValueNotEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {
+          query.taskVariableValueGreaterThan(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OR_EQUALS_OPERATOR_NAME)) {
+          query.taskVariableValueGreaterThanOrEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OPERATOR_NAME)) {
+          query.taskVariableValueLessThan(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OR_EQUALS_OPERATOR_NAME)) {
+          query.taskVariableValueLessThanOrEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
+          query.taskVariableValueLike(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid task variable comparator specified: " + op);
         }
@@ -442,9 +479,20 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.processVariableValueEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
           query.processVariableValueNotEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {
+          query.processVariableValueGreaterThan(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OR_EQUALS_OPERATOR_NAME)) {
+          query.processVariableValueGreaterThanOrEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OPERATOR_NAME)) {
+          query.processVariableValueLessThan(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OR_EQUALS_OPERATOR_NAME)) {
+          query.processVariableValueLessThanOrEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
+          query.processVariableValueLike(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid process variable comparator specified: " + op);
         }
+
       }
     }
   }
