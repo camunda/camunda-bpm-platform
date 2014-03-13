@@ -162,7 +162,7 @@
   </select>
   
   <select id="selectHistoricDetailCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultType="long">
-    select count(RES.*)
+    select count(*)
     <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
   </select>
   
