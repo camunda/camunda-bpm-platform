@@ -29,37 +29,43 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
 
-  .badge {
-    font-size: 12px;
-    height: 14px;
-    line-height: 14px;
-    padding: 1px 8px;
-    text-shadow: none;
-    border-width: 1px;
-    border-style: solid;
+.badge {
+  font-size: 12px;
+  height: 14px;
+  line-height: 14px;
+  padding: 1px 8px;
+  text-shadow: none;
+  border-width: 1px;
+  border-style: solid;
 
-    background-color: @running-color;
-    border-color: @running-darker;
-    color: @running-darker;
+  background-color: @running-color;
+  border-color: @running-darker;
+  color: @running-darker;
 
-    &.badge-important {
-      background-color: @important-color;
-      border-color: @important-darker;
-      color: @important-darker;
-    }
+  &.badge-warning {
+    background-color: @warning-color;
+    border-color: @warning-darker;
+    color: @warning-darker;
+  }
 
-    &.activity-instance-completed {
-      background-color: @completed-color;
-      border-color: @completed-darker;
-      color: @completed-darker;
-    }
+  &.badge-important {
+    background-color: @important-color;
+    border-color: @important-darker;
+    color: @important-darker;
+  }
 
-    &.activity-instance-canceled {
-      background-color: @canceled-color;
-      border-color: @canceled-darker;
-      color: @canceled-darker;
-    }
+  &.activity-instance-completed {
+    background-color: @completed-color;
+    border-color: @completed-darker;
+    color: @completed-darker;
+  }
+
+  &.activity-instance-canceled {
+    background-color: @canceled-color;
+    border-color: @canceled-darker;
+    color: @canceled-darker;
   }
 }
 
@@ -466,10 +472,6 @@ a.expand-collapse {
     right: 0;
   }
 
-  .name {
-    font-weight: bolder;
-  }
-
   &:last-child {
     border-style: none;
   }
@@ -708,12 +710,22 @@ textarea.variable-type-string {
   }
 }
 
-.quick-filters {
+.quick-filters,
+.state-filter,
+.version-filter {
+  .name {
+    font-weight: bolder;
+  }
+}
+
+.quick-filters,
+.state-filter {
   .btn {
     // [type="checkbox"] {
     //   display: none;
     // }
-    input, i {
+    input,
+    i {
       vertical-align: sub;
     }
   }
@@ -728,11 +740,11 @@ textarea.variable-type-string {
   label {
     background-image: none;
     &.running {
-
       background-color: @running-color;
       border-color: @running-darker;
     }
-    &.completed {
+    &.completed,
+    &.finished {
       background-color: @completed-color;
       border-color: @completed-darker;
     }
@@ -750,6 +762,7 @@ textarea.variable-type-string {
       max-width: 100%;
     }
   }
+
   .input-append {
     margin: 0;
     width: auto;

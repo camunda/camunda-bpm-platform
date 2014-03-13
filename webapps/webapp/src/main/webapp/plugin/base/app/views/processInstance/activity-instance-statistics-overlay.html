@@ -1,6 +1,15 @@
 <!-- # CE - src/main/webapp/plugin/base/app/views/processInstnace/activity-instance-statistics-overlay.html -->
-<span class="activity-bottom-left-position" ng-show="activityInstanceStatistics">
-  <span class="badge" ng-show="activityInstanceStatistics.instances && activityInstanceStatistics.instances.length">{{ activityInstanceStatistics.instances.length | abbreviateNumber }}</span>
-  <span class="badge badge-important" ng-show="activityInstanceStatistics.incidents && activityInstanceStatistics.incidents.length">!</span>
+<span class="activity-bottom-left-position"
+      ng-show="activityInstanceStatistics">
+  <span class="badge"
+        help
+        help-text="Activity instances"
+        help-placement="top"
+        ng-show="activityInstanceStatistics.instances && activityInstanceStatistics.instances.length">{{ activityInstanceStatistics.instances.length | abbreviateNumber }}</span>
+  <span class="badge badge-important"
+        help
+        help-text="Incidents on activity"
+        help-placement="top"
+        ng-show="activityInstanceStatistics.incidents && activityInstanceStatistics.incidents.length">!</span>
 </span>
 <!-- / CE - src/main/webapp/plugin/base/app/views/processInstnace/activity-instance-statistics-overlay.html -->

@@ -94,7 +94,6 @@ ngDefine('cockpit.services.page', ['angular'], function(module, angular) {
        * @return {angular.Service} this  - the service
        */
       breadcrumbsInsertAt: function(index, crumb) {
-        console.info('breadcrumbsInsertAt', index, crumb);
         page.breadcrumbs = page.breadcrumbs.slice(0, index)
           .concat(angular.isArray(crumb) ? crumb : [crumb])
           .concat(page.breadcrumbs.slice(index + 1));
