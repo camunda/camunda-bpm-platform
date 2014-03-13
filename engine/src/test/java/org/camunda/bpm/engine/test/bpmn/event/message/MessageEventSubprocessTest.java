@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -108,11 +109,14 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
     assertEquals("eventSubProcess-end", collectedEvents.get(7));
 
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
-//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
+    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
+//    SEE: CAM-1755
+//      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
+    }
 
   }
 
@@ -142,13 +146,14 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
     assertEquals("eventSubProcess-end", collectedEvents.get(7));
 
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
-    // SEE: CAM-1755
-//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
-
+    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
+//    SEE: CAM-1755
+//     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
+    }
   }
 
   @Deployment
@@ -173,13 +178,15 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
     assertEquals("eventSubProcess-end", collectedEvents.get(7));
 
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
-    // SEE: CAM-1755
-//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("subProcess").finished().count());
+    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
+//    SEE: CAM-1755
+//      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("subProcess").finished().count());
+    }
 
   }
 
@@ -209,15 +216,15 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
     assertEquals("eventSubProcess-end", collectedEvents.get(7));
 
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
-
-    // SEE: CAM-1755
-//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
-
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("subProcess").finished().count());
+    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
+//    SEE: CAM-1755
+//      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("subProcess").finished().count());
+    }
 
   }
 
@@ -244,12 +251,14 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
     assertEquals("eventSubProcess-end", collectedEvents.get(7));
 
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").canceled().count());
-
-    // SEE: CAM-1755
-//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
+    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
+      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").canceled().count());
+//    SEE: CAM-1755
+//      assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
+    }
 
   }
 
