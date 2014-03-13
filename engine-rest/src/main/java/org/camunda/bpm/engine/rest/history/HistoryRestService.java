@@ -43,4 +43,7 @@ public interface HistoryRestService {
   @Path(HistoricTaskInstanceRestService.PATH)
   HistoricTaskInstanceRestService getTaskInstanceService();
 
+  @Path(HistoricIncidentRestService.PATH)
+  HistoricIncidentRestService getIncidentService();
+
 }

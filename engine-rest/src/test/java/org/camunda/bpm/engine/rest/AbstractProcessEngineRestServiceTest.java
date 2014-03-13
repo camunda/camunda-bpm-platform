@@ -33,6 +33,8 @@ import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
+import org.camunda.bpm.engine.history.HistoricIncident;
+import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -51,6 +53,8 @@ import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.IncidentQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -76,6 +80,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String VARIABLE_INSTANCE_URL = SINGLE_ENGINE_URL + "/variable-instance";
   protected static final String USER_URL = SINGLE_ENGINE_URL + "/user";
   protected static final String GROUP_URL = SINGLE_ENGINE_URL + "/group";
+  protected static final String INCIDENT_URL = SINGLE_ENGINE_URL + "/incident";
   protected static final String AUTHORIZATION_URL = SINGLE_ENGINE_URL + AuthorizationRestService.PATH;
   protected static final String AUTHORIZATION_CHECK_URL = AUTHORIZATION_URL + "/check";
 
@@ -88,6 +93,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String HISTORY_ACTIVITY_STATISTICS_URL = HISTORY_URL + "/process-definition/{id}/statistics";
   protected static final String HISTORY_DETAIL_URL = HISTORY_URL + "/detail";
   protected static final String HISTORY_TASK_INSTANCE_URL = HISTORY_URL + "/task";
+  protected static final String HISTORY_INCIDENT_URL = HISTORY_URL + "/incident";
 
   protected String EXAMPLE_ENGINE_NAME = "anEngineName";
 
@@ -123,6 +129,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createExecutionMock();
     createVariableInstanceMock();
     createJobDefinitionMock();
+    createIncidentMock();
 
     createHistoricActivityInstanceMock();
     createHistoricProcessInstanceMock();
@@ -130,6 +137,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createHistoricActivityStatisticsMock();
     createHistoricDetailMock();
     createHistoricTaskInstanceMock();
+    createHistoricIncidentMock();
   }
 
 
@@ -210,6 +218,13 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(mockManagementService.createJobDefinitionQuery()).thenReturn(mockJobDefinitionQuery);
   }
 
+  private void createIncidentMock() {
+    IncidentQuery mockIncidentQuery = mock(IncidentQuery.class);
+    List<Incident> incidents = MockProvider.createMockIncidents();
+    when(mockIncidentQuery.list()).thenReturn(incidents);
+    when(mockRuntimeService.createIncidentQuery()).thenReturn(mockIncidentQuery);
+  }
+
   private void createHistoricActivityInstanceMock() {
     List<HistoricActivityInstance> activities = new ArrayList<HistoricActivityInstance>();
     HistoricActivityInstance mockInstance = MockProvider.createMockHistoricActivityInstance();
@@ -262,6 +277,13 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     HistoricTaskInstanceQuery query = mock(HistoricTaskInstanceQuery.class);
     when(mockHistoryService.createHistoricTaskInstanceQuery()).thenReturn(query);
     when(query.list()).thenReturn(tasks);
+  }
+
+  private void createHistoricIncidentMock() {
+    HistoricIncidentQuery mockHistoricIncidentQuery = mock(HistoricIncidentQuery.class);
+    List<HistoricIncident> historicIncidents = MockProvider.createMockHistoricIncidents();
+    when(mockHistoricIncidentQuery.list()).thenReturn(historicIncidents);
+    when(mockHistoryService.createHistoricIncidentQuery()).thenReturn(mockHistoricIncidentQuery);
   }
 
   @Test
@@ -495,6 +517,34 @@ public abstract class AbstractProcessEngineRestServiceTest extends
         .get(HISTORY_TASK_INSTANCE_URL);
 
     verify(mockHistoryService).createHistoricTaskInstanceQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testHistoryServiceEngineAccess_Incident() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(INCIDENT_URL);
+
+    verify(mockRuntimeService).createIncidentQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testHistoryServiceEngineAccess_HistoricIncident() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORY_INCIDENT_URL);
+
+    verify(mockHistoryService).createHistoricIncidentQuery();
     verifyZeroInteractions(processEngine);
   }
 }

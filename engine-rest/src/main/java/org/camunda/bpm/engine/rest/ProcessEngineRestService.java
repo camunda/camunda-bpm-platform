@@ -64,6 +64,9 @@ public interface ProcessEngineRestService {
   @Path("/{name}" + AuthorizationRestService.PATH)
   AuthorizationRestService getAuthorizationRestService(@PathParam("name") String engineName);
 
+  @Path("/{name}" + IncidentRestService.PATH)
+  IncidentRestService getIncidentService(@PathParam("name") String engineName);
+
   @Path("/{name}" + HistoryRestService.PATH)
   HistoryRestService getHistoryRestService(@PathParam("name") String engineName);
 

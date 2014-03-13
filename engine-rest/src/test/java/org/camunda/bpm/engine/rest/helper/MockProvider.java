@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
+import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -58,6 +59,7 @@ import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -111,6 +113,7 @@ public abstract class MockProvider {
 
   // process instance
   public static final String EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY = "aKey";
+  public static final String EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY_LIKE = "aKeyLike";
   public static final String EXAMPLE_PROCESS_INSTANCE_ID = "aProcInstId";
   public static final String ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID = "anotherId";
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED = false;
@@ -119,6 +122,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_PROCESS_INSTANCE_ID_LIST_WITH_DUP = EXAMPLE_PROCESS_INSTANCE_ID + "," + ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID + "," + EXAMPLE_PROCESS_INSTANCE_ID;
   public static final String EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID = "aNonExistentProcInstId";
   public static final String EXAMPLE_PROCESS_INSTANCE_ID_LIST_WITH_NONEXISTENT_ID = EXAMPLE_PROCESS_INSTANCE_ID + "," + EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID;
+
 
   // variable instance
   public static final String EXAMPLE_VARIABLE_INSTANCE_NAME = "aVariableInstanceName";
@@ -143,6 +147,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcDefId";
   public static final String NON_EXISTING_PROCESS_DEFINITION_ID = "aNonExistingProcDefId";
   public static final String EXAMPLE_PROCESS_DEFINITION_NAME = "aName";
+  public static final String EXAMPLE_PROCESS_DEFINITION_NAME_LIKE = "aNameLike";
   public static final String EXAMPLE_PROCESS_DEFINITION_KEY = "aKey";
   public static final String NON_EXISTING_PROCESS_DEFINITION_KEY = "aNonExistingKey";
   public static final String EXAMPLE_PROCESS_DEFINITION_CATEGORY = "aCategory";
@@ -173,9 +178,6 @@ public abstract class MockProvider {
   public static final long ANOTHER_EXAMPLE_FINISHED_LONG = 128;
   public static final long ANOTHER_EXAMPLE_CANCELED_LONG = 129;
   public static final long ANOTHER_EXAMPLE_COMPLETE_SCOPE_LONG = 130;
-
-  public static final String EXAMPLE_INCIDENT_TYPE = "anIncidentType";
-  public static final int EXAMPLE_INCIDENT_COUNT = 1;
 
   public static final int ANOTHER_EXAMPLE_FAILED_JOBS = 43;
   public static final int ANOTHER_EXAMPLE_INSTANCES = 124;
@@ -320,6 +322,38 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_TASK_INST_DUE_DATE = "2014-01-01T00:00:00";
   public static final String EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE = "2014-01-01T00:00:00";
   public static final String EXAMPLE_HISTORIC_TASK_INST_PARENT_TASK_ID = "aParentTaskId";
+
+  // Incident
+  public static final String EXAMPLE_INCIDENT_ID = "anIncidentId";
+  public static final String EXAMPLE_INCIDENT_TIMESTAMP = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_INCIDENT_TYPE = "anIncidentType";
+  public static final String EXAMPLE_INCIDENT_EXECUTION_ID = "anExecutionId";
+  public static final String EXAMPLE_INCIDENT_ACTIVITY_ID = "anActivityId";
+  public static final String EXAMPLE_INCIDENT_PROC_INST_ID = "aProcInstId";
+  public static final String EXAMPLE_INCIDENT_PROC_DEF_ID = "aProcDefId";
+  public static final String EXAMPLE_INCIDENT_CAUSE_INCIDENT_ID = "aCauseIncidentId";
+  public static final String EXAMPLE_INCIDENT_ROOT_CAUSE_INCIDENT_ID = "aRootCauseIncidentId";
+  public static final String EXAMPLE_INCIDENT_CONFIGURATION = "aConfiguration";
+  public static final String EXAMPLE_INCIDENT_MESSAGE = "anIncidentMessage";
+
+  public static final int EXAMPLE_INCIDENT_COUNT = 1;
+
+  // Historic Incident
+  public static final String EXAMPLE_HIST_INCIDENT_ID = "anIncidentId";
+  public static final String EXAMPLE_HIST_INCIDENT_CREATE_TIME = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HIST_INCIDENT_END_TIME = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HIST_INCIDENT_TYPE = "anIncidentType";
+  public static final String EXAMPLE_HIST_INCIDENT_EXECUTION_ID = "anExecutionId";
+  public static final String EXAMPLE_HIST_INCIDENT_ACTIVITY_ID = "anActivityId";
+  public static final String EXAMPLE_HIST_INCIDENT_PROC_INST_ID = "aProcInstId";
+  public static final String EXAMPLE_HIST_INCIDENT_PROC_DEF_ID = "aProcDefId";
+  public static final String EXAMPLE_HIST_INCIDENT_CAUSE_INCIDENT_ID = "aCauseIncidentId";
+  public static final String EXAMPLE_HIST_INCIDENT_ROOT_CAUSE_INCIDENT_ID = "aRootCauseIncidentId";
+  public static final String EXAMPLE_HIST_INCIDENT_CONFIGURATION = "aConfiguration";
+  public static final String EXAMPLE_HIST_INCIDENT_MESSAGE = "anIncidentMessage";
+  public static final boolean EXAMPLE_HIST_INCIDENT_STATE_OPEN = false;
+  public static final boolean EXAMPLE_HIST_INCIDENT_STATE_DELETED = false;
+  public static final boolean EXAMPLE_HIST_INCIDENT_STATE_RESOLVED = true;
 
   // tasks
   public static Task createMockTask() {
@@ -1047,6 +1081,62 @@ public abstract class MockProvider {
   public static List<HistoricTaskInstance> createMockHistoricTaskInstances() {
     List<HistoricTaskInstance> entries = new ArrayList<HistoricTaskInstance>();
     entries.add(createMockHistoricTaskInstance());
+    return entries;
+  }
+
+  // Incident ///////////////////////////////////////
+
+  public static Incident createMockIncident() {
+    Incident incident = mock(Incident.class);
+
+    when(incident.getId()).thenReturn(EXAMPLE_INCIDENT_ID);
+    when(incident.getIncidentTimestamp()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_INCIDENT_TIMESTAMP).toDate());
+    when(incident.getIncidentType()).thenReturn(EXAMPLE_INCIDENT_TYPE);
+    when(incident.getExecutionId()).thenReturn(EXAMPLE_INCIDENT_EXECUTION_ID);
+    when(incident.getActivityId()).thenReturn(EXAMPLE_INCIDENT_ACTIVITY_ID);
+    when(incident.getProcessInstanceId()).thenReturn(EXAMPLE_INCIDENT_PROC_INST_ID);
+    when(incident.getProcessDefinitionId()).thenReturn(EXAMPLE_INCIDENT_PROC_DEF_ID);
+    when(incident.getCauseIncidentId()).thenReturn(EXAMPLE_INCIDENT_CAUSE_INCIDENT_ID);
+    when(incident.getRootCauseIncidentId()).thenReturn(EXAMPLE_INCIDENT_ROOT_CAUSE_INCIDENT_ID);
+    when(incident.getConfiguration()).thenReturn(EXAMPLE_INCIDENT_CONFIGURATION);
+    when(incident.getIncidentMessage()).thenReturn(EXAMPLE_INCIDENT_MESSAGE);
+
+    return incident;
+  }
+
+  public static List<Incident> createMockIncidents() {
+    List<Incident> entries = new ArrayList<Incident>();
+    entries.add(createMockIncident());
+    return entries;
+  }
+
+  // Historic Incident ///////////////////////////////////////
+
+  public static HistoricIncident createMockHistoricIncident() {
+    HistoricIncident incident = mock(HistoricIncident.class);
+
+    when(incident.getId()).thenReturn(EXAMPLE_HIST_INCIDENT_ID);
+    when(incident.getCreateTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HIST_INCIDENT_CREATE_TIME).toDate());
+    when(incident.getEndTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HIST_INCIDENT_END_TIME).toDate());
+    when(incident.getIncidentType()).thenReturn(EXAMPLE_HIST_INCIDENT_TYPE);
+    when(incident.getExecutionId()).thenReturn(EXAMPLE_HIST_INCIDENT_EXECUTION_ID);
+    when(incident.getActivityId()).thenReturn(EXAMPLE_HIST_INCIDENT_ACTIVITY_ID);
+    when(incident.getProcessInstanceId()).thenReturn(EXAMPLE_HIST_INCIDENT_PROC_INST_ID);
+    when(incident.getProcessDefinitionId()).thenReturn(EXAMPLE_HIST_INCIDENT_PROC_DEF_ID);
+    when(incident.getCauseIncidentId()).thenReturn(EXAMPLE_HIST_INCIDENT_CAUSE_INCIDENT_ID);
+    when(incident.getRootCauseIncidentId()).thenReturn(EXAMPLE_HIST_INCIDENT_ROOT_CAUSE_INCIDENT_ID);
+    when(incident.getConfiguration()).thenReturn(EXAMPLE_HIST_INCIDENT_CONFIGURATION);
+    when(incident.getIncidentMessage()).thenReturn(EXAMPLE_HIST_INCIDENT_MESSAGE);
+    when(incident.isOpen()).thenReturn(EXAMPLE_HIST_INCIDENT_STATE_OPEN);
+    when(incident.isDeleted()).thenReturn(EXAMPLE_HIST_INCIDENT_STATE_DELETED);
+    when(incident.isResolved()).thenReturn(EXAMPLE_HIST_INCIDENT_STATE_RESOLVED);
+
+    return incident;
+  }
+
+  public static List<HistoricIncident> createMockHistoricIncidents() {
+    List<HistoricIncident> entries = new ArrayList<HistoricIncident>();
+    entries.add(createMockHistoricIncident());
     return entries;
   }
 }

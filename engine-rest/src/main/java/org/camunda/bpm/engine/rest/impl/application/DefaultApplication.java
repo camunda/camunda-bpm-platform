@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.impl.AuthorizationRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ExecutionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.GroupRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.IdentityRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.IncidentRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.JobDefinitionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.JobRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.MessageRestServiceImpl;
@@ -63,6 +64,7 @@ public class DefaultApplication extends Application {
     classes.add(IdentityRestServiceImpl.class);
     classes.add(MessageRestServiceImpl.class);
     classes.add(JobDefinitionRestServiceImpl.class);
+    classes.add(IncidentRestServiceImpl.class);
     classes.add(JobRestServiceImpl.class);
     classes.add(ExecutionRestServiceImpl.class);
     classes.add(VariableInstanceRestServiceImpl.class);
