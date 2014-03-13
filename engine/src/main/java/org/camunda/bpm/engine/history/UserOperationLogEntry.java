@@ -50,6 +50,7 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_DELETE = "Delete";
   public static String OPERATION_TYPE_RESOLVE = "Resolve";
   public static String OPERATION_TYPE_SET_OWNER = "SetOwner";
+  public static String OPERATION_TYPE_SET_PRIORITY = "SetPriority";
   public static String OPERATION_TYPE_UPDATE = "Update";
   public static String OPERATION_TYPE_ADD_USER_LINK = "AddUserLink";
   public static String OPERATION_TYPE_DELETE_USER_LINK = "DeleteUserLink";

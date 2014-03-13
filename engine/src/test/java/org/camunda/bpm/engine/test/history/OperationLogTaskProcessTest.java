@@ -12,16 +12,8 @@
  */
 package org.camunda.bpm.engine.test.history;
 
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ASSIGN;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_COMPLETE;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELEGATE;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_RESOLVE;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_OWNER;
-import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE;
-import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DELEGATION;
-import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DELETE;
-import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.*;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.*;
 
 import java.util.HashMap;
 
@@ -96,6 +88,38 @@ public class OperationLogTaskProcessTest extends PluggableProcessEngineTestCase 
     assertEquals("icke", change.getNewValue());
 
     completeTestProcess();
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testSetPriority() {
+    startTestProcess();
+
+    // then: set the priority of the task to 10
+    taskService.setPriority(task.getId(), 10);
+
+    // expect: one entry for the priority update
+    UserOperationLogQuery query = queryOperationDetails(OPERATION_TYPE_SET_PRIORITY);
+    assertEquals(1, query.count());
+
+    // assert: correct priority set
+    UserOperationLogEntry userOperationLogEntry = query.singleResult();
+    assertEquals(PRIORITY, userOperationLogEntry.getProperty());
+    // note: 50 is the default task priority
+    assertEquals(50, Integer.parseInt(userOperationLogEntry.getOrgValue()));
+    assertEquals(10, Integer.parseInt(userOperationLogEntry.getNewValue()));
+
+    // then: set priority again
+    taskService.setPriority(task.getId(), 75);
+
+    // expect: one entry for the priority update
+    query = queryOperationDetails(OPERATION_TYPE_SET_PRIORITY);
+    assertEquals(2, query.count());
+
+    // assert: correct priority set
+    userOperationLogEntry = query.orderByTimestamp().asc().list().get(1);
+    assertEquals(PRIORITY, userOperationLogEntry.getProperty());
+    assertEquals(10, Integer.parseInt(userOperationLogEntry.getOrgValue()));
+    assertEquals(75, Integer.parseInt(userOperationLogEntry.getNewValue()));
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})

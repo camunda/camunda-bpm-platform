@@ -49,16 +49,17 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     createLogEntries();
 
     // expect: all entries can be fetched
-    assertEquals(16, query().count());
+    assertEquals(17, query().count());
 
     // entity type
-    assertEquals(10, query().entityType(ENTITY_TYPE_TASK).count());
+    assertEquals(11, query().entityType(ENTITY_TYPE_TASK).count());
     assertEquals(4, query().entityType(ENTITY_TYPE_IDENTITY_LINK).count());
     assertEquals(2, query().entityType(ENTITY_TYPE_ATTACHMENT).count());
     assertEquals(0, query().entityType("unknown entity type").count());
 
     // operation type
     assertEquals(1, query().operationType(OPERATION_TYPE_CREATE).count());
+    assertEquals(1, query().operationType(OPERATION_TYPE_SET_PRIORITY).count());
     assertEquals(4, query().operationType(OPERATION_TYPE_UPDATE).count());
     assertEquals(1, query().operationType(OPERATION_TYPE_ADD_USER_LINK).count());
     assertEquals(1, query().operationType(OPERATION_TYPE_DELETE_USER_LINK).count());
@@ -68,16 +69,16 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query().operationType(OPERATION_TYPE_DELETE_ATTACHMENT).count());
 
     // process and execution reference
-    assertEquals(10, query().processDefinitionId(process.getProcessDefinitionId()).count());
-    assertEquals(10, query().processInstanceId(process.getId()).count());
-    assertEquals(10, query().executionId(execution.getId()).count());
+    assertEquals(11, query().processDefinitionId(process.getProcessDefinitionId()).count());
+    assertEquals(11, query().processInstanceId(process.getId()).count());
+    assertEquals(11, query().executionId(execution.getId()).count());
 
     // task reference
-    assertEquals(10, query().taskId(processTaskId).count());
+    assertEquals(11, query().taskId(processTaskId).count());
     assertEquals(6, query().taskId(userTask.getId()).count());
 
     // user reference
-    assertEquals(10, query().userId("icke").count()); // not includes the create operation called by the process
+    assertEquals(11, query().userId("icke").count()); // not includes the create operation called by the process
     assertEquals(6, query().userId("er").count());
 
     // operation ID
@@ -94,10 +95,10 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     for (int i = 0; i < 4; i++) {
       assertTrue(yesterday.getTime()<=ascLog.get(i).getTimestamp().getTime());
     }
-    for (int i = 4; i < 11; i++) {
+    for (int i = 4; i < 12; i++) {
       assertTrue(today.getTime()<=ascLog.get(i).getTimestamp().getTime());
     }
-    for (int i = 11; i < 15; i++) {
+    for (int i = 12; i < 16; i++) {
       assertTrue(tomorrow.getTime()<=ascLog.get(i).getTimestamp().getTime());
     }
 
@@ -116,9 +117,9 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     // filter by time, created yesterday
     assertEquals(4, query().beforeTimestamp(today).count());
     // filter by time, created today and before
-    assertEquals(11, query().beforeTimestamp(tomorrow).count());
+    assertEquals(12, query().beforeTimestamp(tomorrow).count());
     // filter by time, created today and later
-    assertEquals(12, query().afterTimestamp(yesterday).count());
+    assertEquals(13, query().afterTimestamp(yesterday).count());
     // filter by time, created tomorrow
     assertEquals(5, query().afterTimestamp(today).count());
 
@@ -161,6 +162,9 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     taskService.setOwner(processTaskId, "icke");
     taskService.claim(processTaskId, "icke");
     taskService.setAssignee(processTaskId, "er");
+
+    // change priority of task
+    taskService.setPriority(processTaskId, 10);
 
     // add and delete an attachment
     Attachment attachment = taskService.createAttachment("image/ico", processTaskId, process.getId(), "favicon.ico", "favicon", "http://camunda.com/favicon.ico");
