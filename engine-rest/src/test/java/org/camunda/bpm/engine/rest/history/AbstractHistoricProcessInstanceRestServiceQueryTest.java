@@ -1,7 +1,27 @@
 package org.camunda.bpm.engine.rest.history;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.ws.rs.core.Response.Status;
+import javax.xml.registry.InvalidRequestException;
+
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -13,22 +33,8 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import javax.ws.rs.core.Response.Status;
-import javax.xml.registry.InvalidRequestException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.*;
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
@@ -384,8 +390,11 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
 
     parameters.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     parameters.put("processInstanceBusinessKey", MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
+    parameters.put("processInstanceBusinessKeyLike", MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY_LIKE);
     parameters.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     parameters.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    parameters.put("processDefinitionName", MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME);
+    parameters.put("processDefinitionNameLike", MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME_LIKE);
     parameters.put("startedBy", "startedBySomeone");
     parameters.put("superProcessInstanceId", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID);
 
@@ -397,8 +406,11 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
 
     verify(mockedQuery).processInstanceId(stringQueryParameters.get("processInstanceId"));
     verify(mockedQuery).processInstanceBusinessKey(stringQueryParameters.get("processInstanceBusinessKey"));
+    verify(mockedQuery).processInstanceBusinessKeyLike(stringQueryParameters.get("processInstanceBusinessKeyLike"));
     verify(mockedQuery).processDefinitionId(stringQueryParameters.get("processDefinitionId"));
     verify(mockedQuery).processDefinitionKey(stringQueryParameters.get("processDefinitionKey"));
+    verify(mockedQuery).processDefinitionName(stringQueryParameters.get("processDefinitionName"));
+    verify(mockedQuery).processDefinitionNameLike(stringQueryParameters.get("processDefinitionNameLike"));
     verify(mockedQuery).startedBy(stringQueryParameters.get("startedBy"));
     verify(mockedQuery).superProcessInstanceId(stringQueryParameters.get("superProcessInstanceId"));
 
