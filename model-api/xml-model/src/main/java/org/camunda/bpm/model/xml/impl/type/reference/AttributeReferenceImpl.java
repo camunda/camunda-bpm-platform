@@ -47,7 +47,7 @@ public class AttributeReferenceImpl<T extends ModelElementInstance> extends Refe
     return referenceSourceAttribute;
   }
 
-  protected ModelElementType getReferenceSourceElementType() {
+  public ModelElementType getReferenceSourceElementType() {
     return referenceSourceAttribute.getOwningElementType();
   }
 

@@ -115,14 +115,6 @@ public abstract class ReferenceImpl<T extends ModelElementInstance> implements R
     this.referenceTargetElementType = referenceTargetElementType;
   }
 
-
-  /**
-   * Return the model element type of the reference source
-   *
-   * @return the model element type of the reference source
-   */
-  protected abstract ModelElementType getReferenceSourceElementType();
-
   public Collection<ModelElementInstance> findReferenceSourceElements(ModelElementInstance referenceTargetElement) {
     if(referenceTargetElementType.isBaseTypeOf(referenceTargetElement.getElementType())) {
       ModelElementType owningElementType = getReferenceSourceElementType();

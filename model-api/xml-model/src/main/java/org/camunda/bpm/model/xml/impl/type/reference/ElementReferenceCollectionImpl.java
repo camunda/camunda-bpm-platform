@@ -103,8 +103,7 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
     this.referenceSourceType = referenceSourceType;
   }
 
-  @Override
-  protected ModelElementType getReferenceSourceElementType() {
+  public ModelElementType getReferenceSourceElementType() {
     return referenceSourceType;
   }
 
