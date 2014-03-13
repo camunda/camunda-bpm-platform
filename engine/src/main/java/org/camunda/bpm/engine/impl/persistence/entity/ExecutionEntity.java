@@ -91,38 +91,38 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
   // current position /////////////////////////////////////////////////////////
 
-  protected ProcessDefinitionImpl processDefinition;
+  protected transient ProcessDefinitionImpl processDefinition;
 
   /** current activity */
-  protected ActivityImpl activity;
+  protected transient ActivityImpl activity;
 
   /** current transition.  is null when there is no transition being taken. */
-  protected TransitionImpl transition = null;
+  protected transient TransitionImpl transition = null;
 
   /** transition that will be taken.  is null when there is no transition being taken. */
-  protected TransitionImpl transitionBeingTaken = null;
+  protected transient TransitionImpl transitionBeingTaken = null;
 
   /** the process instance.  this is the root of the execution tree.
    * the processInstance of a process instance is a self reference. */
-  protected ExecutionEntity processInstance;
+  protected transient ExecutionEntity processInstance;
 
   /** the parent execution */
-  protected ExecutionEntity parent;
+  protected transient ExecutionEntity parent;
 
   /** nested executions representing scopes or concurrent paths */
-  protected List<ExecutionEntity> executions;
+  protected transient List<ExecutionEntity> executions;
 
   /** super execution, not-null if this execution is part of a subprocess */
-  protected ExecutionEntity superExecution;
+  protected transient ExecutionEntity superExecution;
 
   /** reference to a subprocessinstance, not-null if currently subprocess is started from this execution */
-  protected ExecutionEntity subProcessInstance;
+  protected transient ExecutionEntity subProcessInstance;
 
   /** the unique id of the current activity instance */
   protected String activityInstanceId;
 
-  protected ProcessInstanceStartContext processInstanceStartContext;
-  protected ExecutionStartContext executionStartContext;
+  protected transient ProcessInstanceStartContext processInstanceStartContext;
+  protected transient ExecutionStartContext executionStartContext;
 
   protected boolean shouldQueryForSubprocessInstance = false;
 
@@ -148,16 +148,16 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   // events ///////////////////////////////////////////////////////////////////
 
   protected String eventName;
-  protected PvmProcessElement eventSource;
+  protected transient PvmProcessElement eventSource;
   protected int executionListenerIndex = 0;
 
   // associated entities /////////////////////////////////////////////////////
 
   // (we cache associated entities here to minimize db queries)
-  protected List<EventSubscriptionEntity> eventSubscriptions;
-  protected List<JobEntity> jobs;
-  protected List<TaskEntity> tasks;
-  protected List<IncidentEntity> incidents;
+  protected transient List<EventSubscriptionEntity> eventSubscriptions;
+  protected transient List<JobEntity> jobs;
+  protected transient List<TaskEntity> tasks;
+  protected transient List<IncidentEntity> incidents;
   protected int cachedEntityState;
 
   // cascade deletion ////////////////////////////////////////////////////////
@@ -170,7 +170,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   /** when execution structure is pruned during a takeAll, then
    * the original execution has to be resolved to the replaced execution.
    * @see {@link #takeAll(List, List)} {@link OutgoingExecution} */
-  protected ExecutionEntity replacedBy;
+  protected transient ExecutionEntity replacedBy;
 
   // atomic operations ////////////////////////////////////////////////////////
 
@@ -179,7 +179,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
    * the operations drives the interpretation or execution of a process.
    * @see AtomicOperation
    * @see #performOperation(AtomicOperation) */
-  protected AtomicOperation nextOperation;
+  protected transient AtomicOperation nextOperation;
   protected boolean isOperating = false;
 
   protected int revision = 1;
@@ -238,7 +238,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   protected boolean forcedUpdate;
 
   /** an activity which is to be started next */
-  protected PvmActivity nextActivity;
+  protected transient PvmActivity nextActivity;
 
   public ExecutionEntity() {
 

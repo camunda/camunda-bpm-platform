@@ -76,17 +76,17 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
   protected boolean isIdentityLinksInitialized = false;
-  protected List<IdentityLinkEntity> taskIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
+  protected transient List<IdentityLinkEntity> taskIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
 
   protected String executionId;
-  protected ExecutionEntity execution;
+  protected transient ExecutionEntity execution;
 
   protected String processInstanceId;
-  protected ExecutionEntity processInstance;
+  protected transient ExecutionEntity processInstance;
 
   protected String processDefinitionId;
 
-  protected TaskDefinition taskDefinition;
+  protected transient TaskDefinition taskDefinition;
   protected String taskDefinitionKey;
 
   protected boolean isDeleted;
@@ -96,7 +96,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   /**
    * contains all changed properties of this entity
    */
-  private Map<String, PropertyChange> propertyChanges = new HashMap<String, PropertyChange>();
+  private transient Map<String, PropertyChange> propertyChanges = new HashMap<String, PropertyChange>();
 
   // name references of tracked properties
   public static final String ASSIGNEE = "assignee";
