@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.test.ProcessEngineTestCase;
 
 /**
  * @author Joram Barrez
+ * @author Falko Menge (camunda)
  */
 public class ActivitiTestCaseTest extends ProcessEngineTestCase {
   
@@ -32,5 +33,8 @@ public class ActivitiTestCaseTest extends ProcessEngineTestCase {
     
     taskService.complete(task.getId());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
   }
+
 }
