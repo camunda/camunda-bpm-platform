@@ -8,7 +8,9 @@
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="userTask" />
     <userTask id="userTask" />
-    <sequenceFlow sourceRef="userTask" targetRef="theEnd" />
+    <sequenceFlow sourceRef="userTask" targetRef="deleteTask" />
+    <userTask id="deleteTask" />
+    <sequenceFlow sourceRef="deleteTask" targetRef="theEnd" />
     <endEvent id="theEnd" />
   </process>
 

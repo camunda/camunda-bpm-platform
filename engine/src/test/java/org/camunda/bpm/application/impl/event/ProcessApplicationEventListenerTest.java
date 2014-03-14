@@ -12,18 +12,19 @@
  */
 package org.camunda.bpm.application.impl.event;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Daniel Meyer
@@ -157,7 +158,7 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
     managementService.registerProcessApplication(deploymentId, processApplication.getReference());
 
     // start process instance
-    runtimeService.startProcessInstanceByKey("taskListenerProcess");
+    ProcessInstance taskListenerProcess = runtimeService.startProcessInstanceByKey("taskListenerProcess");
 
     // create event received
     assertEquals(1, events.size());
@@ -171,8 +172,15 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
 
     // complete task
     taskService.complete(task.getId());
-    assertEquals(3, events.size());
+    assertEquals(4, events.size());
     assertEquals(TaskListener.EVENTNAME_COMPLETE, events.get(2));
+    // next task was created
+    assertEquals(TaskListener.EVENTNAME_CREATE, events.get(3));
+
+    // delete process instance so last task will be deleted
+    runtimeService.deleteProcessInstance(taskListenerProcess.getProcessInstanceId(), "test delete event");
+    assertEquals(5, events.size());
+    assertEquals(TaskListener.EVENTNAME_DELETE, events.get(4));
 
   }
 

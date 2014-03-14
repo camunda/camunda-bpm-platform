@@ -106,6 +106,9 @@ public interface DelegateTask extends VariableScope, BpmnModelExecutionContext {
   /** Change due date of the task. */
   void setDueDate(Date dueDate);
 
+  /** Get delete reason of the task. */
+  String getDeleteReason();
+
   /**
    * Involves a user with a task. The type of identity link is defined by the given identityLinkType.
    * @param userId id of the user involve, cannot be null.

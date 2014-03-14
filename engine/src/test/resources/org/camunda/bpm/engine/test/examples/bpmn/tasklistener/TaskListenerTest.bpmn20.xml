@@ -20,6 +20,7 @@
 		      <activiti:field name="greeter" stringValue="The Process" />
           <activiti:field name="shortName" expression="${'Activiti'.substring(0,3)}" />
 		    </activiti:taskListener>
+        <activiti:taskListener event="delete" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.TaskDeleteListener" />
 		  </extensionElements>
 		</userTask>
 		

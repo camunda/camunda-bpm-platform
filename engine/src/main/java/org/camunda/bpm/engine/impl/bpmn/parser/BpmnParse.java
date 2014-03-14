@@ -2014,11 +2014,11 @@ public class BpmnParse extends Parse {
         String eventName = taskListenerElement.attribute("event");
         if (eventName != null) {
           if (TaskListener.EVENTNAME_CREATE.equals(eventName) || TaskListener.EVENTNAME_ASSIGNMENT.equals(eventName)
-                  || TaskListener.EVENTNAME_COMPLETE.equals(eventName)) {
+                  || TaskListener.EVENTNAME_COMPLETE.equals(eventName) || TaskListener.EVENTNAME_DELETE.equals(eventName)) {
             TaskListener taskListener = parseTaskListener(taskListenerElement);
             taskDefinition.addTaskListener(eventName, taskListener);
           } else {
-            addError("Attribute 'event' must be one of {create|assignment|complete}", userTaskElement);
+            addError("Attribute 'event' must be one of {create|assignment|complete|delete}", userTaskElement);
           }
         } else {
           addError("Attribute 'event' is mandatory on taskListener", userTaskElement);
