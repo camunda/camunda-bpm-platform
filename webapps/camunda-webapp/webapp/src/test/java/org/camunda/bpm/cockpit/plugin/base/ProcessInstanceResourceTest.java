@@ -17,18 +17,15 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto;
-import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessInstanceResource;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.webapp.test.util.JobExecutorHelper;
@@ -46,7 +43,6 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
   private JobExecutorHelper helper;
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
-  private ManagementService managementService;
 
   @Before
   public void setUp() throws Exception {
@@ -56,85 +52,6 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     helper = new JobExecutorHelper(processEngine);
     runtimeService = processEngine.getRuntimeService();
     repositoryService = processEngine.getRepositoryService();
-    managementService = processEngine.getManagementService();
-  }
-
-  @Test
-  @Deployment(resources = "processes/failing-process.bpmn")
-  public void testGetIncidents() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FailingProcess");
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-
-    resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
-
-    ProcessDefinition processDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .singleResult();
-
-    Job job = managementService.createJobQuery().singleResult();
-
-    List<IncidentDto> incidents = resource.getIncidents();
-    assertThat(incidents).isNotEmpty();
-    assertThat(incidents).hasSize(1);
-
-    IncidentDto dto = incidents.get(0);
-
-    assertThat(dto.getId()).isNotNull();
-    assertThat(dto.getIncidentTimestamp()).isNotNull();
-    assertThat(dto.getExecutionId()).isEqualTo(processInstance.getId());
-    assertThat(dto.getActivityId()).isEqualTo("ServiceTask_1");
-    assertThat(dto.getProcessInstanceId()).isEqualTo(processInstance.getId());
-    assertThat(dto.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
-    assertThat(dto.getCauseIncidentId()).isEqualTo(dto.getId());
-    assertThat(dto.getRootCauseIncidentId()).isEqualTo(dto.getId());
-    assertThat(dto.getConfiguration()).isEqualTo(job.getId());
-  }
-
-  @Test
-  @Deployment(resources = {"processes/failing-process.bpmn", "processes/call-activity.bpmn"})
-  public void testGetRecursivePropagatedIncident() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CallActivity");
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-
-    resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
-
-    ProcessDefinition processDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("CallActivity")
-        .singleResult();
-
-    List<IncidentDto> incidents = resource.getIncidents();
-    assertThat(incidents).isNotEmpty();
-    assertThat(incidents).hasSize(1);
-
-    IncidentDto dto = incidents.get(0);
-
-    assertThat(dto.getId()).isNotNull();
-    assertThat(dto.getIncidentTimestamp()).isNotNull();
-    assertThat(dto.getExecutionId()).isNotNull().isNotEmpty();
-    assertThat(dto.getActivityId()).isEqualTo("CallActivity_1");
-    assertThat(dto.getProcessInstanceId()).isEqualTo(processInstance.getId());
-    assertThat(dto.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
-    assertThat(dto.getCauseIncidentId()).isNotNull().isNotEmpty();
-    assertThat(dto.getRootCauseIncidentId()).isNotNull().isNotEmpty();
-    assertThat(dto.getConfiguration()).isNull();
-  }
-
-  @Test
-  @Deployment(resources = "processes/process-with-two-parallel-failing-services.bpmn")
-  public void testGetTenIncidents() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processWithTwoParallelFailingServices");
-
-    resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-
-    List<IncidentDto> incidents = resource.getIncidents();
-    assertThat(incidents).isNotEmpty();
-    // 2x failedJob, 3x anIncident, 5x anotherIncident
-    assertThat(incidents).hasSize(10);
   }
 
   @Test

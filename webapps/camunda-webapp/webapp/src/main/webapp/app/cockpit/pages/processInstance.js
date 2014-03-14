@@ -363,8 +363,8 @@ ngDefine('cockpit.pages.processInstance', [
     }]);
 
     // incidents
-    processData.provide('incidents', ['processInstance', 'filter', function (processInstance) {
-      return IncidentResource.query({ id : processInstance.id }).$promise;
+    processData.provide('incidents', ['processInstance', function (processInstance) {
+      return IncidentResource.query({ processInstanceId : processInstance.id }).$promise;
     }]);
 
     // incidentStatistics
