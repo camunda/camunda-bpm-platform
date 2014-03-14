@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+
+import java.util.List;
 
 /**
  * <p>Base atomic operation used for implementing atomic operations which
@@ -44,9 +44,7 @@ public abstract class AtomicOperationCreateConcurrentExecution implements Atomic
       if(execution.getActivity() != null
          && execution.isScope()
          && !((ActivityImpl)execution.getActivity()).isScope()
-//         && concurrencyScope != concurrentActivity.getParent()
          && concurrencyScope == execution.getActivity().getParent()
-//         && !((ActivityImpl)concurrentActivity.getParent()).isScope()
          ) {
 
         // Expand tree (1):
