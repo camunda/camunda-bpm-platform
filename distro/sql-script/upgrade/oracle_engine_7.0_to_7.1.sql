@@ -117,6 +117,12 @@ alter table ACT_RE_PROCDEF
 alter table ACT_RU_AUTHORIZATION
     modify (ID_ NVARCHAR2(64));
 
+-- delete index on column GROUP_ID_ to modify the type --
+drop index ACT_UNIQ_AUTH_GROUP;
+
+-- delete index on column USER_ID_ to modify the type --
+drop index ACT_UNIQ_AUTH_USER;
+    
 alter table ACT_RU_AUTHORIZATION
     modify (GROUP_ID_ NVARCHAR2(255));
 
@@ -126,6 +132,19 @@ alter table ACT_RU_AUTHORIZATION
 alter table ACT_RU_AUTHORIZATION
     modify (RESOURCE_ID_ NVARCHAR2(64));
 
+-- add index on column GROUP_ID_ --
+create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION
+   (case when GROUP_ID_ is null then null else TYPE_ end,
+    case when GROUP_ID_ is null then null else RESOURCE_TYPE_ end,
+    case when GROUP_ID_ is null then null else RESOURCE_ID_ end,
+    case when GROUP_ID_ is null then null else GROUP_ID_ end);
+
+-- add index on column USER_ID_ --
+create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION
+   (case when USER_ID_ is null then null else TYPE_ end,
+    case when USER_ID_ is null then null else RESOURCE_TYPE_ end,
+    case when USER_ID_ is null then null else RESOURCE_ID_ end,
+    case when USER_ID_ is null then null else USER_ID_ end);
 
 -- add new table ACT_HI_INCIDENT --
 
