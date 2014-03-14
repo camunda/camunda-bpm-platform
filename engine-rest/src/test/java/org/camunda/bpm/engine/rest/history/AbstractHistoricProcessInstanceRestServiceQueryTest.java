@@ -447,6 +447,22 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     verifyStartParameterQueryInvocations();
   }
 
+  @Test
+  public void testHistoricBeforeAndAfterStartTimeAsStringQueryAsPost() {
+    Map<String, String> parameters = getCompleteStartDateAsStringQueryParameters();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verifyStringStartParameterQueryInvocations();
+  }
+
   private Map<String, Date> getCompleteStartDateQueryParameters() {
     Map<String, Date> parameters = new HashMap<String, Date>();
 
@@ -456,11 +472,29 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     return parameters;
   }
 
+  private Map<String, String> getCompleteStartDateAsStringQueryParameters() {
+    Map<String, String> parameters = new HashMap<String, String>();
+
+    parameters.put("startedAfter", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER);
+    parameters.put("startedBefore", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE);
+
+    return parameters;
+  }
+
   private void verifyStartParameterQueryInvocations() {
     Map<String, Date> startDateParameters = getCompleteStartDateQueryParameters();
 
     verify(mockedQuery).startedBefore(startDateParameters.get("startedBefore"));
     verify(mockedQuery).startedAfter(startDateParameters.get("startedAfter"));
+
+    verify(mockedQuery).list();
+  }
+
+  private void verifyStringStartParameterQueryInvocations() {
+    Map<String, String> startDateParameters = getCompleteStartDateAsStringQueryParameters();
+
+    verify(mockedQuery).startedBefore(DateTimeUtil.parseDateTime(startDateParameters.get("startedBefore")).toDate());
+    verify(mockedQuery).startedAfter(DateTimeUtil.parseDateTime(startDateParameters.get("startedAfter")).toDate());
 
     verify(mockedQuery).list();
   }
@@ -495,6 +529,22 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     verifyFinishedParameterQueryInvocations();
   }
 
+  @Test
+  public void testHistoricAfterAndBeforeFinishTimeAsStringQueryAsPost() {
+    Map<String, String> parameters = getCompleteFinishedDateAsStringQueryParameters();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verifyStringFinishedParameterQueryInvocations();
+  }
+
   private Map<String, Date> getCompleteFinishedDateQueryParameters() {
     Map<String, Date> parameters = new HashMap<String, Date>();
 
@@ -504,11 +554,29 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     return parameters;
   }
 
+  private Map<String, String> getCompleteFinishedDateAsStringQueryParameters() {
+    Map<String, String> parameters = new HashMap<String, String>();
+
+    parameters.put("finishedAfter", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_AFTER);
+    parameters.put("finishedBefore", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_BEFORE);
+
+    return parameters;
+  }
+
   private void verifyFinishedParameterQueryInvocations() {
     Map<String, Date> finishedDateParameters = getCompleteFinishedDateQueryParameters();
 
     verify(mockedQuery).finishedAfter(finishedDateParameters.get("finishedAfter"));
     verify(mockedQuery).finishedBefore(finishedDateParameters.get("finishedBefore"));
+
+    verify(mockedQuery).list();
+  }
+
+  private void verifyStringFinishedParameterQueryInvocations() {
+    Map<String, String> finishedDateParameters = getCompleteFinishedDateAsStringQueryParameters();
+
+    verify(mockedQuery).finishedAfter(DateTimeUtil.parseDateTime(finishedDateParameters.get("finishedAfter")).toDate());
+    verify(mockedQuery).finishedBefore(DateTimeUtil.parseDateTime(finishedDateParameters.get("finishedBefore")).toDate());
 
     verify(mockedQuery).list();
   }
