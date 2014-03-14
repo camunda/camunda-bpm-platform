@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.webapp.test.util.JobExecutorHelper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,6 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
 
   private ProcessInstanceResource resource;
   private ProcessEngine processEngine;
-  private JobExecutorHelper helper;
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
 
@@ -49,7 +47,6 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     super.before();
 
     processEngine = getProcessEngine();
-    helper = new JobExecutorHelper(processEngine);
     runtimeService = processEngine.getRuntimeService();
     repositoryService = processEngine.getRepositoryService();
   }
@@ -65,7 +62,7 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
 
     resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    executeAvailableJobs();
 
     ProcessDefinition userTaskProcess = repositoryService
         .createProcessDefinitionQuery()
@@ -130,7 +127,7 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
       }
     }
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    executeAvailableJobs();
 
     ProcessInstanceQueryDto queryParameter1 = new ProcessInstanceQueryDto();
 
