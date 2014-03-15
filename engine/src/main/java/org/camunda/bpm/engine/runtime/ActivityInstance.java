@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +16,9 @@ import org.camunda.bpm.engine.RuntimeService;
 
 /**
  * <p>An activity instance represents an instance of an activity.</p>
- * 
+ *
  * <p>For documentation, see {@link RuntimeService#getActivityInstance(String)}</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
@@ -29,15 +29,21 @@ public interface ActivityInstance extends ProcessElementInstance {
 
   /** the name of the activity */
   String getActivityName();
-  
+
+  /**
+   * Type of the activity, corresponds to BPMN element name in XML (e.g. 'userTask').
+   * The type of the Root activity instance (the one corresponding to the process instance will be 'processDefinition'.
+   */
+  public String getActivityType();
+
   /** Returns the child activity instances.
    * Returns an empty list if there are no child instances */
   ActivityInstance[] getChildActivityInstances();
-  
+
   /** Returns the child transition instances.
    * Returns an empty list if there are no child transition instances */
   TransitionInstance[] getChildTransitionInstances();
-  
+
   /** the list of executions that are currently waiting in this activity instance */
   String[] getExecutionIds();
 
