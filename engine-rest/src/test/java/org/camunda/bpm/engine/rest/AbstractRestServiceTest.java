@@ -76,6 +76,7 @@ public abstract class AbstractRestServiceTest {
   protected static final String CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID = "aChildActivityInstanceId";
   protected static final String CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID = "aChildParentActivityInstanceId";
   protected static final String CHILD_EXAMPLE_ACTIVITY_ID = "aChildActivityId";
+  protected static final String CHILD_EXAMPLE_ACTIVITY_TYPE = "aChildActivityType";
   protected static final String CHILD_EXAMPLE_ACTIVITY_NAME = "aChildActivityName";
   protected static final String CHILD_EXAMPLE_PROCESS_INSTANCE_ID = "aChildProcessInstanceId";
   protected static final String CHILD_EXAMPLE_PROCESS_DEFINITION_ID = "aChildProcessDefinitionId";
@@ -87,6 +88,7 @@ public abstract class AbstractRestServiceTest {
     instance.setId(EXAMPLE_ACTIVITY_INSTANCE_ID);
     instance.setParentActivityInstanceId(EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID);
     instance.setActivityId(EXAMPLE_ACTIVITY_ID);
+    instance.setActivityType(CHILD_EXAMPLE_ACTIVITY_TYPE);
     instance.setActivityName(EXAMPLE_ACTIVITY_NAME);
     instance.setProcessInstanceId(EXAMPLE_PROCESS_INSTANCE_ID);
     instance.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
@@ -98,6 +100,7 @@ public abstract class AbstractRestServiceTest {
     childActivity.setParentActivityInstanceId(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID);
     childActivity.setActivityId(CHILD_EXAMPLE_ACTIVITY_ID);
     childActivity.setActivityName(CHILD_EXAMPLE_ACTIVITY_NAME);
+    childActivity.setActivityType(CHILD_EXAMPLE_ACTIVITY_TYPE);
     childActivity.setProcessInstanceId(CHILD_EXAMPLE_PROCESS_INSTANCE_ID);
     childActivity.setProcessDefinitionId(CHILD_EXAMPLE_PROCESS_DEFINITION_ID);
     childActivity.setBusinessKey(CHILD_EXAMPLE_BUSINESS_KEY);
