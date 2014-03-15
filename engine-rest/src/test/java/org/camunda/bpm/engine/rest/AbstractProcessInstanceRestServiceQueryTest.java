@@ -136,13 +136,11 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
     Assert.assertNotNull("There should be one process definition returned", instances.get(0));
 
     String returnedInstanceId = from(content).getString("[0].id");
-    Boolean returnedIsEnded = from(content).getBoolean("[0].ended");
     String returnedDefinitionId = from(content).getString("[0].definitionId");
     String returnedBusinessKey = from(content).getString("[0].businessKey");
     Boolean returnedIsSuspended = from(content).getBoolean("[0].suspended");
 
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED, returnedIsEnded);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, returnedBusinessKey);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED, returnedIsSuspended);

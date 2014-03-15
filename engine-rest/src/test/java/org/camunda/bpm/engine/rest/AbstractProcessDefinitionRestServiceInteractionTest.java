@@ -323,7 +323,6 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
       .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
       .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
-      .body("ended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
       .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
     .when().post(SUBMIT_FORM_URL);
 
@@ -347,7 +346,6 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
         .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
         .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
-        .body("ended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
         .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
       .when().post(SUBMIT_FORM_URL);
 
@@ -371,7 +369,6 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
         .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
         .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
-        .body("ended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
         .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
       .when().post(SUBMIT_FORM_URL);
 
@@ -397,7 +394,6 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
         .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
         .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
-        .body("ended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
         .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
       .when().post(SUBMIT_FORM_URL);
 
@@ -1538,7 +1534,6 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
       .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
       .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
-      .body("ended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
       .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
     .when().post(SUBMIT_FORM_BY_KEY_URL);
 
@@ -1562,7 +1557,6 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
         .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
         .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
-        .body("ended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
         .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
       .when().post(SUBMIT_FORM_BY_KEY_URL);
 
@@ -1586,7 +1580,6 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
         .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
         .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
-        .body("ended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
         .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
       .when().post(SUBMIT_FORM_BY_KEY_URL);
 
@@ -1612,7 +1605,6 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
         .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
         .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
-        .body("ended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
         .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
       .when().post(SUBMIT_FORM_BY_KEY_URL);
 
