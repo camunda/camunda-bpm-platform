@@ -321,4 +321,5 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     
     verify(mockedQuery).count();
   }
+
 }

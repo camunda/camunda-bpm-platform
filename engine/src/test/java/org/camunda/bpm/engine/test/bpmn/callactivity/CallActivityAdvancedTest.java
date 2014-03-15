@@ -13,19 +13,27 @@
 
 package org.camunda.bpm.engine.test.bpmn.callactivity;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
+import org.camunda.bpm.model.bpmn.instance.CallActivity;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -203,17 +211,16 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTimerOnCallActivity.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
   public void testTimerOnCallActivity() {
-    Date startTime = ClockUtil.getCurrentTime();
-
     // After process start, the task in the subprocess should be active
     runtimeService.startProcessInstanceByKey("timerOnCallActivity");
     TaskQuery taskQuery = taskService.createTaskQuery();
     Task taskInSubProcess = taskQuery.singleResult();
     assertEquals("Task in subprocess", taskInSubProcess.getName());
 
-    // When the timer on the subprocess is fired, the complete subprocess is destroyed
-    ClockUtil.setCurrentTime(new Date(startTime.getTime() + (6 * 60 * 1000))); // + 6 minutes, timer fires on 5 minutes
-    waitForJobExecutorToProcessAllJobs(10000);
+    Job timer = managementService.createJobQuery().singleResult();
+    assertNotNull(timer);
+
+    managementService.executeJob(timer.getId());
 
     Task escalatedTask = taskQuery.singleResult();
     assertEquals("Escalated Task", escalatedTask.getName());
@@ -282,6 +289,83 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
+  }
+
+  /**
+   * Test case for handing over process variables without target attribute set
+   */
+  public void testSubProcessWithDataInputOutputWithoutTarget() {
+    String processId = "subProcessDataInputOutputWithoutTarget";
+
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(processId)
+      .startEvent()
+      .callActivity("callActivity")
+        .calledElement("simpleSubProcess")
+      .userTask()
+      .endEvent()
+      .done();
+
+    CallActivityBuilder callActivityBuilder = ((CallActivity) modelInstance.getModelElementById("callActivity")).builder();
+
+    // create camunda:in with source but without target
+    CamundaIn camundaIn = modelInstance.newInstance(CamundaIn.class);
+    camundaIn.setCamundaSource("superVariable");
+    callActivityBuilder.addExtensionElement(camundaIn);
+
+    deployAndExpectException(modelInstance);
+    // set target
+    camundaIn.setCamundaTarget("subVariable");
+
+    // create camunda:in with sourceExpression but without target
+    camundaIn = modelInstance.newInstance(CamundaIn.class);
+    camundaIn.setCamundaSourceExpression("${x+5}");
+    callActivityBuilder.addExtensionElement(camundaIn);
+
+    deployAndExpectException(modelInstance);
+    // set target
+    camundaIn.setCamundaTarget("subVariable2");
+
+    // create camunda:out with source but without target
+    CamundaOut camundaOut = modelInstance.newInstance(CamundaOut.class);
+    camundaOut.setCamundaSource("subVariable");
+    callActivityBuilder.addExtensionElement(camundaOut);
+
+    deployAndExpectException(modelInstance);
+    // set target
+    camundaOut.setCamundaTarget("superVariable");
+
+    // create camunda:out with sourceExpression but without target
+    camundaOut = modelInstance.newInstance(CamundaOut.class);
+    camundaOut.setCamundaSourceExpression("${y+1}");
+    callActivityBuilder.addExtensionElement(camundaOut);
+
+    deployAndExpectException(modelInstance);
+    // set target
+    camundaOut.setCamundaTarget("superVariable2");
+
+    try {
+      String deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
+      repositoryService.deleteDeployment(deploymentId, true);
+    }
+    catch (ProcessEngineException e) {
+      fail("No exception expected");
+    }
+  }
+
+  private void deployAndExpectException(BpmnModelInstance modelInstance) {
+    String deploymentId = null;
+    try {
+      deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
+      fail("Exception expected");
+    }
+    catch (ProcessEngineException e) {
+      assertTextPresent("Missing attribute 'target'", e.getMessage());
+    }
+    finally {
+      if (deploymentId != null) {
+        repositoryService.deleteDeployment(deploymentId, true);
+      }
+    }
   }
 
   /**
@@ -492,6 +576,72 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
 
     // Completing this task end the process instance
     taskService.complete(taskAfterSubProcess.getId());
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testInterruptingEventSubProcessEventSubscriptions.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/interruptingEventSubProcessEventSubscriptions.bpmn20.xml" })
+  public void testInterruptingMessageEventSubProcessEventSubscriptionsInsideCallActivity() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callInterruptingEventSubProcess");
+
+    // one task in the call activity subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskInsideCallActivity = taskQuery.singleResult();
+    assertEquals("taskBeforeInterruptingEventSubprocess", taskInsideCallActivity.getTaskDefinitionKey());
+
+    // we should have no event subscriptions for the parent process
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count());
+    // we should have two event subscriptions for the called process instance, one for message and one for signal
+    String calledProcessInstanceId = taskInsideCallActivity.getProcessInstanceId();
+    EventSubscriptionQuery eventSubscriptionQuery = runtimeService.createEventSubscriptionQuery().processInstanceId(calledProcessInstanceId);
+    List<EventSubscription> subscriptions = eventSubscriptionQuery.list();
+    assertEquals(2, subscriptions.size());
+    
+    // start the message interrupting event sub process
+    runtimeService.correlateMessage("newMessage");
+    Task taskAfterMessageStartEvent = taskQuery.processInstanceId(calledProcessInstanceId).singleResult();
+    assertEquals("taskAfterMessageStartEvent", taskAfterMessageStartEvent.getTaskDefinitionKey());
+
+    // no subscriptions left
+    assertEquals(0, eventSubscriptionQuery.count());
+
+    // Complete the task inside the called process instance
+    taskService.complete(taskAfterMessageStartEvent.getId());
+
+    assertProcessEnded(calledProcessInstanceId);
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testInterruptingEventSubProcessEventSubscriptions.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/interruptingEventSubProcessEventSubscriptions.bpmn20.xml" })
+  public void testInterruptingSignalEventSubProcessEventSubscriptionsInsideCallActivity() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callInterruptingEventSubProcess");
+
+    // one task in the call activity subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskInsideCallActivity = taskQuery.singleResult();
+    assertEquals("taskBeforeInterruptingEventSubprocess", taskInsideCallActivity.getTaskDefinitionKey());
+
+    // we should have no event subscriptions for the parent process
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count());
+    // we should have two event subscriptions for the called process instance, one for message and one for signal
+    String calledProcessInstanceId = taskInsideCallActivity.getProcessInstanceId();
+    EventSubscriptionQuery eventSubscriptionQuery = runtimeService.createEventSubscriptionQuery().processInstanceId(calledProcessInstanceId);
+    List<EventSubscription> subscriptions = eventSubscriptionQuery.list();
+    assertEquals(2, subscriptions.size());
+
+    // start the signal interrupting event sub process
+    runtimeService.signalEventReceived("newSignal");
+    Task taskAfterSignalStartEvent = taskQuery.processInstanceId(calledProcessInstanceId).singleResult();
+    assertEquals("taskAfterSignalStartEvent", taskAfterSignalStartEvent.getTaskDefinitionKey());
+
+    // no subscriptions left
+    assertEquals(0, eventSubscriptionQuery.count());
+
+    // Complete the task inside the called process instance
+    taskService.complete(taskAfterSignalStartEvent.getId());
+
+    assertProcessEnded(calledProcessInstanceId);
     assertProcessEnded(processInstance.getId());
   }
 

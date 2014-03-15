@@ -16,16 +16,17 @@ package org.camunda.bpm.engine.history;
 
 import java.util.Date;
 
+
 /**
  * Represents one execution of an activity and it's stored permanent for statistics, audit and other business intelligence purposes.
- * 
+ *
  * @author Christian Stettler
  */
 public interface HistoricActivityInstance {
 
   /** The unique identifier of this historic activity instance. */
   String getId();
-  
+
   /** return the id of the parent activity instance */
   String getParentActivityInstanceId();
 
@@ -49,7 +50,7 @@ public interface HistoricActivityInstance {
 
   /** The corresponding task in case of task activity */
   String getTaskId();
-  
+
   /** The called process instance in case of call activity */
   String getCalledProcessInstanceId();
 
@@ -64,4 +65,10 @@ public interface HistoricActivityInstance {
 
   /** Difference between {@link #getEndTime()} and {@link #getStartTime()}.  */
   Long getDurationInMillis();
+
+  /** Did this activity instance complete a BPMN 2.0 scope */
+  boolean isCompleteScope();
+
+  /** Was this activity instance canceled */
+  boolean isCanceled();
 }

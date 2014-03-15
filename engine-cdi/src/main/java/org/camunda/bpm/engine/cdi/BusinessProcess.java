@@ -253,6 +253,7 @@ public class BusinessProcess implements Serializable {
    */
   public void signalExecution() {
     assertExecutionAssociated();
+    processEngine.getRuntimeService().setVariablesLocal(associationManager.getExecutionId(), getAndClearVariableLocalCache());
     processEngine.getRuntimeService().signal(associationManager.getExecutionId(), getAndClearVariableCache());
     associationManager.disAssociate();
   }
@@ -326,6 +327,7 @@ public class BusinessProcess implements Serializable {
    */
   public void completeTask() {
     assertTaskAssociated();
+    processEngine.getTaskService().setVariablesLocal(getTask().getId(), getAndClearVariableLocalCache());
     processEngine.getTaskService().complete(getTask().getId(), getAndClearVariableCache());
     associationManager.disAssociate();
   }
@@ -376,7 +378,7 @@ public class BusinessProcess implements Serializable {
   public void stopTask() {
     assertCommandContextNotActive();
     assertTaskAssociated();
-    associationManager.setTask(null);
+    associationManager.disAssociate();
   }
 
   /**
@@ -457,6 +459,63 @@ public class BusinessProcess implements Serializable {
    */
   public Map<String, Object> getVariableCache() {
     return new HashMap<String, Object>(associationManager.getCachedVariables());
+  }
+
+  /**
+   * @param variableName
+   *          the name of the local process variable for which the value is to be
+   *          retrieved
+   * @return the value of the provided local process variable or 'null' if no such
+   *         variable is set
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T getVariableLocal(String variableName) {
+    Object variable = associationManager.getVariableLocal(variableName);
+    if(variable == null) {
+      return null;
+    } else {
+      return (T)variable;
+    }
+
+  }
+
+  /**
+   * Set a value for a local process variable.
+   * <p />
+   *
+   * <strong>NOTE:</strong> If a task or execution is currently associated,
+   * the value is temporarily cached and flushed to the process instance
+   * at the end of the unit of work - otherwise an Exception will be thrown
+   *
+   * @param variableName
+   *          the name of the local process variable for which a value is to be set
+   * @param value
+   *          the value to be set
+   *
+   */
+  public void setVariableLocal(String variableName, Object value) {
+    associationManager.setVariableLocal(variableName, value);
+  }
+
+  /**
+   * Get the map of local cached variables and clear the internal variable cache.
+   *
+   * @return the map of cached variables
+   */
+  public Map<String, Object> getAndClearVariableLocalCache() {
+    Map<String, Object> cachedVariablesLocal = associationManager.getCachedVariablesLocal();
+    Map<String, Object> copy = new HashMap<String, Object>(cachedVariablesLocal);
+    cachedVariablesLocal.clear();
+    return copy;
+  }
+
+  /**
+   * Get a copy of the map of local cached variables.
+   *
+   * @return a copy of the map of local cached variables.
+   */
+  public Map<String, Object> getVariableLocalCache() {
+    return new HashMap<String, Object>(associationManager.getCachedVariablesLocal());
   }
 
   /**

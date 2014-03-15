@@ -13,17 +13,18 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.task.Task;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -41,7 +42,7 @@ public class TaskManager extends AbstractManager {
     String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
 
     for (TaskEntity task: tasks) {
-      deleteTask(task, reason, cascade);
+      task.delete(reason, cascade);
     }
   }
 
@@ -54,7 +55,7 @@ public class TaskManager extends AbstractManager {
 
       List<Task> subTasks = findTasksByParentTaskId(taskId);
       for (Task subTask: subTasks) {
-        deleteTask((TaskEntity) subTask, deleteReason, cascade);
+        ((TaskEntity) subTask).delete(deleteReason, cascade);
       }
 
       commandContext
@@ -73,6 +74,11 @@ public class TaskManager extends AbstractManager {
         commandContext
           .getHistoricTaskInstanceManager()
           .markTaskInstanceEnded(taskId, deleteReason);
+        if (TaskEntity.DELETE_REASON_COMPLETED.equals(deleteReason)) {
+          task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
+        } else {
+          task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+        }
       }
 
       getDbSqlSession().delete(task);
@@ -127,27 +133,6 @@ public class TaskManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<Task> findTasksByParentTaskId(String parentTaskId) {
     return getDbSqlSession().selectList("selectTasksByParentTaskId", parentTaskId);
-  }
-
-  public void deleteTask(String taskId, String deleteReason, boolean cascade) {
-    TaskEntity task = Context
-      .getCommandContext()
-      .getTaskManager()
-      .findTaskById(taskId);
-
-    if (task!=null) {
-      if(task.getExecutionId() != null) {
-        throw new ProcessEngineException("The task cannot be deleted because is part of a running process");
-      }
-
-      String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
-      deleteTask(task, reason, cascade);
-    } else if (cascade) {
-      Context
-        .getCommandContext()
-        .getHistoricTaskInstanceManager()
-        .deleteHistoricTaskInstanceById(taskId);
-    }
   }
 
   public void updateTaskSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {

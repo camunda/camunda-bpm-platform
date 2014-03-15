@@ -64,6 +64,12 @@ public interface ActivityExecution extends DelegateExecution {
   ActivityExecution createExecution();
 
   /**
+   * creates a new execution. This execution will be the parent of the newly created execution.
+   * properties processDefinition, processInstance and activity will be initialized.
+   */
+  ActivityExecution createExecution(boolean initializeExecutionStartContext);
+
+  /**
    * creates a new sub process instance.
    * The current execution will be the super execution of the created execution.
    *
@@ -92,8 +98,7 @@ public interface ActivityExecution extends DelegateExecution {
   /**
    * ends this execution.
    */
-  void end();
-
+  void end(boolean isScopeComplete);
 
   /* State management */
 
@@ -145,6 +150,16 @@ public interface ActivityExecution extends DelegateExecution {
   void setScope(boolean isScope);
 
   /**
+   * Returns whether this execution completed the parent scope.
+   */
+  boolean isCompleteScope();
+
+  /**
+   * Returns whether this execution has been canceled.
+   */
+  boolean isCanceled();
+
+  /**
    * Retrieves all executions which are concurrent and inactive at the given activity.
    */
   List<ActivityExecution> findInactiveConcurrentExecutions(PvmActivity activity);
@@ -161,11 +176,12 @@ public interface ActivityExecution extends DelegateExecution {
   void executeActivity(PvmActivity activity);
 
   /**
-   * Called when an execution is interrupted.
-   *
-   * Performs destroy scope behavior: all child executions and sub-process instances and other related
-   * resources are removed. The execution itself can continue execution.
+   * Called when an execution is interrupted. This will remove all associated entities
+   * such as event subscriptions, jobs, ...
    */
-  void destroyScope(String string);
+  void interruptScope(String reason);
+
+  /** An activity which is to be started next. */
+  PvmActivity getNextActivity();
 
 }

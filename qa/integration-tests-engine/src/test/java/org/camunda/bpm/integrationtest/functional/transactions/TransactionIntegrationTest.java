@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 package org.camunda.bpm.integrationtest.functional.transactions;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
-
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -29,6 +23,10 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import javax.inject.Inject;
+import javax.transaction.Status;
+import javax.transaction.UserTransaction;
 
 
 /**
@@ -41,13 +39,8 @@ public class TransactionIntegrationTest extends AbstractFoxPlatformIntegrationTe
     
   @Deployment
   public static WebArchive processArchive() {    
-    return initWebArchiveDeployment()      
-      .addClass(SomeEntity.class)
-      .addClass(PersistenceDelegateBean.class)
-      .addClass(AsyncPersistenceDelegateBean.class)
+    return initWebArchiveDeployment()
       .addClass(FailingDelegate.class)
-      .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/TransactionIntegrationTest.testDelegateParticipateInApplicationTx.bpmn20.xml")
-      .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/TransactionIntegrationTest.testAsyncDelegateNewTx.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/TransactionIntegrationTest.testProcessFailure.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/TransactionIntegrationTest.testApplicationFailure.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/TransactionIntegrationTest.testTxSuccess.bpmn20.xml")     
@@ -59,72 +52,6 @@ public class TransactionIntegrationTest extends AbstractFoxPlatformIntegrationTe
   
   @Inject
   private RuntimeService runtimeService;
-  
-  @PersistenceContext
-  private EntityManager entityManager;
-  
-  @Inject  
-  private PersistenceDelegateBean persistenceDelegateBean;
-  
-  @Inject
-  private AsyncPersistenceDelegateBean asyncPersistenceDelegateBean;
-   
-  @Test
-  public void testDelegateParticipateInApplicationTx() throws Exception {
-    
-    /* if we start a transaction here, persist an entity and then 
-     * start a process instance which synchronously invokes a java delegate,
-     * that delegate is invoked in the same transaction and thus has access to 
-     * the same entity manager.
-     */
-    
-    try {
-      utx.begin();
-      
-      SomeEntity e = new SomeEntity();
-      entityManager.persist(e);
-      
-      persistenceDelegateBean.setEntity(e);
-            
-      runtimeService.startProcessInstanceByKey("testDelegateParticipateInApplicationTx");
-      
-      utx.commit();
-    }catch (Exception e) {
-      utx.rollback();
-      throw e;
-    }
-  }
-  
-
-  @Test
-  public void testAsyncDelegateNewTx() throws Exception {
-    
-    /* if we start a transaction here, persist an entity and then 
-     * start a process instance which asynchronously invokes a java delegate,
-     * that delegate is invoked in a new transaction and thus does not have access to 
-     * the same entity manager.
-     */
-    
-    try {
-      utx.begin();
-      
-      SomeEntity e = new SomeEntity();
-      entityManager.persist(e);
-      
-      asyncPersistenceDelegateBean.setEntity(e);
-            
-      runtimeService.startProcessInstanceByKey("testAsyncDelegateNewTx");
-      
-      utx.commit();
-            
-    }catch (Exception e) {
-      utx.rollback();
-      throw e;
-    }
-    
-    waitForJobExecutorToProcessAllJobs(10000);
-    
-  }
   
   @Test
   public void testProcessFailure() throws Exception {

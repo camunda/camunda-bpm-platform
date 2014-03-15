@@ -1,8 +1,12 @@
+/* global ngDefine: false */
+
+/**
+ * @namespace cam.cockpit.services
+ */
 ngDefine('cockpit.services', [
   //'./activityInstance',
   './transform',
   './variables',
-  './search'
-], function(module) {
-
-});
+  './search',
+  'module:cockpit.services.page:./page'
+], function() {});

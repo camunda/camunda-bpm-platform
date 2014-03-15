@@ -1,7 +1,7 @@
 ngDefine('tasklist.directives', [
   './taskForm',
   './sortable',
-  './sitebar',
+  './sidebar',
   './processDefinitionSelect'
 ], function(module) {
   

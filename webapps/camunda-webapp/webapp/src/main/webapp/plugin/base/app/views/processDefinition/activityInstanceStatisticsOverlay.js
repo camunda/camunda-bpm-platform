@@ -25,17 +25,15 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+  var Configuration = [ 'ViewsProvider', function(ViewsProvider) {
 
     ViewsProvider.registerDefaultView('cockpit.processDefinition.diagram.overlay', {
       id: 'activity-instance-statistics-overlay',
       url: 'plugin://base/static/app/views/processDefinition/activity-instance-statistics-overlay.html',
       controller: Controller,
       priority: 20
-    }); 
-  };
-
-  Configuration.$inject = ['ViewsProvider'];
+    });
+  }];
 
   module.config(Configuration);
 });

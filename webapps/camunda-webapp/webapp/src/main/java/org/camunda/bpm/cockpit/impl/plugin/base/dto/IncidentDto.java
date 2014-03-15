@@ -12,17 +12,13 @@
  */
 package org.camunda.bpm.cockpit.impl.plugin.base.dto;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
-import org.camunda.bpm.engine.runtime.Incident;
 
 /**
  * @author roman.smirnov
  */
 public class IncidentDto {
-  
+
   protected String id;
   protected Date incidentTimestamp;
   protected String incidentMessage;
@@ -34,7 +30,7 @@ public class IncidentDto {
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
-  
+
   // additional properties
   protected String causeIncidentProcessInstanceId;
   protected String causeIncidentProcessDefinitionId;
@@ -44,15 +40,15 @@ public class IncidentDto {
   protected String rootCauseIncidentActivityId;
   protected String rootCauseIncidentConfiguration;
   protected String rootCauseIncidentMessage;
-  
+
   public String getId() {
     return id;
   }
-  
+
   public void setId(String id) {
     this.id = id;
-  }  
-  
+  }
+
   public Date getIncidentTimestamp() {
     return incidentTimestamp;
   }
@@ -64,11 +60,11 @@ public class IncidentDto {
   public String getIncidentMessage() {
     return incidentMessage;
   }
-  
+
   public void setIncidentMessage(String incidentMessage) {
     this.incidentMessage = incidentMessage;
   }
-  
+
   public String getIncidentType() {
     return incidentType;
   }
@@ -144,7 +140,7 @@ public class IncidentDto {
   public String getCauseIncidentProcessDefinitionId() {
     return causeIncidentProcessDefinitionId;
   }
-  
+
   public String getCauseIncidentActivityId() {
     return causeIncidentActivityId;
   }
@@ -172,7 +168,7 @@ public class IncidentDto {
   public void setRootCauseIncidentProcessDefinitionId(String rootCauseIncidentProcessDefinitionId) {
     this.rootCauseIncidentProcessDefinitionId = rootCauseIncidentProcessDefinitionId;
   }
-  
+
   public String getRootCauseIncidentActivityId() {
     return rootCauseIncidentActivityId;
   }
@@ -195,33 +191,6 @@ public class IncidentDto {
 
   public void setRootCauseIncidentMessage(String rootCauseIncidentMessage) {
     this.rootCauseIncidentMessage = rootCauseIncidentMessage;
-  }
-
-  public static IncidentDto fromIncident(Incident incident) {
-    IncidentDto result = new IncidentDto();
-    
-    result.id = incident.getId();
-    result.incidentTimestamp = incident.getIncidentTimestamp();
-    result.incidentMessage = incident.getIncidentMessage();
-    result.incidentType = incident.getIncidentType();
-    result.executionId = incident.getExecutionId();
-    result.activityId = incident.getActivityId();
-    result.processInstanceId = incident.getProcessInstanceId();
-    result.processDefinitionId = incident.getProcessDefinitionId();
-    result.causeIncidentId = incident.getCauseIncidentId();
-    result.rootCauseIncidentId = incident.getRootCauseIncidentId();
-    result.configuration = incident.getConfiguration();
-    
-    return result;
-  }
-  
-  public static List<IncidentDto> fromListOfIncidents(List<Incident> incidents) {
-    List<IncidentDto> dtos = new ArrayList<IncidentDto>();
-    for (Incident incident : incidents) {
-      IncidentDto dto = fromIncident(incident);
-      dtos.add(dto);
-    }
-    return dtos;
   }
 
 }

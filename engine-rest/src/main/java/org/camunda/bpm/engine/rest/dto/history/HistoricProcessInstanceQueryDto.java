@@ -22,15 +22,14 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
-import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
-import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
-import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
+import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricProcessInstanceQuery> {
@@ -57,8 +56,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Set<String> processInstanceIds;
   private String processDefinitionId;
   private String processDefinitionKey;
+  private String processDefinitionName;
+  private String processDefinitionNameLike;
   private List<String> processDefinitionKeyNotIn;
   private String processInstanceBusinessKey;
+  private String processInstanceBusinessKeyLike;
   private Boolean finished;
   private Boolean unfinished;
   private Date startedBefore;
@@ -91,6 +93,16 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.processDefinitionId = processDefinitionId;
   }
 
+  @CamundaQueryParam("processDefinitionName")
+  public void setProcessDefinitionName(String processDefinitionName) {
+    this.processDefinitionName = processDefinitionName;
+  }
+
+  @CamundaQueryParam("processDefinitionNameLike")
+  public void setProcessDefinitionNameLike(String processDefinitionNameLike) {
+    this.processDefinitionNameLike = processDefinitionNameLike;
+  }
+
   @CamundaQueryParam("processDefinitionKey")
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
@@ -104,6 +116,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam("processInstanceBusinessKey")
   public void setProcessInstanceBusinessKey(String processInstanceBusinessKey) {
     this.processInstanceBusinessKey = processInstanceBusinessKey;
+  }
+
+  @CamundaQueryParam("processInstanceBusinessKeyLike")
+  public void setProcessInstanceBusinessKeyLike(String processInstanceBusinessKeyLike) {
+    this.processInstanceBusinessKeyLike = processInstanceBusinessKeyLike;
   }
 
   @CamundaQueryParam(value = "finished", converter = BooleanConverter.class)
@@ -176,11 +193,20 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     if (processDefinitionKey != null) {
       query.processDefinitionKey(processDefinitionKey);
     }
+    if (processDefinitionName != null) {
+      query.processDefinitionName(processDefinitionName);
+    }
+    if (processDefinitionNameLike != null) {
+      query.processDefinitionNameLike(processDefinitionNameLike);
+    }
     if (processDefinitionKeyNotIn != null) {
       query.processDefinitionKeyNotIn(processDefinitionKeyNotIn);
     }
     if (processInstanceBusinessKey != null) {
       query.processInstanceBusinessKey(processInstanceBusinessKey);
+    }
+    if (processInstanceBusinessKeyLike != null) {
+      query.processInstanceBusinessKeyLike(processInstanceBusinessKeyLike);
     }
     if (finished != null && finished) {
       query.finished();

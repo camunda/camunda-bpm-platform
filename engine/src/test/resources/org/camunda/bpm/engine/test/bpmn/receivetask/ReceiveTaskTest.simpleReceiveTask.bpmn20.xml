@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="TestProcess">
+
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="theStart"/>
+    <sequenceFlow sourceRef="theStart" targetRef="waitState"/>
+    <receiveTask id="waitState" name="Wait State" />
+    <sequenceFlow sourceRef="waitState" targetRef="theEnd"/>
+    <endEvent id="theEnd"/>
+  </process>
+
+</definitions>

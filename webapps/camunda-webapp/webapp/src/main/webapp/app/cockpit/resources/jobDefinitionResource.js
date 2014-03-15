@@ -1,5 +1,6 @@
+/* global ngDefine: false */
 ngDefine('cockpit.resources', function(module) {
-
+  'use strict';
   var Resource = [ '$resource', 'Uri', function ($resource, Uri) {
 
     return $resource(Uri.appUri('engine://engine/:engine/job-definition/:id/:action'), { id: '@id' }, {

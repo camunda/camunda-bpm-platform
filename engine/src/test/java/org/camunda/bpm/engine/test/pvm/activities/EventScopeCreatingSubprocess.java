@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,31 +37,31 @@ public class EventScopeCreatingSubprocess implements CompositeActivityBehavior {
         startActivities.add(activity);
       }
     }
-    
+
     for (PvmActivity startActivity: startActivities) {
       execution.executeActivity(startActivity);
     }
   }
 
   /*
-   * Incoming execution is transformed into an event scope, 
-   * new, non-concurrent execution leaves activity 
+   * Incoming execution is transformed into an event scope,
+   * new, non-concurrent execution leaves activity
    */
   @SuppressWarnings("unchecked")
   public void lastExecutionEnded(ActivityExecution execution) {
-    
+
     ActivityExecution outgoingExecution = execution.getParent().createExecution();
     outgoingExecution.setConcurrent(false);
     ((InterpretableExecution)outgoingExecution).setActivity((ActivityImpl) execution.getActivity());
-        
+
     // eventscope execution
     execution.setConcurrent(false);
     execution.setActive(false);
     ((InterpretableExecution)execution).setEventScope(true);
-        
+
     List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
     if(outgoingTransitions.isEmpty()) {
-      outgoingExecution.end();
+      outgoingExecution.end(true);
     }else {
       outgoingExecution.takeAll(outgoingTransitions, Collections.EMPTY_LIST);
     }

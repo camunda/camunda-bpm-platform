@@ -104,7 +104,7 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
     try {
       List<VirtualFile> processes = processArchiveRoot.getChildrenRecursively(new VirtualFileFilter() {
         public boolean accepts(VirtualFile file) {
-          return ProcessApplicationScanningUtil.isDeployable(file.getName());
+          return file.isFile() && ProcessApplicationScanningUtil.isDeployable(file.getName());
         }
       });
       for (final VirtualFile process : processes) {

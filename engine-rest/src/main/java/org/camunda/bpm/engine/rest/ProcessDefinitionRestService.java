@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -24,6 +22,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
 
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -43,32 +42,39 @@ public interface ProcessDefinitionRestService {
   public static final String PATH = "/process-definition";
 
   @Path("/{id}")
-  ProcessDefinitionResource getProcessDefinition(@PathParam("id") String processDefinitionId);
+  ProcessDefinitionResource getProcessDefinitionById(@PathParam("id") String processDefinitionId);
+
+  @Path("/key/{key}")
+  ProcessDefinitionResource getProcessDefinitionByKey(@PathParam("key") String processDefinitionKey);
 
   /**
    * Exposes the {@link ProcessDefinitionQuery} interface as a REST service.
+   *
    * @param uriInfo
    * @param firstResult
    * @param maxResults
    * @return
    */
-	@GET
+  @GET
   @Produces(MediaType.APPLICATION_JSON)
-	List<ProcessDefinitionDto> getProcessDefinitions(@Context UriInfo uriInfo,
-	    @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+  List<ProcessDefinitionDto> getProcessDefinitions(@Context UriInfo uriInfo,
+                                                   @QueryParam("firstResult") Integer firstResult,
+                                                   @QueryParam("maxResults") Integer maxResults);
 
-	@GET
+  @GET
   @Path("/count")
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getProcessDefinitionsCount(@Context UriInfo uriInfo);
 
-	@GET
+  @GET
   @Path("/statistics")
   @Produces(MediaType.APPLICATION_JSON)
-  List<StatisticsResultDto> getStatistics(@QueryParam("failedJobs") Boolean includeFailedJobs, @QueryParam("incidents") Boolean includeIncidents, @QueryParam("incidentsForType") String includeIncidentsForType);
+  List<StatisticsResultDto> getStatistics(@QueryParam("failedJobs") Boolean includeFailedJobs,
+                                          @QueryParam("incidents") Boolean includeIncidents,
+                                          @QueryParam("incidentsForType") String includeIncidentsForType);
 
-	@PUT
-	@Path("/suspended")
-	@Consumes(MediaType.APPLICATION_JSON)
-	void updateSuspensionState(ProcessDefinitionSuspensionStateDto dto);
+  @PUT
+  @Path("/suspended")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void updateSuspensionState(ProcessDefinitionSuspensionStateDto dto);
 }

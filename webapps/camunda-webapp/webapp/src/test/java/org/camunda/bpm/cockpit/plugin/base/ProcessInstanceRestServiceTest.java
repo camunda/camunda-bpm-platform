@@ -12,10 +12,18 @@
  */
 package org.camunda.bpm.cockpit.plugin.base;
 
+import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.EQUALS_OPERATOR_NAME;
+import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.GREATER_THAN_OPERATOR_NAME;
+import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.GREATER_THAN_OR_EQUALS_OPERATOR_NAME;
+import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.LESS_THAN_OPERATOR_NAME;
+import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.LESS_THAN_OR_EQUALS_OPERATOR_NAME;
+import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.LIKE_OPERATOR_NAME;
+import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.NOT_EQUALS_OPERATOR_NAME;
 import static org.fest.assertions.Assertions.assertThat;
-import static org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto.*;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +32,12 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentStatisticsDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.resources.ProcessInstanceRestService;
-import org.camunda.bpm.cockpit.plugin.base.util.JobExecutorHelper;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
@@ -48,7 +57,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
   private ProcessEngine processEngine;
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
-  private JobExecutorHelper helper;
 
   private ProcessInstanceRestService resource;
 
@@ -57,8 +65,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     super.before();
 
     processEngine = getProcessEngine();
-
-    helper = new JobExecutorHelper(processEngine);
 
     runtimeService = processEngine.getRuntimeService();
     repositoryService = processEngine.getRepositoryService();
@@ -70,6 +76,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     for (int i = 0; i < numOfInstances; i++) {
       runtimeService.startProcessInstanceByKey(processDefinitionKey, "businessKey_" + i);
     }
+
+    executeAvailableJobs();
   }
 
   @Test
@@ -160,8 +168,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
   public void testQueryWithContainingIncidents() {
     startProcessInstances("FailingProcess", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
@@ -189,8 +195,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
   })
   public void testQueryWithMoreThanOneIncident() {
     startProcessInstances("processWithTwoParallelFailingServices", 1);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -341,8 +345,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
   public void testNestedIncidents() {
     startProcessInstances("NestedCallActivity", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-
     String nestedCallActivityId = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("NestedCallActivity")
@@ -446,8 +448,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     startProcessInstances("userTaskProcess", 3);
     startProcessInstances("FailingProcess", 3);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
     queryParameter.setBusinessKey("businessKey_2");
 
@@ -464,8 +464,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
   public void testQueryByBusinessKeyWithMoreThanOneProcessCount() {
     startProcessInstances("userTaskProcess", 3);
     startProcessInstances("FailingProcess", 3);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
     queryParameter.setBusinessKey("businessKey_2");
@@ -3118,6 +3116,73 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(dto.getId()).isEqualTo(processInstance.getId());
   }
 
+  @Test
+  @Deployment(resources = {
+      "processes/user-task-process.bpmn"
+    })
+  public void testQueryByStartedAfter() {
+    String date = "2014-01-01T13:13:00";
+    Date currentDate = DateTimeUtil.parseDateTime(date).toDate();
+
+    ClockUtil.setCurrentTime(currentDate);
+
+    startProcessInstances("userTaskProcess", 5);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setStartedAfter(currentDate);
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(5);
+  }
+
+  @Test
+  @Deployment(resources = {
+      "processes/user-task-process.bpmn"
+    })
+  public void testQueryByStartedBefore() {
+    String date = "2014-01-01T13:13:00";
+    Date currentDate = DateTimeUtil.parseDateTime(date).toDate();
+
+    ClockUtil.setCurrentTime(currentDate);
+
+    startProcessInstances("userTaskProcess", 5);
+
+    Calendar hourFromNow = Calendar.getInstance();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setStartedBefore(hourFromNow.getTime());
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(5);
+  }
+
+  @Test
+  @Deployment(resources = {
+      "processes/user-task-process.bpmn"
+    })
+  public void testQueryByStartedBetween() {
+    String date = "2014-01-01T13:13:00";
+    Date currentDate = DateTimeUtil.parseDateTime(date).toDate();
+
+    ClockUtil.setCurrentTime(currentDate);
+
+    startProcessInstances("userTaskProcess", 5);
+
+    Calendar hourFromNow = Calendar.getInstance();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setStartedAfter(currentDate);
+    queryParameter.setStartedBefore(hourFromNow.getTime());
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(5);
+  }
+
   private VariableQueryParameterDto createVariableParameter(String name, String operator, Object value) {
     VariableQueryParameterDto variable = new VariableQueryParameterDto();
     variable.setName(name);
@@ -3126,4 +3191,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     return variable;
   }
+
+
 }

@@ -33,7 +33,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   public void testCatchingMessageEventCorrelation() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
-    runtimeService.startProcessInstanceByKey("process", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
 
     variables = new HashMap<String, Object>();
     variables.put("aKey", "anotherValue");
@@ -54,6 +54,31 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
     // the execution that has been correlated should have advanced
     long correlatedExecutions = runtimeService.createExecutionQuery()
+        .activityId("task").processVariableValueEquals("aKey", "aValue").processVariableValueEquals("aNewKey", "aNewVariable")
+        .count();
+    assertEquals(1, correlatedExecutions);
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // this time: use the builder ////////////////
+
+    variables = new HashMap<String, Object>();
+    variables.put("aKey", "aValue");
+    processInstance = runtimeService.startProcessInstanceByKey("process", variables);
+
+    // use the fluent builder
+    runtimeService.createMessageCorrelation(messageName)
+      .processInstanceVariableEquals("aKey", "aValue")
+      .setVariable("aNewKey", "aNewVariable")
+      .correlate();
+
+    uncorrelatedExecutions = runtimeService.createExecutionQuery()
+        .processVariableValueEquals("aKey", "anotherValue").messageEventSubscriptionName("newInvoiceMessage")
+        .count();
+    assertEquals(1, uncorrelatedExecutions);
+
+    // the execution that has been correlated should have advanced
+    correlatedExecutions = runtimeService.createExecutionQuery()
         .activityId("task").processVariableValueEquals("aKey", "aValue").processVariableValueEquals("aNewKey", "aNewVariable")
         .count();
     assertEquals(1, correlatedExecutions);
@@ -79,23 +104,47 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     } catch (MismatchingMessageCorrelationException e) {
       assertTextPresent("2 executions match the correlation keys.", e.getMessage());
     }
+
+    // fluent builder fails as well
+    try {
+      runtimeService.createMessageCorrelation(messageName)
+        .processInstanceVariableEquals("aKey", "aValue")
+        .correlate();
+      fail("Expected an Exception");
+    } catch (MismatchingMessageCorrelationException e) {
+      assertTextPresent("2 executions match the correlation keys.", e.getMessage());
+    }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   public void testExecutionCorrelationByBusinessKey() {
     String businessKey = "aBusinessKey";
-    runtimeService.startProcessInstanceByKey("process", businessKey);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", businessKey);
     runtimeService.correlateMessage("newInvoiceMessage", businessKey);
 
     // the execution that has been correlated should have advanced
     long correlatedExecutions = runtimeService.createExecutionQuery().activityId("task").count();
     assertEquals(1, correlatedExecutions);
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // use fluent builder //////////////////////
+
+    runtimeService.startProcessInstanceByKey("process", businessKey);
+    runtimeService.createMessageCorrelation("newInvoiceMessage")
+      .processInstanceBusinessKey(businessKey)
+      .correlate();
+
+    // the execution that has been correlated should have advanced
+    correlatedExecutions = runtimeService.createExecutionQuery().activityId("task").count();
+    assertEquals(1, correlatedExecutions);
+
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   public void testExecutionCorrelationByBusinessKeyWithVariables() {
     String businessKey = "aBusinessKey";
-    runtimeService.startProcessInstanceByKey("process", businessKey);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", businessKey);
 
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
@@ -105,12 +154,38 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     long correlatedExecutions = runtimeService.createExecutionQuery()
         .processVariableValueEquals("aKey", "aValue").count();
     assertEquals(1, correlatedExecutions);
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // use fluent builder /////////////////////////
+
+    runtimeService.startProcessInstanceByKey("process", businessKey);
+
+    runtimeService.createMessageCorrelation("newInvoiceMessage")
+      .processInstanceBusinessKey(businessKey)
+      .setVariable("aKey", "aValue")
+      .correlate();
+
+    // the execution that has been correlated should have advanced
+    correlatedExecutions = runtimeService.createExecutionQuery()
+        .processVariableValueEquals("aKey", "aValue").count();
+    assertEquals(1, correlatedExecutions);
+
   }
 
 
   public void testNullMessageEventCorrelation() {
     try {
       runtimeService.correlateMessage(null);
+      fail("Exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("messageName cannot be null", e.getMessage());
+    }
+
+    //fluent builder
+    try {
+      runtimeService.createMessageCorrelation(null)
+        .correlate();
       fail("Exception expected");
     } catch (ProcessEngineException e) {
       assertTextPresent("messageName cannot be null", e.getMessage());
@@ -126,6 +201,16 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     long instances = runtimeService.createProcessInstanceQuery().processDefinitionKey("messageStartEvent")
         .variableValueEquals("aKey", "aValue").count();
     assertEquals(1, instances);
+
+    // fluent builder ////////////////
+
+    runtimeService.createMessageCorrelation("newInvoiceMessage")
+      .setVariable("aKey", "aValue")
+      .correlate();
+
+    instances = runtimeService.createProcessInstanceQuery().processDefinitionKey("messageStartEvent")
+        .variableValueEquals("aKey", "aValue").count();
+    assertEquals(2, instances);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml"})
@@ -136,6 +221,18 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
     // assert that the business key is set correctly
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertEquals(businessKey, processInstance.getBusinessKey());
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // fluent builder ////////////////
+
+    runtimeService.createMessageCorrelation("newInvoiceMessage")
+      .processInstanceBusinessKey(businessKey)
+      .correlate();
+
+    // assert that the business key is set correctly
+    processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertEquals(businessKey, processInstance.getBusinessKey());
   }
 
@@ -158,22 +255,57 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     assertNotNull(task);
     assertNull(taskService.createTaskQuery().taskDefinitionKey("task1").singleResult());
     taskService.complete(task.getId());
+
+    // fluent builder //////////////////////////
+
+    runtimeService.createMessageCorrelation("someMessage").correlate();
+    // verify the right start event was selected:
+    task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+    assertNotNull(task);
+    assertNull(taskService.createTaskQuery().taskDefinitionKey("task2").singleResult());
+    taskService.complete(task.getId());
+
+    runtimeService.createMessageCorrelation("someOtherMessage").correlate();
+    // verify the right start event was selected:
+    task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+    assertNotNull(task);
+    assertNull(taskService.createTaskQuery().taskDefinitionKey("task1").singleResult());
+    taskService.complete(task.getId());
   }
 
   @Deployment
   public void testMatchingStartEventAndExecution() {
-    runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     assertNotNull(runtimeService.createExecutionQuery().messageEventSubscriptionName("newInvoiceMessage").singleResult());
     // correlate message -> this will trigger the execution
     runtimeService.correlateMessage("newInvoiceMessage");
     assertNull(runtimeService.createExecutionQuery().messageEventSubscriptionName("newInvoiceMessage").singleResult());
 
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // fluent builder //////////////////////
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    assertNotNull(runtimeService.createExecutionQuery().messageEventSubscriptionName("newInvoiceMessage").singleResult());
+    // correlate message -> this will trigger the execution
+    runtimeService.createMessageCorrelation("newInvoiceMessage").correlate();
+    assertNull(runtimeService.createExecutionQuery().messageEventSubscriptionName("newInvoiceMessage").singleResult());
   }
 
   public void testMessageStartEventCorrelationWithNonMatchingDefinition() {
     try {
       runtimeService.correlateMessage("aMessageName");
+      fail("Expect an Exception");
+    } catch (MismatchingMessageCorrelationException e) {
+      assertTextPresent("Cannot correlate message", e.getMessage());
+    }
+
+    // fluent builder //////////////////
+
+    try {
+      runtimeService.createMessageCorrelation("aMessageName").correlate();
       fail("Expect an Exception");
     } catch (MismatchingMessageCorrelationException e) {
       assertTextPresent("Cannot correlate message", e.getMessage());
@@ -184,7 +316,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   public void testCorrelationByBusinessKeyAndVariables() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
-    runtimeService.startProcessInstanceByKey("process", "aBusinessKey", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", "aBusinessKey", variables);
 
     variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
@@ -208,5 +340,63 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
         .processInstanceId(correlatedExecution.getProcessInstanceId()).singleResult();
 
     assertEquals("aBusinessKey", correlatedProcessInstance.getBusinessKey());
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // fluent builder /////////////////////////////
+
+    variables = new HashMap<String, Object>();
+    variables.put("aKey", "aValue");
+    processInstance = runtimeService.startProcessInstanceByKey("process", "aBusinessKey", variables);
+
+    runtimeService.createMessageCorrelation(messageName)
+      .processInstanceBusinessKey("aBusinessKey")
+      .processInstanceVariableEquals("aKey", "aValue")
+      .setVariable("aProcessVariable", "aVariableValue")
+      .correlate();
+
+    correlatedExecution = runtimeService.createExecutionQuery()
+        .activityId("task").processVariableValueEquals("aProcessVariable", "aVariableValue")
+        .singleResult();
+
+    assertNotNull(correlatedExecution);
+
+    correlatedProcessInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(correlatedExecution.getProcessInstanceId()).singleResult();
+
+    assertEquals("aBusinessKey", correlatedProcessInstance.getBusinessKey());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testCorrelationByProcessInstanceId() {
+
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("process");
+
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("process");
+
+    // correlation with only the name is ambiguous:
+    try {
+      runtimeService.createMessageCorrelation("aMessageName").correlate();
+      fail("Expect an Exception");
+    } catch (MismatchingMessageCorrelationException e) {
+      assertTextPresent("Cannot correlate message", e.getMessage());
+    }
+
+    // use process instance id as well
+    runtimeService.createMessageCorrelation("newInvoiceMessage")
+      .processInstanceId(processInstance1.getId())
+      .correlate();
+
+    Execution correlatedExecution = runtimeService.createExecutionQuery()
+        .activityId("task")
+        .processInstanceId(processInstance1.getId())
+        .singleResult();
+    assertNotNull(correlatedExecution);
+
+    Execution uncorrelatedExecution = runtimeService.createExecutionQuery()
+        .activityId("task")
+        .processInstanceId(processInstance2.getId())
+        .singleResult();
+    assertNull(uncorrelatedExecution);
   }
 }

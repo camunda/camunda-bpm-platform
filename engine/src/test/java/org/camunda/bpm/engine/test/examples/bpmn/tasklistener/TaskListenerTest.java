@@ -44,7 +44,25 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
     assertEquals("Hello from The Process", runtimeService.getVariable(processInstance.getId(), "greeting"));
     assertEquals("Act", runtimeService.getVariable(processInstance.getId(), "shortName"));
   }
-  
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
+  public void testTaskDeleteListener() {
+    TaskDeleteListener.clear();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
+
+    assertEquals(0, TaskDeleteListener.eventCounter);
+    assertNull(TaskDeleteListener.lastTaskDefinitionKey);
+    assertNull(TaskDeleteListener.lastDeleteReason);
+
+    // delete process instance to delete task
+    Task task = taskService.createTaskQuery().singleResult();
+    runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), "test delete task listener");
+
+    assertEquals(1, TaskDeleteListener.eventCounter);
+    assertEquals(task.getTaskDefinitionKey(), TaskDeleteListener.lastTaskDefinitionKey);
+    assertEquals("test delete task listener", TaskDeleteListener.lastDeleteReason);
+  }
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
   public void testTaskListenerWithExpression() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");

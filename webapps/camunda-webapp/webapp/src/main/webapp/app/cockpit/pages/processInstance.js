@@ -1,45 +1,73 @@
+/* global ngDefine: false */
 ngDefine('cockpit.pages.processInstance', [
   'require',
+  'angular',
+  'cockpit/util/routeUtil',
   'module:dataDepend:angular-data-depend'
-], function(module, require) {
+], function(module, require, angular) {
+  'use strict';
 
-  function ProcessInstanceController ($scope, $rootScope, $location, $filter, $dialog, search, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Data, Transform, processInstance, dataDepend) {
+  var routeUtil = require('cockpit/util/routeUtil');
 
-    $rootScope.clearBreadcrumbs();
+  var Controller = [
+    '$scope',
+    '$filter',
+    'search',
+    'ProcessDefinitionResource',
+    'ProcessInstanceResource',
+    'IncidentResource',
+    'Views',
+    'Data',
+    'Transform',
+    'processInstance',
+    'dataDepend',
+    'page',
+  function(
+    $scope,
+    $filter,
+    search,
+    ProcessDefinitionResource,
+    ProcessInstanceResource,
+    IncidentResource,
+    Views,
+    Data,
+    Transform,
+    processInstance,
+    dataDepend,
+    page
+  ) {
 
     $scope.processInstance = processInstance;
 
-    var currentFilter;
-    var controllerInitialized = false;
+    var filter;
 
     var processData = $scope.processData = dataDepend.create($scope);
 
     // utilities ///////////////////////
 
     $scope.$on('$routeChanged', function() {
-      var filter = completeFilter(parseFilterFromUri(), $scope.instanceIdToInstanceMap, $scope.activityIdToInstancesMap);
-      processData.set('filter', filter);
+      processData.set('filter', parseFilterFromUri());
+      // update tab selection
+      setDefaultTab($scope.processInstanceTabs);
     });
 
-    function collect(elements, fn) {
-      var result = [];
+    // function collect(elements, fn) {
+    //   var result = [];
 
-      angular.forEach(elements, function(e) {
-        try {
-          var c = fn(e);
+    //   angular.forEach(elements, function(e) {
+    //     try {
+    //       var c = fn(e);
 
-          if (c !== undefined) {
-            result.push(c);
-          }
-        } catch (e) {
-          ; // safe collect -> error skips element
-        }
-      });
+    //       if (c !== undefined) {
+    //         result.push(c);
+    //       }
+    //     } catch (ex) {
+    //       // safe collect -> error skips element
+    //     }
+    //   });
 
-      return result;
-    }
-
-    var currentFilter = null;
+    //   return result;
+    // }
 
     function parseFilterFromUri() {
 
@@ -55,24 +83,22 @@ ngDefine('cockpit.pages.processInstance', [
         return str.split(/,/);
       }
 
-      function parseVariables(vars) {
-        return collect(vars, Variables.parse);
-      }
+      // function parseVariables(vars) {
+      //   return collect(vars, Variables.parse);
+      // }
 
-      currentFilter = {
+      $scope.filter = filter = {
         activityIds: activityIdsParam,
         activityInstanceIds: activityInstanceIdsParam,
-        page: parseInt(params.page) || undefined
+        page: parseInt(params.page, 10) || undefined
       };
 
-      $scope.filter = currentFilter;
-
-      return currentFilter;
+      return filter;
     }
 
-    function serializeFilterToUri(filter) {
-      var activityIds = filter.activityIds,
-          activityInstanceIds = filter.activityInstanceIds;
+    function serializeFilterToUri(newFilter) {
+      var activityIds = newFilter.activityIds,
+          activityInstanceIds = newFilter.activityInstanceIds;
 
       function nonEmpty(array) {
         return array && array.length;
@@ -83,14 +109,32 @@ ngDefine('cockpit.pages.processInstance', [
         activityInstanceIds: nonEmpty(activityInstanceIds) ? activityInstanceIds.join(',') : null
       });
 
-      $scope.filter = currentFilter = filter;
+      $scope.filter = filter = newFilter;
     }
 
-    function completeFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap) {
-      var activityIds = angular.copy(filter.activityIds) || [],
-          activityInstanceIds = angular.copy(filter.activityInstanceIds) || [],
-          page = parseInt(filter.page) || undefined,
-          scrollToBpmnElement;
+    /**
+     * Auto complete a filter based on the given filter data.
+     *
+     * It performs the following logic
+     *
+     *   - If activity instances are selected, select the associated activities unless they are explicitly specified.
+     *   - If an activity is selected, select the associated activity instances unless they are explicitly specified.
+     *
+     * @param  {Object} filter the filter to auto complete
+     * @param  {Object} instanceIdToInstanceMap a activity instance id -> activity instance map
+     * @param  {*} activityIdToInstancesMap a activity id -> activity instance map
+     */
+    function autoCompleteFilter(newFilter, instanceIdToInstanceMap, activityIdToInstancesMap) {
+
+      var activityIds = newFilter.activityIds || [],
+          activityInstanceIds = newFilter.activityInstanceIds || [],
+          page = parseInt(newFilter.page, 10) || null,
+          scrollToBpmnElement = newFilter.scrollToBpmnElement,
+          // if filter has been changed from outside this component,
+          // newFilter is different from cached filter
+          externalUpdate = newFilter !== filter,
+          changed,
+          completedFilter;
 
       angular.forEach(activityInstanceIds, function (instanceId) {
         var instance = instanceIdToInstanceMap[instanceId],
@@ -99,12 +143,13 @@ ngDefine('cockpit.pages.processInstance', [
 
         if (idx === -1) {
           activityIds.push(activityId);
+          changed = true;
         }
       });
 
       angular.forEach(activityIds, function (activityId) {
         var instanceList = activityIdToInstancesMap[activityId],
-            foundAtLeastOne = false,
+            foundOne = false,
             instanceIds = [];
 
         if (instanceList) {
@@ -113,34 +158,57 @@ ngDefine('cockpit.pages.processInstance', [
             var idx = activityInstanceIds.indexOf(instance.id);
 
             if (idx !== -1) {
-              foundAtLeastOne = true;
+              foundOne = true;
               break;
             }
 
             instanceIds.push(instance.id);
           }
 
-          if (!foundAtLeastOne) {
+          if (!foundOne) {
             activityInstanceIds = activityInstanceIds.concat(instanceIds);
+            changed = true;
           }
 
         }
       });
 
       if (activityIds.length > 0) {
-        scrollToBpmnElement = activityIds[activityIds.length-1];
+        var newScrollTo = activityIds[activityIds.length - 1];
+
+        if (newScrollTo !== scrollToBpmnElement) {
+          scrollToBpmnElement = newScrollTo;
+          changed = true;
+        }
       }
 
-      filter = {};
+      completedFilter = {
+        activityIds: activityIds,
+        activityInstanceIds: activityInstanceIds,
+        scrollToBpmnElement: scrollToBpmnElement,
+        page: page
+      };
 
-      filter['activityIds'] = activityIds;
-      filter['activityInstanceIds'] = activityInstanceIds;
-      filter['scrollToBpmnElement'] = scrollToBpmnElement;
-      filter['page'] = page;
+      changed = !angular.equals(completedFilter, newFilter);
 
-      $scope.filter = currentFilter = filter;
+      // update filter only if actual changes happened above
+      // (auto completion took place)
+      if (changed) {
 
-      return filter;
+        // update cached filters
+        $scope.filter = filter = completedFilter;
+
+        // notify external components of filter change
+        processData.set('filter', filter);
+      }
+
+      // update uri only if filter change is triggered from
+      // external view component
+      if (externalUpdate) {
+
+        // serialize filter to url
+        serializeFilterToUri(filter);
+      }
     }
 
     // end utilities ///////////////////////
@@ -216,7 +284,7 @@ ngDefine('cockpit.pages.processInstance', [
         var name = bpmnElement.name;
         if (!name) {
           var shortenFilter = $filter('shorten');
-          name = bpmnElement.type + ' (' + shortenFilter(bpmnElement.id, 8) + '...)';
+          name = bpmnElement.type + ' (' + shortenFilter(bpmnElement.id, 8) + ')';
         }
 
         return name;
@@ -248,17 +316,17 @@ ngDefine('cockpit.pages.processInstance', [
         var transitions = instance.childTransitionInstances;
         if (transitions && transitions.length > 0) {
 
-          for (var i = 0, transition; !!(transition = transitions[i]); i++) {
-            var activityId = transition.targetActivityId,
-                bpmnElement = bpmnElements[activityId],
-                instances = activityIdToInstancesMap[activityId] || [];
+          for (var t = 0, transition; !!(transition = transitions[t]); t++) {
+            var targetActivityId = transition.targetActivityId,
+                transitionBpmnElement = bpmnElements[targetActivityId],
+                transitionInstances = activityIdToInstancesMap[targetActivityId] || [];
 
-            transition.name = getActivityName(bpmnElement);
-            activityIdToInstancesMap[activityId] = instances;
+            transition.name = getActivityName(transitionBpmnElement);
+            activityIdToInstancesMap[targetActivityId] = transitionInstances;
             if(!instanceIdToInstanceMap[transition.id]) {
               instanceIdToInstanceMap[transition.id] = transition;
             }
-            instances.push(transition);
+            transitionInstances.push(transition);
           }
         }
       }
@@ -281,8 +349,8 @@ ngDefine('cockpit.pages.processInstance', [
             executionId = instance.executionId;
 
         if (executionIds) {
-          for (var i = 0, executionId; !!(executionId = executionIds[i]); i++) {
-            executionIdToInstanceMap[executionId] = instance;
+          for (var i = 0, execId; !!(execId = executionIds[i]); i++) {
+            executionIdToInstanceMap[execId] = instance;
           }
         }
 
@@ -295,8 +363,8 @@ ngDefine('cockpit.pages.processInstance', [
     }]);
 
     // incidents
-    processData.provide('incidents', ['processInstance', 'filter', function (processInstance, filter) {
-      return IncidentResource.query({ id : processInstance.id }).$promise;
+    processData.provide('incidents', ['processInstance', function (processInstance) {
+      return IncidentResource.query({ processInstanceId : processInstance.id }).$promise;
     }]);
 
     // incidentStatistics
@@ -331,29 +399,36 @@ ngDefine('cockpit.pages.processInstance', [
 
     // /////// Begin usage of definied process data
 
-    processData.observe([ 'filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'], function (filter, instanceIdToInstanceMap, activityIdToInstancesMap) {
-      if (!controllerInitialized) {
-        filter = completeFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap)
-        processData.set('filter', filter);
-
-        controllerInitialized = true;
-      }
-    });
-
-    processData.observe('filter',  function(filter) {
-      if (filter != currentFilter) {
-        serializeFilterToUri(filter);
-        $scope.filter = filter;
-      }
-    });
+    processData.observe([ 'filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'], autoCompleteFilter);
 
     $scope.processDefinition = processData.observe('processDefinition', function (processDefinition) {
       $scope.processDefinition = processDefinition;
     });
 
     processData.observe([ 'processDefinition', 'processInstance'], function (processDefinition, processInstance) {
-      $rootScope.addBreadcrumb({'type': 'processDefinition', 'processDefinition': processDefinition});
-      $rootScope.addBreadcrumb({'type': 'processInstance', 'processInstance': processInstance,'processDefinition': processDefinition});
+      page
+        .breadcrumbsClear()
+        .breadcrumbsAdd([
+          {
+            label: processDefinition.name || processDefinition.key || processDefinition.id,
+            href: '#/process-definition/'+ (processDefinition.id) +'/runtime',
+            type: 'processDefinition',
+            processDefinition: processDefinition
+          },
+          {
+            label: processInstance.name || processInstance.key || processInstance.id,
+            href: '#/process-instance/'+ (processInstance.id) +'/runtime',
+            type: 'processInstance',
+            processInstance: processInstance,
+            processDefinition: processDefinition
+          }
+        ]);
+
+      page.titleSet([
+        'camunda Cockpit',
+        $scope.processDefinition.name || $scope.processDefinition.id,
+        'Instance View'
+      ].join(' | '));
     });
 
     $scope.activityInstanceTree = processData.observe('activityInstanceTree', function (activityInstanceTree) {
@@ -372,18 +447,18 @@ ngDefine('cockpit.pages.processInstance', [
     // /////// End of usage of definied process data
 
     $scope.handleBpmnElementSelection = function (id, $event) {
+
       if (!id) {
-        var filter = {activityIds: null, activityInstanceIds: null};
-        processData.set('filter', filter);
+        processData.set('filter', {});
         return;
       }
 
       var ctrlKey = $event.ctrlKey,
-          activityIds = angular.copy(currentFilter.activityIds) || [],
-          activityInstanceIds = angular.copy(currentFilter.activityInstanceIds) || [],
+          activityIds = angular.copy(filter.activityIds) || [],
+          activityInstanceIds = angular.copy(filter.activityInstanceIds) || [],
           idx = activityIds.indexOf(id),
           instanceList = $scope.activityIdToInstancesMap[id],
-          filter = {};
+          newFilter;
 
       if (!ctrlKey) {
         activityIds = [ id ];
@@ -417,25 +492,27 @@ ngDefine('cockpit.pages.processInstance', [
         }
       }
 
-      filter['activityIds'] = activityIds;
-      filter['activityInstanceIds'] = activityInstanceIds;
+      newFilter = {
+        activityIds: activityIds,
+        activityInstanceIds: activityInstanceIds
+      };
 
-      processData.set('filter', filter);
+      processData.set('filter', newFilter);
     };
 
     $scope.handleActivityInstanceSelection = function (id, activityId, $event) {
+
       if (!id) {
-        var filter = {activityIds: null, activityInstanceIds: null};
-        processData.set('filter', filter);
+        processData.set('filter', {});
         return;
       }
 
       var ctrlKey = $event.ctrlKey,
-          activityIds = angular.copy(currentFilter.activityIds) || [],
-          activityInstanceIds = angular.copy(currentFilter.activityInstanceIds) || [],
+          activityIds = angular.copy(filter.activityIds) || [],
+          activityInstanceIds = angular.copy(filter.activityInstanceIds) || [],
           idx = activityInstanceIds.indexOf(id),
           instanceList = $scope.activityIdToInstancesMap[activityId],
-          filter = {};
+          newFilter;
 
       if (!ctrlKey) {
         activityIds = [ activityId ];
@@ -452,71 +529,69 @@ ngDefine('cockpit.pages.processInstance', [
           if (index === -1) {
             activityIds.push(activityId);
           }
-        } else
-
-        if (idx !== -1) {
+        }
+        else {
           activityInstanceIds.splice(idx, 1);
 
           var foundAnotherActivityInstance = false;
           if (instanceList) {
             for (var i = 0, instance; !!(instance = instanceList[i]); i++) {
               var instanceId = instance.id,
-                  index = activityInstanceIds.indexOf(instanceId);
+                  instanceIndex = activityInstanceIds.indexOf(instanceId);
 
-              if (index !== -1) {
+              if (instanceIndex !== -1) {
                 foundAnotherActivityInstance = true;
               }
             }
           }
 
           if (!foundAnotherActivityInstance) {
-            var index = activityIds.indexOf(activityId);
-            activityIds.splice(index, 1);
+            var otherIndex = activityIds.indexOf(activityId);
+            activityIds.splice(otherIndex, 1);
           }
         }
       }
 
-      filter['activityIds'] = activityIds;
-      filter['activityInstanceIds'] = activityInstanceIds;
-      filter['scrollToBpmnElement'] = activityId;
+      newFilter = {
+        activityIds: activityIds,
+        activityInstanceIds: activityInstanceIds,
+        scrollToBpmnElement: activityId
+      };
 
-      processData.set('filter', filter);
+      processData.set('filter', newFilter);
     };
 
     $scope.$on('$routeChangeStart', function () {
-      $rootScope.clearBreadcrumbs();
+      page.breadcrumbsClear();
     });
 
     $scope.processInstanceVars = { read: [ 'processInstance', 'processData', 'filter' ] };
-    $scope.processInstanceTabs = Views.getProviders({ component: 'cockpit.processInstance.view' })
-                         .concat(Views.getProviders({ component: 'cockpit.processInstance.instanceDetails' })); // backwards compatibility
-    $scope.processInstanceActions = Views.getProviders({ component: 'cockpit.processInstance.action' });
+    $scope.processInstanceTabs = Views.getProviders({ component: 'cockpit.processInstance.runtime.tab' });
+
+    $scope.processInstanceActions = Views.getProviders({ component: 'cockpit.processInstance.runtime.action' });
 
     Data.instantiateProviders('cockpit.processInstance.data', {$scope: $scope, processData : processData});
 
-    $scope.selectView = function(view) {
-      $scope.selectedView = view;
+    $scope.selectTab = function(tabProvider) {
+      $scope.selectedTab = tabProvider;
 
       search.updateSilently({
-        detailsTab: view.id
+        detailsTab: tabProvider.id
       });
     };
 
     function setDefaultTab(tabs) {
       var selectedTabId = search().detailsTab;
 
-      if (!tabs.length) {
+      if (!tabs || !tabs.length) {
         return;
       }
 
       if (selectedTabId) {
-        var provider = Views.getProvider({ component: 'cockpit.processInstance.view', id: selectedTabId });
-        if (!provider) {
-          // backwards compatibility
-          provider = Views.getProvider({ component: 'cockpit.processInstance.instanceDetails', id: selectedTabId });
-        }
+        var provider = Views.getProvider({ component: 'cockpit.processInstance.runtime.tab', id: selectedTabId });
+
         if (provider && tabs.indexOf(provider) != -1) {
-          $scope.selectedView = provider;
+          $scope.selectedTab = provider;
           return;
         }
       }
@@ -525,12 +600,11 @@ ngDefine('cockpit.pages.processInstance', [
         detailsTab: null
       });
 
-      $scope.selectedView = tabs[0];
+      $scope.selectedTab = tabs[0];
     }
 
     setDefaultTab($scope.processInstanceTabs);
-
-  };
+  }];
 
   function ProcessInstanceFilterController ($scope) {
 
@@ -568,34 +642,25 @@ ngDefine('cockpit.pages.processInstance', [
       processData.set('filter', filterData.filter);
     };
 
-  };
+  }
 
   module
-    .controller('ProcessInstanceController', [ '$scope',
-                                               '$rootScope',
-                                               '$location',
-                                               '$filter',
-                                               '$dialog',
-                                               'search',
-                                               'ProcessDefinitionResource',
-                                               'ProcessInstanceResource',
-                                               'IncidentResource',
-                                               'Views',
-                                               'Data',
-                                               'Transform',
-                                               'processInstance',
-                                               'dataDepend', ProcessInstanceController ])
     .controller('ProcessInstanceFilterController', ['$scope', ProcessInstanceFilterController]);
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
-    $routeProvider.when('/process-instance/:processInstanceId', {
-      templateUrl: 'pages/process-instance.html',
-      controller: 'ProcessInstanceController',
+
+    $routeProvider.when('/process-instance/:id', {
+      redirectTo: routeUtil.redirectToRuntime
+    });
+
+    $routeProvider.when('/process-instance/:id/runtime', {
+      templateUrl: require.toUrl('./pages/process-instance.html'),
+      controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
         processInstance: ['ResourceResolver', 'ProcessInstanceResource',
           function(ResourceResolver, ProcessInstanceResource) {
-            return ResourceResolver.getByRouteParam('processInstanceId', {
+            return ResourceResolver.getByRouteParam('id', {
               name: 'process instance',
               resolve: function(id) {
                 return ProcessInstanceResource.get({ id : id });
@@ -607,5 +672,15 @@ ngDefine('cockpit.pages.processInstance', [
     });
   }];
 
-  module.config(RouteConfig);
+  var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
+      id: 'runtime',
+      priority: 20,
+      label: 'Runtime'
+    });
+  }];
+
+  module
+    .config(RouteConfig)
+    .config(ViewConfig);
 });

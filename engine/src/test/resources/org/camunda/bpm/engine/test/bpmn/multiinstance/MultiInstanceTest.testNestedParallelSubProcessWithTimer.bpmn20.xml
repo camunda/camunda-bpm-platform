@@ -49,17 +49,17 @@
           
           <sequenceFlow id="flow5" sourceRef="miSubProcess" targetRef="subProcessEnd3" />
           <endEvent id="subProcessEnd3" />
+          
+          <boundaryEvent id="timer" attachedToRef="miSubProcess">
+            <timerEventDefinition>
+              <timeDuration>PT1H</timeDuration>
+            </timerEventDefinition>
+          </boundaryEvent>
+          <sequenceFlow id="flow6" sourceRef="timer" targetRef="taskAfterTimer" />
+          <userTask id="taskAfterTimer" />
+          <sequenceFlow id="flow7" sourceRef="taskAfterTimer" targetRef="subProcessEnd3" />
         
         </subProcess>
-        
-        <boundaryEvent id="timer" attachedToRef="miSubProcess">
-          <timerEventDefinition>
-            <timeDuration>PT1H</timeDuration>
-          </timerEventDefinition>
-        </boundaryEvent>
-        <sequenceFlow id="flow6" sourceRef="timer" targetRef="taskAfterTimer" />
-        <userTask id="taskAfterTimer" />
-        <sequenceFlow id="flow7" sourceRef="taskAfterTimer" targetRef="subProcessEnd3" />
         
         <sequenceFlow id="flow8" sourceRef="nesting3" targetRef="subProcessEnd2" />
         <endEvent id="subProcessEnd2" />

@@ -20,7 +20,7 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>apache-tomcat-dist</artifactId>
+      <artifactId>tomcat</artifactId>
       <version>${version.tomcat}</version>
       <type>tar.gz</type>
     </dependency>
@@ -108,5 +108,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

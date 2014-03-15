@@ -90,7 +90,7 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
     
     if(isPaLocal) {
   
-      if (urlPath.startsWith("file:") || urlPath.startsWith("jar:") || urlPath.startsWith("wsjar:")) {
+      if (urlPath.startsWith("file:") || urlPath.startsWith("jar:") || urlPath.startsWith("wsjar:") || urlPath.startsWith("zip:")) {
         urlPath = url.getPath();
         int withinArchive = urlPath.indexOf('!');
         if (withinArchive != -1) {
@@ -102,7 +102,7 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
       }
       
     } else {
-      if (urlPath.startsWith("file:") || urlPath.startsWith("jar:") || urlPath.startsWith("wsjar:")) {
+      if (urlPath.startsWith("file:") || urlPath.startsWith("jar:") || urlPath.startsWith("wsjar:") || urlPath.startsWith("zip:")) {
         urlPath = url.getPath();
         int withinArchive = urlPath.indexOf('!');
         if (withinArchive != -1) {

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="processGatewayAndTwoEndEventsPlusTimer1" name="processGatewayAndTwoEndEventsPlusTimer1">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+
+    <parallelGateway id="fork" />
+    <serviceTask id="service1" activiti:class="org.camunda.bpm.engine.test.bpmn.async.AsyncService" activiti:async="true" />
+    <intermediateCatchEvent id="timer1">
+       <timerEventDefinition>
+          <timeDuration>PT0S</timeDuration>
+       </timerEventDefinition>
+    </intermediateCatchEvent>
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="service1" />
+    <sequenceFlow id="flow3" sourceRef="fork" targetRef="timer1" />
+    <sequenceFlow id="flow4" sourceRef="service1" targetRef="end1" />
+    <sequenceFlow id="flow5" sourceRef="timer1" targetRef="end2" />
+    <endEvent id="end1" />
+    <endEvent id="end2" />
+
+  </process>
+
+</definitions>

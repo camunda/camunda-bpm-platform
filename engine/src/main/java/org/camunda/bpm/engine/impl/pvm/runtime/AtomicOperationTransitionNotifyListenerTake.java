@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,23 +26,23 @@ import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
  * @author Tom Baeyens
  */
 public class AtomicOperationTransitionNotifyListenerTake implements AtomicOperation {
-  
+
   private static Logger log = Logger.getLogger(AtomicOperationTransitionNotifyListenerTake.class.getName());
-  
+
   public boolean isAsync(InterpretableExecution execution) {
     return false;
   }
 
   public void execute(InterpretableExecution execution) {
     TransitionImpl transition = execution.getTransition();
-    
+
     // while executing the transition, the activityInstance is 'null'
     // (we are not executing an activity)
     execution.setActivityInstanceId(null);
-    
+
     List<ExecutionListener> executionListeners = transition.getExecutionListeners();
     int executionListenerIndex = execution.getExecutionListenerIndex();
-    
+
     if (executionListeners.size()>executionListenerIndex) {
       execution.setEventName(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_TAKE);
       execution.setEventSource(transition);
@@ -62,11 +62,16 @@ public class AtomicOperationTransitionNotifyListenerTake implements AtomicOperat
       execution.setExecutionListenerIndex(0);
       execution.setEventName(null);
       execution.setEventSource(null);
-      
+
       ActivityImpl activity = (ActivityImpl) execution.getActivity();
-      ActivityImpl nextScope = findNextScope(activity.getParent(), transition.getDestination());
+      ActivityImpl nextScope = findNextScope((ScopeImpl) activity.getFlowScope(), transition.getDestination());
       execution.setActivity(nextScope);
-      execution.performOperation(TRANSITION_CREATE_SCOPE);
+
+      if (nextScope.isCancelScope()) {
+        execution.performOperation(TRANSITION_CANCEL_SCOPE);
+      } else {
+        execution.performOperation(TRANSITION_CREATE_SCOPE);
+      }
     }
   }
 

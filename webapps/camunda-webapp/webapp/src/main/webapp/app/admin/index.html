@@ -12,7 +12,7 @@
     <base href="$BASE" admin-api="$APP_ROOT/api/admin/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
 
     <!-- Styles -->
-    <link href="$APP_ROOT/assets/css/admin/loader.css" rel="stylesheet" />
+    <link href="$APP_ROOT/assets/css/admin/loader.css?bust=CACHE_BUSTER" rel="stylesheet" />
 
     <!-- For IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -28,9 +28,9 @@
     <script src="$APP_ROOT/assets/vendor/better-dom/better-dom.js" data-htc="$APP_ROOT/assets/vendor/better-dom/better-dom.htc"></script>
     <script src="$APP_ROOT/assets/vendor/better-placeholder-polyfill/better-placeholder-polyfill.js"></script>
     <![endif]-->
-    <script src="$APP_ROOT/assets/vendor/require/require.js"></script>
+    <script src="$APP_ROOT/assets/vendor/requirejs/require.js"></script>
 
-    <script src="$APP_ROOT/app/admin/admin-bootstrap.js"></script>
+    <script src="$APP_ROOT/app/admin/admin-bootstrap.js?bust=CACHE_BUSTER"></script>
   </head>
   <body>
     <!-- navigation -->
@@ -55,8 +55,8 @@
     <!-- content -->
     <div class="ctn-main">
       <div class="ctn-wrapper">
-        <div class="notifications-panel"></div>
-        <div class="breadcrumbs-panel"></div>
+        <div cam-breadcrumbs-panel divider="&raquo;" class="breadcrumbs-panel"></div>
+        <div notifications-panel class="notifications-panel"></div>
 
         <!-- view body provided by ngView -->
         <div ng-view>

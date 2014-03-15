@@ -29,23 +29,20 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
  */
 public class HistoricVariableInstanceManager extends AbstractHistoricManager {
 
-  @SuppressWarnings("unchecked")
   public void deleteHistoricVariableInstanceByProcessInstanceId(String historicProcessInstanceId) {
     if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      HistoricVariableInstanceManager historicProcessVariableManager = Context
-              .getCommandContext()
-              .getHistoricVariableInstanceManager();
 
       // delete entries in DB
-      List<HistoricVariableInstanceEntity> historicProcessVariables = (List) getDbSqlSession()
-        .createHistoricVariableInstanceQuery()
-        .processInstanceId(historicProcessInstanceId)
-        .list();
-      for (HistoricVariableInstanceEntity historicProcessVariable : historicProcessVariables) {
-        historicProcessVariable.delete();
+      List<HistoricVariableInstance> historicProcessVariables = Context
+          .getCommandContext()
+          .getHistoricVariableInstanceManager()
+          .findHistoricVariableInstancesByProcessInstanceId(historicProcessInstanceId);
+
+      for (HistoricVariableInstance historicProcessVariable : historicProcessVariables) {
+        ((HistoricVariableInstanceEntity) historicProcessVariable).delete();
       }
 
-      //delete enrties in Cache
+      //delete entries in Cache
       List<HistoricVariableInstanceEntity> cachedHistoricVariableInstances = getDbSqlSession().findInCache(HistoricVariableInstanceEntity.class);
       for (HistoricVariableInstanceEntity historicProcessVariable : cachedHistoricVariableInstances) {
         // make sure we only delete the right ones (as we cannot make a proper query in the cache)
@@ -54,6 +51,11 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
         }
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricVariableInstance> findHistoricVariableInstancesByProcessInstanceId(String processInstanceId) {
+    return getDbSqlSession().selectList("selectHistoricVariablesByProcessInstanceId", processInstanceId);
   }
 
   public long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {

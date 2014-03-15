@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,14 +17,14 @@ import java.util.Date;
 
 
 /**
- * Represents a historic task instance (waiting, finished or deleted) that is stored permanent for 
+ * Represents a historic task instance (waiting, finished or deleted) that is stored permanent for
  * statistics, audit and other business intelligence purposes.
- * 
+ *
  * @author Tom Baeyens
  */
 public interface HistoricTaskInstance {
 
-  /** 
+  /**
    * The unique identifier of this historic task instance. This is the same identifier as the
    * runtime Task instance.
    */
@@ -39,6 +39,9 @@ public interface HistoricTaskInstance {
   /** Execution reference. */
   String getExecutionId();
 
+  /** Activity instance reference. */
+  String getActivityInstanceId();
+
   /** The latest name given to this task. */
   String getName();
 
@@ -47,7 +50,7 @@ public interface HistoricTaskInstance {
 
   /** The reason why this task was deleted {'completed' | 'deleted' | any other user defined string }. */
   String getDeleteReason();
-  
+
   /** Task owner */
   String getOwner();
 
@@ -62,17 +65,20 @@ public interface HistoricTaskInstance {
 
   /** Difference between {@link #getEndTime()} and {@link #getStartTime()} in milliseconds.  */
   Long getDurationInMillis();
-  
+
   /** Task definition key. */
   String getTaskDefinitionKey();
-  
+
   /** Task priority **/
   int getPriority();
-  
+
   /** Task due date **/
   Date getDueDate();
-  
+
   /** The parent task of this task, in case this task was a subtask */
   String getParentTaskId();
+
+  /** Task follow-up date */
+  Date getFollowUpDate();
 
 }

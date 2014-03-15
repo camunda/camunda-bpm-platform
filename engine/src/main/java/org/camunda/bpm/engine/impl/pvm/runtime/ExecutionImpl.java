@@ -23,6 +23,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.delegate.BpmnModelExecutionContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceState;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -36,6 +39,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.FlowElement;
 
 
 /**
@@ -64,11 +69,16 @@ public class ExecutionImpl implements
   /** current activity */
   protected ActivityImpl activity;
 
+  protected PvmActivity nextActivity;
+
   /** the Id of the current activity instance */
   protected String activityInstanceId;
 
   /** current transition.  is null when there is no transition being taken. */
   protected TransitionImpl transition = null;
+
+  /** transition that will be taken.  is null when there is no transition being taken. */
+  protected TransitionImpl transitionBeingTaken = null;
 
   /** the process instance.  this is the root of the execution tree.
    * the processInstance of a process instance is a self reference. */
@@ -89,6 +99,9 @@ public class ExecutionImpl implements
   /** only available until the process instance is started */
   protected ProcessInstanceStartContext processInstanceStartContext;
 
+  /** only available until the execution is started */
+  protected ExecutionStartContext executionStartContext;
+
   /** the business key */
   protected String businessKey;
   // state/type of execution //////////////////////////////////////////////////
@@ -106,6 +119,8 @@ public class ExecutionImpl implements
   protected boolean isConcurrent = false;
   protected boolean isEnded = false;
   protected boolean isEventScope = false;
+
+  protected int activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
 
   protected Map<String, Object> variables = null;
 
@@ -149,6 +164,11 @@ public class ExecutionImpl implements
 
   /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
   public ExecutionImpl createExecution() {
+    return createExecution(false);
+  }
+
+  /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
+  public ExecutionImpl createExecution(boolean initializeExecutionStartContext) {
     // create the new child execution
     ExecutionImpl createdExecution = newExecution();
 
@@ -164,6 +184,10 @@ public class ExecutionImpl implements
 
     // make created execution start in same activity instance
     createdExecution.activityInstanceId = activityInstanceId;
+
+    if (initializeExecutionStartContext) {
+      createdExecution.executionStartContext = new ExecutionStartContext();
+    }
 
     return createdExecution;
   }
@@ -222,7 +246,7 @@ public class ExecutionImpl implements
     }
   }
 
-  public void destroyScope(String reason) {
+  public void cancelScope(String reason) {
 
     if(log.isLoggable(Level.FINE)) {
       log.fine("performing destroy scope behavior for execution "+this);
@@ -237,6 +261,9 @@ public class ExecutionImpl implements
       childExecution.deleteCascade(reason);
     }
 
+  }
+
+  public void interruptScope(String reason) {
   }
 
   // parent ///////////////////////////////////////////////////////////////////
@@ -308,10 +335,18 @@ public class ExecutionImpl implements
     performOperation(AtomicOperation.DELETE_CASCADE);
   }
 
+  public void deleteCascade2(String deleteReason) {
+    this.deleteReason = deleteReason;
+    this.deleteRoot = true;
+    performOperation(new FoxAtomicOperationDeleteCascadeFireActivityEnd());
+  }
+
   /** removes an execution. if there are nested executions, those will be ended recursively.
    * if there is a parent, this method removes the bidirectional relation
    * between parent and this execution. */
-  public void end() {
+  public void end(boolean completeScope) {
+    setCompleteScope(completeScope);
+
     isActive = false;
     isEnded = true;
     performOperation(AtomicOperation.ACTIVITY_END);
@@ -421,8 +456,8 @@ public class ExecutionImpl implements
 
   /** sets the current activity.  can be overridden by subclasses.  doesn't
    * require initialization. */
-  public void setActivity(ActivityImpl activity) {
-    this.activity = activity;
+  public void setActivity(PvmActivity activity) {
+    this.activity = (ActivityImpl) activity;
   }
 
   /** must be called before the activity member field or getActivity() is called */
@@ -456,11 +491,13 @@ public class ExecutionImpl implements
       activityInstanceId = getParentActivityInstanceId();
     }
 
+    activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
   }
 
   public String getParentActivityInstanceId() {
     if(isProcessInstance()) {
-      return String.valueOf(System.identityHashCode(getProcessInstance()));
+      return getId();
+
     } else {
       ExecutionImpl parent = getParent();
       ActivityImpl activity = getActivity();
@@ -558,8 +595,18 @@ public class ExecutionImpl implements
   }
 
   public void executeActivity(PvmActivity activity) {
-    setActivity((ActivityImpl) activity);
-    performOperation(AtomicOperation.ACTIVITY_START);
+    if(activity.isConcurrent()) {
+      this.nextActivity = activity;
+      performOperation(AtomicOperation.ACTIVITY_START_CONCURRENT);
+
+    } else if(activity.isCancelScope()) {
+      this.nextActivity = activity;
+      performOperation(AtomicOperation.ACTIVITY_START_CANCEL_SCOPE);
+
+    } else {
+      setActivity((ActivityImpl) activity);
+      performOperation(AtomicOperation.ACTIVITY_START);
+    }
   }
 
   public List<ActivityExecution> findInactiveConcurrentExecutions(PvmActivity activity) {
@@ -606,9 +653,12 @@ public class ExecutionImpl implements
 
     ExecutionImpl concurrentRoot = ((isConcurrent && !isScope) ? getParent() : this);
     List<ExecutionImpl> concurrentActiveExecutions = new ArrayList<ExecutionImpl>();
+    List<ExecutionImpl> concurrentInActiveExecutions = new ArrayList<ExecutionImpl>();
     for (ExecutionImpl execution: concurrentRoot.getExecutions()) {
       if (execution.isActive()) {
         concurrentActiveExecutions.add(execution);
+      } else {
+        concurrentInActiveExecutions.add(execution);
       }
     }
 
@@ -619,23 +669,25 @@ public class ExecutionImpl implements
 
     if ( (transitions.size()==1)
          && (concurrentActiveExecutions.isEmpty())
+         && allExecutionsInSameActivity(concurrentInActiveExecutions)
        ) {
 
       List<ExecutionImpl> recyclableExecutionImpls = (List) recyclableExecutions;
+      recyclableExecutions.remove(concurrentRoot);
       for (ExecutionImpl prunedExecution: recyclableExecutionImpls) {
         // End the pruned executions if necessary.
         // Some recyclable executions are inactivated (joined executions)
         // Others are already ended (end activities)
         if (!prunedExecution.isEnded()) {
           log.fine("pruning execution " + prunedExecution);
-          prunedExecution.remove();
+          prunedExecution.end(false);
         }
       }
 
       log.fine("activating the concurrent root "+concurrentRoot+" as the single path of execution going forward");
       concurrentRoot.setActive(true);
       concurrentRoot.setActivity(activity);
-      concurrentRoot.setConcurrent(false);
+      concurrentRoot.setConcurrent(hasConcurrentSiblings(concurrentRoot));
       concurrentRoot.take(transitions.get(0));
 
     } else {
@@ -644,7 +696,7 @@ public class ExecutionImpl implements
 
       recyclableExecutions.remove(concurrentRoot);
 
-      log.fine("recyclable executions for reused: " + recyclableExecutions);
+      log.fine("recyclable executions for reuse: " + recyclableExecutions);
 
       // first create the concurrent executions
       while (!transitions.isEmpty()) {
@@ -653,7 +705,8 @@ public class ExecutionImpl implements
         ExecutionImpl outgoingExecution = null;
         if (recyclableExecutions.isEmpty()) {
           outgoingExecution = concurrentRoot.createExecution();
-          log.fine("new "+outgoingExecution+" created to take transition "+outgoingTransition);
+          log.fine("new "+outgoingExecution+" with parent "
+                  + outgoingExecution.getParent()+" created to take transition "+outgoingTransition);
         } else {
           outgoingExecution = (ExecutionImpl) recyclableExecutions.remove(0);
           log.fine("recycled "+outgoingExecution+" to take transition "+outgoingTransition);
@@ -662,20 +715,47 @@ public class ExecutionImpl implements
         outgoingExecution.setActive(true);
         outgoingExecution.setScope(false);
         outgoingExecution.setConcurrent(true);
+        outgoingExecution.setTransitionBeingTaken((TransitionImpl) outgoingTransition);
         outgoingExecutions.add(new OutgoingExecution(outgoingExecution, outgoingTransition, true));
       }
+
+      concurrentRoot.setActivityInstanceId(concurrentRoot.getParentActivityInstanceId());
+
+      boolean isConcurrentEnd = outgoingExecutions.isEmpty();
 
       // prune the executions that are not recycled
       for (ActivityExecution prunedExecution: recyclableExecutions) {
         log.fine("pruning execution "+prunedExecution);
-        prunedExecution.end();
+        prunedExecution.end(isConcurrentEnd);
       }
 
       // then launch all the concurrent executions
       for (OutgoingExecution outgoingExecution: outgoingExecutions) {
         outgoingExecution.take();
       }
+
+      // if no outgoing executions, the concurrent root execution ends
+      if (isConcurrentEnd) {
+        concurrentRoot.end(true);
+      }
     }
+  }
+
+  protected boolean allExecutionsInSameActivity(List<ExecutionImpl> executions) {
+    if (executions.size() > 1) {
+      String activityId = executions.get(0).getActivity().getId();
+      for (ExecutionImpl execution : executions) {
+        String otherActivityId = execution.getActivity().getId();
+        if (!execution.isEnded) {
+          if ( (activityId == null && otherActivityId != null)
+                  || (activityId != null && otherActivityId == null)
+                  || (activityId != null && otherActivityId!= null && !otherActivityId.equals(activityId))) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
   }
 
   public void performOperation(AtomicOperation executionOperation) {
@@ -698,6 +778,20 @@ public class ExecutionImpl implements
     }
   }
 
+  protected boolean hasConcurrentSiblings(ExecutionImpl concurrentRoot) {
+    if(concurrentRoot.isProcessInstance()) {
+      return false;
+    } else {
+      List<ExecutionImpl> executions = concurrentRoot.getParent().getExecutions();
+      for (ExecutionImpl executionImpl : executions) {
+        if(executionImpl != concurrentRoot
+            && !executionImpl.isEventScope()) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
 
   public boolean isActive(String activityId) {
     return findExecution(activityId)!=null;
@@ -814,7 +908,7 @@ public class ExecutionImpl implements
   // allow for subclasses to expose a real id /////////////////////////////////
 
   public String getId() {
-    return null;
+    return String.valueOf(System.identityHashCode(this));
   }
 
   // getters and setters //////////////////////////////////////////////////////
@@ -846,6 +940,27 @@ public class ExecutionImpl implements
   public boolean isEnded() {
     return isEnded;
   }
+
+  public boolean isCanceled() {
+    return ActivityInstanceState.CANCELED.getStateCode() == activityInstanceState;
+  }
+
+  public void setCanceled(boolean canceled) {
+    if (canceled) {
+      activityInstanceState = ActivityInstanceState.CANCELED.getStateCode();
+    }
+  }
+
+  public boolean isCompleteScope() {
+    return ActivityInstanceState.SCOPE_COMPLETE.getStateCode() == activityInstanceState;
+  }
+
+  public void setCompleteScope(boolean completeScope) {
+    if (completeScope) {
+      activityInstanceState = ActivityInstanceState.SCOPE_COMPLETE.getStateCode();
+    }
+  }
+
   public void setProcessDefinition(ProcessDefinitionImpl processDefinition) {
     this.processDefinition = processDefinition;
   }
@@ -875,6 +990,12 @@ public class ExecutionImpl implements
     // set execution to this activity instance
     replacedBy.setActivityInstanceId(this.activityInstanceId);
   }
+
+  public void replace(InterpretableExecution execution) {
+    this.activityInstanceId = execution.getActivityInstanceId();
+    execution.leaveActivityInstance();
+  }
+
   public void setExecutions(List<ExecutionImpl> executions) {
     this.executions = executions;
   }
@@ -965,14 +1086,16 @@ public class ExecutionImpl implements
     return processInstanceStartContext;
   }
 
+  public ExecutionStartContext getExecutionStartContext() {
+    return executionStartContext;
+  }
+
   public void disposeProcessInstanceStartContext() {
     processInstanceStartContext = null;
   }
 
-  public void deleteCascade2(String deleteReason) {
-    this.deleteReason = deleteReason;
-    this.deleteRoot = true;
-    performOperation(new FoxAtomicOperationDeleteCascadeFireActivityEnd());
+  public void disposeExecutionStartContext() {
+    executionStartContext = null;
   }
 
   public String getActivityInstanceId() {
@@ -983,6 +1106,14 @@ public class ExecutionImpl implements
     this.activityInstanceId = activityInstanceId;
   }
 
+  public PvmActivity getNextActivity() {
+    return nextActivity;
+  }
+
+  public void setTransitionBeingTaken(TransitionImpl transitionBeingTaken) {
+    this.transitionBeingTaken = transitionBeingTaken;
+  }
+
   public String getCurrentTransitionId() {
     if(transition != null) {
       return transition.getId();
@@ -990,4 +1121,12 @@ public class ExecutionImpl implements
       return null;
     }
   }
+
+  public FlowElement getBpmnModelElementInstance() {
+    throw new UnsupportedOperationException(BpmnModelExecutionContext.class.getName() +" is unsupported in transient ExecutionImpl");
+  }
+  public BpmnModelInstance getBpmnModelInstance() {
+    throw new UnsupportedOperationException(BpmnModelExecutionContext.class.getName() +" is unsupported in transient ExecutionImpl");
+  }
+
 }

@@ -25,6 +25,7 @@ public class EnginesFilterTest {
     Matcher matcher2 = pattern.matcher("/app/cockpit/engine1/");
     Matcher matcher3 = pattern.matcher("/app/cockpit/engine1/something/asd.html");
     Matcher matcher4 = pattern.matcher("/app/admin/engine1/something/asd.html");
+    Matcher matcher5 = pattern.matcher("/app/cockpit/index.html");
 
     // then
     assertThat(matcher1.matches()).isTrue();
@@ -46,5 +47,10 @@ public class EnginesFilterTest {
     assertThat(matcher4.group(1)).isEqualTo("admin");
     assertThat(matcher4.group(2)).isEqualTo("engine1");
     assertThat(matcher4.group(3)).isEqualTo("something/asd.html");
+
+    assertThat(matcher5.matches()).isTrue();
+    assertThat(matcher5.group(1)).isEqualTo("cockpit");
+    assertThat(matcher5.group(2)).isEqualTo("index.html");
+    assertThat(matcher5.group(3)).isEmpty();
   }
 }

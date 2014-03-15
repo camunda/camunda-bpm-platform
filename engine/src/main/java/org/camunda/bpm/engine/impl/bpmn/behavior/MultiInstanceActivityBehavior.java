@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,30 +38,30 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 /**
  * Implementation of the multi-instance functionality as described in the BPMN 2.0 spec.
- * 
+ *
  * Multi instance functionality is implemented as an {@link ActivityBehavior} that
  * wraps the original {@link ActivityBehavior} of the activity.
  *
  * Only subclasses of {@link AbstractBpmnActivityBehavior} can have multi-instance
  * behavior. As such, special logic is contained in the {@link AbstractBpmnActivityBehavior}
  * to delegate to the {@link MultiInstanceActivityBehavior} if needed.
- * 
+ *
  * @author Joram Barrez
  * @author Falko Menge
  */
-public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBehavior  
+public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBehavior
   implements CompositeActivityBehavior, SubProcessActivityBehavior {
-  
+
   protected static final Logger LOGGER = Logger.getLogger(MultiInstanceActivityBehavior.class.getName());
-  
+
   // Variable names for outer instance(as described in spec)
   protected final String NUMBER_OF_INSTANCES = "nrOfInstances";
   protected final String NUMBER_OF_ACTIVE_INSTANCES = "nrOfActiveInstances";
   protected final String NUMBER_OF_COMPLETED_INSTANCES = "nrOfCompletedInstances";
-  
+
   // Variable names for inner instances (as described in the spec)
   protected final String LOOP_COUNTER = "loopCounter";
-  
+
   // Instance members
   protected ActivityImpl activity;
   protected AbstractBpmnActivityBehavior innerActivityBehavior;
@@ -70,9 +70,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   protected Expression collectionExpression;
   protected String collectionVariable;
   protected String collectionElementVariable;
-  
+
   /**
-   * @param innerActivityBehavior The original {@link ActivityBehavior} of the activity 
+   * @param innerActivityBehavior The original {@link ActivityBehavior} of the activity
    *                         that will be wrapped inside this behavior.
    * @param isSequential Indicates whether the multi instance behavior
    *                     must be sequential or parallel
@@ -81,10 +81,10 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     this.activity = activity;
     setInnerActivityBehavior(innerActivityBehavior);
   }
-  
+
   public void execute(ActivityExecution execution) throws Exception {
     if (getLocalLoopVariable(execution, LOOP_COUNTER) == null) {
-      try {        
+      try {
         if (!createInstancesIfPossible(execution)) {
           // leave the state through the default behavior (so we have to call super.!)
           // no multiple instance needed in this case
@@ -99,11 +99,11 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         innerActivityBehavior.execute(execution);
     }
   }
-  
+
   /**
    * protects the createInstance method - it is only called if the numberOfInstances is valid
    * (negative is invalid -> exception; zero means the sub instances are skipped)
-   * 
+   *
    * Returns true if instances were created
    */
   protected boolean createInstancesIfPossible(ActivityExecution execution) throws Exception {
@@ -113,26 +113,26 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
       return false;
     }
     else if (nrOfInstances < 0) {
-      throw new ProcessEngineException("Invalid number of instances: must be positive integer value or zero" 
+      throw new ProcessEngineException("Invalid number of instances: must be positive integer value or zero"
               + ", but was " + nrOfInstances);
     }
     createInstances(execution, nrOfInstances);
     return true;
   }
-  
+
   protected abstract void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception;
-  
+
   // Intercepts signals, and delegates it to the wrapped {@link ActivityBehavior}.
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
     innerActivityBehavior.signal(execution, signalName, signalData);
   }
-  
+
   // required for supporting embedded subprocesses
   public void lastExecutionEnded(ActivityExecution execution) {
     ScopeUtil.createEventScopeExecution((ExecutionEntity) execution);
     leave(execution);
   }
-  
+
   // required for supporting external subprocesses
   public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
   }
@@ -141,9 +141,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   public void completed(ActivityExecution execution) throws Exception {
     leave(execution);
   }
-  
+
   // Helpers //////////////////////////////////////////////////////////////////////
-  
+
   @SuppressWarnings("rawtypes")
   protected int resolveNrOfInstances(ActivityExecution execution) {
     int nrOfInstances = -1;
@@ -166,7 +166,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     }
     return nrOfInstances;
   }
-  
+
   @SuppressWarnings("rawtypes")
   protected void executeOriginalBehavior(ActivityExecution execution, int loopCounter) throws Exception {
     if (usesCollection() && collectionElementVariable != null) {
@@ -176,7 +176,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
       } else if (collectionVariable != null) {
         collection = (Collection) execution.getVariable(collectionVariable);
       }
-       
+
       Object value = null;
       int index = 0;
       Iterator it = collection.iterator();
@@ -195,17 +195,17 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
       execution.executeActivity(activity);
     }
   }
-  
+
   protected boolean usesCollection() {
-    return collectionExpression != null 
+    return collectionExpression != null
               || collectionVariable != null;
   }
-  
+
   public boolean isExtraScopeNeeded() {
     // special care is needed when the behavior is an embedded subprocess (not very clean, but it works)
-    return innerActivityBehavior instanceof org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;  
+    return innerActivityBehavior instanceof org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
   }
-  
+
   protected int resolveLoopCardinality(ActivityExecution execution) {
     // Using Number since expr can evaluate to eg. Long (which is also the default for Juel)
     Object value = loopCardinalityExpression.getValue(execution);
@@ -214,11 +214,11 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     } else if (value instanceof String) {
       return Integer.valueOf((String) value);
     } else {
-      throw new ProcessEngineException("Could not resolve loopCardinality expression '" 
+      throw new ProcessEngineException("Could not resolve loopCardinality expression '"
               +loopCardinalityExpression.getExpressionText()+"': not a number nor number String");
     }
   }
-  
+
   protected boolean completionConditionSatisfied(ActivityExecution execution) {
     if (completionConditionExpression != null) {
       Object value = completionConditionExpression.getValue(execution);
@@ -235,11 +235,11 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     }
     return false;
   }
-  
+
   protected void setLoopVariable(ActivityExecution execution, String variableName, Object value) {
     execution.setVariableLocal(variableName, value);
   }
-  
+
   protected Integer getLoopVariable(ActivityExecution execution, String variableName) {
     Object value = execution.getVariableLocal(variableName);
     ActivityExecution parent = execution.getParent();
@@ -247,13 +247,18 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
       value = parent.getVariableLocal(variableName);
       parent = parent.getParent();
     }
+
+    if (value == null) {
+      throw new ProcessEngineException("The variable \"" + variableName + "\" could not be found in execution with id " + execution.getId());
+    }
+
     return (Integer) value;
   }
-  
+
   protected Integer getLocalLoopVariable(ActivityExecution execution, String variableName) {
     return (Integer) execution.getVariableLocal(variableName);
   }
-  
+
   /**
    * Since no transitions are followed when leaving the inner activity,
    * it is needed to call the end listeners yourself.
@@ -271,8 +276,8 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
       }
     }
   }
-  
-  protected void logLoopDetails(ActivityExecution execution, String custom, int loopCounter, 
+
+  protected void logLoopDetails(ActivityExecution execution, String custom, int loopCounter,
           int nrOfCompletedInstances, int nrOfActiveInstances, int nrOfInstances) {
     if (LOGGER.isLoggable(Level.FINE)) {
       StringBuilder strb = new StringBuilder();
@@ -285,9 +290,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     }
   }
 
-  
+
   // Getters and Setters ///////////////////////////////////////////////////////////
-  
+
   public Expression getLoopCardinalityExpression() {
     return loopCardinalityExpression;
   }
@@ -322,5 +327,5 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     this.innerActivityBehavior = innerActivityBehavior;
     this.innerActivityBehavior.setMultiInstanceActivityBehavior(this);
   }
-  
+
 }

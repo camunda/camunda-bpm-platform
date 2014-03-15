@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" targetNamespace="Examples">
+  <process id="testResolveBean" isExecutable="true">
+    <startEvent id="theStart" name="Start">
+      <outgoing>flow12</outgoing>
+    </startEvent>
+    <endEvent id="endevent1" name="End">
+      <incoming>flow11</incoming>
+    </endEvent>
+    <serviceTask id="servicetask1" activiti:delegateExpression="${exampleSignallableActivityBehaviorBean}" name="Service Task">
+      <incoming>flow12</incoming>
+      <outgoing>flow11</outgoing>
+    </serviceTask>
+    <sequenceFlow id="flow11" name="" sourceRef="servicetask1" targetRef="endevent1"/>
+    <sequenceFlow id="flow12" name="" sourceRef="theStart" targetRef="servicetask1"/>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_testDeployProcessArchive">
+    <bpmndi:BPMNPlane id="BPMNPlane_testDeployProcessArchive" bpmnElement="testDeployProcessArchive">
+      <bpmndi:BPMNShape id="BPMNShape_theStart" bpmnElement="theStart">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="200.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endevent1" bpmnElement="endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="250.0" y="200.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_servicetask1" bpmnElement="servicetask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="110.0" y="190.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow11" bpmnElement="flow11">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="215.0" y="217.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="250.0" y="217.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow12" bpmnElement="flow12">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="65.0" y="217.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="110.0" y="217.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

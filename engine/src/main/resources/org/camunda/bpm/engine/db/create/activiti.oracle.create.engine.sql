@@ -96,7 +96,7 @@ create table ACT_RE_PROCDEF (
     VERSION_ INTEGER NOT NULL,
     DEPLOYMENT_ID_ NVARCHAR2(64),
     RESOURCE_NAME_ NVARCHAR2(2000),
-    DGRM_RESOURCE_NAME_ varchar(4000),
+    DGRM_RESOURCE_NAME_ NVARCHAR2(2000),
     HAS_START_FORM_KEY_ NUMBER(1,0) CHECK (HAS_START_FORM_KEY_ IN (1,0)),
     SUSPENSION_STATE_ INTEGER,
     primary key (ID_)
@@ -118,6 +118,7 @@ create table ACT_RU_TASK (
     PRIORITY_ INTEGER,
     CREATE_TIME_ TIMESTAMP(6),
     DUE_DATE_ TIMESTAMP(6),
+    FOLLOW_UP_DATE_ TIMESTAMP(6),
     SUSPENSION_STATE_ INTEGER,
     primary key (ID_)
 );
@@ -178,13 +179,13 @@ create table ACT_RU_INCIDENT (
 );
 
 create table ACT_RU_AUTHORIZATION (
-  ID_ varchar(64) not null,
+  ID_ NVARCHAR2(64) not null,
   REV_ integer not null,
   TYPE_ integer not null,
-  GROUP_ID_ varchar(255),
-  USER_ID_ varchar(255),
+  GROUP_ID_ NVARCHAR2(255),
+  USER_ID_ NVARCHAR2(255),
   RESOURCE_TYPE_ integer not null,
-  RESOURCE_ID_ varchar(64),
+  RESOURCE_ID_ NVARCHAR2(64),
   PERMS_ integer,
   primary key (ID_)
 );

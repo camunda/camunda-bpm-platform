@@ -19,4 +19,5 @@ drop table ACT_HI_TASKINST;
 drop table ACT_HI_DETAIL;
 drop table ACT_HI_COMMENT;
 drop table ACT_HI_ATTACHMENT;
-
+drop table ACT_HI_OP_LOG;
+drop table ACT_HI_INCIDENT;

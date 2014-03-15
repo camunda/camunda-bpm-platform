@@ -15,14 +15,18 @@ package org.camunda.bpm.engine.test.api.mgmt;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.TableMetaData;
@@ -343,6 +347,34 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException re) {
       assertTextPresent("No job found with id 'unexistingjob'.", re.getMessage());
     }
+  }
+
+  public void testGetProperties() {
+    Map<String, String> properties = managementService.getProperties();
+    assertNotNull(properties);
+    assertFalse(properties.isEmpty());
+  }
+
+  public void  testSetProperty() {
+    final String name = "testProp";
+    final String value = "testValue";
+    managementService.setProperty(name, value);
+
+    Map<String, String> properties = managementService.getProperties();
+    assertTrue(properties.containsKey(name));
+    String storedValue = properties.get(name);
+    assertEquals(value, storedValue);
+
+    processEngineConfiguration.getCommandExecutorTxRequired()
+      .execute(new Command<Void>() {
+
+        public Void execute(CommandContext commandContext) {
+          PropertyEntity property = commandContext.getPropertyManager().findPropertyById(name);
+          commandContext.getDbSqlSession().delete(property);
+          return null;
+        }
+
+      });
   }
 
 }

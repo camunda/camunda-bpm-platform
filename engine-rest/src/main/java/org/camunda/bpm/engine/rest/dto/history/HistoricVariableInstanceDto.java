@@ -18,10 +18,16 @@ import org.camunda.bpm.engine.impl.variable.SerializableType;
 
 public class HistoricVariableInstanceDto {
 
+  private String id;
   private String name;
   private String type;
   private Object value;
   private String processInstanceId;
+  private String activityInstanceId;
+
+  public String getId() {
+    return id;
+  }
 
   public String getName() {
     return name;
@@ -39,14 +45,20 @@ public class HistoricVariableInstanceDto {
     return processInstanceId;
   }
 
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+
   public static HistoricVariableInstanceDto fromHistoricVariableInstance(HistoricVariableInstance historicVariableInstance) {
 
     HistoricVariableInstanceEntity entity = (HistoricVariableInstanceEntity) historicVariableInstance;
 
     HistoricVariableInstanceDto dto = new HistoricVariableInstanceDto();
 
+    dto.id = entity.getId();
     dto.name = entity.getVariableName();
     dto.processInstanceId = entity.getProcessInstanceId();
+    dto.activityInstanceId = entity.getActivtyInstanceId();
 
     if (!entity.getVariableTypeName().equals(SerializableType.TYPE_NAME)) {
       dto.value = entity.getValue();

@@ -9,7 +9,9 @@ ngDefine('admin.pages', [
   './groupCreate',
   './groupEdit',
   './groupMembershipsCreate',
-  './setup'
+  './setup',
+  './system',
+  './systemSettingsGeneral',
 ], function(module) {
 
 });

@@ -43,6 +43,7 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   private Object variableValue;
   protected String[] executionIdIn;
   protected String[] taskIdIn;
+  protected String[] activityInstanceIdIn;
 
   public HistoricVariableInstanceQueryDto() {
   }
@@ -81,6 +82,11 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     this.taskIdIn = taskIdIn;
   }
 
+  @CamundaQueryParam(value="activityInstanceIdIn", converter = StringArrayConverter.class)
+  public void setActivityInstanceIdIn(String[] activityInstanceIdIn) {
+    this.activityInstanceIdIn = activityInstanceIdIn;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -115,6 +121,9 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     }
     if (taskIdIn != null && taskIdIn.length > 0) {
       query.taskIdIn(taskIdIn);
+    }
+    if (activityInstanceIdIn != null && activityInstanceIdIn.length > 0) {
+      query.activityInstanceIdIn(activityInstanceIdIn);
     }
   }
 

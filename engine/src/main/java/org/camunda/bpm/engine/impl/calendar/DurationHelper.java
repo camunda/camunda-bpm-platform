@@ -118,8 +118,8 @@ public class DurationHelper {
     return calendar.getTime();
   }
 
-  private Duration parsePeriod(String period) throws Exception {
-      return datatypeFactory.newDuration(period);
+  private Duration parsePeriod(String period) {
+    return datatypeFactory.newDuration(period);
   }
 
   private boolean isDuration(String time) {

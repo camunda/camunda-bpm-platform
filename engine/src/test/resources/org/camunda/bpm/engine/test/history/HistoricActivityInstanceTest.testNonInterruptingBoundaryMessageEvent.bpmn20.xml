@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <message id="messageId" name="newMessage" />
+  
+  <process id="process">
+  
+    <startEvent id="theStart" />
+    
+    <sequenceFlow sourceRef="theStart" targetRef="task" />
+    
+    <userTask id="task" />
+    
+    <sequenceFlow sourceRef="task" targetRef="end1" />
+    
+    <endEvent id="end1" />
+    
+    <boundaryEvent id="message" attachedToRef="task" cancelActivity="false">
+  		<messageEventDefinition messageRef="messageId" />
+  	</boundaryEvent>
+    
+    <sequenceFlow sourceRef="message" targetRef="taskAfterMessage" />
+    
+    <userTask id="taskAfterMessage" />
+    
+    <sequenceFlow sourceRef="taskAfterMessage" targetRef="end2" />
+    
+    <endEvent id="end2" />
+    
+  </process>
+
+</definitions>

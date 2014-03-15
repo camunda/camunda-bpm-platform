@@ -1,27 +1,66 @@
-<div class="tree-node" 
-     ng-class="{ 'selected' : node.isSelected }">
+<!-- # CE - src/main/webapp/app/cockpit/directives/activity-instance-tree.html -->
+<div class="tree-node" >
 
-  <div class="tree-node-label">
-    <button class="btn btn-link btn-control-link btn-toggle" ng-if="node.children.length" ng-click="toggleOpen()">
-      <i ng-class="{ 'icon-chevron-right' : !node.isOpen, 'icon-chevron-down' : node.isOpen }"></i>
-    </button>
-    
-    <button class="btn btn-link btn-control-link btn-control remove"
-            ng-click="deselect($event)">
-      <i class="icon-remove"></i>
-    </button>
-    
-    <a id="{{ node.id }}"
-       ng-click="select($event)">
-      {{ node.name }}
-    </a>
+  <div id="{{ node.id }}" ng-class="{ 'state-running': !node.endTime, 'state-completed' : node.endTime && !node.canceled, 'state-canceled': node.endTime && node.canceled }"
+       class="tree-node-group">
+
+    <span class="tree-node-label"
+          ng-class="{ 'selected' : node.isSelected, 'has-children': node.children.length }">
+
+      <button class="btn btn-link btn-control-link btn-toggle" ng-if="node.children.length" ng-click="toggleOpen()">
+        <i ng-class="{ 'icon-chevron-right' : !node.isOpen, 'icon-chevron-down' : node.isOpen }"></i>
+      </button>
+
+      <button class="btn btn-link btn-control-link btn-control remove"
+              ng-click="deselect($event)">
+        <i class="icon-remove"></i>
+      </button>
+
+      <a ng-click="select($event)"
+         help
+         help-placement="top"
+         help-text="{{ node.name }}">
+        {{ node.name }}
+      </a>
+
+    </span>
+
+    <!-- running -->
+    <span ng-if="!node.endTime"
+          class="tree-node-addon activity-instance-running"
+          help
+          help-text="Running Activity Instance"
+          help-placement="'right'">
+      <i class="icon-adjust"></i>
+    </span>
+
+    <!-- completed -->
+    <span ng-if="node.endTime && !node.canceled"
+          class="tree-node-addon activity-instance-completed"
+          help
+          help-text="Completed Activity Instance"
+          help-placement="'right'">
+      <i class="icon-ok-circle"></i>
+    </span>
+
+    <!-- canceled -->
+    <span ng-if="node.endTime && node.canceled"
+          class="tree-node-addon activity-instance-canceled"
+          help
+          help-text="Canceled Activity Instance"
+          help-placement="'right'">
+      <i class="icon-ban-circle"></i>
+    </span>
+
   </div>
 
   <ul class="unstyled" ng-show="node.isOpen" ng-if="node.children.length">
-    <li ng-repeat="child in node.children | orderBy:'name'">
-      <div activity-instance-tree="child" 
+    <li ng-repeat="child in node.children | orderBy:orderPropertyValue">
+      <div activity-instance-tree="child"
            selection="selection"
-           on-element-click="propogateSelection(id, activityId, $event)" />
+           on-element-click="propogateSelection(id, activityId, $event)">
+      </div>
     </li>
   </ul>
 </div>
+<!-- / CE - src/main/webapp/app/cockpit/directives/activity-instance-tree.html -->

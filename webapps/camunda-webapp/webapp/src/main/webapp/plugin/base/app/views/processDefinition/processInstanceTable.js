@@ -1,5 +1,6 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
-
+  'use strict';
+  
   var Controller = [ '$scope', 'search', 'PluginProcessInstanceResource',
       function ($scope, search, PluginProcessInstanceResource) {
 
@@ -54,6 +55,18 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       countParams.activityIdIn = countParams.activityIds;
       delete countParams.activityIds;
 
+      // fix missmatch -> start -> startedAfter/startedBefore
+      angular.forEach(countParams.start, function (dateFilter) {
+        if (dateFilter.value) {
+          if (dateFilter.type === 'after') {
+            countParams.startedAfter = dateFilter.value;
+          } else if (dateFilter.type === 'before') {
+            countParams.startedBefore = dateFilter.value;
+          }
+        }
+      });
+      delete countParams.start;      
+
       var params = angular.extend({}, countParams, pagingParams);
 
       $scope.processInstances = null;
@@ -65,21 +78,19 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       PluginProcessInstanceResource.count(countParams).$then(function(data) {
         pages.total = Math.ceil(data.data.count / pages.size);
       });
-    };
+    }
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+  var Configuration = [ 'ViewsProvider', function(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
+    ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
       id: 'process-instances-table',
       label: 'Process Instances',
       url: 'plugin://base/static/app/views/processDefinition/process-instance-table.html',
       controller: Controller,
       priority: 10
-    }); 
-  };
-
-  Configuration.$inject = ['ViewsProvider'];
+    });
+  }];
 
   module.config(Configuration);
 });

@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.cockpit;
 
-import java.util.Set;
 import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.cockpit.db.QueryService;
 import org.camunda.bpm.cockpit.plugin.PluginRegistry;
-import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
+import org.camunda.bpm.webapp.AppRuntimeDelegate;
 
 /**
  * <p>The {@link CockpitRuntimeDelegate} is a delegate to provide
@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.ProcessEngine;
  *
  * @author roman.smirnov
  */
-public interface CockpitRuntimeDelegate {
+public interface CockpitRuntimeDelegate extends AppRuntimeDelegate<CockpitPlugin> {
 
   /**
    * Returns a configured {@link QueryService} to execute custom
@@ -43,31 +43,12 @@ public interface CockpitRuntimeDelegate {
   public CommandExecutor getCommandExecutor(String processEngineName);
 
   /**
-   * Returns a {@link ProcessEngine} to the assigned
-   * <code>processEngineName</code>
-   *
-   * @param processEngineName
-   * @return a {@link ProcessEngine}
-   */
-  public ProcessEngine getProcessEngine(String processEngineName);
-
-  /**
-   * Returns the list of {@link ProcessEngine} names available to the runtime
-   * @return
-   */
-  public Set<String> getProcessEngineNames();
-
-  /**
-   * Returns the default {@link ProcessEngine} provided by the
-   * @return
-   */
-  public ProcessEngine getDefaultProcessEngine();
-
-  /**
    * A registry that provides access to the plugins registered
    * in the application.
    *
    * @return
    */
+  @Deprecated
   public PluginRegistry getPluginRegistry();
+
 }

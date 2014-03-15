@@ -12,12 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.history.event;
 
+import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceState;
+
 
 /**
  * <p>{@link HistoryEvent} implementation for events that happen in an activity.</p>
  *
  * @author Daniel Meyer
  * @author Marcel Wieczorek
+ * @author roman.smirnov
  *
  */
 public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEvent {
@@ -36,6 +39,9 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
   /** the id of this activity instance */
   protected String activityInstanceId;
 
+  /** the state of this activity instance */
+  protected int activityInstanceState;
+
   /** the id of the parent activity instance */
   protected String parentActivityInstanceId;
 
@@ -45,12 +51,12 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
   protected String taskId;
   protected String taskAssignee;
 
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getAssignee() {
     return taskAssignee;
   }
-
 
   public String getActivityId() {
     return activityId;
@@ -116,6 +122,22 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
     this.taskAssignee = taskAssignee;
   }
 
+  public void setActivityInstanceState(int activityInstanceState) {
+    this.activityInstanceState = activityInstanceState;
+  }
+
+  public int getActivityInstanceState() {
+    return activityInstanceState;
+  }
+
+  public boolean isCompleteScope() {
+    return ActivityInstanceState.SCOPE_COMPLETE.getStateCode() == activityInstanceState;
+  }
+
+  public boolean isCanceled() {
+    return ActivityInstanceState.CANCELED.getStateCode() == activityInstanceState;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -123,6 +145,7 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
            + ", activityName=" + activityName
            + ", activityType=" + activityType
            + ", activityInstanceId=" + activityInstanceId
+           + ", activityInstanceState=" + activityInstanceState
            + ", parentActivityInstanceId=" + parentActivityInstanceId
            + ", calledProcessInstanceId=" + calledProcessInstanceId
            + ", taskId=" + taskId

@@ -32,6 +32,7 @@
         <include>org.camunda.bpm.javaee:camunda-ejb-client:jar:${project.version}</include>
         <include>org.camunda.bpm:*</include>
         <include>org.camunda.bpm.identity:*</include>
+        <include>org.camunda.bpm.model:*</include>
         <include>org.mybatis:mybatis:jar:*</include>
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>           

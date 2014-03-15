@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,10 +34,11 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   protected String id;
   protected String processInstanceId;
-  
+
   protected String taskId;
   protected String executionId;
-  
+  protected String activityInstanceId;
+
   protected String name;
   protected int revision;
   protected String variableTypeName;
@@ -53,7 +54,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   protected Object cachedValue;
 
-  
+
   public HistoricVariableInstanceEntity() {
   }
 
@@ -66,20 +67,21 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.processInstanceId = historyEvent.getProcessInstanceId();
     this.taskId = historyEvent.getTaskId();
     this.executionId = historyEvent.getExecutionId();
+    this.activityInstanceId = historyEvent.getScopeActivityInstanceId();
     this.name = historyEvent.getVariableName();
     this.variableTypeName = historyEvent.getVariableTypeName();
     this.longValue = historyEvent.getLongValue();
     this.doubleValue = historyEvent.getDoubleValue();
     this.textValue = historyEvent.getTextValue();
     this.textValue2 = historyEvent.getTextValue2();
-    
+
     deleteByteArrayValue();
     if(historyEvent.getByteValue() != null) {
       setByteArrayValue(historyEvent.getByteValue());
     }
-    
+
   }
-  
+
   public void delete() {
     deleteByteArrayValue();
     Context
@@ -90,6 +92,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   public Object getPersistentState() {
     List<Object> state = new ArrayList<Object>(5);
+    state.add(variableTypeName);
     state.add(textValue);
     state.add(textValue2);
     state.add(doubleValue);
@@ -97,28 +100,28 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     state.add(byteArrayId);
     return state;
   }
-  
+
   public int getRevisionNext() {
     return revision+1;
   }
-  
+
   public Object getValue() {
     if (!variableType.isCachable() || cachedValue == null) {
       cachedValue = variableType.getValue(this);
     }
     return cachedValue;
   }
-  
+
  // byte array value /////////////////////////////////////////////////////////
-  
+
   // i couldn't find a easy readable way to extract the common byte array value logic
-  // into a common class.  therefor it's duplicated in VariableInstanceEntity, 
-  // HistoricVariableInstance and HistoricDetailVariableInstanceUpdateEntity 
-  
+  // into a common class.  therefor it's duplicated in VariableInstanceEntity,
+  // HistoricVariableInstance and HistoricDetailVariableInstanceUpdateEntity
+
   public String getByteArrayValueId() {
     return byteArrayId;
   }
-  
+
   public String getByteArrayId() {
     return byteArrayId;
   }
@@ -137,7 +140,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     }
     return byteArrayValue;
   }
-  
+
   public void setByteArrayValue(byte[] bytes) {
     ByteArrayEntity byteArrayValue = null;
     deleteByteArrayValue();
@@ -158,7 +161,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   protected void deleteByteArrayValue() {
     if (byteArrayId != null) {
-      // the next apparently useless line is probably to ensure consistency in the DbSqlSession 
+      // the next apparently useless line is probably to ensure consistency in the DbSqlSession
       // cache, but should be checked and docced here (or removed if it turns out to be unnecessary)
       getByteArrayValue();
       Context
@@ -174,7 +177,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   public String getVariableTypeName() {
     return variableTypeName;
   }
-  
+
   public String getVariableName() {
     return name;
   }
@@ -254,7 +257,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   public String getId() {
     return id;
   }
-  
+
   public void setId(String id) {
     this.id = id;
   }
@@ -270,13 +273,21 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   public void setTaskId(String taskId) {
     this.taskId = taskId;
   }
-  
+
   public String getExecutionId() {
     return executionId;
   }
-  
+
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
+  }
+
+  public String getActivtyInstanceId() {
+    return activityInstanceId;
+  }
+
+  public void setActivtyInstanceId(String activityInstanceId) {
+    this.activityInstanceId = activityInstanceId;
   }
 
   @Override
@@ -286,6 +297,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
            + ", processInstanceId=" + processInstanceId
            + ", taskId=" + taskId
            + ", executionId=" + executionId
+           + ", activityInstanceId=" + activityInstanceId
            + ", name=" + name
            + ", revision=" + revision
            + ", variableTypeName=" + variableTypeName
@@ -296,4 +308,5 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
            + ", byteArrayId=" + byteArrayId
            + "]";
   }
+
 }

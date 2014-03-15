@@ -45,7 +45,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
@@ -59,6 +61,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
@@ -291,6 +294,10 @@ public class CommandContext {
     return getSession(HistoricDetailManager.class);
   }
 
+  public UserOperationLogManager getOperationLogManager() {
+    return getSession(UserOperationLogManager.class);
+  }
+
   public HistoricVariableInstanceManager getHistoricVariableInstanceManager() {
     return getSession(HistoricVariableInstanceManager.class);
   }
@@ -301,6 +308,10 @@ public class CommandContext {
 
   public HistoricTaskInstanceManager getHistoricTaskInstanceManager() {
     return getSession(HistoricTaskInstanceManager.class);
+  }
+
+  public HistoricIncidentManager getHistoricIncidentManager() {
+    return getSession(HistoricIncidentManager.class);
   }
 
   public JobManager getJobManager() {
@@ -345,6 +356,10 @@ public class CommandContext {
 
   public StatisticsManager getStatisticsManager() {
     return getSession(StatisticsManager.class);
+  }
+
+  public HistoricStatisticsManager getHistoricStatisticsManager() {
+    return getSession(HistoricStatisticsManager.class);
   }
 
   public AuthorizationManager getAuthorizationManager() {

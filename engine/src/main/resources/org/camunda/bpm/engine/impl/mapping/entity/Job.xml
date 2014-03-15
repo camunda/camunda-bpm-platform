@@ -40,6 +40,9 @@
       <if test="processDefinitionKey != null">
         and PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
       </if>
+      <if test="handlerType != null">
+        and HANDLER_TYPE_ =  #{handlerType, jdbcType=VARCHAR}
+      </if>
     </where>
   </update>  
   
@@ -322,6 +325,7 @@
     update ${prefix}ACT_RU_JOB
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
+       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
        LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
        LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
        RETRIES_ = #{retries, jdbcType=INTEGER},
@@ -405,6 +409,7 @@
     update ${prefix}ACT_RU_JOB
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
+       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
        LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
        LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
        RETRIES_ = #{retries, jdbcType=INTEGER},

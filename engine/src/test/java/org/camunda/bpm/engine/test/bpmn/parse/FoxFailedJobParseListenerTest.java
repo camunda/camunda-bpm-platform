@@ -30,6 +30,24 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTestCas
   }
 
   @Deployment
+      (resources =
+          { "org/camunda/bpm/engine/test/bpmn/parse/CamundaFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
+  public void testUserTaskParseFailedJobRetryTimeCycleInActivitiNamespace() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncUserTaskFailedJobRetryTimeCycle");
+
+    assertTrue(pi instanceof ExecutionEntity);
+    ExecutionEntity execution = (ExecutionEntity) pi;
+
+    ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
+    assertNotNull(processDefinition);
+
+    ActivityImpl userTask = processDefinition.findActivity("task");
+    assertNotNull(userTask);
+
+    this.checkFoxFailedJobConfig(userTask);
+  }
+
+  @Deployment
           (resources = 
               { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
   public void testNotAsyncUserTaskParseFailedJobRetryTimeCycle() {

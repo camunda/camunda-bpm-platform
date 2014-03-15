@@ -1,0 +1,42 @@
+{
+  "name": "camunda-webapp",
+  "version": "7.1.0-alpha1",
+  "homepage": "https://github.com/camunda/camunda-bpm-platform",
+  "authors": [
+    "Nico Rehwaldt <nico.rehwaldt@camunda.com>",
+    "Valentin Vago <valentin.vago@camunda.com>"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "http://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.js",
+    "angular-resource": "./src/main/webapp/assets/local/angular-resource-patched.js",
+    "angular-sanitize": "http://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-sanitize.js",
+    "angular-cookies": "http://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-cookies.js",
+    "angular-data-depend": "camunda/angular-data-depend",
+    "angular-ui": "./src/main/webapp/assets/local/ui-bootstrap-dialog-tpls-0.5.0.js",
+    "better-dom": "1.6.6",
+    "better-placeholder-polyfill": "1.1.1",
+    "bootstrap": "./src/main/webapp/assets/local/bootstrap",
+    "bootstrap-slider": "*",
+    "camunda-bpmn.js": "camunda/camunda-bpmn.js",
+    "dojo": "./src/main/webapp/assets/local/dojo",
+    "jquery": "http://code.jquery.com/jquery-1.11.0.js",
+    "jquery-mousewheel": "https://raw.github.com/brandonaaron/jquery-mousewheel/09bb82c73c5650812e36dfd27d605d64d3ed32b8/jquery.mousewheel.js",
+    "jquery-overscroll-fixed": "https://raw.github.com/azoff/overscroll/1579345a5d7cf2601a290e64d04aaa2a22449cac/src/jquery.overscroll.js",
+    "jquery-ui": "./src/main/webapp/assets/local/jquery-ui-1.10.3.custom.min.js",
+    "requirejs-angular-define": "camunda/requirejs-angular-define",
+    "requirejs": "http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js",
+    "requirejs-domready": "http://cdnjs.cloudflare.com/ajax/libs/require-domReady/2.0.1/domReady.min.js"
+  },
+  "devDependencies": {
+    "angular-scenario": "http://code.angularjs.org/1.1.5/angular-scenario.js",
+    "angular-mocks": "http://code.angularjs.org/1.1.5/angular-mocks.js"
+  }
+}

@@ -216,14 +216,13 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     $scope.isDateValueValid = function (param) {
       console.log(param);
     };
-
-  };
+  }
 
   module.controller('VariableInstancesController', [ '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', VariableInstancesController ]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
       id: 'variables-tab',
       label: 'Variables',
       url: 'plugin://base/static/app/views/processInstance/variable-instances-tab.html',

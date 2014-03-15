@@ -30,6 +30,7 @@ create table ACT_HI_ACTINST (
     START_TIME_ datetime2 not null,
     END_TIME_ datetime2,
     DURATION_ numeric(19,0),
+    ACT_INST_STATE_ tinyint,
     primary key (ID_)
 );
 
@@ -39,6 +40,7 @@ create table ACT_HI_TASKINST (
     TASK_DEF_KEY_ nvarchar(255),
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    ACT_INST_ID_ nvarchar(64),
     NAME_ nvarchar(255),
     PARENT_TASK_ID_ nvarchar(64),
     DESCRIPTION_ nvarchar(4000),
@@ -50,6 +52,7 @@ create table ACT_HI_TASKINST (
     DELETE_REASON_ nvarchar(4000),
     PRIORITY_ int,
     DUE_DATE_ datetime2,
+    FOLLOW_UP_DATE_ datetime2,
     primary key (ID_)
 );
 
@@ -57,6 +60,7 @@ create table ACT_HI_VARINST (
     ID_ nvarchar(64) not null,
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    ACT_INST_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
     NAME_ nvarchar(255) not null,
     VAR_TYPE_ nvarchar(100),
@@ -76,6 +80,7 @@ create table ACT_HI_DETAIL (
     EXECUTION_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
     ACT_INST_ID_ nvarchar(64),
+    VAR_INST_ID_ nvarchar(64),
     NAME_ nvarchar(255) not null,
     VAR_TYPE_ nvarchar(255),
     REV_ int,
@@ -113,6 +118,40 @@ create table ACT_HI_ATTACHMENT (
     URL_ nvarchar(4000),
     CONTENT_ID_ nvarchar(64),
     primary key (ID_)
+);
+
+create table ACT_HI_OP_LOG (
+    ID_ nvarchar(64) not null,
+    PROC_DEF_ID_ nvarchar(64),
+    PROC_INST_ID_ nvarchar(64),
+    EXECUTION_ID_ nvarchar(64),
+    TASK_ID_ nvarchar(64),
+    USER_ID_ nvarchar(255),
+    TIMESTAMP_ datetime2 not null,
+    OPERATION_TYPE_ nvarchar(64),
+    OPERATION_ID_ nvarchar(64),
+    ENTITY_TYPE_ nvarchar(30),
+    PROPERTY_ nvarchar(64),
+    ORG_VALUE_ nvarchar(4000),
+    NEW_VALUE_ nvarchar(4000),
+    primary key (ID_)
+);
+
+create table ACT_HI_INCIDENT (
+  ID_ nvarchar(64) not null,
+  PROC_DEF_ID_ nvarchar(64),
+  PROC_INST_ID_ nvarchar(64),
+  EXECUTION_ID_ nvarchar(64),
+  CREATE_TIME_ datetime2 not null,
+  END_TIME_ datetime2,
+  INCIDENT_MSG_ nvarchar(4000),
+  INCIDENT_TYPE_ nvarchar(255) not null,
+  ACTIVITY_ID_ nvarchar(255),
+  CAUSE_INCIDENT_ID_ nvarchar(64),
+  ROOT_CAUSE_INCIDENT_ID_ nvarchar(64),
+  CONFIGURATION_ nvarchar(255),
+  INCIDENT_STATE_ integer,
+  primary key (ID_)
 );
 
 create index ACT_IDX_HI_PRO_INST_END on ACT_HI_PROCINST(END_TIME_);

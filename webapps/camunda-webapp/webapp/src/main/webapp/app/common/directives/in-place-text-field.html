@@ -1,0 +1,51 @@
+<!-- # CE - src/main/webapp/app/common/directives/in-place-text-field.html -->
+<div in-place-text-field-root>
+  <div ng-if="!editing">
+    {{ context[property] }}
+    <span class="edit-toggle"
+          ng-click="enter()">
+      <i class="icon-pencil"></i>
+    </span>
+  </div>
+
+  <form ng-if="editing"
+        ng-submit="submit()"
+        class="inline-edit"
+        name="inPlaceTextFieldForm"
+        novalidate
+        request-aware>
+
+    <fieldset>
+      <!-- {{ value }} -->
+      <input name="value"
+             ng-model="value"
+             type="text"
+             class="in-place-edit"
+             placeholder="{{ placeholder }}"
+             autofocus
+             required>
+    </fieldset>
+
+    <div class="inline-edit-footer">
+
+      <p class="error" ng-show="error">
+        {{ error.message }}
+      </p>
+
+      <div class="btn-group">
+        <button type="submit"
+                class="btn btn-primary"
+                ng-disabled="inPlaceTextFieldForm.$invalid">
+          <i class="icon-ok icon-white"></i>
+        </button>
+        <button type="button"
+                class="btn"
+                ng-click="leave()">
+          <i class="icon-ban-circle"></i>
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>
+<!-- / CE - src/main/webapp/app/common/directives/in-place-text-field.html -->

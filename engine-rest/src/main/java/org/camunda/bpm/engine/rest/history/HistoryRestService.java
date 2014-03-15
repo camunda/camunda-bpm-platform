@@ -30,4 +30,20 @@ public interface HistoryRestService {
 
   @Path(HistoricVariableInstanceRestService.PATH)
   HistoricVariableInstanceRestService getVariableInstanceService();
+
+  @Path(HistoricActivityStatisticsRestService.PATH)
+  HistoricActivityStatisticsRestService getActivityStatisticsService();
+
+  @Path(UserOperationLogRestService.PATH)
+  UserOperationLogRestService getUserOperationLogRestService();
+
+  @Path(HistoricDetailRestService.PATH)
+  HistoricDetailRestService getDetailService();
+
+  @Path(HistoricTaskInstanceRestService.PATH)
+  HistoricTaskInstanceRestService getTaskInstanceService();
+
+  @Path(HistoricIncidentRestService.PATH)
+  HistoricIncidentRestService getIncidentService();
+
 }

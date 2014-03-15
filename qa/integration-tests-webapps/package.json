@@ -1,0 +1,10 @@
+{
+  "name": "integration-tests-webapps",
+  "version": "0.0.0",
+  "description": "Webapp Integration Tests",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "author": "camunda Services GmbH",
+  "license": "Apache"
+}

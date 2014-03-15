@@ -1,6 +1,7 @@
 package org.camunda.bpm.integrationtest.functional.classloading.war;
 
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleTaskListener;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -46,13 +47,13 @@ public class TaskListenerResolutionTest extends AbstractFoxPlatformIntegrationTe
       // expected
     }
 
-    runtimeService.startProcessInstanceByKey("testTaskListenerProcess");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testTaskListenerProcess");
 
     // the listener should execute successfully
-    Task task = taskService.createTaskQuery().singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     taskService.setAssignee(task.getId(), "john doe");
 
-    Execution execution = runtimeService.createExecutionQuery().singleResult();
+    Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).singleResult();
     Assert.assertNotNull(runtimeService.getVariable(execution.getId(), "listener"));
     runtimeService.removeVariable(execution.getId(), "listener");
 
@@ -63,7 +64,7 @@ public class TaskListenerResolutionTest extends AbstractFoxPlatformIntegrationTe
     // the delegate expression listener should execute successfully
     runtimeService.removeVariable(execution.getId(), "listener");
 
-    task = taskService.createTaskQuery().singleResult();
+    task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
 
     taskService.setAssignee(task.getId(), "john doe");
     Assert.assertNotNull(runtimeService.getVariable(execution.getId(), "listener"));

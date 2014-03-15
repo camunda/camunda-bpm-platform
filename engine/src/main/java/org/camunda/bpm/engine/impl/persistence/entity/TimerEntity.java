@@ -63,9 +63,9 @@ public class TimerEntity extends JobEntity {
       if (log.isLoggable(Level.FINE)) {
         log.fine("Timer " + getId() + " fired. Deleting timer.");
       }
-      delete();
+      delete(true);
     } else {
-      delete();
+      delete(true);
       Date newTimer = calculateRepeat();
       if (newTimer != null) {
         TimerEntity te = new TimerEntity(this);

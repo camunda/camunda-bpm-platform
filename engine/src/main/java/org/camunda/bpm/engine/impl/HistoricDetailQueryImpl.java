@@ -34,6 +34,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String activityId;
   protected String activityInstanceId;
   protected String type;
+  protected String variableInstanceId;
   protected boolean excludeTaskRelated = false;
 
   public HistoricDetailQueryImpl() {
@@ -45,6 +46,12 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public HistoricDetailQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+  }
+
+  public HistoricDetailQuery variableInstanceId(String variableInstanceId) {
+    assertParamNotNull("variableInstanceId", variableInstanceId);
+    this.variableInstanceId = variableInstanceId;
+    return this;
   }
 
   public HistoricDetailQuery processInstanceId(String processInstanceId) {

@@ -1,24 +1,26 @@
 module.exports = function(karma) {
-  karma.configure({
+  var conf = require('./../../../../src/main/webapp/require-conf');
 
-    // base path, that will be used to
-    // resolve files and exclude
+  karma.set({
+    basePath: '../../../..',
 
-    // we use /camunda-webapp/src
-    basePath: '../../..',
-    frameworks: ['jasmine', 'requirejs' ],
-
-    files: [
-      { pattern: 'main/webapp/**/*.js', included: false },
-      { pattern: 'test/js/unit/**/*.js', included: false },
-      { pattern: 'test/js/lib/**/*.js', included: false },
-
-      'test/js/config/require-unit-bootstrap.js'
+    frameworks: [
+      'jasmine',
+      'requirejs'
     ],
 
-    browsers: ['Chrome', 'IE'], // "PhantomJS", "Firefox"
+    files: [
+      { pattern: 'target/webapp/**/*.js', included: false },
+      { pattern: 'src/test/js/unit/**/*.js', included: false },
+      { pattern: 'src/test/js/lib/**/*.js', included: false },
 
-    autoWatch: true,
+      'src/test/js/config/require-unit-bootstrap.js'
+    ],
+
+    browsers: ['PhantomJS'],
+
+    singleRun: true,
+    autoWatch: false,
 
     junitReporter: {
       outputFile: '../../../../target/failsafe-reports/e2e.xml',
@@ -26,7 +28,7 @@ module.exports = function(karma) {
     },
 
     plugins: [
-      'karma-ie-launcher',            
+      'karma-ie-launcher',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-phantomjs-launcher',

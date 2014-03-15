@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:activiti="http://activiti.org/bpmn" 
+	targetNamespace="Examples">
+
+	<process id="nonInterruptingEvent">
+
+		<startEvent id="start" />
+    
+		<sequenceFlow sourceRef="start" targetRef="userTask" />
+    
+		<userTask id="userTask" name="UserTask" activiti:assignee="kermit"/>
+    
+    <sequenceFlow sourceRef="userTask" targetRef="end1" />
+    
+    <endEvent id="end1" />
+    
+    <boundaryEvent id="timer" attachedToRef="userTask" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>PT1H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    
+		<sequenceFlow sourceRef="timer" targetRef="end2" />
+    
+    <endEvent id="end2" />
+
+	</process>
+
+</definitions>

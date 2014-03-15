@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="taskAssigneeExample" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="start"/>
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="task" />
+
+    <sendTask id="task" name="Task" camunda:class="org.camunda.bpm.engine.test.bpmn.sendtask.DummyActivityBehavior" />
+
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="end" />
+
+    <endEvent id="end" />
+
+  </process>
+
+</definitions>

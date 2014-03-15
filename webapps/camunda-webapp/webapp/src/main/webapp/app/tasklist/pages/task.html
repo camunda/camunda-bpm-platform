@@ -1,3 +1,4 @@
+<!-- # CE - src/main/webapp/app/tasklist/pages/task.html -->
 <div class="control-group" ng-show="form.loaded">
   <h5>Complete Task</h5>
   <h3>{{ task.name }}</h3>
@@ -8,7 +9,7 @@
 
   <hr />
 
-  <form ng-submit="submit()" name="variablesForm">
+  <form ng-submit="submit()" name="variablesForm" request-aware>
     <div ngm-if="!form.key && !form.generic">
       <p>
         It looks as if no form has been defined for the task.
@@ -31,11 +32,14 @@
     </div>
 
     <div ng-if="form.embedded || form.generic">
-      <button class="btn btn-primary" 
+      <button class="btn btn-primary"
               ng-disabled="variablesForm.$invalid"
-              type="submit">{{ !task.delegationState || task.delegationState == 'RESOLVED' ? 'Complete Task' : 'Resolve Task' }}</button>
-      
+              type="submit">
+        {{ !task.delegationState || task.delegationState == 'RESOLVED' ? 'Complete Task' : 'Resolve Task' }}
+      </button>
+
       <button class="btn" ng-click="cancel()">Cancel</button>
     </div>
   </form>
 </div>
+<!-- / CE - src/main/webapp/app/tasklist/pages/task.html -->

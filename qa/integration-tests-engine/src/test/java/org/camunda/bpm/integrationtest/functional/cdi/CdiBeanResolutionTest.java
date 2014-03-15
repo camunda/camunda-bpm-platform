@@ -15,7 +15,6 @@
  */
 package org.camunda.bpm.integrationtest.functional.cdi;
 
-import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.camunda.bpm.integrationtest.functional.cdi.beans.ExampleBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -33,10 +32,10 @@ import org.junit.runner.RunWith;
 
 
 /**
- * <p>Deploys two different applications, a process archive and a cleint application.</p>
+ * <p>Deploys two different applications, a process archive and a client application.</p>
  * 
  * <p>This test ensures that when the process is started from the client,
- * it is able to make the context switch to the process archvie and resolve cdi beans 
+ * it is able to make the context switch to the process archive and resolve cdi beans
  * from the process archive.</p> 
  * 
  * 
@@ -76,24 +75,24 @@ public class CdiBeanResolutionTest extends AbstractFoxPlatformIntegrationTest {
       // expected
     }
     
-    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());
+    Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBean").count());
     // but the process engine can:
     runtimeService.startProcessInstanceByKey("testResolveBean");
     
-    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());
+    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBean").count());
   }
   
   @Test
   @OperateOnDeployment("clientDeployment")
   public void testResolveBeanFromJobExecutor() {
    
-    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());
+    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
     runtimeService.startProcessInstanceByKey("testResolveBeanFromJobExecutor");
-    Assert.assertEquals(1,runtimeService.createProcessInstanceQuery().count());
+    Assert.assertEquals(1,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
     
     waitForJobExecutorToProcessAllJobs(16000);    
     
-    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());    
+    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
     
   }
   

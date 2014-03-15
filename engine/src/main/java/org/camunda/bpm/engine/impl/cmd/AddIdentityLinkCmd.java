@@ -17,18 +17,14 @@ import java.io.Serializable;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.task.Event;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
 
 /**
  * @author Joram Barrez
  */
-public class AddIdentityLinkCmd implements Command<Void>, Serializable {
+public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -39,6 +35,8 @@ public class AddIdentityLinkCmd implements Command<Void>, Serializable {
   protected String type;
 
   protected String taskId;
+
+  protected TaskEntity task;
 
   public AddIdentityLinkCmd(String taskId, String userId, String groupId, String type) {
     validateParams(userId, groupId, type, taskId);
@@ -76,7 +74,7 @@ public class AddIdentityLinkCmd implements Command<Void>, Serializable {
       throw new ProcessEngineException("taskId is null");
     }
 
-    TaskEntity task = commandContext
+    task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
 
@@ -90,24 +88,6 @@ public class AddIdentityLinkCmd implements Command<Void>, Serializable {
       task.setOwner(userId);
     } else {
       task.addIdentityLink(userId, groupId, type);
-    }
-
-    CommentManager commentManager = commandContext.getCommentManager();
-    if (commentManager.isHistoryEnabled()) {
-      String authenticatedUserId = commandContext.getAuthenticatedUserId();
-      CommentEntity comment = new CommentEntity();
-      comment.setUserId(authenticatedUserId);
-      comment.setType(CommentEntity.TYPE_EVENT);
-      comment.setTime(ClockUtil.getCurrentTime());
-      comment.setTaskId(taskId);
-      if (userId!=null) {
-        comment.setAction(Event.ACTION_ADD_USER_LINK);
-        comment.setMessage(new String[]{userId, type});
-      } else {
-        comment.setAction(Event.ACTION_ADD_GROUP_LINK);
-        comment.setMessage(new String[]{groupId, type});
-      }
-      commentManager.insert(comment);
     }
 
     return null;

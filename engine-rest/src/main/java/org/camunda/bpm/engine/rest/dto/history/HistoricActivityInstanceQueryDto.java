@@ -63,6 +63,8 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
   private String taskAssignee;
   private Boolean finished;
   private Boolean unfinished;
+  private Boolean completeScope;
+  private Boolean canceled;
   private Date startedBefore;
   private Date startedAfter;
   private Date finishedBefore;
@@ -125,6 +127,16 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     this.unfinished = unfinished;
   }
 
+  @CamundaQueryParam(value = "completeScope", converter = BooleanConverter.class)
+  public void setCompleteScope(Boolean completeScope) {
+    this.completeScope = completeScope;
+  }
+
+  @CamundaQueryParam(value = "canceled", converter = BooleanConverter.class)
+  public void setCanceled(Boolean canceled) {
+    this.canceled = canceled;
+  }
+
   @CamundaQueryParam(value = "startedBefore", converter = DateConverter.class)
   public void setStartedBefore(Date startedBefore) {
     this.startedBefore = startedBefore;
@@ -143,8 +155,8 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
   @CamundaQueryParam(value = "finishedAfter", converter = DateConverter.class)
   public void setFinishedAfter(Date finishedAfter) {
     this.finishedAfter = finishedAfter;
-  }  
-  
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -186,6 +198,12 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     }
     if (unfinished != null && unfinished) {
       query.unfinished();
+    }
+    if (completeScope != null && completeScope) {
+      query.completeScope();
+    }
+    if (canceled != null && canceled) {
+      query.canceled();
     }
     if (startedBefore != null) {
       query.startedBefore(startedBefore);

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity">
+
+  <!-- OPERATION LOG ENTRY INSERT -->
+
+  <insert id="insertUserOperationLogEntryEvent" parameterType="org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity">
+      insert into ${prefix}ACT_HI_OP_LOG (
+        ID_,
+        PROC_DEF_ID_,
+        PROC_INST_ID_,
+        EXECUTION_ID_,
+        TASK_ID_,
+        USER_ID_,
+        TIMESTAMP_,
+        OPERATION_ID_ ,
+        OPERATION_TYPE_,
+        ENTITY_TYPE_,
+        PROPERTY_,
+        ORG_VALUE_,
+        NEW_VALUE_
+      ) values (
+        #{id ,jdbcType=VARCHAR},
+        #{processDefinitionId, jdbcType=VARCHAR},
+        #{processInstanceId, jdbcType=VARCHAR},
+        #{executionId, jdbcType=VARCHAR},
+        #{taskId ,jdbcType=VARCHAR},
+        #{userId ,jdbcType=VARCHAR},
+        #{timestamp ,jdbcType=TIMESTAMP},
+        #{operationId ,jdbcType=VARCHAR},
+        #{operationType ,jdbcType=VARCHAR},
+        #{entityType ,jdbcType=VARCHAR},
+        #{property, jdbcType=VARCHAR},
+        #{orgValue, jdbcType=VARCHAR},
+        #{newValue ,jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <!-- OPERATION LOG ENTRY DELETE -->
+
+  <delete id="deleteUserOperationLogEntriesByProcessInstanceId">
+    delete from ${prefix}ACT_HI_OP_LOG where PROC_INST_ID_ = #{id}
+  </delete>
+
+  <delete id="deleteUserOperationLogEntriesByTaskId">
+    delete from ${prefix}ACT_HI_OP_LOG where TASK_ID_ = #{id}
+  </delete>
+
+  <!--OPERATION LOG ENTRY RESULT MAP -->
+
+  <resultMap id="UserOperationLogResultMap" type="org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
+    <result property="operationId" column="OPERATION_ID_" jdbcType="VARCHAR" />
+    <result property="operationType" column="OPERATION_TYPE_" jdbcType="VARCHAR" />
+    <result property="entityType" column="ENTITY_TYPE_" jdbcType="VARCHAR" />
+    <result property="property" column="PROPERTY_" jdbcType="VARCHAR" />
+    <result property="orgValue" column="ORG_VALUE_" jdbcType="VARCHAR" />
+    <result property="newValue" column="NEW_VALUE_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <!-- OPERATION LOG ENTRY SELECT -->
+
+  <select id="selectUserOperationLogEntry" resultMap="UserOperationLogResultMap">
+    select * from ${prefix}ACT_HI_OP_LOG where ID_ = #{id}
+  </select>
+
+  <select id="selectUserOperationLogEntriesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.UserOperationLogQueryImpl" resultMap="UserOperationLogResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectUserOperationLogEntriesByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectUserOperationLogEntryCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.UserOperationLogQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectUserOperationLogEntriesByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectUserOperationLogEntriesByQueryCriteriaSql">
+    from ${prefix}ACT_HI_OP_LOG RES
+    <where>
+      <if test="processDefinitionId != null">
+        RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="processInstanceId != null">
+        and RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="executionId != null">
+        and RES.EXECUTION_ID_ = #{executionId}
+      </if>
+      <if test="taskId != null">
+        and RES.TASK_ID_ = #{taskId}
+      </if>
+      <if test="userId != null">
+        and RES.USER_ID_ = #{userId}
+      </if>
+      <if test="operationId != null">
+        and RES.OPERATION_ID_ = #{operationId}
+      </if>
+      <if test="operationType != null">
+        and RES.OPERATION_TYPE_ = #{operationType}
+      </if>
+      <if test="entityType != null">
+        and RES.ENTITY_TYPE_ = #{entityType}
+      </if>
+      <if test="property != null">
+        and RES.PROPERTY_ = #{property}
+      </if>
+      <if test="timestampAfter != null">
+        and RES.TIMESTAMP_ &gt; #{timestampAfter}
+      </if>
+      <if test="timestampBefore != null">
+        and RES.TIMESTAMP_ &lt; #{timestampBefore}
+      </if>
+    </where>
+  </sql>
+
+</mapper>

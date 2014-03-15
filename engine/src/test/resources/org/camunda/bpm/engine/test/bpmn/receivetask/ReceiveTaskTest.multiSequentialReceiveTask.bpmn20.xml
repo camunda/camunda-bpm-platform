@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="TestProcess">
+
+  <message id="newInvoice" name="newInvoiceMessage"/>
+
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="theStart"/>
+    <sequenceFlow sourceRef="theStart" targetRef="waitState"/>
+    <receiveTask id="waitState" name="Wait State" messageRef="newInvoice">
+      <multiInstanceLoopCharacteristics isSequential="true">
+        <loopCardinality>2</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </receiveTask>
+    <sequenceFlow sourceRef="waitState" targetRef="interaction"/>
+    <userTask id="interaction" name="Interaction"/>
+    <sequenceFlow sourceRef="interaction" targetRef="theEnd"/>
+    <endEvent id="theEnd"/>
+  </process>
+
+</definitions>

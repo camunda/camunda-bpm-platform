@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn"
+             targetNamespace="Examples">
+
+  <process id="interruptingTimer">
+  
+    <startEvent id="theStart"/>
+    
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="subprocess"/>
+    
+    <subProcess id="subprocess">
+    
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>${4}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    
+    
+      <startEvent id="innerStart" />
+      <parallelGateway id="innerFork" />
+      <sequenceFlow sourceRef="innerStart" targetRef="innerFork" />
+      
+      <userTask id="innerTask1" />
+      <userTask id="innerTask2" />
+      
+      <sequenceFlow sourceRef="innerFork" targetRef="innerTask1" />
+      <sequenceFlow sourceRef="innerFork" targetRef="innerTask2" />
+            
+    </subProcess>
+    
+    <sequenceFlow id="flow2" sourceRef="subprocess" targetRef="end"/>
+    
+    <boundaryEvent id="timer" attachedToRef="subprocess">
+      <timerEventDefinition>
+          <timeDuration>PT10S</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    
+    <sequenceFlow id="flow3" sourceRef="timer" targetRef="timerFiredTask1"/>
+    
+    <userTask id="timerFiredTask1" />
+
+    <sequenceFlow id="flow4" sourceRef="timer" targetRef="timerFiredTask2"/>
+    
+    <userTask id="timerFiredTask2" />
+    
+    <sequenceFlow id="flow5" sourceRef="timerFiredTask1" targetRef="nonInterruptingEnd1"/>
+    
+    <endEvent id="nonInterruptingEnd1"/>
+    
+    <sequenceFlow id="flow6" sourceRef="timerFiredTask2" targetRef="nonInterruptingEnd2"/>
+    
+    <endEvent id="nonInterruptingEnd2"/>
+        
+    <endEvent id="end"/>
+  
+  </process>
+</definitions>

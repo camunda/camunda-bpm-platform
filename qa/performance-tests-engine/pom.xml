@@ -1,0 +1,274 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>camunda-qa-performance-tests-engine</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - QA Performance Tests Engine</name>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
+    <version>7.1.0-SNAPSHOT</version>
+  </parent>
+  
+  <properties>
+    <historyLevel>full</historyLevel>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>      
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.11</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jdbc</artifactId>
+      <version>7.0.33</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-juli</artifactId>
+      <version>7.0.33</version>
+    </dependency>
+    
+  </dependencies>
+
+  <profiles>
+
+    <!-- distro profile skips tests -->
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+    
+      <!-- the benchmark performs multiple runs of the same process on multiple threads. -->
+      <id>benchmark</id>
+
+      <properties>
+        <!-- default values for properties -->
+        <numberOfThreads>2</numberOfThreads>
+        <numberOfRuns>100</numberOfRuns>
+        <testWatchers></testWatchers>
+        <processEnginePlugins></processEnginePlugins>
+      </properties>
+
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <argLine>-Xmx512m</argLine>
+            </configuration>
+          </plugin>
+          
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.4</version>
+            <executions>              
+              <execution>
+                <id>database-test-drop-schema</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="Generating reports" />
+                    <copy todir="${basedir}/target/reports/images" flatten="true">
+                      <fileset dir="${basedir}/src/test/resources">
+                        <include name="**/*.png"/>
+                      </fileset>
+                    </copy>
+                    <java classname="org.camunda.bpm.qa.performance.engine.benchmark.BenchmarkReport" classpathref="maven.test.classpath" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          
+        </plugins>
+
+      </build>
+
+    </profile>
+    
+     <profile>
+      
+      <!-- Allows to log the process engine's interaction with the database -->     
+      <id>sql-statementlog</id>
+
+      <properties>        
+        <numberOfThreads>1</numberOfThreads>
+        <numberOfRuns>1</numberOfRuns>
+        <testWatchers>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogPerfTestWatcher</testWatchers>
+        <processEnginePlugins>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogProcessEnginePlugin</processEnginePlugins>
+      </properties>
+
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <argLine>-Xmx512m</argLine>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.4</version>
+            <executions>              
+              <execution>
+                <id>database-test-drop-schema</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>                  
+                    <echo message="Generating reports in ${basedir}/target/reports/" />
+                    <copy todir="${basedir}/target/reports/images" flatten="true">
+                      <fileset dir="${basedir}/src/test/resources">
+                        <include name="**/*.png"/>
+                      </fileset>
+                    </copy>
+                    <java classname="org.camunda.bpm.qa.performance.engine.sqlstatementlog.SqlStatementLogReport" classpathref="maven.test.classpath" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+
+      </build>
+
+    </profile>
+    
+    <!-- override h2 profile to use in-mem db -->
+    <profile>    
+      <id>h2</id>
+      <properties>
+        <database.type>h2</database.type>
+        <database.user>sa</database.user>
+        <database.password>sa</database.password>
+        <database.driver>org.h2.Driver</database.driver>
+        <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
+        <database.url>jdbc:h2:mem:performance-test;MVCC=TRUE</database.url>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>history-level-none</id>
+      <properties>
+        <historyLevel>none</historyLevel>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>history-level-full</id>
+      <properties>
+        <historyLevel>full</historyLevel>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>mysql</id>
+      <dependencies>
+        <dependency>
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    
+    <profile>
+      <id>postgres</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    
+    <profile>
+      <id>mssql</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.microsoft.sqlserver</groupId>
+          <artifactId>sqljdbc4</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+
+
+    <profile>
+      <id>db2</id>
+      <dependencies>
+         <dependency>
+          <groupId>com.ibm.db2.jcc</groupId>
+          <artifactId>db2jcc4</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>oracle</id>
+      <dependencies>
+         <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc6</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
+  </profiles>
+
+</project>

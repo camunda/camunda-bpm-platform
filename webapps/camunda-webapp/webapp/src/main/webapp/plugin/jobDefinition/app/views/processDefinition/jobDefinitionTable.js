@@ -1,7 +1,7 @@
 ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, require) {
 
-  var Controller = [ '$scope', '$rootScope', '$dialog', 
-      function ($scope, $rootScope, $dialog) {
+  var Controller = [ '$scope', '$rootScope', '$dialog', 'search',
+      function ($scope, $rootScope, $dialog, search) {
 
     var processData = $scope.processData.newChild($scope),
         processDefinition = null;
@@ -59,18 +59,17 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
       });
 
     };
-
   }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
+    ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
       id: 'job-definition-table',
       label: 'Job Definitions',
       url: 'plugin://jobDefinition/static/app/views/processDefinition/job-definition-table.html',
       controller: Controller,
       priority: 2
-    }); 
+    });
   };
 
   Configuration.$inject = ['ViewsProvider'];

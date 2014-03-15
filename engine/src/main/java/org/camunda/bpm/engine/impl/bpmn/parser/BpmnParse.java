@@ -12,56 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.text.StringCharacterIterator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.Condition;
-import org.camunda.bpm.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CancelBoundaryEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivitiBehaviour;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivityBehaviour;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.MailActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ManualTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskExpressionActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ShellActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.SignalEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.TaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.TransactionActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.*;
 import org.camunda.bpm.engine.impl.bpmn.helper.ClassDelegate;
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionTaskListener;
@@ -70,30 +26,18 @@ import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
+import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationType;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.*;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.HasDIBounds;
-import org.camunda.bpm.engine.impl.pvm.process.Lane;
-import org.camunda.bpm.engine.impl.pvm.process.LaneSet;
-import org.camunda.bpm.engine.impl.pvm.process.ParticipantProcess;
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
+import org.camunda.bpm.engine.impl.pvm.process.*;
 import org.camunda.bpm.engine.impl.scripting.ScriptingEngines;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -101,6 +45,13 @@ import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.text.StringCharacterIterator;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Specific parsing of one BPMN 2.0 XML file, created by the {@link BpmnParser}.
@@ -191,7 +142,6 @@ public class BpmnParse extends Parse {
 
   /**
    * Constructor to be called by the {@link BpmnParser}.
-   * @param deploymentContext
    */
   public BpmnParse(BpmnParser parser) {
     super(parser);
@@ -285,9 +235,6 @@ public class BpmnParse extends Parse {
 
   /**
    * Parses the rootElement importing structures
-   *
-   * @param rootElement
-   *          The root element of the XML file.
    */
   protected void parseImports() {
     List<Element> imports = rootElement.elements("import");
@@ -326,9 +273,6 @@ public class BpmnParse extends Parse {
    * Parses the messages of the given definitions file. Messages are not
    * contained within a process element, but they can be referenced from inner
    * process elements.
-   *
-   * @param definitionsElement
-   *          The root element of the XML file/
    */
   public void parseMessages() {
     for (Element messageElement : rootElement.elements("message")) {
@@ -344,9 +288,6 @@ public class BpmnParse extends Parse {
    * Parses the signals of the given definitions file. Signals are not
    * contained within a process element, but they can be referenced from inner
    * process elements.
-   *
-   * @param definitionsElement
-   *          The root element of the XML file/
    */
   protected void parseSignals() {
     for (Element signalElement : rootElement.elements("signal")) {
@@ -396,9 +337,6 @@ public class BpmnParse extends Parse {
   /**
    * Parses all the process definitions defined within the 'definitions' root
    * element.
-   *
-   * @param definitionsElement
-   *          The root element of the XML file.
    */
   public void parseProcessDefinitions() {
     for (Element processElement : rootElement.elements("process")) {
@@ -771,48 +709,57 @@ public class BpmnParse extends Parse {
 
   protected void parseScopeStartEvent(ActivityImpl startEventActivity, Element startEventElement, Element parentElement, ScopeImpl scope) {
 
-    Object triggeredByEvent = scope.getProperty("triggeredByEvent");
+    Object triggeredByEvent = scope.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT);
     boolean isTriggeredByEvent = triggeredByEvent != null && ((Boolean) triggeredByEvent == true);
 
     Element errorEventDefinition = startEventElement.element("errorEventDefinition");
     Element messageEventDefinition = startEventElement.element("messageEventDefinition");
     Element signalEventDefinition = startEventElement.element("signalEventDefinition");
+    Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
 
     if (isTriggeredByEvent) { // event subprocess
 
       // all start events of an event subprocess share common behavior
-      EventSubProcessStartEventActivityBehavior activityBehavior = new EventSubProcessStartEventActivityBehavior(startEventActivity.getId());
+      EventSubProcessStartEventActivityBehavior activityBehavior = new EventSubProcessStartEventActivityBehavior();
       startEventActivity.setActivityBehavior(activityBehavior);
 
       String isInterrupting = startEventElement.attribute("isInterrupting");
-      if(isInterrupting != null && (isInterrupting.equals("false")||isInterrupting.equals("FALSE"))) {
-        activityBehavior.setInterrupting(false);
-      }
+      boolean interrupting = isInterrupting.equalsIgnoreCase("true") ? true : false;
+
+      ((ActivityImpl)scope).setCancelScope(interrupting);
+      ((ActivityImpl)scope).setConcurrent(!interrupting);
+
 
       // the scope of the event subscription is the parent of the event
-      // subprocess (subscription must be created when parent is initialized)
+      // subprocess (subscription must be created when parent is initialized).
       ScopeImpl catchingScope = ((ActivityImpl) scope).getParent();
+      startEventActivity.setScope(catchingScope);
+      // the flow scope is the event subprocess activity.
+      startEventActivity.setFlowScope(scope);
+
+      if (scope.getProperty(PROPERTYNAME_INITIAL) == null) {
+        scope.setProperty(PROPERTYNAME_INITIAL, startEventActivity);
+      } else {
+        addError("multiple start events not supported for subprocess", startEventElement);
+      }
 
       if (errorEventDefinition != null) {
-        if(!activityBehavior.isInterrupting()) {
+        if(!interrupting) {
           addError("error start event of event subprocess must be interrupting", startEventElement);
         }
-        if (scope.getProperty(PROPERTYNAME_INITIAL) == null) {
-            scope.setProperty(PROPERTYNAME_INITIAL, startEventActivity);
-            parseErrorStartEventDefinition(errorEventDefinition, startEventActivity, catchingScope);
-          } else {
-            addError("multiple start events not supported for subprocess", startEventElement);
-          }
+        parseErrorStartEventDefinition(errorEventDefinition, startEventActivity, catchingScope);
 
       } else if (messageEventDefinition != null) {
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseMessageEventDefinition(messageEventDefinition);
         eventSubscriptionDeclaration.setActivityId(startEventActivity.getId());
+        eventSubscriptionDeclaration.setEventScopeActivityId(catchingScope.getId());
         eventSubscriptionDeclaration.setStartEvent(false);
         addEventSubscriptionDeclaration(eventSubscriptionDeclaration, catchingScope, messageEventDefinition);
 
       } else if (signalEventDefinition != null) {
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseSignalEventDefinition(signalEventDefinition);
         eventSubscriptionDeclaration.setActivityId(startEventActivity.getId());
+        eventSubscriptionDeclaration.setEventScopeActivityId(catchingScope.getId());
         eventSubscriptionDeclaration.setStartEvent(false);
         addEventSubscriptionDeclaration(eventSubscriptionDeclaration, catchingScope, signalEventDefinition);
 
@@ -824,7 +771,6 @@ public class BpmnParse extends Parse {
       Element conditionalEventDefinition = startEventElement.element("conditionalEventDefinition");
       Element timerEventDefinition = startEventElement.element("timerEventDefinition");
       Element escalationEventDefinition = startEventElement.element("escalationEventDefinition");
-      Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
 
       if (conditionalEventDefinition != null) {
         addError("conditionalEventDefinition is not allowed on start event within a subprocess", conditionalEventDefinition);
@@ -881,7 +827,7 @@ public class BpmnParse extends Parse {
       addError("Invalid 'messageRef': no message with id '"+messageRef+"' found.", messageEventDefinition);
     }
 
-    return new EventSubscriptionDeclaration(messageDefinition.getName(), "message");
+    return new EventSubscriptionDeclaration(messageDefinition.getName(), MessageEventHandler.EVENT_HANDLER_TYPE);
   }
 
   @SuppressWarnings("unchecked")
@@ -921,7 +867,6 @@ public class BpmnParse extends Parse {
    * @param scopeElement
    *          The {@link ScopeImpl} to which the activities must be added.
    * @param postponedElements
-   * @param postProcessActivities
    */
   public void parseActivities(Element parentElement, ScopeImpl scopeElement, HashMap<String, Element> postponedElements) {
     for (Element activityElement : parentElement.elements()) {
@@ -1041,7 +986,12 @@ public class BpmnParse extends Parse {
     Element linkEventDefinitionElement = intermediateEventElement.element("linkEventDefinition");
 
     // shared by all events except for link event
-    IntermediateCatchEventActivitiBehaviour defaultCatchBehaviour = new IntermediateCatchEventActivitiBehaviour();
+    IntermediateCatchEventActivityBehavior defaultCatchBehaviour = new IntermediateCatchEventActivityBehavior(isAfterEventBasedGateway);
+
+    if(isAfterEventBasedGateway) {
+      nestedActivity.setCancelScope(true);
+      nestedActivity.setScope(scopeElement.getParentScope());
+    }
 
     if (timerEventDefinition != null) {
       nestedActivity.setActivityBehavior(defaultCatchBehaviour);
@@ -1053,10 +1003,13 @@ public class BpmnParse extends Parse {
 
     } else if(messageEventDefinition != null) {
       nestedActivity.setActivityBehavior(defaultCatchBehaviour);
-      parseIntemediateMessageEventDefinition(messageEventDefinition, nestedActivity, isAfterEventBasedGateway);
+      parseIntermediateMessageEventDefinition(messageEventDefinition, nestedActivity, isAfterEventBasedGateway);
 
     } else if(linkEventDefinitionElement != null) {
-      nestedActivity.setActivityBehavior(new IntermediateCatchLinkEventActivityBehaviour());
+      if (isAfterEventBasedGateway) {
+        addError("IntermediateCatchLinkEvent is not allowed after an EventBasedGateway.", intermediateEventElement);
+      }
+      nestedActivity.setActivityBehavior(new IntermediateCatchLinkEventActivityBehavior());
       parseIntermediateLinkEventCatchBehavior(intermediateEventElement, nestedActivity, linkEventDefinitionElement);
 
     } else {
@@ -1093,7 +1046,7 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected void parseIntemediateMessageEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity, boolean isAfterEventBasedGateway) {
+  protected void parseIntermediateMessageEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity, boolean isAfterEventBasedGateway) {
 
     nestedActivity.setProperty("type", "intermediateMessageCatch");
 
@@ -1148,7 +1101,7 @@ public class BpmnParse extends Parse {
     } else if (messageEventDefinitionElement != null) {
       if (isServiceTaskLike(messageEventDefinitionElement)) {
 
-        // CAM-436 same behaviour as service task
+        // CAM-436 same behavior as service task
         activityBehavior = parseServiceTaskLike("intermediateMessageThrowEvent", messageEventDefinitionElement, scopeElement).getActivityBehavior();
       } else {
         // default to non behavior if no service task
@@ -1821,6 +1774,14 @@ public class BpmnParse extends Parse {
 
     parseExecutionListenersOnScope(receiveTaskElement, activity);
 
+    if (receiveTaskElement.attribute("messageRef") != null) {
+      activity.setScope(true);
+      EventSubscriptionDeclaration declaration = parseMessageEventDefinition(receiveTaskElement);
+      declaration.setActivityId(activity.getActivityId());
+      declaration.setEventScopeActivityId(activity.getActivityId());
+      addEventSubscriptionDeclaration(declaration, activity, receiveTaskElement);
+    }
+
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseReceiveTask(receiveTaskElement, scope, activity);
     }
@@ -2053,11 +2014,11 @@ public class BpmnParse extends Parse {
         String eventName = taskListenerElement.attribute("event");
         if (eventName != null) {
           if (TaskListener.EVENTNAME_CREATE.equals(eventName) || TaskListener.EVENTNAME_ASSIGNMENT.equals(eventName)
-                  || TaskListener.EVENTNAME_COMPLETE.equals(eventName)) {
+                  || TaskListener.EVENTNAME_COMPLETE.equals(eventName) || TaskListener.EVENTNAME_DELETE.equals(eventName)) {
             TaskListener taskListener = parseTaskListener(taskListenerElement);
             taskDefinition.addTaskListener(eventName, taskListener);
           } else {
-            addError("Attribute 'event' must be one of {create|assignment|complete}", userTaskElement);
+            addError("Attribute 'event' must be one of {create|assignment|complete|delete}", userTaskElement);
           }
         } else {
           addError("Attribute 'event' is mandatory on taskListener", userTaskElement);
@@ -2125,6 +2086,7 @@ public class BpmnParse extends Parse {
         }
       } else if (terminateEventDefinition != null) {
         activity.setActivityBehavior(new TerminateEndEventActivityBehavior());
+        activity.setCancelScope(true);
       } else if (messageEventDefinitionElement != null) {
         if (isServiceTaskLike(messageEventDefinitionElement)) {
 
@@ -2204,34 +2166,46 @@ public class BpmnParse extends Parse {
       Element cancelEventDefinition = boundaryEventElement.element("cancelEventDefinition");
       Element compensateEventDefinition = boundaryEventElement.element("compensateEventDefinition");
       Element messageEventDefinition = boundaryEventElement.element("messageEventDefinition");
+
+      behavior = new BoundaryEventActivityBehavior();
       if (timerEventDefinition != null) {
-    	behavior = new BoundaryEventActivityBehavior(interrupting, nestedActivity.getId());
         parseBoundaryTimerEventDefinition(timerEventDefinition, interrupting, nestedActivity);
+
       } else if (errorEventDefinition != null) {
-        interrupting = true; // non-interrupting not yet supported
-        behavior = new BoundaryEventActivityBehavior(interrupting, nestedActivity.getId());
+        interrupting = true; // always interrupting
         parseBoundaryErrorEventDefinition(errorEventDefinition, interrupting, parentActivity, nestedActivity);
+
       } else if (signalEventDefinition != null) {
-    	behavior = new BoundaryEventActivityBehavior(interrupting, nestedActivity.getId());
         parseBoundarySignalEventDefinition(signalEventDefinition, interrupting, nestedActivity);
+
       } else if (cancelEventDefinition != null) {
-        // always interrupting
         behavior = parseBoundaryCancelEventDefinition(cancelEventDefinition, nestedActivity);
+
       } else if(compensateEventDefinition != null) {
-        behavior = new BoundaryEventActivityBehavior(interrupting, nestedActivity.getId());
         parseCatchCompensateEventDefinition(compensateEventDefinition, nestedActivity);
+
       } else if(messageEventDefinition != null) {
-        behavior = new BoundaryEventActivityBehavior(interrupting, nestedActivity.getId());
         parseBoundaryMessageEventDefinition(messageEventDefinition, interrupting, nestedActivity);
+
       } else {
         addError("Unsupported boundary event type", boundaryEventElement);
+
       }
 
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseBoundaryEvent(boundaryEventElement, scopeElement, nestedActivity);
       }
 
+      if(cancelEventDefinition == null) {
+        nestedActivity.setCancelScope(interrupting);
+        nestedActivity.setConcurrent(!interrupting);
+      }
+
+      // scope of the boundary event is the parent of the activity to which it is attached.
+      nestedActivity.setScope(parentActivity.getParentScope());
       nestedActivity.setActivityBehavior(behavior);
+
+      parseExecutionListenersOnScope(boundaryEventElement, nestedActivity);
     }
   }
 
@@ -2506,8 +2480,8 @@ public class BpmnParse extends Parse {
 
     parseAsynchronousContinuation(subProcessElement, activity);
 
-    Boolean isTriggeredByEvent = parseBooleanAttribute(subProcessElement.attribute("triggeredByEvent"), false);
-    activity.setProperty("triggeredByEvent", isTriggeredByEvent);
+    Boolean isTriggeredByEvent = parseBooleanAttribute(subProcessElement.attribute(PROPERTYNAME_TRIGGERED_BY_EVENT), false);
+    activity.setProperty(PROPERTYNAME_TRIGGERED_BY_EVENT, isTriggeredByEvent);
 
     // event subprocesses are not scopes
     activity.setScope(!isTriggeredByEvent);
@@ -2581,15 +2555,19 @@ public class BpmnParse extends Parse {
       }
     }
 
-    Element extentionsElement = callActivityElement.element("extensionElements");
-    if (extentionsElement != null) {
+    Element extensionsElement = callActivityElement.element("extensionElements");
+    if (extensionsElement != null) {
       // input data elements
-      for (Element listenerElement : extentionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "in")) {
-        String sourceExpression = listenerElement.attribute("sourceExpression");
-        String target = listenerElement.attribute("target");
-        String variables = listenerElement.attribute("variables");
-        String businessKeyExpression = listenerElement.attribute("businessKey");
-        if (sourceExpression != null) {
+      for (Element inElement : extensionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "in")) {
+        String source = inElement.attribute("source");
+        String sourceExpression = inElement.attribute("sourceExpression");
+        String target = inElement.attribute("target");
+        String variables = inElement.attribute("variables");
+        String businessKeyExpression = inElement.attribute("businessKey");
+        if ((source != null || sourceExpression != null) && target == null) {
+          addError("Missing attribute 'target' when attribute source or sourceExpression is set", inElement);
+        }
+        else if (sourceExpression != null) {
           Expression expression = expressionManager.createExpression(sourceExpression.trim());
           callActivityBehaviour.addDataInputAssociation(new DataAssociation(expression, target));
         } else if (variables != null && ("all").equals(variables)) {
@@ -2598,22 +2576,24 @@ public class BpmnParse extends Parse {
           Expression expression = expressionManager.createExpression(businessKeyExpression.trim());
           callActivityBehaviour.addDataInputAssociation(new DataAssociation(expression));
         } else {
-          String source = listenerElement.attribute("source");
           callActivityBehaviour.addDataInputAssociation(new DataAssociation(source, target));
         }
       }
       // output data elements
-      for (Element listenerElement : extentionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "out")) {
-        String sourceExpression = listenerElement.attribute("sourceExpression");
-        String target = listenerElement.attribute("target");
-        String variables = listenerElement.attribute("variables");
-        if (sourceExpression != null) {
+      for (Element outElement : extensionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "out")) {
+        String source = outElement.attribute("source");
+        String sourceExpression = outElement.attribute("sourceExpression");
+        String target = outElement.attribute("target");
+        String variables = outElement.attribute("variables");
+        if ((source != null || sourceExpression != null) && target == null) {
+          addError("Missing attribute 'target' when attribute source or sourceExpression is set", outElement);
+        }
+        else if (sourceExpression != null) {
           Expression expression = expressionManager.createExpression(sourceExpression.trim());
           callActivityBehaviour.addDataOutputAssociation(new DataAssociation(expression, target));
         } else if (variables != null && ("all").equals(variables)) {
           callActivityBehaviour.addDataOutputAssociation(new DataAssociation(variables));
         } else {
-          String source = listenerElement.attribute("source");
           callActivityBehaviour.addDataOutputAssociation(new DataAssociation(source, target));
         }
       }
@@ -2774,7 +2754,7 @@ public class BpmnParse extends Parse {
         addError("Invalid destination '" + destinationRef + "' of sequence flow '" + id + "'", sequenceFlowElement);
       } else if(sourceActivity.getActivityBehavior() instanceof EventBasedGatewayActivityBehavior) {
         // ignore
-      } else if(destinationActivity.getActivityBehavior() instanceof IntermediateCatchEventActivitiBehaviour
+      } else if(destinationActivity.getActivityBehavior() instanceof IntermediateCatchEventActivityBehavior
               && (destinationActivity.getParentActivity() != null)
               && (destinationActivity.getParentActivity().getActivityBehavior() instanceof EventBasedGatewayActivityBehavior)) {
         addError("Invalid incoming sequenceflow for intermediateCatchEvent with id '"+destinationActivity.getId()+"' connected to an event-based gateway.", sequenceFlowElement);
@@ -2828,7 +2808,6 @@ public class BpmnParse extends Parse {
    *          the XML element containing the scope definition.
    * @param scope
    *          the scope to add the executionListeners to.
-   * @param postProcessActivities
    */
   public void parseExecutionListenersOnScope(Element scopeElement, ScopeImpl scope) {
     Element extentionsElement = scopeElement.element("extensionElements");

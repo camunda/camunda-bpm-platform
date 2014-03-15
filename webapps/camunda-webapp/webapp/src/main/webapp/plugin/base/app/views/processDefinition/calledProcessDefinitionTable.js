@@ -52,18 +52,16 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     }
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+  var Configuration = [ 'ViewsProvider', function(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
+    ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
       id: 'call-process-definitions-table',
       label: 'Called Process Definitions',
       url: 'plugin://base/static/app/views/processDefinition/called-process-definition-table.html',
       controller: Controller,
       priority: 5
     });
-  };
-
-  Configuration.$inject = ['ViewsProvider'];
+  }];
 
   module.config(Configuration);
 });

@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
@@ -84,8 +85,10 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
     // complete or resolve the task
     if(DelegationState.PENDING.equals(task.getDelegationState())) {
       task.resolve();
+      task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_RESOLVE);
     } else {
       task.complete();
+      task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
     }
 
     return null;

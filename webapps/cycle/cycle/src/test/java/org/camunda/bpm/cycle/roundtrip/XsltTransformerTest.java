@@ -1,9 +1,6 @@
 package org.camunda.bpm.cycle.roundtrip;
 
-import org.camunda.bpm.cycle.roundtrip.XsltTransformer;
 import org.junit.Test;
-
-
 
 public class XsltTransformerTest {
 
@@ -13,7 +10,7 @@ public class XsltTransformerTest {
   public void shouldCreateDeveloperFriendlyTransformer() throws Exception {
     xsltTransformer.createDeveloperFriendlyTransformer();
   }
-  
+
   @Test
   public void shouldCreateEnginePoolTransformer() throws Exception {
     xsltTransformer.createEnginePoolTransformer();

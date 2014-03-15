@@ -1,0 +1,28 @@
+<!-- # CE - src/main/webapp/app/tasklist/directives/sidebar.html -->
+<div class="well sidebar-nav" ng-show="tasks">
+  <ul class="nav nav-list">
+    <li class="nav-header">Tasks</li>
+    <li ng-class="{active: isActive('mytasks')}">
+      <a href="#/overview?filter=mytasks">
+        My Tasks ({{ tasks.mytasks.count }})
+      </a>
+    </li>
+    <li ng-class="{active: isActive('unassigned')}">
+      <a href="#/overview?filter=unassigned">
+        Inbox ({{ tasks.unassigned.count }})
+      </a>
+    </li>
+    <li ng-show="isActive('search')" ng-class="{ active: isActive('search') }">
+      <a href >Search</a>
+    </li>
+    <li class="nav-header">Unclaimed Group Tasks</li>
+    <li ng-repeat="group in groupInfo.groups" ng-class="{active: isActive('group', group.id)}">
+      <a href="#/overview?filter=group&search={{group.id}}">{{group.name}} ({{ groupCount[group.id] }})</a>
+    </li>
+    <li class="nav-header">Colleagues</li>
+    <li ng-repeat="colleague in groupInfo.groupUsers" ng-class="{active: isActive('colleague', colleague.id)}">
+      <a href="#/overview?filter=colleague&search={{colleague.id}}">{{colleague.displayName}} ({{ colleagueCount[colleague.id] }})</a>
+    </li>
+  </ul>
+</div>
+<!-- / CE - src/main/webapp/app/tasklist/directives/sidebar.html -->

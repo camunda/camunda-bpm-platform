@@ -9,7 +9,8 @@
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-root</artifactId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../parent</relativePath>
     <version>7.1.0-SNAPSHOT</version>
   </parent>
   
@@ -318,6 +319,41 @@
         <database.datasource.class>org.postgresql.xa.PGXADataSource</database.datasource.class>
         <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
         <database.port>${env.postgres.database.port}</database.port>
+        <database.url>jdbc:postgresql://${database.host}:${database.port}/${database.name}</database.url>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>postgres93</id>
+      <properties>
+        <database.type>postgres</database.type>
+        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
+        <jboss.datasource.filename>postgres-ds.xml</jboss.datasource.filename>
+        <database.host>${env.postgres93.database.host}</database.host>
+        <database.name>${env.postgres93.database.name}</database.name>
+        <database.user>${env.postgres93.database.user}</database.user>
+        <database.password>${env.postgres93.database.password}</database.password>
+        <database.driver>org.postgresql.Driver</database.driver>
+        <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
+        <database.port>${env.postgres93.database.port}</database.port>
+        <database.url>jdbc:postgresql://${database.host}:${database.port}/${database.name}</database.url>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>postgres93-xa</id>
+      <properties>
+        <database.type>postgres</database.type>
+        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
+        <jboss.datasource.filename>postgres-xa-ds.xml</jboss.datasource.filename>
+        <database.host>${env.postgres93.database.host}</database.host>
+        <database.name>${env.postgres93.database.name}</database.name>
+        <database.user>${env.postgres93.database.user}</database.user>
+        <database.password>${env.postgres93.database.password}</database.password>
+        <database.driver>org.postgresql.Driver</database.driver>
+        <database.datasource.class>org.postgresql.xa.PGXADataSource</database.datasource.class>
+        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
+        <database.port>${env.postgres93.database.port}</database.port>
         <database.url>jdbc:postgresql://${database.host}:${database.port}/${database.name}</database.url>
       </properties>
     </profile>

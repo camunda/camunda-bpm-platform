@@ -26,6 +26,7 @@
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
+        ACT_INST_ID_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
@@ -37,12 +38,14 @@
         DELETE_REASON_,
         TASK_DEF_KEY_,
         PRIORITY_,
-        DUE_DATE_
+        DUE_DATE_,
+        FOLLOW_UP_DATE_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
+        #{activityInstanceId, jdbcType=VARCHAR},
         #{name ,jdbcType=VARCHAR},
         #{parentTaskId ,jdbcType=VARCHAR},
         #{description ,jdbcType=VARCHAR},
@@ -54,7 +57,8 @@
         #{deleteReason ,jdbcType=VARCHAR},
         #{taskDefinitionKey ,jdbcType=VARCHAR},
         #{priority, jdbcType=INTEGER},
-        #{dueDate, jdbcType=TIMESTAMP}
+        #{dueDate, jdbcType=TIMESTAMP},
+        #{followUpDate, jdbcType=TIMESTAMP}
       )
   </insert>
 
@@ -71,8 +75,8 @@
       DELETE_REASON_ = #{deleteReason ,jdbcType=VARCHAR},
       TASK_DEF_KEY_ = #{taskDefinitionKey ,jdbcType=VARCHAR},
       PRIORITY_ = #{priority, jdbcType=INTEGER},
-      DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP}
-      
+      DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
+      FOLLOW_UP_DATE_ = #{followUpDate, jdbcType=TIMESTAMP}
       <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
@@ -101,6 +105,7 @@
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -113,6 +118,7 @@
     <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="priority" column="PRIORITY_" jdbcType="INTEGER" />
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+    <result property="followUpDate" column="FOLLOW_UP_DATE_" jdbcType="TIMESTAMP" />
   </resultMap>
 
   <!-- HISTORIC TASK INSTANCE SELECT -->
@@ -170,6 +176,13 @@
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
       </if>
+      <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
+        and RES.ACT_INST_ID_ in
+        <foreach item="item" index="index" collection="activityInstanceIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="taskName != null">
         and RES.NAME_ = #{taskName}
       </if>
@@ -226,6 +239,21 @@
       </if>
       <if test="dueAfter != null">
         and RES.DUE_DATE_ &gt; #{dueAfter}
+      </if>
+      <if test="dueDate != null || dueBefore != null || dueAfter != null">
+        and RES.DUE_DATE_ is not null
+      </if>
+      <if test="followUpDate != null">
+        and RES.FOLLOW_UP_DATE_ = #{followUpDate}
+      </if>
+      <if test="followUpBefore != null">
+        and RES.FOLLOW_UP_DATE_ &lt; #{followUpBefore}
+      </if>
+      <if test="followUpAfter != null">
+        and RES.FOLLOW_UP_DATE_ &gt; #{followUpAfter}
+      </if>
+      <if test="followUpDate != null || followUpBefore != null || followUpAfter != null">
+        and RES.FOLLOW_UP_DATE_ is not null
       </if>
       <foreach collection="variables" index="index" item="var">
         and exists (

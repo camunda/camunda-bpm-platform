@@ -27,10 +27,12 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
   protected String name;
   protected String description;
   protected Date dueDate;
+  protected Date followUpDate;
   protected int priority;
   protected String parentTaskId;
   protected String deleteReason;
   protected String taskDefinitionKey;
+  protected String activityInstanceId;
 
   // getters and setters //////////////////////////////////////////////////////
 
@@ -78,6 +80,14 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
     this.dueDate = dueDate;
   }
 
+  public Date getFollowUpDate() {
+    return followUpDate;
+  }
+
+  public void setFollowUpDate(Date followUpDate) {
+    this.followUpDate = followUpDate;
+  }
+
   public int getPriority() {
     return priority;
   }
@@ -114,6 +124,14 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
     this.taskDefinitionKey = taskDefinitionKey;
   }
 
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+
+  public void setActivityInstanceId(String activityInstanceId) {
+    this.activityInstanceId = activityInstanceId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -123,6 +141,7 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
            + ", name=" + name
            + ", description=" + description
            + ", dueDate=" + dueDate
+           + ", followUpDate=" + followUpDate
            + ", priority=" + priority
            + ", parentTaskId=" + parentTaskId
            + ", deleteReason=" + deleteReason
@@ -135,6 +154,7 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
            + ", executionId=" + executionId
            + ", processDefinitionId=" + processDefinitionId
            + ", processInstanceId=" + processInstanceId
+           + ", activityInstanceId=" + activityInstanceId
            + "]";
   }
 }

@@ -19,7 +19,7 @@
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
 
   <!-- HISTORIC ACTIVITY INSTANCE INSERT -->
-  
+
   <insert id="insertHistoricActivityInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity">
       insert into ${prefix}ACT_HI_ACTINST (
         ID_,
@@ -35,7 +35,8 @@
         ASSIGNEE_,
         START_TIME_,
         END_TIME_,
-        DURATION_
+        DURATION_,
+        ACT_INST_STATE_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{parentActivityInstanceId ,jdbcType=VARCHAR},
@@ -50,38 +51,40 @@
         #{taskAssignee ,jdbcType=VARCHAR},
         #{startTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
-        #{durationInMillis ,jdbcType=BIGINT}
+        #{durationInMillis ,jdbcType=BIGINT},
+        #{activityInstanceState,jdbcType=INTEGER}
       )
   </insert>
 
   <!-- HISTORIC ACTIVITY INSTANCE UPDATE -->
-  
+
   <update id="updateHistoricActivityInstanceEvent" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
-    UPDATE 
+    UPDATE
         ${prefix}ACT_HI_ACTINST
     SET
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
       <if test="eventType == 'update'">
         , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR}
         , TASK_ID_ = #{taskId, jdbcType=VARCHAR}
-      </if>      
+      </if>
       <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
+        , ACT_INST_STATE_ = #{activityInstanceState, jdbcType=INTEGER}
       </if>
-    WHERE 
+    WHERE
       ID_ = #{id, jdbcType=VARCHAR}
   </update>
-  
+
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->
-  
+
   <select id="selectHistoricActivityInstanceEvent" parameterType="java.lang.String" resultMap="historicActivityInstanceResultMap">
-    select HAI.START_TIME_ from ${prefix}ACT_HI_ACTINST HAI              
+    select HAI.START_TIME_ from ${prefix}ACT_HI_ACTINST HAI
     where HAI.ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
   <!-- HISTORIC ACTIVITY INSTANCE DELETE -->
-  
+
   <delete id="deleteHistoricActivityInstancesByProcessInstanceId">
     delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ = #{processInstanceId}
   </delete>
@@ -103,10 +106,11 @@
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
+    <result property="activityInstanceState" column="ACT_INST_STATE_" jdbcType="INTEGER" />
   </resultMap>
 
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->
-  
+
   <select id="selectHistoricActivityInstance" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST where Id_ = #{id}
   </select>
@@ -118,12 +122,12 @@
     ${orderBy}
     ${limitAfter}
   </select>
-  
+
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
     select count(*)
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
   </select>
-  
+
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
     from ${prefix}ACT_HI_ACTINST RES
     <where>
@@ -169,9 +173,12 @@
       <if test="finishedAfter != null">
         and RES.END_TIME_ &gt;= #{finishedAfter}
       </if>
+      <if test="activityInstanceState != null">
+        and RES.ACT_INST_STATE_ = #{activityInstanceState.stateCode}
+      </if>
     </where>
   </sql>
-  
+
   <select id="selectHistoricActivityInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicActivityInstanceResultMap">
     <if test="resultType == 'LIST_PAGE'">
       ${limitBefore}
@@ -181,12 +188,12 @@
       ${limitAfter}
     </if>
   </select>
-  
+
   <select id="selectHistoricActivityInstanceByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="historicActivityInstanceResultMap">
     <if test="resultType == 'LIST_PAGE'">
         ${limitBeforeNativeQuery}
     </if>
-    ${sql} 
+    ${sql}
     <if test="resultType == 'LIST_PAGE'">
       ${limitAfter}
     </if>

@@ -69,6 +69,10 @@ public class HistoryEvent implements Serializable, PersistentObject {
   /** fired when a form property is updated */
   public static final String FORM_PROPERTY_UPDATE = "form-property-update";
 
+  public static final String INCIDENT_CREATE = "create";
+  public static final String INCIDENT_DELETE = "delete";
+  public static final String INCIDENT_RESOLVE = "resolve";
+
   /** each {@link HistoryEvent} has a unique id */
   protected String id;
 

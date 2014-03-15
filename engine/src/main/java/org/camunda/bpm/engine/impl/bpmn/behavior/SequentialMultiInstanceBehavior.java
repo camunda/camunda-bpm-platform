@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
+import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -60,8 +62,12 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
     logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
     
     if (loopCounter == nrOfInstances || completionConditionSatisfied(execution)) {
-      super.leave(execution);
-    } else {      
+      super.leave(execution); // last instance
+    } else {
+      for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(execution.getActivity())) {
+        declaration.handleSequentialMultiInstanceLeave((ExecutionEntity) execution);
+      }
+
       callActivityEndListeners(execution);
       
       try {

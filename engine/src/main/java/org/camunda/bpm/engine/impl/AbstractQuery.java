@@ -181,18 +181,18 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
 
   // helper methods /////////////////////////////////////////
 
-  protected void assertParamNotNull(String paramName, String[] values) {
+  protected void assertParamNotNull(String paramName, Object[] values) {
     if(values == null) {
       throw new ProcessEngineException(paramName +" is null");
     }
-    for (String value : values) {
+    for (Object value : values) {
       if(value == null) {
         throw new ProcessEngineException(paramName +" contains null value");
       }
     }
   }
 
-  protected void assertParamNotNull(String paramName, String value) {
+  protected void assertParamNotNull(String paramName, Object value) {
     if(value == null) {
       throw new ProcessEngineException(paramName +" is null");
     }

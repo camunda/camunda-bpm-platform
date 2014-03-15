@@ -100,6 +100,12 @@ public interface Task {
 	/** Change due date of the task. */
 	void setDueDate(Date dueDate);
 
+	/** Follow-up date of the task. */
+	Date getFollowUpDate();
+
+	/** Change follow-up date of the task. */
+	void setFollowUpDate(Date dueDate);
+
 	/** delegates this task to the given user and sets the {@link #getDelegationState() delegationState} to {@link DelegationState#PENDING}.
 	 * If no owner is set on the task, the owner is set to the current assignee of the task. */
   void delegate(String userId);

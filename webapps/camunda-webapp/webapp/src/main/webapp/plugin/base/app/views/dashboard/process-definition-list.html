@@ -1,3 +1,4 @@
+<!-- # CE - src/main/webapp/plugin/base/app/views/dashboard/process-definition-list.html -->
 <div>
   <div class="page-header">
     <h1>Deployed Processes (List)</h1>
@@ -12,7 +13,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr data-ng-repeat="statistic in statistics">
+      <tr data-ng-repeat="statistic in statistics | orderBy:orderByPredicate:orderByReverse">
         <td>
           <a href="#/process-definition/{{ statistic.definition.id }}">
             {{ statistic.definition.name }}
@@ -38,3 +39,4 @@
     </tbody>
   </table>
 </div>
+<!-- / CE - src/main/webapp/plugin/base/app/views/dashboard/process-definition-list.html -->

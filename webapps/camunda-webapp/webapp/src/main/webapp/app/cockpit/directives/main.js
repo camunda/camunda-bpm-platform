@@ -1,3 +1,8 @@
+/* global ngDefine: false */
+
+/**
+ * @namespace cam.cockpit.directives
+ */
 ngDefine('cockpit.directives', [
   './breadcrumbs',
   './numeric',
@@ -5,9 +10,13 @@ ngDefine('cockpit.directives', [
   './processDiagram',
   './processDiagramPreview',
   './activityInstanceTree',
-  './sitebarContainer',
+  './sidebarContainer',
   './stateCircle',
-  './variable'
-], function(module) {
+  './variable',
+  './viewPills',
+  './selectActivity',
+  './processVariable',
+  './dynamicName',
+  './quickFilter'
+], function() {});
 
-});

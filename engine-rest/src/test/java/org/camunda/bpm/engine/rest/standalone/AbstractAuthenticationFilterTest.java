@@ -1,20 +1,6 @@
 package org.camunda.bpm.engine.rest.standalone;
 
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-
+import com.jayway.restassured.http.ContentType;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -31,21 +17,25 @@ import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessEngineRestService;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
-import org.camunda.bpm.engine.rest.util.ResteasyTomcatServerBootstrap;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.jayway.restassured.http.ContentType;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 public abstract class AbstractAuthenticationFilterTest extends AbstractRestServiceTest {
 
   protected static final String SERVLET_PATH = "/rest";
   protected static final String SERVICE_PATH = TEST_RESOURCE_ROOT_PATH + SERVLET_PATH + ProcessEngineRestService.PATH + "/{name}"+ ProcessDefinitionRestService.PATH;
-
-  protected static EmbeddedServerBootstrap serverBootstrap;
 
   protected AuthorizationService authorizationServiceMock;
   protected IdentityService identityServiceMock;
@@ -53,18 +43,6 @@ public abstract class AbstractAuthenticationFilterTest extends AbstractRestServi
 
   protected User userMock;
   protected List<Group> groupMocks;
-
-  @BeforeClass
-  public static void setUpEmbeddedRuntime() {
-    serverBootstrap = new ResteasyTomcatServerBootstrap("runtime/resteasy/auth-filter-no-servlet-web.xml");
-    serverBootstrap.start();
-  }
-
-  @AfterClass
-  public static void tearDownEmbeddedRuntime() {
-    serverBootstrap.stop();
-  }
-
 
   @Before
   public void setup() {

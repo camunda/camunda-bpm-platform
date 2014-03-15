@@ -13,7 +13,7 @@
     <base href="$BASE" cockpit-api="$APP_ROOT/api/cockpit/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
 
     <!-- styles -->
-    <link href="$APP_ROOT/assets/css/cockpit/loader.css" rel="stylesheet" />
+    <link href="$APP_ROOT/assets/css/cockpit/loader.css?bust=CACHE_BUSTER" rel="stylesheet" />
 
     <!-- For IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -30,9 +30,9 @@
     <script src="$APP_ROOT/assets/vendor/better-placeholder-polyfill/better-placeholder-polyfill.js"></script>
     <![endif]-->
 
-    <script src="$APP_ROOT/assets/vendor/require/require.js"></script>
+    <script src="$APP_ROOT/assets/vendor/requirejs/require.js"></script>
 
-    <script src="$APP_ROOT/app/cockpit/cockpit-bootstrap.js"></script>
+    <script src="$APP_ROOT/app/cockpit/cockpit-bootstrap.js?bust=CACHE_BUSTER"></script>
   </head>
   <body>
     <!-- navigation -->
@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          
+
           <div ng-include="'templates/navigation.html'"></div>
         </div>
       </div>
@@ -57,8 +57,8 @@
     <!-- content -->
     <div class="ctn-main">
       <div class="ctn-wrapper">
-        <div class="notifications-panel"></div>
-        <div class="breadcrumbs-panel"></div>
+        <div cam-breadcrumbs-panel divider="&raquo;" class="breadcrumbs-panel"></div>
+        <div notifications-panel class="notifications-panel"></div>
 
         <!-- view body provided by ngView -->
         <div ng-view>

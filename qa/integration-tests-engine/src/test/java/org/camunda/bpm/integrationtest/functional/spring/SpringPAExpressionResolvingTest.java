@@ -78,24 +78,24 @@ public class SpringPAExpressionResolvingTest extends AbstractFoxPlatformIntegrat
   @Test
   @OperateOnDeployment("clientDeployment")
   public void testResolveBean() {       
-    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());
+    Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBean").count());
     // but the process engine can:
     runtimeService.startProcessInstanceByKey("testResolveBean");
     
-    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());
+    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBean").count());
   }
   
   @Test
   @OperateOnDeployment("clientDeployment")
   public void testResolveBeanFromJobExecutor() {
    
-    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());
+    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
     runtimeService.startProcessInstanceByKey("testResolveBeanFromJobExecutor");
-    Assert.assertEquals(1,runtimeService.createProcessInstanceQuery().count());
+    Assert.assertEquals(1,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
     
     waitForJobExecutorToProcessAllJobs(16000);    
     
-    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());    
+    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
     
   }
   

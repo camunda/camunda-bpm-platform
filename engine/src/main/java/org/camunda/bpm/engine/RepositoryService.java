@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.task.IdentityLink;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 
 /** Service providing access to the repository of process definitions and deployments.
@@ -234,6 +235,15 @@ public interface RepositoryService {
    * @throws ProcessEngineException when the process model or diagram doesn't exist.
    */
   DiagramLayout getProcessDiagramLayout(String processDefinitionId);
+
+  /**
+   * Returns the {@link BpmnModelInstance} for the given processDefinitionId.
+   *
+   * @param processDefinitionId the id of the Process Definition for which the {@link BpmnModelInstance}
+   *  should be retrieved.
+   * @return the {@link BpmnModelInstance}
+   */
+  BpmnModelInstance getBpmnModelInstance(String processDefinitionId);
 
   /**
    * Authorizes a candidate user for a process definition.

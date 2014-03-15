@@ -12,15 +12,18 @@
  */
 package org.camunda.bpm.cockpit.plugin.resource;
 
-import org.camunda.bpm.cockpit.service.AbstractEngineAware;
-
 /**
  * A abstract plugin resource class that may be used to implement
  * resources in cockpit.
- * 
+ *
+ * Deprecated, use {@link AbstractCockpitPluginResource}
+ *
+ * @see AbstractCockpitPluginResource
+ *
  * @author nico.rehwaldt
  */
-public class AbstractPluginResource extends AbstractEngineAware {
+@Deprecated
+public class AbstractPluginResource extends AbstractCockpitPluginResource {
 
   public AbstractPluginResource(String engineName) {
     super(engineName);

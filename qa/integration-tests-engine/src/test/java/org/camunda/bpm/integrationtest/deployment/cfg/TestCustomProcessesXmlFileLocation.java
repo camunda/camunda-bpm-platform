@@ -15,7 +15,6 @@ package org.camunda.bpm.integrationtest.deployment.cfg;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
-import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -43,7 +42,7 @@ public class TestCustomProcessesXmlFileLocation extends AbstractFoxPlatformInteg
         .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/processes.xml", "my/alternate/location/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
         .addClass(CustomProcessApplication.class)
-        .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/invoice.bpmn20.xml");
+        .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/invoice-it.bpmn20.xml");
     
     return archive;
     
@@ -54,7 +53,7 @@ public class TestCustomProcessesXmlFileLocation extends AbstractFoxPlatformInteg
     Assert.assertNotNull(processEngine);
     RepositoryService repositoryService = processEngine.getRepositoryService();
     long count = repositoryService.createProcessDefinitionQuery()
-      .processDefinitionKey("invoice")
+      .processDefinitionKey("invoice-it")
       .count();
     
     Assert.assertEquals(1, count);

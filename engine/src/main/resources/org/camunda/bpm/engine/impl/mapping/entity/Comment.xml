@@ -101,18 +101,62 @@
   </select>
 
   <select id="selectEventsByTaskId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
-    select * 
-    from ${prefix}ACT_HI_COMMENT 
-    where TASK_ID_ = #{parameter,jdbcType=VARCHAR}
-    order by TIME_ desc
+    <include refid="selectEventsByTaskIdSql"/>
   </select>
   
   <select id="selectEventsByTaskId_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap_postgres">
-    select * 
-    from ${prefix}ACT_HI_COMMENT 
-    where TASK_ID_ = #{parameter,jdbcType=VARCHAR}
-    order by TIME_ desc
+    <include refid="selectEventsByTaskIdSql"/>
   </select>
+
+  <sql id="selectEventsByTaskIdSql">
+    ${limitBefore}
+    select distinct RES.* ${limitBetween}
+    from (
+        select
+          ID_,
+          TYPE_,
+          TIME_,
+          USER_ID_,
+          TASK_ID_,
+          PROC_INST_ID_,
+          ACTION_,
+          MESSAGE_
+        from ${prefix}ACT_HI_COMMENT
+        where TASK_ID_ = #{parameter,jdbcType=VARCHAR}
+     UNION
+     select
+        ID_ as ID_,
+        ${constant.event} as TYPE_,
+        TIMESTAMP_ as TIME_,
+        USER_ID_ as USER_ID_,
+        TASK_ID_ as TASK_ID_,
+        PROC_INST_ID_ as PROC_INST_ID_,
+        OPERATION_TYPE_ as ACTION_,
+        ${constant.op_message} as MESSAGE_
+        from ${prefix}ACT_HI_OP_LOG
+        where TASK_ID_ = #{parameter,jdbcType=VARCHAR}
+        and OPERATION_TYPE_ in ('AddUserLink',
+                                'DeleteUserLink',
+                                'AddGroupLink',
+                                'DeleteGroupLink')
+     UNION
+     select
+        ID_ as ID_,
+        ${constant.event} as TYPE_,
+        TIMESTAMP_ as TIME_,
+        USER_ID_ as USER_ID_,
+        TASK_ID_ as TASK_ID_,
+        PROC_INST_ID_ as PROC_INST_ID_,
+        OPERATION_TYPE_ as ACTION_,
+        NEW_VALUE_ as MESSAGE_
+        from ${prefix}ACT_HI_OP_LOG
+        where TASK_ID_ = #{parameter,jdbcType=VARCHAR}
+        and OPERATION_TYPE_ in ('AddAttachment',
+                                'DeleteAttachment')
+    ) RES
+    ${orderBy}
+    ${limitAfter}
+  </sql>
 
   <select id="selectCommentsByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
     select * 

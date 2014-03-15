@@ -117,7 +117,24 @@ public class BpmnProcessModelUtil {
   public String replaceDeveloperFriendlyIds(String sourceModel) {    
     return replaceDeveloperFriendlyIds(sourceModel, "Process_Engine");
   }
-  
+
+  /**
+   * Extract executable pool based on string data
+   *
+   * @param sourceModel
+   * @return
+   *
+   * @see #extractExecutablePool(java.io.InputStream)
+   */
+  public String extractExecutablePool(String sourceModel) {
+
+    InputStream input = new ByteArrayInputStream(getBytesFromString(sourceModel));
+
+    InputStream result = extractExecutablePool(input);
+
+    return getStringFromBytes(IoUtil.readInputStream(result, "foo"));
+  }
+
   /**
    * Takes a bpmn process model in XML representation as input. Removes all pools 
    * except for a single executable pool (property 'isExecutable="true").

@@ -49,8 +49,29 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   /** Only select historic process instances that don't have a process-definition of which the key is present in the given list */
   HistoricProcessInstanceQuery processDefinitionKeyNotIn(List<String> processDefinitionKeys);
 
+  /** Only select historic process instances that are defined by a process
+   * definition with the given name.  */
+  HistoricProcessInstanceQuery processDefinitionName(String processDefinitionName);
+
+  /**
+   * Only select historic process instances that are defined by process definition which name
+   * is like the given value.
+   *
+   * @param nameLike The string can include the wildcard character '%' to express
+   *    like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+   */
+  HistoricProcessInstanceQuery processDefinitionNameLike(String nameLike);
+
   /** Only select historic process instances with the given business key */
   HistoricProcessInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey);
+
+  /**
+   * Only select historic process instances which had a business key like the given value.
+   *
+   * @param processInstanceBusinessKey The string can include the wildcard character '%' to express
+   *    like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+   */
+  HistoricProcessInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKeyLike);
 
   /** Only select historic process instances that are completely finished. */
   HistoricProcessInstanceQuery finished();

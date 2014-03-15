@@ -1,16 +1,8 @@
 package org.camunda.bpm.engine.rest.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.commons.io.FileUtils;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -19,11 +11,16 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
 
   private Tomcat tomcat;
-  private String workingDir = System.getProperty("java.io.tmpdir");
-
+  private String workingDir;
   private String webXmlPath;
 
   public TomcatServerBootstrap(String webXmlPath) {
@@ -36,28 +33,14 @@ public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
 
     tomcat = new Tomcat();
     tomcat.setPort(port);
-    tomcat.setBaseDir(workingDir);
+    tomcat.setBaseDir(getWorkingDir());
 
-    tomcat.getHost().setAppBase(workingDir);
+    tomcat.getHost().setAppBase(getWorkingDir());
     tomcat.getHost().setAutoDeploy(true);
     tomcat.getHost().setDeployOnStartup(true);
 
     String contextPath = "/" + getContextPath();
-    File webApp = new File(workingDir, getContextPath());
-    File oldWebApp = new File(webApp.getAbsolutePath());
-
-    // check if old webapp folder exists (may not do so on windows)
-    if (oldWebApp.exists() && oldWebApp.isDirectory()) {
-      try {
-        FileUtils.deleteDirectory(oldWebApp);
-      } catch (IOException e) {
-        if ((oldWebApp.exists())) {
-          throw new RuntimeException(e);
-        } else {
-          // well, task done
-        }
-      }
-    }
+    File webApp = new File(getWorkingDir(), getContextPath());
 
     PomEquippedResolveStage resolver = Maven.resolver().loadPomFromFile("pom.xml");
 
@@ -73,7 +56,7 @@ public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
     wa.setWebXML(webXmlPath);
 
     wa.as(ZipExporter.class).exportTo(
-        new File(workingDir + "/" + getContextPath() + ".war"), true);
+        new File(getWorkingDir() + "/" + getContextPath() + ".war"), true);
 
     Context ctx = tomcat.addWebapp(tomcat.getHost(), contextPath, webApp.getAbsolutePath());
 
@@ -99,10 +82,6 @@ public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
   }
 
   public void stop() {
-    if (tomcat.getServer() == null) {
-      return;
-    }
-
     try {
       try {
         tomcat.stop();
@@ -121,4 +100,16 @@ public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
       throw new RuntimeException(e);
     }
   }
+
+  public String getWorkingDir() {
+    if (workingDir == null) {
+      workingDir = System.getProperty("java.io.tmpdir");
+    }
+    return workingDir;
+  }
+
+  public void setWorkingDir(String workingDir) {
+    this.workingDir = workingDir;
+  }
+
 }

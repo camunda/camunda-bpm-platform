@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,23 +20,25 @@ package org.camunda.bpm.engine.impl.history.event;
 public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity {
 
   private static final long serialVersionUID = 1L;
-  
+
+  protected int revision;
+
   protected String variableName;
   protected String variableInstanceId;
-  protected int revision;
-  
+  protected String scopeActivityInstanceId;
+
   protected String variableTypeName;
 
   protected Long longValue;
-  protected Double doubleValue; 
+  protected Double doubleValue;
   protected String textValue;
-  protected String textValue2;  
+  protected String textValue2;
   protected byte[] byteValue;
 
   protected String byteArrayId;
-  
+
   // getter / setters ////////////////////////////
-  
+
   public String getVariableTypeName() {
     return variableTypeName;
   }
@@ -86,7 +88,7 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
     this.revision = revision;
   }
   public void setByteArrayId(String id) {
-    byteArrayId = id;   
+    byteArrayId = id;
   }
   public String getByteArrayId() {
     return byteArrayId;
@@ -96,6 +98,12 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
   }
   public void setVariableInstanceId(String variableInstanceId) {
     this.variableInstanceId = variableInstanceId;
+  }
+  public String getScopeActivityInstanceId() {
+    return scopeActivityInstanceId;
+  }
+  public void setScopeActivityInstanceId(String scopeActivityInstanceId) {
+    this.scopeActivityInstanceId = scopeActivityInstanceId;
   }
 
   @Override
@@ -111,6 +119,7 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
            + ", textValue2=" + textValue2
            + ", byteArrayId=" + byteArrayId
            + ", activityInstanceId=" + activityInstanceId
+           + ", scopeActivityInstanceId=" + scopeActivityInstanceId
            + ", eventType=" + eventType
            + ", executionId=" + executionId
            + ", id=" + id

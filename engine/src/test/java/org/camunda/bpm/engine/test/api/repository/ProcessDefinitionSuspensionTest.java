@@ -2195,4 +2195,77 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     }
   }
 
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testSuspendStartTimerOnProcessDefinitionSuspension.bpmn20.xml"})
+  public void testSuspendStartTimerOnProcessDefinitionSuspensionByKey() {
+    // given
+    Job startTimer = managementService.createJobQuery().timers().singleResult();
+
+    assertFalse(startTimer.isSuspended());
+
+    // when
+    repositoryService.suspendProcessDefinitionByKey("process");
+
+    // then
+
+    // refresh job
+    startTimer = managementService.createJobQuery().timers().singleResult();
+    assertTrue(startTimer.isSuspended());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testSuspendStartTimerOnProcessDefinitionSuspension.bpmn20.xml"})
+  public void testSuspendStartTimerOnProcessDefinitionSuspensionById() {
+    // given
+    ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    Job startTimer = managementService.createJobQuery().timers().singleResult();
+
+    assertFalse(startTimer.isSuspended());
+
+    // when
+    repositoryService.suspendProcessDefinitionById(pd.getId());
+
+    // then
+
+    // refresh job
+    startTimer = managementService.createJobQuery().timers().singleResult();
+    assertTrue(startTimer.isSuspended());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testSuspendStartTimerOnProcessDefinitionSuspension.bpmn20.xml"})
+  public void testActivateStartTimerOnProcessDefinitionSuspensionByKey() {
+    // given
+    repositoryService.suspendProcessDefinitionByKey("process");
+
+    Job startTimer = managementService.createJobQuery().timers().singleResult();
+    assertTrue(startTimer.isSuspended());
+
+    // when
+    repositoryService.activateProcessDefinitionByKey("process");
+    // then
+
+    // refresh job
+    startTimer = managementService.createJobQuery().timers().singleResult();
+    assertFalse(startTimer.isSuspended());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testSuspendStartTimerOnProcessDefinitionSuspension.bpmn20.xml"})
+  public void testActivateStartTimerOnProcessDefinitionSuspensionById() {
+    // given
+    ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
+    repositoryService.suspendProcessDefinitionById(pd.getId());
+
+    Job startTimer = managementService.createJobQuery().timers().singleResult();
+
+    assertTrue(startTimer.isSuspended());
+
+    // when
+    repositoryService.activateProcessDefinitionById(pd.getId());
+
+    // then
+
+    // refresh job
+    startTimer = managementService.createJobQuery().timers().singleResult();
+    assertFalse(startTimer.isSuspended());
+  }
 }

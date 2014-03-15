@@ -19,19 +19,7 @@ import java.util.List;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.cmd.ActivateProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.AddIdentityLinkForProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkForProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.DeployCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramLayoutCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessModelCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceNamesCmd;
-import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.SuspendProcessDefinitionCmd;
+import org.camunda.bpm.engine.impl.cmd.*;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
@@ -43,6 +31,7 @@ import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.task.IdentityLink;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 
 /**
@@ -143,6 +132,10 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public DiagramLayout getProcessDiagramLayout(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentProcessDiagramLayoutCmd(processDefinitionId));
+  }
+
+  public BpmnModelInstance getBpmnModelInstance(String processDefinitionId) {
+    return commandExecutor.execute(new GetDeploymentBpmnModelInstanceCmd(processDefinitionId));
   }
 
   public void addCandidateStarterUser(String processDefinitionId, String userId) {

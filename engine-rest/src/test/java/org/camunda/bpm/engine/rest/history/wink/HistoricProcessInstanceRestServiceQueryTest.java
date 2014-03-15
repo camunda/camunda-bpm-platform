@@ -4,14 +4,20 @@ import org.camunda.bpm.engine.rest.history.AbstractHistoricProcessInstanceRestSe
 import org.camunda.bpm.engine.rest.util.WinkTomcatServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.rules.TemporaryFolder;
 
 public class HistoricProcessInstanceRestServiceQueryTest extends AbstractHistoricProcessInstanceRestServiceQueryTest {
 
   protected static WinkTomcatServerBootstrap serverBootstrap;
 
+  @ClassRule
+  public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+
   @BeforeClass
   public static void setUpEmbeddedRuntime() {
     serverBootstrap = new WinkTomcatServerBootstrap();
+    serverBootstrap.setWorkingDir(temporaryFolder.getRoot().getAbsolutePath());
     serverBootstrap.start();
   }
 

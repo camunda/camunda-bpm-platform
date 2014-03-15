@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="TestProcess">
+
+  <message id="newInvoice" name="newInvoiceMessage"/>
+
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="theStart"/>
+    <sequenceFlow sourceRef="theStart" targetRef="waitState"/>
+    <receiveTask id="waitState" name="Wait State" messageRef="newInvoice"/>
+    <sequenceFlow sourceRef="waitState" targetRef="theEnd"/>
+    <endEvent id="theEnd"/>
+  </process>
+
+</definitions>

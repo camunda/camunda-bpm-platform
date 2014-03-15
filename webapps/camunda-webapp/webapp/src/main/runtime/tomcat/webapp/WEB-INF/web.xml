@@ -7,6 +7,11 @@
   <listener>
     <listener-class>org.camunda.bpm.cockpit.impl.web.bootstrap.CockpitContainerBootstrap</listener-class>
   </listener>
+
+  <!-- admin bootstrap listener -->
+  <listener>
+    <listener-class>org.camunda.bpm.admin.impl.web.bootstrap.AdminContainerBootstrap</listener-class>
+  </listener>
   
   <!-- Authentication filter -->
   <filter>
@@ -33,23 +38,39 @@
     <url-pattern>/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
-   
-  <!-- client plugins filter -->
+
+  <!-- cockpit client plugins filter -->
   <filter>
-    <filter-name>Client Plugins Filter</filter-name>
-    <filter-class>org.camunda.bpm.cockpit.impl.web.filter.plugin.ClientPluginsFilter</filter-class>
+    <filter-name>Cockpit Client Plugins Filter</filter-name>
+    <filter-class>org.camunda.bpm.cockpit.impl.web.filter.plugin.CockpitClientPluginsFilter</filter-class>
   </filter>
   <filter-mapping>
-    <filter-name>Client Plugins Filter</filter-name>
+    <filter-name>Cockpit Client Plugins Filter</filter-name>
     <url-pattern>/app/cockpit/cockpit-bootstrap.js</url-pattern>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>Client Plugins Filter</filter-name>
+    <filter-name>Cockpit Client Plugins Filter</filter-name>
     <url-pattern>/app/cockpit/cockpit.js</url-pattern>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   
+  <!-- admin client plugins filter -->
+  <filter>
+    <filter-name>Admin Client Plugins Filter</filter-name>
+    <filter-class>org.camunda.bpm.admin.impl.web.filter.plugin.AdminClientPluginsFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>Admin Client Plugins Filter</filter-name>
+    <url-pattern>/app/admin/admin-bootstrap.js</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>Admin Client Plugins Filter</filter-name>
+    <url-pattern>/app/admin/admin.js</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+
   <!-- REST cache control filter -->
   <filter>
     <filter-name>CacheControlFilter</filter-name>
