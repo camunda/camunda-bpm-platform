@@ -405,22 +405,18 @@ ngDefine('cockpit.pages.processInstance', [
       $scope.processDefinition = processDefinition;
     });
 
-    processData.observe([ 'processDefinition', 'processInstance'], function (processDefinition, processInstance) {
+    processData.observe(['processDefinition', 'processInstance'], function (processDefinition, processInstance) {
       page
         .breadcrumbsClear()
         .breadcrumbsAdd([
           {
-            label: processDefinition.name || processDefinition.key || processDefinition.id,
-            href: '#/process-definition/'+ (processDefinition.id) +'/runtime',
-            type: 'processDefinition',
-            processDefinition: processDefinition
+            label: processDefinition.name || ((processDefinition.key || processDefinition.id).slice(0, 8) +'…'),
+            href: '#/process-definition/'+ (processDefinition.id) +'/runtime'
           },
+
           {
-            label: processInstance.name || processInstance.key || processInstance.id,
-            href: '#/process-instance/'+ (processInstance.id) +'/runtime',
-            type: 'processInstance',
-            processInstance: processInstance,
-            processDefinition: processDefinition
+            label: processInstance.name || ((processInstance.key || processInstance.id).slice(0, 8) +'…'),
+            href: '#/process-instance/'+ (processInstance.id) +'/runtime'
           }
         ]);
 
