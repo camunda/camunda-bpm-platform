@@ -2,19 +2,24 @@
 ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angular, require) {
   'use strict';
 
+  // QUESTION: Shouldn't we use the templateUrl property instead?
   var TEMPLATE_URL = require.toUrl('./activity-instance-tree.html');
 
-  var Directive = [ '$compile', '$http', '$templateCache',
-            function ($compile, $http, $templateCache) {
-
+  var Directive = [
+    '$compile',
+    '$http',
+    '$templateCache',
+  function ($compile, $http, $templateCache) {
     return {
       restrict: 'EAC',
+
       scope: {
         node: '=activityInstanceTree',
         onElementClick: '&',
         selection: '=',
         quickFilters: '='
       },
+
       link: function(scope, element /*, attrs, processDiagram */ ) {
 
         var $nodeElement = element,

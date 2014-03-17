@@ -14,10 +14,8 @@ ngDefine('cockpit.services.page', ['angular'], function(module, angular) {
    */
   module.service('page', [
     '$rootScope',
-    'ProcessInstanceResource',
   function(
-    $rootScope,
-    ProcessInstanceResource
+    $rootScope
   ) {
 
     var page = {
@@ -70,43 +68,37 @@ ngDefine('cockpit.services.page', ['angular'], function(module, angular) {
           return angular.forEach(crumb, this.breadcrumbsAdd);
         }
 
-        // that sucks - badly -
-        // to be really relevant the concepts of
-        // process/instance should be avoided in this file
-        var processDefinition = crumb.processDefinition;
-        switch (crumb.type) {
-          case 'processDefinition':
-            crumb.label = crumb.label || processDefinition.name || processDefinition.key || processDefinition.id;
-            crumb.href = crumb.href || '#/process-definition/' + processDefinition.id;
-            crumb.divider = '/';
-
-            page.breadcrumbs.push(crumb);
-            break;
-
-          case 'processInstance':
-            var processInstance = crumb.processInstance;
-
-            crumb.label = crumb.label || processInstance.id;
-            crumb.href = crumb.href || '#/process-instance/' + processInstance.id;
-            crumb.divider = ':';
-
-            ProcessInstanceResource.count({ subProcessInstance: processInstance.id }).$then(function(response) {
-              var count = response.data.count;
-
-              if (count === 1) {
-                page.breadcrumbs.unshift({
-                  type: 'expand',
-                  divider: '/',
-                  processInstance: processInstance
-                });
-              }
-            });
-
-            page.breadcrumbs.push(crumb);
-            break;
+        if (angular.isFunction(crumb)) {
+          var callback = crumb;
+          crumb = {
+            callback: callback
+          };
         }
 
-        // $rootScope.$broadcast('page.changed', 'breadcrumbs', page.breadcrumbs);
+        crumb.label = crumb.label || '…';
+
+        page.breadcrumbs.push(crumb);
+
+        $rootScope.$broadcast('page.breadcrumbs.changed', page.breadcrumbs);
+        return this;
+      },
+
+      /**
+       * Insert a link (or array of links) at a given index
+       *
+       * @param {integer} index          - the position at which the new
+       *                                   element(s) will be insert
+       *
+       * @param {(Object|Array)} crumb   - the new element(s) to insert
+       *
+       * @return {angular.Service} this  - the service
+       */
+      breadcrumbsInsertAt: function(index, crumb) {
+        console.info('breadcrumbsInsertAt', index, crumb);
+        page.breadcrumbs = page.breadcrumbs.slice(0, index)
+          .concat(angular.isArray(crumb) ? crumb : [crumb])
+          .concat(page.breadcrumbs.slice(index + 1));
+
         $rootScope.$broadcast('page.breadcrumbs.changed', page.breadcrumbs);
         return this;
       },
@@ -137,7 +129,7 @@ ngDefine('cockpit.services.page', ['angular'], function(module, angular) {
        */
       breadcrumbsClear: function() {
         page.breadcrumbs = [];
-        // $rootScope.$broadcast('page.changed', 'breadcrumbs', page.breadcrumbs);
+
         $rootScope.$broadcast('page.breadcrumbs.changed', page.breadcrumbs);
         return this;
       }
