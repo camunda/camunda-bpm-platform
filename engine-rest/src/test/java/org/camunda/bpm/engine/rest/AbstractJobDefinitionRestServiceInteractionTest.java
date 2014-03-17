@@ -1,6 +1,22 @@
 package org.camunda.bpm.engine.rest;
 
-import com.jayway.restassured.http.ContentType;
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -13,17 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
-import javax.ws.rs.core.Response.Status;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.*;
+import com.jayway.restassured.http.ContentType;
 
 public abstract class AbstractJobDefinitionRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -31,6 +37,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
   protected static final String SINGLE_JOB_DEFINITION_RESOURCE_URL = JOB_DEFINITION_RESOURCE_URL + "/{id}";
   protected static final String SINGLE_JOB_DEFINITION_SUSPENDED_URL = SINGLE_JOB_DEFINITION_RESOURCE_URL + "/suspended";
   protected static final String JOB_DEFINITION_SUSPENDED_URL = JOB_DEFINITION_RESOURCE_URL + "/suspended";
+  protected static final String JOB_DEFINITION_RETRIES_URL = SINGLE_JOB_DEFINITION_RESOURCE_URL + "/retries";
 
   private ProcessEngine namedProcessEngine;
   private ManagementService mockManagementService;
@@ -936,4 +943,49 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
   }
+
+  @Test
+  public void testSetJobRetries() {
+    Map<String, Object> retriesVariableJson = new HashMap<String, Object>();
+    retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(retriesVariableJson)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_DEFINITION_RETRIES_URL);
+
+    verify(mockManagementService).setJobRetriesByJobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID, MockProvider.EXAMPLE_JOB_RETRIES);
+  }
+
+  @Test
+  public void testSetJobRetriesExceptionExpected() {
+    String expectedMessage = "expected exception message";
+
+    doThrow(new ProcessEngineException(expectedMessage))
+      .when(mockManagementService)
+        .setJobRetriesByJobDefinitionId(MockProvider.NON_EXISTING_JOB_DEFINITION_ID, MockProvider.EXAMPLE_JOB_RETRIES);
+
+    Map<String, Object> retriesVariableJson = new HashMap<String, Object>();
+    retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
+
+    given()
+      .pathParam("id", MockProvider.NON_EXISTING_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(retriesVariableJson)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_DEFINITION_RETRIES_URL);
+
+    verify(mockManagementService).setJobRetriesByJobDefinitionId(MockProvider.NON_EXISTING_JOB_DEFINITION_ID, MockProvider.EXAMPLE_JOB_RETRIES);
+  }
+
 }
