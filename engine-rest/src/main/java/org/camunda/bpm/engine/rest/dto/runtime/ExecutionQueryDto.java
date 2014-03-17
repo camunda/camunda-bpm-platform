@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   private static final String SORT_BY_INSTANCE_ID_VALUE = "instanceId";
   private static final String SORT_BY_DEFINITION_KEY_VALUE = "definitionKey";
   private static final String SORT_BY_DEFINITION_ID_VALUE = "definitionId";
-  
+
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
@@ -40,7 +40,7 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_DEFINITION_KEY_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEFINITION_ID_VALUE);
   }
-  
+
   private String processDefinitionKey;
   private String businessKey;
   private String processDefinitionId;
@@ -50,14 +50,18 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   private String messageEventSubscriptionName;
   private Boolean active;
   private Boolean suspended;
-  
+  private String incidentId;
+  private String incidentType;
+  private String incidentMessage;
+  private String incidentMessageLike;
+
   private List<VariableQueryParameterDto> variables;
   private List<VariableQueryParameterDto> processVariables;
 
   public ExecutionQueryDto() {
-    
+
   }
-  
+
   public ExecutionQueryDto(MultivaluedMap<String, String> queryParameters) {
     super(queryParameters);
   }
@@ -106,7 +110,7 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   public void setProcessVariables(List<VariableQueryParameterDto> processVariables) {
     this.processVariables = processVariables;
   }
-  
+
   @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
   public void setActive(Boolean active) {
     this.active = active;
@@ -116,7 +120,27 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   public void setSuspended(Boolean suspended) {
     this.suspended = suspended;
   }
-  
+
+  @CamundaQueryParam(value = "incidentId")
+  public void setIncidentId(String incidentId) {
+    this.incidentId = incidentId;
+  }
+
+  @CamundaQueryParam(value = "incidentType")
+  public void setIncidentType(String incidentType) {
+    this.incidentType = incidentType;
+  }
+
+  @CamundaQueryParam(value = "incidentMessage")
+  public void setIncidentMessage(String incidentMessage) {
+    this.incidentMessage = incidentMessage;
+  }
+
+  @CamundaQueryParam(value = "incidentMessageLike")
+  public void setIncidentMessageLike(String incidentMessageLike) {
+    this.incidentMessageLike = incidentMessageLike;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -140,7 +164,7 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
     }
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
-    } 
+    }
     if (activityId != null) {
       query.activityId(activityId);
     }
@@ -156,13 +180,25 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
     if (suspended != null && suspended == true) {
       query.suspended();
     }
-    
+    if (incidentId != null) {
+      query.incidentId(incidentId);
+    }
+    if (incidentType != null) {
+      query.incidentType(incidentType);
+    }
+    if (incidentMessage != null) {
+      query.incidentMessage(incidentMessage);
+    }
+    if (incidentMessageLike != null) {
+      query.incidentMessageLike(incidentMessageLike);
+    }
+
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
         Object variableValue = variableQueryParam.getValue();
-        
+
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.variableValueEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {
@@ -182,13 +218,13 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
         }
       }
     }
-    
+
     if (processVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : processVariables) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
         Object variableValue = variableQueryParam.getValue();
-        
+
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.processVariableValueEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
@@ -211,7 +247,7 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
         query.orderByProcessDefinitionId();
       }
     }
-    
+
     if (sortOrder != null) {
       if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
         query.asc();
@@ -220,7 +256,7 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
       }
     }
   }
-  
-  
-  
+
+
+
 }

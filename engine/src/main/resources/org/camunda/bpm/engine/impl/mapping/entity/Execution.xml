@@ -159,6 +159,16 @@
     <if test="businessKey != null">
         inner join ${prefix}ACT_RU_EXECUTION INST on RES.PROC_INST_ID_ = INST.ID_
     </if>
+    <if test="incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
+      <choose>
+        <when test="onlyProcessInstances">
+          inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.PROC_INST_ID_
+        </when>
+        <otherwise>
+          inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.EXECUTION_ID_
+        </otherwise>
+      </choose>
+    </if>
     inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
     <where>
       <if test="onlyProcessInstances">
@@ -253,6 +263,18 @@
     	 <foreach collection="eventSubscriptions" index="index" item="eventSubscriptionValue">
     	    and (EVT${index}.EVENT_TYPE_ = #{eventSubscriptionValue.eventType} and EVT${index}.EVENT_NAME_ = #{eventSubscriptionValue.eventName}) 
 	    </foreach>
+      </if>
+      <if test="incidentType != null">
+        and INC.INCIDENT_TYPE_ = #{incidentType}
+      </if>
+      <if test="incidentId != null">
+        and INC.ID_ = #{incidentId}
+      </if>
+      <if test="incidentMessage != null">
+        and INC.INCIDENT_MSG_ = #{incidentMessage}
+      </if>
+      <if test="incidentMessageLike != null">
+        and INC.INCIDENT_MSG_ like #{incidentMessageLike}
       </if>
     </where>
   </sql>

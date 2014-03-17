@@ -91,6 +91,9 @@
     <if test="eventSubscriptionType != null">
     	inner join ${prefix}ACT_RU_EVENT_SUBSCR EVT on RES.ID_ = EVT.CONFIGURATION_
     </if>
+    <if test="incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
+      inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.PROC_DEF_ID_
+    </if>
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -139,9 +142,21 @@
              OR exists (select IDN.ID_  from ${prefix} ACT_RU_IDENTITYLINK  IDN,  ${prefix} ACT_ID_MEMBERSHIP MBMR where IDN.PROC_DEF_ID_ = RES.ID_ and MBMR.USER_ID_ =  #{authorizationUserId} and IDN.GROUP_ID_ = MBMR.GROUP_ID_)
              )
       </if>
+      <if test="incidentType != null">
+        and INC.INCIDENT_TYPE_ = #{incidentType}
+      </if>
+      <if test="incidentId != null">
+        and INC.ID_ = #{incidentId}
+      </if>
+      <if test="incidentMessage != null">
+        and INC.INCIDENT_MSG_ = #{incidentMessage}
+      </if>
+      <if test="incidentMessageLike != null">
+        and INC.INCIDENT_MSG_ like #{incidentMessageLike}
+      </if>
     </where>
   </sql>
-    
+
   <select id="selectProcessDefinitionByDeploymentAndKey" parameterType="map" resultMap="processDefinitionResultMap">
     select * 
     from ${prefix}ACT_RE_PROCDEF 
