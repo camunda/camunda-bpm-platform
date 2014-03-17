@@ -54,6 +54,8 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Pe
 
   boolean forcedUpdate;
 
+  protected String errorMessage;
+
   // Default constructor for SQL mapping
   protected VariableInstanceEntity() {
   }
@@ -148,10 +150,13 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Pe
 
   public ByteArrayEntity getByteArrayValue() {
     if ((byteArrayValue == null) && (byteArrayValueId != null)) {
-      byteArrayValue = Context
-        .getCommandContext()
-        .getDbSqlSession()
-        .selectById(ByteArrayEntity.class, byteArrayValueId);
+      // no lazy fetching outside of command context
+      if(Context.getCommandContext() != null) {
+        byteArrayValue = Context
+          .getCommandContext()
+          .getDbSqlSession()
+          .selectById(ByteArrayEntity.class, byteArrayValueId);
+      }
     }
     return byteArrayValue;
   }
@@ -195,8 +200,17 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Pe
   // type /////////////////////////////////////////////////////////////////////
 
   public Object getValue() {
-    if (!type.isCachable() || cachedValue==null) {
-      cachedValue = type.getValue(this);
+    if (errorMessage == null && (!type.isCachable() || cachedValue==null)) {
+      try {
+        cachedValue = type.getValue(this);
+
+      } catch(RuntimeException e) {
+        // catch error message
+        errorMessage = e.getMessage();
+
+        //re-throw the exception
+        throw e;
+      }
     }
     return cachedValue;
   }
@@ -282,6 +296,9 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Pe
   }
   public String getTypeName() {
     return (type != null ? type.getTypeName() : null);
+  }
+  public String getErrorMessage() {
+    return errorMessage;
   }
 
   @Override

@@ -33,7 +33,12 @@ public class ByteArrayType implements VariableType {
     if (valueFields.getByteArrayValueId()==null) {
       return null;
     }
-    return valueFields.getByteArrayValue().getBytes();
+    ByteArrayEntity byteArrayValue = valueFields.getByteArrayValue();
+    if(byteArrayValue != null) {
+      return byteArrayValue.getBytes();
+    } else {
+      return null;
+    }
   }
 
   public void setValue(Object value, ValueFields valueFields) {
@@ -55,6 +60,6 @@ public class ByteArrayType implements VariableType {
   }
 
   public String getTypeNameForValue(Object value) {
-    return byte[].class.getSimpleName();
+    return "Binary";
   }
 }
