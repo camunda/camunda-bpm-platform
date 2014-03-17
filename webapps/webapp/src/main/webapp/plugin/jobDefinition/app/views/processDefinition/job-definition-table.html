@@ -32,18 +32,9 @@
         </span>
       </td>
       <td>
-        <a class="btn action-button" ng-click="openSuspensionStateDialog(jobDefinition)" ng-show="jobDefinition.suspended"
-           help
-           help-text="Activate Job Definition"
-           help-placement="'left'">
-          <i class="icon-play"></i>
-        </a>
-        <a class="btn action-button" ng-click="openSuspensionStateDialog(jobDefinition)" ng-hide="jobDefinition.suspended"
-           help
-           help-text="Suspend Job Definition"
-           help-placement="'left'">
-          <i class="icon-suspended"></i>
-        </a>
+        <span ng-repeat="actionProvider in jobDefinitionActions">
+          <view provider="actionProvider" vars="jobDefinitionVars"/>
+        </span>
       </td>
     </tr>
 
