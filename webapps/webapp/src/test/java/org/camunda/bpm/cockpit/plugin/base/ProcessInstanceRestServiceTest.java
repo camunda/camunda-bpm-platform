@@ -63,6 +63,16 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
   private void startProcessInstances(String processDefinitionKey, int numOfInstances) {
     for (int i = 0; i < numOfInstances; i++) {
+      ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 1000));
+      runtimeService.startProcessInstanceByKey(processDefinitionKey, "businessKey_" + i);
+    }
+
+    executeAvailableJobs();
+  }
+
+  private void startProcessInstancesDelayed(String processDefinitionKey, int numOfInstances) {
+    for (int i = 0; i < numOfInstances; i++) {
+      ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 3000));
       runtimeService.startProcessInstanceByKey(processDefinitionKey, "businessKey_" + i);
     }
 
@@ -108,7 +118,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     "processes/user-task-process.bpmn"
   })
   public void testQueryOrderByStartTime() {
-    startProcessInstances("userTaskProcess", 3);
+    startProcessInstancesDelayed("userTaskProcess", 3);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -132,7 +142,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     "processes/user-task-process.bpmn"
   })
   public void testQueryOrderByStartTimeAsc() {
-    startProcessInstances("userTaskProcess", 3);
+    startProcessInstancesDelayed("userTaskProcess", 3);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -156,7 +166,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     "processes/user-task-process.bpmn"
   })
   public void testQueryOrderByStartTimeDesc() {
-    startProcessInstances("userTaskProcess", 3);
+    startProcessInstancesDelayed("userTaskProcess", 3);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
