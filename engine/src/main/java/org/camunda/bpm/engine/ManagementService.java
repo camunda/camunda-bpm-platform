@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.management.TablePageQuery;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
@@ -486,6 +487,30 @@ public interface ManagementService {
    * @param retries number of retries.
    */
   void setJobRetries(String jobId, int retries);
+
+  /**
+   * <p>
+   * Set the number of retries of all <strong>failed</strong> {@link Job jobs}
+   * of the provided job definition id.
+   * </p>
+   *
+   * <p>
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be <strong>failed</strong> and
+   * not retried again. In that case, this method can be used to increase the
+   * number of retries.
+   * </p>
+   *
+   * <p>
+   * {@link Incident Incidents} of the involved failed {@link Job jobs} will not
+   * be resolved using this method! When the execution of a job was successful
+   * the corresponding incident will be resolved.
+   * </p>
+   *
+   * @param jobdefinitionId id of the job definition, cannot be null.
+   * @param retries number of retries.
+   */
+  void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries);
 
   /**
    * Sets a new due date for the provided id.

@@ -53,12 +53,15 @@
     where I.EXECUTION_ID_ = #{parameter}
   </select>
 
-  <select id="selectIncidentsByConfiguration" parameterType="string" resultMap="incidentResultMap">
+  <select id="selectIncidentsByConfiguration" resultMap="incidentResultMap">
     select *
     from ${prefix}ACT_RU_INCIDENT I
-    where I.CONFIGURATION_ = #{parameter}
-  </select>  
-  
+    where I.CONFIGURATION_ = #{parameter.configuration, jdbcType=VARCHAR}
+    <if test="parameter.incidentType != null">
+      and INCIDENT_TYPE_ = #{parameter.incidentType, jdbcType=VARCHAR}
+    </if>
+  </select>
+
   <select id="selectIncidentByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.IncidentQueryImpl" resultMap="incidentResultMap">
     ${limitBefore}
     select RES.* ${limitBetween}

@@ -20,8 +20,10 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.IncidentQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -352,6 +354,36 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
     // manually delete job for timer start event
     managementService.deleteJob(job.getId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateOneIncident.bpmn"})
+  public void testDoNotCreateNewIncident() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
+
+    executeAvailableJobs();
+
+    IncidentQuery query = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId());
+    Incident incident = query.singleResult();
+    assertNotNull(incident);
+
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+
+    // set retries to 1 by job definition id
+    managementService.setJobRetriesByJobDefinitionId(jobDefinition.getId(), 1);
+
+    // the incident still exists
+    Incident tmp = query.singleResult();
+    assertEquals(incident.getId(), tmp.getId());
+
+    // execute the available job (should fail again)
+    executeAvailableJobs();
+
+    // the incident still exists and their
+    // should be not a new incident
+    assertEquals(1, query.count());
+    tmp = query.singleResult();
+    assertEquals(incident.getId(), tmp.getId());
+
   }
 
 }

@@ -210,4 +210,11 @@ public class JobManager extends AbstractManager {
     getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
   }
 
+  public void updateFailedJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("jobDefinitionId", jobDefinitionId);
+    parameters.put("retries", retries);
+    getDbSqlSession().update("updateFailedJobRetriesByParameters", parameters);
+  }
+
 }

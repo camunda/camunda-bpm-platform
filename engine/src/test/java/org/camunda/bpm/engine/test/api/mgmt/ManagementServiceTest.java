@@ -29,8 +29,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -191,7 +193,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       managementService.setJobRetries("", 5);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException re) {
-      assertTextPresent("The job id is mandatory, but '' has been provided.", re.getMessage());
+      assertTextPresent("Either job definition id or job id has to be provided as parameter.", re.getMessage());
     }
   }
 
@@ -200,11 +202,61 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
       managementService.setJobRetries(null, 5);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException re) {
-      assertTextPresent("The job id is mandatory, but 'null' has been provided.", re.getMessage());
+      assertTextPresent("Either job definition id or job id has to be provided as parameter.", re.getMessage());
     }
   }
 
   public void testSetJobRetriesNegativeNumberOfRetries() {
+    try {
+      managementService.setJobRetries("unexistingjob", -1);
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException re) {
+      assertTextPresent("The number of job retries must be a non-negative Integer, but '-1' has been provided.", re.getMessage());
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testSetJobRetriesByJobDefinitionId() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+    executeAvailableJobs();
+
+    JobQuery query = managementService.createJobQuery()
+        .processInstanceId(processInstance.getId());
+
+    JobDefinition jobDefinition = managementService
+        .createJobDefinitionQuery()
+        .singleResult();
+
+    Job timerJob = query.singleResult();
+
+    assertNotNull("No job found for process instance", timerJob);
+    assertEquals(0, timerJob.getRetries());
+
+    managementService.setJobRetriesByJobDefinitionId(jobDefinition.getId(), 5);
+
+    timerJob = query.singleResult();
+    assertEquals(5, timerJob.getRetries());
+  }
+
+  public void testSetJobRetriesByJobDefinitionIdEmptyJobDefinitionId() {
+    try {
+      managementService.setJobRetriesByJobDefinitionId("", 5);
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException re) {
+      assertTextPresent("Either job definition id or job id has to be provided as parameter.", re.getMessage());
+    }
+  }
+
+  public void testSetJobRetriesByJobDefinitionIdNull() {
+    try {
+      managementService.setJobRetriesByJobDefinitionId(null, 5);
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException re) {
+      assertTextPresent("Either job definition id or job id has to be provided as parameter.", re.getMessage());
+    }
+  }
+
+  public void testSetJobRetriesByJobDefinitionIdNegativeNumberOfRetries() {
     try {
       managementService.setJobRetries("unexistingjob", -1);
       fail("ProcessEngineException expected");
