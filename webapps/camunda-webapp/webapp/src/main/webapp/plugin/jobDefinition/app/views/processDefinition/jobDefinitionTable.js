@@ -1,7 +1,9 @@
 ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, require) {
 
-  var Controller = [ '$scope', '$rootScope', '$dialog', 'search',
-      function ($scope, $rootScope, $dialog, search) {
+  var Controller = [
+    '$scope',
+    'Views',
+  function ($scope, Views) {
 
     var processData = $scope.processData.newChild($scope),
         processDefinition = null;
@@ -37,28 +39,9 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
 
     };
 
-    $scope.openSuspensionStateDialog = function (jobDefinition) {
-      var dialog = $dialog.dialog({
-        resolve: {
-          jobDefinition: function() { return jobDefinition; }
-        },
-        controller: 'JobDefinitionSuspensionStateController',
-        templateUrl: require.toUrl('./job-definition-suspension-state-dialog.html')
-      });
+    $scope.jobDefinitionVars = { read: [ 'jobDefinition', 'processData', 'filter' ] };
+    $scope.jobDefinitionActions = Views.getProviders({ component: 'cockpit.jobDefinition.action' });
 
-      dialog.open().then(function(result) {
-        // dialog closed. YEA!
-        if (result.status === 'SUCCESS') {
-          if (result.executeImmediately) {
-            jobDefinition.suspended = result.suspended;
-            $rootScope.$broadcast('$jobDefinition.suspensionState.changed', $scope.jobDefinition);
-          }
-
-          $scope.processData.set('filter', angular.extend({}, $scope.filter));
-        }
-      });
-
-    };
   }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {

@@ -19,13 +19,13 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.webapp.AppRuntimeDelegate;
 import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
 
@@ -113,7 +113,7 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
     }
 
     // no asset found
-    throw new WebApplicationException(Status.NOT_FOUND);
+    throw new RestException(Status.NOT_FOUND, "It was not able to load the following file '" + file + "'.");
   }
 
   /**

@@ -99,7 +99,11 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   public void setJobRetries(String jobId, int retries) {
-    commandExecutor.execute(new SetJobRetriesCmd(jobId, retries));
+    commandExecutor.execute(new SetJobRetriesCmd(jobId, null, retries));
+  }
+
+  public void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
+    commandExecutor.execute(new SetJobRetriesCmd(null, jobDefinitionId, retries));
   }
 
   public void setJobDuedate(String jobId, Date newDuedate) {

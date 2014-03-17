@@ -3,7 +3,8 @@
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:activiti="http://activiti.org/bpmn"
 	targetNamespace="Examples">
-	
+
+  <message id="message1" name="message"/>
 	<process id="taskListenerProcess" name="Task  Listener Example">
 	
 		<startEvent id="theStart" />
@@ -20,9 +21,16 @@
 		      <activiti:field name="greeter" stringValue="The Process" />
           <activiti:field name="shortName" expression="${'Activiti'.substring(0,3)}" />
 		    </activiti:taskListener>
+        <activiti:taskListener event="delete" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.TaskDeleteListener" />
 		  </extensionElements>
 		</userTask>
-		
+
+    <boundaryEvent id="messageBoundary" attachedToRef="task1">
+      <outgoing>flow2</outgoing>
+      <messageEventDefinition messageRef="message1"/>
+    </boundaryEvent>
+    <sequenceFlow id="flow4" sourceRef="task1" targetRef="theEnd2" />
+
 		<sequenceFlow id="flow2" sourceRef="task1" targetRef="task2" />
 		
 		<userTask id="task2" name="Write meeting notes" >
@@ -37,7 +45,8 @@
     <sequenceFlow id="flow3" sourceRef="task2" targetRef="theEnd" />
 		
 		<endEvent id="theEnd" />
-		
+    <endEvent id="theEnd2" />
+
 	</process>
 
 </definitions>

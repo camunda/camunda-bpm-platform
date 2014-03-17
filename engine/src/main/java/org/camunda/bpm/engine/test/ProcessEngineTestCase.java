@@ -58,6 +58,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
  * </p>
  *  
  * @author Tom Baeyens
+ * @author Falko Menge (camunda)
  */
 public class ProcessEngineTestCase extends TestCase {
 
@@ -69,7 +70,8 @@ public class ProcessEngineTestCase extends TestCase {
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
-  protected HistoryService historicDataService;
+  @Deprecated protected HistoryService historicDataService;
+  protected HistoryService historyService;
   protected IdentityService identityService;
   protected ManagementService managementService;
   protected FormService formService;
@@ -113,6 +115,7 @@ public class ProcessEngineTestCase extends TestCase {
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();
     historicDataService = processEngine.getHistoryService();
+    historyService = processEngine.getHistoryService();
     identityService = processEngine.getIdentityService();
     managementService = processEngine.getManagementService();
     formService = processEngine.getFormService();

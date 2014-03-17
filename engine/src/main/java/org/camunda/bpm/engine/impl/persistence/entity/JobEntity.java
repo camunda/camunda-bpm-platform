@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -28,6 +29,7 @@ import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
@@ -205,14 +207,30 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
 
     if (processEngineConfiguration
         .isCreateIncidentOnFailedJobEnabled()) {
+
+      String incidentHandlerType = FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE;
+
       // make sure job has an ID set:
       if(id == null) {
         id = processEngineConfiguration
             .getIdGenerator()
             .getNextId();
+
+      } else {
+        // check whether there exists already an incident
+        // for this job
+        List<Incident> failedJobIncidents = Context
+            .getCommandContext()
+            .getIncidentManager()
+            .findIncidentByConfigurationAndIncidentType(id, incidentHandlerType);
+
+        if (!failedJobIncidents.isEmpty()) {
+          return;
+        }
+
       }
       processEngineConfiguration
-        .getIncidentHandler(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE)
+        .getIncidentHandler(incidentHandlerType)
         .handleIncident(getProcessDefinitionId(), null, executionId, id, exceptionMessage);
 
     }

@@ -12,17 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -46,6 +35,9 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * @author Tom Baeyens
@@ -90,6 +82,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   protected String taskDefinitionKey;
 
   protected boolean isDeleted;
+  protected String deleteReason;
 
   protected String eventName;
 
@@ -174,6 +167,21 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
       ExecutionEntity execution = getExecution();
       execution.removeTask(this);
       execution.signal(null, null);
+    }
+  }
+
+  public void delete(String deleteReason, boolean cascade) {
+    this.deleteReason = deleteReason;
+    fireEvent(TaskListener.EVENTNAME_DELETE);
+
+    Context
+      .getCommandContext()
+      .getTaskManager()
+      .deleteTask(this, deleteReason, cascade);
+
+    if (executionId != null) {
+      ExecutionEntity execution = getExecution();
+      execution.removeTask(this);
     }
   }
 
@@ -737,6 +745,11 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   public boolean isDeleted() {
     return isDeleted;
   }
+
+  public String getDeleteReason() {
+    return deleteReason;
+  }
+
   public void setDeleted(boolean isDeleted) {
     propertyChanged(DELETE, this.isDeleted, isDeleted);
     this.isDeleted = isDeleted;

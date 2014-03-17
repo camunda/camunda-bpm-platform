@@ -21,6 +21,7 @@ package org.camunda.bpm.engine.delegate;
  * <li>{@link #EVENTNAME_CREATE}</li>
  * <li>{@link #EVENTNAME_ASSIGNMENT}</li>
  * <li>{@link #EVENTNAME_COMPLETE}</li>
+ * <li>{@link #EVENTNAME_DELETE}</li>
  * </ul>
  * </p>
  *
@@ -31,6 +32,7 @@ public interface TaskListener {
   String EVENTNAME_CREATE = "create";
   String EVENTNAME_ASSIGNMENT = "assignment";
   String EVENTNAME_COMPLETE = "complete";
+  String EVENTNAME_DELETE = "delete";
 
   void notify(DelegateTask delegateTask);
 

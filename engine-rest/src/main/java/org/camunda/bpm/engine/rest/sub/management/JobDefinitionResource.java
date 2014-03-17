@@ -21,6 +21,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobRetriesDto;
 
 /**
  * @author roman.smirnov
@@ -35,5 +36,10 @@ public interface JobDefinitionResource {
   @Path("/suspended")
   @Consumes(MediaType.APPLICATION_JSON)
   void updateSuspensionState(JobDefinitionSuspensionStateDto dto);
+
+  @PUT
+  @Path("/retries")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void setJobRetries(JobRetriesDto dto);
 
 }

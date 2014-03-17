@@ -13,10 +13,6 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
@@ -28,6 +24,10 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author  Tom Baeyens
@@ -144,14 +144,10 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
             .getDbSqlSession()
             .selectById(TaskEntity.class, taskId);
         
-        HistoryEvent evt = null;
-        if(deleteReason != null) {
-          evt = eventProducer.createTaskInstanceCompleteEvt(taskEntity, deleteReason);          
-        } 
-        
+        HistoryEvent evt = eventProducer.createTaskInstanceCompleteEvt(taskEntity, deleteReason);
+
         eventHandler.handleEvent(evt);
-        
-      }      
+      }
     }
 
 

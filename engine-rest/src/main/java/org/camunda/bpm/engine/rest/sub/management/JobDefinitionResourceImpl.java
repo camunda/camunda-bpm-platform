@@ -16,9 +16,11 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobRetriesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 /**
@@ -55,6 +57,15 @@ public class JobDefinitionResourceImpl implements JobDefinitionResource {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, message);
     }
 
+  }
+
+  public void setJobRetries(JobRetriesDto dto) {
+    try {
+      ManagementService managementService = engine.getManagementService();
+      managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, dto.getRetries());
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
   }
 
 }

@@ -1,7 +1,14 @@
 ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, require) {
 
-  var JobDefinitionSuspensionStateController = [ '$scope', '$http', '$filter', 'Uri', 'Notifications', '$dialog', 'dialog', 'jobDefinition',
-                                  function($scope, $http, $filter, Uri, Notifications, $dialog, dialog, jobDefinition) {
+  var JobDefinitionSuspensionStateController = [
+    '$scope',
+    '$http',
+    '$filter',
+    'Uri',
+    'Notifications',
+    'dialog',
+    'jobDefinition',
+  function($scope, $http, $filter, Uri, Notifications, dialog, jobDefinition) {
 
     var BEFORE_UPDATE = 'BEFORE_UPDATE',
         PERFORM_UPDATE = 'PERFORM_UDPATE',

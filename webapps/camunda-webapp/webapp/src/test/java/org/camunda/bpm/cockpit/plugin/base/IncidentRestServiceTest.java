@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.webapp.test.util.JobExecutorHelper;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,8 +35,6 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
 
   private ProcessEngine processEngine;
   private RuntimeService runtimeService;
-  private JobExecutorHelper helper;
-
   private IncidentRestService resource;
 
   @Before
@@ -45,8 +42,6 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     super.before();
 
     processEngine = getProcessEngine();
-
-    helper = new JobExecutorHelper(processEngine);
 
     runtimeService = processEngine.getRuntimeService();
 
@@ -61,7 +56,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    executeAvailableJobs();
 
     String[] processInstanceIds= {processInstance1.getId()};
 
@@ -103,7 +98,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("FailingProcess");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("FailingProcess");
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    executeAvailableJobs();
 
     String[] processInstanceIds= {processInstance1.getId(), processInstance2.getId()};
 
@@ -122,7 +117,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
   public void testQueryByActivityId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processWithTwoParallelFailingServices");
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    executeAvailableJobs();
 
     String[] activityIds= {"theServiceTask1"};
 
@@ -163,7 +158,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
   public void testQueryByActivityIds() {
     runtimeService.startProcessInstanceByKey("processWithTwoParallelFailingServices");
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    executeAvailableJobs();
 
     String[] activityIds= {"theServiceTask1", "theServiceTask2"};
 
@@ -182,7 +177,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
   public void testQueryByProcessInstanceIdAndActivityId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FailingProcess");
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    executeAvailableJobs();
 
     String[] processInstanceIds= {processInstance.getId()};
     String[] activityIds= {"ServiceTask_1"};
@@ -205,7 +200,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("processWithTwoParallelFailingServices");
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    executeAvailableJobs();
 
     String[] processInstanceIds= {processInstance.getId()};
     String[] activityIds= {"theServiceTask1"}; // is an activity id in "processWithTwoParallelFailingServices"
@@ -228,7 +223,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
   public void testQueryWithNestedIncidents() {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("NestedCallActivity");
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    executeAvailableJobs();
 
     ProcessInstance processInstance2 = runtimeService.createProcessInstanceQuery().processDefinitionKey("CallActivity").singleResult();
     ProcessInstance processInstance3 = runtimeService.createProcessInstanceQuery().processDefinitionKey("FailingProcess").singleResult();
@@ -274,7 +269,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
   public void testQueryPaginiation() {
     runtimeService.startProcessInstanceByKey("processWithTwoParallelFailingServices");
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    executeAvailableJobs();
 
     IncidentQueryDto queryParameter = new IncidentQueryDto();
 
