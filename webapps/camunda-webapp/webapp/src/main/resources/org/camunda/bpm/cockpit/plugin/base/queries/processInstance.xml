@@ -73,6 +73,8 @@
       ) INCIDENT
     on
       INSTANCE.ID_ = INCIDENT.PROC_INST_ID_
+    order by
+      ${outerOrderBy}
   </select>
 
   <sql id="selectProcessInstances">

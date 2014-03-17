@@ -12,14 +12,6 @@
  */
 package org.camunda.bpm.cockpit.impl.plugin.base.dto.query;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.rest.dto.AbstractRestQueryParametersDto;
 import org.camunda.bpm.engine.impl.QueryVariableValue;
@@ -30,6 +22,9 @@ import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
+
+import javax.ws.rs.core.MultivaluedMap;
+import java.util.*;
 
 public class ProcessInstanceQueryDto extends AbstractRestQueryParametersDto<ProcessInstanceDto> {
 
@@ -165,6 +160,15 @@ public class ProcessInstanceQueryDto extends AbstractRestQueryParametersDto<Proc
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
+  }
+
+  public String getOuterOrderBy() {
+    if (orderBy == null) {
+      return "ID_ asc";
+    }
+    else {
+      return orderBy;
+    }
   }
 
   private List<QueryVariableValue> createQueryVariableValues(VariableTypes variableTypes, List<VariableQueryParameterDto> variables) {

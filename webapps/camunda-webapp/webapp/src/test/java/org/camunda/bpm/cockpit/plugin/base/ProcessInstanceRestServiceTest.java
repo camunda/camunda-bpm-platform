@@ -12,22 +12,6 @@
  */
 package org.camunda.bpm.cockpit.plugin.base;
 
-import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.EQUALS_OPERATOR_NAME;
-import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.GREATER_THAN_OPERATOR_NAME;
-import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.GREATER_THAN_OR_EQUALS_OPERATOR_NAME;
-import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.LESS_THAN_OPERATOR_NAME;
-import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.LESS_THAN_OR_EQUALS_OPERATOR_NAME;
-import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.LIKE_OPERATOR_NAME;
-import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.NOT_EQUALS_OPERATOR_NAME;
-import static org.fest.assertions.Assertions.assertThat;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentStatisticsDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
@@ -47,6 +31,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.*;
+
+import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.*;
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author roman.smirnov
@@ -112,6 +101,78 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
     assertThat(result).isNotNull();
     assertThat(result.getCount()).isEqualTo(3);
+  }
+
+  @Test
+  @Deployment(resources = {
+    "processes/user-task-process.bpmn"
+  })
+  public void testQueryOrderByStartTime() {
+    startProcessInstances("userTaskProcess", 3);
+
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setProcessDefinitionId(processDefinitionId);
+    queryParameter.setOrderBy("START_TIME_");
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(3);
+
+    for (int i=1; i < result.size(); i++) {
+      Date previousStartTime = result.get(i - 1).getStartTime();
+      Date startTime = result.get(i).getStartTime();
+      assertThat(startTime.after(previousStartTime)).isTrue();
+    }
+  }
+
+  @Test
+  @Deployment(resources = {
+    "processes/user-task-process.bpmn"
+  })
+  public void testQueryOrderByStartTimeAsc() {
+    startProcessInstances("userTaskProcess", 3);
+
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setProcessDefinitionId(processDefinitionId);
+    queryParameter.setOrderBy("START_TIME_ asc");
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(3);
+
+    for (int i=1; i < result.size(); i++) {
+      Date previousStartTime = result.get(i - 1).getStartTime();
+      Date startTime = result.get(i).getStartTime();
+      assertThat(startTime.after(previousStartTime)).isTrue();
+    }
+  }
+
+  @Test
+  @Deployment(resources = {
+    "processes/user-task-process.bpmn"
+  })
+  public void testQueryOrderByStartTimeDesc() {
+    startProcessInstances("userTaskProcess", 3);
+
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setProcessDefinitionId(processDefinitionId);
+    queryParameter.setOrderBy("START_TIME_ desc");
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(3);
+
+    for (int i=1; i < result.size(); i++) {
+      Date previousStartTime = result.get(i - 1).getStartTime();
+      Date startTime = result.get(i).getStartTime();
+      assertThat(startTime.before(previousStartTime)).isTrue();
+    }
   }
 
   @Test
