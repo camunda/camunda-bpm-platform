@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.enterprise.inject.AmbiguousResolutionException;
 import javax.enterprise.inject.spi.Bean;
 
+import org.camunda.bpm.engine.cdi.compat.CamundaTaskForm;
 import org.camunda.bpm.engine.cdi.compat.FoxTaskForm;
 import org.camunda.bpm.engine.cdi.jsf.TaskForm;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
@@ -44,7 +45,15 @@ public class TaskFormTest extends CdiProcessEngineTestCase {
       Bean<? extends Object> bean = beanManager.resolve(foxTaskForm);
       Assert.assertNotNull(bean);
     }catch(AmbiguousResolutionException e) {
-      Assert.fail("Injection of TaskForm is ambiguous.");
+      Assert.fail("Injection of FoxTaskForm is ambiguous.");
+    }
+
+    Set<Bean<?>> camundaTaskForm = beanManager.getBeans(CamundaTaskForm.class);
+    try {
+      Bean<? extends Object> bean = beanManager.resolve(camundaTaskForm);
+      Assert.assertNotNull(bean);
+    }catch(AmbiguousResolutionException e) {
+      Assert.fail("Injection of CamundaTaskForm is ambiguous.");
     }
 
   }
