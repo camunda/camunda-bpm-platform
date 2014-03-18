@@ -13,12 +13,7 @@
 
 package org.camunda.bpm.engine.test.api.runtime;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -34,6 +29,8 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.*;
 
 
 /**
@@ -154,6 +151,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("No process instance found for id", ae.getMessage());
+      assertTrue(ae instanceof BadUserRequestException);
     }
   }
   
@@ -164,6 +162,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("processInstanceId is null", ae.getMessage());
+      assertTrue(ae instanceof BadUserRequestException);
     }
   }
   
@@ -281,6 +280,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
+      assertTrue(ae instanceof BadUserRequestException);
     }
   }
   
@@ -290,6 +290,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
+      assertTrue(ae instanceof BadUserRequestException);
     }
   }
   

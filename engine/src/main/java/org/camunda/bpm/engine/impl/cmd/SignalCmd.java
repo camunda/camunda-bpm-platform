@@ -13,13 +13,13 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+
+import java.io.Serializable;
+import java.util.Map;
 
 
 /**
@@ -53,7 +53,7 @@ public class SignalCmd implements Command<Object>, Serializable {
   @Override
   public Object execute(CommandContext commandContext) {
     if(executionId == null) {
-      throw new ProcessEngineException("executionId is null");
+      throw new BadUserRequestException("executionId is null");
     }
     
     ExecutionEntity execution = commandContext
@@ -61,7 +61,7 @@ public class SignalCmd implements Command<Object>, Serializable {
       .findExecutionById(executionId);
     
     if (execution==null) {
-      throw new ProcessEngineException("execution "+executionId+" doesn't exist");
+      throw new BadUserRequestException("execution "+executionId+" doesn't exist");
     }
     
     if(processVariables != null) {

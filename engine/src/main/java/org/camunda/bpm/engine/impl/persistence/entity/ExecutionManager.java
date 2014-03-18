@@ -13,11 +13,7 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -25,6 +21,10 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -57,7 +57,7 @@ public class ExecutionManager extends AbstractManager {
     ExecutionEntity execution = findExecutionById(processInstanceId);
 
     if(execution == null) {
-      throw new ProcessEngineException("No process instance found for id '" + processInstanceId + "'");
+      throw new BadUserRequestException("No process instance found for id '" + processInstanceId + "'");
     }
 
     CommandContext commandContext = Context.getCommandContext();

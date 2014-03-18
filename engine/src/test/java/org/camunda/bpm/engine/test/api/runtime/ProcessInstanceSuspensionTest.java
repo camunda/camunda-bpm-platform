@@ -12,11 +12,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -29,6 +25,11 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Daniel Meyer
@@ -723,6 +724,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
       assertTextPresent("is suspended", e.getMessage());
+      assertTrue(e instanceof BadUserRequestException);
     }
 
     try {
@@ -731,6 +733,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
       assertTextPresent("is suspended", e.getMessage());
+      assertTrue(e instanceof BadUserRequestException);
     }
   }
 
@@ -748,6 +751,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
       assertTextPresent("is suspended", e.getMessage());
+      assertTrue(e instanceof BadUserRequestException);
     }
 
     try {
@@ -756,6 +760,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
       assertTextPresent("is suspended", e.getMessage());
+      assertTrue(e instanceof BadUserRequestException);
     }
   }
 
@@ -773,6 +778,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
       assertTextPresent("is suspended", e.getMessage());
+      assertTrue(e instanceof BadUserRequestException);
     }
 
     try {
@@ -781,6 +787,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
       assertTextPresent("is suspended", e.getMessage());
+      assertTrue(e instanceof BadUserRequestException);
     }
   }
 

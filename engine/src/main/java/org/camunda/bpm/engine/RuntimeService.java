@@ -12,23 +12,13 @@
  */
 package org.camunda.bpm.engine;
 
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.*;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.ActivityInstance;
-import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.ExecutionQuery;
-import org.camunda.bpm.engine.runtime.IncidentQuery;
-import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
-import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
-import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 
 
 /** Service which provides access to {@link Deployment}s,
@@ -253,7 +243,7 @@ public interface RuntimeService {
   /** Delete an existing runtime process instance.
    * @param processInstanceId id of process instance to delete, cannot be null.
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
-   * @throws ProcessEngineException when no process instance is found with the given id.
+   * @throws BadUserRequestException when no process instance is found with the given id or id is null.
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason);
 
@@ -316,7 +306,8 @@ public interface RuntimeService {
    * if the process instance contains multiple executions.
    *
    * @param executionId id of process instance or execution to signal, cannot be null.
-   * @throws ProcessEngineException when no execution is found for the given executionId.
+   * @throws BadUserRequestException when no execution is found for the given executionId or id is null.
+   * @throws SuspendedEntityInteractionException when the execution is suspended.
    */
   void signal(String executionId);
 
@@ -327,7 +318,8 @@ public interface RuntimeService {
    *
    * @param executionId id of process instance or execution to signal, cannot be null.
    * @param processVariables a map of process variables
-   * @throws ProcessEngineException when no execution is found for the given executionId.
+   * @throws BadUserRequestException when no execution is found for the given executionId or id is null.
+   * @throws SuspendedEntityInteractionException when the execution is suspended.
    */
   void signal(String executionId, Map<String, Object> processVariables);
 
