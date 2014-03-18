@@ -166,7 +166,10 @@ If the feature ID is not provided, the whole plugin will be excluded.
 This example will completely deactivate the action buttons on the right side of the process instance view.
 
 ```html
-<base href="/"
+<base href="$BASE"
+      cockpit-api="$APP_ROOT/api/cockpit/"
+      engine-api="$APP_ROOT/api/engine/"
+      app-root="$APP_ROOT"
       cam-exclude-plugins="cockpit.processInstance.runtime.action" />
 ```
 
@@ -176,9 +179,20 @@ In this example, we deactivate the definition list in the cockpit dashboard
 but keep the diagram previews and disable the job retry action button:
 
 ```html
-<base href="/"
+<base href="$BASE"
+      cockpit-api="$APP_ROOT/api/cockpit/"
+      engine-api="$APP_ROOT/api/engine/"
+      app-root="$APP_ROOT"
       cam-exclude-plugins="cockpit.dashboard:process-definition-tiles,
                            cockpit.processInstance.runtime.action:job-retry-action" />
+```
+
+__Important__: make sure you only keep 1 `base` tag.
+
+_Hint_: If you need to know what plugins and features are available and/or excluded, open your browser
+developer tools (generally by hiting F12) and, in the console, enter:
+```javascript
+angular.module('cockpit.plugin')._camPlugins
 ```
 
 #### Overriding a Plugin's Resources (Server Side)
