@@ -3,6 +3,26 @@
 
 ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
   'use strict';
+  // the following lines are gathering the IDs of plugins who should be excluded
+  // to exclude a plugin, its key and (optionaly) its id
+  module._camPlugins = {};
+  var excludeExp;
+  var expParts = [];
+  var attr = angular.element('base').attr('cam-exclude-plugins') || '';
+  if (attr) {
+    angular.forEach(attr.split(','), function(plugin) {
+      plugin = plugin.split(':');
+      var feature = '*';
+      if (plugin.length >= 2 && !!trim(plugin[1])) {
+        feature = trim(plugin.pop());
+      }
+      plugin = trim(plugin.shift());
+      if (plugin) {
+        expParts.push(plugin +':'+ feature);
+      }
+    });
+    excludeExp = new RegExp('('+ expParts.join('|') +')', 'i');
+  }
 
   function trim(str) {
     if (String.prototype.trim) {
@@ -37,6 +57,15 @@ ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
     }
 
     this.registerPlugin = function(type, key, definition) {
+      module._camPlugins[key +':'+ definition.id] = false;
+
+      // test if the plugin is excluded
+      if (excludeExp && excludeExp.test(key +':'+ definition.id)) {
+        return;
+      }
+
+      module._camPlugins[key +':'+ definition.id] = true;
+
       var pluginTypeMap = pluginMap[type] = pluginMap[type] || {};
       internalRegisterPlugin(key, definition, pluginTypeMap);
     };
@@ -81,25 +110,6 @@ ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
   module.provider('Plugins', PluginsProvider);
 
   var ViewsProvider = [ 'PluginsProvider', function(PluginsProvider) {
-    // the following lines are gathering the IDs of plugins who should be excluded
-    // to exclude a plugin, its key and (optionaly) its id
-    var excludeExp;
-    var expParts = [];
-    var attr = angular.element('base').attr('cam-exclude-plugins') || '';
-    if (attr) {
-      angular.forEach(attr.split(','), function(plugin) {
-        plugin = plugin.split(':');
-        var feature = '*';
-        if (plugin.length >= 2 && !!trim(plugin[1])) {
-          feature = trim(plugin.pop());
-        }
-        plugin = trim(plugin.shift());
-        if (plugin) {
-          expParts.push(plugin +':'+ feature);
-        }
-      });
-      excludeExp = new RegExp('('+ expParts.join('|') +')', 'i');
-    }
 
     /**
      * Registers the given viewProvider for the specified view
