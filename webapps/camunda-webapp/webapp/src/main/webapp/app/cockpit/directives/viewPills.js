@@ -1,9 +1,14 @@
-ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
+/* global ngDefine: false */
+ngDefine('cockpit.directives', [], function(module) {
   'use strict';
 
-  module.directive('viewPills', [ '$location', 'Views', function($location, Views) {
-    
-    var ViewPillsController = [ '$scope', 'Views', '$location', function($scope, Views, $location) {
+  module.directive('viewPills', [
+  function() {
+    var ViewPillsController = [
+      '$scope',
+      'Views',
+      '$location',
+    function($scope, Views, $location) {
       var providers = Views.getProviders({ component: $scope.id });
       $scope.providers = providers;
 
@@ -21,9 +26,11 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
       scope: {
         id: '@'
       },
-      template: 
+      template:
 '<ul class="nav nav-pills">' +
-'  <li ng-repeat="provider in providers" ng-class="{ active: isActive(provider) }"><a ng-href="{{ getUrl(provider) }}">{{ provider.label }}</a></li>' +
+'  <li ng-repeat="provider in providers" ng-class="{ active: isActive(provider) }" class="{{ provider.id }}">' +
+'    <a ng-href="{{ getUrl(provider) }}">{{ provider.label }}</a>' +
+'  </li>' +
 '</ul>',
       replace: true,
       controller: ViewPillsController

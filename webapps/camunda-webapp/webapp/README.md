@@ -55,7 +55,7 @@ UNIX-like new lines (lf) and a new line at the and of file in the **.js**, **.le
 
 #### Scripts
 
-We started linting the **.js** files using [jshint](http://www.jshint.com/).
+We started linting the **.js** files using [jshint](http://www.jshint.com/) and we `'use strict';` because it is a [good thing to do](http://www.webdesignporto.com/why-use-strict-in-javascript-can-save-you-hours)
 
 #### Styles
 
