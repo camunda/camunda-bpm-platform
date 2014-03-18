@@ -125,6 +125,7 @@ public abstract class MockProvider {
 
 
   // variable instance
+  public static final String EXAMPLE_VARIABLE_INSTANCE_ID = "aVariableInstanceId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_NAME = "aVariableInstanceName";
   public static final String EXAMPLE_VARIABLE_INSTANCE_TYPE = "String";
   public static final String EXAMPLE_VARIABLE_INSTANCE_VALUE = "aVariableInstanceValue";
@@ -132,6 +133,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID = "aVariableInstanceExecutionId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_TASK_ID = "aVariableInstanceTaskId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID = "aVariableInstanceVariableInstanceId";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_ERROR_MESSAGE = "aVariableInstanceErrorMessage";
 
   // execution
   public static final String EXAMPLE_EXECUTION_ID = "anExecutionId";
@@ -476,6 +478,7 @@ public abstract class MockProvider {
   public static VariableInstance createMockVariableInstance() {
     VariableInstanceEntity mock = mock(VariableInstanceEntity.class);
 
+    when(mock.getId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_ID);
     when(mock.getName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_NAME);
     when(mock.getType()).thenReturn(new StringType());
     when(mock.getTypeName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_TYPE);
@@ -484,6 +487,7 @@ public abstract class MockProvider {
     when(mock.getExecutionId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID);
     when(mock.getTaskId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_TASK_ID);
     when(mock.getActivityInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID);
+    when(mock.getErrorMessage()).thenReturn(null);
 
     return mock;
   }
