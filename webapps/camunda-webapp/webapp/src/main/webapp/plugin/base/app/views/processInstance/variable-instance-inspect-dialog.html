@@ -1,0 +1,59 @@
+<!-- # CE - src/main/webapp/plugin/base/app/views/processInstnace/cancel-process-instance-dialog.html -->
+<div class="modal-header">
+  <h3>Inspect Serializable Variable</h3>
+</div>
+
+<div class="modal-body">
+  <div notifications-panel></div>
+
+  <div ng-show="status === 'beforeChange' || status === 'confirmChange'">
+    
+    <p>
+      Serializable Variable of type <code>{{variableInstance.value.type}}</code>:
+    </p>
+
+    <p>
+      <strong>Value:</strong>
+    </p>
+    <p>
+      <textarea ng-model="currentValue" rows="10" class="input-xxlarge" ng-disabled="status === 'confirmChange'">
+      </textarea>
+    </p>
+   
+  </div>
+
+  <div class="alert alert-block" ng-show="status === 'confirmChange'">
+    <i class="icon-warning-sign"></i>
+    <strong>Warning:</strong>
+    Are you sure you want to change the value of this serialized Java Object? Changing the variable in an incompatible 
+    way may lead to severe runtime problems.
+  </div>
+ 
+  <div ng-show="status === 'changeSuccess'">   
+    <p>
+      Variable <code>{{variableInstance.name}}</code> of execution <code>{{variableInstance.executionId}}</code>
+      was suceessfully updated.
+    </p>
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn" ng-click="close(status)"
+          ng-disabled="status === 'performCancellation'"
+          ng-hide="status === 'changeSuccess' || status === 'changeFailed' || status === 'changeFailed'">Close</button>
+  <![if gt IE 9]>
+    <button class="btn btn-primary" ng-click="close(status)"
+            ng-show="status === 'changeSuccess' || status === 'changeFailed' || status === 'changeFailed'">OK</button>          
+    <button class="btn btn-primary" ng-click="change()"
+            ng-disabled="status !== 'beforeChange' || !hasChanged()"
+            ng-hide="status != 'beforeChange'">Change</button>
+    <button class="btn btn-warning" ng-click="change()"
+            ng-hide="status != 'confirmChange'">Confirm Change</button>
+  <![endif]>
+</div>
+
+
+
+
+<!-- / CE - src/main/webapp/plugin/base/app/views/processInstnace/cancel-process-instance-dialog.html -->

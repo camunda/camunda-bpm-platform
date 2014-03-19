@@ -22,6 +22,7 @@ ngDefine('cockpit.pages.processInstance', [
     'processInstance',
     'dataDepend',
     'page',
+    'breadcrumbTrails',
   function(
     $scope,
     $filter,
@@ -34,7 +35,8 @@ ngDefine('cockpit.pages.processInstance', [
     Transform,
     processInstance,
     dataDepend,
-    page
+    page,
+    breadcrumbTrails
   ) {
 
     $scope.processInstance = processInstance;
@@ -405,20 +407,49 @@ ngDefine('cockpit.pages.processInstance', [
       $scope.processDefinition = processDefinition;
     });
 
-    processData.observe(['processDefinition', 'processInstance'], function (processDefinition, processInstance) {
+    processData.provide('superProcessInstanceCount', ['processInstance', function (processInstance) {
+      return ProcessInstanceResource.count({ subProcessInstance : processInstance.id }).$promise;
+    }]);
+
+    function fetchSuperProcessInstance(processInstance, done) {
+
+      ProcessInstanceResource.query({
+        subProcessInstance: processInstance.id
+      })
+      .$then(function(response) {
+
+        var superInstance = response.data[0];
+
+        done(null, superInstance);
+      });
+    }
+
+    processData.observe([
+      'processDefinition',
+      'processInstance',
+      'superProcessInstanceCount'
+    ], function (processDefinition, processInstance, superProcessInstanceCount) {
+      var crumbs = [];
+
+      if (superProcessInstanceCount.count) {
+        crumbs.push(function(index) {
+          breadcrumbTrails(processInstance, fetchSuperProcessInstance, [], index, 'runtime');
+        });
+      }
+
+      crumbs.push({
+        label: processDefinition.name || ((processDefinition.key || processDefinition.id).slice(0, 8) +'…'),
+        href: '#/process-definition/'+ (processDefinition.id) +'/runtime'
+      });
+      crumbs.push({
+        divider: ':',
+        label: processInstance.name || ((processInstance.key || processInstance.id).slice(0, 8) +'…'),
+        href: '#/process-instance/'+ (processInstance.id) +'/runtime'
+      });
+
       page
         .breadcrumbsClear()
-        .breadcrumbsAdd([
-          {
-            label: processDefinition.name || ((processDefinition.key || processDefinition.id).slice(0, 8) +'…'),
-            href: '#/process-definition/'+ (processDefinition.id) +'/runtime'
-          },
-
-          {
-            label: processInstance.name || ((processInstance.key || processInstance.id).slice(0, 8) +'…'),
-            href: '#/process-instance/'+ (processInstance.id) +'/runtime'
-          }
-        ]);
+        .breadcrumbsAdd(crumbs);
 
       page.titleSet([
         'camunda Cockpit',

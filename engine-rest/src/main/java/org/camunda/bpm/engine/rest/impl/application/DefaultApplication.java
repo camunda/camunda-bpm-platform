@@ -36,6 +36,8 @@ import org.camunda.bpm.engine.rest.impl.UserRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.VariableInstanceRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.history.HistoryRestServiceImpl;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
+import org.camunda.bpm.engine.rest.mapper.MultipartPayloadProvider;
+import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.jaxrs.JsonMappingExceptionMapper;
 import org.codehaus.jackson.jaxrs.JsonParseExceptionMapper;
@@ -81,6 +83,8 @@ public class DefaultApplication extends Application {
 
     classes.add(ProcessEngineExceptionHandler.class);
     classes.add(RestExceptionHandler.class);
+
+    classes.add(MultipartPayloadProvider.class);
 
     return classes;
   }

@@ -20,7 +20,21 @@ public class AnotherChangeVariablesService implements JavaDelegate {
     serializable.add("eight");
     serializable.add("nine");
 
+    List<Date> dateList = new ArrayList<Date>();
+    dateList.add(new Date());
+    dateList.add(new Date());
+    dateList.add(new Date());
+
+    List<CockpitVariable> cockpitVariableList = new ArrayList<CockpitVariable>();
+    cockpitVariableList.add(new CockpitVariable("foo", "bar"));
+    cockpitVariableList.add(new CockpitVariable("foo2", "bar"));
+    cockpitVariableList.add(new CockpitVariable("foo3", "bar"));
+
     byte[] bytes = "someAnotherBytes".getBytes();
+
+    FailingSerializable failingSerializable = new FailingSerializable();
+
+    Map<String, Integer> mapVariable = new HashMap<String, Integer>();
 
     Map<String, Object> variables = new HashMap<String, Object>();
 
@@ -38,13 +52,21 @@ public class AnotherChangeVariablesService implements JavaDelegate {
 
     variables.put("dateVar", now);
 
-    variables.put("serializableVar", serializable);
+    variables.put("serializableCollection", serializable);
 
     variables.put("bytesVar", bytes);
     variables.put("value1", "blub");
 
     int random = (int)(Math.random() * 100);
     variables.put("random", random);
+
+    variables.put("failingSerializable", failingSerializable);
+
+    variables.put("mapVariable", mapVariable);
+
+    variables.put("dateList", dateList);
+
+    variables.put("cockpitVariableList", cockpitVariableList);
 
     execution.setVariablesLocal(variables);
   }

@@ -15,13 +15,54 @@
       </td>
       <td class="variable-value">
 
-        <div ng-if="!variable.inEditMode">
-          {{ variable.value }}
-          <span ng-if="!isSerializable(variable)" class="edit-toggle" ng-click="editVariable(variable)">
+        <div ng-if="isPrimitive(variable) && !variable.inEditMode && !variable.errorMessage">
+          {{ variable.value }}          
+          <span ng-if="isEditable(variable)" class="edit-toggle" ng-click="editVariable(variable)">
             <i class="icon-pencil"></i>
+          </span>         
+        </div>
+
+        <div ng-if="!!variable.errorMessage" class="muted">
+          <span 
+            help
+            help-text="Object which cannot be de-serialized"
+            help-placement="'right'">
+              Serialized Java Object
           </span>
         </div>
 
+        <!-- binary variables -->
+        <div ng-if="isBinary(variable)">
+          <a class="muted" 
+             href="{{getBinaryVariableDownloadLink(variable)}}" 
+             target="__blank" 
+             help
+             help-text="Click to Download"
+             help-placement="'right'">
+            Binary Content
+          </a>
+          <a class="edit-toggle" 
+             href
+             ng-click="openUploadDialog(variable)"
+             help
+             help-text="Upload"
+             help-placement="'right'">
+            <i class="icon-upload"></i>
+          </a>
+        </div>
+
+        <!-- serializable variable -->
+        <div ng-if="isSerializable(variable) && !variable.errorMessage">
+          <a class="muted" 
+             ng-click="openInspectDialog(variable)"
+             href
+             help
+             help-text="Click to Inspect"
+             help-placement="'right'">
+            {{ variable.value.type }}
+          </a>   
+        </div>
+   
         <form class="inline-edit" name="editVariableForm" ng-if="variable.inEditMode" ng-submit="submit(variable, this.editVariableForm)" novalidate request-aware>
 
           <fieldset>

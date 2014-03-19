@@ -17,6 +17,8 @@ ngDefine('cockpit.plugin.base.views', [
 
   // process instance
   './processInstance/variableInstancesTab',
+  './processInstance/variableInstanceUploadDialog',
+  './processInstance/variableInstanceInspectDialog',
   './processInstance/incidentsTab',
   './processInstance/calledProcessInstanceTable',
   './processInstance/userTasksTable',

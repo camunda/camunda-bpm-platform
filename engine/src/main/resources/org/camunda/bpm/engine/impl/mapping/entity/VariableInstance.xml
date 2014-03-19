@@ -132,6 +132,11 @@
           on EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
           
           <where>
+            <!-- variableId -->
+            <if test="variableId != null">
+              RES.ID_ = #{variableId}
+            </if>
+            
             <!-- variableName -->
             <if test="variableName != null">
               RES.NAME_ = #{variableName}
@@ -223,10 +228,7 @@
               </choose>
               </if>
             </foreach>
-            
-            <!-- Add this hook to prevent loading of byte arrays -->
-            and RES.TYPE_ != 'bytes'
-            
+
           </where>
     ) RES
   </sql>

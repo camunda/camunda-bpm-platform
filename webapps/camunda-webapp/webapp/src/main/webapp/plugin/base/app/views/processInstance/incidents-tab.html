@@ -21,7 +21,7 @@
                ng-show="incident.rootCauseIncidentMessage"
                help
                help-text="Open stacktrace in new window"
-               help-placement="top">
+               help-placement="'top'">
               {{ incident.rootCauseIncidentMessage }}
             </a>
             <a href="{{ getJobStacktraceUrl(incident) }}"
@@ -29,7 +29,7 @@
                ng-hide="incident.rootCauseIncidentMessage"
                help
                help-text="Open stacktrace in new window"
-               help-placement="top">
+               help-placement="'top'">
               <i>Message is null.</i>
             </a>
           </span>
