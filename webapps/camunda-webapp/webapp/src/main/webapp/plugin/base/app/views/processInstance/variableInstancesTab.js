@@ -1,6 +1,6 @@
-ngDefine('cockpit.plugin.base.views', function(module) {
+ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
 
-   function VariableInstancesController ($scope, $http, search, Uri, LocalExecutionVariableResource, Notifications) {
+   function VariableInstancesController ($scope, $http, search, Uri, LocalExecutionVariableResource, Notifications, $dialog) {
 
     // input: processInstance, processData
 
@@ -84,7 +84,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
           currentVariable.instance = instance;
 
           // set an internal id
-          currentVariable.id = getNextId();
+          //currentVariable.id = getNextId();
 
           // creates initially a copy of the current variable instance
           variableCopies[currentVariable.id] = angular.copy(currentVariable);
@@ -201,24 +201,69 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       return variable.type === 'null' || variable.type === 'Null';
     };
 
+    var isBinary = $scope.isBinary = function (variable) {
+      return variable.type === 'binary' || variable.type === 'Binary';
+    };
+
     var isSerializable = $scope.isSerializable = function (variable) {
-      return !isInteger(variable) &&
-          !isShort(variable) &&
-          !isLong(variable) &&
-          !isDouble(variable) &&
-          !isFloat(variable) &&
-          !isString(variable) &&
-          !isDate(variable) &&
-          !isBoolean(variable) &&
-          !isNull(variable);
+      return variable.type === 'serializable' || variable.type === 'Serializable';
+    };
+
+    var isPrimitive = $scope.isPrimitive = function (variable) {
+      return isInteger(variable) ||
+        isShort(variable) ||
+        isLong(variable) ||
+        isDouble(variable) ||
+        isFloat(variable) ||
+        isString(variable) ||
+        isDate(variable) ||
+        isBoolean(variable) ||
+        isNull(variable)     
+    };
+
+    $scope.isEditable = function (param) {
+      return !isSerializable(param) && !isBinary(param);
     };
 
     $scope.isDateValueValid = function (param) {
       console.log(param);
     };
+
+    $scope.getBinaryVariableDownloadLink = function (variable) {
+      return Uri.appUri('engine://engine/:engine/variable-instance/'+variable.id+'/data');
+    }
+
+    $scope.openUploadDialog = function (variableInstance) {
+       var dialog = $dialog.dialog({
+        resolve: {
+          variableInstance: function() { return variableInstance; }
+        },
+        controller: 'VariableInstanceUpluadController',
+        templateUrl: require.toUrl('./variable-instance-upload-dialog.html')
+      });
+
+      dialog.open().then(function(result) {
+        // dialog closed.
+      });
+    }
+
+    $scope.openInspectDialog = function (variableInstance) {
+       var dialog = $dialog.dialog({
+        resolve: {
+          variableInstance: function() { return variableInstance; }
+        },
+        controller: 'VariableInstanceInspectController',
+        templateUrl: require.toUrl('./variable-instance-inspect-dialog.html')
+      });
+
+      dialog.open().then(function(result) {
+        // dialog closed.
+      });
+    }
+
   }
 
-  module.controller('VariableInstancesController', [ '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', VariableInstancesController ]);
+  module.controller('VariableInstancesController', [ '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', '$dialog', VariableInstancesController ]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
