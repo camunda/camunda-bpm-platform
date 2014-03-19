@@ -163,11 +163,15 @@ public class ProcessInstanceQueryDto extends AbstractRestQueryParametersDto<Proc
   }
 
   public String getOuterOrderBy() {
-    if (orderBy == null) {
+    String outerOrderBy = getOrderBy();
+    if (outerOrderBy == null || outerOrderBy.isEmpty()) {
       return "ID_ asc";
     }
+    else if (outerOrderBy.contains(".")) {
+      return outerOrderBy.substring(outerOrderBy.lastIndexOf(".") + 1);
+    }
     else {
-      return orderBy;
+      return outerOrderBy;
     }
   }
 
