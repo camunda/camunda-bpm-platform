@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples">
+
+  <process id="startTimerEventSubProcessWithUserTask">
+  
+    <startEvent id="startEvent" />
+
+    <sequenceFlow id="sequenceFlow_1" sourceRef="startEvent" targetRef="userTask" />
+
+    <userTask id="userTask" name="NonInterruptingUserTask" />
+
+    <sequenceFlow id="sequenceFlow_2" sourceRef="userTask" targetRef="endEvent" />
+
+    <endEvent id="endEvent" />
+
+     <subProcess id="subProcess" name="Subprocess" triggeredByEvent="true">
+       <startEvent id="subprocessStartEvent">
+         <timerEventDefinition>
+             <timeDuration>PT1M</timeDuration>
+         </timerEventDefinition>
+       </startEvent>
+       <sequenceFlow id="sequenceFlow_3" sourceRef="subprocessStartEvent" targetRef="subprocessUserTask" />
+       <userTask id="subprocessUserTask" />
+       <sequenceFlow id="sequenceFlow_4" sourceRef="subprocessUserTask" targetRef="subprocessEndEvent" />
+       <endEvent id="subprocessEndEvent" />
+     </subProcess>
+     
+     <subProcess id="secondSubProcess" name="Second Subprocess" triggeredByEvent="true">
+       <startEvent id="secondSubprocessStartEvent">
+         <timerEventDefinition>
+             <timeDuration>PT1H</timeDuration>
+         </timerEventDefinition>
+       </startEvent>
+       <sequenceFlow id="sequenceFlow_5" sourceRef="secondSubprocessStartEvent" targetRef="secondSubprocessUserTask" />
+       <userTask id="secondSubprocessUserTask" />
+       <sequenceFlow id="sequenceFlow_6" sourceRef="secondSubprocessUserTask" targetRef="secondSubprocessEndEvent" />
+       <endEvent id="secondSubprocessEndEvent" />
+     </subProcess>
+    
+  </process>
+
+</definitions>

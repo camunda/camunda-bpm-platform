@@ -715,7 +715,7 @@ public class BpmnParse extends Parse {
     Element errorEventDefinition = startEventElement.element("errorEventDefinition");
     Element messageEventDefinition = startEventElement.element("messageEventDefinition");
     Element signalEventDefinition = startEventElement.element("signalEventDefinition");
-    Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
+    Element timerEventDefinition = startEventElement.element("timerEventDefinition");
 
     if (isTriggeredByEvent) { // event subprocess
 
@@ -763,13 +763,16 @@ public class BpmnParse extends Parse {
         eventSubscriptionDeclaration.setStartEvent(false);
         addEventSubscriptionDeclaration(eventSubscriptionDeclaration, catchingScope, signalEventDefinition);
 
+      } else if (timerEventDefinition != null) {
+        parseTimerStartEventDefinitionforEventSubprocess(timerEventDefinition, startEventActivity, catchingScope);
+
       } else {
-        addError("start event of event subprocess must be of type 'error', 'message' or 'signal'", startEventElement);
+        addError("start event of event subprocess must be of type 'error', 'message', 'timer' or 'signal'", startEventElement);
       }
 
     } else { // "regular" subprocess
+      Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
       Element conditionalEventDefinition = startEventElement.element("conditionalEventDefinition");
-      Element timerEventDefinition = startEventElement.element("timerEventDefinition");
       Element escalationEventDefinition = startEventElement.element("escalationEventDefinition");
 
       if (conditionalEventDefinition != null) {
@@ -2296,6 +2299,16 @@ public class BpmnParse extends Parse {
     }
     timerDeclarations.add(timerDeclaration);
 
+  }
+
+  protected void parseTimerStartEventDefinitionforEventSubprocess(Element timerEventDefinition, ActivityImpl timerActivity, ScopeImpl catchingScope) {
+    timerActivity.setProperty("type", "startTimerEvent");
+    TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventSubprocessJobHander.TYPE);
+    timerDeclaration.setActivityId(timerActivity.getId());
+    timerDeclaration.setEventScopeActivityId(catchingScope.getId());
+    timerDeclaration.setJobHandlerConfiguration(timerActivity.getParent().getId());
+
+    addTimerDeclaration(catchingScope, timerDeclaration);
   }
 
   protected void parseIntemediateSignalEventDefinition(Element element, ActivityImpl signalActivity, boolean isAfterEventBasedGateway) {

@@ -304,6 +304,14 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       declaration.createSubscription(subProcessInstance);
     }
 
+    // create timer jobs
+    List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) processDefinition.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
+    if (timerDeclarations != null) {
+      for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
+        timerDeclaration.createTimerInstance(subProcessInstance);
+      }
+    }
+
     if(businessKey != null) {
       subProcessInstance.setBusinessKey(businessKey);
     }
@@ -362,11 +370,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
     if (timerDeclarations!=null) {
       for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
-        TimerEntity timer = timerDeclaration.createJobInstance(this);
-        Context
-          .getCommandContext()
-          .getJobManager()
-          .schedule(timer);
+        timerDeclaration.createTimerInstance(this);
       }
     }
 

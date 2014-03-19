@@ -14,15 +14,16 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
@@ -38,6 +39,8 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
 
   protected String repeat;
   protected boolean isInterruptingTimer; // For boundary timers
+  protected String eventScopeActivityId = null;
+  protected Boolean isParallelMultiInstance;
 
   public TimerDeclarationImpl(Expression expression, TimerDeclarationType type, String jobHandlerType) {
     super(jobHandlerType);
@@ -55,6 +58,14 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
 
   public String getRepeat() {
     return repeat;
+  }
+
+  public void setEventScopeActivityId(String eventScopeActivityId) {
+    this.eventScopeActivityId = eventScopeActivityId;
+  }
+
+  public String getEventScopeActivityId() {
+    return eventScopeActivityId;
   }
 
   protected TimerEntity newJobInstance(ExecutionEntity execution) {
@@ -118,6 +129,43 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
       return dueDate.replace("/","/"+sdf.format(ClockUtil.getCurrentTime())+"/");
     }
     return dueDate;
+  }
+
+  private boolean isParallelMultiInstance(ExecutionEntity execution) {
+    if (isParallelMultiInstance == null) { // cache result
+      if (eventScopeActivityId == null) {
+        isParallelMultiInstance = false;
+      } else {
+        ActivityImpl activity = execution.getProcessDefinition().findActivity(eventScopeActivityId);
+        isParallelMultiInstance = activity.getActivityBehavior() instanceof ParallelMultiInstanceBehavior;
+      }
+    }
+    return isParallelMultiInstance;
+  }
+
+  public TimerEntity createTimerInstance(ExecutionEntity execution) {
+    if (isParallelMultiInstance(execution)) {
+      return null;
+    } else {
+      return createTimer(execution);
+    }
+  }
+
+  public TimerEntity createTimerInstanceForParallelMultiInstance(ExecutionEntity execution) {
+    if (isParallelMultiInstance(execution)) {
+      return createTimer(execution);
+    } else {
+      return null;
+    }
+  }
+
+  public TimerEntity createTimer(ExecutionEntity execution) {
+    TimerEntity timer = super.createJobInstance(execution);
+    Context
+    .getCommandContext()
+    .getJobManager()
+    .schedule(timer);
+    return timer;
   }
 
 }

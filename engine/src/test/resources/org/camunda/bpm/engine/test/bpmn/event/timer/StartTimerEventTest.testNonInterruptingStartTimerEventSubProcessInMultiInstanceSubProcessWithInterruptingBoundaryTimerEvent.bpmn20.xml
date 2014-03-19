@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples">
+
+  <process id="process">
+  
+    <startEvent id="startEvent" />
+    
+    <sequenceFlow id="sequenceFlow_1" sourceRef="startEvent" targetRef="parentSubProcess" />
+    
+     <subProcess id="parentSubProcess">
+      <multiInstanceLoopCharacteristics isSequential="true">
+        <loopCardinality>2</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+   
+      <startEvent id="parentSubProcessStartEvent" />
+  
+      <sequenceFlow id="sequenceFlow_2" sourceRef="parentSubProcessStartEvent" targetRef="userTask" />
+  
+      <userTask id="userTask" name="NonInterruptingUserTask" />
+  
+      <sequenceFlow id="sequenceFlow_3" sourceRef="userTask" targetRef="parentSubProcessEndEvent" />
+  
+      <endEvent id="parentSubProcessEndEvent" />
+  
+       <subProcess id="subProcess" name="Subprocess" triggeredByEvent="true">
+         <startEvent id="subprocessStartEvent" isInterrupting="false">
+           <timerEventDefinition>
+               <timeDuration>PT1M</timeDuration>
+           </timerEventDefinition>
+         </startEvent>
+         <sequenceFlow id="sequenceFlow_4" sourceRef="subprocessStartEvent" targetRef="subprocessServiceTask" />
+         <serviceTask id="subprocessServiceTask" camunda:class="org.camunda.bpm.engine.test.bpmn.event.timer.DummyServiceTask" />       
+         <sequenceFlow id="sequenceFlow_5" sourceRef="subprocessServiceTask" targetRef="subprocessEndEvent" />
+         <endEvent id="subprocessEndEvent" />
+       </subProcess>
+     
+     </subProcess>
+     
+    <boundaryEvent id="timerBoundary" attachedToRef="parentSubProcess" cancelActivity="true">
+      <timerEventDefinition>
+          <timeDuration>PT10S</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    
+     <sequenceFlow id="sequenceFlow_7" sourceRef="timerBoundary" targetRef="endEvent" />
+     
+     <sequenceFlow id="sequenceFlow_6" sourceRef="parentSubProcess" targetRef="endEvent" />
+     
+     <endEvent id="endEvent" />
+    
+  </process>
+
+</definitions>
