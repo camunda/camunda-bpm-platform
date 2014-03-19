@@ -8,5 +8,6 @@ ngDefine('cockpit.services', [
   './transform',
   './variables',
   './search',
-  'module:cockpit.services.page:./page'
+  'module:cockpit.services.page:./page',
+  'module:cockpit.services.breadcrumbTrails:./breadcrumbTrails'
 ], function() {});
