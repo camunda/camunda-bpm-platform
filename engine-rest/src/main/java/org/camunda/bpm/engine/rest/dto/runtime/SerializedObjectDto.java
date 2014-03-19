@@ -25,10 +25,7 @@ public class SerializedObjectDto {
   protected Object object;
 
   public SerializedObjectDto(Object value) {
-    TypeFactory defaultInstance = TypeFactory.defaultInstance();
-    type = defaultInstance
-      .constructType(value.getClass())
-      .toCanonical();
+    type = TypeFactory.type(value.getClass()).toCanonical();
     object = value;
   }
 

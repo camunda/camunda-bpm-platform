@@ -618,7 +618,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     ObjectMapper mapper = new ObjectMapper();
     String jsonBytes = mapper.writeValueAsString(serializable);
-    String typeName = TypeFactory.defaultInstance().constructType(serializable.getClass()).toCanonical();
+    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
 
     String variableKey = "aVariableKey";
 
@@ -641,7 +641,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     ObjectMapper mapper = new ObjectMapper();
     String jsonBytes = mapper.writeValueAsString(serializable);
-    String typeName = TypeFactory.defaultInstance().constructType(serializable.getClass()).toCanonical();
+    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
 
     String variableKey = "aVariableKey";
 

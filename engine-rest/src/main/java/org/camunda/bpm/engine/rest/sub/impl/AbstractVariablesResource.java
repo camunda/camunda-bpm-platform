@@ -208,9 +208,9 @@ public abstract class AbstractVariablesResource implements VariableResource {
     try {
 
       ObjectMapper objectMapper = new ObjectMapper();
-      JavaType type = TypeFactory.defaultInstance().constructFromCanonical(className);
+      JavaType type = TypeFactory.fromCanonical(className);
 
-      return objectMapper.readValue(data, type);
+      return objectMapper.readValue(new String(data), type);
 
     } catch(Exception e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Could not deserialize JSON object: "+e.getMessage());
