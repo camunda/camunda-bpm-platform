@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
+import org.camunda.bpm.engine.rest.mapper.MultipartPayloadProvider;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 
 /**
@@ -42,10 +43,12 @@ public class EngineRestApplication extends Application {
     classes.add(JacksonConfigurator.class);
     classes.add(JacksonJsonProvider.class);
     classes.add(RestExceptionHandler.class);
-    
+
     classes.add(ProcessEngineExceptionHandler.class);
     classes.add(ExceptionHandler.class);
-    
+
+    classes.add(MultipartPayloadProvider.class);
+
     return classes;
   }
 }
