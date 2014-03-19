@@ -295,7 +295,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   public boolean areJobsAvailable() {
     List<Job> list = managementService.createJobQuery().list();
     for (Job job : list) {
-      if (job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
+      if (!job.isSuspended() && job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
         return true;
       }
     }

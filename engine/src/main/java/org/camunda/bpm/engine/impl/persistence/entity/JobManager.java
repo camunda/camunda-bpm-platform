@@ -69,7 +69,8 @@ public class JobManager extends AbstractManager {
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
     JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
     TransactionListener transactionListener = null;
-    if(job.isExclusive()
+    if(!job.isSuspended()
+            && job.isExclusive()
             && jobExecutorContext != null
             && jobExecutorContext.isExecutingExclusiveJob()) {
       // lock job & add to the queue of the current processor
