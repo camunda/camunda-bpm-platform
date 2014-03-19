@@ -147,7 +147,7 @@ public class BpmnParse extends Parse {
     super(parser);
     this.expressionManager = parser.getExpressionManager();
     this.parseListeners = parser.getParseListeners();
-    setSchemaResource(ReflectUtil.getResource(BpmnParser.BPMN_20_SCHEMA_LOCATION).toString());
+    setSchemaResource(ReflectUtil.getResourceUrlAsString(BpmnParser.BPMN_20_SCHEMA_LOCATION));
   }
 
   public BpmnParse deployment(DeploymentEntity deployment) {

@@ -12,22 +12,19 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ClassLoadingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+import java.util.logging.Logger;
 
 
 /**
@@ -129,6 +126,21 @@ public abstract class ReflectUtil {
    
     return url;
    }
+
+  /**
+   * Gets the encoded url of the resource.
+   *
+   * @param name  the name of the resource
+   * @return the encoded url of the resource
+   */
+  public static String getResourceUrlAsString(String name) {
+    URL url = getResource(name);
+    try {
+      return url.toURI().toASCIIString();
+    } catch (URISyntaxException e) {
+      throw new ProcessEngineException("couldn't encode url " + url, e);
+    }
+  }
 
   public static Object instantiate(String className) {
     try {
