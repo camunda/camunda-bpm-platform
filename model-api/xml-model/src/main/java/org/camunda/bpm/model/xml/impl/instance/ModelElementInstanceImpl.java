@@ -205,6 +205,9 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
 
     // replace the existing child with the new child in the DOM
     domElement.replaceChild(newChildDomElement, existingChildDomElement);
+
+    // execute after replacement updates
+    newChild.updateAfterReplacement();
   }
 
   @SuppressWarnings("unchecked")
@@ -297,6 +300,10 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
     else {
       domElement.insertChildElementAfter(elementToInsert.getDomElement(), insertAfterElement.getDomElement());
     }
+  }
+
+  public void updateAfterReplacement() {
+    // do nothing
   }
 
   /**

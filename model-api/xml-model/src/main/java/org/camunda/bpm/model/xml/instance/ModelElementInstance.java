@@ -226,4 +226,9 @@ public interface ModelElementInstance {
    * @param insertAfterElement  the element to insert after or null to insert at first position
    */
   void insertElementAfter(ModelElementInstance elementToInsert, ModelElementInstance insertAfterElement);
+
+  /**
+   * Execute updates after the element was inserted as a replacement of another element.
+   */
+  void updateAfterReplacement();
 }
