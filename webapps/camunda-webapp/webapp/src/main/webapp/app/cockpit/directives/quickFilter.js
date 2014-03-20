@@ -87,9 +87,11 @@ ngDefine('cockpit.directives', ['jquery'], function(module, $) {
 
         scope.search = function() {
 
-          if (scope.quickFilters.running.$viewValue &&
-              scope.quickFilters.canceled.$viewValue &&
-              scope.quickFilters.completed.$viewValue) {
+          if (scope.quickFilters &&
+              scope.quickFilters.running && scope.quickFilters.running.$viewValue &&
+              scope.quickFilters.canceled && scope.quickFilters.canceled.$viewValue &&
+              scope.quickFilters.completed && scope.quickFilters.completed.$viewValue) {
+
             scope.quickFilters.running.$setViewValue(false);
             scope.quickFilters.running.$render();
             scope.quickFilters.canceled.$setViewValue(false);
