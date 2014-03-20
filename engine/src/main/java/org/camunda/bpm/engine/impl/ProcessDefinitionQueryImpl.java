@@ -195,37 +195,28 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
 
   public ProcessDefinitionQuery incidentType(String incidentType) {
-    if (incidentType == null) {
-      throw new ProcessEngineException("incident type is null");
-    }
+    assertParamNotNull("incident type", incidentType);
     this.incidentType = incidentType;
     return this;
   }
 
   public ProcessDefinitionQuery incidentId(String incidentId) {
-    if (incidentId == null) {
-      throw new ProcessEngineException("incident id is null");
-    }
+    assertParamNotNull("incident id", incidentId);
     this.incidentId = incidentId;
     return this;
   }
 
   public ProcessDefinitionQuery incidentMessage(String incidentMessage) {
-    if (incidentMessage == null) {
-      throw new ProcessEngineException("incident message is null");
-    }
+    assertParamNotNull("incident message", incidentMessage);
     this.incidentMessage = incidentMessage;
     return this;
   }
 
   public ProcessDefinitionQuery incidentMessageLike(String incidentMessageLike) {
-    if (incidentMessageLike == null) {
-      throw new ProcessEngineException("incident messageLike is null");
-    }
+    assertParamNotNull("incident messageLike", incidentMessageLike);
     this.incidentMessageLike = incidentMessageLike;
     return this;
   }
-
 
   //sorting ////////////////////////////////////////////
 

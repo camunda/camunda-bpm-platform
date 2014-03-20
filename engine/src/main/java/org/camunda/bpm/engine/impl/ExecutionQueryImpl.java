@@ -156,33 +156,25 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   }
 
   public ExecutionQuery incidentType(String incidentType) {
-    if (incidentType == null) {
-      throw new ProcessEngineException("incident type is null");
-    }
+    assertParamNotNull("incident type", incidentType);
     this.incidentType = incidentType;
     return this;
   }
 
   public ExecutionQuery incidentId(String incidentId) {
-    if (incidentId == null) {
-      throw new ProcessEngineException("incidentId is null");
-    }
+    assertParamNotNull("incident id", incidentId);
     this.incidentId = incidentId;
     return this;
   }
 
   public ExecutionQuery incidentMessage(String incidentMessage) {
-    if (incidentMessage == null) {
-      throw new ProcessEngineException("incident message is null");
-    }
+    assertParamNotNull("incident message", incidentMessage);
     this.incidentMessage = incidentMessage;
     return this;
   }
 
   public ExecutionQuery incidentMessageLike(String incidentMessageLike) {
-    if (incidentMessageLike == null) {
-      throw new ProcessEngineException("incident messageLike is null");
-    }
+    assertParamNotNull("incident messageLike", incidentMessageLike);
     this.incidentMessageLike = incidentMessageLike;
     return this;
   }

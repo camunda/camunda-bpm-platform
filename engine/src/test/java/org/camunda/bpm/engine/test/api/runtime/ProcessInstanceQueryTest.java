@@ -1152,10 +1152,22 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<ProcessInstance> processInstanceList = runtimeService.createProcessInstanceQuery()
+    List<ProcessInstance> processInstanceList = runtimeService
+        .createProcessInstanceQuery()
         .incidentId(incident.getId()).list();
 
     assertEquals(1, processInstanceList.size());
+  }
+
+  public void testQueryByInvalidIncidentId() {
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    assertEquals(0, query.incidentId("invalid").count());
+
+    try {
+      query.incidentId(null);
+      fail();
+    } catch (ProcessEngineException e) {}
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingProcessCreateOneIncident.bpmn20.xml"})
@@ -1169,10 +1181,22 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<ProcessInstance> processInstanceList = runtimeService.createProcessInstanceQuery()
+    List<ProcessInstance> processInstanceList = runtimeService
+        .createProcessInstanceQuery()
         .incidentType(incident.getIncidentType()).list();
 
     assertEquals(1, processInstanceList.size());
+  }
+
+  public void testQueryByInvalidIncidentType() {
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    assertEquals(0, query.incidentType("invalid").count());
+
+    try {
+      query.incidentType(null);
+      fail();
+    } catch (ProcessEngineException e) {}
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingProcessCreateOneIncident.bpmn20.xml"})
@@ -1186,27 +1210,49 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<ProcessInstance> processInstanceList = runtimeService.createProcessInstanceQuery()
+    List<ProcessInstance> processInstanceList = runtimeService
+        .createProcessInstanceQuery()
         .incidentMessage(incident.getIncidentMessage()).list();
 
     assertEquals(1, processInstanceList.size());
   }
 
+  public void testQueryByInvalidIncidentMessage() {
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    assertEquals(0, query.incidentMessage("invalid").count());
+
+    try {
+      query.incidentMessage(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingProcessCreateOneIncident.bpmn20.xml"})
   public void testQueryByIncidentMessageLike() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
+    runtimeService.startProcessInstanceByKey("failingProcess");
 
     executeAvailableJobs();
 
     List<Incident> incidentList = runtimeService.createIncidentQuery().list();
     assertEquals(1, incidentList.size());
 
-    runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
-
-    List<ProcessInstance> processInstanceList = runtimeService.createProcessInstanceQuery()
+    List<ProcessInstance> processInstanceList = runtimeService
+        .createProcessInstanceQuery()
         .incidentMessageLike("%exception%").list();
 
     assertEquals(1, processInstanceList.size());
+  }
+
+  public void testQueryByInvalidIncidentMessageLike() {
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    assertEquals(0, query.incidentMessageLike("invalid").count());
+
+    try {
+      query.incidentMessageLike(null);
+      fail();
+    } catch (ProcessEngineException e) {}
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingSubProcessCreateOneIncident.bpmn20.xml"})
@@ -1220,7 +1266,8 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<ProcessInstance> processInstanceList = runtimeService.createProcessInstanceQuery()
+    List<ProcessInstance> processInstanceList = runtimeService
+        .createProcessInstanceQuery()
         .incidentId(incident.getId()).list();
 
     assertEquals(1, processInstanceList.size());
@@ -1238,7 +1285,8 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<ProcessInstance> processInstanceList = runtimeService.createProcessInstanceQuery()
+    List<ProcessInstance> processInstanceList = runtimeService
+        .createProcessInstanceQuery()
         .incidentType(incident.getIncidentType()).list();
 
     assertEquals(1, processInstanceList.size());
@@ -1256,7 +1304,8 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<ProcessInstance> processInstanceList = runtimeService.createProcessInstanceQuery()
+    List<ProcessInstance> processInstanceList = runtimeService
+        .createProcessInstanceQuery()
         .incidentMessage(incident.getIncidentMessage()).list();
 
     assertEquals(1, processInstanceList.size());
@@ -1272,9 +1321,8 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
     List<Incident> incidentList = runtimeService.createIncidentQuery().list();
     assertEquals(1, incidentList.size());
 
-    runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
-
-    List<ProcessInstance> processInstanceList = runtimeService.createProcessInstanceQuery()
+    List<ProcessInstance> processInstanceList = runtimeService
+        .createProcessInstanceQuery()
         .incidentMessageLike("%exception%").list();
 
     assertEquals(1, processInstanceList.size());

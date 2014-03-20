@@ -333,12 +333,9 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deployment.getId());
   }
 
+  @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
   public void testQueryByIncidentId() {
-    Deployment deployment = repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml")
-        .deploy();
-
-    assertEquals(1,repositoryService.createProcessDefinitionQuery()
+    assertEquals(1, repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("failingProcess")
         .count());
 
@@ -351,20 +348,27 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery()
+    ProcessDefinitionQuery query = repositoryService
+        .createProcessDefinitionQuery()
         .incidentId(incident.getId());
 
     verifyQueryResults(query, 1);
-
-    repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
-  public void testQueryByIncidentType() {
-    Deployment deployment = repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml")
-        .deploy();
+  public void testQueryByInvalidIncidentId() {
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
 
-    assertEquals(1,repositoryService.createProcessDefinitionQuery()
+    verifyQueryResults(query.incidentId("invalid"), 0);
+
+    try {
+      query.incidentId(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
+  public void testQueryByIncidentType() {
+    assertEquals(1, repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("failingProcess")
         .count());
 
@@ -377,20 +381,27 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery()
+    ProcessDefinitionQuery query = repositoryService
+        .createProcessDefinitionQuery()
         .incidentType(incident.getIncidentType());
 
     verifyQueryResults(query, 1);
-
-    repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
-  public void testQueryByIncidentMessage() {
-    Deployment deployment = repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml")
-        .deploy();
+  public void testQueryByInvalidIncidentType() {
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
 
-    assertEquals(1,repositoryService.createProcessDefinitionQuery()
+    verifyQueryResults(query.incidentType("invalid"), 0);
+
+    try {
+      query.incidentType(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
+  public void testQueryByIncidentMessage() {
+    assertEquals(1, repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("failingProcess")
         .count());
 
@@ -403,38 +414,53 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery()
+    ProcessDefinitionQuery query = repositoryService
+        .createProcessDefinitionQuery()
         .incidentMessage(incident.getIncidentMessage());
 
     verifyQueryResults(query, 1);
-
-    repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
-  public void testQueryByIncidentMessageLike() {
-    Deployment deployment = repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml")
-        .deploy();
+  public void testQueryByInvalidIncidentMessage() {
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
 
-    assertEquals(1,repositoryService.createProcessDefinitionQuery()
+    verifyQueryResults(query.incidentMessage("invalid"), 0);
+
+    try {
+      query.incidentMessage(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
+  public void testQueryByIncidentMessageLike() {
+    assertEquals(1, repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("failingProcess")
         .count());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
+    runtimeService.startProcessInstanceByKey("failingProcess");
 
     executeAvailableJobs();
 
     List<Incident> incidentList = runtimeService.createIncidentQuery().list();
     assertEquals(1, incidentList.size());
 
-    runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
-
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery()
+    ProcessDefinitionQuery query = repositoryService
+        .createProcessDefinitionQuery()
         .incidentMessageLike("%expected%");
 
     verifyQueryResults(query, 1);
+  }
 
-    repositoryService.deleteDeployment(deployment.getId(), true);
+  public void testQueryByInvalidIncidentMessageLike() {
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    verifyQueryResults(query.incidentMessageLike("invalid"), 0);
+
+    try {
+      query.incidentMessageLike(null);
+      fail();
+    } catch (ProcessEngineException e) {}
   }
 
 }

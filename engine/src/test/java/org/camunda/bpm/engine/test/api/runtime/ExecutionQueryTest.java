@@ -38,6 +38,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -1121,10 +1122,22 @@ public void testBooleanVariable() throws Exception {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<Execution> executionList = runtimeService.createExecutionQuery()
+    List<Execution> executionList = runtimeService
+        .createExecutionQuery()
         .incidentId(incident.getId()).list();
 
     assertEquals(1, executionList.size());
+  }
+
+  public void testQueryByInvalidIncidentId() {
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    assertEquals(0, query.incidentId("invalid").count());
+
+    try {
+      query.incidentId(null);
+      fail();
+    } catch (ProcessEngineException e) {}
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingProcessCreateOneIncident.bpmn20.xml"})
@@ -1138,10 +1151,22 @@ public void testBooleanVariable() throws Exception {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<Execution> executionList = runtimeService.createExecutionQuery()
+    List<Execution> executionList = runtimeService
+        .createExecutionQuery()
         .incidentType(incident.getIncidentType()).list();
 
     assertEquals(1, executionList.size());
+  }
+
+  public void testQueryByInvalidIncidentType() {
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    assertEquals(0, query.incidentType("invalid").count());
+
+    try {
+      query.incidentType(null);
+      fail();
+    } catch (ProcessEngineException e) {}
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingProcessCreateOneIncident.bpmn20.xml"})
@@ -1155,27 +1180,49 @@ public void testBooleanVariable() throws Exception {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<Execution> executionList = runtimeService.createExecutionQuery()
+    List<Execution> executionList = runtimeService
+        .createExecutionQuery()
         .incidentMessage(incident.getIncidentMessage()).list();
 
     assertEquals(1, executionList.size());
   }
 
+  public void testQueryByInvalidIncidentMessage() {
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    assertEquals(0, query.incidentMessage("invalid").count());
+
+    try {
+      query.incidentMessage(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingProcessCreateOneIncident.bpmn20.xml"})
   public void testQueryByIncidentMessageLike() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
+    runtimeService.startProcessInstanceByKey("failingProcess");
 
     executeAvailableJobs();
 
     List<Incident> incidentList = runtimeService.createIncidentQuery().list();
     assertEquals(1, incidentList.size());
 
-    runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
-
-    List<Execution> executionList = runtimeService.createExecutionQuery()
+    List<Execution> executionList = runtimeService
+        .createExecutionQuery()
         .incidentMessageLike("%exception%").list();
 
     assertEquals(1, executionList.size());
+  }
+
+  public void testQueryByInvalidIncidentMessageLike() {
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    assertEquals(0, query.incidentMessageLike("invalid").count());
+
+    try {
+      query.incidentMessageLike(null);
+      fail();
+    } catch (ProcessEngineException e) {}
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingSubProcessCreateOneIncident.bpmn20.xml"})
@@ -1189,7 +1236,8 @@ public void testBooleanVariable() throws Exception {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<Execution> executionList = runtimeService.createExecutionQuery()
+    List<Execution> executionList = runtimeService
+        .createExecutionQuery()
         .incidentId(incident.getId()).list();
 
     assertEquals(1, executionList.size());
@@ -1208,7 +1256,8 @@ public void testBooleanVariable() throws Exception {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<Execution> executionList = runtimeService.createExecutionQuery()
+    List<Execution> executionList = runtimeService
+        .createExecutionQuery()
         .incidentType(incident.getIncidentType()).list();
 
     assertEquals(1, executionList.size());
@@ -1217,7 +1266,7 @@ public void testBooleanVariable() throws Exception {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingSubProcessCreateOneIncident.bpmn20.xml"})
-  public void testQueryByIncidentMessageSubProcess() {
+  public void testQueryByIncidentMessageInSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingSubProcess");
 
     executeAvailableJobs();
@@ -1227,7 +1276,8 @@ public void testBooleanVariable() throws Exception {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<Execution> executionList = runtimeService.createExecutionQuery()
+    List<Execution> executionList = runtimeService
+        .createExecutionQuery()
         .incidentMessage(incident.getIncidentMessage()).list();
 
     assertEquals(1, executionList.size());
@@ -1246,13 +1296,13 @@ public void testBooleanVariable() throws Exception {
 
     runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    List<Execution> executionList = runtimeService.createExecutionQuery()
+    List<Execution> executionList = runtimeService
+        .createExecutionQuery()
         .incidentMessageLike("%exception%").list();
 
     assertEquals(1, executionList.size());
     // execution id of subprocess != process instance id
     assertNotSame(processInstance.getId(), executionList.get(0).getId());
   }
-
 
 }
