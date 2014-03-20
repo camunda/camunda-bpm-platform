@@ -86,7 +86,20 @@ ngDefine('cockpit.directives', ['jquery'], function(module, $) {
         scope.showStateFilter = typeof attrs.stateFilter !== 'undefined';
 
         scope.search = function() {
+
+          if (scope.quickFilters.running.$viewValue &&
+              scope.quickFilters.canceled.$viewValue &&
+              scope.quickFilters.completed.$viewValue) {
+            scope.quickFilters.running.$setViewValue(false);
+            scope.quickFilters.running.$render();
+            scope.quickFilters.canceled.$setViewValue(false);
+            scope.quickFilters.canceled.$render();
+            scope.quickFilters.completed.$setViewValue(false);
+            scope.quickFilters.completed.$render();
+          }
+
           var searched = scope.showNameFilter && scope.quickFilters.name ? $.trim(scope.quickFilters.name.$viewValue) : '';
+
           var states = {
             running: !!scope.showStateFilter && !!scope.quickFilters.running && !!scope.quickFilters.running.$viewValue,
             canceled: !!scope.showStateFilter && !!scope.quickFilters.canceled && !!scope.quickFilters.canceled.$viewValue,
