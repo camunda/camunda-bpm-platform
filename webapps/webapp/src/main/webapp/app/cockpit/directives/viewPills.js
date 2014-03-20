@@ -1,6 +1,10 @@
 /* global ngDefine: false */
-ngDefine('cockpit.directives', [], function(module) {
+ngDefine('cockpit.directives', [
+  'cockpit/util/routeUtil'
+  ], function(module) {
   'use strict';
+
+  var routeUtil = require('cockpit/util/routeUtil');
 
   module.directive('viewPills', [
   function() {
@@ -12,12 +16,18 @@ ngDefine('cockpit.directives', [], function(module) {
       var providers = Views.getProviders({ component: $scope.id });
       $scope.providers = providers;
 
-      $scope.isActive = function(provider) {
+      var isActive = $scope.isActive = function(provider) {
         return $location.path().indexOf('/' + provider.id) != -1;
       };
 
       $scope.getUrl = function(provider) {
-        return '#' + $location.path().replace(/[^\/]*$/, provider.id);
+        var replacement = provider.id,
+            currentPath = $location.path(),
+            currentSearch = $location.search(),
+            keepSearchParams = !isActive(provider) ? provider.keepSearchParams : true;
+
+        return '#' + routeUtil.replaceLastPathFragment(replacement, currentPath, currentSearch, keepSearchParams);
+
       };
     }];
 
@@ -27,11 +37,11 @@ ngDefine('cockpit.directives', [], function(module) {
         id: '@'
       },
       template:
-'<ul class="nav nav-pills">' +
-'  <li ng-repeat="provider in providers" ng-class="{ active: isActive(provider) }" class="{{ provider.id }}">' +
-'    <a ng-href="{{ getUrl(provider) }}">{{ provider.label }}</a>' +
-'  </li>' +
-'</ul>',
+        '<ul class="nav nav-pills">' +
+        '  <li ng-repeat="provider in providers" ng-class="{ active: isActive(provider) }" class="{{ provider.id }}">' +
+        '    <a ng-href="{{ getUrl(provider) }}">{{ provider.label }}</a>' +
+        '  </li>' +
+        '</ul>',
       replace: true,
       controller: ViewPillsController
     };

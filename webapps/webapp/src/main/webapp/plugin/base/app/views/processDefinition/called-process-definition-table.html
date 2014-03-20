@@ -7,7 +7,7 @@
   <tbody>
     <tr ng-repeat="calledProcessDefinition in calledProcessDefinitions">
       <td>
-        <a ng-href="#/process-definition/{{ calledProcessDefinition.id }}?parentProcessDefinitionId={{ processDefinition.id }}&amp;detailsTab=call-process-definitions-table">
+        <a ng-href="#/process-definition/{{ calledProcessDefinition.id }}?parentProcessDefinitionId={{ processDefinition.id }}">
           {{ calledProcessDefinition.name }}
         </a>
       </td>
