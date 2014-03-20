@@ -11,7 +11,7 @@
 
     <sequenceFlow sourceRef="theStart" targetRef="serviceTask" />
 
-    <serviceTask id="serviceTask" activiti:expression="${true}" />
+    <serviceTask id="serviceTask" activiti:class="org.camunda.bpm.application.impl.event.AsyncThrowErrorService" />
     <sequenceFlow sourceRef="serviceTask" targetRef="theEnd" />
 
     <boundaryEvent id="errorBoundary" attachedToRef="serviceTask">

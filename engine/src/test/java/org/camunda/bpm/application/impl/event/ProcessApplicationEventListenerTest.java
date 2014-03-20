@@ -18,11 +18,13 @@ import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -90,7 +92,7 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
   }
 
   @Deployment
-  public void FAILING_testExecutionListenerWithErrorBoundaryEvent() {
+  public void testExecutionListenerWithErrorBoundaryEvent() {
     final AtomicInteger eventCount = new AtomicInteger();
 
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication() {
@@ -106,37 +108,107 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
     // register app so that it is notified about events
     managementService.registerProcessApplication(deploymentId, processApplication.getReference());
 
+    // 1. (start)startEvent(end) -(take)-> (start)serviceTask(end) -(take)-> (start)endEvent(end) (8 Events)
+
     // start process instance
     runtimeService.startProcessInstanceByKey("executionListener");
 
-    /**
-     * 8 events should be received:
-     * - theStart_start
-     * - theStart_end
-     * - theStart_take
-     * - serviceTask_start
-     * - serviceTask_end
-     * - serviceTask_take
-     * - theEnd_start
-     * - theEnd_end
-     */
-
-    /**
-     * 10 events are received:
-     * theStart_start
-     * theStart_end
-     * theStart_take
-     * serviceTask_start
-     * serviceTask_start <-- triggered twice
-     * serviceTask_end
-     * serviceTask_end <-- triggered twice
-     * errorBoundary_start
-     * errorBoundary_end
-     * errorBoundary_take
-     * theEnd_start
-     * theEnd_end
-     */
     assertEquals(8, eventCount.get());
+
+    // reset counter
+    eventCount.set(0);
+
+    // 2. (start)startEvent(end) -(take)-> (start)serviceTask(end)/(start)errorBoundaryEvent(end) -(take)-> (start)endEvent(end) (10 Events)
+
+    // start process instance
+    runtimeService.startProcessInstanceByKey("executionListener", Collections.<String, Object>singletonMap("shouldThrowError", true));
+
+    assertEquals(10, eventCount.get());
+  }
+
+  @Deployment
+  public void testExecutionListenerWithTimerBoundaryEvent() {
+    final AtomicInteger eventCount = new AtomicInteger();
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication() {
+      public ExecutionListener getExecutionListener() {
+        return new ExecutionListener() {
+          public void notify(DelegateExecution execution) throws Exception {
+            eventCount.incrementAndGet();
+          }
+        };
+      }
+    };
+
+    // register app so that it is notified about events
+    managementService.registerProcessApplication(deploymentId, processApplication.getReference());
+
+    // 1. (start)startEvent(end) -(take)-> (start)userTask(end) -(take)-> (start)endEvent(end) (8 Events)
+
+    // start process instance
+    runtimeService.startProcessInstanceByKey("executionListener");
+
+    // complete task
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    assertEquals(8, eventCount.get());
+
+    // reset counter
+    eventCount.set(0);
+
+    // 2. (start)startEvent(end) -(take)-> (start)userTask(end)/(start)timerBoundaryEvent(end) -(take)-> (start)endEvent(end) (10 Events)
+
+    // start process instance
+    runtimeService.startProcessInstanceByKey("executionListener");
+
+    // fire timer event
+    Job job = managementService.createJobQuery().singleResult();
+    managementService.executeJob(job.getId());
+
+    assertEquals(10, eventCount.get());
+  }
+
+  @Deployment
+  public void testExecutionListenerWithSignalBoundaryEvent() {
+    final AtomicInteger eventCount = new AtomicInteger();
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication() {
+      public ExecutionListener getExecutionListener() {
+        return new ExecutionListener() {
+          public void notify(DelegateExecution execution) throws Exception {
+            eventCount.incrementAndGet();
+          }
+        };
+      }
+    };
+
+    // register app so that it is notified about events
+    managementService.registerProcessApplication(deploymentId, processApplication.getReference());
+
+    // 1. (start)startEvent(end) -(take)-> (start)userTask(end) -(take)-> (start)endEvent(end) (8 Events)
+
+    // start process instance
+    runtimeService.startProcessInstanceByKey("executionListener");
+
+    // complete task
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    assertEquals(8, eventCount.get());
+
+    // reset counter
+    eventCount.set(0);
+
+    // 2. (start)startEvent(end) -(take)-> (start)userTask(end)/(start)signalBoundaryEvent(end) -(take)-> (start)endEvent(end) (10 Events)
+
+    // start process instance
+    runtimeService.startProcessInstanceByKey("executionListener");
+
+    // signal event
+    runtimeService.signalEventReceived("signal");
+
+    assertEquals(10, eventCount.get());
   }
 
   @Deployment

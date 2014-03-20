@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <signal id="signal1" name="signal"/>
+
+  <process id="executionListener">
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="userTask" />
+
+    <userTask id="userTask" />
+    <sequenceFlow sourceRef="userTask" targetRef="theEnd" />
+
+    <boundaryEvent id="errorBoundary" attachedToRef="userTask">
+      <signalEventDefinition signalRef="signal1"/>
+    </boundaryEvent>
+    <sequenceFlow sourceRef="errorBoundary" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>

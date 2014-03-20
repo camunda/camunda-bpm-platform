@@ -144,14 +144,12 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
 
   @Override
   public void parseBoundaryTimerEventDefinition(Element timerEventDefinition, boolean interrupting, ActivityImpl timerActivity) {
-    addStartEventListener(timerActivity);
-    addEndEventListener(timerActivity);
+    // start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override
   public void parseBoundaryErrorEventDefinition(Element errorEventDefinition, boolean interrupting, ActivityImpl activity, ActivityImpl nestedErrorEventActivity) {
-    addStartEventListener(activity);
-    addEndEventListener(activity);
+    // start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override
@@ -209,8 +207,7 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
 
   @Override
   public void parseBoundarySignalEventDefinition(Element signalEventDefinition, boolean interrupting, ActivityImpl signalActivity) {
-    addStartEventListener(signalActivity);
-    addEndEventListener(signalActivity);
+    // start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override
