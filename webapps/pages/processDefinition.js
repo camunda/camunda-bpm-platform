@@ -652,7 +652,14 @@ ngDefine('cockpit.pages.processDefinition', [
     ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
       id: 'runtime',
       priority: 20,
-      label: 'Runtime'
+      label: 'Runtime',
+      keepSearchParams: [
+        'parentProcessDefinitionId',
+        'businessKey',
+        'variables',
+        'startedAfter',
+        'startedBefore'
+      ]
     });
   }];
 

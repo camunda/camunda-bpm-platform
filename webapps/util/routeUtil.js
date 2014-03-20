@@ -1,6 +1,7 @@
 /* global define: false */
 define([], function() {
   'use strict';
+
   /**
    * A set of utilities for routing
    * @exports routeUtil
@@ -22,16 +23,52 @@ define([], function() {
    * @return {string}               - A URL string to be redirected to
    */
   utils.redirectToRuntime = function(params, currentPath, currentSearch) {
-    var redirectUrl = currentPath + '/runtime',
-        search = [],
+    var redirectUrl = currentPath + '/runtime';
+
+    return redirectTo(redirectUrl, currentSearch, true);
+  };
+
+  /**
+   * Replace the last fragment of a given path with a given replacement.
+   *
+   * @param {string} replacement    - The replacement.
+   * @param {string} currentPath    - The actual path of the request,
+   *                                  generally something like:
+   *                                  `/process-definition/<processDefinitionId>/runtime`
+   * @param {Object} currentSearch  - The parsed object of the route "search" part
+   * @return {string}               - A URL string to be redirected to
+   */
+  utils.replaceLastPathFragment = function (replacement, currentPath, currentSearch, keepSearchParams) {
+    var redirectUrl = currentPath.replace(/[^\/]*$/, replacement);
+
+    return redirectTo(redirectUrl, currentSearch, keepSearchParams);
+  };
+
+  function redirectTo(redirectUrl, currentSearch, keepSearchParams) {
+    var search = [],
         key;
 
-    for (key in currentSearch) {
-      search.push(key + '=' + currentSearch[key]);
+    if (currentSearch && keepSearchParams) {
+
+      var isArray = Object.prototype.toString.call(keepSearchParams) === '[object Array]';
+
+      for (key in currentSearch) {
+
+        if (isArray) {
+
+          if (keepSearchParams.indexOf(key) === -1) {
+            continue;
+          }
+
+        }
+
+        search.push(key + '=' + encodeURIComponent(currentSearch[key]));
+      }
+      
     }
 
     return redirectUrl + (search.length ? '?' + search.join('&') : '');
-  };
+  }
 
   return utils;
 });

@@ -139,11 +139,11 @@ ngDefine('cockpit.pages.processInstance', [
           completedFilter;
 
       angular.forEach(activityInstanceIds, function (instanceId) {
-        var instance = instanceIdToInstanceMap[instanceId],
+        var instance = instanceIdToInstanceMap[instanceId] || {},
             activityId = instance.activityId || instance.targetActivityId,
             idx = activityIds.indexOf(activityId);
 
-        if (idx === -1) {
+        if (idx === -1 && !activityId) {
           activityIds.push(activityId);
           changed = true;
         }
@@ -643,7 +643,7 @@ ngDefine('cockpit.pages.processInstance', [
       if (!filterData || filterData.filter != filter) {
         var activityIds = filter.activityIds || [],
             activityInstanceIds = filter.activityInstanceIds || [];
-
+            
         return {
           filter: filter,
           activityCount: activityIds.length || 0,
