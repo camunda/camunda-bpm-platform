@@ -17,6 +17,7 @@ import java.util.List;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -246,6 +247,76 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     // cause and root cause id is equal to the id of the root incident
     assertEquals(causeHistoricIncident.getId(), historicIncident.getCauseIncidentId());
     assertEquals(rootCauseHistoricIncident.getId(), historicIncident.getRootCauseIncidentId());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  public void testDoNotCreateNewIncident() {
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
+    ProcessInstance pi = runtimeService.createProcessInstanceQuery().singleResult();
+
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery().processInstanceId(pi.getId());
+    HistoricIncident incident = query.singleResult();
+    assertNotNull(incident);
+
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+
+    // set retries to 1 by job definition id
+    managementService.setJobRetriesByJobDefinitionId(jobDefinition.getId(), 1);
+
+    // the incident still exists
+    HistoricIncident tmp = query.singleResult();
+    assertEquals(incident.getId(), tmp.getId());
+    assertNull(tmp.getEndTime());
+    assertTrue(tmp.isOpen());
+
+    // execute the available job (should fail again)
+    executeAvailableJobs();
+
+    // the incident still exists and there
+    // should be not a new incident
+    assertEquals(1, query.count());
+    tmp = query.singleResult();
+    assertEquals(incident.getId(), tmp.getId());
+    assertNull(tmp.getEndTime());
+    assertTrue(tmp.isOpen());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  public void testSetRetriesByJobDefinitionIdResolveIncident() {
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
+    ProcessInstance pi = runtimeService.createProcessInstanceQuery().singleResult();
+
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery().processInstanceId(pi.getId());
+    HistoricIncident incident = query.singleResult();
+    assertNotNull(incident);
+
+    runtimeService.setVariable(pi.getId(), "fail", false);
+
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+
+    // set retries to 1 by job definition id
+    managementService.setJobRetriesByJobDefinitionId(jobDefinition.getId(), 1);
+
+    // the incident still exists
+    HistoricIncident tmp = query.singleResult();
+    assertEquals(incident.getId(), tmp.getId());
+    assertNull(tmp.getEndTime());
+    assertTrue(tmp.isOpen());
+
+    // execute the available job (should fail again)
+    executeAvailableJobs();
+
+    // the incident still exists and there
+    // should be not a new incident
+    assertEquals(1, query.count());
+    tmp = query.singleResult();
+    assertEquals(incident.getId(), tmp.getId());
+    assertNotNull(tmp.getEndTime());
+    assertTrue(tmp.isResolved());
+
+    assertProcessEnded(pi.getId());
   }
 
   protected void startProcessInstance(String key) {

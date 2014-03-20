@@ -378,7 +378,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     // execute the available job (should fail again)
     executeAvailableJobs();
 
-    // the incident still exists and their
+    // the incident still exists and there
     // should be not a new incident
     assertEquals(1, query.count());
     tmp = query.singleResult();

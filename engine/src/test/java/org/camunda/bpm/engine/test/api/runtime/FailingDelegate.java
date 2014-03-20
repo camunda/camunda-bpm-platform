@@ -10,7 +10,12 @@ public class FailingDelegate implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    throw new ProcessEngineException(EXCEPTION_MESSAGE);
+
+    Boolean fail = (Boolean) execution.getVariable("fail");
+
+    if (fail == null || fail == true) {
+      throw new ProcessEngineException(EXCEPTION_MESSAGE);
+    }
 
   }
 

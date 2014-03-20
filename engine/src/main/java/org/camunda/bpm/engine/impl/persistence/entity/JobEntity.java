@@ -135,11 +135,7 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
       execution.removeJob(this);
     }
 
-    // if a job with retries == 0 is deleted,
-    // means that the corresponding incident has to be also removed.
-    if (retries == 0) {
-      removeFailedJobIncident(incidentResolved);
-    }
+    removeFailedJobIncident(incidentResolved);
   }
 
   public Object getPersistentState() {
