@@ -2,9 +2,16 @@
 <div class="ctn-fixed-view">
   <div class="ctn-header">
     <h1>
+      <!--
       <i class="icon-type icon-inbox"
          help
          help-text="Process instance"></i>
+      -->
+      <span class="process-name-prefix">
+        <span>Process</span>
+        <span>instance</span>
+      </span>
+
       {{ processDefinition.name || processDefinition.key }}
 
       <span title="Process instance id, as it appears in the database">

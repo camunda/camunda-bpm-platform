@@ -133,10 +133,41 @@ a.expand-collapse {
 .ctn-header h1 {
   font-size: 20px;
   font-weight: normal;
+  position: relative;
+  padding-left: 70px;
 }
 
 .ctn-header .icon-type {
   margin: 5px 5px 5px 0;
+}
+
+.process-name-prefix {
+  position: absolute;
+  bottom: 7px;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  display: block;
+  text-transform: uppercase;
+  font-size: 10px;
+  width: 65px;
+  line-height: 12px;
+  color: #B6B6B6;
+  span {
+    width: 65px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    clear: both;
+  }
+  // &:after {
+  //   position: absolute;
+  //   right: 0;
+  //   display: block;
+  //   content: ':';
+  //   font-size: 20px;
+  //   color: rgb(207, 207, 207);
+  // }
 }
 
 .ctn-header .nav > li {
