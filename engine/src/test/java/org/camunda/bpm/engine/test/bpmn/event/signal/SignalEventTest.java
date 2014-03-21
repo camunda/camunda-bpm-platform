@@ -304,11 +304,11 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
     // start process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonInterruptingSignalStartEventInEventSubProcess");
 
-    // check if user task exists
+    // check if execution exists
     ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
     assertEquals(1, executionQuery.count());
 
-    // check if execution exists
+    // check if user task exists
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstance.getId());
     assertEquals(1, taskQuery.count());
 
@@ -317,11 +317,11 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
 
     assertEquals(true, DummyServiceTask.wasExecuted);
 
-    // check if user task already exists because signal start event is non interrupting
+    // check if user task still exists because signal start event is non interrupting
     taskQuery = taskService.createTaskQuery().processInstanceId(processInstance.getId());
     assertEquals(1, taskQuery.count());
 
-    // check if execution already exists because signal start event is non interrupting
+    // check if execution still exists because signal start event is non interrupting
     executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
     assertEquals(1, executionQuery.count());
   }
