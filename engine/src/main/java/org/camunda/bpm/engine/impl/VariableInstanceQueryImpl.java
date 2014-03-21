@@ -41,7 +41,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   protected String[] taskIds;
   protected String[] activityInstanceIds;
 
-  protected boolean isByteArrayFetchingEnabled = false;
+  protected boolean isByteArrayFetchingEnabled = true;
 
   public VariableInstanceQueryImpl() { }
 
@@ -85,8 +85,8 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
     return this;
   }
 
-  public VariableInstanceQuery fetchBinaryValues() {
-    this.isByteArrayFetchingEnabled = true;
+  public VariableInstanceQuery disableBinaryFetching() {
+    this.isByteArrayFetchingEnabled = false;
     return this;
   }
 

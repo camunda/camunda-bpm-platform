@@ -53,6 +53,9 @@ public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAw
     ProcessEngine engine = getProcessEngine();
     VariableInstanceQuery query = queryDto.toQuery(engine);
 
+    // disable binary fetching by default.
+    query.disableBinaryFetching();
+
     List<VariableInstance> matchingInstances;
     if (firstResult != null || maxResults != null) {
       matchingInstances = executePaginatedQuery(query, firstResult, maxResults);

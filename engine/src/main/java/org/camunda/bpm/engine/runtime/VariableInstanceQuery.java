@@ -106,12 +106,12 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
   VariableInstanceQuery variableValueLessThanOrEqual(String name, Object value);
 
   /**
-   * Enable fetching of byte array values. By default, the query will not fetch the value of a byte array.
-   * If this method is called, the query will fetch the value of byte arrays.
+   * Disable fetching of byte array values. By default, the query will fetch the value of a byte array.
+   * By calling this method you can prevent the values of (potentially large) blob data chunks to be fetched.
    *
-   * @param value variable value, cannot be null.
+   * @return the query builder
    */
-  VariableInstanceQuery fetchBinaryValues();
+  VariableInstanceQuery disableBinaryFetching();
 
   /**
    * Only select variable instances which value is like the given value.

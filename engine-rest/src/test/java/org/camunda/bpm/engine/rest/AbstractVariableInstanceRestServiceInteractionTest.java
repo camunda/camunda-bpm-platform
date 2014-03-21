@@ -63,6 +63,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     VariableInstance variableInstanceMock = MockProvider.createMockVariableInstance();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
     Response response = given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
@@ -70,7 +71,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     .when().get(VARIABLE_INSTANCE_URL);
 
     verifyResponse(variableInstanceMock, response);
-    verify(variableInstanceQueryMock, never()).fetchBinaryValues();
+    verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
 
   }
 
@@ -84,6 +85,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     when(variableInstanceMock.getValue()).thenReturn(null);
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
     Response response = given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
@@ -91,7 +93,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     .when().get(VARIABLE_INSTANCE_URL);
 
     verifyResponse(variableInstanceMock, response);
-    verify(variableInstanceQueryMock, never()).fetchBinaryValues();
+    verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
 
   }
 
@@ -101,6 +103,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     String nonExistingId = "nonExistingId";
 
     when(variableInstanceQueryMock.variableId(nonExistingId)).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(null);
 
     given().pathParam("id", nonExistingId)
@@ -108,7 +111,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     .body(containsString("Variable instance with Id 'nonExistingId' does not exist."))
     .when().get(VARIABLE_INSTANCE_URL);
 
-    verify(variableInstanceQueryMock, never()).fetchBinaryValues();
+    verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
 
   }
 
@@ -123,7 +126,6 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     when(variableInstanceMock.getValue()).thenReturn(byteContent);
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.fetchBinaryValues()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
     Response response = given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
@@ -134,7 +136,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
 
     byte[] responseBytes = response.getBody().asByteArray();
     Assert.assertEquals(new String(byteContent), new String(responseBytes));
-    verify(variableInstanceQueryMock, times(1)).fetchBinaryValues();
+    verify(variableInstanceQueryMock, never()).disableBinaryFetching();
 
   }
 
@@ -143,7 +145,6 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     VariableInstanceEntity variableInstanceMock = (VariableInstanceEntity) MockProvider.createMockVariableInstance();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.fetchBinaryValues()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
     given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
@@ -152,7 +153,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
       .body(containsString("Variable instance with Id '"+variableInstanceMock.getId()+"' is not a binary variable"))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
-    verify(variableInstanceQueryMock, times(1)).fetchBinaryValues();
+    verify(variableInstanceQueryMock, never()).disableBinaryFetching();
 
   }
 
@@ -162,7 +163,6 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     String nonExistingId = "nonExistingId";
 
     when(variableInstanceQueryMock.variableId(nonExistingId)).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.fetchBinaryValues()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(null);
 
     given().pathParam("id", nonExistingId)
@@ -170,7 +170,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     .body(containsString("Variable instance with Id 'nonExistingId' does not exist."))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
-    verify(variableInstanceQueryMock, times(1)).fetchBinaryValues();
+    verify(variableInstanceQueryMock, never()).disableBinaryFetching();
 
   }
 

@@ -2177,7 +2177,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Test
-  public void testFetchBinaryValues() {
+  public void testDisableBinaryFetching() {
     byte[] binaryContent = "some binary content".getBytes();
 
     // given
@@ -2187,19 +2187,19 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     taskService.saveTask(task);
     taskService.setVariablesLocal(task.getId(), variables);
 
-    // when binary fetching disabled (default)
+    // when binary fetching is enabled (default)
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
-    // then value is not fetched
-    VariableInstance result = query.singleResult();
-    assertNull(result.getValue());
-
-    // when binary fetching enabled
-    query = runtimeService.createVariableInstanceQuery().fetchBinaryValues();
-
     // then value is fetched
-    result = query.singleResult();
+    VariableInstance result = query.singleResult();
     assertNotNull(result.getValue());
+
+    // when binary fetching is disabled
+    query = runtimeService.createVariableInstanceQuery().disableBinaryFetching();
+
+    // then value is not fetched
+    result = query.singleResult();
+    assertNull(result.getValue());
 
     // delete task
     taskService.deleteTask(task.getId(), true);

@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -64,6 +65,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     expect().statusCode(Status.OK.getStatusCode()).when().get(VARIABLE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -74,6 +76,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
       .when().post(VARIABLE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -153,6 +156,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).listPage(firstResult, maxResults);
+    verify(mockedQuery).disableBinaryFetching();
   }
 
   /**
@@ -166,6 +170,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).listPage(0, maxResults);
+    verify(mockedQuery).disableBinaryFetching();
   }
 
   /**
@@ -179,6 +184,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).listPage(firstResult, Integer.MAX_VALUE);
+    verify(mockedQuery).disableBinaryFetching();
   }
 
   @Test
@@ -215,6 +221,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID, returnedExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TASK_ID, returnedTaskId);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID, returnedActivityId);
+
+    verify(mockedQuery).disableBinaryFetching();
   }
 
   @Test
@@ -252,6 +260,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID, returnedExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TASK_ID, returnedTaskId);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID, returnedActivityId);
+
+    verify(mockedQuery).disableBinaryFetching();
   }
 
   @Test
@@ -276,6 +286,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).taskIdIn(queryParameters.get("taskIdIn"));
     verify(mockedQuery).activityInstanceIdIn(queryParameters.get("activityInstanceIdIn"));
     verify(mockedQuery).list();
+
+    verify(mockedQuery).disableBinaryFetching();
   }
 
   @Test
@@ -319,6 +331,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).taskIdIn(aTaskId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId);
     verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
   }
 
   @Test
@@ -366,6 +379,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
     verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
+    verify(mockedQuery, times(7)).disableBinaryFetching();
   }
 
   @Test
@@ -386,6 +400,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).variableValueEquals(variableName1, variableValue1);
     verify(mockedQuery).variableValueNotEquals(variableName2, variableValue2);
+    verify(mockedQuery).disableBinaryFetching();
   }
 
   @Test
@@ -418,6 +433,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
     verify(mockedQuery).variableValueNotEquals(anotherVariableName, anotherVariableValue);
+    verify(mockedQuery).disableBinaryFetching();
   }
 
   @Test
@@ -446,6 +462,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId, anotherTaskId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId, anotherActivityInstanceId);
+    verify(mockedQuery).disableBinaryFetching();
   }
 
   @Test
@@ -492,6 +509,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId, anotherTaskId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId, anotherActivityInstanceId);
+    verify(mockedQuery).disableBinaryFetching();
   }
 
   @Test
