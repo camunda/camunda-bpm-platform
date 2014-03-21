@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.spring;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
@@ -48,10 +47,6 @@ public class ProcessEngineFactoryBean implements FactoryBean<ProcessEngine>, Dis
   public ProcessEngine getObject() throws Exception {
     initializeExpressionManager();
     initializeTransactionExternallyManaged();
-    
-    if (processEngineConfiguration.getBeans()==null) {
-      processEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(applicationContext));
-    }
     
     processEngine = (ProcessEngineImpl) processEngineConfiguration.buildProcessEngine();
 
