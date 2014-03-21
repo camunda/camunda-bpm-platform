@@ -152,7 +152,9 @@ a.expand-collapse {
   font-size: 10px;
   width: 65px;
   line-height: 12px;
-  color: #B6B6B6;
+  color: #999999;
+  text-shadow: 0 1px 0 #fff;
+
   span {
     width: 65px;
     height: 20px;
@@ -160,14 +162,18 @@ a.expand-collapse {
     padding: 0;
     clear: both;
   }
-  // &:after {
-  //   position: absolute;
-  //   right: 0;
-  //   display: block;
-  //   content: ':';
-  //   font-size: 20px;
-  //   color: rgb(207, 207, 207);
-  // }
+
+  &:after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    content: ':';
+    font-size: 20px;
+    line-height: 20px;
+    color: #888;
+    text-shadow: 0 1px 0 #fff;
+  }
 }
 
 .ctn-header .nav > li {
