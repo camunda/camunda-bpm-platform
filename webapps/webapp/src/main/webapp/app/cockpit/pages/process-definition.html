@@ -3,9 +3,15 @@
 
   <div class="ctn-header">
     <h1>
+      <!--
       <i class="icon-type icon-inbox"
          help
          help-text="Process definition"></i>
+      -->
+      <span class="process-name-prefix">
+        <span>Process</span>
+        <span>definition</span>
+      </span>
       {{ processDefinition.name || processDefinition.key }}
 
       <span class="badge badge-warning badge-suspended"
