@@ -185,6 +185,18 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       assertTextPresent("process", e.getMessage());
     }
   }
+
+  public void testInvalidSequenceFlowInAndOutEventSubProcess() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSequenceFlowInAndOutEventSubProcess");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process has incoming and outgoing sequence flows");
+    }
+    catch (ProcessEngineException e) {
+      assertTextPresent("Invalid incoming sequence flow of event subprocess", e.getMessage());
+      assertTextPresent("Invalid outgoing sequence flow of event subprocess", e.getMessage());
+    }
+  }
   
   public void testParseWithBpmnNamespacePrefix() {
       repositoryService.createDeployment()

@@ -2501,6 +2501,7 @@ public class BpmnParse extends Parse {
 
     activity.setScope(true);
     activity.setActivityBehavior(new TransactionActivityBehavior());
+    activity.setProperty(PROPERTYNAME_TRIGGERED_BY_EVENT, false);
     parseScope(transactionElement, activity);
 
     for (BpmnParseListener parseListener : parseListeners) {
@@ -2758,6 +2759,10 @@ public class BpmnParse extends Parse {
               && (destinationActivity.getParentActivity() != null)
               && (destinationActivity.getParentActivity().getActivityBehavior() instanceof EventBasedGatewayActivityBehavior)) {
         addError("Invalid incoming sequenceflow for intermediateCatchEvent with id '"+destinationActivity.getId()+"' connected to an event-based gateway.", sequenceFlowElement);
+      } else if (sourceActivity.getActivityBehavior() instanceof SubProcessActivityBehavior && (Boolean) sourceActivity.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT)) {
+        addError("Invalid outgoing sequence flow of event subprocess", sequenceFlowElement);
+      } else if (destinationActivity.getActivityBehavior() instanceof SubProcessActivityBehavior && (Boolean) destinationActivity.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT)) {
+        addError("Invalid incoming sequence flow of event subprocess", sequenceFlowElement);
       } else {
         TransitionImpl transition = sourceActivity.createOutgoingTransition(id);
         sequenceFlows.put(id, transition);
