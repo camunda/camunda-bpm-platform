@@ -48,6 +48,7 @@ public class HistoricVariableInstanceRestServiceImpl implements HistoricVariable
   @Override
   public List<HistoricVariableInstanceDto> queryHistoricVariableInstances(HistoricVariableInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     HistoricVariableInstanceQuery query = queryDto.toQuery(processEngine);
+    query.disableBinaryFetching();
 
     List<HistoricVariableInstance> matchingHistoricVariableInstances;
     if (firstResult != null || maxResults != null) {

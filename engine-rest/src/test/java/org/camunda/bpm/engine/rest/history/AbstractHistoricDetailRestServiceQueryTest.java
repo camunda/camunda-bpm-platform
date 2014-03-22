@@ -87,6 +87,7 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
       .get(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
     verifyNoMoreInteractions(mockedQuery);
   }
 
