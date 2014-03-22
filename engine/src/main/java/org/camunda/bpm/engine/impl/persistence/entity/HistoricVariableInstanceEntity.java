@@ -54,6 +54,8 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   protected Object cachedValue;
 
+  protected String errorMessage;
+
 
   public HistoricVariableInstanceEntity() {
   }
@@ -106,8 +108,17 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   }
 
   public Object getValue() {
-    if (!variableType.isCachable() || cachedValue == null) {
-      cachedValue = variableType.getValue(this);
+    if (errorMessage == null && (!variableType.isCachable() || cachedValue==null)) {
+      try {
+        cachedValue = variableType.getValue(this);
+
+      } catch(RuntimeException e) {
+        // catch error message
+        errorMessage = e.getMessage();
+
+        //re-throw the exception
+        throw e;
+      }
     }
     return cachedValue;
   }
@@ -133,10 +144,13 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   public ByteArrayEntity getByteArrayValue() {
     if ((byteArrayValue == null) && (byteArrayId != null)) {
-      byteArrayValue = Context
-        .getCommandContext()
-        .getDbSqlSession()
-        .selectById(ByteArrayEntity.class, byteArrayId);
+      // no lazy fetching outside of command context
+      if(Context.getCommandContext() != null) {
+        byteArrayValue = Context
+          .getCommandContext()
+          .getDbSqlSession()
+          .selectById(ByteArrayEntity.class, byteArrayId);
+      }
     }
     return byteArrayValue;
   }
@@ -288,6 +302,10 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   public void setActivtyInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
+  }
+
+  public String getErrorMessage() {
+    return errorMessage;
   }
 
   @Override

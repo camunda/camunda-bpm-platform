@@ -23,6 +23,11 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface HistoricVariableInstanceQuery extends Query<HistoricVariableInstanceQuery, HistoricVariableInstance> {
 
+  /** Only select the variable with the given Id
+   * @param the id of the variable to select
+   * @return the query object */
+  HistoricVariableInstanceQuery variableId(String id);
+
   /** Only select historic process variables with the given process instance. */
   HistoricVariableInstanceQuery processInstanceId(String processInstanceId);
 
@@ -49,5 +54,13 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
 
   /** Only select historic variable instances which have one of the activity instance ids. **/
   HistoricVariableInstanceQuery activityInstanceIdIn(String... activityInstanceIds);
+
+  /**
+   * Disable fetching of byte array values. By default, the query will fetch the value of a byte array.
+   * By calling this method you can prevent the values of (potentially large) blob data chunks to be fetched.
+   *
+   * @return the query builder
+   */
+  HistoricVariableInstanceQuery disableBinaryFetching();
 
 }

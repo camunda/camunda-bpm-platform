@@ -14,6 +14,8 @@
 package org.camunda.bpm.engine.impl;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
@@ -21,6 +23,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.variable.ByteArrayType;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
 
 /**
@@ -29,7 +32,10 @@ import org.camunda.bpm.engine.impl.variable.VariableTypes;
 public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVariableInstanceQuery, HistoricVariableInstance> implements
         HistoricVariableInstanceQuery {
 
+  private final static Logger LOGGER = Logger.getLogger(HistoricVariableInstanceQueryImpl.class.getName());
+
   private static final long serialVersionUID = 1L;
+  protected String variableId;
   protected String processInstanceId;
   protected String variableName;
   protected String variableNameLike;
@@ -37,6 +43,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   protected String[] taskIds;
   protected String[] executionIds;
   protected String[] activityInstanceIds;
+
+  protected boolean isByteArrayFetchingEnabled = true;
 
   public HistoricVariableInstanceQueryImpl() {
   }
@@ -47,6 +55,12 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public HistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+  }
+
+  public HistoricVariableInstanceQuery variableId(String id) {
+    assertParamNotNull("variableId", id);
+    this.variableId = id;
+    return this;
   }
 
   public HistoricVariableInstanceQueryImpl processInstanceId(String processInstanceId) {
@@ -100,6 +114,11 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     }
   }
 
+  public HistoricVariableInstanceQuery disableBinaryFetching() {
+    isByteArrayFetchingEnabled = false;
+    return this;
+  }
+
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -112,11 +131,25 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     List<HistoricVariableInstance> historicVariableInstances = commandContext
             .getHistoricVariableInstanceManager()
             .findHistoricVariableInstancesByQueryCriteria(this, page);
+
     if (historicVariableInstances!=null) {
       for (HistoricVariableInstance historicVariableInstance: historicVariableInstances) {
-        if (historicVariableInstance instanceof HistoricVariableInstanceEntity) {
-          ((HistoricVariableInstanceEntity)historicVariableInstance).getByteArrayValue();
+
+        HistoricVariableInstanceEntity variableInstanceEntity = (HistoricVariableInstanceEntity) historicVariableInstance;
+
+        // do not fetch values for byte arrays eagerly (unless requested by the user)
+        if (isByteArrayFetchingEnabled
+            || !ByteArrayType.TYPE_NAME.equals(variableInstanceEntity.getVariableType().getTypeName())) {
+
+          try {
+            variableInstanceEntity.getValue();
+          } catch(Exception t) {
+            // do not fail if one of the variables fails to load
+            LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
+          }
+
         }
+
       }
     }
     return historicVariableInstances;

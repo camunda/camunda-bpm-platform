@@ -10,12 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.history;
-
-
-
-
 
 /**
  * A single process variable containing the last value when its process instance has finished.
@@ -26,17 +21,41 @@ package org.camunda.bpm.engine.history;
  */
 public interface HistoricVariableInstance {
 
-  /** The unique DB id */
+  /**
+   * @return the Id of this variable instance
+   */
   String getId();
 
+  /**
+   * Returns the name of <code>this</code> variable instance.
+   */
   String getVariableName();
+
+  /**
+   * Returns the name of the type of <code>this</code> variable instance
+   *
+   */
   String getVariableTypeName();
+
+  /**
+   * Returns the value of <code>this</code> variable instance.
+   */
   Object getValue();
 
-  /** The process instance reference. */
+  /**
+   * The process instance reference.
+   */
   String getProcessInstanceId();
 
-  /** Returns the corresponding activity instance id. */
+  /**
+   * Returns the corresponding activity instance id.
+   */
   String getActivtyInstanceId();
+
+  /**
+   * If the variable value could not be loaded, this returns the error message.
+   * @return an error message indicating why the variable value could not be loaded.
+   */
+  String getErrorMessage();
 
 }

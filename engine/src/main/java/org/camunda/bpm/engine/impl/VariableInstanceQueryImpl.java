@@ -130,20 +130,17 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
     // iterate over the result array to initialize the value of the value
     for (VariableInstance variableInstance : result) {
-      if (variableInstance instanceof VariableInstanceEntity) {
         VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
 
-        // do not fetch values for byte arrays eagerly (unless requested by the user)
-        if (isByteArrayFetchingEnabled
-            || !ByteArrayType.TYPE_NAME.equals(variableInstanceEntity.getType().getTypeName())) {
+      // do not fetch values for byte arrays eagerly (unless requested by the user)
+      if (isByteArrayFetchingEnabled
+          || !ByteArrayType.TYPE_NAME.equals(variableInstanceEntity.getType().getTypeName())) {
 
-          try {
-            variableInstanceEntity.getValue();
-          } catch(Exception t) {
-            // do not fail if one of the variables fails to load
-            LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
-          }
-
+        try {
+          variableInstanceEntity.getValue();
+        } catch(Exception t) {
+          // do not fail if one of the variables fails to load
+          LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
         }
 
       }

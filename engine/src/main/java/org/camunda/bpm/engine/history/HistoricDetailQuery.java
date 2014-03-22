@@ -24,6 +24,14 @@ import org.camunda.bpm.engine.runtime.Execution;
  */
 public interface HistoricDetailQuery extends Query<HistoricDetailQuery, HistoricDetail> {
 
+  /**
+   * Only select the historic detail with the given id.
+   *
+   * @param id the historic detail to select
+   * @return the query builder
+   */
+  HistoricDetailQuery detailId(String id);
+
   /** Only select historic variable updates with the given process instance.
    * {@link ProcessInstance) ids and {@link HistoricProcessInstance} ids match. */
   HistoricDetailQuery processInstanceId(String processInstanceId);
@@ -55,6 +63,14 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
 
   /** Only select {@link HistoricVariableUpdate}s. */
   HistoricDetailQuery variableUpdates();
+
+  /**
+   * Disable fetching of byte array values. By default, the query will fetch the value of a byte array.
+   * By calling this method you can prevent the values of (potentially large) blob data chunks to be fetched.
+   *
+   * @return the query builder
+   */
+  HistoricDetailQuery disableBinaryFetching();
 
   /** Exclude all task-related {@link HistoricDetail}s, so only items which have no
    * task-id set will be selected. When used together with {@link #taskId(String)}, this

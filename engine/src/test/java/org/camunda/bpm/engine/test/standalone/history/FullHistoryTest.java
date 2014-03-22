@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.DummySerializable;
+import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
 import org.junit.Assert;
 
@@ -1258,5 +1259,99 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
 
     HistoricDetail historicDetail = historyService.createHistoricDetailQuery().singleResult();
     assertNotNull(historicDetail.getActivityInstanceId());
+  }
+
+  public void testHistoricDetailQueryById() {
+
+    Task newTask = taskService.newTask();
+    taskService.saveTask(newTask);
+
+    String variableName = "someName";
+    String variableValue = "someValue";
+    taskService.setVariable(newTask.getId(), variableName, variableValue);
+
+    HistoricDetail result = historyService.createHistoricDetailQuery()
+      .singleResult();
+
+    HistoricDetail resultById = historyService.createHistoricDetailQuery().detailId(result.getId()).singleResult();
+    assertNotNull(resultById);
+    assertEquals(result.getId(), resultById.getId());
+    assertEquals(variableName, ((HistoricVariableUpdate)resultById).getVariableName());
+    assertEquals(variableValue, ((HistoricVariableUpdate)resultById).getValue());
+
+    taskService.deleteTask(newTask.getId(), true);
+  }
+
+  public void testHistoricDetailQueryByNonExistingId() {
+
+    Task newTask = taskService.newTask();
+    taskService.saveTask(newTask);
+
+    String variableName = "someName";
+    String variableValue = "someValue";
+    taskService.setVariable(newTask.getId(), variableName, variableValue);
+
+    HistoricDetail result = historyService.createHistoricDetailQuery().detailId("non-existing").singleResult();
+    assertNull(result);
+
+    taskService.deleteTask(newTask.getId(), true);
+  }
+
+
+  public void testbinaryFetchingEnabled() {
+
+    // by default, binary fetching is enabled
+
+    Task newTask = taskService.newTask();
+    taskService.saveTask(newTask);
+
+    String variableName = "binaryVariableName";
+    taskService.setVariable(newTask.getId(), variableName, "some bytes".getBytes());
+
+    HistoricDetail result = historyService.createHistoricDetailQuery()
+      .variableUpdates()
+      .singleResult();
+
+    assertNotNull(((HistoricVariableUpdate)result).getValue());
+
+    taskService.deleteTask(newTask.getId(), true);
+  }
+
+  public void testbinaryFetchingDisabled() {
+
+    Task newTask = taskService.newTask();
+    taskService.saveTask(newTask);
+
+    String variableName = "binaryVariableName";
+    taskService.setVariable(newTask.getId(), variableName, "some bytes".getBytes());
+
+    HistoricDetail result = historyService.createHistoricDetailQuery()
+      .disableBinaryFetching()
+      .variableUpdates()
+      .singleResult();
+
+    assertNull(((HistoricVariableUpdate)result).getValue());
+
+    taskService.deleteTask(newTask.getId(), true);
+  }
+
+  public void testErrorMessage() {
+
+    Task newTask = taskService.newTask();
+    taskService.saveTask(newTask);
+
+    String variableName = "failingSerializable";
+    taskService.setVariable(newTask.getId(), variableName, new FailingSerializable());
+
+    HistoricDetail result = historyService.createHistoricDetailQuery()
+        .disableBinaryFetching()
+        .variableUpdates()
+        .singleResult();
+
+    assertNull(((HistoricVariableUpdate)result).getValue());
+    assertNotNull(((HistoricVariableUpdate)result).getErrorMessage());
+
+    taskService.deleteTask(newTask.getId(), true);
+
   }
 }

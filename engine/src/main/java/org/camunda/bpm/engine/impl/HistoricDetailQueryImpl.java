@@ -14,12 +14,15 @@
 package org.camunda.bpm.engine.impl;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.camunda.bpm.engine.impl.variable.ByteArrayType;
 
 
 /**
@@ -27,7 +30,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInst
  */
 public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, HistoricDetail> implements HistoricDetailQuery {
 
+  private final static Logger LOGGER = Logger.getLogger(HistoricDetailQueryImpl.class.getName());
+
   private static final long serialVersionUID = 1L;
+  protected String detailId;
   protected String taskId;
   protected String processInstanceId;
   protected String executionId;
@@ -35,7 +41,9 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String activityInstanceId;
   protected String type;
   protected String variableInstanceId;
+
   protected boolean excludeTaskRelated = false;
+  protected boolean isByteArrayFetchingEnabled = true;
 
   public HistoricDetailQueryImpl() {
   }
@@ -46,6 +54,12 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public HistoricDetailQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+  }
+
+  public HistoricDetailQuery detailId(String id) {
+    assertParamNotNull("detailId", id);
+    this.detailId = id;
+    return this;
   }
 
   public HistoricDetailQuery variableInstanceId(String variableInstanceId) {
@@ -106,6 +120,11 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
       .findHistoricDetailCountByQueryCriteria(this);
   }
 
+  public HistoricDetailQuery disableBinaryFetching() {
+    this.isByteArrayFetchingEnabled = false;
+    return this;
+  }
+
   public List<HistoricDetail> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     List<HistoricDetail> historicDetails = commandContext
@@ -114,7 +133,20 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     if (historicDetails!=null) {
       for (HistoricDetail historicDetail: historicDetails) {
         if (historicDetail instanceof HistoricDetailVariableInstanceUpdateEntity) {
-          ((HistoricDetailVariableInstanceUpdateEntity)historicDetail).getByteArrayValue();
+          HistoricDetailVariableInstanceUpdateEntity entity = (HistoricDetailVariableInstanceUpdateEntity) historicDetail;
+          // do not fetch values for byte arrays eagerly (unless requested by the user)
+          if (isByteArrayFetchingEnabled
+              || !ByteArrayType.TYPE_NAME.equals(entity.getVariableType().getTypeName())) {
+
+            try {
+              entity.getValue();
+            } catch(Exception t) {
+              // do not fail if one of the variables fails to load
+              LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
+            }
+
+          }
+
         }
       }
     }
@@ -173,5 +205,9 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public boolean getExcludeTaskRelated() {
     return excludeTaskRelated;
+  }
+
+  public String getDetailId() {
+    return detailId;
   }
 }
