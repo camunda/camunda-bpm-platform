@@ -897,12 +897,14 @@ public abstract class MockProvider {
   public static HistoricVariableInstance createMockHistoricVariableInstance() {
     HistoricVariableInstanceEntity mock = mock(HistoricVariableInstanceEntity.class);
 
+    when(mock.getId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_ID);
     when(mock.getVariableName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_NAME);
     when(mock.getVariableTypeName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_TYPE);
     when(mock.getVariableType()).thenReturn(new StringType());
     when(mock.getValue()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_VALUE);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID);
     when(mock.getActivtyInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID);
+    when(mock.getErrorMessage()).thenReturn(null);
 
     return mock;
   }

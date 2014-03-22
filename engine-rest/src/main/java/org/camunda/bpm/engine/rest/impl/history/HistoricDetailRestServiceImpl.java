@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDetailDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDetailQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricDetailRestService;
+import org.camunda.bpm.engine.rest.sub.history.HistoricDetailResource;
+import org.camunda.bpm.engine.rest.sub.history.impl.HistoricDetailResourceImpl;
 
 /**
  * @author Roman Smirnov
@@ -35,6 +37,10 @@ public class HistoricDetailRestServiceImpl implements HistoricDetailRestService 
 
   public HistoricDetailRestServiceImpl(ProcessEngine processEngine) {
     this.processEngine = processEngine;
+  }
+
+  public HistoricDetailResource historicDetail(String detailId) {
+    return new HistoricDetailResourceImpl(detailId, processEngine);
   }
 
   @Override

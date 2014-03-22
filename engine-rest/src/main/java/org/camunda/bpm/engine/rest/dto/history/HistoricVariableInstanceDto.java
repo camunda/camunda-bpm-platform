@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.variable.SerializableType;
+import org.camunda.bpm.engine.rest.dto.runtime.SerializedObjectDto;
 
 public class HistoricVariableInstanceDto {
 
@@ -24,6 +25,7 @@ public class HistoricVariableInstanceDto {
   private Object value;
   private String processInstanceId;
   private String activityInstanceId;
+  private String errorMessage;
 
   public String getId() {
     return id;
@@ -49,6 +51,10 @@ public class HistoricVariableInstanceDto {
     return activityInstanceId;
   }
 
+  public String getErrorMessage() {
+    return errorMessage;
+  }
+
   public static HistoricVariableInstanceDto fromHistoricVariableInstance(HistoricVariableInstance historicVariableInstance) {
 
     HistoricVariableInstanceEntity entity = (HistoricVariableInstanceEntity) historicVariableInstance;
@@ -59,14 +65,15 @@ public class HistoricVariableInstanceDto {
     dto.name = entity.getVariableName();
     dto.processInstanceId = entity.getProcessInstanceId();
     dto.activityInstanceId = entity.getActivtyInstanceId();
-
-    if (!entity.getVariableTypeName().equals(SerializableType.TYPE_NAME)) {
-      dto.value = entity.getValue();
-      dto.type = entity.getVariableType().getTypeNameForValue(dto.value);
+    if(SerializableType.TYPE_NAME.equals(entity.getVariableType().getTypeName())) {
+      if(entity.getValue() != null) {
+        dto.value = new SerializedObjectDto(entity.getValue());
+      }
     } else {
-      dto.value = "Cannot deserialize object.";
-      dto.type = entity.getVariableType().getTypeNameForValue(null);
+      dto.value = entity.getValue();
     }
+    dto.type = entity.getVariableType().getTypeNameForValue(entity.getValue());
+    dto.errorMessage = entity.getErrorMessage();
 
     return dto;
   }

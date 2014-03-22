@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.variable.SerializableType;
+import org.camunda.bpm.engine.rest.dto.runtime.SerializedObjectDto;
 
 /**
  * @author Roman Smirnov
@@ -26,6 +27,7 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
   protected String variableTypeName;
   protected Object value;
   protected int revision;
+  protected String errorMessage;
 
   public String getVariableName() {
     return variableName;
@@ -43,6 +45,10 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
     return revision;
   }
 
+  public String getErrorMessage() {
+    return errorMessage;
+  }
+
   public static HistoricVariableUpdateDto fromHistoricVariableUpdate(HistoricVariableUpdate historicVariableUpdate) {
 
     HistoricDetailVariableInstanceUpdateEntity entity = (HistoricDetailVariableInstanceUpdateEntity) historicVariableUpdate;
@@ -52,14 +58,15 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
     dto.revision = entity.getRevision();
     dto.variableName = entity.getVariableName();
     dto.variableTypeName = entity.getVariableTypeName();
-
-    if (!entity.getVariableTypeName().equals(SerializableType.TYPE_NAME)) {
-      dto.value = entity.getValue();
-      dto.variableTypeName = entity.getVariableType().getTypeNameForValue(dto.value);
+    if(SerializableType.TYPE_NAME.equals(entity.getVariableType().getTypeName())) {
+      if(entity.getValue() != null) {
+        dto.value = new SerializedObjectDto(entity.getValue());
+      }
     } else {
-      dto.value = "Cannot deserialize object.";
-      dto.variableTypeName = entity.getVariableType().getTypeNameForValue(null);
+      dto.value = entity.getValue();
     }
+    dto.variableTypeName = entity.getVariableType().getTypeNameForValue(entity.getValue());
+    dto.errorMessage = entity.getErrorMessage();
 
     return dto;
   }
