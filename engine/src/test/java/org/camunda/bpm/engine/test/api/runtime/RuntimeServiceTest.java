@@ -309,6 +309,38 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
        
   }
   
+  @Deployment(resources={
+    "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testSignalWithProcessVariables.bpmn20.xml"})
+  public void testSignalWithSignalNameAndData() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignalWithProcessVariables");
+    Map<String, Object> processVariables = new HashMap<String, Object>();
+    processVariables.put("variable", "value");
+
+    // signal the execution while passing in the variables
+    runtimeService.signal(processInstance.getId(), "dummySignalName", new String("SignalData"), processVariables);
+
+    Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(variables, processVariables);
+
+  }
+  
+  @Deployment(resources={
+    "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testSignalWithProcessVariables.bpmn20.xml"})
+  public void testSignalWithoutSignalNameAndData() {
+  
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignalWithProcessVariables");
+    Map<String, Object> processVariables = new HashMap<String, Object>();
+    processVariables.put("variable", "value");
+  
+    // signal the execution while passing in the variables
+    runtimeService.signal(processInstance.getId(), null, null, processVariables);
+  
+    Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(variables, processVariables);
+  
+  }
+  
   @Deployment
   public void testSignalInactiveExecution() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("testSignalInactiveExecution");

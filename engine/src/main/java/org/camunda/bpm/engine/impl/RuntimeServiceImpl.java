@@ -198,6 +198,10 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public void signal(String executionId) {
     commandExecutor.execute(new SignalCmd(executionId, null, null, null));
   }
+  
+  public void signal(String executionId, String signalName, Object signalData, Map<String, Object> processVariables) {
+    commandExecutor.execute(new SignalCmd(executionId, signalName, signalData, processVariables));
+  }
 
   public void signal(String executionId, Map<String, Object> processVariables) {
     commandExecutor.execute(new SignalCmd(executionId, null, null, processVariables));
