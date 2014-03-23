@@ -26,6 +26,7 @@ public class ActivityInstanceDto {
   protected String id;
   protected String parentActivityInstanceId;
   protected String activityId;
+  protected String activityType;
   protected String processInstanceId;
   protected String processDefinitionId;
   protected ActivityInstanceDto[] childActivityInstances;
@@ -47,6 +48,11 @@ public class ActivityInstanceDto {
   /** the id of the activity */
   public String getActivityId() {
     return activityId;
+  }
+  
+  /** type of the activity, corresponds to BPMN element name in XML (e.g. 'userTask') */
+  public String getActivityType() {
+    return activityType;
   }
   
   /** the process instance id */
@@ -84,6 +90,7 @@ public class ActivityInstanceDto {
     result.id = instance.getId();
     result.parentActivityInstanceId = instance.getParentActivityInstanceId();
     result.activityId = instance.getActivityId();
+    result.activityType = instance.getActivityType();
     result.processInstanceId = instance.getProcessInstanceId();
     result.processDefinitionId = instance.getProcessDefinitionId();
     result.childActivityInstances = fromListOfActivityInstance(instance.getChildActivityInstances());

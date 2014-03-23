@@ -30,6 +30,9 @@ public interface ActivityInstance extends ProcessElementInstance {
   /** the name of the activity */
   String getActivityName();
   
+  /** type of the activity, corresponds to BPMN element name in XML (e.g. 'userTask') */
+  public String getActivityType();
+  
   /** Returns the child activity instances.
    * Returns an empty list if there are no child instances */
   ActivityInstance[] getChildActivityInstances();
