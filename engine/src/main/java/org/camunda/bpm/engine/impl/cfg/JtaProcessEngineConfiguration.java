@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,16 +38,16 @@ import org.camunda.bpm.engine.impl.interceptor.TxContextCommandContextFactory;
 public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
 
   protected TransactionManager transactionManager;
-  
+
   protected String transactionManagerJndiName;
-  
+
   /** {@link CommandContextFactory} to be used for DbSchemaOperations */
   protected CommandContextFactory dbSchemaOperationsCommandContextFactory;
-  
+
   public JtaProcessEngineConfiguration() {
     transactionsExternallyManaged = true;
   }
-  
+
   protected void init() {
     initTransactionManager();
     initDbSchemaOperationsCommandContextFactory();
@@ -68,7 +68,7 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     List<CommandInterceptor> defaultCommandInterceptorsTxRequiresNew = new ArrayList<CommandInterceptor>();
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequiresNew.add(new JtaTransactionInterceptor(transactionManager, true));
-    defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, this));
+    defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, this, true));
     return defaultCommandInterceptorsTxRequiresNew;
   }
 
@@ -94,31 +94,31 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
       dbSchemaOperationsCommandContextFactory = cmdContextFactory;
     }
   }
-    
+
   protected void initTransactionManager() {
     if(transactionManager == null){
-      
+
       if(transactionManagerJndiName == null || transactionManagerJndiName.length() == 0) {
         throw new ProcessEngineException("Property 'transactionManager' is null and 'transactionManagerJndiName' is not set. \n " +
         		"Please set either the 'transactionManager' property or the 'transactionManagerJndiName' property.");
       }
-      
+
       try {
-        transactionManager = (TransactionManager) new InitialContext().lookup(transactionManagerJndiName);        
-        
+        transactionManager = (TransactionManager) new InitialContext().lookup(transactionManagerJndiName);
+
       } catch(NamingException e) {
-        throw new ProcessEngineException("Cannot lookup Jta TransactionManager in JNDI using name '"+transactionManagerJndiName+"'.", e);        
+        throw new ProcessEngineException("Cannot lookup Jta TransactionManager in JNDI using name '"+transactionManagerJndiName+"'.", e);
       }
-    }    
+    }
   }
-  
+
   @Override
   protected void initTransactionContextFactory() {
     if(transactionContextFactory == null) {
       transactionContextFactory = new JtaTransactionContextFactory(transactionManager);
     }
   }
-  
+
   public TransactionManager getTransactionManager() {
     return transactionManager;
   }
@@ -126,19 +126,19 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
   public void setTransactionManager(TransactionManager transactionManager) {
     this.transactionManager = transactionManager;
   }
-  
+
   public String getTransactionManagerJndiName() {
     return transactionManagerJndiName;
   }
-  
+
   public void setTransactionManagerJndiName(String transactionManagerJndiName) {
     this.transactionManagerJndiName = transactionManagerJndiName;
   }
-  
+
   public CommandContextFactory getDbSchemaOperationsCommandContextFactory() {
     return dbSchemaOperationsCommandContextFactory;
   }
-  
+
   public void setDbSchemaOperationsCommandContextFactory(CommandContextFactory dbSchemaOperationsCommandContextFactory) {
     this.dbSchemaOperationsCommandContextFactory = dbSchemaOperationsCommandContextFactory;
   }

@@ -26,7 +26,7 @@ import org.camunda.bpm.model.bpmn.instance.UserTask;
  * @author Daniel Meyer
  * @author Sebastian Menski
  */
-public interface DelegateTask extends VariableScope, BpmnModelExecutionContext {
+public interface DelegateTask extends VariableScope, BpmnModelExecutionContext, ProcessEngineServicesAware {
 
   /** DB id of the task. */
   String getId();

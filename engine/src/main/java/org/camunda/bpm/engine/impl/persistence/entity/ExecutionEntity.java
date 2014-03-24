@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
@@ -1894,6 +1895,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       return null;
 
     }
+  }
+
+  public ProcessEngineServices getProcessEngineServices() {
+    return Context.getProcessEngineConfiguration()
+          .getProcessEngine();
   }
 
 }

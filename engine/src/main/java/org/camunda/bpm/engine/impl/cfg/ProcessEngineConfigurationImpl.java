@@ -369,11 +369,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected boolean isExecutionTreePrefetchEnabled = true;
 
+  /**
+   * The process engine created by this configuration.
+   */
+  protected ProcessEngineImpl processEngine;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   public ProcessEngine buildProcessEngine() {
     init();
-    ProcessEngineImpl processEngine = new ProcessEngineImpl(this);
+    processEngine = new ProcessEngineImpl(this);
     invokePostProcessEngineBuild(processEngine);
     return processEngine;
   }
@@ -2098,5 +2103,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setExecutionTreePrefetchEnabled(boolean isExecutionTreePrefetchingEnabled) {
     this.isExecutionTreePrefetchEnabled = isExecutionTreePrefetchingEnabled;
+  }
+
+  public ProcessEngineImpl getProcessEngine() {
+    return processEngine;
   }
 }

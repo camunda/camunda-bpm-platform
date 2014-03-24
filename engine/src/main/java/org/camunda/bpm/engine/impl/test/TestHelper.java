@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,7 +44,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Tom Baeyens
  */
 public abstract class TestHelper {
-  
+
   private static Logger log = Logger.getLogger(TestHelper.class.getName());
 
   public static final String EMPTY_LINE = "                                                                                           ";
@@ -54,22 +54,22 @@ public abstract class TestHelper {
   );
 
   static Map<String, ProcessEngine> processEngines = new HashMap<String, ProcessEngine>();
-  
+
   /**
    * use {@link ProcessEngineAssert} instead.
    */
-  @Deprecated  
+  @Deprecated
   public static void assertProcessEnded(ProcessEngine processEngine, String processInstanceId) {
     ProcessEngineAssert.assertProcessEnded(processEngine, processInstanceId);
   }
-  
+
   public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName) {
     String deploymentId = null;
     Method method = null;
     try {
       method = testClass.getDeclaredMethod(methodName, (Class<?>[])null);
     } catch (Exception e) {
-      throw new ProcessEngineException("can't get method by reflection", e);
+      return null;
     }
     Deployment deploymentAnnotation = method.getAnnotation(Deployment.class);
     if (deploymentAnnotation != null) {
@@ -80,25 +80,25 @@ public abstract class TestHelper {
         String resource = getBpmnProcessDefinitionResource(testClass, name);
         resources = new String[]{resource};
       }
-      
+
       DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService()
         .createDeployment()
         .name(ClassNameUtil.getClassNameWithoutPackage(testClass)+"."+methodName);
-      
+
       for (String resource: resources) {
         deploymentBuilder.addClasspathResource(resource);
       }
-      
+
       deploymentId = deploymentBuilder.deploy().getId();
     }
-    
+
     return deploymentId;
   }
-  
+
   public static void annotationDeploymentTearDown(ProcessEngine processEngine, String deploymentId, Class<?> testClass, String methodName) {
     log.fine("annotation @Deployment deletes deployment for "+ClassNameUtil.getClassNameWithoutPackage(testClass)+"."+methodName);
     if(deploymentId != null) {
-      processEngine.getRepositoryService().deleteDeployment(deploymentId, true);      
+      processEngine.getRepositoryService().deleteDeployment(deploymentId, true);
     }
   }
 
@@ -106,7 +106,7 @@ public abstract class TestHelper {
    * get a resource location by convention based on a class (type) and a
    * relative resource name. The return value will be the full classpath
    * location of the type, plus a suffix built from the name parameter:
-   * <code>BpmnDeployer.BPMN_RESOURCE_SUFFIXES</code>. 
+   * <code>BpmnDeployer.BPMN_RESOURCE_SUFFIXES</code>.
    * The first resource matching a suffix will be returned.
    */
   public static String getBpmnProcessDefinitionResource(Class< ? > type, String name) {
@@ -123,7 +123,7 @@ public abstract class TestHelper {
   }
 
   /** Each test is assumed to clean up all DB content it entered.
-   * After a test method executed, this method scans all tables to see if the DB is completely clean. 
+   * After a test method executed, this method scans all tables to see if the DB is completely clean.
    * It throws AssertionFailed in case the DB is not clean.
    * If the DB is not clean, it is cleaned by performing a create a drop. */
   public static void assertAndEnsureCleanDb(ProcessEngine processEngine) {
@@ -155,11 +155,11 @@ public abstract class TestHelper {
             return null;
           }
         });
-      
+
       throw new AssertionError(outputMessage.toString());
     }
   }
-  
+
   public static void waitForJobExecutorToProcessAllJobs(ProcessEngineConfigurationImpl processEngineConfiguration, long maxMillisToWait, long intervalMillis) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
@@ -230,7 +230,7 @@ public abstract class TestHelper {
     }
     processEngines.clear();
   }
-  
+
   public static void createSchema(ProcessEngineConfigurationImpl processEngineConfiguration) {
     processEngineConfiguration.getCommandExecutorTxRequired()
         .execute(new Command<Object>() {
@@ -243,7 +243,7 @@ public abstract class TestHelper {
           }
         });
   }
-  
+
   public static void dropSchema(ProcessEngineConfigurationImpl processEngineConfiguration) {
     processEngineConfiguration.getCommandExecutorTxRequired()
         .execute(new Command<Object>() {
@@ -253,7 +253,7 @@ public abstract class TestHelper {
          }
         });
   }
-  
+
   public static void createOrUpdateHistoryLevel(final ProcessEngineConfigurationImpl processEngineConfiguration) {
     processEngineConfiguration.getCommandExecutorTxRequired()
       .execute(new Command<Object>() {
@@ -272,7 +272,7 @@ public abstract class TestHelper {
        }
       });
   }
-  
+
   public static void deleteHistoryLevel(ProcessEngineConfigurationImpl processEngineConfiguration) {
     processEngineConfiguration.getCommandExecutorTxRequired()
       .execute(new Command<Object>() {

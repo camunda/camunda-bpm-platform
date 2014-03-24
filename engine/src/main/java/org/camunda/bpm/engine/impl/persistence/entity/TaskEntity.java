@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
@@ -808,6 +809,11 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
       commandContext.getOperationLogManager().logTaskOperations(operation, this, values);
     }
     propertyChanges.clear();
+  }
+
+  public ProcessEngineServices getProcessEngineServices() {
+    return Context.getProcessEngineConfiguration()
+          .getProcessEngine();
   }
 
 }
