@@ -1298,7 +1298,7 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
   }
 
 
-  public void testbinaryFetchingEnabled() {
+  public void testBinaryFetchingEnabled() {
 
     // by default, binary fetching is enabled
 
@@ -1317,7 +1317,7 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     taskService.deleteTask(newTask.getId(), true);
   }
 
-  public void testbinaryFetchingDisabled() {
+  public void testBinaryFetchingDisabled() {
 
     Task newTask = taskService.newTask();
     taskService.saveTask(newTask);

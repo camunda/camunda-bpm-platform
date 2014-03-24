@@ -442,7 +442,7 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
     } catch (ProcessEngineException e) {}
   }
 
-  public void testbinaryFetchingEnabled() {
+  public void testBinaryFetchingEnabled() {
 
     // by default, binary fetching is enabled
 
@@ -461,7 +461,7 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
     taskService.deleteTask(newTask.getId(), true);
   }
 
-  public void testbinaryFetchingDisabled() {
+  public void testBinaryFetchingDisabled() {
 
     Task newTask = taskService.newTask();
     taskService.saveTask(newTask);
