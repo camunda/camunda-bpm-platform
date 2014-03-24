@@ -19,8 +19,6 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
                           'Date'
                         ];
 
-    var sequencer = 0;
-
     var DEFAULT_PAGES = { size: 50, total: 0, current: 1 };
 
     var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
@@ -83,22 +81,12 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
           var instance = instanceIdToInstanceMap[currentVariable.activityInstanceId];
           currentVariable.instance = instance;
 
-          // set an internal id
-          //currentVariable.id = getNextId();
-
           // creates initially a copy of the current variable instance
           variableCopies[currentVariable.id] = angular.copy(currentVariable);
         });
         $scope.variables = data;
       });
     };
-
-    /**
-     * Returns the next id.
-     */
-    function getNextId () {
-      return sequencer++;
-    }
 
     $scope.editVariable = function (variable) {
       variable.inEditMode = true;

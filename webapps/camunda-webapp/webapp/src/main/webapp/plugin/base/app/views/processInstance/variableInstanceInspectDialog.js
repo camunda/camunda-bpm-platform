@@ -47,7 +47,8 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
           // check whether the user provided valid JSON.
           parsedValue = JSON.parse(newValue);
         } catch(e) {
-          Notifications.addError({ status: 'Variable', message: 'Could not parse json input: '+e, exclusive: true, duration: 5000 });
+          $scope.status = BEFORE_CHANGE;
+          Notifications.addError({ status: 'Variable', message: 'Could not parse json input: '+e, exclusive: true });
           return;
         }
 

@@ -36,7 +36,7 @@ This feature is unsupported in your Browser.
   <div ng-show="status === 'uploadSuccess'">   
     <p>
       Variable <code>{{variableInstance.name}}</code> of execution <code>{{variableInstance.executionId}}</code>
-      was suceessfully replaced with the content of the uploaded file.
+      was successfully replaced with the content of the uploaded file.
     </p>
   </div>
 
@@ -48,13 +48,12 @@ This feature is unsupported in your Browser.
 
 <div class="modal-footer">
   <button class="btn" ng-click="close(status)"
-          ng-disabled="status === 'performCancellation'"
-          ng-hide="status === 'uploadSuccess' || status === 'uploadFailed' || status === 'uploadFailed'">Close</button>
+          ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">Close</button>
   <button class="btn btn-primary" ng-click="close(status)"
-          ng-show="status === 'uploadSuccess' || status === 'uploadFailed' || status === 'uploadFailed'">OK</button>
+          ng-show="status === 'uploadSuccess' || status === 'uploadFailed'">OK</button>
   <button class="btn btn-primary" ng-click="upload()"
           ng-disabled="status !== 'beforeUpload'"
-          ng-hide="status === 'uploadSuccess' || status === 'uploadFailed' || status === 'uploadFailed'">Upload</button>
+          ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">Upload</button>
 </div>
 
 <![endif]>

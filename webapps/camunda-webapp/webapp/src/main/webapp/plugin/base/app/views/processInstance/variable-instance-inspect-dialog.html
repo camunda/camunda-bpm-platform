@@ -32,7 +32,7 @@
   <div ng-show="status === 'changeSuccess'">   
     <p>
       Variable <code>{{variableInstance.name}}</code> of execution <code>{{variableInstance.executionId}}</code>
-      was suceessfully updated.
+      was successfully updated.
     </p>
   </div>
 
@@ -40,11 +40,10 @@
 
 <div class="modal-footer">
   <button class="btn" ng-click="close(status)"
-          ng-disabled="status === 'performCancellation'"
-          ng-hide="status === 'changeSuccess' || status === 'changeFailed' || status === 'changeFailed'">Close</button>
+          ng-hide="status === 'changeSuccess'">Close</button>
   <![if gt IE 9]>
     <button class="btn btn-primary" ng-click="close(status)"
-            ng-show="status === 'changeSuccess' || status === 'changeFailed' || status === 'changeFailed'">OK</button>          
+            ng-show="status === 'changeSuccess'">OK</button>
     <button class="btn btn-primary" ng-click="change()"
             ng-disabled="status !== 'beforeChange' || !hasChanged()"
             ng-hide="status != 'beforeChange'">Change</button>
