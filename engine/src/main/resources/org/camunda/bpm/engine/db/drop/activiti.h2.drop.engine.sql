@@ -72,8 +72,11 @@ alter table ACT_RU_AUTHORIZATION
     drop constraint ACT_UNIQ_AUTH_GROUP; 
     
 alter table ACT_RU_AUTHORIZATION
-    drop constraint ACT_UNIQ_AUTH_USER; 
-        
+    drop constraint ACT_UNIQ_AUTH_USER;
+
+alter table ACT_RU_VARIABLE
+    drop constraint ACT_UNIQ_VARIABLE;
+
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
     

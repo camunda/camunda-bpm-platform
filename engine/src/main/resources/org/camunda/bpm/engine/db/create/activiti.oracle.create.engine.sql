@@ -86,7 +86,6 @@ create table ACT_RU_JOBDEF (
     primary key (ID_)
 );
 
-
 create table ACT_RE_PROCDEF (
     ID_ NVARCHAR2(64) NOT NULL,
     REV_ INTEGER,
@@ -147,6 +146,7 @@ create table ACT_RU_VARIABLE (
     LONG_ NUMBER(19,0),
     TEXT_ NVARCHAR2(2000),
     TEXT2_ NVARCHAR2(2000),
+    VAR_SCOPE_ NVARCHAR2(64) not null,
     primary key (ID_)
 );
 
@@ -329,4 +329,7 @@ create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION
     case when GROUP_ID_ is null then null else RESOURCE_TYPE_ end,
     case when GROUP_ID_ is null then null else RESOURCE_ID_ end,
     case when GROUP_ID_ is null then null else GROUP_ID_ end);
-    
+
+alter table ACT_RU_VARIABLE
+    add constraint ACT_UNIQ_VARIABLE
+    unique (VAR_SCOPE_, NAME_);

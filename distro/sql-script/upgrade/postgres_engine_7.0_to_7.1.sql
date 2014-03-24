@@ -123,3 +123,44 @@ create table ACT_HI_INCIDENT (
   INCIDENT_STATE_ integer,
   primary key (ID_)
 );
+
+-- update ACT_RU_VARIABLE table --
+
+-- add new column --
+
+ALTER TABLE ACT_RU_VARIABLE
+    add VAR_SCOPE_ varchar(64);
+
+-- migrate execution variables --
+
+UPDATE
+  ACT_RU_VARIABLE V
+
+SET
+  VAR_SCOPE_ = V.EXECUTION_ID_
+
+WHERE
+  V.EXECUTION_ID_ is not null AND
+  V.TASK_ID_ is null;
+
+-- migrate task variables --
+
+UPDATE
+  ACT_RU_VARIABLE V
+  
+SET
+  VAR_SCOPE_ = V.TASK_ID_
+
+WHERE
+  V.TASK_ID_ is not null;
+
+-- set VAR_SCOPE_ not null--
+
+ALTER TABLE ACT_RU_VARIABLE
+    ALTER COLUMN VAR_SCOPE_ SET NOT NULL;
+
+-- add unique constraint --
+
+alter table ACT_RU_VARIABLE
+    add constraint ACT_UNIQ_VARIABLE
+    unique (VAR_SCOPE_, NAME_);

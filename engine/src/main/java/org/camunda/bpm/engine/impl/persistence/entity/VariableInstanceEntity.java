@@ -301,6 +301,13 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Pe
     return errorMessage;
   }
 
+  public String getVariableScope() {
+    if (taskId != null) {
+      return taskId;
+    }
+    return executionId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()

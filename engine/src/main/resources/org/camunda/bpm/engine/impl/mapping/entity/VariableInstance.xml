@@ -7,7 +7,7 @@
   <!-- VARIABLE INSTANCE INSERT -->
   
   <insert id="insertVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
-    insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
+    insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, VAR_SCOPE_)
     values (
       #{id, jdbcType=VARCHAR},
       1,
@@ -20,7 +20,8 @@
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
       #{textValue, jdbcType=VARCHAR},
-      #{textValue2, jdbcType=VARCHAR}
+      #{textValue2, jdbcType=VARCHAR},
+      #{variableScope, jdbcType=VARCHAR}
     )
   </insert>
   

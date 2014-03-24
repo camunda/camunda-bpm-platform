@@ -146,6 +146,7 @@ create table ACT_RU_VARIABLE (
     LONG_ bigint,
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
+    VAR_SCOPE_ varchar(64),
     primary key (ID_)
 );
 
@@ -324,4 +325,7 @@ alter table ACT_RU_AUTHORIZATION
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_GROUP
     unique (TYPE_,GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
-    
+
+alter table ACT_RU_VARIABLE
+    add constraint ACT_UNIQ_VARIABLE
+    unique (VAR_SCOPE_, NAME_);

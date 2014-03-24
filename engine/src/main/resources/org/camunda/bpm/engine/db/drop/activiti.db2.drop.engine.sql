@@ -6,19 +6,20 @@ drop index ACT_IDX_VARIABLE_TASK_ID;
 drop index ACT_IDX_INC_CONFIGURATION;
 drop index ACT_UNIQ_AUTH_USER;
 drop index ACT_UNIQ_AUTH_GROUP;
+drop index ACT_UNIQ_VARIABLE;
 
-alter table ACT_GE_BYTEARRAY 
+alter table ACT_GE_BYTEARRAY
     drop foreign key ACT_FK_BYTEARR_DEPL;
 
 alter table ACT_RU_EXECUTION
     drop foreign key ACT_FK_EXE_PROCINST;
 
-alter table ACT_RU_EXECUTION 
+alter table ACT_RU_EXECUTION
     drop foreign key ACT_FK_EXE_PARENT;
 
-alter table ACT_RU_EXECUTION 
+alter table ACT_RU_EXECUTION
     drop foreign key ACT_FK_EXE_SUPER;
-    
+
 alter table ACT_RU_EXECUTION 
     drop foreign key ACT_FK_EXE_PROCDEF;
 
@@ -33,44 +34,43 @@ alter table ACT_RU_TASK
 
 alter table ACT_RU_TASK
 	drop foreign key ACT_FK_TASK_PROCINST;
-	
+
 alter table ACT_RU_TASK
 	drop foreign key ACT_FK_TASK_PROCDEF;
-    
+
 alter table ACT_RU_VARIABLE
     drop foreign key ACT_FK_VAR_EXE;
-    
+
 alter table ACT_RU_VARIABLE
-	drop foreign key ACT_FK_VAR_PROCINST;    
+	drop foreign key ACT_FK_VAR_PROCINST;
 
 alter table ACT_RU_VARIABLE
     drop foreign key ACT_FK_VAR_BYTEARRAY;
 
 alter table ACT_RU_JOB
     drop foreign key ACT_FK_JOB_EXCEPTION;
-    
+
 alter table ACT_RU_EVENT_SUBSCR
     drop foreign key ACT_FK_EVENT_EXEC;
 
 alter table ACT_RU_INCIDENT
-    drop foreign key ACT_FK_INC_EXE; 
-  
+    drop foreign key ACT_FK_INC_EXE;
+
 alter table ACT_RU_INCIDENT
-    drop foreign key ACT_FK_INC_PROCINST; 
+    drop foreign key ACT_FK_INC_PROCINST;
 
 alter table ACT_RU_INCIDENT
     drop foreign key ACT_FK_INC_PROCDEF;
-    
-alter table ACT_RU_INCIDENT
-    drop foreign key ACT_FK_INC_CAUSE; 
 
 alter table ACT_RU_INCIDENT
-    drop foreign key ACT_FK_INC_RCAUSE; 
+    drop foreign key ACT_FK_INC_CAUSE;
 
-    
+alter table ACT_RU_INCIDENT
+    drop foreign key ACT_FK_INC_RCAUSE;
+
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
-    
+
 drop table ACT_GE_PROPERTY;
 drop table ACT_GE_BYTEARRAY;
 drop table ACT_RE_DEPLOYMENT;

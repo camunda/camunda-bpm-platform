@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.concurrency;
 
 import java.util.Collections;
+
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -28,7 +29,8 @@ public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase
 
   class SetTaskVariablesThread extends ControllableThread {
 
-    OptimisticLockingException exception;
+    OptimisticLockingException optimisticLockingException;
+    Exception exception;
 
     protected Object variableValue;
     protected String taskId;
@@ -52,6 +54,8 @@ public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase
           .execute(new ControlledCommand(activeThread, new SetTaskVariablesCmd(taskId, Collections.singletonMap(variableName, variableValue), false)));
 
       } catch (OptimisticLockingException e) {
+        this.optimisticLockingException = e;
+      } catch (Exception e) {
         this.exception = e;
       }
       log.fine(getName()+" ends");
@@ -59,25 +63,29 @@ public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/concurrency/ConcurrentVariableUpdateTest.process.bpmn20.xml")
-  public void FAILING_testConcurrentVariableCreate() {
+  public void testConcurrentVariableCreate() {
 
-    runtimeService.startProcessInstanceByKey("testProcess");
+    runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("varName1", "someValue"));
 
-    String taskId = taskService.createTaskQuery().singleResult().getId();
     String variableName = "varName";
+    String taskId = taskService.createTaskQuery().singleResult().getId();
 
     SetTaskVariablesThread thread1 = new SetTaskVariablesThread(taskId, variableName, "someString");
     thread1.startAndWaitUntilControlIsReturned();
 
-    // this should fail with integrity constraint violation - BUT it doesn't!
-    // we end up with two lines in the ACT_RU_VARIABLE table for the same variableName and same executionId...
+    // this should fail with integrity constraint violation
     SetTaskVariablesThread thread2 = new SetTaskVariablesThread(taskId, variableName, "someString");
     thread2.startAndWaitUntilControlIsReturned();
 
     thread1.proceedAndWaitTillDone();
-    thread2.proceedAndWaitTillDone();
+    assertNull(thread1.exception);
+    assertNull(thread1.optimisticLockingException);
 
-    // fails with FK violation because one of the variables is not deleted.
+    thread2.proceedAndWaitTillDone();
+    assertNotNull(thread2.exception);
+    assertNull(thread2.optimisticLockingException);
+
+    // should not fail with FK violation because one of the variables is not deleted.
     taskService.complete(taskId);
   }
 
@@ -101,8 +109,8 @@ public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase
     thread1.proceedAndWaitTillDone();
     thread2.proceedAndWaitTillDone();
 
-    assertNull(thread1.exception);
-    assertNotNull(thread2.exception);
+    assertNull(thread1.optimisticLockingException);
+    assertNotNull(thread2.optimisticLockingException);
 
     // succeeds
     taskService.complete(taskId);
@@ -129,8 +137,8 @@ public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase
     thread1.proceedAndWaitTillDone();
     thread2.proceedAndWaitTillDone();
 
-    assertNull(thread1.exception);
-    assertNotNull(thread2.exception);
+    assertNull(thread1.optimisticLockingException);
+    assertNotNull(thread2.optimisticLockingException);
 
     // succeeds
     taskService.complete(taskId);

@@ -146,6 +146,7 @@ create table ACT_RU_VARIABLE (
     LONG_ bigint,
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
+    VAR_SCOPE_ varchar(64) not null,
     primary key (ID_)
 );
 
@@ -277,12 +278,12 @@ alter table ACT_RU_EVENT_SUBSCR
     add constraint ACT_FK_EVENT_EXEC
     foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION;
-    
+
 alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_EXE 
     foreign key (EXECUTION_ID_) 
     references ACT_RU_EXECUTION (ID_);
-  
+
 alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_PROCINST 
     foreign key (PROC_INST_ID_) 
@@ -292,7 +293,7 @@ alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_PROCDEF 
     foreign key (PROC_DEF_ID_) 
     references ACT_RE_PROCDEF (ID_);  
-    
+
 alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_CAUSE 
     foreign key (CAUSE_INCIDENT_ID_) 
@@ -302,11 +303,15 @@ alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_RCAUSE 
     foreign key (ROOT_CAUSE_INCIDENT_ID_) 
     references ACT_RU_INCIDENT (ID_);
-    
+
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_USER
     unique (TYPE_, USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
-    
+
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_GROUP
     unique (TYPE_, GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
+
+alter table ACT_RU_VARIABLE
+    add constraint ACT_UNIQ_VARIABLE
+    unique (VAR_SCOPE_, NAME_);

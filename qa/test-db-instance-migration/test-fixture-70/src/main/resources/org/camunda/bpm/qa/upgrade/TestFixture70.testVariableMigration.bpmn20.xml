@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+
+  <process id="TestFixture70.testVariableMigration">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask1" />
+    <serviceTask id="serviceTask1" activiti:async="true" activiti:expression="${true}" />
+    <sequenceFlow id="flow2" sourceRef="serviceTask1" targetRef="serviceTask2" />
+    <serviceTask id="serviceTask2" activiti:async="true" activiti:expression="${true}" />
+    <sequenceFlow id="flow3" sourceRef="serviceTask2" targetRef="userTask" />
+    <userTask id="userTask" />
+    <sequenceFlow id="flow4" sourceRef="userTask" targetRef="serviceTask3" />
+    <serviceTask id="serviceTask3" activiti:async="true" activiti:expression="${true}" />
+    <sequenceFlow id="flow5" sourceRef="serviceTask3" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>

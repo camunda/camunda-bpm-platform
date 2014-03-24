@@ -18,21 +18,21 @@ drop index ACT_IDX_IDENT_LNK_USER;
 drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
 
-alter table ACT_GE_BYTEARRAY 
+alter table ACT_GE_BYTEARRAY
     drop CONSTRAINT ACT_FK_BYTEARR_DEPL;
 
 alter table ACT_RU_EXECUTION
     drop CONSTRAINT ACT_FK_EXE_PROCINST;
 
-alter table ACT_RU_EXECUTION 
+alter table ACT_RU_EXECUTION
     drop CONSTRAINT ACT_FK_EXE_PARENT;
 
-alter table ACT_RU_EXECUTION 
+alter table ACT_RU_EXECUTION
     drop CONSTRAINT ACT_FK_EXE_SUPER;
-	
-alter table ACT_RU_EXECUTION 
+
+alter table ACT_RU_EXECUTION
     drop CONSTRAINT ACT_FK_EXE_PROCDEF;
-    
+
 alter table ACT_RU_IDENTITYLINK
     drop CONSTRAINT ACT_FK_TSKASS_TASK;
 
@@ -44,13 +44,13 @@ alter table ACT_RU_TASK
 
 alter table ACT_RU_TASK
 	drop CONSTRAINT ACT_FK_TASK_PROCINST;
-	
+
 alter table ACT_RU_TASK
 	drop CONSTRAINT ACT_FK_TASK_PROCDEF;
-    
+
 alter table ACT_RU_VARIABLE
     drop CONSTRAINT ACT_FK_VAR_EXE;
-    
+
 alter table ACT_RU_VARIABLE
 	drop CONSTRAINT ACT_FK_VAR_PROCINST;
 
@@ -59,28 +59,31 @@ alter table ACT_RU_VARIABLE
 
 alter table ACT_RU_JOB
     drop CONSTRAINT ACT_FK_JOB_EXCEPTION;
-    
+
 alter table ACT_RU_EVENT_SUBSCR
     drop CONSTRAINT ACT_FK_EVENT_EXEC;
 
 alter table ACT_RE_PROCDEF
     drop CONSTRAINT ACT_UNIQ_PROCDEF;
-    
+
 alter table ACT_RU_INCIDENT
     drop CONSTRAINT ACT_FK_INC_EXE; 
-  
+
 alter table ACT_RU_INCIDENT
     drop CONSTRAINT ACT_FK_INC_PROCINST; 
 
 alter table ACT_RU_INCIDENT
     drop CONSTRAINT ACT_FK_INC_PROCDEF;
-    
+
 alter table ACT_RU_INCIDENT
     drop CONSTRAINT ACT_FK_INC_CAUSE; 
 
 alter table ACT_RU_INCIDENT
     drop CONSTRAINT ACT_FK_INC_RCAUSE; 
-    
+
+alter table ACT_RU_VARIABLE
+    drop CONSTRAINT ACT_UNIQ_VARIABLE;
+
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_EVENT_SUBSCR;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
