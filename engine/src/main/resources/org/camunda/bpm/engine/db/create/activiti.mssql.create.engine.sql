@@ -301,7 +301,7 @@ alter table ACT_RU_INCIDENT
     foreign key (ROOT_CAUSE_INCIDENT_ID_) 
     references ACT_RU_INCIDENT (ID_);
 
-/** indices for mssql concurrency problems, add after FK are created */
+-- indexes for concurrency problems - https://app.camunda.com/jira/browse/CAM-1646 --
 create index ACT_IDX_EXECUTION_PROC on ACT_RU_EXECUTION(PROC_DEF_ID_);
 create index ACT_IDX_EXECUTION_PARENT on ACT_RU_EXECUTION(PARENT_ID_);
 create index ACT_IDX_EXECUTION_SUPER on ACT_RU_EXECUTION(SUPER_EXEC_);
