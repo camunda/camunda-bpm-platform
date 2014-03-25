@@ -55,13 +55,90 @@ UNIX-like new lines (lf) and a new line at the and of file in the **.js**, **.le
 
 #### Scripts
 
-We started linting the **.js** files using [jshint](http://www.jshint.com/) and we `'use strict';` because it is a [good thing to do](http://www.webdesignporto.com/why-use-strict-in-javascript-can-save-you-hours)
+We started linting the **.js** files using [jshint](http://www.jshint.com/) and we `'use strict';`
+because it is a __[good thing to do](http://www.webdesignporto.com/why-use-strict-in-javascript-can-save-you-hours)__.
+
+To improve the readability (and code reviews) of the code we also suggest to use new lines for:
+
+ - __objects__ or __arrays__ with more than 1 key
+ - __statements__ like:
+    - __if__, __else__, __else if__
+    - __try / catch__
+
+__Avoid:__
+```js
+var array_of_values = ["first", "second", 3, "fifth"];
+var obj = {"key": "string value in double-quotes", other: "double quotes are for HTML", or_something_else: 10};
+if (condition == false) {
+    //...
+}else if(other_condition == true){
+    try{
+        //...
+    }catch(e){
+        //...
+    }
+}
+```
+
+__Instead:__
+```js
+var arrayOfValues = [
+    'first',
+    'second',
+    3,
+    'fifth'
+];
+
+var obj = {
+    key: 'string value',
+    other: 'single quotes are for JS',
+    andVariableNamesAreCamelCased: 10
+};
+
+if (condition) {
+    //...
+}
+else if (otherCondition) {
+    try{
+        //...
+    }
+    catch(err){
+        //...
+    }
+}
+```
+
+_Note_: They are tools available, like the [JSHint Gutter](https://github.com/victorporof/Sublime-JSHint) plugin,
+who will help a lot spotting the linting issues.
+
+#### HTML
+
+To ease the comparaison in diffs, except for the first and expect when there is only 1,
+the attributes of a tag should be placed on a seperate line.
+
+An other good thing to do to ease the development is to put a comment (with the location )
+at the beginning and end of the HTML files used as angular templates, as follow:
+
+```html
+<!-- # CE src/path/to/the/file.html -->
+<div first-attribute-on-same-line
+     additional-attributes-on="new lines"
+     and-so-on>
+  ...
+</div>
+<!-- / CE src/path/to/the/file.html -->
+```
+
+The `#` implies here the beginning and the `/` implies the end of the template. The `CE` is meant to
+indicate that that the file is part of the community edition of the platform.  
+It makes much easier to find which file is used during development.
+
+_Note:_ those comments are removed when the project is build for production.
 
 #### Styles
 
 We use [less](http://less.github.io) to generate the CSS stylesheets.
 The **.less** files are located in the `webapps/camunda-webapp/webapp/assets/styles` directory.
-
 
 ### Testing
 
