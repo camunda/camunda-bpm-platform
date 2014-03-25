@@ -67,74 +67,14 @@ BpmnModelInstance modelInstance = [...]
 Bpmn.validateModel(modelInstance);
 ----
 
-=== Create a simple Process
+=== Creating a Process using the full API
 
-Currently not all BPMN 2.0 elements are supported. But basic elements like
-StartEvent, EndEvent, Tasks, Parallel- and ExclusiveGateways are already
-implemented. For the current list of implemented elements please visit
-link:bpmn-model/src/main/java/org/camunda/bpm/model/bpmn/instance[org.camunda.bpm.model.bpmn.instance]
-package.
-
-The following code creates a simple Process as a jUnit4 test. See link:bpmn-model/src/test/java/org/camunda/bpm/model/bpmn/CreateModelTest.java[CreateModelTest.java] for
-another example with ParallelGateways.
-
-[source,java]
-----
-public class CreateProcessTest {
-
-  public BpmnModelInstance modelInstance;
-  public Definitions definitions;
-  public Process process;
-
-  @Before
-  public void createEmptyModel() {
-    modelInstance = Bpmn.createEmptyModel();
-    definitions = modelInstance.newInstance(Definitions.class);
-    definitions.setTargetNamespace("http://camunda.org/examples");
-    modelInstance.setDefinitions(definitions);
-  }
-
-  protected <T extends BpmnModelElementInstance> T createElement(BpmnModelElementInstance parentElement, String id, Class<T> elementClass) {
-    T element = modelInstance.newInstance(elementClass);
-    element.setAttributeValue("id", id, true);
-    parentElement.addChildElement(element);
-    return element;
-  }
-
-  public SequenceFlow createSequenceFlow(Process process, FlowNode from, FlowNode to) {
-    SequenceFlow sequenceFlow = createElement(process, from.getId() + "-" + to.getId(), SequenceFlow.class);
-    process.addChildElement(sequenceFlow);
-    sequenceFlow.setSource(from);
-    from.getOutgoing().add(sequenceFlow);
-    sequenceFlow.setTarget(to);
-    to.getIncoming().add(sequenceFlow);
-    return sequenceFlow;
-  }
-
-  @Test
-  public void createProcessWithOneTask() {
-    // create process
-    Process process = createElement(definitions, "process-with-one-task", Process.class);
-
-    // create elements
-    StartEvent startEvent = createElement(process, "start", StartEvent.class);
-    UserTask task1 = createElement(process, "task1", UserTask.class);
-    EndEvent endEvent = createElement(process, "end", EndEvent.class);
-
-    // create flows
-    createSequenceFlow(process, startEvent, task1);
-    createSequenceFlow(process, task1, endEvent);
-  }
-
-  @After
-  public void validateModel() throws IOException {
-    Bpmn.validateModel(modelInstance);
-    File tempFile = File.createTempFile("bpmn-model-api-", ".bpmn");
-    Bpmn.writeModelToFile(tempFile, modelInstance);
-  }
-
-}
-----
+The fluent API is usually a good choice for creating a new BPMN process. 
+However, not all elements supported by the model are exposed through fluent
+builders and the fluent api may not be the appropriate API style for all usecases.
+In such cases, the full API can be used for creating a process model. 
+The following code creates a simple Process as a jUnit4 test using the full API: 
+link:bpmn-model/src/test/java/org/camunda/bpm/model/bpmn/CreateModelTest.java[CreateModelTest.java].
 
 === Find elements inside the model
 
@@ -190,3 +130,9 @@ Java JRE 1.6+ is required. We test camunda BPMN model API on Oracle and IBM JVMs
 === Under which License is camunda BPMN model API distributed?
 
 Apache License 2.0.
+
+=== Does this API support all BPMN 2.0 Elements?
+
+No, but support is already quite extensive. See
+link:bpmn-model/src/main/java/org/camunda/bpm/model/bpmn/instance[org.camunda.bpm.model.bpmn.instance] 
+for a list of currently supported elements.
