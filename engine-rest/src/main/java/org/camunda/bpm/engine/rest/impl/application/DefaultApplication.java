@@ -18,29 +18,7 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
-import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
-import org.camunda.bpm.engine.rest.impl.AuthorizationRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.ExecutionRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.GroupRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.IdentityRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.IncidentRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.JobDefinitionRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.JobRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.MessageRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.UserRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.VariableInstanceRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.history.HistoryRestServiceImpl;
-import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
-import org.camunda.bpm.engine.rest.mapper.MultipartPayloadProvider;
-import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
-import org.codehaus.jackson.jaxrs.JsonMappingExceptionMapper;
-import org.codehaus.jackson.jaxrs.JsonParseExceptionMapper;
+import org.camunda.bpm.engine.rest.impl.CamundaRestResources;
 
 /**
  * <p>Default {@link Application} registering all resources.</p>
@@ -59,32 +37,9 @@ public class DefaultApplication extends Application {
   @Override
   public Set<Class<?>> getClasses() {
     Set<Class<?>> classes = new HashSet<Class<?>>();
-    classes.add(ProcessEngineRestServiceImpl.class);
-    classes.add(ProcessDefinitionRestServiceImpl.class);
-    classes.add(ProcessInstanceRestServiceImpl.class);
-    classes.add(TaskRestServiceImpl.class);
-    classes.add(IdentityRestServiceImpl.class);
-    classes.add(MessageRestServiceImpl.class);
-    classes.add(JobDefinitionRestServiceImpl.class);
-    classes.add(IncidentRestServiceImpl.class);
-    classes.add(JobRestServiceImpl.class);
-    classes.add(ExecutionRestServiceImpl.class);
-    classes.add(VariableInstanceRestServiceImpl.class);
-    classes.add(UserRestServiceImpl.class);
-    classes.add(GroupRestServiceImpl.class);
-    classes.add(AuthorizationRestServiceImpl.class);
-    classes.add(HistoryRestServiceImpl.class);
 
-    classes.add(JacksonConfigurator.class);
-
-    classes.add(JacksonJsonProvider.class);
-    classes.add(JsonMappingExceptionMapper.class);
-    classes.add(JsonParseExceptionMapper.class);
-
-    classes.add(ProcessEngineExceptionHandler.class);
-    classes.add(RestExceptionHandler.class);
-
-    classes.add(MultipartPayloadProvider.class);
+    classes.addAll(CamundaRestResources.getResourceClasses());
+    classes.addAll(CamundaRestResources.getConfigurationClasses());
 
     return classes;
   }
