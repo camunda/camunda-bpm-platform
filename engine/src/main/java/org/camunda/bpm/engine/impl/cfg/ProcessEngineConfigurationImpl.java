@@ -135,7 +135,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHan
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHander;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.mail.MailScanner;
@@ -894,7 +894,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     TimerStartEventJobHandler timerStartEvent = new TimerStartEventJobHandler();
     jobHandlers.put(timerStartEvent.getType(), timerStartEvent);
 
-    TimerStartEventSubprocessJobHander timerStartEventSubprocess = new TimerStartEventSubprocessJobHander();
+    TimerStartEventSubprocessJobHandler timerStartEventSubprocess = new TimerStartEventSubprocessJobHandler();
     jobHandlers.put(timerStartEventSubprocess.getType(), timerStartEventSubprocess);
 
     AsyncContinuationJobHandler asyncContinuationJobHandler = new AsyncContinuationJobHandler();

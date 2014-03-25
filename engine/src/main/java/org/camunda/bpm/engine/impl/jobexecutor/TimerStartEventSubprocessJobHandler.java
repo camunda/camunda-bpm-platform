@@ -28,9 +28,9 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  * @author Kristin Polenz
  *
  */
-public class TimerStartEventSubprocessJobHander implements JobHandler {
+public class TimerStartEventSubprocessJobHandler implements JobHandler {
 
-  private static Logger log = Logger.getLogger(TimerStartEventSubprocessJobHander.class.getName());
+  private static Logger log = Logger.getLogger(TimerStartEventSubprocessJobHandler.class.getName());
 
   public static final String TYPE = "timer-start-event-subprocess";
 

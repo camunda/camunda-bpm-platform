@@ -2303,7 +2303,7 @@ public class BpmnParse extends Parse {
 
   protected void parseTimerStartEventDefinitionforEventSubprocess(Element timerEventDefinition, ActivityImpl timerActivity, ScopeImpl catchingScope) {
     timerActivity.setProperty("type", "startTimerEvent");
-    TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventSubprocessJobHander.TYPE);
+    TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventSubprocessJobHandler.TYPE);
     timerDeclaration.setActivityId(timerActivity.getId());
     timerDeclaration.setEventScopeActivityId(catchingScope.getId());
     timerDeclaration.setJobHandlerConfiguration(timerActivity.getParent().getId());
