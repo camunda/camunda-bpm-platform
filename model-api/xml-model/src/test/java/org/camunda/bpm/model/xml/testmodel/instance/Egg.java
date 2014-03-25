@@ -26,7 +26,7 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.*;
  */
 public class Egg extends ModelElementInstanceImpl {
 
-  private static Attribute<String> idAttr;
+  protected static Attribute<String> idAttr;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Egg.class, ELEMENT_NAME_EGG)

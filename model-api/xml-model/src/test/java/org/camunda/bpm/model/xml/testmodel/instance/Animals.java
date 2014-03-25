@@ -31,7 +31,7 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMES
  */
 public class Animals extends ModelElementInstanceImpl {
 
-  private static ChildElementCollection<Animal> animalColl;
+  protected static ChildElementCollection<Animal> animalColl;
 
   public static void registerType(ModelBuilder modelBuilder) {
 

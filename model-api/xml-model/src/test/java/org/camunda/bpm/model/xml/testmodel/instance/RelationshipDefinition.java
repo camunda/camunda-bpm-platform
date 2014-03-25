@@ -27,8 +27,8 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.*;
  */
 public abstract class RelationshipDefinition extends ModelElementInstanceImpl {
 
-  private static Attribute<String> idAttr;
-  private static AttributeReference<Animal> animalRef;
+  protected static Attribute<String> idAttr;
+  protected static AttributeReference<Animal> animalRef;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(RelationshipDefinition.class, TYPE_NAME_RELATIONSHIP_DEFINITION)

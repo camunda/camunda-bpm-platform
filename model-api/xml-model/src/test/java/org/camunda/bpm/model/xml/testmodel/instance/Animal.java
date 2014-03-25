@@ -33,15 +33,15 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.*;
  */
 public abstract class Animal extends ModelElementInstanceImpl {
 
-  private static Attribute<String> idAttr;
-  private static Attribute<String> nameAttr;
-  private static AttributeReference<Animal> fatherRef;
-  private static AttributeReference<Animal> motherRef;
-  private static Attribute<Boolean> isEndangeredAttr;
-  private static Attribute<Gender> genderAttr;
-  private static Attribute<Integer> ageAttr;
-  private static ChildElementCollection<RelationshipDefinition> relationshipDefinitionsColl;
-  private static ElementReferenceCollection<RelationshipDefinition, RelationshipDefinitionRef> relationshipDefinitionRefsColl;
+  protected static Attribute<String> idAttr;
+  protected static Attribute<String> nameAttr;
+  protected static AttributeReference<Animal> fatherRef;
+  protected static AttributeReference<Animal> motherRef;
+  protected static Attribute<Boolean> isEndangeredAttr;
+  protected static Attribute<Gender> genderAttr;
+  protected static Attribute<Integer> ageAttr;
+  protected static ChildElementCollection<RelationshipDefinition> relationshipDefinitionsColl;
+  protected static ElementReferenceCollection<RelationshipDefinition, RelationshipDefinitionRef> relationshipDefinitionRefsColl;
 
   public static void registerType(ModelBuilder modelBuilder) {
 

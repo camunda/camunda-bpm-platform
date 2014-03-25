@@ -31,8 +31,8 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMES
  */
 public class Bird extends FlyingAnimal {
 
-  private static ChildElementCollection<Egg> eggColl;
-  private static ElementReference<Bird, SpouseRef> spouseRefsColl;
+  protected static ChildElementCollection<Egg> eggColl;
+  protected static ElementReference<Bird, SpouseRef> spouseRefsColl;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Bird.class, ELEMENT_NAME_BIRD)
