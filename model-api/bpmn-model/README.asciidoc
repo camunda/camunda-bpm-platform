@@ -26,6 +26,25 @@ simple access of the attributes and child elements of a BPMN element.
 
 == Features
 
+=== Fluent builder API
+
+To easily create simple BPMN 2.0 processes we provide the fluent builder API. It supports most BPMN 2.0
+elements and allows you to set attributes and add some child elements. The following process is deployable
+and can be executed by the camunda BPM platform.
+
+[source,java]
+----
+BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("processId")
+  .startEvent()
+  .userTask()
+  .endEvent()
+  .done();
+----
+
+For more complex examples see the link:http://docs.camunda.org/latest/guides/user-guide/#bpmn-model-api-fluent-builder-api[docs],
+the tests in link:bpmn-model/src/test/java/org/camunda/bpm/model/bpmn/builder/ProcessBuilderTest.java[ProcessBuilderTest.java] or this
+link:https://github.com/camunda/camunda-bpm-examples/tree/master/bpmn-model-api/generate-process-fluent-api[example].
+
 === Create an empty BPMN model
 
 You can easily create a new empty BPMN model.
@@ -154,7 +173,6 @@ Bpmn.writeModelToFile(file, modelInstance);
 == Planned features
 
 * complete read, edit and write support for BPMN 2.0 models
-* a fluent builder API to create simple models
 * JSON import and export
 * extended validation support like integrity checks for broken references
 
