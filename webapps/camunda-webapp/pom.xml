@@ -37,8 +37,11 @@
       <modules>
 
         <module>jboss</module>
+        <module>jboss-standalone</module>
         <module>tomcat</module>
+        <module>tomcat-standalone</module>
         <module>glassfish</module>
+        <module>glassfish-standalone</module>
 
       </modules>
     </profile>
