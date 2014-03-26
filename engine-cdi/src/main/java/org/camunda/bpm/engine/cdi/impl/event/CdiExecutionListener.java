@@ -12,26 +12,27 @@
  */
 package org.camunda.bpm.engine.cdi.impl.event;
 
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-
-import javax.enterprise.inject.spi.BeanManager;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
 import org.camunda.bpm.engine.cdi.BusinessProcessEventType;
-import org.camunda.bpm.engine.cdi.annotation.event.BusinessProcessDefinitionLiteral;
-import org.camunda.bpm.engine.cdi.annotation.event.EndActivityLiteral;
-import org.camunda.bpm.engine.cdi.annotation.event.StartActivityLiteral;
-import org.camunda.bpm.engine.cdi.annotation.event.TakeTransitionLiteral;
+import org.camunda.bpm.engine.cdi.annotation.event.*;
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ExecutionContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+
+import javax.enterprise.inject.spi.BeanManager;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.util.logging.Logger;
 
 /**
  * Generic {@link ExecutionListener} publishing events using the cdi event
@@ -39,21 +40,42 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
  *
  * @author Daniel Meyer
  */
-public class CdiExecutionListener implements ExecutionListener, Serializable {
+public class CdiExecutionListener implements TaskListener, ExecutionListener, Serializable {
 
   private static final long serialVersionUID = 1L;
+  private static final Logger LOGGER = Logger.getLogger(CdiExecutionListener.class.getName());
 
   public void notify(DelegateExecution execution) throws Exception {
-    // test whether cdi is setup correclty. (if not, just do not deliver the event)
-    try {
-      ProgrammaticBeanLookup.lookup(ProcessEngine.class);
-    }catch (Exception e) {
+    // test whether cdi is setup correctly. (if not, just do not deliver the event)
+    if (!testCdiSetup()) {
       return;
     }
 
     BusinessProcessEvent event = createEvent(execution);
     Annotation[] qualifiers = getQualifiers(event);
     getBeanManager().fireEvent(event, qualifiers);
+  }
+
+  public void notify(DelegateTask task) {
+    // test whether cdi is setup correctly. (if not, just do not deliver the event)
+    if (!testCdiSetup()) {
+      return;
+    }
+
+    BusinessProcessEvent event = createEvent(task);
+    Annotation[] qualifiers = getQualifiers(event);
+    getBeanManager().fireEvent(event, qualifiers);
+  }
+
+  private boolean testCdiSetup() {
+    try {
+      ProgrammaticBeanLookup.lookup(ProcessEngine.class);
+    }
+    catch (Exception e) {
+      LOGGER.fine("CDI was not setup correctly");
+      return false;
+    }
+    return true;
   }
 
   protected BusinessProcessEvent createEvent(DelegateExecution execution) {
@@ -73,10 +95,41 @@ public class CdiExecutionListener implements ExecutionListener, Serializable {
     return new CdiBusinessProcessEvent(execution.getCurrentActivityId(), execution.getCurrentTransitionId(), processDefinition, execution, type, ClockUtil.getCurrentTime());
   }
 
+  protected BusinessProcessEvent createEvent(DelegateTask task) {
+    ExecutionContext executionContext = Context.getExecutionContext();
+    ProcessDefinitionEntity  processDefinition = null;
+    if (task.getProcessDefinitionId() != null) {
+      if (executionContext != null) {
+        processDefinition = executionContext.getProcessDefinition();
+      } else {
+        processDefinition = Context.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(task.getProcessDefinitionId());
+      }
+    }
+
+    // map type
+    String eventName = task.getEventName();
+    BusinessProcessEventType type = null;
+    if (TaskListener.EVENTNAME_CREATE.equals(eventName)) {
+      type = BusinessProcessEventType.CREATE_TASK;
+    }
+    else if (TaskListener.EVENTNAME_ASSIGNMENT.equals(eventName)) {
+      type = BusinessProcessEventType.ASSIGN_TASK;
+    }
+    else if (TaskListener.EVENTNAME_COMPLETE.equals(eventName)) {
+      type = BusinessProcessEventType.COMPLETE_TASK;
+    }
+    else if (TaskListener.EVENTNAME_DELETE.equals(eventName)) {
+      type = BusinessProcessEventType.DELETE_TASK;
+    }
+
+    return new CdiBusinessProcessEvent(task, processDefinition, type, ClockUtil.getCurrentTime());
+  }
+
+
   protected BeanManager getBeanManager() {
     BeanManager bm = BeanManagerLookup.getBeanManager();
     if (bm == null) {
-      throw new ProcessEngineException("No cdi bean manager avaiable, cannot publish event.");
+      throw new ProcessEngineException("No cdi bean manager available, cannot publish event.");
     }
     return bm;
   }
@@ -91,6 +144,18 @@ public class CdiExecutionListener implements ExecutionListener, Serializable {
     }
     if (event.getType() == BusinessProcessEventType.END_ACTIVITY) {
       return new Annotation[] {businessProcessQualifier, new EndActivityLiteral(event.getActivityId()) };
+    }
+    if (event.getType() == BusinessProcessEventType.CREATE_TASK) {
+      return  new Annotation[] {businessProcessQualifier, new CreateTaskLiteral(event.getTaskDefinitionKey()) };
+    }
+    if (event.getType() == BusinessProcessEventType.ASSIGN_TASK) {
+      return  new Annotation[] {businessProcessQualifier, new AssignTaskLiteral(event.getTaskDefinitionKey()) };
+    }
+    if (event.getType() == BusinessProcessEventType.COMPLETE_TASK) {
+      return  new Annotation[] {businessProcessQualifier, new CompleteTaskLiteral(event.getTaskDefinitionKey()) };
+    }
+    if (event.getType() == BusinessProcessEventType.DELETE_TASK) {
+      return  new Annotation[] {businessProcessQualifier, new DeleteTaskLiteral(event.getTaskDefinitionKey()) };
     }
     return new Annotation[] {};
   }
