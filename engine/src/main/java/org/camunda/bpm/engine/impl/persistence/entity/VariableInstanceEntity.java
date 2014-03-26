@@ -12,16 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Tom Baeyens
@@ -175,7 +175,7 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Pe
       Context
         .getCommandContext()
         .getDbSqlSession()
-        .insert(byteArrayValue);
+        .insertBefore(byteArrayValue, this);
     }
     this.byteArrayValue = byteArrayValue;
     if (byteArrayValue != null) {

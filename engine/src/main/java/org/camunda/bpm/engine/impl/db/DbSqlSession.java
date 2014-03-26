@@ -13,45 +13,9 @@
 
 package org.camunda.bpm.engine.impl.db;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.ibatis.session.SqlSession;
-import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.WrongDbException;
-import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
-import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
-import org.camunda.bpm.engine.impl.GroupQueryImpl;
-import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
-import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.JobQueryImpl;
-import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
-import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.TaskQueryImpl;
-import org.camunda.bpm.engine.impl.UserQueryImpl;
+import org.camunda.bpm.engine.*;
+import org.camunda.bpm.engine.impl.*;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.upgrade.DbUpgradeStep;
@@ -64,6 +28,15 @@ import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.variable.DeserializedObject;
+
+import java.io.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /** responsibilities:
@@ -107,13 +80,32 @@ public class DbSqlSession implements Session {
 
   // insert ///////////////////////////////////////////////////////////////////
 
-  public void insert(PersistentObject persistentObject) {
+  /**
+   * Inserts a object at the given index in the insert objects list. If the
+   * index is -1 it will inserted at the end of the list.
+   *
+   * @param persistentObject  the object to insert
+   * @param index  the index at which the object should be inserted or -1 for the end of the list
+   */
+  public void insertAt(PersistentObject persistentObject, int index) {
     if (persistentObject.getId()==null) {
       String id = dbSqlSessionFactory.getIdGenerator().getNextId();
       persistentObject.setId(id);
     }
-    insertedObjects.add(persistentObject);
+    if (index == -1) {
+      index = insertedObjects.size();
+    }
+    insertedObjects.add(index, persistentObject);
     cachePut(persistentObject, false);
+  }
+
+  public void insert(PersistentObject persistentObject) {
+    insertAt(persistentObject, -1);
+  }
+
+  public void insertBefore(PersistentObject objectToInsert, PersistentObject referenceObject) {
+    int index = insertedObjects.indexOf(referenceObject);
+    insertAt(objectToInsert, index);
   }
 
   // update ///////////////////////////////////////////////////////////////////
@@ -1230,6 +1222,10 @@ public class DbSqlSession implements Session {
   }
   public DbSqlSessionFactory getDbSqlSessionFactory() {
     return dbSqlSessionFactory;
+  }
+
+  public boolean isInsertedObject(PersistentObject persistentObject) {
+    return insertedObjects.contains(persistentObject);
   }
 
 

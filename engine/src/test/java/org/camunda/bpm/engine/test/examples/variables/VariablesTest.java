@@ -12,22 +12,16 @@
  */
 package org.camunda.bpm.engine.test.examples.variables;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.variable.IntegerType;
-import org.camunda.bpm.engine.impl.variable.LongType;
-import org.camunda.bpm.engine.impl.variable.ShortType;
+import org.camunda.bpm.engine.impl.variable.*;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.history.SerializableVariable;
+
+import java.util.*;
 
 /**
  * @author Tom Baeyens
@@ -154,5 +148,52 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     runtimeService.setVariable(pi.getId(), "aVariable", (short)1234);
     variable = query.singleResult();
     assertEquals(ShortType.TYPE_NAME, variable.getTypeName());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml"})
+  public void testChangeTypeFromSerializableUsingApi() {
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", new SerializableVariable("foo"));
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableName("aVariable");
+
+    VariableInstance variable = query.singleResult();
+    assertEquals(SerializableType.TYPE_NAME, variable.getTypeName());
+
+    runtimeService.setVariable(pi.getId(), "aVariable", null);
+    variable = query.singleResult();
+    assertEquals(NullType.TYPE_NAME, variable.getTypeName());
+
+  }
+
+  @Deployment
+  public void testChangeSerializableInsideEngine() {
+
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    SerializableVariable var = (SerializableVariable) taskService.getVariable(task.getId(), "variableName");
+    assertNotNull(var);
+
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml"})
+  public void testChangeToSerializableUsingApi() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", "test");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableName("aVariable");
+
+    VariableInstance variable = query.singleResult();
+    assertEquals(StringType.TYPE_NAME, variable.getTypeName());
+
+    runtimeService.setVariable(processInstance.getId(), "aVariable", new SerializableVariable("foo"));
+    variable = query.singleResult();
+    assertEquals(SerializableType.TYPE_NAME, variable.getTypeName());
+
   }
 }
