@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="taskAssigneeExample" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+
+  <process id="process">
+    <startEvent id="startEvent" />
+
+    <userTask id="userTask">
+      <extensionElements>
+        <activiti:taskListener event="assignment" delegateExpression="${cdiTaskListenerBean}"/>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endEvent" />
+
+    <sequenceFlow sourceRef="startEvent" targetRef="userTask"/>
+    <sequenceFlow sourceRef="userTask" targetRef="endEvent"/>
+
+  </process>
+</definitions>

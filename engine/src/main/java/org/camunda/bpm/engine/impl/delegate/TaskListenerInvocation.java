@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.impl.delegate;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ExecutionContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 
 /**
@@ -38,9 +40,20 @@ public class TaskListenerInvocation extends DelegateInvocation {
   }
 
   protected void invoke() throws Exception {
-    executionListenerInstance.notify(delegateTask);
+    ExecutionContext executionContext = Context.getExecutionContext();
+    try {
+      if (executionContext == null) {
+        Context.setExecutionContext(contextExecution);
+      }
+      executionListenerInstance.notify(delegateTask);
+    }
+    finally {
+      if (executionContext == null) {
+        Context.removeExecutionContext();
+      }
+    }
   }
-  
+
   public Object getTarget() {
     return executionListenerInstance;
   }

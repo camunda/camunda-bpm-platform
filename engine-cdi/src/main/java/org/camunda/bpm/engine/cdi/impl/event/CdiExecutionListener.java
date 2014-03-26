@@ -32,6 +32,8 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import javax.enterprise.inject.spi.BeanManager;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -97,13 +99,9 @@ public class CdiExecutionListener implements TaskListener, ExecutionListener, Se
 
   protected BusinessProcessEvent createEvent(DelegateTask task) {
     ExecutionContext executionContext = Context.getExecutionContext();
-    ProcessDefinitionEntity  processDefinition = null;
-    if (task.getProcessDefinitionId() != null) {
-      if (executionContext != null) {
-        processDefinition = executionContext.getProcessDefinition();
-      } else {
-        processDefinition = Context.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(task.getProcessDefinitionId());
-      }
+    ProcessDefinitionEntity processDefinition = null;
+    if (executionContext != null) {
+      processDefinition = executionContext.getProcessDefinition();
     }
 
     // map type
@@ -135,28 +133,33 @@ public class CdiExecutionListener implements TaskListener, ExecutionListener, Se
   }
 
   protected Annotation[] getQualifiers(BusinessProcessEvent event) {
-    Annotation businessProcessQualifier = new BusinessProcessDefinitionLiteral(event.getProcessDefinition().getKey());
+    ProcessDefinition processDefinition = event.getProcessDefinition();
+    List<Annotation> annotations = new ArrayList<Annotation>();
+    if (processDefinition != null) {
+      annotations.add(new BusinessProcessDefinitionLiteral(processDefinition.getKey()));
+    }
+
     if (event.getType() == BusinessProcessEventType.TAKE) {
-      return new Annotation[] {businessProcessQualifier, new TakeTransitionLiteral(event.getTransitionName()) };
+      annotations.add(new TakeTransitionLiteral(event.getTransitionName()));
     }
-    if (event.getType() == BusinessProcessEventType.START_ACTIVITY) {
-      return new Annotation[] {businessProcessQualifier, new StartActivityLiteral(event.getActivityId()) };
+    else if (event.getType() == BusinessProcessEventType.START_ACTIVITY) {
+      annotations.add(new StartActivityLiteral(event.getActivityId()));
     }
-    if (event.getType() == BusinessProcessEventType.END_ACTIVITY) {
-      return new Annotation[] {businessProcessQualifier, new EndActivityLiteral(event.getActivityId()) };
+    else if (event.getType() == BusinessProcessEventType.END_ACTIVITY) {
+      annotations.add(new EndActivityLiteral(event.getActivityId()));
     }
-    if (event.getType() == BusinessProcessEventType.CREATE_TASK) {
-      return  new Annotation[] {businessProcessQualifier, new CreateTaskLiteral(event.getTaskDefinitionKey()) };
+    else if (event.getType() == BusinessProcessEventType.CREATE_TASK) {
+      annotations.add(new CreateTaskLiteral(event.getTaskDefinitionKey()));
     }
-    if (event.getType() == BusinessProcessEventType.ASSIGN_TASK) {
-      return  new Annotation[] {businessProcessQualifier, new AssignTaskLiteral(event.getTaskDefinitionKey()) };
+    else if (event.getType() == BusinessProcessEventType.ASSIGN_TASK) {
+      annotations.add(new AssignTaskLiteral(event.getTaskDefinitionKey()));
     }
-    if (event.getType() == BusinessProcessEventType.COMPLETE_TASK) {
-      return  new Annotation[] {businessProcessQualifier, new CompleteTaskLiteral(event.getTaskDefinitionKey()) };
+    else if (event.getType() == BusinessProcessEventType.COMPLETE_TASK) {
+      annotations.add(new CompleteTaskLiteral(event.getTaskDefinitionKey()));
     }
-    if (event.getType() == BusinessProcessEventType.DELETE_TASK) {
-      return  new Annotation[] {businessProcessQualifier, new DeleteTaskLiteral(event.getTaskDefinitionKey()) };
+    else if (event.getType() == BusinessProcessEventType.DELETE_TASK) {
+      annotations.add(new DeleteTaskLiteral(event.getTaskDefinitionKey()));
     }
-    return new Annotation[] {};
+    return annotations.toArray(new Annotation[annotations.size()]);
   }
 }
