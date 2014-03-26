@@ -1,10 +1,28 @@
+/* global ngDefine: false, require: false */
 ngDefine('tasklist.pages', [
   'angular',
+  'jquery',
   'bpmn/Bpmn',
-], function(module, angular, Bpmn) {
+], function(module, angular, $, Bpmn) {
+  'use strict';
 
-  var OverviewController = [ '$rootScope', '$scope', '$location', 'debounce', 'EngineApi', 'Notifications', 'authenticatedUser',
-                     function($rootScope, $scope, $location, debounce, EngineApi, Notifications, authenticatedUser) {
+  var OverviewController = [
+    '$rootScope',
+    '$scope',
+    '$location',
+    'debounce',
+    'EngineApi',
+    'Notifications',
+    'authenticatedUser',
+  function(
+     $rootScope,
+     $scope,
+     $location,
+     debounce,
+     EngineApi,
+     Notifications,
+     authenticatedUser
+   ) {
 
     var fireTaskListChanged = debounce(function() {
       $rootScope.$broadcast('tasklist.reload');
@@ -24,7 +42,7 @@ ngDefine('tasklist.pages', [
       });
 
       return query;
-    };
+    }
 
     var reloadTasks = debounce(function() {
       var view = $scope.taskList.view;
@@ -60,7 +78,7 @@ ngDefine('tasklist.pages', [
       $scope.taskList.view = { filter: filter, search: search };
 
       var queryObject = {},
-          user = authenticatedUser,
+          // user = authenticatedUser,
           sort = $scope.taskList.sort;
 
       queryObject.userId = authenticatedUser;
@@ -97,13 +115,14 @@ ngDefine('tasklist.pages', [
       EngineApi.getTaskList().query(queryObject).$then(function(response) {
         $scope.taskList.tasks = response.resource;
       });
-    };
+    }
 
     $scope.claimTask = function(task) {
 
       return EngineApi.getTaskList().claim({ id : task.id }, { userId: authenticatedUser }).$then(function () {
-        var tasks = $scope.taskList.tasks,
-            view = $scope.taskList.view;
+        // var tasks = $scope.taskList.tasks,
+        //     view = $scope.taskList.view;
+        var view = $scope.taskList.view;
 
         if (view.filter == 'mytasks') {
           $scope.addTask(task);
@@ -222,7 +241,7 @@ ngDefine('tasklist.pages', [
       return $scope.bpmn.task == task;
     };
 
-    $scope.toggleShowDiagram = function (task, index) {
+    $scope.toggleShowDiagram = function (task /*, index */) {
       var diagram = $scope.bpmn.diagram,
           oldTask = $scope.bpmn.task;
 
@@ -246,19 +265,25 @@ ngDefine('tasklist.pages', [
         if (diagram) {
           diagram.clear();
         }
+        var $diagramEl = $('#diagram');
+        var width = $diagramEl.width();
+        // var height = $diagramEl.height();
 
-        var width = $('#diagram').width();
-        var height = $('#diagram').height();
+        try {
+          diagram = new Bpmn().render(xml, {
+            diagramElement : 'diagram',
+            width: width,
+            height: 400
+          });
 
-        diagram = new Bpmn().render(xml, {
-          diagramElement : 'diagram',
-          width: width,
-          height: 400
-        });
+          diagram.annotation(task.taskDefinitionKey).addClasses([ 'bpmn-highlight' ]);
 
-        diagram.annotation(task.taskDefinitionKey).addClasses([ 'bpmn-highlight' ]);
-
-        $scope.bpmn.diagram = diagram;
+          $scope.bpmn.diagram = diagram;
+        }
+        catch (up) {
+          $diagramEl
+            .html('<p style="text-align: center;margin-top: 100px;">Unable to render process diagram.</p>');
+        }
       });
     };
   }];
