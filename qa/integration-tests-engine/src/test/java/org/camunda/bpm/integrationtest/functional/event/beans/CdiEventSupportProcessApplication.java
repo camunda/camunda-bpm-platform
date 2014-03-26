@@ -16,6 +16,7 @@ import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.cdi.impl.event.CdiExecutionListener;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
 
 /**
  * @author Daniel Meyer
@@ -30,5 +31,7 @@ public class CdiEventSupportProcessApplication extends ServletProcessApplication
     return new CdiExecutionListener();
   }
 
-
+  public TaskListener getTaskListener() {
+    return new CdiExecutionListener();
+  }
 }
