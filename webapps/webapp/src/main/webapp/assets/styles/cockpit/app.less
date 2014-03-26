@@ -612,132 +612,106 @@ textarea.variable-type-string {
 /** activity instance tree */
 
 .instance-tree {
-  padding-top: 10px;
-  font-size: 0.83em;
-
-  a {
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-    vertical-align: middle;
+  * {
+    display: block;
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+       -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+            box-sizing: border-box;         /* Opera/IE 8+ */
   }
 
-  .btn-toggle {
-    border: none;
-
-    i {
-      margin-top: 0;
-    }
-
+  li {
+    margin: 3px 0;
   }
 
   .tree-node {
-    margin: 2px 0;
-
-    ul {
-      margin-left: 19px;
-      // margin-bottom: 10px;
-    }
-
-    .tree-node-label.selected > .remove {
-      border: none;
-    }
-
-  }
-
-  > .tree-node {
-    margin-left: 3px;
+    padding-left: 20px;
   }
 
   .tree-node-group {
     position: relative;
-
-    > .tree-node-label {
-      border-radius: 4px 0 0 4px;
-      border-right: none;
-      padding: 0 5px;
-      position: relative;
-
-      a {
-        padding: 2px 5px;
-        position: absolute;
-        display: block;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      button {
-        top: 2px;
-        position: relative;
-        z-index: 2;
-      }
-    }
-
-    .has-children a {
-      left: 20px;
-    }
-
-    .selected a {
-      right: 20px;
-    }
-
-    > .tree-node-addon {
-      border-radius: 0 4px 4px 0;
-    }
+    vertical-align: middle;
+    height: 25px;
   }
 
   .tree-node-label {
-    display: table-cell;
-    // position: relative;
-    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    border: 1px solid #ccc;
     border-radius: 4px;
-    border: solid 1px #CCC;
-    // cursor: pointer;
-    line-height: 20px;
-    height: 23px;
 
     a {
-      display: inline-block;
-      min-height: 20px;
+      font-size: 12px;
+      color: #000;
+      text-decoration: none;
+
+      display: block;
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      right: 20px;
+      bottom: 0;
+      height: 23px;
+      padding: 0 4px;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 24px;
+      vertical-align: middle;
+    }
+
+    button {
+      position: absolute;
+      top: 0;
+      height: 23px;
+    }
+
+    .btn-toggle {
+      left: 4px;
     }
 
     .remove {
+      right: 24px;
       display: none;
+    }
+
+    &.has-children {
+      a {
+        left: 20px;
+      }
     }
 
     &.selected {
       -webkit-box-shadow: 0px 0px 2px 2px rgba(30, 144, 255, 1);
-      -moz-box-shadow: 0px 0px 2px 2px rgba(30, 144, 255, 1);
-      box-shadow: 0px 0px 2px 2px rgb(30, 144, 255);
+         -moz-box-shadow: 0px 0px 2px 2px rgba(30, 144, 255, 1);
+              box-shadow: 0px 0px 2px 2px rgb(30, 144, 255);
 
       background: #D5E8FF;
 
       .remove {
-        display: inline-block;
-        opacity: 0.3;
+        display: block;
+      }
+      a {
+        right: 40px;
       }
     }
-
-    &:hover.selected .remove {
-      opacity: 1.0;
-    }
-
   }
 
   .tree-node-addon {
-    display: table-cell;
-    vertical-align: middle;
-    padding: 4px 8px;
-    line-height: 1;
+    display: block;
+    padding: 4px;
+    border-radius: 0 4px 4px 0;
     background-color: @canceled-color;
     border: 1px solid @canceled-darker;
-    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
 
     &.activity-instance-completed {
       background-color: @completed-color;
@@ -748,7 +722,6 @@ textarea.variable-type-string {
       background-color: @running-color;
       border-color: @running-darker;
     }
-
   }
 }
 
