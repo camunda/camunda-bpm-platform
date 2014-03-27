@@ -58,7 +58,7 @@
                     <argument>--create</argument>
                     <argument>--drop</argument>
                     <argument>--delimiter=;</argument>
-                    <argument>--output=${project.basedir}/src/main/resources/cycle/sql/@folder@/@dbname@_cycle.sql</argument>
+                    <argument>--output=${project.basedir}/src/main/resources/sql/@folder@/@dbname@_cycle.sql</argument>
                     <argument>cyclePU</argument> <!-- persistence unit name in persistence.xml -->
                   </arguments>
                 </configuration>
