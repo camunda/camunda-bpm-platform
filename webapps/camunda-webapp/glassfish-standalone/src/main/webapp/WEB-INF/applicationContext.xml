@@ -7,8 +7,8 @@
 
   <bean id="dataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
     <property name="targetDataSource">
-      <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-        <property name="driverClass" value="org.h2.Driver" />
+      <bean class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="org.h2.Driver" />
         <property name="url" value="jdbc:h2:./camunda-h2-dbs/process-engine;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE" />
         <property name="username" value="sa" />
         <property name="password" value="" />
@@ -27,9 +27,11 @@
     <property name="databaseSchemaUpdate" value="true" />
     <property name="jobExecutorActivate" value="false" />
     <property name="deploymentResources" value="classpath*:bpmn/*.bpmn" />
+    <property name="authorizationEnabled" value="true" />
     <property name="processEnginePlugins">
       <list>
         <!--<ref bean="ldapIdentityProviderPlugin" />-->
+        <!--<ref bean="administratorAuthorizationPlugin" />-->
       </list>
     </property>
   </bean>
@@ -54,6 +56,10 @@
     <property name="groupIdAttribute" value="ou" />
     <property name="groupNameAttribute" value="cn" />
     <property name="groupMemberAttribute" value="member" />
+  </bean>
+
+  <bean id="administratorAuthorizationPlugin" class="org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin">
+    <property name="administratorUserName" value="admin" />
   </bean>
 
   <bean id="processEngine" class="org.camunda.bpm.engine.spring.ProcessEngineFactoryBean">
