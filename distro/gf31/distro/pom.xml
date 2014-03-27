@@ -62,6 +62,13 @@
 	
     <!-- sample applications -->
     <dependency>
+      <groupId>org.camunda.bpm.distro</groupId>
+      <artifactId>camunda-h2-webapp</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    
+    <dependency>
       <groupId>org.camunda.bpm.example</groupId>
       <artifactId>camunda-example-invoice</artifactId>
       <version>${project.version}</version>
