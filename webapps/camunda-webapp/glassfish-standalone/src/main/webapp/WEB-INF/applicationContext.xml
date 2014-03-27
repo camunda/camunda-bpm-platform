@@ -27,6 +27,33 @@
     <property name="databaseSchemaUpdate" value="true" />
     <property name="jobExecutorActivate" value="false" />
     <property name="deploymentResources" value="classpath*:bpmn/*.bpmn" />
+    <property name="processEnginePlugins">
+      <list>
+        <!--<ref bean="ldapIdentityProviderPlugin" />-->
+      </list>
+    </property>
+  </bean>
+
+  <!-- ldap identity provider (deactivated, uncomment plugin in processEngineConfiguration to activate) -->
+  <bean id="ldapIdentityProviderPlugin" class="org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin">
+    <property name="serverUrl" value="ldap://localhost:3433/" />
+    <property name="managerDn" value="uid=daniel,ou=office-berlin,o=camunda,c=org" />
+    <property name="managerPassword" value="daniel" />
+    <property name="baseDn" value="o=camunda,c=org" />
+
+    <property name="userSearchBase" value="" />
+    <property name="userSearchFilter" value="(objectclass=person)" />
+    <property name="userIdAttribute" value="uid" />
+    <property name="userFirstnameAttribute" value="cn" />
+    <property name="userLastnameAttribute" value="sn" />
+    <property name="userEmailAttribute" value="mail" />
+    <property name="userPasswordAttribute" value="userpassword" />
+
+    <property name="groupSearchBase" value="" />
+    <property name="groupSearchFilter" value="(objectclass=groupOfNames)" />
+    <property name="groupIdAttribute" value="ou" />
+    <property name="groupNameAttribute" value="cn" />
+    <property name="groupMemberAttribute" value="member" />
   </bean>
 
   <bean id="processEngine" class="org.camunda.bpm.engine.spring.ProcessEngineFactoryBean">
