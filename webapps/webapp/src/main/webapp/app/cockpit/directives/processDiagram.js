@@ -52,7 +52,7 @@ ngDefine('cockpit.directives', [
           scrollToBpmnElement(scrollToBpmnElementId);
         } catch (exception) {
           console.log('Unable to render diagram for process definition ' + $scope.processDiagram.processDefinition.id + ', reason: ' + exception.message);
-          $element.html('<p style="text-align: center;margin-top: 100px;">Unable to render process diagram.</p>');
+          $element.html('<div class="alert alert-error diagram-rendering-error">Unable to render process diagram.</div>');
         }
       }
     });
