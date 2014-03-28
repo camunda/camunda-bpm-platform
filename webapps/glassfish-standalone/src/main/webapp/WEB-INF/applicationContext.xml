@@ -9,7 +9,7 @@
     <property name="targetDataSource">
       <bean class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="org.h2.Driver" />
-        <property name="url" value="jdbc:h2:./camunda-h2-dbs/process-engine;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE" />
+        <property name="url" value="jdbc:h2:mem:process-engine;MVCC=TRUE;TRACE_LEVEL_FILE=0" />
         <property name="username" value="sa" />
         <property name="password" value="" />
       </bean>
@@ -28,6 +28,12 @@
     <property name="jobExecutorActivate" value="false" />
     <property name="deploymentResources" value="classpath*:bpmn/*.bpmn" />
     <property name="authorizationEnabled" value="true" />
+    <property name="failedJobCommandFactory">
+      <bean class="org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory" />
+    </property>
+    <property name="idGenerator">
+      <bean class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />
+    </property>
     <property name="processEnginePlugins">
       <list>
         <!--<ref bean="ldapIdentityProviderPlugin" />-->
