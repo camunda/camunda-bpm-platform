@@ -282,7 +282,7 @@ ngDefine('tasklist.pages', [
         }
         catch (up) {
           $diagramEl
-            .html('<p style="text-align: center;margin-top: 100px;">Unable to render process diagram.</p>');
+            .html('<div class="alert alert-error diagram-rendering-error">Unable to render process diagram.</div>');
         }
       });
     };
