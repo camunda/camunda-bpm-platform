@@ -236,9 +236,11 @@ ngDefine('tasklist.pages', [
     };
 
     $scope.bpmn = { };
+    $scope.showing = false;
 
     $scope.isDiagramActive = function(task) {
-      return $scope.bpmn.task == task;
+      // return $scope.showing;
+      return $scope.bpmn.task === task;
     };
 
     $scope.toggleShowDiagram = function (task /*, index */) {
@@ -251,11 +253,17 @@ ngDefine('tasklist.pages', [
         // destroy old diagram
         diagram.clear();
 
-        if (task == oldTask) {
+        if (task === oldTask) {
+          $scope.showing = false;
           return;
         }
       }
+      else if ($scope.showing) {
+        $scope.showing = false;
+        return;
+      }
 
+      $scope.showing = true;
       $scope.bpmn.task = task;
 
       EngineApi.getProcessDefinitions().xml({ id : task.processDefinitionId }).$then(function (result) {
@@ -265,9 +273,9 @@ ngDefine('tasklist.pages', [
         if (diagram) {
           diagram.clear();
         }
+
         var $diagramEl = $('#diagram');
         var width = $diagramEl.width();
-        // var height = $diagramEl.height();
 
         try {
           diagram = new Bpmn().render(xml, {
