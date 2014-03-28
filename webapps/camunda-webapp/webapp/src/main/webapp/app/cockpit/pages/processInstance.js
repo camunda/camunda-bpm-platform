@@ -143,7 +143,7 @@ ngDefine('cockpit.pages.processInstance', [
             activityId = instance.activityId || instance.targetActivityId,
             idx = activityIds.indexOf(activityId);
 
-        if (idx === -1 && !activityId) {
+        if (idx === -1) {
           activityIds.push(activityId);
           changed = true;
         }
