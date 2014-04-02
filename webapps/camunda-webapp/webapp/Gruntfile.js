@@ -172,7 +172,7 @@ module.exports = function(grunt) {
               '!vendor/requirejs/**/*',
               'css/**/*',
               'img/**/*',
-              'vendor/**/*.{js,css,jpg,png,gif,html,eot,ttf,svg,woff}'
+              'vendor/**/*.{js,css,jpg,png,gif,html,eot,ttf,svg,woff,htc}'
             ],
             dest: 'target/webapp/assets'
           }

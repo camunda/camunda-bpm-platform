@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>camunda Cockpit</title>
 
     <meta charset="utf-8" />
@@ -24,19 +25,18 @@
     <!-- styles -->
     <link href="$APP_ROOT/assets/css/cockpit/loader.css?bust=CACHE_BUSTER" rel="stylesheet" />
 
-    <!-- For IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
     <!-- favicon -->
     <link href="$APP_ROOT/assets/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
     <!-- scripts -->
-    <!-- For IE9 support of placeholder tag -->
-    <!--[if (lt IE 9)| (IE 9) ]>
-    <script src="$APP_ROOT/assets/vendor/better-dom/better-dom.js" data-htc="$APP_ROOT/assets/vendor/better-dom/better-dom.htc"></script>
-    <script src="$APP_ROOT/assets/vendor/better-placeholder-polyfill/better-placeholder-polyfill.js"></script>
+
+    <!-- For IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if IE]>
+        <link href="$APP_ROOT/assets/vendor/better-dom/dist/better-dom-legacy.htc" rel="htc"/>
+        <script src="$APP_ROOT/assets/vendor/better-dom/dist/better-dom-legacy.js"></script>
     <![endif]-->
 
     <script src="$APP_ROOT/assets/vendor/requirejs/require.js"></script>
@@ -58,7 +58,7 @@
             <span class="icon-bar"></span>
           </a>
 
-          <div ng-include="'templates/navigation.html'"></div>
+          <div ng-include="'$APP_ROOT/app/cockpit/templates/navigation.html'"></div>
         </div>
       </div>
     </div>
@@ -83,5 +83,7 @@
         </div>
       </footer>
     </div>
+    <script src="$APP_ROOT/assets/vendor/better-dom/dist/better-dom.js"></script>
+    <script src="$APP_ROOT/assets/vendor/better-placeholder-polyfill/dist/better-placeholder-polyfill.js"></script>
   </body>
 </html>
