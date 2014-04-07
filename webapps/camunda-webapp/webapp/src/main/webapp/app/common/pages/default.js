@@ -4,19 +4,19 @@ ngDefine('camunda.common.pages', ['jquery'], function(module, $) {
 
   function setHeadTitle(url) {
     var pageTitle = 'camunda Login';
-        
+
     if (url.indexOf('/cockpit/') !== -1) {
       pageTitle = 'camunda Cockpit';
     } else
-    
+
     if (url.indexOf('/tasklist/') !== -1) {
       pageTitle = 'camunda Tasklist';
-    } else 
+    } else
 
     if (url.indexOf('/admin/') !== -1) {
       pageTitle = 'camunda Admin';
     }
-    
+
     $('head title').text(pageTitle);
   }
 
@@ -68,7 +68,10 @@ ngDefine('camunda.common.pages', ['jquery'], function(module, $) {
 
           setHeadTitle($location.absUrl());
 
-          $location.path('/login');
+          $location
+            .search('destination', $location.search().destination || encodeURIComponent($location.url()))
+            .path('/login')
+          ;
         } else {
           $location.path('/setup');
         }

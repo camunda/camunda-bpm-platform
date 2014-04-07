@@ -147,8 +147,11 @@ ngDefine('camunda.common.services.authentication', ['angular', 'jquery'], functi
           }
 
           addError({ status: 'Unauthorized', message: 'Login is required to access the resource' });
-          // store current URL to come back directly after re-login?
-          $location.path('/login');
+
+          $location
+            .search('destination', $location.search().destination || encodeURIComponent($location.url()))
+            .path('/login')
+          ;
 
           return $q.reject(new Error('no user'));
         });

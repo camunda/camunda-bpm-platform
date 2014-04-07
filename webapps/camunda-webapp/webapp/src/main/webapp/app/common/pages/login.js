@@ -32,7 +32,12 @@ ngDefine('camunda.common.pages.login', [ 'angular', 'require', 'module:camunda.c
           Notifications.clearAll();
 
           if (success) {
-            $location.path('/');
+            if ($location.search().destination) {
+              $location.url(decodeURIComponent($location.search().destination));
+            }
+            else {
+              $location.path('/');
+            }
           } else {
             Notifications.addError({ status: 'Login Failed', message: 'Wrong credentials or missing access rights to application' });
           }
