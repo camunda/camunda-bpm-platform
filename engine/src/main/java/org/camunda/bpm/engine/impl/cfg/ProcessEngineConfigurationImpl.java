@@ -307,6 +307,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<String> customScriptingEngineClasses;
   protected ScriptingEngines scriptingEngines;
   protected List<ResolverFactory> resolverFactories;
+  protected boolean autoStoreScriptVariables = false;
 
   protected BusinessCalendarManager businessCalendarManager;
 
@@ -2107,5 +2108,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineImpl getProcessEngine() {
     return processEngine;
+  }
+
+  /**
+   * If set to true, the process engine will save all script variables (created from Java Script, Groovy ...)
+   * as process variables.
+   */
+  public void setAutoStoreScriptVariables(boolean autoStoreScriptVariables) {
+    this.autoStoreScriptVariables = autoStoreScriptVariables;
+  }
+
+  /**
+   * @return true if the process engine should save all script variables (created from Java Script, Groovy ...)
+   * as process variables.
+   */
+  public boolean isAutoStoreScriptVariables() {
+    return autoStoreScriptVariables;
   }
 }

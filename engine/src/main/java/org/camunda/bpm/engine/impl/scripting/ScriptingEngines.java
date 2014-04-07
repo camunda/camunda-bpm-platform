@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
@@ -58,12 +59,13 @@ public class ScriptingEngines {
   }
 
   public Object evaluate(String script, String language, VariableScope variableScope) {
-    Bindings bindings = createBindings(variableScope);
     ScriptEngine scriptEngine = scriptEngineManager.getEngineByName(language);
 
     if (scriptEngine == null) {
       throw new ProcessEngineException("Can't find scripting engine for '" + language + "'");
     }
+
+    Bindings bindings = createBindings(variableScope, scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE));
 
     try {
       return scriptEngine.eval(script, bindings);
@@ -72,11 +74,13 @@ public class ScriptingEngines {
     }
   }
 
-  /** override to build a spring aware ScriptingEngines */
-  protected Bindings createBindings(VariableScope variableScope) {
-    return scriptBindingsFactory.createBindings(variableScope); 
+  /** override to build a spring aware ScriptingEngines
+   * @param engineBindings
+   * @param scriptEngine */
+  protected Bindings createBindings(VariableScope variableScope, Bindings engineBindings) {
+    return scriptBindingsFactory.createBindings(variableScope, engineBindings);
   }
-  
+
   public ScriptBindingsFactory getScriptBindingsFactory() {
     return scriptBindingsFactory;
   }

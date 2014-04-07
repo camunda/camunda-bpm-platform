@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,11 +26,18 @@ public class GroovyScriptTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testScriptExecution() {
-    int[] inputArray = new int[] {1, 2, 3, 4, 5};
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("scriptExecution", CollectionUtil.singletonMap("inputArray", inputArray));
+    try {
 
-    Integer result = (Integer) runtimeService.getVariable(pi.getId(), "sum");
-    assertEquals(15, result.intValue());
+      processEngineConfiguration.setAutoStoreScriptVariables(true);
+      int[] inputArray = new int[] {1, 2, 3, 4, 5};
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("scriptExecution", CollectionUtil.singletonMap("inputArray", inputArray));
+
+      Integer result = (Integer) runtimeService.getVariable(pi.getId(), "sum");
+      assertEquals(15, result.intValue());
+
+    } finally {
+      processEngineConfiguration.setAutoStoreScriptVariables(false);
+    }
   }
 
   @Deployment
