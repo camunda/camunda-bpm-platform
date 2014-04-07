@@ -22,7 +22,10 @@ ngDefine('camunda.common.pages.login', [ 'angular', 'require', 'module:camunda.c
     }
 
     $scope.login = function () {
-      // possible bug to investigate (when password is remembered, under FF)
+      // this corrects a bug with password managers (observed in FF at least)
+      $scope.username = $scope.username || angular.element('[ng-model="username"]').val();
+      $scope.password = $scope.password || angular.element('[ng-model="password"]').val();
+
       AuthenticationService
         .login($scope.username, $scope.password)
         .then(function(success) {
