@@ -64,7 +64,8 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
 
   private static final long ONE_HOUR = 60L * 60L * 1000L;
   private static final long ONE_SECOND = 1000L;
-  private static final String EXCEPTION_MESSAGE = "problem evaluating script: javax.script.ScriptException: java.lang.RuntimeException: This is an exception thrown from scriptTask";
+  private static final String EXCEPTION_MESSAGE = "java.lang.RuntimeException: This is an exception thrown from scriptTask";
+
 
   /**
    * Setup will create
@@ -327,7 +328,9 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
 
     ProcessInstance processInstance = startProcessInstanceWithFailingJob();
 
-    query = managementService.createJobQuery().exceptionMessage(EXCEPTION_MESSAGE);
+    Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    query = managementService.createJobQuery().exceptionMessage(job.getExceptionMessage());
     verifyFailedJob(query, processInstance);
   }
 

@@ -22,7 +22,12 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 
 
 /**
+ * <p>Factory for the Bindings used by the {@link ScriptingEngines}. The default
+ * implementation will wrap the provided default bindings using an {@link ScriptBindings}
+ * implementation.</p>
+ *
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
 public class ScriptBindingsFactory {
 

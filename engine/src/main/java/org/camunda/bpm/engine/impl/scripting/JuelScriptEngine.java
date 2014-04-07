@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,10 +49,10 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
  * ScriptEngine that used JUEL for script evaluation and compilation (JSR-223).
- * 
+ *
  * Uses EL 1.1 if available, to resolve expressions. Otherwise it reverts to EL
  * 1.0, using {@link ExpressionFactoryResolver}.
- * 
+ *
  * @author Frederik Heremans
  */
 public class JuelScriptEngine extends AbstractScriptEngine implements Compilable {
@@ -71,8 +71,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
   }
 
   public CompiledScript compile(String script) throws ScriptException {
-    ValueExpression expr = parse(script, context);
-    return new JuelCompiledScript(expr);
+    throw new UnsupportedOperationException("Compile is unsupported");
   }
 
   public CompiledScript compile(Reader reader) throws ScriptException {
@@ -232,7 +231,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
 
   /**
    * Class representing a compiled script using JUEL.
-   * 
+   *
    * @author Frederik Heremans
    */
   private class JuelCompiledScript extends CompiledScript {
@@ -256,7 +255,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
   /**
    * ValueMapper that uses the ScriptContext to get variable values or value
    * expressions.
-   * 
+   *
    * @author Frederik Heremans
    */
   private class ScriptContextVariableMapper extends VariableMapper {
@@ -293,7 +292,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
 
   /**
    * FunctionMapper that uses the ScriptContext to resolve functions in EL.
-   * 
+   *
    * @author Frederik Heremans
    */
   private class ScriptContextFunctionMapper extends FunctionMapper {

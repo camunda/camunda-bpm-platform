@@ -308,6 +308,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ScriptingEngines scriptingEngines;
   protected List<ResolverFactory> resolverFactories;
   protected boolean autoStoreScriptVariables = false;
+  protected boolean enableScriptCompilation = true;
 
   protected BusinessCalendarManager businessCalendarManager;
 
@@ -2124,5 +2125,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   public boolean isAutoStoreScriptVariables() {
     return autoStoreScriptVariables;
+  }
+
+  /**
+   * If set to true, the process engine will attempt to pre-compile script sources at runtime
+   * to optimize script task execution performance.
+   */
+  public void setEnableScriptCompilation(boolean enableScriptCompilation) {
+    this.enableScriptCompilation = enableScriptCompilation;
+  }
+
+  /**
+   * @return true if compilation of script sources ins enabled. False otherwise.
+   */
+  public boolean isEnableScriptCompilation() {
+    return enableScriptCompilation;
   }
 }
