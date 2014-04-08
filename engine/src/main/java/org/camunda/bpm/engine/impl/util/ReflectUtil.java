@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
@@ -135,10 +136,21 @@ public abstract class ReflectUtil {
    */
   public static String getResourceUrlAsString(String name) {
     URL url = getResource(name);
+    return urlToURI(url).toASCIIString();
+  }
+
+  /**
+   * Converts an url to an uri. Escapes whitespaces if needed.
+   *
+   * @param url  the url to convert
+   * @return the resulting uri
+   * @throws ProcessEngineException if the url has invalid syntax
+   */
+  public static URI urlToURI(URL url) {
     try {
-      return url.toURI().toASCIIString();
+      return new URI(url.getProtocol(), url.getAuthority(), url.getPath(), url.getQuery(), null);
     } catch (URISyntaxException e) {
-      throw new ProcessEngineException("couldn't encode url " + url, e);
+      throw new ProcessEngineException("couldn't convert URL to URI " + url, e);
     }
   }
 
