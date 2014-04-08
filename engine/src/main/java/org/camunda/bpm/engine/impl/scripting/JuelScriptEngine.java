@@ -20,7 +20,6 @@ import java.lang.reflect.Modifier;
 
 import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
-import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -55,7 +54,7 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
  *
  * @author Frederik Heremans
  */
-public class JuelScriptEngine extends AbstractScriptEngine implements Compilable {
+public class JuelScriptEngine extends AbstractScriptEngine {
 
   private ScriptEngineFactory scriptEngineFactory;
   private ExpressionFactory expressionFactory;
@@ -68,15 +67,6 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
 
   public JuelScriptEngine() {
     this(null);
-  }
-
-  public CompiledScript compile(String script) throws ScriptException {
-    throw new UnsupportedOperationException("Compile is unsupported");
-  }
-
-  public CompiledScript compile(Reader reader) throws ScriptException {
-    // Create a String based on the reader and complile it
-    return compile(readFully(reader));
   }
 
   public Object eval(String script, ScriptContext scriptContext) throws ScriptException {
