@@ -8,23 +8,23 @@
   <insert id="insertAuthorization" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity">
     insert into ${prefix}ACT_RU_AUTHORIZATION (
       ID_,
-      REV_,
       TYPE_,
       GROUP_ID_,
       USER_ID_,
       RESOURCE_TYPE_,
       RESOURCE_ID_,
-      PERMS_
+      PERMS_,
+      REV_
       )
     values (
       #{id ,jdbcType=VARCHAR},
-      1,
       #{authorizationType ,jdbcType=INTEGER},
       #{groupId ,jdbcType=VARCHAR},
       #{userId ,jdbcType=VARCHAR},
       #{resourceType ,jdbcType=INTEGER},
       #{resourceId ,jdbcType=VARCHAR},
-      #{permissions, jdbcType=INTEGER}
+      #{permissions, jdbcType=INTEGER},
+      1
     )
   </insert>
   

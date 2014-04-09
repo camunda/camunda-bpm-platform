@@ -8,23 +8,23 @@
   <insert id="insertJobDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity">
     insert into ${prefix}ACT_RU_JOBDEF (
       ID_,
-      REV_,
       PROC_DEF_ID_,
       PROC_DEF_KEY_,
       ACT_ID_,
       JOB_TYPE_,
       JOB_CONFIGURATION_,
-      SUSPENSION_STATE_
+      SUSPENSION_STATE_,
+      REV_
       )
     values (
       #{id ,jdbcType=VARCHAR},
-      1,
       #{processDefinitionId, jdbcType=VARCHAR},
       #{processDefinitionKey, jdbcType=VARCHAR},
       #{activityId, jdbcType=VARCHAR},
       #{jobType, jdbcType=VARCHAR},
       #{jobConfiguration, jdbcType=VARCHAR},
-      #{suspensionState, jdbcType=INTEGER}
+      #{suspensionState, jdbcType=INTEGER},
+      1
     )
   </insert>
 

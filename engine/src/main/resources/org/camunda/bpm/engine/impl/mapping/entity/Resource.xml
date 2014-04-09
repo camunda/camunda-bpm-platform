@@ -7,8 +7,8 @@
   <!-- RESOURCE INSERT -->
 
   <insert id="insertResource" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity">
-    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_, GENERATED_)
-    values (#{id, jdbcType=VARCHAR}, 1, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=BLOB}, #{deploymentId, jdbcType=VARCHAR}, #{generated, jdbcType=BOOLEAN})  
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, GENERATED_, REV_)
+    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=BLOB}, #{deploymentId, jdbcType=VARCHAR}, #{generated, jdbcType=BOOLEAN}, 1)  
   </insert>
   
   <!-- RESOURCE UPDATE -->

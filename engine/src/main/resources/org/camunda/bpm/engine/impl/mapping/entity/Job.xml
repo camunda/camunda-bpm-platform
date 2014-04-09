@@ -288,7 +288,6 @@
   <insert id="insertTimer" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TimerEntity">
     insert into ${prefix}ACT_RU_JOB (
             ID_, 
-            REV_,
             TYPE_,
             LOCK_OWNER_, 
             LOCK_EXP_TIME_,
@@ -306,9 +305,10 @@
             HANDLER_CFG_,
             DEPLOYMENT_ID_,
             SUSPENSION_STATE_,
-            JOB_DEF_ID_ )
+            JOB_DEF_ID_, 
+            REV_
+          )
     values (#{id, jdbcType=VARCHAR},
-            1,
             'timer',
             #{lockOwner, jdbcType=VARCHAR},
             #{lockExpirationTime, jdbcType=TIMESTAMP},
@@ -326,7 +326,8 @@
             #{jobHandlerConfiguration, jdbcType=VARCHAR},
             #{deploymentId, jdbcType=VARCHAR},
             #{suspensionState, jdbcType=INTEGER},
-            #{jobDefinitionId, jdbcType=VARCHAR}
+            #{jobDefinitionId, jdbcType=VARCHAR},
+            1
     )
   </insert>
 
@@ -375,7 +376,6 @@
   <insert id="insertMessage" parameterType="org.camunda.bpm.engine.impl.persistence.entity.MessageEntity">
     insert into ${prefix}ACT_RU_JOB (
             ID_, 
-            REV_, 
             TYPE_,
             LOCK_OWNER_, 
             LOCK_EXP_TIME_,
@@ -391,9 +391,10 @@
             HANDLER_CFG_,
             DEPLOYMENT_ID_,
             SUSPENSION_STATE_,
-            JOB_DEF_ID_ )
+            JOB_DEF_ID_,
+            REV_
+            )
     values (#{id, jdbcType=VARCHAR},
-            1,
             'message',
             #{lockOwner, jdbcType=VARCHAR},
             #{lockExpirationTime, jdbcType=TIMESTAMP},
@@ -409,7 +410,8 @@
             #{jobHandlerConfiguration, jdbcType=VARCHAR},
             #{deploymentId, jdbcType=VARCHAR},
             #{suspensionState, jdbcType=INTEGER},
-            #{jobDefinitionId, jdbcType=VARCHAR}
+            #{jobDefinitionId, jdbcType=VARCHAR},
+            1
     )
   </insert>
 

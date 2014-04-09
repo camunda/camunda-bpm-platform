@@ -165,24 +165,24 @@
   <insert id="insertMessageEventSubscription" parameterType="org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity">
  	insert into ${prefix}ACT_RU_EVENT_SUBSCR (
             ID_, 
-            REV_,
             EVENT_TYPE_,
            	EVENT_NAME_,
            	EXECUTION_ID_,
            	PROC_INST_ID_,
            	ACTIVITY_ID_,
            	CONFIGURATION_,
-           	CREATED_
+           	CREATED_,
+            REV_
     )
     values (#{id, jdbcType=VARCHAR},
-            1,
             'message',
             #{eventName, jdbcType=VARCHAR},
             #{executionId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{activityId, jdbcType=VARCHAR},
             #{configuration, jdbcType=VARCHAR},
-            #{created, jdbcType=TIMESTAMP}                   
+            #{created, jdbcType=TIMESTAMP},
+            1
     )
   </insert>
 
@@ -207,25 +207,25 @@
   
   <insert id="insertSignalEventSubscription" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity">
    insert into ${prefix}ACT_RU_EVENT_SUBSCR (
-             ID_, 
-            REV_,
+            ID_, 
             EVENT_TYPE_,
            	EVENT_NAME_,
            	EXECUTION_ID_,
            	PROC_INST_ID_,
            	ACTIVITY_ID_,
            	CONFIGURATION_,
-           	CREATED_
+           	CREATED_,
+            REV_
     )
     values (#{id, jdbcType=VARCHAR},
-            1,
             'signal',
             #{eventName, jdbcType=VARCHAR},
             #{executionId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{activityId, jdbcType=VARCHAR},
             #{configuration, jdbcType=VARCHAR},
-            #{created, jdbcType=TIMESTAMP}          
+            #{created, jdbcType=TIMESTAMP},
+            1
     )
   </insert>
 

@@ -7,10 +7,9 @@
   <!-- VARIABLE INSTANCE INSERT -->
   
   <insert id="insertVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
-    insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, VAR_SCOPE_)
+    insert into ${prefix}ACT_RU_VARIABLE (ID_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, VAR_SCOPE_, REV_) 
     values (
       #{id, jdbcType=VARCHAR},
-      1,
       #{type, jdbcType=VARCHAR },
       #{name, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
@@ -21,7 +20,8 @@
       #{longValue, jdbcType=BIGINT},
       #{textValue, jdbcType=VARCHAR},
       #{textValue2, jdbcType=VARCHAR},
-      #{variableScope, jdbcType=VARCHAR}
+      #{variableScope, jdbcType=VARCHAR},
+      1
     )
   </insert>
   
@@ -248,13 +248,13 @@
   <!-- BYTE ARRAY INSERT -->
 
   <insert id="insertByteArray" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
-    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_)
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, REV_)
     values (
       #{id, jdbcType=VARCHAR},
-      1, 
       #{name, jdbcType=VARCHAR}, 
       #{bytes, jdbcType=BLOB}, 
-      #{deploymentId, jdbcType=VARCHAR}
+      #{deploymentId, jdbcType=VARCHAR},
+      1 
     )  
   </insert>
   
@@ -324,13 +324,13 @@
   </update>  
   
     <insert id="insertByteArray_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
-    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_)
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, REV_)
     values (
       #{id, jdbcType=VARCHAR},
-      1, 
       #{name, jdbcType=VARCHAR}, 
       #{bytes, jdbcType=BINARY}, 
-      #{deploymentId, jdbcType=VARCHAR}
+      #{deploymentId, jdbcType=VARCHAR},
+      1
     )  
   </insert>
 </mapper>
