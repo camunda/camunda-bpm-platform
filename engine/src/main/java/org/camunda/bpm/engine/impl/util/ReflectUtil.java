@@ -148,7 +148,6 @@ public abstract class ReflectUtil {
    */
   public static URI urlToURI(URL url) {
     try {
-      //return new URI(url.getProtocol(), url.getAuthority(), url.getPath(), url.getQuery(), null);
       return new URI(url.getProtocol(), url.getPath(), null);
     } catch (URISyntaxException e) {
       throw new ProcessEngineException("couldn't convert URL to URI " + url, e);
