@@ -43,6 +43,10 @@ public class ReflectUtilTest extends TestCase {
     url = "http://test:test@camunda.org/test.xml?page=2";
   }
 
+  public void testJarUrl() {
+    url = "jar:file:/home/menski/review/server/jboss-as-7.2.0.Final/modules/org/camunda/bpm/camunda-engine/main/camunda-engine-7.2.0-SNAPSHOT.jar!/ProcessApplication.xsd";
+  }
+
   public void tearDown() throws MalformedURLException {
     URL testUrl = new URL(url);
     String uri = ReflectUtil.urlToURI(testUrl).toASCIIString();
