@@ -618,6 +618,7 @@ module.exports = function(grunt) {
       ]);
     }
 
+    target = 'dist';
 
     tasks = tasks.concat([
       'less:'+ target,
