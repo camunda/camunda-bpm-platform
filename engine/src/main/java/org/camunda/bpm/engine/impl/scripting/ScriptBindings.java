@@ -36,7 +36,7 @@ import org.camunda.bpm.engine.impl.context.Context;
  * <li>additional bindings provided through a set of {@link Resolver Resolvers}.</li>
  * </ul>
  *
- * <p><strong>Note on backwards compatibility:</strong> before 7.1 the Script
+ * <p><strong>Note on backwards compatibility:</strong> before 7.2 the Script
  * bindings behaved in a way that all script variables were automatically exposed
  * as process variables. You can enable this behavior by setting {@link #autoStoreScriptVariables}.
  * </p>
