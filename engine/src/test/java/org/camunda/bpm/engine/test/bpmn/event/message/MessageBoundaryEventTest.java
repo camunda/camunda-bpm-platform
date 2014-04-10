@@ -16,6 +16,8 @@ package org.camunda.bpm.engine.test.bpmn.event.message;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -504,6 +506,30 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
+  }
+
+  @Deployment
+  public void testBoundaryMessageEventOnSubprocessWithIntermediateMessageCatch() {
+
+    // given
+    // a process instance waiting inside the intermediate message catch inside the subprocess
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // when
+    // I cancel the subprocess
+    runtimeService.correlateMessage("cancelMessage");
+
+    // then
+    // the process instance is ended
+    assertProcessEnded(processInstance.getId());
+
+    if(processEngineConfiguration.getHistoryLevel()>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      // and all activity instances in history have an end time set
+      List<HistoricActivityInstance> hais = historyService.createHistoricActivityInstanceQuery().list();
+      for (HistoricActivityInstance historicActivityInstance : hais) {
+        assertNotNull(historicActivityInstance.getEndTime());
+      }
+    }
   }
 
   @Deployment

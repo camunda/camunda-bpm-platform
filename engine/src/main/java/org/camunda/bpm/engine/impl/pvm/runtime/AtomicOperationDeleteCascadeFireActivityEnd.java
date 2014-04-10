@@ -76,6 +76,10 @@ public class AtomicOperationDeleteCascadeFireActivityEnd extends AtomicOperation
       if (!execution.isDeleteRoot()) {
         InterpretableExecution parent = (InterpretableExecution) execution.getParent();
         if (parent!=null) {
+          // set activity on parent in case the parent is an inactive scope execution and activity has been set to 'null'.
+          if(parent.getActivity() == null && activity.getParentActivity() != null) {
+            parent.setActivity(activity.getParentActivity());
+          }
           parent.performOperation(AtomicOperation.DELETE_CASCADE);
         }
       }
