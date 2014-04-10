@@ -107,7 +107,7 @@
     where (RES.RETRIES_ &gt; 0)
       and (RES.DUEDATE_ is null or RES.DUEDATE_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
       and (RES.LOCK_OWNER_ is null or RES.LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
-      and (RES.SUSPENSION_STATE_ = 1)
+      and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
 
       <if test="parameter.deploymentAware">
         and (RES.DEPLOYMENT_ID_ is null 
@@ -133,7 +133,7 @@
       and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
       and (EXCLUSIVE_ = TRUE)
       and (PROCESS_INSTANCE_ID_ = #{parameter.pid})
-      and (RES.SUSPENSION_STATE_ = 1)
+      and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
     ${limitAfter}
   </select>
 
@@ -146,7 +146,7 @@
       and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
       and (EXCLUSIVE_ = 1)
       and (PROCESS_INSTANCE_ID_ = #{parameter.pid})  
-      and (RES.SUSPENSION_STATE_ = 1)
+      and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
     ${limitAfter}
   </select>
 
@@ -207,8 +207,8 @@
         and (RES.DUEDATE_ is null or RES.DUEDATE_ &lt;= #{now, jdbcType=TIMESTAMP})
         and (
             (RES.EXECUTION_ID_ is null)
-            or 
-            (PI.SUSPENSION_STATE_ = 1)     
+            or
+            (PI.SUSPENSION_STATE_ = 1 or PI.SUSPENSION_STATE_ is null)
       )
       </if>
       <if test="onlyTimers">
@@ -253,7 +253,7 @@
 	  where (RETRIES_ &gt; 0)
 	    and (DUEDATE_ is null or DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
 	    and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
-      and (RES.SUSPENSION_STATE_ = 1) 
+      and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
 	   <if test="parameter.deploymentAware">
         and (RES.DEPLOYMENT_ID_ is null 
         <if test="parameter.deploymentIds != null">
@@ -278,7 +278,7 @@
       and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
       and (EXCLUSIVE_ = TRUE)
       and (PROCESS_INSTANCE_ID_ = #{parameter.pid})
-      and (RES.SUSPENSION_STATE_ = 1)
+      and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
     ${limitAfter}
   </select>
 
