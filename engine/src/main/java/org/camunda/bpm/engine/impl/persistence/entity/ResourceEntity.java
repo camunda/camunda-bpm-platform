@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +16,13 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.repository.Resource;
 
 
 /**
  * @author Tom Baeyens
  */
-public class ResourceEntity implements Serializable, PersistentObject {
+public class ResourceEntity implements Serializable, PersistentObject, Resource {
 
   private static final long serialVersionUID = 1L;
 
@@ -30,35 +31,35 @@ public class ResourceEntity implements Serializable, PersistentObject {
   protected byte[] bytes;
   protected String deploymentId;
   protected boolean generated = false;
-  
+
   public String getId() {
     return id;
   }
-  
+
   public void setId(String id) {
     this.id = id;
   }
-  
+
   public String getName() {
     return name;
   }
-  
+
   public void setName(String name) {
     this.name = name;
   }
-  
+
   public byte[] getBytes() {
     return bytes;
   }
-  
+
   public void setBytes(byte[] bytes) {
     this.bytes = bytes;
   }
-  
+
   public String getDeploymentId() {
     return deploymentId;
   }
-  
+
   public void setDeploymentId(String deploymentId) {
     this.deploymentId = deploymentId;
   }
@@ -66,14 +67,14 @@ public class ResourceEntity implements Serializable, PersistentObject {
   public Object getPersistentState() {
     return ResourceEntity.class;
   }
-  
+
   public void setGenerated(boolean generated) {
     this.generated = generated;
   }
-  
+
   /**
    * Indicated whether or not the resource has been generated while deploying rather than
-   * being actual part of the deployment. 
+   * being actual part of the deployment.
    */
   public boolean isGenerated() {
     return generated;

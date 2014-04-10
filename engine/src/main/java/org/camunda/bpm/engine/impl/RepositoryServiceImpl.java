@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilde
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -74,8 +75,17 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return commandExecutor.execute(new GetDeploymentResourceNamesCmd(deploymentId));
   }
 
+  @SuppressWarnings("unchecked")
+  public List<Resource> getDeploymentResources(String deploymentId) {
+    return commandExecutor.execute(new GetDeploymentResourcesCmd(deploymentId));
+  }
+
   public InputStream getResourceAsStream(String deploymentId, String resourceName) {
     return commandExecutor.execute(new GetDeploymentResourceCmd(deploymentId, resourceName));
+  }
+
+  public InputStream getResourceAsStreamById(String deploymentId, String resourceId) {
+    return commandExecutor.execute(new GetDeploymentResourceForIdCmd(deploymentId, resourceId));
   }
 
   public DeploymentQuery createDeploymentQuery() {

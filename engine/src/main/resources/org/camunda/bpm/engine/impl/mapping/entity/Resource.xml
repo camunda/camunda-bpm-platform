@@ -40,6 +40,12 @@
           AND NAME_ = #{resourceName}
   </select>
 
+  <select id="selectResourceByDeploymentIdAndResourceId" parameterType="map" resultMap="resourceResultMap">
+    select * from ${prefix}ACT_GE_BYTEARRAY 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+          AND ID_ = #{resourceId}
+  </select>
+
   <select id="selectResourcesByDeploymentId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap">
     select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>  
@@ -57,6 +63,13 @@
     select * from ${prefix}ACT_GE_BYTEARRAY 
     where DEPLOYMENT_ID_ = #{deploymentId}
           AND NAME_ = #{resourceName}
+  </select>
+
+  <!-- postgresql specific -->
+  <select id="selectResourceByDeploymentIdAndResourceId_postgres" parameterType="map" resultMap="resourceResultMap_postgres">
+    select * from ${prefix}ACT_GE_BYTEARRAY 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+          AND ID_ = #{resourceId}
   </select>
   
   <!-- postgresql specific -->

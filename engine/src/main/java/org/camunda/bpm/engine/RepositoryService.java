@@ -20,6 +20,7 @@ import java.util.List;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
@@ -69,11 +70,18 @@ public interface RepositoryService {
   void deleteDeployment(String deploymentId, boolean cascade);
 
   /**
-   * Retrieves a list of deployment resources for the given deployment,
+   * Retrieves a list of deployment resource names for the given deployment,
    * ordered alphabetically.
    * @param deploymentId id of the deployment, cannot be null.
    */
   List<String> getDeploymentResourceNames(String deploymentId);
+
+  /**
+   * Retrieves a list of deployment resources for the given deployment,
+   * ordered alphabetically by name.
+   * @param deploymentId id of the deployment, cannot be null.
+   */
+  List<Resource> getDeploymentResources(String deploymentId);
 
   /**
    * Gives access to a deployment resource through a stream of bytes.
@@ -83,6 +91,15 @@ public interface RepositoryService {
    * for the given deploymentId.
    */
   InputStream getResourceAsStream(String deploymentId, String resourceName);
+
+  /**
+   * Gives access to a deployment resource through a stream of bytes.
+   * @param deploymentId id of the deployment, cannot be null.
+   * @param resourceId id of the resource, cannot be null.
+   * @throws ProcessEngineException when the resource doesn't exist in the given deployment or when no deployment exists
+   * for the given deploymentId.
+   */
+  InputStream getResourceAsStreamById(String deploymentId, String resourceId);
 
   /** Query process definitions. */
   ProcessDefinitionQuery createProcessDefinitionQuery();

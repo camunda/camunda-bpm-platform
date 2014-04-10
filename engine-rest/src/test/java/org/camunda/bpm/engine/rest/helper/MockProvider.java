@@ -50,13 +50,16 @@ import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.variable.StringType;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -166,6 +169,17 @@ public abstract class MockProvider {
   public static final String EXAMPLE_ACTIVITY_NAME = "anActivityName";
   public static final String EXAMPLE_ACTIVITY_TYPE = "anActivityType";
   public static final String EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION = "2013-04-23T13:42:43";
+
+  // deployment
+  public static final String NON_EXISTING_DEPLOYMENT_ID = "aNonExistingDeploymentId";
+  public static final String EXAMPLE_DEPLOYMENT_NAME = "aName";
+  public static final String EXAMPLE_DEPLOYMENT_NAME_LIKE = "aNameLike";
+  public static final String EXAMPLE_DEPLOYMENT_TIME = "2013-01-23T13:59:43";
+  public static final String NON_EXISTING_DEPLOYMENT_TIME = "2013-04-23T13:42:43";
+
+  // deployment resources
+  public static final String EXAMPLE_DEPLOYMENT_RESOURCE_ID = "aDeploymentResourceId";
+  public static final String EXAMPLE_DEPLOYMENT_RESOURCE_NAME = "aDeploymentResourceName";
 
   // statistics
   public static final int EXAMPLE_FAILED_JOBS = 42;
@@ -604,6 +618,38 @@ public abstract class MockProvider {
         .diagram(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME).suspended(EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED).build();
 
     return mockDefinition;
+  }
+
+  // deployments
+  public static List<Deployment> createMockDeployments() {
+    List<Deployment> mocks = new ArrayList<Deployment>();
+    mocks.add(createMockDeployment());
+    return mocks;
+  }
+
+  public static Deployment createMockDeployment() {
+    Deployment mockDeployment = mock(Deployment.class);
+    when(mockDeployment.getId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
+    when(mockDeployment.getName()).thenReturn(EXAMPLE_DEPLOYMENT_NAME);
+    when(mockDeployment.getDeploymentTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_DEPLOYMENT_TIME).toDate());
+
+    return mockDeployment;
+  }
+
+  // deployment resources
+  public static List<Resource> createMockDeploymentResources() {
+    List<Resource> mocks = new ArrayList<Resource>();
+    mocks.add(createMockDeploymentResource());
+    return mocks;
+  }
+
+  public static Resource createMockDeploymentResource() {
+    Resource mockResource = mock(ResourceEntity.class);
+    when(mockResource.getId()).thenReturn(EXAMPLE_DEPLOYMENT_RESOURCE_ID);
+    when(mockResource.getName()).thenReturn(EXAMPLE_DEPLOYMENT_RESOURCE_NAME);
+    when(mockResource.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
+
+    return mockResource;
   }
 
   // user & groups

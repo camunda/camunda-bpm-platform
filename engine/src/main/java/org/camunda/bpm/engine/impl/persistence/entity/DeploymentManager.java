@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 
@@ -154,6 +155,10 @@ public class DeploymentManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<String> getDeploymentResourceNames(String deploymentId) {
     return getDbSqlSession().getSqlSession().selectList("selectResourceNamesByDeploymentId", deploymentId);
+  }
+
+  public List<Resource> getDeploymentResources(String deploymentId) {
+    return getDbSqlSession().getSqlSession().selectList("selectResourcesByDeploymentId", deploymentId);
   }
 
   public void close() {
