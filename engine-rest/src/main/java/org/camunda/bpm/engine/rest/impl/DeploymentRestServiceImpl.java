@@ -12,11 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -25,7 +20,11 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentQueryDto;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
-import org.camunda.bpm.engine.rest.sub.repository.DeploymentResourceImpl;
+import org.camunda.bpm.engine.rest.sub.repository.impl.DeploymentResourceImpl;
+
+import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware implements DeploymentRestService {
 
@@ -37,27 +36,24 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     super(engineName);
   }
 
-  @Override
-  public DeploymentResource getDeploymentById(String deploymentId) {
+  public DeploymentResource getDeployment(String deploymentId) {
     return new DeploymentResourceImpl(getProcessEngine(), deploymentId);
   }
 
-  @Override
   public List<DeploymentDto> getDeployments(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     DeploymentQueryDto queryDto = new DeploymentQueryDto(uriInfo.getQueryParameters());
-    List<DeploymentDto> deployments = new ArrayList<DeploymentDto>();
 
     ProcessEngine engine = getProcessEngine();
     DeploymentQuery query = queryDto.toQuery(engine);
 
-    List<Deployment> matchingDeployments = null;
-
+    List<Deployment> matchingDeployments;
     if (firstResult != null || maxResults != null) {
       matchingDeployments = executePaginatedQuery(query, firstResult, maxResults);
     } else {
       matchingDeployments = query.list();
     }
 
+    List<DeploymentDto> deployments = new ArrayList<DeploymentDto>();
     for (Deployment deployment : matchingDeployments) {
       DeploymentDto def = DeploymentDto.fromDeployment(deployment);
       deployments.add(def);
@@ -75,7 +71,6 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     return query.listPage(firstResult, maxResults);
   }
 
-  @Override
   public CountResultDto getDeploymentsCount(UriInfo uriInfo) {
     DeploymentQueryDto queryDto = new DeploymentQueryDto(uriInfo.getQueryParameters());
 

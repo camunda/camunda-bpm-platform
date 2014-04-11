@@ -1,53 +1,67 @@
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-import javax.ws.rs.core.Response.Status;
-
+import com.jayway.restassured.path.json.JsonPath;
+import com.jayway.restassured.response.Response;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jayway.restassured.path.json.JsonPath;
-import com.jayway.restassured.response.Response;
+import javax.ws.rs.core.Response.Status;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.*;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public abstract class AbstractDeploymentRestServiceInteractionTest extends AbstractRestServiceTest {
 
-  protected static final String DEPLOYMENT_URL = TEST_RESOURCE_ROOT_PATH + "/deployments";
-  protected static final String SINGLE_DEPLOYMENT_URL = DEPLOYMENT_URL + "/{id}";
-  protected static final String DEPLOYMENT_RESOURCE_URL = SINGLE_DEPLOYMENT_URL + "/{resourceId}";
-  protected static final String DEPLOYMENT_RESOURCE_DATA_URL = DEPLOYMENT_RESOURCE_URL + "/data";
+  protected static final String DEPLOYMENT_URL = TEST_RESOURCE_ROOT_PATH + "/deployment/{id}";
+  protected static final String RESOURCES_URL = DEPLOYMENT_URL + "/resources";
+  protected static final String SINGLE_RESOURCE_URL = RESOURCES_URL + "/{resourceId}";
+  protected static final String SINGLE_RESOURCE_DATA_URL = SINGLE_RESOURCE_URL + "/data";
 
+  protected Deployment mockDeployment;
   protected List<Resource> mockDeploymentResources;
-  private RepositoryService repositoryServiceMock;
+  protected Resource mockDeploymentResource;
+  protected DeploymentQuery deploymentQueryMock;
 
   @Before
   public void setUpRuntimeData() {
-     List<Resource> mockDeploymentResources = MockProvider.createMockDeploymentResources();
+    RepositoryService repositoryServiceMock = mock(RepositoryService.class);
+    when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
 
-     repositoryServiceMock = mock(RepositoryService.class);
-     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
-     when(repositoryServiceMock.getDeploymentResources(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID))).thenReturn(mockDeploymentResources);
-     when(repositoryServiceMock.getResourceAsStreamById(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), eq(MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_ID))).thenReturn(createMockDeploymentResource());
+    mockDeployment = MockProvider.createMockDeployment();
+    deploymentQueryMock = mock(DeploymentQuery.class);
+    when(deploymentQueryMock.deploymentId(EXAMPLE_DEPLOYMENT_ID)).thenReturn(deploymentQueryMock);
+    when(deploymentQueryMock.singleResult()).thenReturn(mockDeployment);
+    when(repositoryServiceMock.createDeploymentQuery()).thenReturn(deploymentQueryMock);
+
+    mockDeploymentResources = MockProvider.createMockDeploymentResources();
+    when(repositoryServiceMock.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(mockDeploymentResources);
+
+    mockDeploymentResource = MockProvider.createMockDeploymentResource();
+
+    when(repositoryServiceMock.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_RESOURCE_ID))).thenReturn(createMockDeploymentResourceData());
   }
 
-  private InputStream createMockDeploymentResource() {
+  private InputStream createMockDeploymentResourceData() {
     // do not close the input stream, will be done in implementation
-    InputStream bpmn20XmlIn = null;
-    bpmn20XmlIn = ReflectUtil.getResourceAsStream("processes/fox-invoice_en_long_id.bpmn");
+    InputStream bpmn20XmlIn = ReflectUtil.getResourceAsStream("processes/fox-invoice_en_long_id.bpmn");
     Assert.assertNotNull(bpmn20XmlIn);
     return bpmn20XmlIn;
   }
@@ -55,145 +69,186 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
   @Test
   public void testGetSingleDeployment() {
 
-    Resource mockDeploymentResource = MockProvider.createMockDeploymentResource();
+    Response response = given().pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(DEPLOYMENT_URL);
 
-    Response response = given().pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
-    .then().expect().statusCode(Status.OK.getStatusCode())
-    .when().get(SINGLE_DEPLOYMENT_URL);
-
-    verifyResponseList(mockDeploymentResource, response);
+    verifyDeployment(mockDeployment, response);
 
   }
 
   @Test
   public void testGetNonExistingSingleDeployment() {
 
-    String nonExistingDeploymentId = "nonExistingId";
+    when(deploymentQueryMock.deploymentId(NON_EXISTING_DEPLOYMENT_ID)).thenReturn(deploymentQueryMock);
+    when(deploymentQueryMock.singleResult()).thenReturn(null);
 
-    given().pathParam("id", nonExistingDeploymentId)
-    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
-    .body(containsString("Deployment resources for deployment Id 'nonExistingId' do not exist."))
-    .when().get(SINGLE_DEPLOYMENT_URL);
+    given().pathParam("id", NON_EXISTING_DEPLOYMENT_ID)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("Deployment with id '" + NON_EXISTING_DEPLOYMENT_ID + "' does not exist"))
+      .when().get(DEPLOYMENT_URL);
 
   }
 
   @Test
-  public void testGetSingleDeploymentWithoutParameter() {
-    given()
-    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
-    .body(containsString("Deployment resources for deployment Id '{id}' do not exist."))
-    .when().get(SINGLE_DEPLOYMENT_URL);
+  public void testGetDeploymentResources() {
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(RESOURCES_URL);
+
+    verifyDeploymentResources(mockDeploymentResources, response);
+
+  }
+
+  @Test
+  public void testGetNonExistingDeploymentResources() {
+
+    given().pathParam("id", NON_EXISTING_DEPLOYMENT_ID)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("Deployment resources for deployment id '" + NON_EXISTING_DEPLOYMENT_ID + "' do not exist."))
+      .when().get(RESOURCES_URL);
+
   }
 
   @Test
   public void testGetDeploymentResource() {
-    Resource mockDeploymentResource = MockProvider.createMockDeploymentResource();
 
     Response response = given()
-        .pathParam("resourceId", MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_ID)
-        .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
-    .then().expect().statusCode(Status.OK.getStatusCode())
-    .when().get(DEPLOYMENT_RESOURCE_URL);
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_RESOURCE_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(SINGLE_RESOURCE_URL);
 
-    verifyResponse(mockDeploymentResource, response);
+    verifyDeploymentResource(mockDeploymentResource, response);
+
   }
 
   @Test
   public void testGetNonExistingDeploymentResource() {
 
-    String nonExistingResourceId = "nonExistingId";
-
     given()
-        .pathParam("resourceId", nonExistingResourceId)
-        .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
-    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
-    .body(containsString("Deployment resource with resource id 'nonExistingId' does not exist in deployment with deployment id 'aDeploymentId'."))
-    .when().get(DEPLOYMENT_RESOURCE_URL);
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", NON_EXISTING_DEPLOYMENT_RESOURCE_ID)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("Deployment resource with resource id '" + NON_EXISTING_DEPLOYMENT_RESOURCE_ID + "' for deployment id '" + EXAMPLE_DEPLOYMENT_ID + "' does not exist."))
+      .when().get(SINGLE_RESOURCE_URL);
+
   }
 
   @Test
   public void testGetDeploymentResourceWithNonExistingDeploymentId() {
 
-    String nonExistingDeploymentId = "nonExistingId";
-
     given()
-        .pathParam("resourceId", MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_ID)
-        .pathParam("id", nonExistingDeploymentId)
-    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
-    .body(containsString("Deployment resources for deployment Id 'nonExistingId' do not exist."))
-    .when().get(DEPLOYMENT_RESOURCE_URL);
+        .pathParam("id", NON_EXISTING_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_RESOURCE_ID)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("Deployment resources for deployment id '" + NON_EXISTING_DEPLOYMENT_ID + "' do not exist."))
+      .when().get(SINGLE_RESOURCE_URL);
+
   }
 
   @Test
-  public void testGetDeploymentResourceWithoutParameters() {
+  public void testGetDeploymentResourceWithNonExistingDeploymentIdAndNonExistingResourceId() {
 
     given()
-    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
-    .body(containsString("Deployment resources for deployment Id '{id}' do not exist."))
-    .when().get(DEPLOYMENT_RESOURCE_URL);
+        .pathParam("id", NON_EXISTING_DEPLOYMENT_ID)
+        .pathParam("resourceId", NON_EXISTING_DEPLOYMENT_RESOURCE_ID)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("Deployment resources for deployment id '" + NON_EXISTING_DEPLOYMENT_ID + "' do not exist."))
+      .when().get(SINGLE_RESOURCE_URL);
+
   }
 
   @Test
   public void testGetDeploymentResourceData() {
+
     Response response = given()
-        .pathParam("resourceId", MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_ID)
-        .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
-    .then().expect().statusCode(Status.OK.getStatusCode())
-    .when().get(DEPLOYMENT_RESOURCE_DATA_URL);
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_RESOURCE_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
-    Assert.assertTrue(responseContent.contains("<?xml"));
-  }
+    assertTrue(responseContent.contains("<?xml"));
 
-  @Test
-  public void testGetDeploymentResourceDataForNonExistingResourceId() {
-
-    String nonExistingResourceId = "nonExistingId";
-
-    given()
-        .pathParam("resourceId", nonExistingResourceId)
-        .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
-    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
-    .body(containsString("No deployment resource stream exists for resource id 'nonExistingId' in deployment with deployment id 'aDeploymentId'."))
-    .when().get(DEPLOYMENT_RESOURCE_DATA_URL);
   }
 
   @Test
   public void testGetDeploymentResourceDataForNonExistingDeploymentId() {
 
-    String nonExistingDeploymentId = "nonExistingId";
+    given()
+        .pathParam("id", NON_EXISTING_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_RESOURCE_ID)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("Deployment resource '" + EXAMPLE_DEPLOYMENT_RESOURCE_ID + "' for deployment id '" + NON_EXISTING_DEPLOYMENT_ID + "' does not exist."))
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+  }
+
+  @Test
+  public void testGetDeploymentResourceDataForNonExistingResourceId() {
 
     given()
-        .pathParam("resourceId", MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_ID)
-        .pathParam("id", nonExistingDeploymentId)
-    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
-    .body(containsString("No deployment resource stream exists for resource id 'aDeploymentResourceId' in deployment with deployment id 'nonExistingId'."))
-    .when().get(DEPLOYMENT_RESOURCE_DATA_URL);
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", NON_EXISTING_DEPLOYMENT_RESOURCE_ID)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("Deployment resource '" + NON_EXISTING_DEPLOYMENT_RESOURCE_ID + "' for deployment id '" + EXAMPLE_DEPLOYMENT_ID + "' does not exist."))
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
   }
 
-  @SuppressWarnings("unchecked")
-  private void verifyResponseList(Resource mockDeploymentResource, Response response) {
-    List list = response.as(List.class);
-    Assert.assertEquals(1, list.size());
+  @Test
+  public void testGetDeploymentResourceDataForNonExistingDeploymentIdAndNonExistingResourceId() {
 
-    LinkedHashMap<String, String> resourceHashMap = (LinkedHashMap<String, String>) list.get(0);
+    given()
+        .pathParam("id", NON_EXISTING_DEPLOYMENT_ID)
+        .pathParam("resourceId", NON_EXISTING_DEPLOYMENT_RESOURCE_ID)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("Deployment resource '" + NON_EXISTING_DEPLOYMENT_RESOURCE_ID + "' for deployment id '" + NON_EXISTING_DEPLOYMENT_ID + "' does not exist."))
+      .when().get(SINGLE_RESOURCE_DATA_URL);
 
-    String returnedId = (String )resourceHashMap.get("id");
-    String returnedName = (String) resourceHashMap.get("name");
-    String returnedDeploymentId = (String) resourceHashMap.get("deploymentId");
-
-    Assert.assertEquals(mockDeploymentResource.getId(), returnedId);
-    Assert.assertEquals(mockDeploymentResource.getName(), returnedName);
-    Assert.assertEquals(mockDeploymentResource.getDeploymentId(), returnedDeploymentId);
   }
 
-  private void verifyResponse(Resource mockDeploymentResource, Response response) {
+  private void verifyDeployment(Deployment mockDeployment, Response response) {
+    String content = response.asString();
+
+    JsonPath path = from(content);
+    String returnedId = path.get("id");
+    String returnedName = path.get("name");
+    Date returnedDeploymentTime = DateTimeUtil.parseDateTime(path.<String>get("deploymentTime")).toDate();
+
+    Assert.assertEquals(mockDeployment.getId(), returnedId);
+    Assert.assertEquals(mockDeployment.getName(), returnedName);
+    Assert.assertEquals(mockDeployment.getDeploymentTime(), returnedDeploymentTime);
+  }
+
+  private void verifyDeploymentResource(Resource mockDeploymentResource, Response response) {
     String content = response.asString();
 
     JsonPath path = from(content);
     String returnedId = path.get("id");
     String returnedName = path.get("name");
     String returnedDeploymentId = path.get("deploymentId");
+
+    Assert.assertEquals(mockDeploymentResource.getId(), returnedId);
+    Assert.assertEquals(mockDeploymentResource.getName(), returnedName);
+    Assert.assertEquals(mockDeploymentResource.getDeploymentId(), returnedDeploymentId);
+  }
+
+  @SuppressWarnings("unchecked")
+  private void verifyDeploymentResources(List<Resource> mockDeploymentResources, Response response) {
+    List list = response.as(List.class);
+    Assert.assertEquals(1, list.size());
+
+    LinkedHashMap<String, String> resourceHashMap = (LinkedHashMap<String, String>) list.get(0);
+
+    String returnedId = resourceHashMap.get("id");
+    String returnedName = resourceHashMap.get("name");
+    String returnedDeploymentId = resourceHashMap.get("deploymentId");
+
+    Resource mockDeploymentResource = mockDeploymentResources.get(0);
 
     Assert.assertEquals(mockDeploymentResource.getId(), returnedId);
     Assert.assertEquals(mockDeploymentResource.getName(), returnedName);

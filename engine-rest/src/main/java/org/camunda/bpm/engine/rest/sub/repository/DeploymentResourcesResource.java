@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,9 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.camunda.bpm.engine.rest.sub.repository;
 
-import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentResourceDto;
 
 import javax.ws.rs.GET;
@@ -23,13 +23,23 @@ import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.util.List;
 
-public interface DeploymentResource {
+/**
+ * @author Sebastian Menski
+ */
+public interface DeploymentResourcesResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  DeploymentDto getDeployment();
+  List<DeploymentResourceDto> getDeploymentResources();
 
-  @Path("/resources")
-  DeploymentResourcesResource getDeploymentResources();
+  @GET
+  @Path("/{resourceId}")
+  @Produces(MediaType.APPLICATION_JSON)
+  DeploymentResourceDto getDeploymentResource(@PathParam("resourceId") String resourceId);
+
+  @GET
+  @Path("/{resourceId}/data")
+  @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  InputStream getDeploymentResourceData(@PathParam("resourceId") String resourceId);
 
 }

@@ -30,7 +30,7 @@ import com.jayway.restassured.response.Response;
 
 public abstract class AbstractDeploymentRestServiceQueryTest extends AbstractRestServiceTest {
 
-  protected static final String DEPLOYMENT_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/deployments";
+  protected static final String DEPLOYMENT_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/deployment";
   protected static final String DEPLOYMENT_COUNT_QUERY_URL = DEPLOYMENT_QUERY_URL + "/count";
   private DeploymentQuery mockedQuery;
 

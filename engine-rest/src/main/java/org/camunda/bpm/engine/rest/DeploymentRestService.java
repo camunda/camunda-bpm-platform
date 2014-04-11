@@ -12,42 +12,30 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
+import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
+
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
-import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
-import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
-
 @Path(DeploymentRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface DeploymentRestService {
 
-  public static final String PATH = "/deployments";
+  public static final String PATH = "/deployment";
 
   @Path("/{id}")
-  DeploymentResource getDeploymentById(@PathParam("id") String deploymentId);
+  DeploymentResource getDeployment(@PathParam("id") String deploymentId);
 
-  /**
-   * Exposes the {@link DeploymentQuery} interface as a REST service.
-   *
-   * @param uriInfo
-   * @param firstResult
-   * @param maxResults
-   * @return
-   */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   List<DeploymentDto> getDeployments(@Context UriInfo uriInfo,
-                                                   @QueryParam("firstResult") Integer firstResult,
-                                                   @QueryParam("maxResults") Integer maxResults);
+                                     @QueryParam("firstResult") Integer firstResult,
+                                     @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/count")
