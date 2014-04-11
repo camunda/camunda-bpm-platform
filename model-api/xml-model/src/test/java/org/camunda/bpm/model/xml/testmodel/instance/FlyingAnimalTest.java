@@ -85,13 +85,13 @@ public class FlyingAnimalTest extends TestModelTest {
   @Before
   public void copyModelInstance() {
     modelInstance = cloneModelInstance();
-    tweety = (FlyingAnimal) modelInstance.getModelElementById("tweety");
-    hedwig = (FlyingAnimal) modelInstance.getModelElementById("hedwig");
-    birdo = (FlyingAnimal) modelInstance.getModelElementById("birdo");
-    plucky = (FlyingAnimal) modelInstance.getModelElementById("plucky");
-    fiffy = (FlyingAnimal) modelInstance.getModelElementById("fiffy");
-    timmy = (FlyingAnimal) modelInstance.getModelElementById("timmy");
-    daisy = (FlyingAnimal) modelInstance.getModelElementById("daisy");
+    tweety = modelInstance.getModelElementById("tweety");
+    hedwig = modelInstance.getModelElementById("hedwig");
+    birdo = modelInstance.getModelElementById("birdo");
+    plucky = modelInstance.getModelElementById("plucky");
+    fiffy = modelInstance.getModelElementById("fiffy");
+    timmy = modelInstance.getModelElementById("timmy");
+    daisy = modelInstance.getModelElementById("daisy");
   }
 
   @Test

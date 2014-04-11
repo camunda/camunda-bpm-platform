@@ -81,11 +81,11 @@ public class ChildElementCollectionTest extends TestModelTest {
   public void copyModelInstance() {
     modelInstance = cloneModelInstance();
 
-    tweety = (Bird) modelInstance.getModelElementById("tweety");
-    daffy = (Bird) modelInstance.getModelElementById("daffy");
-    daisy = (Bird) modelInstance.getModelElementById("daisy");
-    plucky = (Bird) modelInstance.getModelElementById("plucky");
-    birdo = (Bird) modelInstance.getModelElementById("birdo");
+    tweety = modelInstance.getModelElementById("tweety");
+    daffy = modelInstance.getModelElementById("daffy");
+    daisy = modelInstance.getModelElementById("daisy");
+    plucky = modelInstance.getModelElementById("plucky");
+    birdo = modelInstance.getModelElementById("birdo");
 
     flightInstructorChild = (ChildElement<FlightInstructor>) FlyingAnimal.flightInstructorChild.getReferenceSourceCollection();
     flightPartnerRefCollection = FlyingAnimal.flightPartnerRefsColl.getReferenceSourceCollection();

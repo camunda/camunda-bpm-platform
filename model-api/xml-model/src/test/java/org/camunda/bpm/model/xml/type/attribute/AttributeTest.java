@@ -70,7 +70,7 @@ public class AttributeTest extends TestModelTest {
   public void copyModelInstance() {
     modelInstance = cloneModelInstance();
 
-    tweety = (Bird) modelInstance.getModelElementById("tweety");
+    tweety = modelInstance.getModelElementById("tweety");
 
     ModelElementType animalType = modelInstance.getModel().getType(Animal.class);
     idAttribute = (Attribute<String>) animalType.getAttribute("id");

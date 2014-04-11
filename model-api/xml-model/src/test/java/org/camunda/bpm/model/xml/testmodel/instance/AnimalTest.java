@@ -102,18 +102,18 @@ public class AnimalTest extends TestModelTest {
   public void copyModelInstance() {
     modelInstance = cloneModelInstance();
 
-    tweety = (Animal) modelInstance.getModelElementById("tweety");
-    hedwig = (Animal) modelInstance.getModelElementById("hedwig");
-    birdo = (Animal) modelInstance.getModelElementById("birdo");
-    plucky = (Animal) modelInstance.getModelElementById("plucky");
-    fiffy = (Animal) modelInstance.getModelElementById("fiffy");
-    timmy = (Animal) modelInstance.getModelElementById("timmy");
-    daisy = (Animal) modelInstance.getModelElementById("daisy");
+    tweety = modelInstance.getModelElementById("tweety");
+    hedwig = modelInstance.getModelElementById("hedwig");
+    birdo = modelInstance.getModelElementById("birdo");
+    plucky = modelInstance.getModelElementById("plucky");
+    fiffy = modelInstance.getModelElementById("fiffy");
+    timmy = modelInstance.getModelElementById("timmy");
+    daisy = modelInstance.getModelElementById("daisy");
 
-    hedwigRelationship = (RelationshipDefinition) modelInstance.getModelElementById("tweety-hedwig");
-    birdoRelationship = (RelationshipDefinition) modelInstance.getModelElementById("tweety-birdo");
-    pluckyRelationship = (RelationshipDefinition) modelInstance.getModelElementById("tweety-plucky");
-    fiffyRelationship = (RelationshipDefinition) modelInstance.getModelElementById("tweety-fiffy");
+    hedwigRelationship = modelInstance.getModelElementById("tweety-hedwig");
+    birdoRelationship = modelInstance.getModelElementById("tweety-birdo");
+    pluckyRelationship = modelInstance.getModelElementById("tweety-plucky");
+    fiffyRelationship = modelInstance.getModelElementById("tweety-fiffy");
 
     timmyRelationship = createRelationshipDefinition(modelInstance, timmy, FriendRelationshipDefinition.class);
     daisyRelationship = createRelationshipDefinition(modelInstance, daisy, ChildRelationshipDefinition.class);

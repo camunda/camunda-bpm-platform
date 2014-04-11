@@ -76,10 +76,10 @@ public class ModelElementInstanceTest extends TestModelTest {
     modelInstance = cloneModelInstance();
 
     animals = (Animals) modelInstance.getDocumentElement();
-    tweety = (Bird) modelInstance.getModelElementById("tweety");
-    donald = (Bird) modelInstance.getModelElementById("donald");
-    daisy = (Bird) modelInstance.getModelElementById("daisy");
-    hedwig = (Bird) modelInstance.getModelElementById("hedwig");
+    tweety = modelInstance.getModelElementById("tweety");
+    donald = modelInstance.getModelElementById("donald");
+    daisy = modelInstance.getModelElementById("daisy");
+    hedwig = modelInstance.getModelElementById("hedwig");
   }
 
   @Test

@@ -134,7 +134,7 @@ public class UnknownAnimalTest {
 
     wanda.insertElementAfter(friendRelationshipDefinition, null);
 
-    Animal tweety = (Animal) modelInstance.getModelElementById("tweety");
+    Animal tweety = modelInstance.getModelElementById("tweety");
     RelationshipDefinition childRelationshipDefinition = modelInstance.newInstance(ChildRelationshipDefinition.class);
     childRelationshipDefinition.setId("child-relationship");
     childRelationshipDefinition.setAnimal(tweety);

@@ -92,14 +92,15 @@ public class ModelInstanceImpl implements ModelInstance {
     return elementType;
   }
 
-  public ModelElementInstance getModelElementById(String id) {
+  @SuppressWarnings("unchecked")
+  public <T extends ModelElementInstance> T getModelElementById(String id) {
     if (id == null) {
       return null;
     }
 
     DomElement element = document.getElementById(id);
     if(element != null) {
-      return ModelUtil.getModelElement(element, this);
+      return (T) ModelUtil.getModelElement(element, this);
     } else {
       return null;
     }

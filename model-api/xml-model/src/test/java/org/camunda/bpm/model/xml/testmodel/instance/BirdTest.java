@@ -75,11 +75,11 @@ public class BirdTest extends TestModelTest {
   @Before
   public void copyModelInstance() {
     modelInstance = cloneModelInstance();
-    tweety = (Bird) modelInstance.getModelElementById("tweety");
-    hedwig = (Bird) modelInstance.getModelElementById("hedwig");
-    timmy = (Bird) modelInstance.getModelElementById("timmy");
-    egg1 = (Egg) modelInstance.getModelElementById("egg1");
-    egg2 = (Egg) modelInstance.getModelElementById("egg2");
+    tweety = modelInstance.getModelElementById("tweety");
+    hedwig = modelInstance.getModelElementById("hedwig");
+    timmy = modelInstance.getModelElementById("timmy");
+    egg1 = modelInstance.getModelElementById("egg1");
+    egg2 = modelInstance.getModelElementById("egg2");
   }
 
   @Test

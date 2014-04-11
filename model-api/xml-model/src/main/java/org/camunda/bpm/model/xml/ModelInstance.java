@@ -80,7 +80,7 @@ public interface ModelInstance {
    * @param id  the id of the element
    * @return the element with the id or null
    */
-  ModelElementInstance getModelElementById(String id);
+  <T extends ModelElementInstance> T getModelElementById(String id);
 
   /**
    * Find all elements of a type.
