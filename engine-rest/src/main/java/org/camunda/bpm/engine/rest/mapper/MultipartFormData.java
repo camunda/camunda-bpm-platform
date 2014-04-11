@@ -57,16 +57,18 @@ public class MultipartFormData {
 
     protected String fieldName;
     protected String contentType;
-    protected String textConent;
+    protected String textContent;
+    protected String name;
     protected byte[] binaryContent;
 
     public FormPart(FileItemStream stream) {
       fieldName = stream.getFieldName();
       contentType = stream.getContentType();
       binaryContent = readBinaryContent(stream);
+      name = stream.getName();
 
       if(contentType == null || contentType.contains(MediaType.TEXT_PLAIN)) {
-        textConent = new String(binaryContent);
+        textContent = new String(binaryContent);
       }
     }
 
@@ -95,11 +97,15 @@ public class MultipartFormData {
     }
 
     public String getTextContent() {
-      return textConent;
+      return textContent;
     }
 
     public byte[] getBinaryContent() {
       return binaryContent;
+    }
+
+    public String getName() {
+      return name;
     }
 
   }

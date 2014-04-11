@@ -15,8 +15,9 @@ package org.camunda.bpm.engine.rest.dto.repository;
 import java.util.Date;
 
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.rest.dto.LinkableDto;
 
-public class DeploymentDto {
+public class DeploymentDto extends LinkableDto {
 
   protected String id;
   protected String name;
