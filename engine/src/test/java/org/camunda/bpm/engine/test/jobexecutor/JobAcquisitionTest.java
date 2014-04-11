@@ -33,7 +33,7 @@ public class JobAcquisitionTest extends PluggableProcessEngineTestCase {
     timer.setLockExpirationTime(null);
     timer.setJobHandlerConfiguration(myCustomTimerEntity);
     timer.setProcessInstanceId(processInstanceId);
-    
+
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
 
     // we create a timer entity
@@ -53,7 +53,7 @@ public class JobAcquisitionTest extends PluggableProcessEngineTestCase {
               .prepareStatement("UPDATE ACT_RU_JOB SET SUSPENSION_STATE_ = NULL");
           assertEquals(1, preparedStatement.executeUpdate());
         } catch (SQLException e) {
-          e.printStackTrace();
+          throw new RuntimeException(e);
         }
         return null;
       }
@@ -83,7 +83,7 @@ public class JobAcquisitionTest extends PluggableProcessEngineTestCase {
         return null;
       }
     });
-    
+
   }
 
 }
