@@ -47,6 +47,8 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
@@ -83,6 +85,8 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String INCIDENT_URL = SINGLE_ENGINE_URL + "/incident";
   protected static final String AUTHORIZATION_URL = SINGLE_ENGINE_URL + AuthorizationRestService.PATH;
   protected static final String AUTHORIZATION_CHECK_URL = AUTHORIZATION_URL + "/check";
+  protected static final String DEPLOYMENT_REST_SERVICE_URL = SINGLE_ENGINE_URL + DeploymentRestService.PATH;
+  protected static final String DEPLOYMENT_URL = DEPLOYMENT_REST_SERVICE_URL + "/{id}";
 
   protected static final String JOB_DEFINITION_URL = SINGLE_ENGINE_URL + "/job-definition";
 
@@ -130,6 +134,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createVariableInstanceMock();
     createJobDefinitionMock();
     createIncidentMock();
+    createDeploymentMock();
 
     createHistoricActivityInstanceMock();
     createHistoricProcessInstanceMock();
@@ -284,6 +289,16 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     List<HistoricIncident> historicIncidents = MockProvider.createMockHistoricIncidents();
     when(mockHistoricIncidentQuery.list()).thenReturn(historicIncidents);
     when(mockHistoryService.createHistoricIncidentQuery()).thenReturn(mockHistoricIncidentQuery);
+  }
+
+  private void createDeploymentMock() {
+    Deployment mockDeployment = MockProvider.createMockDeployment();
+
+    DeploymentQuery deploymentQueryMock = mock(DeploymentQuery.class);
+    when(deploymentQueryMock.deploymentId(anyString())).thenReturn(deploymentQueryMock);
+    when(deploymentQueryMock.singleResult()).thenReturn(mockDeployment);
+
+    when(mockRepoService.createDeploymentQuery()).thenReturn(deploymentQueryMock);
   }
 
   @Test
@@ -545,6 +560,18 @@ public abstract class AbstractProcessEngineRestServiceTest extends
         .get(HISTORY_INCIDENT_URL);
 
     verify(mockHistoryService).createHistoricIncidentQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testDeploymentRestServiceEngineAccess() {
+    given().pathParam("name", EXAMPLE_ENGINE_NAME)
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(DEPLOYMENT_URL);
+
+    verify(mockRepoService).createDeploymentQuery();
     verifyZeroInteractions(processEngine);
   }
 }
