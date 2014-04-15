@@ -5,13 +5,16 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
-import java.sql.PreparedStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 /**
@@ -31,58 +34,96 @@ public class JobAcquisitionTest extends PluggableProcessEngineTestCase {
     timer.setDuedate(null);
     timer.setLockOwner(null);
     timer.setLockExpirationTime(null);
+    timer.setJobHandlerType(TimerStartEventJobHandler.TYPE);
     timer.setJobHandlerConfiguration(myCustomTimerEntity);
     timer.setProcessInstanceId(processInstanceId);
 
-    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    final CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
 
-    // we create a timer entity
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        commandContext.getJobManager().insert(timer);
-        return null;
-      }
-    });
-
-    // we change the suspension state to null
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        try {
-          SqlSession sqlSession = commandContext.getDbSqlSession().getSqlSession();
-          PreparedStatement preparedStatement = sqlSession.getConnection()
-              .prepareStatement("UPDATE ACT_RU_JOB SET SUSPENSION_STATE_ = NULL");
-          assertEquals(1, preparedStatement.executeUpdate());
-        } catch (SQLException e) {
-          throw new RuntimeException(e);
+    try {
+      // we create a timer entity
+      commandExecutor.execute(new Command<Void>() {
+        public Void execute(CommandContext commandContext) {
+          commandContext.getJobManager().insert(timer);
+          return null;
         }
-        return null;
-      }
-    });
+      });
 
-    // it is picked up by the acquisition queries
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        JobManager jobManager = commandContext.getJobManager();
+      // we change the suspension state to null
+      commandExecutor.execute(new Command<Void>() {
+        public Void execute(CommandContext commandContext) {
+          Connection connection = null;
+          Statement statement = null;
+          ResultSet rs = null;
 
-        List<JobEntity> executableJobs = jobManager.findNextJobsToExecute(new Page(0, 1));
+          try {
+            SqlSession sqlSession = commandContext.getDbSqlSession().getSqlSession();
+            connection = sqlSession.getConnection();
+            statement = connection
+                .createStatement();
+            int updateResult = statement.executeUpdate("UPDATE ACT_RU_JOB " +
+                "SET SUSPENSION_STATE_ = NULL, REV_ = 2" +
+                " WHERE SUSPENSION_STATE_ = 1");
+            statement.close();
+            assertEquals(1, updateResult);
 
-        assertEquals(1, executableJobs.size());
-        assertEquals(myCustomTimerEntity, executableJobs.get(0).getJobHandlerConfiguration());
+            statement = connection
+                .createStatement();
+            rs = statement.executeQuery("SELECT * FROM ACT_RU_JOB WHERE SUSPENSION_STATE_ IS NULL");
 
-        executableJobs = jobManager.findExclusiveJobsToExecute(processInstanceId);
-        assertEquals(1, executableJobs.size());
-        assertEquals(myCustomTimerEntity, executableJobs.get(0).getJobHandlerConfiguration());
-        return null;
-      }
-    });
+            int rowNum = 0;
+            while (rs.next()) {
+              rowNum = rs.getRow();
+            }
+            assertEquals(1, rowNum);
+          } catch (SQLException e) {
+            throw new RuntimeException(e);
+          } finally {
+            try {
+              if (statement != null) {
+                statement.close();
+              }
+              if (rs != null) {
+                rs.close();
+              }
+              if (connection != null) {
+                connection.close();
+              }
+            } catch (SQLException e) {
+              throw new RuntimeException(e);
+            }
+          }
+          return null;
+        }
+      });
 
-    // cleanup
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        commandContext.getJobManager().delete(timer);
-        return null;
-      }
-    });
+      // it is picked up by the acquisition queries
+      commandExecutor.execute(new Command<Void>() {
+        public Void execute(CommandContext commandContext) {
+          JobManager jobManager = commandContext.getJobManager();
+
+          List<JobEntity> executableJobs = jobManager.findNextJobsToExecute(new Page(0, 1));
+
+          assertEquals(1, executableJobs.size());
+          assertEquals(myCustomTimerEntity, executableJobs.get(0).getJobHandlerConfiguration());
+
+          executableJobs = jobManager.findExclusiveJobsToExecute(processInstanceId);
+          assertEquals(1, executableJobs.size());
+          assertEquals(myCustomTimerEntity, executableJobs.get(0).getJobHandlerConfiguration());
+          return null;
+        }
+      });
+
+    } finally {
+      // cleanup
+      commandExecutor.execute(new Command<Void>() {
+        public Void execute(CommandContext commandContext) {
+          final JobEntity newTimer = commandContext.getJobManager().findJobById(timer.getId());
+          newTimer.delete();
+          return null;
+        }
+      });
+    }
 
   }
 
