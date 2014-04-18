@@ -13,15 +13,15 @@
 
 package org.camunda.bpm.engine.impl.db;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -82,6 +82,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     HashMap<String, String> constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
+    constants.put("constant.for.update", "for update");
     dbSpecificConstants.put(H2, constants);
 
 	  //mysql specific
@@ -109,6 +110,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");
+    constants.put("constant.for.update", "for update");
     dbSpecificConstants.put(MYSQL, constants);
 
     //postgres specific
@@ -150,6 +152,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
+    constants.put("constant.for.update", "for update");
     dbSpecificConstants.put(POSTGRES, constants);
 
     // oracle
@@ -172,6 +175,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants = new HashMap<String, String>();
     constants.put("constant.event", "cast('event' as nvarchar2(255))");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
+    constants.put("constant.for.update", "for update");
     dbSpecificConstants.put(ORACLE, constants);
 
     // db2
@@ -199,6 +203,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "CAST(CONCAT(CONCAT(COALESCE(NEW_VALUE_,''), '_|_'), COALESCE(PROPERTY_,'')) as varchar(255))");
+    constants.put("constant.for.update", "for read only with rs use and keep update locks");
     dbSpecificConstants.put(DB2, constants);
 
     // mssql
@@ -222,6 +227,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(MSSQL, "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(MSSQL, "lockDeploymentLockProperty", "lockDeploymentLockProperty_mssql");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");

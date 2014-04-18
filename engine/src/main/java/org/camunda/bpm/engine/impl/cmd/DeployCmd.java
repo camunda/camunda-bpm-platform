@@ -12,16 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
@@ -40,6 +30,11 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Tom Baeyens
@@ -60,6 +55,16 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
   }
 
   public Deployment execute(CommandContext commandContext) {
+
+    if (Context.getProcessEngineConfiguration().isDeploymentLockUsed()) {
+      // Acquire global exclusive lock: this ensures that there can be only one
+      // transaction in the cluster which is allowed to perform deployments.
+      // This is important to ensure that duplicate filtering works correctly
+      // in a multi-node cluster. See also https://app.camunda.com/jira/browse/CAM-2128
+
+      commandContext.getPropertyManager().acquireExclusiveLock();
+    }
+
     DeploymentEntity deployment = deploymentBuilder.getDeployment();
 
     deployment.setDeploymentTime(ClockUtil.getCurrentTime());
@@ -71,18 +76,33 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         .getDeploymentManager()
         .findLatestDeploymentByName(deployment.getName());
 
-      if (!((existingDeployment!=null) && !deploymentsDiffer(deployment, existingDeployment))) {
-        existingDeployment = null;
+      if (existingDeployment != null) {
+        log.fine("Found existing deployment "+existingDeployment+" checking resources.");
+
+        if (deploymentsDiffer(deployment, existingDeployment)) {
+          log.fine("Resources differ.");
+          existingDeployment = null;
+
+        } else {
+          log.fine("Resources do not differ.");
+
+        }
+      } else {
+        log.fine("No existing deployment for name "+deployment.getName()+".");
+
       }
+
     }
 
     if(existingDeployment == null) {
+      log.fine("Creating new deployment.");
       deployment.setNew(true);
       Context
         .getCommandContext()
         .getDeploymentManager()
         .insertDeployment(deployment);
     } else {
+      log.fine("Using existing deployment.");
       deployment = existingDeployment;
     }
 

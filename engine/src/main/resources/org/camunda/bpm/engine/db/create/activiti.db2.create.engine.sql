@@ -14,6 +14,9 @@ values ('schema.history', 'create(fox)', 1);
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
 
+insert into ACT_GE_PROPERTY
+values ('deployment.lock', '0', 1);
+
 create table ACT_GE_BYTEARRAY (
     ID_ varchar(64) not null,
     REV_ integer,

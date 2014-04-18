@@ -56,5 +56,13 @@
   <select id="selectProperties" resultMap="propertyResultMap">
     select * from ${prefix}ACT_GE_PROPERTY 
   </select>
-  
+
+  <update id="lockDeploymentLockProperty">
+    SELECT * FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'deployment.lock' ${constant.for.update}
+  </update>
+
+  <update id="lockDeploymentLockProperty_mssql">
+    SELECT * FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'deployment.lock'
+  </update>
+
 </mapper>

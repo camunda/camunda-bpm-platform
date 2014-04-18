@@ -744,6 +744,11 @@ public class DbSqlSession implements Session {
     return ClassNameUtil.getClassNameWithoutPackage(persistentObject)+"["+persistentObject.getId()+"]";
   }
 
+  public void lock(String statement) {
+    String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
+    sqlSession.update(mappedStatement);
+  }
+
   // schema operations ////////////////////////////////////////////////////////
 
 
@@ -803,6 +808,13 @@ public class DbSqlSession implements Session {
       if (!configuredHistoryLevel.equals(databaseHistoryLevel)) {
         throw new ProcessEngineException("historyLevel mismatch: configuration says " + configuredHistoryLevel + " and database says " + databaseHistoryLevel);
       }
+    }
+  }
+
+  public void checkDeploymentLockExists() {
+    PropertyEntity deploymentLockProperty = selectById(PropertyEntity.class, "deployment.lock");
+    if (deploymentLockProperty == null) {
+      log.warning("No deployment lock property found in database.");
     }
   }
 
@@ -1164,6 +1176,7 @@ public class DbSqlSession implements Session {
     }
 
     checkHistoryLevel();
+    checkDeploymentLockExists();
   }
 
   public void performSchemaOperationsProcessEngineClose() {
@@ -1227,6 +1240,5 @@ public class DbSqlSession implements Session {
   public boolean isInsertedObject(PersistentObject persistentObject) {
     return insertedObjects.contains(persistentObject);
   }
-
 
 }

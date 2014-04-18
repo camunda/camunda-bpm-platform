@@ -21,13 +21,12 @@ import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class DbDeadlockTests extends PluggableProcessEngineTestCase {
+public class DbDeadlockTests extends ConcurrencyTestCase {
 
   private ThreadControl thread1;
   private ThreadControl thread2;
@@ -127,94 +126,6 @@ public class DbDeadlockTests extends PluggableProcessEngineTestCase {
         }
 
       });
-  }
-
-  // helper classes for concurrency /////////////////////////////////////////////////////
-
-  protected ThreadControl executeControllableCommand(final ControllableCommand<?> command) {
-
-    final Thread controlThread = Thread.currentThread();
-
-    Thread thread = new Thread(new Runnable() {
-      public void run() {
-        try {
-          processEngineConfiguration.getCommandExecutorTxRequired().execute(command);
-        } catch(RuntimeException e) {
-          controlThread.interrupt();
-          throw e;
-        }
-      }
-    });
-
-    command.monitor.executingThread = thread;
-
-    thread.start();
-
-    return command.monitor;
-  }
-
-  static abstract class ControllableCommand<T> implements Command<T> {
-
-    protected final ThreadControl monitor;
-
-    public ControllableCommand() {
-      this.monitor = new ThreadControl();
-    }
-
-  }
-
-  static class ThreadControl {
-
-    protected boolean syncAvailable = false;
-
-    protected Thread executingThread;
-
-    public void waitForSync() {
-      synchronized (this) {
-        if(Thread.interrupted()) {
-          fail();
-        }
-        if(!syncAvailable) {
-          try {
-            wait();
-          } catch (InterruptedException e) {
-            fail();
-          }
-        }
-        syncAvailable = false;
-      }
-    }
-
-    public void waitUntilDone() {
-      makeContinue();
-      try {
-        executingThread.join();
-      } catch (InterruptedException e) {
-        fail();
-      }
-    }
-
-    public void sync() {
-      synchronized (this) {
-        syncAvailable = true;
-        try {
-          notifyAll();
-          wait();
-        } catch (InterruptedException e) {
-          fail();
-        }
-      }
-    }
-
-    public void makeContinue() {
-      synchronized (this) {
-        if(Thread.interrupted()) {
-          fail();
-        }
-        notifyAll();
-      }
-    }
-
   }
 
 }
