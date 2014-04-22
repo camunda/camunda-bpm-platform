@@ -12,17 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -37,7 +26,19 @@ import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.DeploymentResourceImpl;
 
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware implements DeploymentRestService {
+
+  public final static String DEPLOYMENT_NAME = "deployment-name";
+  public final static String ENABLE_DUPLICATE_FILTERING = "enable-duplicate-filtering";
 
   public DeploymentRestServiceImpl() {
     super();
@@ -77,32 +78,31 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
 
     Set<String> partNames = payload.getPartNames();
     for (String name : partNames) {
-      if ("deployment-name".equals(name)) {
-        FormPart part = payload.getNamedPart(name);
+      FormPart part = payload.getNamedPart(name);
+      if (DEPLOYMENT_NAME.equals(name)) {
         deploymentBuilder.name(part.getTextContent());
-      } else if ("enable-duplicate-filtering".equals(name)) {
-        FormPart part = payload.getNamedPart(name);
+      } else if (ENABLE_DUPLICATE_FILTERING.equals(name)) {
         if (Boolean.parseBoolean(part.getTextContent())) {
           deploymentBuilder.enableDuplicateFiltering();
         }
       } else {
-        FormPart part = payload.getNamedPart(name);
-        deploymentBuilder.addInputStream(part.getName(), new ByteArrayInputStream(part.getBinaryContent()));
+        deploymentBuilder.addInputStream(part.getFileName(), new ByteArrayInputStream(part.getBinaryContent()));
       }
     }
 
     if(!deploymentBuilder.getResourceNames().isEmpty()) {
       Deployment deployment = deploymentBuilder.deploy();
 
-      UriBuilder baseUriBuilder = uriInfo.getBaseUriBuilder()
-          .path(relativeRootResourcePath)
-          .path(DeploymentRestService.class);
-
       DeploymentDto deploymentDto = DeploymentDto.fromDeployment(deployment);
 
+      URI uri = uriInfo.getBaseUriBuilder()
+        .path(relativeRootResourcePath)
+        .path(DeploymentRestService.class)
+        .path(deployment.getId())
+        .build();
+
       // GET /
-      URI baseUri = baseUriBuilder.build();
-      deploymentDto.addReflexiveLink(baseUri, HttpMethod.GET, deployment.getId());
+      deploymentDto.addReflexiveLink(uri, HttpMethod.GET, "self");
 
       return deploymentDto;
 

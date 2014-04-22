@@ -12,18 +12,17 @@
  */
 package org.camunda.bpm.engine.rest.mapper;
 
+import org.apache.commons.fileupload.FileItemStream;
+import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.rest.exception.RestException;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-
-import org.apache.commons.fileupload.FileItemStream;
-import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.rest.exception.RestException;
 
 /**
  * Custom implementation of Multipart Form Data which can be used for handling requests.
@@ -58,14 +57,14 @@ public class MultipartFormData {
     protected String fieldName;
     protected String contentType;
     protected String textContent;
-    protected String name;
+    protected String fileName;
     protected byte[] binaryContent;
 
     public FormPart(FileItemStream stream) {
       fieldName = stream.getFieldName();
       contentType = stream.getContentType();
       binaryContent = readBinaryContent(stream);
-      name = stream.getName();
+      fileName = stream.getName();
 
       if(contentType == null || contentType.contains(MediaType.TEXT_PLAIN)) {
         textContent = new String(binaryContent);
@@ -104,8 +103,8 @@ public class MultipartFormData {
       return binaryContent;
     }
 
-    public String getName() {
-      return name;
+    public String getFileName() {
+      return fileName;
     }
 
   }
