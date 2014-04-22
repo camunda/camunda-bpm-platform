@@ -95,12 +95,12 @@ public class DbDeadlockTests extends PluggableProcessEngineTestCase {
       dbSqlSession.insert(hpi);
       dbSqlSession.flush();
 
-      monitor.snyc();
+      monitor.sync();
 
       DbSqlSession newDbSqlSession = (DbSqlSession) dbSqlSessionFactory.openSession();
       newDbSqlSession.createHistoricProcessInstanceQuery().list();
 
-      monitor.snyc();
+      monitor.sync();
 
       return null;
     }
@@ -133,14 +133,14 @@ public class DbDeadlockTests extends PluggableProcessEngineTestCase {
 
   protected ThreadControl executeControllableCommand(final ControllableCommand<?> command) {
 
-    final Thread contolThread = Thread.currentThread();
+    final Thread controlThread = Thread.currentThread();
 
     Thread thread = new Thread(new Runnable() {
       public void run() {
         try {
           processEngineConfiguration.getCommandExecutorTxRequired().execute(command);
         } catch(RuntimeException e) {
-          contolThread.interrupt();
+          controlThread.interrupt();
           throw e;
         }
       }
@@ -165,7 +165,7 @@ public class DbDeadlockTests extends PluggableProcessEngineTestCase {
 
   static class ThreadControl {
 
-    protected boolean syncAwailable = false;
+    protected boolean syncAvailable = false;
 
     protected Thread executingThread;
 
@@ -174,14 +174,14 @@ public class DbDeadlockTests extends PluggableProcessEngineTestCase {
         if(Thread.interrupted()) {
           fail();
         }
-        if(!syncAwailable) {
+        if(!syncAvailable) {
           try {
             wait();
           } catch (InterruptedException e) {
             fail();
           }
         }
-        syncAwailable = false;
+        syncAvailable = false;
       }
     }
 
@@ -194,9 +194,9 @@ public class DbDeadlockTests extends PluggableProcessEngineTestCase {
       }
     }
 
-    public void snyc() {
+    public void sync() {
       synchronized (this) {
-        syncAwailable = true;
+        syncAvailable = true;
         try {
           notifyAll();
           wait();
