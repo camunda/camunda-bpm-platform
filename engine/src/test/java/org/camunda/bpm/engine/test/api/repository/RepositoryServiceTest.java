@@ -13,15 +13,15 @@
 
 package org.camunda.bpm.engine.test.api.repository;
 
-import java.util.Date;
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Frederik Heremans
@@ -109,6 +109,16 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("deploymentId is null", ae.getMessage());
+    }
+  }
+
+  public void testFindDeploymentResourcesNullDeploymentId() {
+    try {
+      repositoryService.getDeploymentResources(null);
+      fail("ProcessEngineException expected");
+    }
+    catch (ProcessEngineException e) {
+      assertTextPresent("deploymentId is null", e.getMessage());
     }
   }
 

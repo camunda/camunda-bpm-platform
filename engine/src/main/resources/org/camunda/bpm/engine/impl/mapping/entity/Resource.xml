@@ -25,6 +25,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="bytes" column="BYTES_" jdbcType="BLOB"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="generated" column="GENERATED_" jdbcType="BOOLEAN"/>
   </resultMap>
   
@@ -55,6 +56,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="bytes" column="BYTES_" jdbcType="BINARY"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="generated" column="GENERATED_" jdbcType="BOOLEAN"/>
   </resultMap>
     

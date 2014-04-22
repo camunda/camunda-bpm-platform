@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+
+import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -40,8 +40,8 @@ public class GetDeploymentResourcesCmd implements Command<List>, Serializable {
 
     return Context
       .getCommandContext()
-      .getDeploymentManager()
-      .getDeploymentResources(deploymentId);
+      .getResourceManager()
+      .findResourcesByDeploymentId(deploymentId);
   }
 
 }
