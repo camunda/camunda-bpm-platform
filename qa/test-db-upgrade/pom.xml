@@ -12,8 +12,8 @@
   </parent>
 
   <properties>
-    <test.version.old>7.0.0-Final</test.version.old>
-    <test.version.old.major>7.0</test.version.old.major>
+    <test.version.old>7.1.0-Final</test.version.old>
+    <test.version.old.major>7.1</test.version.old.major>
     <test.version.current>${project.version}</test.version.current>
     <mail.server.port>5025</mail.server.port>
   </properties>
@@ -54,10 +54,10 @@
       </build>
     </profile>
     <profile>
-      <id>71</id>
+      <id>72</id>
       <properties>
         <test.version.current>${project.version}</test.version.current>
-        <test.version.current.major>7.1</test.version.current.major>
+        <test.version.current.major>7.2</test.version.current.major>
       </properties>
       <dependencies>
         <dependency>    
@@ -347,6 +347,18 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
