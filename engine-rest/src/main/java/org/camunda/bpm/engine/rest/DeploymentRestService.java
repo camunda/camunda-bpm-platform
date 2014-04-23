@@ -39,6 +39,7 @@ public interface DeploymentRestService {
                                      @QueryParam("maxResults") Integer maxResults);
 
   @POST
+  @Path("/create")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Produces(MediaType.APPLICATION_JSON)
   DeploymentDto createDeployment(@Context UriInfo uriInfo, MultipartFormData multipartFormData);

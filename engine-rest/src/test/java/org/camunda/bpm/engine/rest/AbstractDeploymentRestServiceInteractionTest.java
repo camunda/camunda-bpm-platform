@@ -40,11 +40,12 @@ import static org.mockito.Mockito.*;
 
 public abstract class AbstractDeploymentRestServiceInteractionTest extends AbstractRestServiceTest {
 
-  protected static final String DEPLOYMENT_URL = TEST_RESOURCE_ROOT_PATH + "/deployment/{id}";
+  protected static final String RESEOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/deployment";
+  protected static final String DEPLOYMENT_URL = RESEOURCE_URL + "/{id}";
   protected static final String RESOURCES_URL = DEPLOYMENT_URL + "/resources";
   protected static final String SINGLE_RESOURCE_URL = RESOURCES_URL + "/{resourceId}";
   protected static final String SINGLE_RESOURCE_DATA_URL = SINGLE_RESOURCE_URL + "/data";
-  protected static final String CREATE_DEPLOYMENT_URL = TEST_RESOURCE_ROOT_PATH + "/deployment";
+  protected static final String CREATE_DEPLOYMENT_URL = TEST_RESOURCE_ROOT_PATH + "/deployment/create";
 
   protected Deployment mockDeployment;
   protected List<Resource> mockDeploymentResources;
@@ -310,7 +311,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
 
     Map<String, String> returnedLink = returnedLinks.get(0);
     assertEquals(HttpMethod.GET, returnedLink.get("method"));
-    assertTrue(returnedLink.get("href").endsWith(CREATE_DEPLOYMENT_URL + "/" + mockDeployment.getId()));
+    assertTrue(returnedLink.get("href").endsWith(RESEOURCE_URL + "/" + mockDeployment.getId()));
     assertEquals("self", returnedLink.get("rel"));
   }
 
