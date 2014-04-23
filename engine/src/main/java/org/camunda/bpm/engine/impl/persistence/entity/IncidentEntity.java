@@ -12,14 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
@@ -27,10 +22,14 @@ import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Incident;
 
+import java.util.*;
+
 /**
  * @author roman.smirnov
  */
-public class IncidentEntity implements Incident, PersistentObject {
+public class IncidentEntity implements Incident, PersistentObject, HasRevision {
+
+  protected int revision;
 
   protected String id;
   protected Date incidentTimestamp;
@@ -334,17 +333,20 @@ public class IncidentEntity implements Incident, PersistentObject {
 
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("incidentTimestamp", this.incidentTimestamp);
-    persistentState.put("incidentType", this.incidentType);
-    persistentState.put("incidentMessage", this.incidentMessage);
     persistentState.put("executionId", this.executionId);
-    persistentState.put("activityId", this.activityId);
-    persistentState.put("processInstanceId", this.processInstanceId);
-    persistentState.put("processDefinitionId", this.processDefinitionId);
-    persistentState.put("causeId", this.causeIncidentId);
-    persistentState.put("rootCauseId", this.rootCauseIncidentId);
-    persistentState.put("configuration", this.configuration);
     return persistentState;
+  }
+
+  public void setRevision(int revision) {
+    this.revision = revision;
+  }
+
+  public int getRevision() {
+    return revision;
+  }
+
+  public int getRevisionNext() {
+    return revision + 1;
   }
 
   @Override

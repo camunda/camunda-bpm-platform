@@ -12,22 +12,17 @@
  */
 package org.camunda.bpm.engine.test.incident;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.Incident;
-import org.camunda.bpm.engine.runtime.IncidentQuery;
-import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.JobQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.*;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class IncidentTest extends PluggableProcessEngineTestCase {
 
@@ -384,6 +379,25 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     tmp = query.singleResult();
     assertEquals(incident.getId(), tmp.getId());
 
+  }
+
+  @Deployment
+  public void testIncidentUpdateAfterCompaction() {
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    executeAvailableJobs();
+
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+    assertNotNull(incident);
+    assertNotSame(processInstanceId, incident.getExecutionId());
+
+    runtimeService.correlateMessage("Message");
+
+    incident = runtimeService.createIncidentQuery().singleResult();
+    assertNotNull(incident);
+
+    // incident updated with new execution id after execution tree is compacted
+    assertEquals(processInstanceId, incident.getExecutionId());
   }
 
 }

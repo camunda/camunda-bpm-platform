@@ -168,6 +168,7 @@ create table ACT_RU_EVENT_SUBSCR (
 
 create table ACT_RU_INCIDENT (
   ID_ nvarchar(64) not null,
+  REV_ int not null,
   INCIDENT_TIMESTAMP_ datetime2 not null,
   INCIDENT_MSG_ nvarchar(4000),
   INCIDENT_TYPE_ nvarchar(255) not null,
