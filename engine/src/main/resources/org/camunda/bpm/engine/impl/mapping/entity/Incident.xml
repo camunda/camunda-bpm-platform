@@ -111,4 +111,19 @@
     </where>
   </sql>
   
+  <update id="updateIncident" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
+    update ${prefix}ACT_RU_INCIDENT set 
+    INCIDENT_TIMESTAMP_ = #{incidentTimestamp, jdbcType=TIMESTAMP},
+    INCIDENT_MSG_ = #{incidentMessage, jdbcType=VARCHAR},
+    INCIDENT_TYPE_ = #{incidentType, jdbcType=VARCHAR},
+    EXECUTION_ID_ = #{executionId ,jdbcType=VARCHAR},
+    ACTIVITY_ID_ = #{activityId ,jdbcType=VARCHAR},
+    PROC_INST_ID_ = #{processInstanceId ,jdbcType=VARCHAR},
+    PROC_DEF_ID_ = #{processDefinitionId ,jdbcType=VARCHAR},
+    CAUSE_INCIDENT_ID_ = #{causeIncidentId ,jdbcType=VARCHAR},
+    ROOT_CAUSE_INCIDENT_ID_ = #{rootCauseIncidentId ,jdbcType=VARCHAR},
+    CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+  
 </mapper>
