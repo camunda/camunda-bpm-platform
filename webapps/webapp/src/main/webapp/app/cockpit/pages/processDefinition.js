@@ -10,29 +10,8 @@ ngDefine('cockpit.pages.processDefinition', [
   var routeUtil = require('cockpit/util/routeUtil');
 
   var Controller = [
-    '$scope',
-    'search',
-    'ProcessDefinitionResource',
-    'ProcessInstanceResource',
-    'Views',
-    'Data',
-    'Transform',
-    'Variables',
-    'dataDepend',
-    'processDefinition',
-    'page',
-  function(
-    $scope,
-    search,
-    ProcessDefinitionResource,
-    ProcessInstanceResource,
-    Views,
-    Data,
-    Transform,
-    Variables,
-    dataDepend,
-    processDefinition,
-    page
+          '$scope', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
+  function($scope,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
   ) {
 
     var processData = $scope.processData = dataDepend.create($scope);
@@ -206,7 +185,8 @@ ngDefine('cockpit.pages.processDefinition', [
       if (!parentId) {
         return null;
       } else {
-        return ProcessDefinitionResource.get({ id : parentId }).$promise;
+        // return ProcessDefinitionResource.get({ id : parentId }).$promise;
+        return ProcessDefinitionResource.get({ id : parentId }).$promise.promise;
       }
     }]);
 

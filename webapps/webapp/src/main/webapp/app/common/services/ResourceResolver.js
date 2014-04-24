@@ -48,12 +48,14 @@ ngDefine('camunda.common.services.resolver', function(module) {
 
         // resolve
         var promise = resolve(id);
-        if (promise.$then) {
-          promise = promise.$then(function(response) { succeed(response.resource); }, fail);
-        } else
-        if (promise.then) {
+        if (promise.$promise.then) {
+          // promise = promise.$promise.then(function(response) { succeed(response.resource); }, fail);
+          promise = promise.$promise.then(function(response) { succeed(response); }, fail);
+        }
+        else if (promise.then) {
           promise = promise.then(succeed, fail);
-        } else {
+        }
+        else {
           throw new Error('No promise returned by #resolve');
         }
 

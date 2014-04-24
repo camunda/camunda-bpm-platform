@@ -20,8 +20,8 @@
       'angular-sanitize',
       'angular-ui',
       'ngDefine',
-      'bootstrap',
-      'jquery-ui'
+      // 'bootstrap',
+      'jquery-ui/ui/jquery.ui.draggable'
     ], function(angular) {
       require([
         APP_NAME,

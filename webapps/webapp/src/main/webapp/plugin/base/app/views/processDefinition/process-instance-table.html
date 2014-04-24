@@ -23,9 +23,8 @@
            ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
         <span class="badge badge-warning badge-suspended"
               ng-show="processInstance.suspended"
-              help
-              help-text="Currently suspended"
-              help-placement="'left'">
+              tooltip="Currently suspended"
+              tooltip-placement="left">
           <i class="icon-suspended white"></i>
         </span>
       </td>
@@ -46,5 +45,15 @@
   </tbody>
 </table>
 
-<div paginator total-pages="pages.total" current-page="pages.current"></div>
+<pagination ng-if="pages.total > pages.size"
+            class="pagination-sm"
+
+            page="pages.current"
+            ng-model="pages.current"
+
+            total-items="pages.total"
+            items-per-page="pages.size"
+
+            max-size="7"
+            boundary-links="true"></pagination>
 <!-- / CE - src/main/webapp/plugin/base/views/processDefinition/process-instance-table.html -->

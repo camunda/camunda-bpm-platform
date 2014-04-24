@@ -12,9 +12,10 @@ ngDefine('tasklist.pages', [], function(module) {
 
     var processDefinition = $scope.processDefinition = EngineApi.getProcessDefinitions().get({ id: processDefinitionId });
 
-    processDefinition.$then(function() {
-      form.data = EngineApi.getProcessDefinitions().getStartForm({ id: processDefinitionId }).$then(function(response) {
-        var data = response.resource;
+    processDefinition.$promise.then(function() {
+      form.data = EngineApi.getProcessDefinitions().getStartForm({ id: processDefinitionId }).$promise.then(function(response) {
+        // var data = response.resource;
+        var data = response;
 
         Forms.parseFormData(data, form);
 
@@ -39,7 +40,7 @@ ngDefine('tasklist.pages', [], function(module) {
 
       var variablesMap = Forms.variablesToMap(variables);
 
-      EngineApi.getProcessDefinitions().startInstance({ id: processDefinitionId }, { variables : variablesMap }).$then(function() {
+      EngineApi.getProcessDefinitions().startInstance({ id: processDefinitionId }, { variables : variablesMap }).$promise.then(function() {
         $rootScope.$broadcast('tasklist.reload');
         $location.url('/process-definition/' + processDefinitionId + '/complete');
       });
@@ -56,8 +57,9 @@ ngDefine('tasklist.pages', [], function(module) {
 
     var processDefinitionId = $routeParams.id;
 
-    EngineApi.getProcessDefinitions().get({ id: processDefinitionId }).$then(function(response) {
-      var processDefinition = response.resource;
+    EngineApi.getProcessDefinitions().get({ id: processDefinitionId }).$promise.then(function(response) {
+      // var processDefinition = response.resource;
+      var processDefinition = response;
 
       Notifications.addMessage({ status: 'Completed', message: 'Instance of <a>' + (processDefinition.name || processDefinition.key) + '</a> has been started', duration: 5000 });
       $location.url('/overview');

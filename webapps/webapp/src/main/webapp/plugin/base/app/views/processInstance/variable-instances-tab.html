@@ -16,53 +16,49 @@
       <td class="variable-value">
 
         <div ng-if="isPrimitive(variable) && !variable.inEditMode && !variable.errorMessage">
-          {{ variable.value }}          
+          {{ variable.value }}
           <span ng-if="isEditable(variable)" class="edit-toggle" ng-click="editVariable(variable)">
             <i class="icon-pencil"></i>
-          </span>         
+          </span>
         </div>
 
         <div ng-if="!!variable.errorMessage" class="muted">
-          <span 
-            help
-            help-text="Object which cannot be de-serialized"
-            help-placement="'right'">
+          <span
+            tooltip="Object which cannot be de-serialized"
+            tooltip-placement="right">
               Serialized Java Object
           </span>
         </div>
 
         <!-- binary variables -->
         <div ng-if="isBinary(variable)">
-          <a class="muted" 
-             href="{{getBinaryVariableDownloadLink(variable)}}" 
-             target="__blank" 
-             help
-             help-text="Click to Download"
-             help-placement="'right'">
+          <a class="muted"
+             href="{{getBinaryVariableDownloadLink(variable)}}"
+             target="_blank"
+             tooltip="Click to Download"
+             tooltip-placement="right">
             Binary Content
           </a>
-          <a class="edit-toggle" 
+          <a class="edit-toggle"
              href
              ng-click="openUploadDialog(variable)"
-             help
-             help-text="Upload"
-             help-placement="'right'">
+             tooltip="Upload"
+             tooltip-placement="right">
             <i class="icon-upload"></i>
           </a>
         </div>
 
         <!-- serializable variable -->
         <div ng-if="isSerializable(variable) && !variable.errorMessage">
-          <a class="muted" 
+          <a class="muted"
              ng-click="openInspectDialog(variable)"
              href
-             help
-             help-text="Click to Inspect"
-             help-placement="'right'">
+             tooltip="Click to Inspect"
+             tooltip-placement="right">
             {{ variable.value.type }}
-          </a>   
+          </a>
         </div>
-   
+
         <form class="inline-edit" name="editVariableForm" ng-if="variable.inEditMode" ng-submit="submit(variable, this.editVariableForm)" novalidate request-aware>
 
           <fieldset>
@@ -126,5 +122,15 @@
   </tbody>
 </table>
 
-<div paginator total-pages="pages.total" current-page="pages.current"></div>
+<pagination ng-if="pages.total > pages.size"
+            class="pagination-sm"
+
+            page="pages.current"
+            ng-model="pages.current"
+
+            total-items="pages.total"
+            items-per-page="pages.size"
+
+            max-size="7"
+            boundary-links="true"></pagination>
 <!-- / CE - src/main/webapp/plugin/base/app/views/processInstance/variable-instances-tab.html -->

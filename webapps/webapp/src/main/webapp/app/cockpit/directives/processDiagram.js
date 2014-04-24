@@ -8,6 +8,11 @@ ngDefine('cockpit.directives', [
 ], function(module, angular, $, Bpmn) {
   'use strict';
   /* jshint unused: false */
+  var _unique = 0;
+  function unique(prefix) {
+    _unique++;
+    return (prefix ? prefix +'_' : '') + _unique;
+  }
 
   function DirectiveController($scope, $element, $attrs, $filter, $q, $window, $compile, Views) {
 
@@ -60,7 +65,8 @@ ngDefine('cockpit.directives', [
     function renderDiagram() {
 
       // set the element id to processDiagram_*
-      var elementId = 'processDiagram_' + $scope.processDiagram.processDefinition.id.replace(/[.|:]/g, '_');
+      // var elementId = 'processDiagram_' + $scope.processDiagram.processDefinition.id.replace(/[.|:]/g, '_');
+      var elementId = unique('processDiagram');//'processDiagram_' + $scope.processDiagram.processDefinition.id.replace(/[.|:]/g, '_');
       $element.attr('id', elementId);
 
       // clear innerHTML of element in case that the process diagram has changed
@@ -70,7 +76,7 @@ ngDefine('cockpit.directives', [
       // set the render options
       $element.addClass('process-diagram');
       var options = {
-        diagramElement : $element.attr('id')
+        diagramElement : elementId//$element.attr('id')
       };
 
       // do the rendering

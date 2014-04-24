@@ -16,10 +16,9 @@ ngDefine('cockpit.directives', [ 'angular', 'bpmn/Bpmn' ], function(module, angu
             var elementId = 'processDiagram_' + processDefinitionId.replace(/[.|:]/g, '_');
             element.attr('id', elementId);
 
-            ProcessDefinitionResource
-            .getBpmn20Xml({ id : processDefinitionId })
-              .$then(function(response) {
-                var xml = response.data.bpmn20Xml;
+            ProcessDefinitionResource.getBpmn20Xml({ id : processDefinitionId }).$promise.then(function(response) {
+                // var xml = response.data.bpmn20Xml;
+                var xml = response.bpmn20Xml;
                 scope.$loaded = true;
 
                 try {

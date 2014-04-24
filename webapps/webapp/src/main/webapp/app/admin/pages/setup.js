@@ -35,7 +35,7 @@ define(['angular'], function(angular) {
         credentials : { password : $scope.credentials.password }
       };
 
-      InitialUserResource.create(user).$then(
+      InitialUserResource.create(user).$promise.then(
         function() {
           $scope.created = true;
         },

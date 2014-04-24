@@ -1,8 +1,9 @@
 ngDefine('camunda.common.directives.ifLoggedIn', [
-  'module:camunda.common.services.authentication:../services/Authentication'
+  'module:camunda.common.services.authentication:../services/Authentication',
+  'module:ngAnimate:angular-animate'
 ], function(module) {
 
-  var loggedInDirective = [ '$animator', 'Authentication', function($animator, Authentication) {
+  var loggedInDirective = [ '$animate', 'Authentication', function($animate, Authentication) {
     return {
       transclude: 'element',
       priority: 1000,
@@ -10,12 +11,13 @@ ngDefine('camunda.common.directives.ifLoggedIn', [
       restrict: 'A',
       compile: function (element, attr, transclude) {
         return function ($scope, $element, $attr) {
-          var animate = $animator($scope, $attr);
+          // var animate = $animate($scope, $attr);
           var childElement, childScope;
 
           $scope.$watch(Authentication.username, function ifLoggedInWatchAction(value) {
             if (childElement) {
-              animate.leave(childElement);
+              // animate.leave(childElement);
+              $animate.leave(childElement);
               childElement = undefined;
             }
             if (childScope) {
@@ -26,7 +28,8 @@ ngDefine('camunda.common.directives.ifLoggedIn', [
               childScope = $scope.$new();
               transclude(childScope, function (clone) {
                 childElement = clone;
-                animate.enter(clone, $element.parent(), $element);
+                // animate.enter(clone, $element.parent(), $element);
+                $animate.enter(clone, $element.parent(), $element);
               });
             }
           });
@@ -35,7 +38,7 @@ ngDefine('camunda.common.directives.ifLoggedIn', [
     }
   }];
 
-  var loggedOutDirective = [ '$animator', 'Authentication', function($animator, Authentication) {
+  var loggedOutDirective = [ '$animate', 'Authentication', function($animate, Authentication) {
     return {
       transclude: 'element',
       priority: 1000,
@@ -43,12 +46,13 @@ ngDefine('camunda.common.directives.ifLoggedIn', [
       restrict: 'A',
       compile: function (element, attr, transclude) {
         return function ($scope, $element, $attr) {
-          var animate = $animator($scope, $attr);
+          // var animate = $animate($scope, $attr);
           var childElement, childScope;
 
           $scope.$watch(Authentication.username, function ifLoggedInWatchAction(value) {
             if (childElement) {
-              animate.leave(childElement);
+              // animate.leave(childElement);
+              $animate.leave(childElement);
               childElement = undefined;
             }
             if (childScope) {
@@ -59,7 +63,8 @@ ngDefine('camunda.common.directives.ifLoggedIn', [
               childScope = $scope.$new();
               transclude(childScope, function (clone) {
                 childElement = clone;
-                animate.enter(clone, $element.parent(), $element);
+                // animate.enter(clone, $element.parent(), $element);
+                $animate.enter(clone, $element.parent(), $element);
               });
             }
           });

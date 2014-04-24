@@ -1,6 +1,10 @@
+/* global ngDefine: false, angular: false */
 ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
+  'use strict';
 
-   function VariableInstancesController ($scope, $http, search, Uri, LocalExecutionVariableResource, Notifications, $dialog) {
+  module.controller('VariableInstancesController', [
+          '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', '$modal',
+  function($scope,   $http,   search,   Uri,   LocalExecutionVariableResource,   Notifications,   $modal) {
 
     // input: processInstance, processData
 
@@ -69,7 +73,8 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
 
       // get the 'count' of variables
       $http.post(Uri.appUri('engine://engine/:engine/variable-instance/count'), params).success(function(data) {
-        pages.total = Math.ceil(data.count / pages.size);
+        // pages.total = Math.ceil(data.count / pages.size);
+        pages.total = data.count;
       });
 
       variableInstanceIdexceptionMessageMap = {};
@@ -86,7 +91,7 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
         });
         $scope.variables = data;
       });
-    };
+    }
 
     $scope.editVariable = function (variable) {
       variable.inEditMode = true;
@@ -106,7 +111,7 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
 
     var isValid = $scope.isValid = function (form) {
       return !form.$invalid;
-    }
+    };
 
     $scope.submit = function (variable, form) {
       if (!isValid(form)) {
@@ -126,9 +131,9 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
       var newVariable = { value: newValue, type: newType };
       modifiedVariable[variable.name] = newVariable;
 
-      LocalExecutionVariableResource.updateVariables({ executionId: variable.executionId }, { modifications : modifiedVariable }).$then(
+      LocalExecutionVariableResource.updateVariables({ executionId: variable.executionId }, { modifications : modifiedVariable }).$promise.then(
         // success
-        function(response) {
+        function() {
           Notifications.addMessage({ status: 'Variable', message: 'The variable \'' + variable.name + '\' has been changed successfully.', duration: 5000 });
           angular.extend(variable, newVariable);
           $scope.closeInPlaceEditing(variable);
@@ -206,7 +211,7 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
         isString(variable) ||
         isDate(variable) ||
         isBoolean(variable) ||
-        isNull(variable)     
+        isNull(variable);
     };
 
     $scope.isEditable = function (param) {
@@ -214,44 +219,33 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
     };
 
     $scope.isDateValueValid = function (param) {
-      console.log(param);
+      // console.log(param);
     };
 
     $scope.getBinaryVariableDownloadLink = function (variable) {
       return Uri.appUri('engine://engine/:engine/variable-instance/'+variable.id+'/data');
-    }
+    };
 
     $scope.openUploadDialog = function (variableInstance) {
-       var dialog = $dialog.dialog({
+      $modal.open({
         resolve: {
           variableInstance: function() { return variableInstance; }
         },
         controller: 'VariableInstanceUpluadController',
         templateUrl: require.toUrl('./variable-instance-upload-dialog.html')
       });
-
-      dialog.open().then(function(result) {
-        // dialog closed.
-      });
-    }
+    };
 
     $scope.openInspectDialog = function (variableInstance) {
-       var dialog = $dialog.dialog({
+      $modal.open({
         resolve: {
           variableInstance: function() { return variableInstance; }
         },
         controller: 'VariableInstanceInspectController',
         templateUrl: require.toUrl('./variable-instance-inspect-dialog.html')
       });
-
-      dialog.open().then(function(result) {
-        // dialog closed.
-      });
-    }
-
-  }
-
-  module.controller('VariableInstancesController', [ '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', '$dialog', VariableInstancesController ]);
+    };
+  }]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 

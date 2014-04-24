@@ -5,8 +5,7 @@
     <h1>
       <!--
       <i class="icon-type icon-inbox"
-         help
-         help-text="Process definition"></i>
+                  tooltip="Process definition"></i>
       -->
       <span class="process-name-prefix">
         <span>Process</span>
@@ -16,9 +15,8 @@
 
       <span class="badge badge-warning badge-suspended"
             ng-show="processDefinition.suspended"
-            help
-            help-text="Currently suspended"
-            help-placement="'top'">
+            tooltip="Currently suspended"
+            tooltip-placement="top">
         <i class="icon-suspended white"></i>
       </span>
     </h1>
@@ -43,8 +41,9 @@
       <div class="filters" ng-controller="ProcessDefinitionFilterController">
         <h5>
           Filter
-          <div class="btn-group btn-control">
-            <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown">
+          <div class="btn-group btn-control dropdown">
+            <button class="btn btn-mini dropdown-toggle"
+                    data-toggle="dropdown">
               <i class="icon-plus"></i>
             </button>
 
@@ -76,8 +75,9 @@
                 Version
               </span>
 
-              <div class="btn-group">
-                <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown">
+              <div class="btn-group dropdown">
+                <button class="btn btn-mini dropdown-toggle"
+                        data-toggle="dropdown">
                   {{ processDefinition.version }} <span class="caret"></span>
                 </button>
 
@@ -284,7 +284,11 @@
 
       <!-- content top pane -->
       <div class="ctn-row ctn-content-top">
-        <div process-diagram="processDiagram" on-element-click="handleBpmnElementSelection(id, $event)" selection="filter" process-data="processData" provider-component="cockpit.processDefinition.diagram.overlay"></div>
+        <div process-diagram="processDiagram"
+             on-element-click="handleBpmnElementSelection(id, $event)"
+             selection="filter"
+             process-data="processData"
+             provider-component="cockpit.processDefinition.diagram.overlay"></div>
       </div>
 
       <!-- content bottom pane -->

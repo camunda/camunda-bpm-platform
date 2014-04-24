@@ -19,17 +19,15 @@
             <a href="{{ getJobStacktraceUrl(incident) }}"
                target="_blank"
                ng-show="incident.rootCauseIncidentMessage"
-               help
-               help-text="Open stacktrace in new window"
-               help-placement="'top'">
+               tooltip="Open stacktrace in new window"
+               tooltip-placement="top">
               {{ incident.rootCauseIncidentMessage }}
             </a>
             <a href="{{ getJobStacktraceUrl(incident) }}"
                target="_blank"
                ng-hide="incident.rootCauseIncidentMessage"
-               help
-               help-text="Open stacktrace in new window"
-               help-placement="'top'">
+               tooltip="Open stacktrace in new window"
+               tooltip-placement="top">
               <i>Message is null.</i>
             </a>
           </span>
@@ -72,9 +70,8 @@
       </td>
       <td>
         <a class="btn action-button" ng-click="openJobRetryDialog(incident)" ng-show="incident.incidentType === 'failedJob' && incident.configuration"
-           help
-           help-text="Increment Number of Retries of Failed Job"
-           help-placement="left">
+           tooltip="Increment Number of Retries of Failed Job"
+           tooltip-placement="left">
           <i class="icon-repeat"></i>
         </a>
       </td>
@@ -94,5 +91,16 @@
   </tbody>
 </table>
 
-<div paginator total-pages="pages.total" current-page="pages.current"></div>
+
+<pagination ng-if="pages.total > pages.size"
+            class="pagination-sm"
+
+            page="pages.current"
+            ng-model="pages.current"
+
+            total-items="pages.total"
+            items-per-page="pages.size"
+
+            max-size="7"
+            boundary-links="true"></pagination>
 <!-- / CE - src/main/webapp/plugin/base/views/processInstance/incidents-tab.html -->

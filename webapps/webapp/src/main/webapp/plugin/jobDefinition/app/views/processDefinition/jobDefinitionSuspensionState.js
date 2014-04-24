@@ -1,14 +1,10 @@
-ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, require) {
+/* global ngDefine: false */
+ngDefine('cockpit.plugin.jobDefinition.views', function(module) {
+  'use strict';
 
-  var JobDefinitionSuspensionStateController = [
-    '$scope',
-    '$http',
-    '$filter',
-    'Uri',
-    'Notifications',
-    'dialog',
-    'jobDefinition',
-  function($scope, $http, $filter, Uri, Notifications, dialog, jobDefinition) {
+  module.controller('JobDefinitionSuspensionStateController', [
+          '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'jobDefinition',
+  function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   jobDefinition) {
 
     var BEFORE_UPDATE = 'BEFORE_UPDATE',
         PERFORM_UPDATE = 'PERFORM_UDPATE',
@@ -28,7 +24,7 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
     $scope.executionDate = dateFilter(Date.now(), dateFormat);
 
     $scope.$on('$routeChangeStart', function () {
-      dialog.close($scope.status);
+      $modalInstance.close($scope.status);
     });
 
     $scope.updateSuspensionState = function () {
@@ -40,13 +36,13 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
       data.includeJobs = $scope.includeJobs;
       data.executionDate = !$scope.executeImmediately ? $scope.executionDate : null;
 
-      $http.put(Uri.appUri('engine://engine/:engine/job-definition/' + jobDefinition.id + '/suspended/'), data).success(function (data) {
+      $http.put(Uri.appUri('engine://engine/:engine/job-definition/' + jobDefinition.id + '/suspended/'), data).success(function () {
         $scope.status = UPDATE_SUCCESS;
 
         if ($scope.executeImmediately) {
-          Notifications.addMessage({'status': 'Finished', 'message': 'Updated the suspension state of the job definition.', 'exclusive': true });  
+          Notifications.addMessage({'status': 'Finished', 'message': 'Updated the suspension state of the job definition.', 'exclusive': true });
         } else {
-          Notifications.addMessage({'status': 'Finished', 'message': 'The update of the suspension state of the job definition has been scheduled.', 'exclusive': true });  
+          Notifications.addMessage({'status': 'Finished', 'message': 'The update of the suspension state of the job definition has been scheduled.', 'exclusive': true });
         }
 
       }).error(function (data) {
@@ -55,14 +51,14 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
         if ($scope.executeImmediately) {
           Notifications.addError({'status': 'Finished', 'message': 'Could not update the suspension state of the job definition: ' + data.message, 'exclusive': true });
         } else {
-          Notifications.addMessage({'status': 'Finished', 'message': 'The update of the suspension state of the job definition could not be scheduled: ' + data.message, 'exclusive': true });  
+          Notifications.addMessage({'status': 'Finished', 'message': 'The update of the suspension state of the job definition could not be scheduled: ' + data.message, 'exclusive': true });
         }
       });
-    }
+    };
 
     $scope.isValid = function () {
       if (!$scope.executeImmediately) {
-        return $scope.updateSuspensionStateForm.$valid;    
+        return $scope.updateSuspensionStateForm.$valid;
       }
       return true;
     };
@@ -75,11 +71,9 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
       response.executeImmediately = $scope.executeImmediately;
       response.executionDate = $scope.executionDate;
 
-      dialog.close(response);
-      
+      $modalInstance.close(response);
+
     };
 
-  }];
-
-  module.controller('JobDefinitionSuspensionStateController', JobDefinitionSuspensionStateController);
+  }]);
 });

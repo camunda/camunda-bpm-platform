@@ -104,22 +104,24 @@ ngDefine('tasklist.pages', [
       queryObject.sortBy = sort.by;
       queryObject.sortOrder = sort.order;
 
-      EngineApi.getProcessDefinitions().query().$then(function(response) {
+      EngineApi.getProcessDefinitions().query().$promise.then(function(response) {
         var processDefinitions = {};
-        $.each(response.resource, function(index, definition) {
+        // $.each(response.resource, function(index, definition) {
+        $.each(response, function(index, definition) {
           processDefinitions[definition.id] = definition;
         });
         $scope.processDefinitions = processDefinitions;
       });
 
-      EngineApi.getTaskList().query(queryObject).$then(function(response) {
-        $scope.taskList.tasks = response.resource;
+      EngineApi.getTaskList().query(queryObject).$promise.then(function(response) {
+        // $scope.taskList.tasks = response.resource;
+        $scope.taskList.tasks = response;
       });
     }
 
     $scope.claimTask = function(task) {
 
-      return EngineApi.getTaskList().claim({ id : task.id }, { userId: authenticatedUser }).$then(function () {
+      return EngineApi.getTaskList().claim({ id : task.id }, { userId: authenticatedUser }).$promise.then(function () {
         // var tasks = $scope.taskList.tasks,
         //     view = $scope.taskList.view;
         var view = $scope.taskList.view;
@@ -137,7 +139,7 @@ ngDefine('tasklist.pages', [
     };
 
     $scope.unclaimTask = function(task) {
-      return EngineApi.getTaskList().unclaim({ id : task.id }).$then(function () {
+      return EngineApi.getTaskList().unclaim({ id : task.id }).$promise.then(function () {
         $scope.removeTask(task);
 
         notifyScopeChange('Unclaimed task <a href="#/overview?filter=unassigned&selection=' + task.id + '">' + task.name + '</a>');
@@ -170,7 +172,7 @@ ngDefine('tasklist.pages', [
     };
 
     $scope.delegateTask = function(task, user) {
-      return EngineApi.getTaskList().delegate( { id : task.id}, { userId: user.id }).$then(function () {
+      return EngineApi.getTaskList().delegate( { id : task.id}, { userId: user.id }).$promise.then(function () {
         $scope.removeTask(task);
 
         notifyScopeChange('Delegated task');
@@ -266,9 +268,10 @@ ngDefine('tasklist.pages', [
       $scope.showing = true;
       $scope.bpmn.task = task;
 
-      EngineApi.getProcessDefinitions().xml({ id : task.processDefinitionId }).$then(function (result) {
+      EngineApi.getProcessDefinitions().xml({ id : task.processDefinitionId }).$promise.then(function (result) {
         var diagram = $scope.bpmn.diagram,
-            xml = result.data.bpmn20Xml;
+            // xml = result.data.bpmn20Xml;
+            xml = result.bpmn20Xml;
 
         if (diagram) {
           diagram.clear();

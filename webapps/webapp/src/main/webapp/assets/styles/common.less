@@ -1,9 +1,10 @@
-@import "_vars.less";
 /**
  * loaded to remove angular template flicker on site load
  * @see http://docs.angularjs.org/api/ng.directive:ngCloak
  */
-[ng\:cloak], [ng-cloak], .ng-cloak {
+[ng\:cloak],
+[ng-cloak],
+.ng-cloak {
   display: none;
 }
 
@@ -35,9 +36,9 @@
 
 .badge.badge-suspended .icon-suspended {
   -webkit-background-size: contain;
-  -moz-background-size: contain;
-  -o-background-size: contain;
-  background-size: contain;
+     -moz-background-size: contain;
+       -o-background-size: contain;
+          background-size: contain;
 
   width: 16px;
   height: 12px;
@@ -48,12 +49,13 @@
 div, textarea, .inline-edit input {
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
-      box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .navbar-inner {
-      box-sizing: content-box;
-  moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+     -moz-box-sizing: content-box;
+          box-sizing: content-box;
 }
 
 /** inline editing of elements */
@@ -154,8 +156,8 @@ html, body {
 input.ng-invalid.ng-dirty {
   border-color: #E9322D;
   -webkit-box-shadow: 0 0 6px #F8B9B7;
-  -moz-box-shadow: 0 0 6px #f8b9b7;
-  box-shadow: 0 0 6px #F8B9B7;
+     -moz-box-shadow: 0 0 6px #F8B9B7;
+          box-shadow: 0 0 6px #F8B9B7;
 }
 
 .modal-body {
@@ -202,8 +204,8 @@ Icons
   margin-right: 4px;
 
   -webkit-border-radius: 50%;
-   -moz-border-radius: 50%;
-        border-radius: 50%;
+     -moz-border-radius: 50%;
+          border-radius: 50%;
 }
 
 .circle-red {
@@ -266,9 +268,23 @@ Utilities
   height: 32px;
 }
 
+/** layout ui tweaks */
+
 footer {
   margin-top: 32px;
   padding: 5px 10px;
+  border-top: 1px solid #E5E5E5;
+  background-color: whiteSmoke;
+  > div {
+    font-size: 0.83em;
+    text-align: right;
+
+    opacity: 0.7;
+  }
+
+  &:hover > div {
+    opacity: 1.0;
+  }
 }
 
 @media (max-width: 767px) {
@@ -278,27 +294,6 @@ footer {
   }
 }
 
-/** layout ui tweaks */
-
-footer {
-  border-top: 1px solid #E5E5E5;
-  background-color: whiteSmoke;
-}
-
-footer > div {
-  font-size: 0.83em;
-  text-align: right;
-
-  opacity: 0.7;
-}
-
-footer:hover > div {
-  opacity: 1.0;
-}
-
-footer .version {
-  font-family: monospace;
-}
 
 @media (min-width: 979px) {
   .ctn-wrapper > .notifications-panel {
@@ -327,13 +322,38 @@ footer .version {
   }
 }
 
+.cuteScroll() {
+  &::-webkit-scrollbar{
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-button:start:decrement,
+  &::-webkit-scrollbar-button:end:increment {
+    display: block;
+    height: 0;
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar-track-piece {
+    background-color: #FAFAFA;
+    -webkit-border-radius: 0;
+    -webkit-border-bottom-right-radius: 3px;
+    -webkit-border-bottom-left-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:vertical {
+    height: 50px;
+    background-color: #999;
+    -webkit-border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:horizontal {
+    width: 50px;
+    background-color: #999;
+    -webkit-border-radius: 3px;
+  }
+}
 
-.ctn-scroll::-webkit-scrollbar{width:8px;height:8px;}
-.ctn-scroll::-webkit-scrollbar-button:start:decrement,
-.ctn-scroll::-webkit-scrollbar-button:end:increment{display:block;height:0;background-color:transparent;}
-.ctn-scroll::-webkit-scrollbar-track-piece{background-color:#FAFAFA;-webkit-border-radius:0;-webkit-border-bottom-right-radius:3px;-webkit-border-bottom-left-radius:3px;}
-.ctn-scroll::-webkit-scrollbar-thumb:vertical{height:50px;background-color:#999;-webkit-border-radius:3px;}
-.ctn-scroll::-webkit-scrollbar-thumb:horizontal{width:50px;background-color:#999;-webkit-border-radius:3px;}
+.ctn-scroll {
+  .cuteScroll();
+}
 
 /** end layout ui tweaks */
 
@@ -388,9 +408,9 @@ footer .version {
   -webkit-border-radius: 5px;
      -moz-border-radius: 5px;
           border-radius: 5px;
-  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-          box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+     -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
 }
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
@@ -425,102 +445,11 @@ footer .version {
 }
 
 
+@import "_animate-spin.less";
+
+
 // WHO NEED A FIX??????? IE of course!!!
 .form-signin input[tabindex="-1"][unselectable="on"][style] {
   // take THAT in your face!
   height: 30px !important;
 }
-
-/*
-   Animation example, for spinners
-*/
-// .spinning {
-//   -webkit-animation: spin 2s linear;
-//        -o-animation: spin 2s linear;
-//           animation: spin 2s linear;
-// }
-
-.animate-spin {
-  display: inline-block;
-  -webkit-animation: spin 2s infinite linear;
-     -moz-animation: spin 2s infinite linear;
-       -o-animation: spin 2s infinite linear;
-          animation: spin 2s infinite linear;
-}
-@-moz-keyframes spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-       -moz-transform: rotate(0deg);
-         -o-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-
-  100% {
-    -webkit-transform: rotate(359deg);
-       -moz-transform: rotate(359deg);
-         -o-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-@-webkit-keyframes spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-       -moz-transform: rotate(0deg);
-         -o-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-
-  100% {
-    -webkit-transform: rotate(359deg);
-       -moz-transform: rotate(359deg);
-         -o-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-@-o-keyframes spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-       -moz-transform: rotate(0deg);
-         -o-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-
-  100% {
-    -webkit-transform: rotate(359deg);
-       -moz-transform: rotate(359deg);
-         -o-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-@-ms-keyframes spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-       -moz-transform: rotate(0deg);
-         -o-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-
-  100% {
-    -webkit-transform: rotate(359deg);
-       -moz-transform: rotate(359deg);
-         -o-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-@keyframes spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-       -moz-transform: rotate(0deg);
-         -o-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-
-  100% {
-    -webkit-transform: rotate(359deg);
-       -moz-transform: rotate(359deg);
-         -o-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
-

@@ -32,9 +32,10 @@ ngDefine('tasklist.pages', [], function(module) {
 
     var task = $scope.task = EngineApi.getTaskList().get({ id: taskId });
 
-    task.$then(function() {
-      form.data = EngineApi.getTaskList().getForm({ id: taskId }).$then(function(response) {
-        var data = response.resource;
+    task.$promise.then(function() {
+      form.data = EngineApi.getTaskList().getForm({ id: taskId }).$promise.then(function(response) {
+        // var data = response.resource;
+        var data = response;
         data.taskId = taskId;
 
         Forms.parseFormData(data, form);
@@ -60,14 +61,19 @@ ngDefine('tasklist.pages', [], function(module) {
               break;
           }
 
-          EngineApi.getProcessInstance().variables({ id : task.processInstanceId }).$then(function (result) {
-            var variables = Forms.mapToVariablesArray(result.data),
+          EngineApi.getProcessInstance().variables({ id : task.processInstanceId }).$promise.then(function (result) {
+            // var variables = Forms.mapToVariablesArray(result.data),
+            var variables = Forms.mapToVariablesArray(result),
                 scopeVariables = $scope.variables;
 
             for (var i = 0, variable; !!(variable = variables[i]); i++) {
               var variableInScope = getVariableByName(variable.name, scopeVariables);
               if (!variableInScope) {
-                $scope.variables.push({ name: variable.name, value: variable.value, type: variable.type.toLowerCase() });
+                $scope.variables.push({
+                  name: variable.name,
+                  value: variable.value,
+                  type: variable.type.toLowerCase()
+                });
               } else {
                 variableInScope.value = variable.value;
               }
@@ -93,7 +99,7 @@ ngDefine('tasklist.pages', [], function(module) {
 
       var action = 'submitTaskForm';
 
-      taskList[action]({ id: taskId }, { 'variables' : variablesMap }).$then(function() {
+      taskList[action]({ id: taskId }, { 'variables' : variablesMap }).$promise.then(function() {
         $rootScope.$broadcast('tasklist.reload');
         $location.url('/task/' + taskId + '/' + action);
       });

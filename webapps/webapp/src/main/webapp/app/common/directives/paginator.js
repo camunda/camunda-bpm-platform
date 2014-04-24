@@ -1,6 +1,7 @@
 /* global ngDefine: false */
 ngDefine('camunda.common.directives', [], function(module) {
   'use strict';
+  console.info('paginator directive loaded');
 
   var paginatorTmpl =
     '<div class="pagination pagination-centered">' +
@@ -12,7 +13,7 @@ ngDefine('camunda.common.directives', [], function(module) {
     '  </ul>' +
     '</div>';
 
-  var PaginatorDirective = function () {
+  module.directive('paginator', function () {
     return {
       restrict: 'EAC',
       template: paginatorTmpl,
@@ -22,7 +23,7 @@ ngDefine('camunda.common.directives', [], function(module) {
         currentPage: '='
       },
       link: function(scope /*, element, attrs*/) {
-
+        console.warn('DEPRECATE paginator directive found', arguments[1]);
         /* constants */
 
         var LABEL = {
@@ -97,7 +98,5 @@ ngDefine('camunda.common.directives', [], function(module) {
         };
       }
     };
-  };
-
-  module.directive('paginator', PaginatorDirective);
+  });
 });

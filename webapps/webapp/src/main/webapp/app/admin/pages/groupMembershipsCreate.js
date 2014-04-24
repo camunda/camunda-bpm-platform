@@ -1,6 +1,11 @@
-ngDefine('admin.pages', function(module, $) {
+/* global ngDefine: false, angular: false */
+/* jshint browser: true */
+ngDefine('admin.pages', function(module) {
+  'use strict';
 
-  function CreateGroupMembershipController ($scope, $q, $location, Uri, Notifications, GroupMembershipResource, GroupResource, dialog, user, groupIdList) {
+  module.controller('GroupMembershipDialogController', [
+            '$scope', '$q', '$location', 'Uri', 'Notifications', 'GroupMembershipResource', 'GroupResource', '$modalInstance', 'user', 'groupIdList',
+    function($scope,   $q,   $location,   Uri,   Notifications,   GroupMembershipResource,   GroupResource,   $modalInstance,   user,   groupIdList) {
 
     var BEFORE_CREATE = 'beforeCreate',
         PERFORM_CREATE = 'performCancel',
@@ -12,14 +17,15 @@ ngDefine('admin.pages', function(module, $) {
     $scope.groupIdList = groupIdList;
 
     $scope.$on('$routeChangeStart', function () {
-      dialog.close($scope.status);
+      $modalInstance.close($scope.status);
     });
 
     function loadAllGroups () {
       var deferred = $q.defer();
 
-      GroupResource.query().$then(function (response) {
-        deferred.resolve(response.data);
+      GroupResource.query().$promise.then(function (response) {
+        // deferred.resolve(response.data);
+        deferred.resolve(response);
       }, function (error) {
         deferred.reject(error.data);
       });
@@ -47,21 +53,21 @@ ngDefine('admin.pages', function(module, $) {
 
       var selectedGroupIds = [];
       angular.forEach($scope.availableGroups, function(group){
-        if(group.checked) {             
+        if(group.checked) {
           selectedGroupIds.push(group.id);
-        }        
+        }
       });
 
       var completeCount = 0;
       var deferred = $q.defer();
-      angular.forEach(selectedGroupIds, function(groupId) {        
-        
-        GroupMembershipResource.create({'groupId': groupId, 'userId': $scope.user.id}).$then(function (response) {          
+      angular.forEach(selectedGroupIds, function(groupId) {
+
+        GroupMembershipResource.create({'groupId': groupId, 'userId': $scope.user.id}).$promise.then(function () {
           completeCount++;
           if(completeCount == selectedGroupIds.length) {
             deferred.resolve();
           }
-        }, function (error) {
+        }, function () {
           completeCount++;
           if(completeCount == selectedGroupIds.length) {
             deferred.reject();
@@ -69,8 +75,8 @@ ngDefine('admin.pages', function(module, $) {
         });
 
       });
-     
-      deferred.promise.then(function(results) {
+
+      deferred.promise.then(function() {
         $scope.status = CREATE_SUCCESS;
       }, function (error) {
         $scope.status = CREATE_FAILED;
@@ -80,20 +86,8 @@ ngDefine('admin.pages', function(module, $) {
     };
 
     $scope.close = function (status) {
-      dialog.close(status);
+      $modalInstance.close(status);
     };
-  };
-
-  module.controller('GroupMembershipDialogController', [ '$scope',
-                                                         '$q',
-                                                         '$location',
-                                                         'Uri',
-                                                         'Notifications',
-                                                         'GroupMembershipResource',
-                                                         'GroupResource',
-                                                         'dialog',
-                                                         'user',
-                                                         'groupIdList',
-                                                         CreateGroupMembershipController ]);
+  }]);
 
 });
