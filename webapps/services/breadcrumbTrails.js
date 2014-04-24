@@ -22,8 +22,9 @@ ngDefine('cockpit.services.breadcrumbTrails', function(module) {
           // TODO: CAM-2017 API definition cleanup
           id: superProcessInstance.processDefinitionId || superProcessInstance.definitionId
         })
-        .$then(function (response) {
-          var superProcessDefinition = response.data;
+        .$promise.then(function (response) {
+          // var superProcessDefinition = response.data;
+          var superProcessDefinition = response;
 
           // ... PREpend the breadcrumbs
           trail = [

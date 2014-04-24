@@ -9,16 +9,14 @@
           name="name"
           type="text" />
       <span class="add-on"
-         help
-         help-text="Click here to clear the field value.">
+            tooltip="Click here to clear the field value.">
       <i class="icon-search"
         ng-click="clearName()"></i>
       </span>
     </label>
     <button class="btn btn-small btn-link btn-control-link"
             type="button"
-            help
-            help-text="Filters activity instances that have the entered name.">
+            tooltip="Filters activity instances that have the entered name.">
       <i class="icon-question-sign"></i>
     </button>
   </div>
@@ -29,11 +27,10 @@
     <ul class="inline">
       <li>
         <label class="btn btn-mini running"
-               help
-               help-text="Running Activity Instance"
-               help-placement="'bottom'">
+               tooltip="Running Activity Instance"
+               tooltip-placement="bottom">
           <i class="icon-adjust"></i>
-          <input ng-click="search()"
+          <input ng-change="search()"
                  ng-model="running"
                  name="running"
                  type="checkbox" />
@@ -41,11 +38,10 @@
       </li>
       <li>
         <label class="btn btn-mini completed"
-               help
-               help-text="Completed Activity Instance"
-               help-placement="'bottom'">
+               tooltip="Completed Activity Instance"
+               tooltip-placement="bottom">
           <i class="icon-ok-circle"></i>
-          <input ng-click="search()"
+          <input ng-change="search()"
                  ng-model="completed"
                  name="completed"
                  type="checkbox" />
@@ -53,11 +49,10 @@
       </li>
       <li>
         <label class="btn btn-mini canceled"
-               help
-               help-text="Canceled Activity Instance"
-               help-placement="'bottom'">
+               tooltip="Canceled Activity Instance"
+               tooltip-placement="bottom">
           <i class="icon-ban-circle"></i>
-          <input ng-click="search()"
+          <input ng-change="search()"
                  ng-model="canceled"
                  name="canceled"
                  type="checkbox" />

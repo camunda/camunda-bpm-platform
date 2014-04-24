@@ -1,8 +1,9 @@
-ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
+/* global ngDefine: false */
+ngDefine('cockpit.directives', function(module) {
   'use strict';
 
   module.directive('processVariable', [ 'Variables', function(Variables) {
-    
+
     return {
 
       require: 'ngModel',

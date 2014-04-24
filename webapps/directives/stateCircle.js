@@ -1,8 +1,8 @@
 /* global ngDefine: false */
-ngDefine('camunda.common.directives', [], function(module) {
+ngDefine('cockpit.directives', function(module) {
   'use strict';
 
-  var CircleDirective = function () {
+  module.directive('stateCircle', function () {
     return {
       restrict: 'EAC',
       link: function(scope, element, attrs) {
@@ -13,7 +13,6 @@ ngDefine('camunda.common.directives', [], function(module) {
         });
 
         function updateStateCircle() {
-
           var incidents = scope.$eval(attrs.incidents);
           var incidentsForTypes = scope.$eval(attrs.incidentsForTypes) ||  [];
 
@@ -55,7 +54,5 @@ ngDefine('camunda.common.directives', [], function(module) {
         }
       }
     };
-  };
-
-  module.directive('stateCircle', CircleDirective);
+  });
 });
