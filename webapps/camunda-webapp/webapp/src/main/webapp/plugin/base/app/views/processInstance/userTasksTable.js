@@ -1,5 +1,4 @@
-/* global ngDefine: false, angular: false, console: false */
-
+/* global ngDefine: false, angular: false, require: false */
 ngDefine('cockpit.plugin.base.views', function(module) {
   'use strict';
   /**
@@ -51,7 +50,13 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     return angular.isFunction(func) ? func : angular.noop;
   }
 
-  function UserTaskController ($scope, search, TaskResource, Notifications, $dialog) {
+
+
+
+
+  module.controller('UserTaskController', [
+          '$scope', 'search', 'TaskResource', 'Notifications', '$modal',
+  function($scope,   search,   TaskResource,   Notifications,   $modal) {
 
     // input: processInstance, processData
 
@@ -112,17 +117,21 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       taskIdIdToExceptionMessageMap = {};
       taskCopies = {};
 
-      TaskResource.count(params).$then(function (response) {
-        pages.total = Math.ceil(response.data.count / pages.size);
+      TaskResource.count(params).$promise.then(function (response) {
+        // pages.total = Math.ceil(response.data.count / pages.size);
+        // pages.total = Math.ceil(response.count / pages.size);
+        pages.total = response.count;
       });
 
-      TaskResource.query(pagingParams, params).$then(function (response) {
-        for (var i = 0, task; !!(task = response.resource[i]); i++) {
+      TaskResource.query(pagingParams, params).$promise.then(function (response) {
+        // for (var i = 0, task; !!(task = response.resource[i]); i++) {
+        for (var i = 0, task; !!(task = response[i]); i++) {
           task.instance = executionIdToInstanceMap[task.executionId];
           taskCopies[task.id] = angular.copy(task);
         }
 
-        $scope.userTasks = response.resource;
+        // $scope.userTasks = response.resource;
+        $scope.userTasks = response;
       });
 
     }
@@ -139,10 +148,11 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       var defaultParams = {id: userTask.id};
       var params = {userId : editForm.value};
 
-      TaskResource.setAssignee(defaultParams, params).$then(
+      TaskResource.setAssignee(defaultParams, params).$promise.then(
         // success
         function (response) {
-          copy.assignee = userTask.assignee = response.resource.userId;
+          // copy.assignee = userTask.assignee = response.resource.userId;
+          copy.assignee = userTask.assignee = response.userId;
 
           Notifications.addMessage({
             status: 'Assignee',
@@ -177,7 +187,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
 
     $scope.openDialog = function(userTask, groups) {
-      var dialog = $dialog.dialog({
+      $modal.open({
         resolve: {
           userTask: function() { return userTask; },
           groups: function() { return groups; }
@@ -185,17 +195,16 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         controller: 'UserTaskGroupController',
         templateUrl: require.toUrl('./plugin/base/app/views/processInstance/identity-links-modal.html')
       });
-
-      dialog.open();
     };
 
     $scope.changeGroups = function() {
       var userTask = this.userTask;
 
       // 1. load the identityLinks
-      TaskResource.getIdentityLinks({id: userTask.id}, {}).$then(function(response) {
+      TaskResource.getIdentityLinks({id: userTask.id}, {}).$promise.then(function(response) {
         // 2. filter the response.data to exclude links who have no groupId or have type 'assignee' or 'owner'
-        var groups = compact(map(response.data, function(item) {
+        // var groups = compact(map(response.data, function(item) {
+        var groups = compact(map(response, function(item) {
           var ok = item.groupId && item.type !== 'assignee' && item.type !== 'owner';
           return ok ? item : null;
         }));
@@ -209,35 +218,32 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     $scope.getExceptionForUserTask = function (userTask) {
       return taskIdIdToExceptionMessageMap[userTask.id];
     };
-  }
+  }]);
 
-  function UserTaskGroupController (dialog, TaskResource) {
-    var dialogScope = dialog.$scope;
+  module.controller('UserTaskGroupController', [
+          '$modalInstance', 'TaskResource', '$scope', 'Notifications', 'userTask', 'groups',
+  function($modalInstance,   TaskResource,   $scope,   Notifications,   userTask,   groups) {
+    $scope.groups = groups;
 
-    // fill the dialogScope with the resolved references
-    angular.forEach(dialog.options.resolve, function(func, name) {
-      dialogScope[name] = func();
-    });
+    $scope.title = 'Manage groups';
 
-    dialogScope.title = 'Manage groups';
+    $scope.labelKey = 'groupId';
 
-    dialogScope.labelKey = 'groupId';
-
-    dialogScope.buttons = [
+    $scope.buttons = [
       {
         cssClass: 'btn',
         label: 'Close'
       }
     ];
 
-    dialogScope.removeItem = function() {
+    $scope.removeItem = function() {
       var delta = this.delta;
       TaskResource.deleteIdentityLink({
-        id: dialogScope.userTask.id
-      }, angular.toJson(this.group)).$then(function() {
+        id: userTask.id
+      }, angular.toJson(this.group)).$promise.then(function() {
         // deleting an entry is not enough, we need to "rebuild" the groups array
-        // delete dialogScope.groups[delta];
-        dialogScope.groups = compact(map(dialogScope.groups, function(g, d) {
+        // delete $scope.groups[delta];
+        $scope.groups = compact(map($scope.groups, function(g, d) {
           return delta !== d ? g : false;
         }));
       }, function(error) {
@@ -250,7 +256,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       });
     };
 
-    dialogScope.invalid = function() {
+    $scope.invalid = function() {
       var editForm = this.editForm;
       if (editForm.$invalid) {
         return true;
@@ -258,26 +264,27 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
       var exists;
       var newItem = editForm.newItem.$modelValue;
-      angular.forEach(dialogScope.groups, function(group) {
+      angular.forEach($scope.groups, function(group) {
         exists = (exists || (group.groupId === newItem));
       });
 
       return exists;
     };
 
-    dialogScope.addItem = function() {
+    $scope.addItem = function() {
       var editForm = this;
+
 
       var newGroup = {
         type: 'candidate',
-        groupId: dialogScope.newItem
+        groupId: editForm.newItem
       };
 
       TaskResource.addIdentityLink({
-        id: dialogScope.userTask.id
-      }, newGroup).$then(function() {
-        dialogScope.groups.push(newGroup);
-        dialogScope.newItem = '';
+        id: userTask.id
+      }, newGroup).$promise.then(function() {
+        $scope.groups.push(newGroup);
+        editForm.newItem = '';
       }, function(error) {
         Notifications.addError({
           status: 'Assignee',
@@ -288,25 +295,10 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       });
     };
 
-    dialogScope.close = function(res){
-      dialog.close(res);
-    };
-  }
+    $scope.close = $modalInstance.close;
+  }]);
 
-  module.controller('UserTaskController', [
-    '$scope',
-    'search',
-    'TaskResource',
-    'Notifications',
-    '$dialog',
-  UserTaskController]);
-
-  module.controller('UserTaskGroupController', [
-    'dialog',
-    'TaskResource',
-  UserTaskGroupController]);
-
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+  var Configuration = function(ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
       id: 'user-tasks-tab',
       label: 'User Tasks',

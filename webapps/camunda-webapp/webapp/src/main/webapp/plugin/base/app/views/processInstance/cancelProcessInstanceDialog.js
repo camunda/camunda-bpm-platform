@@ -1,7 +1,9 @@
-ngDefine('cockpit.plugin.base.views', function(module, $) {
-
-  var CancelProcessInstanceController = [ '$scope', '$location', 'Notifications', 'ProcessInstanceResource', 'dialog', 'processInstance', 'processData',
-                                  function($scope, $location, Notifications, ProcessInstanceResource, dialog, processInstance, processData) {
+/* global ngDefine: false */
+ngDefine('cockpit.plugin.base.views', function(module) {
+  'use strict';
+  module.controller('CancelProcessInstanceController', [
+          '$scope', '$location', 'Notifications', 'ProcessInstanceResource', '$modalInstance', 'processInstance', 'processData',
+  function($scope,   $location,   Notifications,   ProcessInstanceResource,   $modalInstance,   processInstance,   processData) {
 
     var BEFORE_CANCEL = 'beforeCancellation',
         PERFORM_CANCEL = 'performCancellation',
@@ -14,15 +16,23 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
     var cancelProcessInstanceData = processData.newChild($scope);
 
     $scope.$on('$routeChangeStart', function () {
-      dialog.close($scope.status);
+      $modalInstance.close($scope.status);
     });
 
     cancelProcessInstanceData.provide('subProcessInstances', function () {
-      return ProcessInstanceResource.query({'firstResult': 0, 'maxResults': 5}, {'superProcessInstance': processInstance.id}).$promise;
+      return ProcessInstanceResource.query({
+        firstResult: 0,
+        maxResults: 5
+      }, {
+        superProcessInstance:
+        processInstance.id
+      }).$promise;
     });
 
     cancelProcessInstanceData.provide('subProcessInstancesCount', function () {
-      return ProcessInstanceResource.count({'superProcessInstance': processInstance.id}).$promise;
+      return ProcessInstanceResource.count({
+        superProcessInstance: processInstance.id
+      }).$promise;
     });
 
     cancelProcessInstanceData.observe([ 'subProcessInstancesCount', 'subProcessInstances' ], function (subProcessInstancesCount, subProcessInstances) {
@@ -35,12 +45,12 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
     $scope.cancelProcessInstance = function () {
       $scope.status = PERFORM_CANCEL;
 
-      $scope.processInstance.$delete(function (response) {
+      $scope.processInstance.$delete(function () {
         // success
         $scope.status = CANCEL_SUCCESS;
         Notifications.addMessage({'status': 'Canceled', 'message': 'The cancellation of the process instance was successful.'});
 
-      }, function (error) {
+      }, function () {
         // failure
         $scope.status = CANCEL_FAILED;
         Notifications.addError({'status': 'Failed', 'message': 'The cancellation of the process instance failed.', 'exclusive': ['type']});
@@ -48,7 +58,7 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
     };
 
     $scope.close = function (status) {
-      dialog.close(status);
+      $modalInstance.close(status);
 
       // if the cancellation of the process instance was successful,
       // then redirect to the corresponding process definition overview.
@@ -57,8 +67,5 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
         $location.replace();
       }
     };
-  }];
-
-  module.controller('CancelProcessInstanceController', CancelProcessInstanceController);
-
+  }]);
 });

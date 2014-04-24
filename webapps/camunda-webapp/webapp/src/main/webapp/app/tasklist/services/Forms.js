@@ -79,7 +79,9 @@ ngDefine('tasklist.services', [
         var variablesArray = [];
 
         angular.forEach(variables_map, function(variable, name) {
-          variablesArray.push({ name : name, value : variable.value, type : variable.type });
+          if (name.slice(0, 1) !== '$') {
+            variablesArray.push({ name : name, value : variable.value, type : variable.type });
+          }
         });
 
         return variablesArray;

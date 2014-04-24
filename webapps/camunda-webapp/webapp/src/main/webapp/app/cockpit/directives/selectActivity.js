@@ -1,12 +1,10 @@
 /* global ngDefine: true */
-
-ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
-
+ngDefine('cockpit.directives', function(module) {
   'use strict';
 
   module.directive('camSelectActivity', function() {
     return {
-      link: function(scope, element, attrs) {
+      link: function(scope, element) {
 
         var processData = scope.processData;
         var selectedActivityQuery = element.attr('cam-select-activity');
@@ -36,7 +34,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
 
   module.directive('camSelectActivityInstance', function() {
     return {
-      link: function(scope, element, attrs) {
+      link: function(scope, element) {
 
         var processData = scope.processData;
         var selectedActivityInstanceQuery = element.attr('cam-select-activity-instance');

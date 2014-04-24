@@ -105,6 +105,14 @@ module.exports = function(grunt) {
               '{app,plugin,develop,common}/**/*.{js,html}'
             ],
             dest: 'target/webapp/'
+          },
+          {
+            expand: true,
+            cwd: 'src/main/webapp/',
+            src: [
+              'assets/fonts/**/*.{css,eot,svg,ttf,woff}'
+            ],
+            dest: 'target/webapp/'
           }
         ],
         options: {
@@ -618,7 +626,7 @@ module.exports = function(grunt) {
       ]);
     }
 
-    target = 'dist';
+    target = target || 'dist';
 
     tasks = tasks.concat([
       'less:'+ target,

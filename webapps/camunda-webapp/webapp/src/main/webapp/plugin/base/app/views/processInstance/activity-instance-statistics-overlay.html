@@ -2,14 +2,12 @@
 <span class="activity-bottom-left-position"
       ng-show="activityInstanceStatistics">
   <span class="badge"
-        help
-        help-text="Running Activity Instances"
-        help-placement="'top'"
+        tooltip="Running Activity Instances"
+        tooltip-placement="top"
         ng-show="activityInstanceStatistics.instances && activityInstanceStatistics.instances.length">{{ activityInstanceStatistics.instances.length | abbreviateNumber }}</span>
   <span class="badge badge-important"
-        help
-        help-text="Open Incidents"
-        help-placement="'top'"
+        tooltip="Open Incidents"
+        tooltip-placement="top"
         ng-show="activityInstanceStatistics.incidents && activityInstanceStatistics.incidents.length">!</span>
 </span>
 <!-- / CE - src/main/webapp/plugin/base/app/views/processInstnace/activity-instance-statistics-overlay.html -->

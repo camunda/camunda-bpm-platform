@@ -4,8 +4,7 @@
     <h1>
       <!--
       <i class="icon-type icon-inbox"
-         help
-         help-text="Process instance"></i>
+                  tooltip="Process instance"></i>
       -->
       <span class="process-name-prefix">
         <span>Process</span>
@@ -20,9 +19,8 @@
 
       <span class="badge badge-warning badge-suspended"
             ng-show="processInstance.suspended"
-            help
-            help-text="Currently suspended"
-            help-placement="'top'">
+            tooltip="Currently suspended"
+            tooltip-placement="top">
         <i class="icon-suspended white"></i>
       </span>
     </h1>
@@ -50,7 +48,7 @@
           Filter
 
           <button class="btn btn-small btn-link btn-control btn-control-link"
-                  help help-text="The activity instance tree with all currently selected activity instances. You may change the selection via (CTRL +) click.">
+                  tooltip="The activity instance tree with all currently selected activity instances. You may change the selection via (CTRL +) click.">
             <i class="icon-question-sign"></i>
           </button>
         </h5>

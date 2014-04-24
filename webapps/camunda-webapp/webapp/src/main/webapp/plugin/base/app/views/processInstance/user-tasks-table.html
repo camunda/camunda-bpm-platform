@@ -40,7 +40,7 @@
       </td>
       <td class="follow-up">
         {{ userTask.followUp }}
-      </td>      
+      </td>
       <td class="priority">
         {{ userTask.priority }}
       </td>
@@ -55,9 +55,8 @@
         <a ng-click="changeGroups()"
            ng-model="userTask"
            class="btn action-button"
-           help
-           help-placement="'left'"
-           help-text="Manage group(s) for '{{ userTask.name || userTask.id }}'">
+           tooltip-placement="left"
+           tooltip="Manage group(s) for '{{ userTask.name || userTask.id }}'">
           <i class="icon-user"></i>
         </a>
       </td>
@@ -79,5 +78,16 @@
   </tbody>
 </table>
 
-<div paginator total-pages="pages.total" current-page="pages.current"></div>
+
+<pagination ng-if="pages.total > pages.size"
+            class="pagination-sm"
+
+            page="pages.current"
+            ng-model="pages.current"
+
+            total-items="pages.total"
+            items-per-page="pages.size"
+
+            max-size="7"
+            boundary-links="true"></pagination>
 <!-- / CE - src/main/webapp/plugin/app/base/views/processInstance/user-tasks-table.html -->

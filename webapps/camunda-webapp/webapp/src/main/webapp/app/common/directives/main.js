@@ -1,18 +1,22 @@
-/* global ngDefine: false */
-
-/**
- * @namespace cam.common.directives
- */
-ngDefine('camunda.common.directives', [
+/* global define: false, angular: false */
+define([
   './email',
   './engineSelect',
   './help',
   './inPlaceTextField',
-  './paginator',
+  // './paginator',
   './password',
   './requestAware',
-  'module:camunda.common.directives.ifLoggedIn:./ifLoggedIn',
-  'module:camunda.common.directives.modal:./modal',
-  'module:camunda.common.directives.notificationsPanel:./notificationsPanel',
-  'module:camunda.common.directives.showIfAuthorized:./showIfAuthorized'
-], function() {});
+  './ifLoggedIn',
+  './bootstrap',
+  './notificationsPanel',
+  './showIfAuthorized'
+], function() {
+  'use strict';
+  angular.module('camunda.common.directives', [
+    'camunda.common.directives.ifLoggedIn',
+    'camunda.common.directives.bootstrap',
+    'camunda.common.directives.notificationsPanel',
+    'camunda.common.directives.showIfAuthorized'
+  ]);
+});

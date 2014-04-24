@@ -33,20 +33,24 @@ ngDefine('tasklist.directives', [
 
       $scope.groupInfo = EngineApi.getGroups(authenticatedUser);
 
-      $scope.groupInfo.$then(function(data){
+      $scope.groupInfo.$promise.then(function(data){
 
-        angular.forEach(data.data.groupUsers, function(user) {
+        // angular.forEach(data.data.groupUsers, function(user) {
+        angular.forEach(data.groupUsers, function(user) {
 
           EngineApi.getColleagueCount(user.id)
-            .$then(function(data) {
-              $scope.colleagueCount[user.id] = data.data.count;
+            .$promise.then(function(data) {
+              // $scope.colleagueCount[user.id] = data.data.count;
+              $scope.colleagueCount[user.id] = data.count;
             });
         });
 
-        angular.forEach(data.data.groups, function(group) {
+        // angular.forEach(data.data.groups, function(group) {
+        angular.forEach(data.groups, function(group) {
           EngineApi.getGroupTaskCount(group.id)
-            .$then(function(data) {
-              $scope.groupCount[group.id] = data.data.count;
+            .$promise.then(function(data) {
+              // $scope.groupCount[group.id] = data.data.count;
+              $scope.groupCount[group.id] = data.count;
           });
         });
       });

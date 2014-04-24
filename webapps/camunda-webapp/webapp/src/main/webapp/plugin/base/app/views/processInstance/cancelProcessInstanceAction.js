@@ -1,9 +1,13 @@
+/* global ngDefine: false */
 ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
+  'use strict';
 
-  function CancelProcessInstanceActionController ($scope, $http, search, Uri, $dialog) {
+  module.controller('CancelProcessInstanceActionController', [
+          '$scope', '$http', 'search', 'Uri', '$modal',
+  function($scope,   $http,   search,   Uri,   $modal) {
 
     $scope.openDialog = function () {
-      var dialog = $dialog.dialog({
+      $modal.open({
         resolve: {
           processData: function() { return $scope.processData; },
           processInstance: function() { return $scope.processInstance; }
@@ -11,19 +15,10 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
         controller: 'CancelProcessInstanceController',
         templateUrl: require.toUrl('./cancel-process-instance-dialog.html')
       });
-
-      dialog.open().then(function(result) {
-
-        // dialog closed. YEA!
-      });
     };
-
-  };
-
-  module.controller('CancelProcessInstanceActionController', [ '$scope', '$http', 'search', 'Uri', '$dialog', CancelProcessInstanceActionController ]);
+  }]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
-
     ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.action', {
       id: 'cancel-process-instance-action',
       label: 'Cancel Process Instance Action',

@@ -10,34 +10,8 @@ ngDefine('cockpit.pages.processInstance', [
   var routeUtil = require('cockpit/util/routeUtil');
 
   var Controller = [
-    '$scope',
-    '$filter',
-    'search',
-    'ProcessDefinitionResource',
-    'ProcessInstanceResource',
-    'IncidentResource',
-    'Views',
-    'Data',
-    'Transform',
-    'processInstance',
-    'dataDepend',
-    'page',
-    'breadcrumbTrails',
-  function(
-    $scope,
-    $filter,
-    search,
-    ProcessDefinitionResource,
-    ProcessInstanceResource,
-    IncidentResource,
-    Views,
-    Data,
-    Transform,
-    processInstance,
-    dataDepend,
-    page,
-    breadcrumbTrails
-  ) {
+          '$scope', '$filter', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
+  function($scope,   $filter,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   IncidentResource,   Views,   Data,   Transform,   processInstance,   dataDepend,   page,   breadcrumbTrails) {
 
     $scope.processInstance = processInstance;
 
@@ -53,24 +27,6 @@ ngDefine('cockpit.pages.processInstance', [
       setDefaultTab($scope.processInstanceTabs);
     });
 
-    // function collect(elements, fn) {
-    //   var result = [];
-
-    //   angular.forEach(elements, function(e) {
-    //     try {
-    //       var c = fn(e);
-
-    //       if (c !== undefined) {
-    //         result.push(c);
-    //       }
-    //     } catch (ex) {
-    //       // safe collect -> error skips element
-    //     }
-    //   });
-
-    //   return result;
-    // }
-
     function parseFilterFromUri() {
 
       var params = search(),
@@ -84,10 +40,6 @@ ngDefine('cockpit.pages.processInstance', [
 
         return str.split(/,/);
       }
-
-      // function parseVariables(vars) {
-      //   return collect(vars, Variables.parse);
-      // }
 
       $scope.filter = filter = {
         activityIds: activityIdsParam,
@@ -274,10 +226,9 @@ ngDefine('cockpit.pages.processInstance', [
     }]);
 
     // activityInstanceTree, activityIdToInstancesMap, instanceIdToInstanceMap
-    processData.provide([ 'activityInstanceTree', 'activityIdToInstancesMap', 'instanceIdToInstanceMap' ],
-      [ 'activityInstances',
-        'processDefinition',
-        'bpmnElements', function (activityInstances, processDefinition, bpmnElements) {
+    processData.provide([ 'activityInstanceTree', 'activityIdToInstancesMap', 'instanceIdToInstanceMap' ], [
+             'activityInstances', 'processDefinition', 'bpmnElements',
+    function (activityInstances,   processDefinition,   bpmnElements) {
       var activityIdToInstancesMap = {},
           instanceIdToInstanceMap = {},
           model = bpmnElements[processDefinition.key];
@@ -386,7 +337,9 @@ ngDefine('cockpit.pages.processInstance', [
     }]);
 
     // processDiagram
-    processData.provide('processDiagram', [ 'semantic', 'processDefinition', 'bpmnElements', function (semantic, processDefinition, bpmnElements) {
+    processData.provide('processDiagram', [
+             'semantic', 'processDefinition', 'bpmnElements',
+    function (semantic,   processDefinition,   bpmnElements) {
       var processDiagram = {};
 
       processDiagram.semantic = semantic;
@@ -416,19 +369,18 @@ ngDefine('cockpit.pages.processInstance', [
       ProcessInstanceResource.query({
         subProcessInstance: processInstance.id
       })
-      .$then(function(response) {
+      .$promise.then(function(response) {
 
-        var superInstance = response.data[0];
+        // var superInstance = response.data[0];
+        var superInstance = response[0];
 
         done(null, superInstance);
       });
     }
 
     processData.observe([
-      'processDefinition',
-      'processInstance',
-      'superProcessInstanceCount'
-    ], function (processDefinition, processInstance, superProcessInstanceCount) {
+             'processDefinition', 'processInstance', 'superProcessInstanceCount'],
+    function (processDefinition,   processInstance,   superProcessInstanceCount) {
       var crumbs = [];
 
       if (superProcessInstanceCount.count) {
@@ -633,48 +585,50 @@ ngDefine('cockpit.pages.processInstance', [
     setDefaultTab($scope.processInstanceTabs);
   }];
 
-  function ProcessInstanceFilterController ($scope) {
 
-    var processData = $scope.processData.newChild($scope),
-        filterData;
-
-    processData.provide('filterData', [ 'filter', function(filter) {
-
-      if (!filterData || filterData.filter != filter) {
-        var activityIds = filter.activityIds || [],
-            activityInstanceIds = filter.activityInstanceIds || [];
-            
-        return {
-          filter: filter,
-          activityCount: activityIds.length || 0,
-          activityInstanceCount: activityInstanceIds.length || 0
-        };
-      } else {
-        return filterData;
-      }
-    }]);
-
-    processData.observe([ 'filterData' ], function(_filterData) {
-      $scope.filterData = filterData = _filterData;
-    });
-
-    $scope.clearSelection = function () {
-      // update cached filter
-      filterData = {
-        activityCount: 0,
-        activityInstanceCount: 0,
-        filter: {}
-      };
-
-      processData.set('filter', filterData.filter);
-    };
-
-  }
 
   module
-    .controller('ProcessInstanceFilterController', ['$scope', ProcessInstanceFilterController]);
+    .controller('ProcessInstanceFilterController', [
+      '$scope',
+    function ($scope) {
+      var processData = $scope.processData.newChild($scope),
+          filterData;
 
-  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
+      processData.provide('filterData', [ 'filter', function(filter) {
+
+        if (!filterData || filterData.filter != filter) {
+          var activityIds = filter.activityIds || [],
+              activityInstanceIds = filter.activityInstanceIds || [];
+
+          return {
+            filter: filter,
+            activityCount: activityIds.length || 0,
+            activityInstanceCount: activityInstanceIds.length || 0
+          };
+        } else {
+          return filterData;
+        }
+      }]);
+
+      processData.observe([ 'filterData' ], function(_filterData) {
+        $scope.filterData = filterData = _filterData;
+      });
+
+      $scope.clearSelection = function () {
+        // update cached filter
+        filterData = {
+          activityCount: 0,
+          activityInstanceCount: 0,
+          filter: {}
+        };
+
+        processData.set('filter', filterData.filter);
+      };
+  }]);
+
+  var RouteConfig = [
+          '$routeProvider', 'AuthenticationServiceProvider',
+  function($routeProvider,   AuthenticationServiceProvider) {
 
     $routeProvider.when('/process-instance/:id', {
       redirectTo: routeUtil.redirectToRuntime
@@ -685,15 +639,16 @@ ngDefine('cockpit.pages.processInstance', [
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
-        processInstance: ['ResourceResolver', 'ProcessInstanceResource',
-          function(ResourceResolver, ProcessInstanceResource) {
-            return ResourceResolver.getByRouteParam('id', {
-              name: 'process instance',
-              resolve: function(id) {
-                return ProcessInstanceResource.get({ id : id });
-              }
-            });
-          }]
+        processInstance: [
+                'ResourceResolver', 'ProcessInstanceResource',
+        function(ResourceResolver,   ProcessInstanceResource) {
+          return ResourceResolver.getByRouteParam('id', {
+            name: 'process instance',
+            resolve: function(id) {
+              return ProcessInstanceResource.get({ id : id });
+            }
+          });
+        }]
       },
       reloadOnSearch: false
     });

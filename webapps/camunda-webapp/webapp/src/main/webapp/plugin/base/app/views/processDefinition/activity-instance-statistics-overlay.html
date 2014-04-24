@@ -2,15 +2,13 @@
 <span class="activity-bottom-left-position"
       ng-show="activityInstance">
   <span class="badge"
-        help
-        help-text="Running Activity Instances"
-        help-placement="'top'"
+        tooltip="Running Activity Instances"
+        tooltip-placement="top"
         ng-show="activityInstance.instances">{{ activityInstance.instances | abbreviateNumber }}</span>
-        
+
   <span class="badge badge-important"
-        help
-        help-text="Open Incidents"
-        help-placement="'top'"
+        tooltip="Open Incidents"
+        tooltip-placement="top"
         ng-show="activityInstance.incidents">!</span>
 </span>
 <!-- / CE - src/main/webapp/plugin/base/views/processDefinition/activity-instance-statistics-overlay.html -->

@@ -1,12 +1,12 @@
 ngDefine('admin.pages', function(module, $) {
 
   function AuthorizationCreateController ($scope, $q, $location, Uri, Notifications, AuthorizationResource) {
-    
+
     $scope.isCreateNewAuthorization = false;
 
     var newAuthorization = $scope.newAuthorization = {};
 
-    var updatePermissions = function() {                
+    var updatePermissions = function() {
       $scope.availablePermissions = [];
 
       for (var i = 0; i < $scope.getPermissionsForResource().length; i++) {
@@ -46,15 +46,15 @@ ngDefine('admin.pages', function(module, $) {
     $scope.setIdentityType = function(identityType) {
       $scope.identityType = identityType;
     }
-    
+
 
     $scope.addPermission = function(perm) {
       if($scope.selectedPermissions.indexOf("ALL")!= -1
         || $scope.selectedPermissions.indexOf("NONE")!= -1) {
         $scope.selectedPermissions = [];
       }
-      $scope.selectedPermissions.push(perm); 
-      updatePermissions();           
+      $scope.selectedPermissions.push(perm);
+      updatePermissions();
     }
 
     $scope.addAllPermissions = function() {
@@ -75,20 +75,20 @@ ngDefine('admin.pages', function(module, $) {
     $scope.createAuthorization = function() {
 
       newAuthorization.permissions = $scope.selectedPermissions;
-     
+
       if($scope.identityType == 'User') {
-        newAuthorization.userId = $scope.identityId; 
+        newAuthorization.userId = $scope.identityId;
       }
 
       if($scope.identityType == 'Group') {
-        newAuthorization.groupId = $scope.identityId; 
+        newAuthorization.groupId = $scope.identityId;
       }
-      
-      AuthorizationResource.create(newAuthorization).$then(function(response) {
+
+      AuthorizationResource.create(newAuthorization).$promise.then(function(response) {
         resetForm();
         $scope.loadAuthorizations();
-      });      
-      
+      });
+
     };
 
   };

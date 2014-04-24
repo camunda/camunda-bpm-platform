@@ -25,22 +25,26 @@ define(['angular'], function(angular) {
     // update group form /////////////////////////////
 
     var loadGroup = $scope.loadGroup = function() {
-      GroupResource.get({groupId : $routeParams.groupId}).$then(function(response) {
-        $scope.group = response.data;
-        $scope.groupName = (!!response.data.name ? response.data.name : response.data.id);
-        $scope.groupCopy = angular.copy(response.data);
+      GroupResource.get({groupId : $routeParams.groupId}).$promise.then(function(response) {
+        // $scope.group = response.data;
+        // $scope.groupName = (!!response.data.name ? response.data.name : response.data.id);
+        // $scope.groupCopy = angular.copy(response.data);
+        $scope.group = response;
+        $scope.groupName = (!!response.name ? response.name : response.id);
+        $scope.groupCopy = angular.copy(response);
       });
     }
 
-    GroupResource.OPTIONS({groupId : $routeParams.groupId}).$then(function(response) {
-      angular.forEach(response.data.links, function(link){
+    GroupResource.OPTIONS({groupId : $routeParams.groupId}).$promise.then(function(response) {
+      // angular.forEach(response.data.links, function(link){
+      angular.forEach(response.links, function(link){
         $scope.availableOperations[link.rel] = true;
       });
     });
 
     $scope.updateGroup = function() {
 
-      GroupResource.update($scope.group).$then(
+      GroupResource.update($scope.group).$promise.then(
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Group successfully updated."});
           loadGroup();
@@ -63,7 +67,7 @@ define(['angular'], function(angular) {
         return;
       }
 
-      GroupResource.delete({'groupId':$scope.group.id}).$then(
+      GroupResource.delete({'groupId':$scope.group.id}).$promise.then(
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Group "+$scope.group.id+" successfully deleted."});
           $location.path("/groups");

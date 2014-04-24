@@ -3,9 +3,8 @@ ngDefine('cockpit.plugin.base.views', function(module) {
   'use strict';
 
   module.controller('CalledProcessInstanceController', [
-    '$scope',
-    'PluginProcessInstanceResource',
-  function($scope, PluginProcessInstanceResource) {
+          '$scope', 'PluginProcessInstanceResource',
+  function($scope,   PluginProcessInstanceResource) {
 
     // input: processInstance, processData
 
@@ -32,25 +31,26 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       $scope.calledProcessInstances = null;
 
       // deprecate `getCalledProcessInstances`
-      // PluginProcessInstanceResource.getCalledProcessInstances({id: $scope.processInstance.id}, filter).$then(function(response) {
+      // PluginProcessInstanceResource.getCalledProcessInstances({id: $scope.processInstance.id}, filter).$promise.then(function(response) {
       PluginProcessInstanceResource
       .processInstances({
         id: $scope.processInstance.id
       }, filter)
-      .$then(function(response) {
+      .$promise.then(function(response) {
 
-        angular.forEach(response.data, function (calledInstance) {
+        // angular.forEach(response.data, function (calledInstance) {
+        angular.forEach(response, function (calledInstance) {
           var instance = instanceIdToInstanceMap[calledInstance.callActivityInstanceId];
           calledInstance.instance = instance;
         });
 
-        $scope.calledProcessInstances = response.data;
+        // $scope.calledProcessInstances = response.data;
+        $scope.calledProcessInstances = response;
       });
     }
   }]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
-
     ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
       id: 'called-process-instances-tab',
       label: 'Called Process Instances',
