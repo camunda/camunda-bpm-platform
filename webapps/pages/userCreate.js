@@ -26,7 +26,7 @@ define(['angular'], function(angular) {
         credentials : { password : $scope.credentials.password }
       }
 
-      UserResource.createUser(user).$then(function() {
+      UserResource.createUser(user).$promise.then(function() {
         Notifications.addMessage({ type: "success", status: "Success", message: "Created new user "+user.profile.id});
         $location.path("/users");
       },

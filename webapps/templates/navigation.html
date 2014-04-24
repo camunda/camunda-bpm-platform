@@ -1,3 +1,4 @@
+<!-- # CE - src/main/webapp/app/admin/templates/navigation.html -->
 <div class="nav-collapse collapse navbar-responsive-collapse" ng-cloak>
   <ul class="nav ng-scope" ng-controller="NavigationController" if-logged-in>
 
@@ -21,8 +22,11 @@
 
     <li engine-select></li>
 
-    <li class="dropdown" if-logged-in>
-      <a href class="dropdown-toggle" data-toggle="dropdown">
+    <li class="dropdown"
+        if-logged-in>
+      <a href
+         class="dropdown-toggle"
+         data-toggle="dropdown">
         <i class="icon-user icon-white"></i> {{ authentication.user.name }}
       </a>
 
@@ -44,7 +48,9 @@
     <li class="divider-vertical" if-logged-in></li>
 
     <li class="dropdown">
-      <a href class="dropdown-toggle" data-toggle="dropdown">
+      <a href
+         class="dropdown-toggle"
+         data-toggle="dropdown">
         <i class="icon-home icon-white"></i>
       </a>
 
@@ -59,3 +65,4 @@
     </li>
   </ul>
 </div>
+<!-- / CE - src/main/webapp/app/admin/templates/authorizations.html -->

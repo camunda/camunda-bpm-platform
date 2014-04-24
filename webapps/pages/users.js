@@ -8,12 +8,14 @@ define(['angular'], function(angular) {
 
     $scope.availableOperations={};
 
-    UserResource.query().$then(function(response) {
-      $scope.userList = response.data;
+    UserResource.query().$promise.then(function(response) {
+      // $scope.userList = response.data;
+      $scope.userList = response;
     });
 
-    UserResource.OPTIONS().$then(function(response) {
-      angular.forEach(response.data.links, function(link){
+    UserResource.OPTIONS().$promise.then(function(response) {
+      // angular.forEach(response.data.links, function(link){
+      angular.forEach(response.links, function(link){
         $scope.availableOperations[link.rel] = true;
       });
     });

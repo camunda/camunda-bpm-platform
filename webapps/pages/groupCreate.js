@@ -15,7 +15,7 @@ define(['angular'], function(angular) {
 
     $scope.createGroup = function() {
       var group = $scope.group;
-      GroupResource.createGroup(group).$then(
+      GroupResource.createGroup(group).$promise.then(
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Successfully created new group "+group.id});
           $location.path("/groups");
