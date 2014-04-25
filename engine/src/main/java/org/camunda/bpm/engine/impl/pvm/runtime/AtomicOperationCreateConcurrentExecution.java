@@ -235,15 +235,17 @@ public abstract class AtomicOperationCreateConcurrentExecution implements Atomic
         PvmScope parentScope = concurrentActivity.getParent();
         if(parentScope instanceof ActivityImpl) {
           ActivityImpl parentActivity = (ActivityImpl) parentScope;
-          if(parentActivity.isScope()) {
-            // Case (2)
-            concurrentRoot = (InterpretableExecution) execution.getParent();
-            if(!concurrentRoot.isConcurrent()) {
-              execution.setConcurrent(true);
+          if (execution.getActivity() != null || execution.isActive()) {
+            if(parentActivity.isScope()) {
+              // Case (2)
+              concurrentRoot = (InterpretableExecution) execution.getParent();
+              if (!concurrentRoot.isConcurrent()) {
+                execution.setConcurrent(true);
 
-            } else {
-              // Case (3)
-              concurrentRoot = (InterpretableExecution) concurrentRoot.getParent();
+              } else {
+                // Case (3)
+                concurrentRoot = (InterpretableExecution) concurrentRoot.getParent();
+              }
             }
           }
         }

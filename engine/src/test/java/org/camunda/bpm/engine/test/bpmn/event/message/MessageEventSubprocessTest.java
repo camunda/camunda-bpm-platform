@@ -442,7 +442,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void FAILING_testMultipleNonInterruptingInEmbeddedSubprocess() {
+  public void testMultipleNonInterruptingInEmbeddedSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     // the process instance must have a message event subscription:
