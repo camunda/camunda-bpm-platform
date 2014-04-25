@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.bpmn.event.message;
 
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -438,6 +439,45 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     // done!
     assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
+  }
+
+  @Deployment
+  public void FAILING_testMultipleNonInterruptingInEmbeddedSubprocess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // the process instance must have a message event subscription:
+    Execution subProcess = runtimeService.createExecutionQuery()
+        .messageEventSubscriptionName("newMessage")
+        .singleResult();
+    assertNotNull(subProcess);
+    assertEquals(1, createEventSubscriptionQuery().count());
+
+    Task subProcessTask = taskService.createTaskQuery().taskDefinitionKey("subProcessTask").singleResult();
+    assertNotNull(subProcessTask);
+
+    // start event sub process multiple times
+    for (int i = 1; i < 3; i++) {
+      runtimeService.messageEventReceived("newMessage", subProcess.getId());
+
+      // check that now i event sub process tasks exist
+      List<Task> eventSubProcessTasks = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list();
+      assertEquals(i, eventSubProcessTasks.size());
+
+      // check that the parent execution of the event sub process task execution is the parent
+      // sub process
+      String taskExecutionId = eventSubProcessTasks.get(i-1).getExecutionId();
+      ExecutionEntity taskExecution = (ExecutionEntity) runtimeService.createExecutionQuery().executionId(taskExecutionId).singleResult();
+      assertEquals(subProcess.getId(), taskExecution.getParentId());
+    }
+
+    // complete sub process task
+    taskService.complete(subProcessTask.getId());
+
+    // after complete the sub process task all task should be deleted because of the terminating end event
+    assertEquals(0, taskService.createTaskQuery().count());
+
+    // and the process instance should be ended
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
   private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
