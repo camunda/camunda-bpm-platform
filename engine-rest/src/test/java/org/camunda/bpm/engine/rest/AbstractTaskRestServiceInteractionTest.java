@@ -1090,18 +1090,6 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testGetSingleTaskCommentForNonExistingCommentId() {
-    String nonExistingId = "nonExistingId";
-
-    given()
-      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
-      .pathParam("commentId", nonExistingId)
-    .then().expect()
-      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-    .when().get(SINGLE_TASK_SINGLE_COMMENT_URL);
-  }
-
-  @Test
   public void testGetTaskComments() {
     Response response = given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
     .then().expect()
