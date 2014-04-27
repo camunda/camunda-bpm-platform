@@ -13,7 +13,9 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
@@ -63,6 +65,16 @@ public class CommentManager extends AbstractHistoricManager {
   public List<Comment> findCommentsByProcessInstanceId(String processInstanceId) {
     checkHistoryEnabled();
     return getDbSqlSession().selectList("selectCommentsByProcessInstanceId", processInstanceId);
+  }
+
+  public CommentEntity findCommentByTaskIdAndCommentId(String taskId, String commentId) {
+    checkHistoryEnabled();
+
+    Map<String, String> parameters = new HashMap<String, String>();
+    parameters.put("taskId", taskId);
+    parameters.put("id", commentId);
+
+    return (CommentEntity) getDbSqlSession().selectOne("selectCommentByTaskIdAndCommentId", parameters);
   }
 
 }

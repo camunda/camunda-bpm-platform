@@ -144,6 +144,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(POSTGRES, "insertComment", "insertComment_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectCommentsByTaskId", "selectCommentsByTaskId_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectCommentsByProcessInstanceId", "selectCommentsByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectCommentByTaskIdAndCommentId", "selectCommentByTaskIdAndCommentId_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectEventsByTaskId", "selectEventsByTaskId_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectActivityStatistics", "selectActivityStatistics_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectActivityStatisticsCount", "selectActivityStatisticsCount_postgres");

@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.runtime.*;
+import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
@@ -74,6 +75,11 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_PARENT_TASK_ID = "aParentId";
   public static final int EXAMPLE_TASK_PRIORITY = 42;
   public static final String EXAMPLE_TASK_DEFINITION_KEY = "aTaskDefinitionKey";
+
+  // task comment
+  public static final String EXAMPLE_TASK_COMMENT_ID = "aTaskCommentId";
+  public static final String EXAMPLE_TASK_COMMENT_FULL_MESSAGE = "aTaskCommentFullMessage";
+  public static final String EXAMPLE_TASK_COMMENT_TIME = "2014-04-24T14:10:44";
 
   // form data
   public static final String EXAMPLE_FORM_KEY = "aFormKey";
@@ -403,6 +409,24 @@ public abstract class MockProvider {
     mockFormFields.add(mockFormField);
     when(mockFormData.getFormFields()).thenReturn(mockFormFields);
     return mockFormData;
+  }
+
+  // task comment
+  public static Comment createMockTaskComment() {
+    Comment mockComment = mock(Comment.class);
+    when(mockComment.getId()).thenReturn(EXAMPLE_TASK_COMMENT_ID);
+    when(mockComment.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
+    when(mockComment.getUserId()).thenReturn(EXAMPLE_USER_ID);
+    when(mockComment.getTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_TASK_COMMENT_TIME).toDate());
+    when(mockComment.getFullMessage()).thenReturn(EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+    when(mockComment.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    return mockComment;
+  }
+
+  public static List<Comment> createMockTaskComments() {
+    List<Comment> mocks = new ArrayList<Comment>();
+    mocks.add(createMockTaskComment());
+    return mocks;
   }
 
   // form data

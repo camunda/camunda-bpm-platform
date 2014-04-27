@@ -1,10 +1,13 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -16,10 +19,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.ProcessApplicationService;
@@ -31,12 +37,14 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
+import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
@@ -47,6 +55,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
 
 public abstract class AbstractTaskRestServiceInteractionTest extends
@@ -66,6 +75,10 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   protected static final String RENDERED_FORM_URL = SINGLE_TASK_URL + "/rendered-form";
   protected static final String SUBMIT_FORM_URL = SINGLE_TASK_URL + "/submit-form";
 
+  protected static final String SINGLE_TASK_ADD_COMMENT_URL = SINGLE_TASK_URL + "/comment/create";
+  protected static final String SINGLE_TASK_COMMENTS_URL = SINGLE_TASK_URL + "/comment";
+  protected static final String SINGLE_TASK_SINGLE_COMMENT_URL = SINGLE_TASK_COMMENTS_URL + "/{commentId}";
+
   private Task mockTask;
   private TaskService taskServiceMock;
   private TaskQuery mockQuery;
@@ -76,6 +89,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   private IdentityLink mockUserAssigneeIdentityLink;
   private IdentityLink mockCandidateGroupIdentityLink;
   private IdentityLink mockCandidateGroup2IdentityLink;
+
+  private Comment mockTaskComment;
+  private List<Comment> mockTaskComments;
 
   @Before
   public void setUpRuntimeData() {
@@ -96,6 +112,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     mockCandidateGroup2IdentityLink = MockProvider.createAnotherMockCandidateGroupIdentityLink();
     identityLinks.add(mockCandidateGroup2IdentityLink);
     when(taskServiceMock.getIdentityLinksForTask(MockProvider.EXAMPLE_TASK_ID)).thenReturn(identityLinks);
+
+    mockTaskComment = MockProvider.createMockTaskComment();
+    when(taskServiceMock.getTaskComment(MockProvider.EXAMPLE_TASK_ID, MockProvider.EXAMPLE_TASK_COMMENT_ID)).thenReturn(mockTaskComment);
+    mockTaskComments = MockProvider.createMockTaskComments();
+    when(taskServiceMock.getTaskComments(MockProvider.EXAMPLE_TASK_ID)).thenReturn(mockTaskComments);
+    when(taskServiceMock.addComment(MockProvider.EXAMPLE_TASK_ID, MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.EXAMPLE_TASK_COMMENT_FULL_MESSAGE)).thenReturn(mockTaskComment);
 
     formServiceMock = mock(FormService.class);
     when(processEngine.getFormService()).thenReturn(formServiceMock);
@@ -1052,4 +1074,155 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     .when().post(DELEGATE_TASK_URL);
   }
 
+  @Test
+  public void testGetSingleTaskComment() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .pathParam("commentId", MockProvider.EXAMPLE_TASK_COMMENT_ID)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("comment.id", equalTo(MockProvider.EXAMPLE_TASK_COMMENT_ID))
+      .body("comment.taskId", equalTo(MockProvider.EXAMPLE_TASK_ID))
+      .body("comment.userId", equalTo(MockProvider.EXAMPLE_USER_ID))
+      .body("comment.time", equalTo(MockProvider.EXAMPLE_TASK_COMMENT_TIME))
+      .body("comment.fullMessage", equalTo(MockProvider.EXAMPLE_TASK_COMMENT_FULL_MESSAGE))
+      .body("comment.processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+    .when().get(SINGLE_TASK_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskCommentForNonExistingCommentId() {
+    String nonExistingId = "nonExistingId";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .pathParam("commentId", nonExistingId)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+    .when().get(SINGLE_TASK_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testGetTaskComments() {
+    Response response = given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+      .body("$.size()", equalTo(1))
+    .when().get(SINGLE_TASK_COMMENTS_URL);
+
+    verifyTaskComments(mockTaskComments, response);
+    verify(taskServiceMock).getTaskComments(MockProvider.EXAMPLE_TASK_ID);
+  }
+
+  @Test
+  public void testGetTaskCommentsForNonExistingTaskId() {
+    String nonExistingTaskId = "nonExistingId";
+
+    given().pathParam("id", nonExistingTaskId)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .body(containsString("Task comments for task id '" + nonExistingTaskId + "' do not exist."))
+    .when().get(SINGLE_TASK_COMMENTS_URL);
+  }
+
+  @Test
+  public void testAddCompleteTaskComment() {
+    Response response = given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .multiPart("process-instance-id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .multiPart("message", "aTaskCommentFullMessage")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_ADD_COMMENT_URL);
+
+    verifyCreatedTaskComment(mockTaskComment, response);
+  }
+
+  @Test
+  public void testAddTaskCommentWithoutMultiparts() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_ADD_COMMENT_URL);
+  }
+
+  @Test
+  public void testAddTaskCommentWithoutMessage() {
+    Comment mockComment = mock(Comment.class);
+    when(mockComment.getId()).thenReturn(MockProvider.EXAMPLE_TASK_COMMENT_ID);
+    when(mockComment.getTaskId()).thenReturn(MockProvider.EXAMPLE_TASK_ID);
+    when(mockComment.getUserId()).thenReturn(MockProvider.EXAMPLE_USER_ID);
+    when(mockComment.getTime()).thenReturn(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_TASK_COMMENT_TIME).toDate());
+    when(mockComment.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+
+    when(taskServiceMock.addComment(MockProvider.EXAMPLE_TASK_ID, MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null)).thenReturn(mockComment);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .multiPart("process-instance-id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_ADD_COMMENT_URL);
+
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private void verifyTaskComments(List<Comment> mockTaskComments, Response response) {
+    List list = response.as(List.class);
+    assertEquals(1, list.size());
+
+    LinkedHashMap<String, String> resourceHashMap = (LinkedHashMap<String, String>) list.get(0);
+
+    String returnedId = resourceHashMap.get("id");
+    String returnedUserId = resourceHashMap.get("userId");
+    String returnedTaskId = resourceHashMap.get("taskId");
+    String returnedProcessInstanceId = resourceHashMap.get("processInstanceId");
+    Date returnedTime = DateTimeUtil.parseDateTime(resourceHashMap.get("time")).toDate();
+    String returnedFullMessage = resourceHashMap.get("fullMessage");
+
+    Comment mockComment = mockTaskComments.get(0);
+
+    assertEquals(mockComment.getId(), returnedId);
+    assertEquals(mockComment.getTaskId(), returnedTaskId);
+    assertEquals(mockComment.getUserId(), returnedUserId);
+    assertEquals(mockComment.getProcessInstanceId(), returnedProcessInstanceId);
+    assertEquals(mockComment.getTime(), returnedTime);
+    assertEquals(mockComment.getFullMessage(), returnedFullMessage);
+  }
+
+  private void verifyCreatedTaskComment(Comment mockTaskComment, Response response) {
+    String content = response.asString();
+    verifyTaskCommentValues(mockTaskComment, content);
+    verifyTaskCommentLink(mockTaskComment, content);
+  }
+
+  private void verifyTaskCommentValues(Comment mockTaskComment, String responseContent) {
+    JsonPath path = from(responseContent);
+    String returnedId = path.get("id");
+    String returnedUserId = path.get("userId");
+    String returnedTaskId = path.get("taskId");
+    String returnedProcessInstanceId = path.get("processInstanceId");
+    Date returnedTime = DateTimeUtil.parseDateTime(path.<String>get("time")).toDate();
+    String returnedFullMessage = path.get("fullMessage");
+
+    assertEquals(mockTaskComment.getId(), returnedId);
+    assertEquals(mockTaskComment.getTaskId(), returnedTaskId);
+    assertEquals(mockTaskComment.getUserId(), returnedUserId);
+    assertEquals(mockTaskComment.getProcessInstanceId(), returnedProcessInstanceId);
+    assertEquals(mockTaskComment.getTime(), returnedTime);
+    assertEquals(mockTaskComment.getFullMessage(), returnedFullMessage);
+  }
+
+  private void verifyTaskCommentLink(Comment mockTaskComment, String responseContent) {
+    List<Map<String, String>> returnedLinks = from(responseContent).getList("links");
+    assertEquals(1, returnedLinks.size());
+
+    Map<String, String> returnedLink = returnedLinks.get(0);
+    assertEquals(HttpMethod.GET, returnedLink.get("method"));
+    assertTrue(returnedLink.get("href").endsWith(SINGLE_TASK_COMMENTS_URL.replace("{id}", mockTaskComment.getTaskId()) + "/" + mockTaskComment.getId()));
+    assertEquals("self", returnedLink.get("rel"));
+  }
 }

@@ -172,4 +172,16 @@
     order by TIME_ desc
   </select>
 
+  <select id="selectCommentByTaskIdAndCommentId" parameterType="map" resultMap="commentResultMap">
+    select * from ${prefix}ACT_HI_COMMENT 
+    where TASK_ID_ = #{taskId,jdbcType=VARCHAR}
+      and ID_ =  #{id,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectCommentByTaskIdAndCommentId_postgres" parameterType="map" resultMap="commentResultMap_postgres">
+    select * from ${prefix}ACT_HI_COMMENT 
+    where TASK_ID_ = #{taskId,jdbcType=VARCHAR}
+      and ID_ =  #{id,jdbcType=VARCHAR}
+  </select>
+
 </mapper>

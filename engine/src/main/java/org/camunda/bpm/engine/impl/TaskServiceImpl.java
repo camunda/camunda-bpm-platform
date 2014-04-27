@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.cmd.CreateAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.DelegateTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteGroupIdentityLinkCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserIdentityLinkCmd;
 import org.camunda.bpm.engine.impl.cmd.GetAttachmentCmd;
@@ -41,6 +40,7 @@ import org.camunda.bpm.engine.impl.cmd.GetProcessInstanceAttachmentsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetProcessInstanceCommentsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetSubTasksCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskAttachmentsCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskCommentCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskCommentsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskEventsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskVariableCmd;
@@ -257,12 +257,16 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, true));
   }
 
-  public void addComment(String taskId, String processInstance, String message) {
-    commandExecutor.execute(new AddCommentCmd(taskId, processInstance, message));
+  public Comment addComment(String taskId, String processInstance, String message) {
+    return commandExecutor.execute(new AddCommentCmd(taskId, processInstance, message));
   }
 
   public List<Comment> getTaskComments(String taskId) {
     return commandExecutor.execute(new GetTaskCommentsCmd(taskId));
+  }
+
+  public Comment getTaskComment(String taskId, String commentId) {
+    return commandExecutor.execute(new GetTaskCommentCmd(taskId, commentId));
   }
 
   public List<Event> getTaskEvents(String taskId) {
