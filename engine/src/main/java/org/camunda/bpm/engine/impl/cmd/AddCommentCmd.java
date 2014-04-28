@@ -13,14 +13,15 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
+
+import java.io.Serializable;
 
 
 /**
@@ -41,6 +42,15 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
   }
 
   public Comment execute(CommandContext commandContext) {
+
+    if (processInstanceId == null && taskId == null) {
+      throw new ProcessEngineException("Process instance id and task id is null");
+    }
+
+    if (message == null) {
+      throw new ProcessEngineException("Message is null");
+    }
+
     String userId = commandContext.getAuthenticatedUserId();
     CommentEntity comment = new CommentEntity();
     comment.setUserId(userId);

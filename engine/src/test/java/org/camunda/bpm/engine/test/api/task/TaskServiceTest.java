@@ -163,6 +163,33 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testAddTaskCommentNull() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      Task task = taskService.newTask("testId");
+      taskService.saveTask(task);
+      try {
+        taskService.addComment(task.getId(), null, null);
+        fail("Expected process engine exception");
+      }
+      catch (ProcessEngineException e) {}
+      finally {
+        taskService.deleteTask(task.getId(), true);
+      }
+    }
+  }
+
+  public void testAddTaskNullComment() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      try {
+        taskService.addComment(null, null, "test");
+        fail("Expected process engine exception");
+      }
+      catch (ProcessEngineException e){}
+    }
+  }
+
   public void testAddTaskComment() {
     int historyLevel = processEngineConfiguration.getHistoryLevel();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
