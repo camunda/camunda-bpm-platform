@@ -56,6 +56,9 @@ import static org.mockito.Mockito.when;
  */
 public abstract class MockProvider {
 
+  // general non existing Id
+  public static final String NON_EXISTING_ID = "nonExistingId";
+
   // engine
   public static final String EXAMPLE_PROCESS_ENGINE_NAME = "default";
   public static final String ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME = "anotherEngineName";
@@ -419,7 +422,6 @@ public abstract class MockProvider {
     when(mockComment.getUserId()).thenReturn(EXAMPLE_USER_ID);
     when(mockComment.getTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_TASK_COMMENT_TIME).toDate());
     when(mockComment.getFullMessage()).thenReturn(EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
-    when(mockComment.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     return mockComment;
   }
 

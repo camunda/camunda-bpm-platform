@@ -135,8 +135,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
       identityService.setAuthenticatedUserId("johndoe");
       // Fetch the task again and update
-      taskService.addComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
-      Comment comment = taskService.getTaskComments(taskId).get(0);
+      Comment comment = taskService.addComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
+      assertNotNull(comment.getId());
       assertEquals("johndoe", comment.getUserId());
       assertEquals(taskId, comment.getTaskId());
       assertNull(comment.getProcessInstanceId());
@@ -187,33 +187,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
         fail("Expected process engine exception");
       }
       catch (ProcessEngineException e){}
-    }
-  }
-
-  public void testAddTaskComment() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      // create new task
-      Task task = taskService.newTask();
-      task.setOwner("johndoe");
-      taskService.saveTask(task);
-      String taskId = task.getId();
-
-      identityService.setAuthenticatedUserId("johndoe");
-
-      // add comment for task and check return value
-      Comment comment = taskService.addComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
-      // check if comment id exists
-      assertNotNull(comment.getId());
-      assertEquals("johndoe", comment.getUserId());
-      assertEquals(taskId, comment.getTaskId());
-      assertNull(comment.getProcessInstanceId());
-      assertEquals("look at this isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg ...", ((Event)comment).getMessage());
-      assertEquals("look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd", comment.getFullMessage());
-      assertNotNull(comment.getTime());
-
-      // Finally, delete task
-      taskService.deleteTask(taskId, true);
     }
   }
 

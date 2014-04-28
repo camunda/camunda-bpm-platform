@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.dto.task;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.rest.dto.LinkableDto;
 import org.camunda.bpm.engine.task.Comment;
+
+import java.util.Date;
 
 public class CommentDto extends LinkableDto {
 
@@ -23,8 +23,7 @@ public class CommentDto extends LinkableDto {
   private String userId;
   private Date time;
   private String taskId;
-  private String processInstanceId;
-  private String fullMessage;
+  private String message;
 
   public CommentDto() {
   }
@@ -57,20 +56,12 @@ public class CommentDto extends LinkableDto {
     this.taskId = taskId;
   }
 
-  public String getProcessInstanceId() {
-    return processInstanceId;
+  public String getMessage() {
+    return message;
   }
 
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
-  public String getFullMessage() {
-    return fullMessage;
-  }
-
-  public void setFullMessage(String fullMessage) {
-    this.fullMessage = fullMessage;
+  public void setMessage(String message) {
+    this.message = message;
   }
 
   public static CommentDto fromComment(Comment comment) {
@@ -78,9 +69,8 @@ public class CommentDto extends LinkableDto {
     dto.id = comment.getId();
     dto.userId = comment.getUserId();
     dto.time = comment.getTime();
-    dto.processInstanceId = comment.getProcessInstanceId();
     dto.taskId = comment.getTaskId();
-    dto.fullMessage = comment.getFullMessage();
+    dto.message = comment.getFullMessage();
     return dto;
   }
 }

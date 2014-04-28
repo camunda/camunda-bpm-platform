@@ -12,16 +12,30 @@
  */
 package org.camunda.bpm.engine.rest.sub.task;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
 import org.camunda.bpm.engine.rest.dto.task.CommentDto;
+import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+import java.util.List;
 
 public interface TaskCommentResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  CommentDto getComment();
+  List<CommentDto> getComments();
+
+  @GET
+  @Path("/{commentId}")
+  @Produces(MediaType.APPLICATION_JSON)
+  CommentDto getComment(@PathParam("commentId") String commentId);
+
+  @POST
+  @Path("/create")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Produces(MediaType.APPLICATION_JSON)
+  CommentDto createComment(@Context UriInfo uriInfo, MultipartFormData multipartFormData);
 
 }

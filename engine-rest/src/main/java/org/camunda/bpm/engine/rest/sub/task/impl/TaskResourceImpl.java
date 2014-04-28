@@ -12,39 +12,26 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
-import java.net.URI;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormData;
-import org.camunda.bpm.engine.rest.TaskRestService;
-import org.camunda.bpm.engine.rest.dto.task.CommentDto;
-import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
-import org.camunda.bpm.engine.rest.dto.task.FormDto;
-import org.camunda.bpm.engine.rest.dto.task.IdentityLinkDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
+import org.camunda.bpm.engine.rest.dto.task.*;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
-import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.rest.sub.task.TaskCommentResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 import org.camunda.bpm.engine.rest.util.DtoUtil;
-import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
+
+import javax.ws.rs.core.Response.Status;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class TaskResourceImpl implements TaskResource {
 
@@ -253,54 +240,8 @@ public class TaskResourceImpl implements TaskResource {
 
   }
 
-  @Override
-  public List<CommentDto> getComments() {
-    List<Comment> taskComments = engine.getTaskService().getTaskComments(taskId);
-
-    List<CommentDto> comments = new ArrayList<CommentDto>();
-    for (Comment comment : taskComments) {
-      comments.add(CommentDto.fromComment(comment));
-    }
-
-    if (!comments.isEmpty()) {
-      return comments;
-    } else {
-        throw new InvalidRequestException(Status.NOT_FOUND, "Task comments for task id '" + taskId + "' do not exist.");
-    }
-  }
-
-  @Override
-  public CommentDto addComment(UriInfo uriInfo, MultipartFormData payload) {
-    FormPart processInstanceIdPart = payload.getNamedPart("process-instance-id");
-    FormPart messagePart = payload.getNamedPart("message");
-
-    String message = null;
-    String processInstanceId = null;
-    if (messagePart != null) {
-      message = messagePart.getTextContent();
-    }
-    if (processInstanceIdPart != null) {
-      processInstanceId = processInstanceIdPart.getTextContent();
-    }
-    Comment comment = engine.getTaskService().addComment(taskId, processInstanceId, message);
-
-    URI uri = uriInfo.getBaseUriBuilder()
-        .path(rootResourcePath)
-        .path(TaskRestService.class)
-        .path(taskId + "/comment/" + comment.getId())
-        .build();
-
-    CommentDto commentDto = CommentDto.fromComment(comment);
-
-    // GET /
-    commentDto.addReflexiveLink(uri, HttpMethod.GET, "self");
-
-    return commentDto;
-  }
-
-  @Override
-  public TaskCommentResource getComment(String commentId) {
-    return new TaskCommentResourceImpl(engine, taskId, commentId);
+  public TaskCommentResource getTaskCommentResource() {
+    return new TaskCommentResourceImpl(engine, taskId, rootResourcePath);
   }
 
 }

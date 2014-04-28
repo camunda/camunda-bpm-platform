@@ -12,26 +12,11 @@
  */
 package org.camunda.bpm.engine.rest.sub.task;
 
-import java.util.List;
+import org.camunda.bpm.engine.rest.dto.task.*;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
-
-import org.camunda.bpm.engine.rest.dto.task.CommentDto;
-import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
-import org.camunda.bpm.engine.rest.dto.task.FormDto;
-import org.camunda.bpm.engine.rest.dto.task.IdentityLinkDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
-import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
+import java.util.List;
 
 public interface TaskResource {
 
@@ -98,18 +83,7 @@ public interface TaskResource {
   @Consumes(MediaType.APPLICATION_JSON)
   void deleteIdentityLink(IdentityLinkDto identityLink);
 
-  @GET
-  @Path("/comment/{commentId}")
-  @Produces(MediaType.APPLICATION_JSON)
-  TaskCommentResource getComment(@PathParam("commentId") String commentId);
-
-  @GET
   @Path("/comment")
-  @Produces(MediaType.APPLICATION_JSON)
-  List<CommentDto> getComments();
+  TaskCommentResource getTaskCommentResource();
 
-  @POST
-  @Path("/comment/create")
-  @Consumes(MediaType.MULTIPART_FORM_DATA)
-  @Produces(MediaType.APPLICATION_JSON)
-  CommentDto addComment(@Context UriInfo uriInfo, MultipartFormData multipartFormData);}
+}
