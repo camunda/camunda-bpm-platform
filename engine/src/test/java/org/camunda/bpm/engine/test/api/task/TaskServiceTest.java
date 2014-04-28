@@ -1240,27 +1240,29 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testGetTaskCommentByTaskIdAndCommentId() {
-    // create and save new task
-    Task task = taskService.newTask();
-    taskService.saveTask(task);
+    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      // create and save new task
+      Task task = taskService.newTask();
+      taskService.saveTask(task);
 
-    String taskId = task.getId();
+      String taskId = task.getId();
 
-    // add comment to task
-    Comment comment = taskService.addComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
+      // add comment to task
+      Comment comment = taskService.addComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
 
-    // select task comment for task id and comment id
-    comment = taskService.getTaskComment(taskId, comment.getId());
-    // check returned comment
-    assertNotNull(comment.getId());
-    assertEquals(taskId, comment.getTaskId());
-    assertNull(comment.getProcessInstanceId());
-    assertEquals("look at this isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg ...", ((Event)comment).getMessage());
-    assertEquals("look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd", comment.getFullMessage());
-    assertNotNull(comment.getTime());
+      // select task comment for task id and comment id
+      comment = taskService.getTaskComment(taskId, comment.getId());
+      // check returned comment
+      assertNotNull(comment.getId());
+      assertEquals(taskId, comment.getTaskId());
+      assertNull(comment.getProcessInstanceId());
+      assertEquals("look at this isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg ...", ((Event)comment).getMessage());
+      assertEquals("look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd", comment.getFullMessage());
+      assertNotNull(comment.getTime());
 
-    // delete task
-    taskService.deleteTask(task.getId(), true);
+      // delete task
+      taskService.deleteTask(task.getId(), true);
+    }
   }
 
 }
