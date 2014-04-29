@@ -578,4 +578,11 @@ public interface ManagementService {
    */
   void unregisterDeploymentForJobExecutor(String deploymentId);
 
+  /**
+   * Get the configured history level for the process engine.
+   *
+   * @return the history level
+   */
+  int getHistoryLevel();
+
 }

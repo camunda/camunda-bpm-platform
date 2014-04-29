@@ -13,12 +13,7 @@
 
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-
 import junit.framework.Assert;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
@@ -35,6 +30,10 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
 
 
 /**
@@ -427,6 +426,11 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
         }
 
       });
+  }
+
+  public void testGetHistoryLevel() {
+    int historyLevel = managementService.getHistoryLevel();
+    assertEquals(processEngineConfiguration.getHistoryLevel(), historyLevel);
   }
 
 }
