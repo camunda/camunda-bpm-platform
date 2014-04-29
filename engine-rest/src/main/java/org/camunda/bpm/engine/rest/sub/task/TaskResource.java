@@ -86,4 +86,9 @@ public interface TaskResource {
   @Path("/comment")
   TaskCommentResource getTaskCommentResource();
 
+  @Path("/attachment")
+  TaskAttachmentResource getAttachmentResource();
+
 }
+
+

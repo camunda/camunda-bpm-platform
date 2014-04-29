@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.test.api.task;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,6 +35,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
@@ -1262,6 +1265,116 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
       // delete task
       taskService.deleteTask(task.getId(), true);
+    }
+  }
+
+  public void testTaskAttachmentByTaskIdAndAttachmentId() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      // create and save task
+      Task task = taskService.newTask();
+      taskService.saveTask(task);
+      String taskId = task.getId();
+
+      // Fetch the task again and update
+      // add attachment
+      Attachment attachment = taskService.createAttachment("web page", taskId, "someprocessinstanceid", "weatherforcast", "temperatures and more", "http://weather.com");
+      String attachmentId = attachment.getId();
+
+      // get attachment for taskId and attachmentId
+      attachment = taskService.getTaskAttachment(taskId, attachmentId);
+      assertEquals("weatherforcast", attachment.getName());
+      assertEquals("temperatures and more", attachment.getDescription());
+      assertEquals("web page", attachment.getType());
+      assertEquals(taskId, attachment.getTaskId());
+      assertEquals("someprocessinstanceid", attachment.getProcessInstanceId());
+      assertEquals("http://weather.com", attachment.getUrl());
+      assertNull(taskService.getAttachmentContent(attachment.getId()));
+
+      // delete attachment for taskId and attachmentId
+      taskService.deleteTaskAttachment(taskId, attachmentId);
+
+      // check if attachment deleted
+      assertNull(taskService.getTaskAttachment(taskId, attachmentId));
+
+      taskService.deleteTask(taskId, true);
+    }
+  }
+
+  public void testGetTaskAttachmentContentByTaskIdAndAttachmentId() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      // create and save task
+      Task task = taskService.newTask();
+      taskService.saveTask(task);
+      String taskId = task.getId();
+
+      // Fetch the task again and update
+      // add attachment
+      Attachment attachment = taskService.createAttachment("web page", taskId, "someprocessinstanceid", "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+      String attachmentId = attachment.getId();
+
+      // get attachment for taskId and attachmentId
+      InputStream taskAttachmentContent = taskService.getTaskAttachmentContent(taskId, attachmentId);
+      assertNotNull(taskAttachmentContent);
+
+      byte[] byteContent = IoUtil.readInputStream(taskAttachmentContent, "weatherforcast");
+      assertEquals("someContent", new String(byteContent));
+
+      taskService.deleteTask(taskId, true);
+    }
+  }
+
+  public void testGetTaskAttachmentWithNullParameters() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      Attachment attachment = taskService.getTaskAttachment(null, null);
+      assertNull(attachment);
+    }
+  }
+
+  public void testGetTaskAttachmentContentWithNullParameters() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      InputStream content = taskService.getTaskAttachmentContent(null, null);
+      assertNull(content);
+    }
+  }
+
+  public void testCreateTaskAttachmentWithNullTaskId() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      try {
+        taskService.createAttachment("web page", null, "someprocessinstanceid", "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+        fail("expected process engine exception");
+      } catch (ProcessEngineException e) {}
+    }
+  }
+
+  public void testDeleteTaskAttachmentWithNullParameters() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      try {
+        taskService.deleteTaskAttachment(null, null);
+        fail("expected process engine exception");
+      } catch (ProcessEngineException e) {}
+    }
+  }
+
+  public void testDeleteTaskAttachmentWithTaskIdNull() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      try {
+        taskService.deleteTaskAttachment(null, "myAttachmentId");
+        fail("expected process engine exception");
+      } catch(ProcessEngineException e) {}
+    }
+  }
+
+  public void testGetTaskAttachmentsWithTaskIdNull() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      assertEquals(Collections.<Attachment>emptyList(), taskService.getTaskAttachments(null));
     }
   }
 

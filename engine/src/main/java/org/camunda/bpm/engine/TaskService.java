@@ -414,8 +414,14 @@ public interface TaskService {
   /** Retrieve a particular attachment */
   Attachment getAttachment(String attachmentId);
 
+  /** Retrieve a particular attachment to the given task id and attachment id*/
+  Attachment getTaskAttachment(String taskId, String attachmentId);
+
   /** Retrieve stream content of a particular attachment */
   InputStream getAttachmentContent(String attachmentId);
+
+  /** Retrieve stream content of a particular attachment to the given task id and attachment id*/
+  InputStream getTaskAttachmentContent(String taskId, String attachmentId);
 
   /** The list of attachments associated to a task */
   List<Attachment> getTaskAttachments(String taskId);
@@ -425,6 +431,9 @@ public interface TaskService {
 
   /** Delete an attachment */
   void deleteAttachment(String attachmentId);
+
+  /** Delete an attachment to the given task id and attachment id */
+  void deleteTaskAttachment(String taskId, String attachmentId);
 
   /** The list of subtasks for this parent task */
   List<Task> getSubTasks(String parentTaskId);

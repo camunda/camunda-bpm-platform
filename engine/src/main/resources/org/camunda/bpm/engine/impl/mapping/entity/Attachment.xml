@@ -82,4 +82,10 @@
     select * from ${prefix}ACT_HI_ATTACHMENT where PROC_INST_ID_ = #{parameter,jdbcType=VARCHAR}
   </select>
 
+  <select id="selectAttachmentByTaskIdAndAttachmentId" parameterType="map" resultMap="attachmentResultMap">
+    select * from ${prefix}ACT_HI_ATTACHMENT 
+    where TASK_ID_ = #{taskId,jdbcType=VARCHAR}
+    and ID_ = #{id,jdbcType=VARCHAR}
+  </select>
+
 </mapper>

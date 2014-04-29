@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.cmd.CreateAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.DelegateTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteGroupIdentityLinkCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteTaskAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserIdentityLinkCmd;
 import org.camunda.bpm.engine.impl.cmd.GetAttachmentCmd;
@@ -39,6 +40,8 @@ import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.GetProcessInstanceAttachmentsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetProcessInstanceCommentsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetSubTasksCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskAttachmentCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskAttachmentContentCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskAttachmentsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskCommentCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskCommentsCmd;
@@ -289,12 +292,24 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     return commandExecutor.execute(new GetAttachmentContentCmd(attachmentId));
   }
 
+  public InputStream getTaskAttachmentContent(String taskId, String attachmentId) {
+    return commandExecutor.execute(new GetTaskAttachmentContentCmd(taskId, attachmentId));
+  }
+
   public void deleteAttachment(String attachmentId) {
     commandExecutor.execute(new DeleteAttachmentCmd(attachmentId));
   }
 
+  public void deleteTaskAttachment(String taskId, String attachmentId) {
+    commandExecutor.execute(new DeleteTaskAttachmentCmd(taskId, attachmentId));
+  }
+
   public Attachment getAttachment(String attachmentId) {
     return commandExecutor.execute(new GetAttachmentCmd(attachmentId));
+  }
+
+  public Attachment getTaskAttachment(String taskId, String attachmentId) {
+    return commandExecutor.execute(new GetTaskAttachmentCmd(taskId, attachmentId));
   }
 
   public List<Attachment> getTaskAttachments(String taskId) {

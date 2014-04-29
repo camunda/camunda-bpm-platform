@@ -1,8 +1,33 @@
 package org.camunda.bpm.engine.rest;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.path.json.JsonPath;
-import com.jayway.restassured.response.Response;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_DESCRIPTION;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_NAME;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_TYPE;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_URL;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_FULL_MESSAGE;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_TIME;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_USER_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstance;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
@@ -12,6 +37,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -24,21 +50,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
 import java.util.*;
 
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.*;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.path.json.JsonPath;
+import com.jayway.restassured.response.Response;
 
 public abstract class AbstractTaskRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -61,6 +77,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   protected static final String SINGLE_TASK_COMMENTS_URL = SINGLE_TASK_URL + "/comment";
   protected static final String SINGLE_TASK_SINGLE_COMMENT_URL = SINGLE_TASK_COMMENTS_URL + "/{commentId}";
 
+  protected static final String SINGLE_TASK_ADD_ATTACHMENT_URL = SINGLE_TASK_URL + "/attachment/create";
+  protected static final String SINGLE_TASK_ATTACHMENTS_URL = SINGLE_TASK_URL + "/attachment";
+  protected static final String SINGLE_TASK_SINGLE_ATTACHMENT_URL = SINGLE_TASK_ATTACHMENTS_URL + "/{attachmentId}";
+  protected static final String SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL = SINGLE_TASK_SINGLE_ATTACHMENT_URL;
+  protected static final String SINGLE_TASK_SINGLE_ATTACHMENT_DATA_URL = SINGLE_TASK_ATTACHMENTS_URL + "/{attachmentId}/data";
+
   private Task mockTask;
   private TaskService taskServiceMock;
   private TaskQuery mockQuery;
@@ -76,6 +98,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
   private Comment mockTaskComment;
   private List<Comment> mockTaskComments;
+
+  private Attachment mockTaskAttachment;
+  private List<Attachment> mockTaskAttachments;
 
   @Before
   public void setUpRuntimeData() {
@@ -102,6 +127,14 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     mockTaskComments = MockProvider.createMockTaskComments();
     when(taskServiceMock.getTaskComments(EXAMPLE_TASK_ID)).thenReturn(mockTaskComments);
     when(taskServiceMock.addComment(EXAMPLE_TASK_ID, null, EXAMPLE_TASK_COMMENT_FULL_MESSAGE)).thenReturn(mockTaskComment);
+
+    mockTaskAttachment = MockProvider.createMockTaskAttachment();
+    when(taskServiceMock.getTaskAttachment(EXAMPLE_TASK_ID, EXAMPLE_TASK_ATTACHMENT_ID)).thenReturn(mockTaskAttachment);
+    mockTaskAttachments = MockProvider.createMockTaskAttachments();
+    when(taskServiceMock.getTaskAttachments(EXAMPLE_TASK_ID)).thenReturn(mockTaskAttachments);
+    when(taskServiceMock.createAttachment(anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(mockTaskAttachment);
+    when(taskServiceMock.createAttachment(anyString(), anyString(), anyString(), anyString(), anyString(), any(InputStream.class))).thenReturn(mockTaskAttachment);
+    when(taskServiceMock.getTaskAttachmentContent(EXAMPLE_TASK_ID, EXAMPLE_TASK_ATTACHMENT_ID)).thenReturn(new ByteArrayInputStream(createMockByteData()));
 
     formServiceMock = mock(FormService.class);
     when(processEngine.getFormService()).thenReturn(formServiceMock);
@@ -139,6 +172,10 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
   public void mockHistoryDisabled() {
     when(managementServiceMock.getHistoryLevel()).thenReturn(ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE);
+  }
+
+  private byte[] createMockByteData() {
+    return "someContent".getBytes();
   }
 
   @Test
@@ -1321,6 +1358,428 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .post(SINGLE_TASK_ADD_COMMENT_URL);
   }
 
+  @Test
+  public void testGetSingleTaskAttachment() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .pathParam("attachmentId", MockProvider.EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect().statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+      .body("id", equalTo(MockProvider.EXAMPLE_TASK_ATTACHMENT_ID))
+      .body("taskId", equalTo(MockProvider.EXAMPLE_TASK_ID))
+      .body("description", equalTo(MockProvider.EXAMPLE_TASK_ATTACHMENT_DESCRIPTION))
+      .body("type", equalTo(MockProvider.EXAMPLE_TASK_ATTACHMENT_TYPE))
+      .body("name", equalTo(MockProvider.EXAMPLE_TASK_ATTACHMENT_NAME))
+      .body("url", equalTo(MockProvider.EXAMPLE_TASK_ATTACHMENT_URL))
+    .when().get(SINGLE_TASK_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskAttachmentWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+    .pathParam("id", EXAMPLE_TASK_ID)
+    .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect()
+    .statusCode(Status.NOT_FOUND.getStatusCode())
+    .body(containsString("History is not enabled"))
+    .when()
+    .get(SINGLE_TASK_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskAttachmentForNonExistingAttachmentId() {
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("attachmentId", NON_EXISTING_ID)
+    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .body(containsString("Task attachment with id " + NON_EXISTING_ID + " does not exist for task id '" + EXAMPLE_TASK_ID +  "'."))
+    .when().get(SINGLE_TASK_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskAttachmentForNonExistingAttachmentIdWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("attachmentId", NON_EXISTING_ID)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("History is not enabled"))
+    .when().get(SINGLE_TASK_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskAttachmentForNonExistingTask() {
+    given()
+      .pathParam("id", NON_EXISTING_ID)
+      .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("Task attachment with id " + EXAMPLE_TASK_ATTACHMENT_ID + " does not exist for task id '" + NON_EXISTING_ID + "'"))
+    .when()
+      .get(SINGLE_TASK_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskAttachmentForNonExistingTaskWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+      .pathParam("id", NON_EXISTING_ID)
+      .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("History is not enabled"))
+    .when()
+      .get(SINGLE_TASK_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testGetTaskAttachments() {
+    Response response = given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+      .body("$.size()", equalTo(1))
+    .when().get(SINGLE_TASK_ATTACHMENTS_URL);
+
+    verifyTaskAttachments(mockTaskAttachments, response);
+    verify(taskServiceMock).getTaskAttachments(MockProvider.EXAMPLE_TASK_ID);
+  }
+
+  @Test
+  public void testGetTaskAttachmentsWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+      .body("$.size()", equalTo(0))
+    .when().get(SINGLE_TASK_ATTACHMENTS_URL);
+  }
+
+  @Test
+  public void testGetTaskAttachmentsForNonExistingTaskId() {
+    when(historicTaskInstanceQueryMock.taskId(NON_EXISTING_ID)).thenReturn(historicTaskInstanceQueryMock);
+    when(historicTaskInstanceQueryMock.singleResult()).thenReturn(null);
+
+    given().pathParam("id", NON_EXISTING_ID)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .body(containsString("No task found for task id " + NON_EXISTING_ID))
+    .when().get(SINGLE_TASK_ATTACHMENTS_URL);
+  }
+
+  @Test
+  public void testGetTaskAttachmentsForNonExistingTaskWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+      .pathParam("id", NON_EXISTING_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("$.size()", equalTo(0))
+    .when()
+      .get(SINGLE_TASK_ATTACHMENTS_URL);
+  }
+
+  @Test
+  public void testGetTaskAttachmentsForNonExistingAttachments() {
+    when(taskServiceMock.getTaskAttachments(EXAMPLE_TASK_ID)).thenReturn(Collections.<Attachment>emptyList());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("$.size()", equalTo(0))
+    .when()
+      .get(SINGLE_TASK_ATTACHMENTS_URL);
+  }
+
+  @Test
+  public void testGetTaskAttachmentsForNonExistingAttachmentsWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("$.size()", equalTo(0))
+    .when()
+      .get(SINGLE_TASK_ATTACHMENTS_URL);
+  }
+
+  @Test
+  public void testCreateCompleteTaskAttachmentWithContent() {
+    Response response = given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .multiPart("attachment-name", EXAMPLE_TASK_ATTACHMENT_NAME)
+      .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
+      .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
+      .multiPart("content", createMockByteData())
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_ADD_ATTACHMENT_URL);
+
+    verifyCreatedTaskAttachment(mockTaskAttachment, response, false);
+  }
+
+  @Test
+  public void testCreateTaskAttachmentWithContentToNonExistingTask() {
+    when(historicTaskInstanceQueryMock.taskId(eq(NON_EXISTING_ID))).thenReturn(historicTaskInstanceQueryMock);
+    when(historicTaskInstanceQueryMock.singleResult()).thenReturn(null);
+
+    given()
+    .pathParam("id", NON_EXISTING_ID)
+      .multiPart("attachment-name", EXAMPLE_TASK_ATTACHMENT_NAME)
+      .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
+      .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
+      .multiPart("content", createMockByteData())
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body(containsString("No task found for task id " + NON_EXISTING_ID))
+    .when()
+      .post(SINGLE_TASK_ADD_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testCreateCompleteTaskAttachmentWithUrl() {
+    Response response = given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .multiPart("attachment-name", EXAMPLE_TASK_ATTACHMENT_NAME)
+      .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
+      .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
+      .multiPart("url", EXAMPLE_TASK_ATTACHMENT_URL)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_ADD_ATTACHMENT_URL);
+
+    verifyCreatedTaskAttachment(mockTaskAttachment, response, true);
+  }
+
+  @Test
+  public void testCreateCompleteTaskAttachmentWithUrlWithHistoryDisabled() {
+
+    mockHistoryDisabled();
+
+    given()
+        .pathParam("id", EXAMPLE_TASK_ID)
+        .multiPart("attachment-name", EXAMPLE_TASK_ATTACHMENT_NAME)
+        .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
+        .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
+        .multiPart("url", EXAMPLE_TASK_ATTACHMENT_URL)
+      .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body(containsString("History is not enabled"))
+      .when()
+        .post(SINGLE_TASK_ADD_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testCreateTaskAttachmentWithUrlToNonExistingTask() {
+    when(historicTaskInstanceQueryMock.taskId(eq(NON_EXISTING_ID))).thenReturn(historicTaskInstanceQueryMock);
+    when(historicTaskInstanceQueryMock.singleResult()).thenReturn(null);
+
+    given()
+    .pathParam("id", NON_EXISTING_ID)
+      .multiPart("attachment-name", EXAMPLE_TASK_ATTACHMENT_NAME)
+      .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
+      .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
+      .multiPart("url", EXAMPLE_TASK_ATTACHMENT_URL)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body(containsString("No task found for task id " + NON_EXISTING_ID))
+    .when()
+      .post(SINGLE_TASK_ADD_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testCreateTaskAttachmentWithUrlToNonExistingTaskWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+    .pathParam("id", NON_EXISTING_ID)
+      .multiPart("attachment-name", EXAMPLE_TASK_ATTACHMENT_NAME)
+      .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
+      .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
+      .multiPart("url", EXAMPLE_TASK_ATTACHMENT_URL)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body(containsString("History is not enabled"))
+    .when()
+      .post(SINGLE_TASK_ADD_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testCreateTaskAttachmentWithoutMultiparts() {
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_ADD_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskAttachmentContent() {
+    Response response = given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .pathParam("attachmentId", MockProvider.EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(SINGLE_TASK_SINGLE_ATTACHMENT_DATA_URL);
+
+    byte[] responseContent = IoUtil.readInputStream(response.asInputStream(), "attachmentContent");
+    assertEquals("someContent", new String(responseContent));
+  }
+
+  @Test
+  public void testGetSingleTaskAttachmentContentWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+    .pathParam("id", EXAMPLE_TASK_ID)
+    .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect()
+    .statusCode(Status.NOT_FOUND.getStatusCode())
+    .body(containsString("History is not enabled"))
+    .when()
+    .get(SINGLE_TASK_SINGLE_ATTACHMENT_DATA_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskAttachmentContentForNonExistingAttachmentId() {
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("attachmentId", NON_EXISTING_ID)
+    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("Attachment content for attachment with id '" + NON_EXISTING_ID + "' does not exist for task id '" + EXAMPLE_TASK_ID + "'."))
+    .when().get(SINGLE_TASK_SINGLE_ATTACHMENT_DATA_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskAttachmentContentForNonExistingAttachmentIdWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("attachmentId", NON_EXISTING_ID)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("History is not enabled"))
+    .when().get(SINGLE_TASK_SINGLE_ATTACHMENT_DATA_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskAttachmentContentForNonExistingTask() {
+    given()
+      .pathParam("id", NON_EXISTING_ID)
+      .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("Attachment content for attachment with id '" + EXAMPLE_TASK_ATTACHMENT_ID + "' does not exist for task id '" + NON_EXISTING_ID + "'."))
+    .when()
+      .get(SINGLE_TASK_SINGLE_ATTACHMENT_DATA_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskAttachmentContentForNonExistingTaskWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+      .pathParam("id", NON_EXISTING_ID)
+      .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("History is not enabled"))
+    .when()
+      .get(SINGLE_TASK_SINGLE_ATTACHMENT_DATA_URL);
+  }
+
+  @Test
+  public void testDeleteSingleTaskAttachment() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .pathParam("attachmentId", MockProvider.EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().delete(SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testDeleteSingleTaskAttachmentWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+    .pathParam("id", EXAMPLE_TASK_ID)
+    .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect()
+    .statusCode(Status.FORBIDDEN.getStatusCode())
+    .body(containsString("History is not enabled"))
+    .when()
+    .delete(SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testDeleteSingleTaskAttachmentForNonExistingAttachmentId() {
+    doThrow(new ProcessEngineException()).when(taskServiceMock).deleteTaskAttachment(EXAMPLE_TASK_ID, NON_EXISTING_ID);
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("attachmentId", NON_EXISTING_ID)
+    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .body(containsString("Deletion is not possible. No attachment exists for task id '" + EXAMPLE_TASK_ID + "' and attachment id '" + NON_EXISTING_ID + "'."))
+    .when().delete(SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testDeleteSingleTaskAttachmentForNonExistingAttachmentIdWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("attachmentId", NON_EXISTING_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body(containsString("History is not enabled"))
+    .when().delete(SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testDeleteSingleTaskAttachmentForNonExistingTask() {
+    doThrow(new ProcessEngineException()).when(taskServiceMock).deleteTaskAttachment(NON_EXISTING_ID, EXAMPLE_TASK_ATTACHMENT_ID);
+
+    given()
+      .pathParam("id", NON_EXISTING_ID)
+      .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("Deletion is not possible. No attachment exists for task id '" + NON_EXISTING_ID + "' and attachment id '" + EXAMPLE_TASK_ATTACHMENT_ID + "'."))
+    .when()
+      .delete(SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testDeleteSingleTaskAttachmentForNonExistingTaskWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+      .pathParam("id", NON_EXISTING_ID)
+      .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body(containsString("History is not enabled"))
+    .when()
+      .delete(SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL);
+  }
+
+
   @SuppressWarnings({ "rawtypes", "unchecked" })
   private void verifyTaskComments(List<Comment> mockTaskComments, Response response) {
     List list = response.as(List.class);
@@ -1373,4 +1832,66 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     assertTrue(returnedLink.get("href").endsWith(SINGLE_TASK_COMMENTS_URL.replace("{id}", mockTaskComment.getTaskId()) + "/" + mockTaskComment.getId()));
     assertEquals("self", returnedLink.get("rel"));
   }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private void verifyTaskAttachments(List<Attachment> mockTaskAttachments, Response response) {
+    List list = response.as(List.class);
+    assertEquals(1, list.size());
+
+    LinkedHashMap<String, String> resourceHashMap = (LinkedHashMap<String, String>) list.get(0);
+
+    String returnedId = resourceHashMap.get("id");
+    String returnedTaskId = resourceHashMap.get("taskId");
+    String returnedName = resourceHashMap.get("name");
+    String returnedType = resourceHashMap.get("type");
+    String returnedDescription = resourceHashMap.get("description");
+    String returnedUrl = resourceHashMap.get("url");
+
+    Attachment mockAttachment = mockTaskAttachments.get(0);
+
+    assertEquals(mockAttachment.getId(), returnedId);
+    assertEquals(mockAttachment.getTaskId(), returnedTaskId);
+    assertEquals(mockAttachment.getName(), returnedName);
+    assertEquals(mockAttachment.getType(), returnedType);
+    assertEquals(mockAttachment.getDescription(), returnedDescription);
+    assertEquals(mockAttachment.getUrl(), returnedUrl);
+  }
+
+  private void verifyCreatedTaskAttachment(Attachment mockTaskAttachment, Response response, boolean urlExist) {
+    String content = response.asString();
+    verifyTaskAttachmentValues(mockTaskAttachment, content, urlExist);
+    verifyTaskAttachmentLink(mockTaskAttachment, content);
+  }
+
+  private void verifyTaskAttachmentValues(Attachment mockTaskAttachment, String responseContent, boolean urlExist) {
+    JsonPath path = from(responseContent);
+    String returnedId = path.get("id");
+    String returnedTaskId = path.get("taskId");
+    String returnedName = path.get("name");
+    String returnedType = path.get("type");
+    String returnedDescription = path.get("description");
+    String returnedUrl = path.get("url");
+
+    Attachment mockAttachment = mockTaskAttachments.get(0);
+
+    assertEquals(mockAttachment.getId(), returnedId);
+    assertEquals(mockAttachment.getTaskId(), returnedTaskId);
+    assertEquals(mockAttachment.getName(), returnedName);
+    assertEquals(mockAttachment.getType(), returnedType);
+    assertEquals(mockAttachment.getDescription(), returnedDescription);
+    if (urlExist) {
+      assertEquals(mockAttachment.getUrl(), returnedUrl);
+    }
+  }
+
+  private void verifyTaskAttachmentLink(Attachment mockTaskAttachment, String responseContent) {
+    List<Map<String, String>> returnedLinks = from(responseContent).getList("links");
+    assertEquals(1, returnedLinks.size());
+
+    Map<String, String> returnedLink = returnedLinks.get(0);
+    assertEquals(HttpMethod.GET, returnedLink.get("method"));
+    assertTrue(returnedLink.get("href").endsWith(SINGLE_TASK_ATTACHMENTS_URL.replace("{id}", mockTaskAttachment.getTaskId()) + "/" + mockTaskAttachment.getId()));
+    assertEquals("self", returnedLink.get("rel"));
+  }
+
 }

@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.runtime.*;
+import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -83,6 +84,13 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_COMMENT_ID = "aTaskCommentId";
   public static final String EXAMPLE_TASK_COMMENT_FULL_MESSAGE = "aTaskCommentFullMessage";
   public static final String EXAMPLE_TASK_COMMENT_TIME = "2014-04-24T14:10:44";
+
+  // task attachment
+  public static final String EXAMPLE_TASK_ATTACHMENT_ID = "aTaskAttachmentId";
+  public static final String EXAMPLE_TASK_ATTACHMENT_NAME = "aTaskAttachmentName";
+  public static final String EXAMPLE_TASK_ATTACHMENT_DESCRIPTION = "aTaskAttachmentDescription";
+  public static final String EXAMPLE_TASK_ATTACHMENT_TYPE = "aTaskAttachmentType";
+  public static final String EXAMPLE_TASK_ATTACHMENT_URL = "aTaskAttachmentUrl";
 
   // form data
   public static final String EXAMPLE_FORM_KEY = "aFormKey";
@@ -428,6 +436,26 @@ public abstract class MockProvider {
   public static List<Comment> createMockTaskComments() {
     List<Comment> mocks = new ArrayList<Comment>();
     mocks.add(createMockTaskComment());
+    return mocks;
+  }
+
+  // task attachment
+  public static Attachment createMockTaskAttachment() {
+    Attachment mockAttachment = mock(Attachment.class);
+    when(mockAttachment.getId()).thenReturn(EXAMPLE_TASK_ATTACHMENT_ID);
+    when(mockAttachment.getName()).thenReturn(EXAMPLE_TASK_ATTACHMENT_NAME);
+    when(mockAttachment.getDescription()).thenReturn(EXAMPLE_TASK_ATTACHMENT_DESCRIPTION);
+    when(mockAttachment.getType()).thenReturn(EXAMPLE_TASK_ATTACHMENT_TYPE);
+    when(mockAttachment.getUrl()).thenReturn(EXAMPLE_TASK_ATTACHMENT_URL);
+    when(mockAttachment.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
+    when(mockAttachment.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+
+    return mockAttachment;
+  }
+
+  public static List<Attachment> createMockTaskAttachments() {
+    List<Attachment> mocks = new ArrayList<Attachment>();
+    mocks.add(createMockTaskAttachment());
     return mocks;
   }
 
