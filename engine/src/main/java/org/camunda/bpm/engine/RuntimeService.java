@@ -792,6 +792,8 @@ public interface RuntimeService {
    *          the name of the message event
    * @param businessKey
    *          the business key of process instances to correlate against
+   * @param processVariables
+   *          a map of variables added to the execution or newly created process instance
    * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
    * @throws ProcessEngineException if messageName is null
    */
