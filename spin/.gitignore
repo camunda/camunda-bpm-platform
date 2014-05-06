@@ -16,4 +16,5 @@ dependency-reduced-pom.xml
 *.iml
 *.sublime-project
 *.sublime-workspace
+*.swp
 
