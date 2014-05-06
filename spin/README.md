@@ -10,13 +10,16 @@ camunda-spin
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
-Spin library for simple XML and JSON processing
+Spin library for simple XML and JSON processing. TODO: add description
 
+# Why Spin?
 
-# TODO
+TODO: provide some snappy examples
 
-- Add description of the camunda-spin library
-- Add motiviation/simple example to use the camunda-spin library
-- Link to user documentation (docs folder)
-- Link to developer/contribution documentation (CONTRIBUTING.md)
-- Add license
+# Documentation
+
+The sources of the camunda spin documentation are located in the [docs folder](docs/index.md) of this repository.
+
+# Contributing
+
+camunda Spin is licensed under the Apache 2.0 License. Check [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines about how to contribute.
