@@ -1,12 +1,19 @@
-*.class
+.idea
+target
+.classpath
+.project
+.settings
+build.properties
+bin
+.metadata
+transaction.log
+nbactions*.xml
+nb-configuration.xml
+/webapps/fox-platform-tasklist/server-work
+dependency-reduced-pom.xml
+faces-config.NavData
+dependency-reduced-pom.xml
+*.iml
+*.sublime-project
+*.sublime-workspace
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.ear
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
