@@ -26,7 +26,7 @@ contains several parts which are described in the following:
 A possible log message would be:
 
 ```
-SPIN-30023 The attribute with the name 'invalidId' was not found in the element with id 'elementId' returning an empty string.
+SPIN-20023 The attribute with the name 'invalidId' was not found in the element with id 'elementId' returning an empty string.
 ```
 
 Every log message/event is associated with a log level. This level defines the
@@ -36,12 +36,11 @@ first digit of the `MessageCode`. The following log levels are used
 
 | Level   | MessageCode | Description
 |---------|:-----------:|-------------
-| `FATAL` | 1xxxx       | The highest possible severity which signals an error which prevents the application from continuing. <br/>**Example:** `SPIN-10012 Unable to read file with the name 'notExisting.xml'`
-| `ERROR` | 2xxxx       | Signals an error which is severe but may allow the application to continue. <br/>**Example:** `SPIN-20033 Unable to change attribute with name 'id' to value '#-test'`
-| `WARN`  | 3xxxx       | Signals a warning which can interfere with the correct execution of the application. <br/>**Example:** `SPIN-30023 The attribute with the name 'invalidId' was not found in the element with id 'elementId' returning an empty string.`
-| `INFO`  | 4xxxx       | Informs about the progress of the application. <br/>**Example:** `SPIN-40001 File with name 'existingData.xml' successful read and parsed`
-| `DEBUG` | 5xxxx       | Information to help debugging an application. <br/>**Example:** `SPIN-51233 Found '12' child elements of element with id 'testElement'`
-| `TRACE` | 6xxxx       | Only allowed during development. Should not be commited or at leased removed after completion of a feature. <br/>**Example:** `SPIN-60123 Recursively searching for child elements (current recursion depth '3')`
+| `ERROR` | 1xxxx       | Signals an error which is severe but may allow the application to continue. <br/>**Example:** `SPIN-10033 Unable to change attribute with name 'id' to value '#-test'`
+| `WARN`  | 2xxxx       | Signals a warning which can interfere with the correct execution of the application. <br/>**Example:** `SPIN-20023 The attribute with the name 'invalidId' was not found in the element with id 'elementId' returning an empty string.`
+| `INFO`  | 3xxxx       | Informs about the progress of the application. <br/>**Example:** `SPIN-30001 File with name 'existingData.xml' successful read and parsed`
+| `DEBUG` | 4xxxx       | Information to help debugging an application. <br/>**Example:** `SPIN-41233 Found '12' child elements of element with id 'testElement'`
+| `TRACE` | 5xxxx       | Only allowed during development. Should not be commited or at leased removed after completion of a feature. <br/>**Example:** `SPIN-50123 Recursively searching for child elements (current recursion depth '3')`
 
 **TODO**: Describe code usage/patterns
 
