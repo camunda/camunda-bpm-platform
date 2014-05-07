@@ -17,8 +17,9 @@ All log messages of camunda spin follow the same convention. The message
 contains several parts which are described in the following:
 
 - `ComponentId`: a short identifier for the logging component like `SPIN`
-- `MessageCode`: a unique five-digit number code which identifies the
-  corresponding logging event for example `30023`
+- `MessageCode`: a unique five-digit `LLMMM` number code which identifies the
+  corresponding logging event for example `20023`. The first two digest identify
+  the logger and the last three digits identify the log message.
 - `LogMessage`: the meaningful log message of the logging event with detailed
   information (surrounded by single quotes) where appropriate for example
   `Attribute with name 'abc' not found`
@@ -29,18 +30,17 @@ A possible log message would be:
 SPIN-20023 The attribute with the name 'invalidId' was not found in the element with id 'elementId' returning an empty string.
 ```
 
-Every log message/event is associated with a log level. This level defines the
-first digit of the `MessageCode`. The following log levels are used
-(sorted by severity):
+Every log message/event is associated with a log level. The following log
+levels are used (sorted by severity):
 
 
-| Level   | MessageCode | Description
-|---------|:-----------:|-------------
-| `ERROR` | 1xxxx       | Signals an error which is severe but may allow the application to continue. <br/>**Example:** `SPIN-10033 Unable to change attribute with name 'id' to value '#-test'`
-| `WARN`  | 2xxxx       | Signals a warning which can interfere with the correct execution of the application. <br/>**Example:** `SPIN-20023 The attribute with the name 'invalidId' was not found in the element with id 'elementId' returning an empty string.`
-| `INFO`  | 3xxxx       | Informs about the progress of the application. <br/>**Example:** `SPIN-30001 File with name 'existingData.xml' successful read and parsed`
-| `DEBUG` | 4xxxx       | Information to help debugging an application. <br/>**Example:** `SPIN-41233 Found '12' child elements of element with id 'testElement'`
-| `TRACE` | 5xxxx       | Only allowed during development. Should not be commited or at leased removed after completion of a feature. <br/>**Example:** `SPIN-50123 Recursively searching for child elements (current recursion depth '3')`
+| Level   | Description
+|---------|-------------
+| `ERROR` | Signals an error which is severe but may allow the application to continue. <br/>**Example:** `SPIN-10033 Unable to change attribute with name 'id' to value '#-test'`
+| `WARN`  | Signals a warning which can interfere with the correct execution of the application. <br/>**Example:** `SPIN-20023 The attribute with the name 'invalidId' was not found in the element with id 'elementId' returning an empty string.`
+| `INFO`  | Informs about the progress of the application. <br/>**Example:** `SPIN-30001 File with name 'existingData.xml' successful read and parsed`
+| `DEBUG` | Information to help debugging an application. <br/>**Example:** `SPIN-41233 Found '12' child elements of element with id 'testElement'`
+| `TRACE` | Only allowed during development. Should not be commited or at leased removed after completion of a feature. <br/>**Example:** `SPIN-50123 Recursively searching for child elements (current recursion depth '3')`
 
 **TODO**: Describe code usage/patterns
 
@@ -82,19 +82,17 @@ As convention exception messages follow a similar structure as log messages:
 
 - `ComponentId`: the static spin identifier `SPIN-` to simply filter error logs
   for example
-- `ExceptionCode`: an unique six-digit identifier for every exception. The
-  identifier has three parts and the pattern `TCCMMMM`. The first digit `T` is
-  either `0` for all exception inheriting from `SpinRuntimeException` and `1` for
-  all exceptions inheriting from `SpinException`. The following two digits `CC`
-  represent the exception class. The last four digits `MMMM` identify the actual
-  exception.
+- `ExceptionCode`: an unique five-digit identifier for every exception. The
+  identifier has two parts and the pattern `LLMMM`. The first two digits `LL`
+  identifies the logger and the last three digits `MMM` identifies the exception
+  message.
 - The exception message should be expressive and optional contain data useful
   for the user.
 
 An example exception message could be:
 
 ```
-SPIN-0020052 The element has the wrong format to be handled as Xml element
+SPIN-12052 The element has the wrong format to be handled as Xml element
 ```
 
 **TODO:** Describe code usage/patterns
