@@ -21,11 +21,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.ProcessApplicationService;
@@ -35,21 +38,27 @@ import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.task.*;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.type.TypeFactory;
 import org.fest.assertions.Assertions;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.jayway.restassured.http.ContentType;
@@ -82,6 +91,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   protected static final String SINGLE_TASK_SINGLE_ATTACHMENT_URL = SINGLE_TASK_ATTACHMENTS_URL + "/{attachmentId}";
   protected static final String SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL = SINGLE_TASK_SINGLE_ATTACHMENT_URL;
   protected static final String SINGLE_TASK_SINGLE_ATTACHMENT_DATA_URL = SINGLE_TASK_ATTACHMENTS_URL + "/{attachmentId}/data";
+
+  protected static final String SINGLE_TASK_VARIABLES_URL = SINGLE_TASK_URL + "/localVariables";
+  protected static final String SINGLE_TASK_SINGLE_VARIABLE_URL = SINGLE_TASK_VARIABLES_URL + "/{varId}";
+  protected static final String SINGLE_TASK_PUT_SINGLE_VARIABLE_URL = SINGLE_TASK_SINGLE_VARIABLE_URL;
+  protected static final String SINGLE_TASK_DELETE_SINGLE_VARIABLE_URL = SINGLE_TASK_SINGLE_VARIABLE_URL;
+  protected static final String SINGLE_TASK_SINGLE_VARIABLE_DATA_URL = SINGLE_TASK_SINGLE_VARIABLE_URL + "/data";
+  protected static final String SINGLE_TASK_MODIFY_VARIABLES_URL = SINGLE_TASK_VARIABLES_URL;
 
   private Task mockTask;
   private TaskService taskServiceMock;
@@ -136,6 +152,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(taskServiceMock.createAttachment(anyString(), anyString(), anyString(), anyString(), anyString(), any(InputStream.class))).thenReturn(mockTaskAttachment);
     when(taskServiceMock.getTaskAttachmentContent(EXAMPLE_TASK_ID, EXAMPLE_TASK_ATTACHMENT_ID)).thenReturn(new ByteArrayInputStream(createMockByteData()));
 
+    when(taskServiceMock.getVariablesLocal(EXAMPLE_TASK_ID)).thenReturn(EXAMPLE_VARIABLES);
+
     formServiceMock = mock(FormService.class);
     when(processEngine.getFormService()).thenReturn(formServiceMock);
     TaskFormData mockFormData = MockProvider.createMockTaskFormData();
@@ -168,6 +186,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     RuntimeContainerDelegate delegate = mock(RuntimeContainerDelegate.class);
     when(delegate.getProcessApplicationService()).thenReturn(processApplicationService);
     RuntimeContainerDelegate.INSTANCE.set(delegate);
+  }
+
+  private TaskServiceImpl mockTaskServiceImpl() {
+    TaskServiceImpl taskServiceMock = mock(TaskServiceImpl.class);
+    when(processEngine.getTaskService()).thenReturn(taskServiceMock);
+    return taskServiceMock;
   }
 
   public void mockHistoryDisabled() {
@@ -1777,6 +1801,487 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .body(containsString("History is not enabled"))
     .when()
       .delete(SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL);
+  }
+
+  @Test
+  public void testGetLocalVariables() {
+    Response response = given().pathParam("id", EXAMPLE_TASK_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body(EXAMPLE_VARIABLE_KEY, notNullValue())
+      .body(EXAMPLE_VARIABLE_KEY + ".value", equalTo(EXAMPLE_VARIABLE_VALUE))
+      .body(EXAMPLE_VARIABLE_KEY + ".type", equalTo(String.class.getSimpleName()))
+      .when().get(SINGLE_TASK_VARIABLES_URL);
+
+    Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
+  }
+
+  @Test
+  public void testGetLocalVariablesForNonExistingTaskId() {
+    when(taskServiceMock.getVariablesLocal(NON_EXISTING_ID)).thenThrow(new ProcessEngineException("task " + NON_EXISTING_ID + " doesn't exist"));
+
+    given().pathParam("id", NON_EXISTING_ID)
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo("task " + NON_EXISTING_ID + " doesn't exist"))
+      .when().get(SINGLE_TASK_VARIABLES_URL);
+  }
+
+  @Test
+  public void testLocalVariableModification() {
+    TaskServiceImpl taskServiceMock = mockTaskServiceImpl();
+
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+
+    String variableKey = "aKey";
+    int variableValue = 123;
+
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue).getVariables();
+    messageBodyJson.put("modifications", modifications);
+
+    List<String> deletions = new ArrayList<String>();
+    deletions.add("deleteKey");
+    messageBodyJson.put("deletions", deletions);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(SINGLE_TASK_MODIFY_VARIABLES_URL);
+
+    Map<String, Object> expectedModifications = new HashMap<String, Object>();
+    expectedModifications.put(variableKey, variableValue);
+    verify(taskServiceMock).updateVariablesLocal(eq(EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedModifications)),
+        argThat(new EqualsList(deletions)));
+  }
+
+  @Test
+  public void testLocalVariableModificationForNonExistingTaskId() {
+    TaskServiceImpl taskServiceMock = mockTaskServiceImpl();
+    doThrow(new ProcessEngineException("Cannot find task with id " + NON_EXISTING_ID)).when(taskServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
+
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+
+    String variableKey = "aKey";
+    int variableValue = 123;
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue).getVariables();
+    messageBodyJson.put("modifications", modifications);
+
+    given().pathParam("id", NON_EXISTING_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot modify variables for task " + NON_EXISTING_ID + ": Cannot find task with id " + NON_EXISTING_ID))
+      .when().post(SINGLE_TASK_MODIFY_VARIABLES_URL);
+  }
+
+  @Test
+  public void testEmptyLocalVariableModification() {
+    mockTaskServiceImpl();
+
+    given().pathParam("id", EXAMPLE_TASK_ID).contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(SINGLE_TASK_MODIFY_VARIABLES_URL);
+  }
+
+  @Test
+  public void testGetSingleLocalVariable() {
+    String variableKey = "aVariableKey";
+    int variableValue = 123;
+
+    when(taskServiceMock.getVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey))).thenReturn(variableValue);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("value", is(123))
+      .body("type", is("Integer"))
+      .when().get(SINGLE_TASK_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testNonExistingLocalVariable() {
+    String variableKey = "aVariableKey";
+
+    when(taskServiceMock.getVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey))).thenReturn(null);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", is("task variable with name " + variableKey + " does not exist or is null"))
+      .when().get(SINGLE_TASK_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testGetLocalVariableForNonExistingTaskId() {
+    String variableKey = "aVariableKey";
+
+    when(taskServiceMock.getVariableLocal(eq(NON_EXISTING_ID), eq(variableKey)))
+      .thenThrow(new ProcessEngineException("task " + NON_EXISTING_ID + " doesn't exist"));
+
+    given().pathParam("id", NON_EXISTING_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", is("Cannot get task variable " + variableKey + ": task " + NON_EXISTING_ID + " doesn't exist"))
+      .when().get(SINGLE_TASK_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPutSingleLocalVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "aVariableValue";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        eq(variableValue));
+  }
+
+  @Test
+  public void testPutSingleVariableWithTypeInteger() {
+    String variableKey = "aVariableKey";
+    Integer variableValue = 123;
+    String type = "Integer";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        eq(variableValue));
+  }
+
+  @Test
+  public void testPutSingleVariableWithUnparseableInteger() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Integer";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " + variableKey + " due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPutSingleVariableWithTypeShort() {
+    String variableKey = "aVariableKey";
+    Short variableValue = 123;
+    String type = "Short";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        eq(variableValue));
+  }
+
+  @Test
+  public void testPutSingleVariableWithUnparseableShort() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Short";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " +  variableKey + " due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPutSingleVariableWithTypeLong() {
+    String variableKey = "aVariableKey";
+    Long variableValue = Long.valueOf(123);
+    String type = "Long";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        eq(variableValue));
+  }
+
+  @Test
+  public void testPutSingleVariableWithUnparseableLong() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Long";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " + variableKey + " due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPutSingleVariableWithTypeDouble() {
+    String variableKey = "aVariableKey";
+    Double variableValue = 123.456;
+    String type = "Double";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        eq(variableValue));
+  }
+
+  @Test
+  public void testPutSingleVariableWithUnparseableDouble() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Double";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " + variableKey + " due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPutSingleVariableWithTypeBoolean() {
+    String variableKey = "aVariableKey";
+    Boolean variableValue = true;
+    String type = "Boolean";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        eq(variableValue));
+  }
+
+  @Test
+  public void testPutSingleVariableWithTypeDate() throws Exception {
+    Date now = new Date();
+    SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+    String variableKey = "aVariableKey";
+    String variableValue = pattern.format(now);
+    String type = "Date";
+
+    Date expectedValue = pattern.parse(variableValue);
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        eq(expectedValue));
+  }
+
+  @Test
+  public void testPutSingleVariableWithUnparseableDate() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Date";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " + variableKey + " due to parse exception: Unparseable date: \"1abc\""))
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPutSingleVariableWithNotSupportedType() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "X";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " + variableKey + ": The variable type 'X' is not supported."))
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPutSingleLocalVariableWithNoValue() {
+    String variableKey = "aVariableKey";
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        isNull());
+  }
+
+  @Test
+  public void testPutLocalVariableForNonExistingTaskId() {
+    String variableKey = "aVariableKey";
+    String variableValue = "aVariableValue";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue);
+
+    doThrow(new ProcessEngineException("Cannot find task with id " + NON_EXISTING_ID))
+      .when(taskServiceMock).setVariableLocal(eq(NON_EXISTING_ID), eq(variableKey), eq(variableValue));
+
+    given().pathParam("id", NON_EXISTING_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", is("Cannot put task variable " + variableKey + ": Cannot find task with id " + NON_EXISTING_ID))
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPostSingleLocalBinaryVariable() throws Exception {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("data", "unspecified", bytes)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_SINGLE_VARIABLE_DATA_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        eq(bytes));
+  }
+
+  @Test
+  public void testPostSingleLocalBinaryVariableWithNoValue() throws Exception {
+    byte[] bytes = new byte[0];
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("data", "unspecified", bytes)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_SINGLE_VARIABLE_DATA_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        eq(bytes));
+  }
+
+  @Test
+  public void testPostSingleLocalSerializableVariable() throws Exception {
+
+    ArrayList<String> serializable = new ArrayList<String>();
+    serializable.add("foo");
+
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonBytes = mapper.writeValueAsString(serializable);
+    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("data", jsonBytes, MediaType.APPLICATION_JSON)
+      .multiPart("type", typeName, MediaType.TEXT_PLAIN)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_SINGLE_VARIABLE_DATA_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
+        eq(serializable));
+  }
+
+  @Test
+  public void testPostSingleLocalSerializableVariableUnsupportedMediaType() throws Exception {
+
+    ArrayList<String> serializable = new ArrayList<String>();
+    serializable.add("foo");
+
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonBytes = mapper.writeValueAsString(serializable);
+    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("data", jsonBytes, "unsupported")
+      .multiPart("type", typeName, MediaType.TEXT_PLAIN)
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body(containsString("Unrecognized content type for serialized java type: unsupported"))
+    .when()
+      .post(SINGLE_TASK_SINGLE_VARIABLE_DATA_URL);
+
+    verify(taskServiceMock, never()).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        eq(serializable));
+  }
+
+  @Test
+  public void testDeleteSingleLocalVariable() {
+    String variableKey = "aVariableKey";
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().delete(SINGLE_TASK_DELETE_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).removeVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey));
+  }
+
+  @Test
+  public void testDeleteLocalVariableForNonExistingTaskId() {
+    String variableKey = "aVariableKey";
+
+    doThrow(new ProcessEngineException("Cannot find task with id " + NON_EXISTING_ID))
+      .when(taskServiceMock).removeVariableLocal(eq(NON_EXISTING_ID), eq(variableKey));
+
+    given().pathParam("id", NON_EXISTING_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", is("Cannot delete task variable " + variableKey + ": Cannot find task with id " + NON_EXISTING_ID))
+      .when().delete(SINGLE_TASK_DELETE_SINGLE_VARIABLE_URL);
   }
 
 

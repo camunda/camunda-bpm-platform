@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.api.task;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -1377,5 +1379,71 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       assertEquals(Collections.<Attachment>emptyList(), taskService.getTaskAttachments(null));
     }
   }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
+  public void testUpdateVariablesLocal() {
+    Map<String, Object> globalVars = new HashMap<String, Object>();
+    globalVars.put("variable4", "value4");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess", globalVars);
+
+    Task currentTask = taskService.createTaskQuery().singleResult();
+    Map<String, Object> localVars = new HashMap<String, Object>();
+    localVars.put("variable1", "value1");
+    localVars.put("variable2", "value2");
+    localVars.put("variable3", "value3");
+    taskService.setVariablesLocal(currentTask.getId(), localVars);
+
+    Map<String, Object> modifications = new HashMap<String, Object>();
+    modifications.put("variable1", "anotherValue1");
+    modifications.put("variable2", "anotherValue2");
+
+    List<String> deletions = new ArrayList<String>();
+    deletions.add("variable2");
+    deletions.add("variable3");
+    deletions.add("variable4");
+
+    ((TaskServiceImpl) taskService).updateVariablesLocal(currentTask.getId(), modifications, deletions);
+
+    assertEquals("anotherValue1", taskService.getVariable(currentTask.getId(), "variable1"));
+    assertNull(taskService.getVariable(currentTask.getId(), "variable2"));
+    assertNull(taskService.getVariable(currentTask.getId(), "variable3"));
+    assertEquals("value4", runtimeService.getVariable(processInstance.getId(), "variable4"));
+  }
+
+  public void testUpdateVariablesLocalForNonExistingTaskId() {
+    Map<String, Object> modifications = new HashMap<String, Object>();
+    modifications.put("variable1", "anotherValue1");
+    modifications.put("variable2", "anotherValue2");
+
+    List<String> deletions = new ArrayList<String>();
+    deletions.add("variable2");
+    deletions.add("variable3");
+    deletions.add("variable4");
+
+    try {
+      ((TaskServiceImpl) taskService).updateVariablesLocal("nonExistingId", modifications, deletions);
+      fail("expected process engine exception");
+    } catch (ProcessEngineException e) {
+    }
+  }
+
+  public void testUpdateVariablesLocaForNullTaskId() {
+    Map<String, Object> modifications = new HashMap<String, Object>();
+    modifications.put("variable1", "anotherValue1");
+    modifications.put("variable2", "anotherValue2");
+
+    List<String> deletions = new ArrayList<String>();
+    deletions.add("variable2");
+    deletions.add("variable3");
+    deletions.add("variable4");
+
+    try {
+      ((TaskServiceImpl) taskService).updateVariablesLocal(null, modifications, deletions);
+      fail("expected process engine exception");
+    } catch (ProcessEngineException e) {
+    }
+  }
+
 
 }

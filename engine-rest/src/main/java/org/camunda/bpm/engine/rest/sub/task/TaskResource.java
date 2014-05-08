@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.sub.task;
 
 import org.camunda.bpm.engine.rest.dto.task.*;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -88,6 +89,9 @@ public interface TaskResource {
 
   @Path("/attachment")
   TaskAttachmentResource getAttachmentResource();
+
+  @Path("/localVariables")
+  VariableResource getLocalVariables();
 
 }
 

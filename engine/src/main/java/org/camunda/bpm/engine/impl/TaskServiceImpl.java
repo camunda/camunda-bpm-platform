@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.impl.cmd.GetTaskCommentsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskEventsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskVariableCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskVariablesCmd;
+import org.camunda.bpm.engine.impl.cmd.PatchTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.RemoveTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.ResolveTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveAttachmentCmd;
@@ -238,6 +239,10 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
   public void setVariablesLocal(String executionId, Map<String, ? extends Object> variables) {
     commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, true));
+  }
+
+  public void updateVariablesLocal(String taskId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
+    commandExecutor.execute(new PatchTaskVariablesCmd(taskId, modifications, deletions, true));
   }
 
   public void removeVariable(String taskId, String variableName) {

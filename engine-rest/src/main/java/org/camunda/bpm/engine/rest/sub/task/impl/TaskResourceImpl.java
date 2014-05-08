@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.rest.dto.task.*;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskAttachmentResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskCommentResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
@@ -248,6 +249,11 @@ public class TaskResourceImpl implements TaskResource {
   @Override
   public TaskAttachmentResource getAttachmentResource() {
     return new TaskAttachmentResourceImpl(engine, taskId, rootResourcePath);
+  }
+
+  @Override
+  public VariableResource getLocalVariables() {
+    return new LocalTaskVariablesResource(engine, taskId);
   }
 
 }
