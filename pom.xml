@@ -115,7 +115,9 @@
         <module>javaee/ejb-client</module>
 
         <module>identity/identity-ldap</module>
-  
+
+        <module>webapps/camunda-webapp</module>
+
         <module>parent</module>
         <module>bom</module>
       </modules>
