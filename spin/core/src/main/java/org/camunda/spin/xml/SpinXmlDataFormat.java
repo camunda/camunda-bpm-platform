@@ -22,7 +22,7 @@ import org.camunda.spin.DataFormat;
   */
 public class SpinXmlDataFormat implements DataFormat<SpinXml> {
 
-  public static DataFormat<SpinXml> INSTANCE = new SpinXmlDataFormat();
+  public static final DataFormat<SpinXml> INSTANCE = new SpinXmlDataFormat();
 
   public Class<SpinXml> getWrapperType() {
     return SpinXml.class;

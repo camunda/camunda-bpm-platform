@@ -181,14 +181,7 @@ public abstract class BaseLogger {
    * @return the formatted template
    */
   protected String formatMessageTemplate(String id, String messageTemplate) {
-    StringBuilder msgBuilder = new StringBuilder(MSG_IDENTIFIER_MAX_SIZE + messageTemplate.length());
-    msgBuilder.append(projectCode);
-    msgBuilder.append("-");
-    msgBuilder.append(componentId);
-    msgBuilder.append(id);
-    msgBuilder.append(" ");
-    msgBuilder.append(messageTemplate);
-    return msgBuilder.toString();
+    return projectCode + "-" + componentId + id + " " + messageTemplate;
   }
 
   /**
@@ -200,7 +193,7 @@ public abstract class BaseLogger {
    *
    * @return the prepared exception message
    */
-  protected String prepareExceptionMessage(String id, String messageTemplate, Object... parameters) {
+  protected String exceptionMessage(String id, String messageTemplate, Object... parameters) {
     String formattedTemplate = formatMessageTemplate(id, messageTemplate);
     if(parameters == null || parameters.length == 0) {
       return formattedTemplate;

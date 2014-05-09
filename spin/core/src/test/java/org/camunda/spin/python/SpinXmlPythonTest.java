@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,26 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.json;
 
-import org.camunda.spin.DataFormat;
+package org.camunda.spin.python;
+
+import org.camunda.spin.test.ScriptEngine;
+import org.camunda.spin.xml.SpinXmlScriptTest;
 
 /**
- *
  * @author Sebastian Menski
- * @author Daniel Meyer
- *
  */
-public class SpinJsonDataFormat implements DataFormat<SpinJson> {
-
-  public static final DataFormat<SpinJson> INSTANCE = new SpinJsonDataFormat();
-
-  public Class<SpinJson> getWrapperType() {
-    return SpinJson.class;
-  }
-
-  public String getName() {
-    return "dataformat://json";
-  }
-
+@ScriptEngine("python")
+public class SpinXmlPythonTest extends SpinXmlScriptTest {
 }
