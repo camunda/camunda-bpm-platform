@@ -8,11 +8,11 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
 public class FoxDeleteProcessInstanceCmd implements Command<Void>, Serializable {
-  
+
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
   protected String deleteReason;
@@ -22,33 +22,33 @@ public class FoxDeleteProcessInstanceCmd implements Command<Void>, Serializable 
     this.deleteReason = deleteReason;
   }
 
-  public Void execute(CommandContext commandContext) { 
+  public Void execute(CommandContext commandContext) {
     if(processInstanceId == null) {
       throw new ProcessEngineException("processInstanceId is null");
     }
-    
+
     ExecutionEntity execution = commandContext
                                   .getExecutionManager()
                                   .findExecutionById(processInstanceId);
-    
+
     if(execution == null) {
       throw new ProcessEngineException("No process instance found for id '" + processInstanceId + "'");
     }
-    
+
     commandContext
       .getTaskManager()
       .deleteTasksByProcessInstanceId(processInstanceId, deleteReason, false);
 
-    for (InterpretableExecution currentExecution : this.collectExecutionToDelete(execution)) {
+    for (PvmExecutionImpl currentExecution : this.collectExecutionToDelete(execution)) {
       currentExecution.deleteCascade2(deleteReason);
     }
     return null;
   }
-  
+
   @SuppressWarnings("unchecked")
-  public List<InterpretableExecution> collectExecutionToDelete(InterpretableExecution execution) {
-    List<InterpretableExecution> result = new ArrayList<InterpretableExecution>();
-    for (InterpretableExecution currentExecution : (List<InterpretableExecution>) execution.getExecutions()) {
+  public List<PvmExecutionImpl> collectExecutionToDelete(PvmExecutionImpl execution) {
+    List<PvmExecutionImpl> result = new ArrayList<PvmExecutionImpl>();
+    for (PvmExecutionImpl currentExecution : (List<PvmExecutionImpl>) execution.getExecutions()) {
       result.addAll(this.collectExecutionToDelete(currentExecution));
     }
     if (execution.getSubProcessInstance() != null) {

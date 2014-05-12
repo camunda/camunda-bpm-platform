@@ -27,10 +27,10 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.delegate.ActivityBehaviorInvocation;
 import org.camunda.bpm.engine.impl.delegate.JavaDelegateInvocation;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 
 
 /**
@@ -54,7 +54,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
 
   @Override
   public void signal(final ActivityExecution execution, final String signalName, final Object signalData) throws Exception {
-    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication((InterpretableExecution) execution);
+    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
 
     if (!ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
 

@@ -15,7 +15,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ProcessElementImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -64,10 +63,6 @@ public class ObjectSerializableTest extends TestCase {
    execution.setTransitionBeingTaken(transitionImpl);
    execution.getProcessInstanceStartContext().setInitial(activityImpl);
    execution.setSuperExecution(new ExecutionEntity());
-
-   ProcessElementImpl processElementImpl = new ProcessElementImpl("test", processDefinitionImpl);
-   processElementImpl.setProperty("myProperty", "myPropertyValue");
-   execution.setEventSource(processElementImpl);
 
    execution.setActive(true);
    execution.setCanceled(false);

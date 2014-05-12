@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 
 /**
@@ -83,7 +83,7 @@ public class Context {
     }
   }
 
-  public static void setExecutionContext(InterpretableExecution execution) {
+  public static void setExecutionContext(ExecutionEntity execution) {
     getStack(executionContextStackThreadLocal).push(new ExecutionContext(execution));
   }
 

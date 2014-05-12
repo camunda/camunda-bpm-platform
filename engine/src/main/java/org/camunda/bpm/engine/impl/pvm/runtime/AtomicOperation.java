@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
+import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
+
+
 
 
 /**
@@ -19,32 +23,28 @@ package org.camunda.bpm.engine.impl.pvm.runtime;
  * @author Daniel Meyer
  * @author Thorben Lindhauer
  */
-public interface AtomicOperation {
+@Deprecated
+public interface AtomicOperation extends CoreAtomicOperation<PvmExecutionImpl> {
 
-  AtomicOperation PROCESS_START = new AtomicOperationProcessStart();
-  AtomicOperation PROCESS_START_INITIAL = new AtomicOperationProcessStartInitial();
-  AtomicOperation PROCESS_END = new AtomicOperationProcessEnd();
+  AtomicOperation PROCESS_START = PvmAtomicOperation.PROCESS_START;
+  AtomicOperation PROCESS_START_INITIAL = PvmAtomicOperation.PROCESS_START_INITIAL;
+  AtomicOperation PROCESS_END = PvmAtomicOperation.PROCESS_END;
 
-  AtomicOperation ACTIVITY_START = new AtomicOperationActivityStart();
-  AtomicOperation ACTIVITY_START_CONCURRENT = new AtomicOperationActivityStartConcurrent();
-  AtomicOperation ACTIVITY_START_CANCEL_SCOPE = new AtomicOperationActivityStartCancelScope();
-  AtomicOperation ACTIVITY_EXECUTE = new AtomicOperationActivityExecute();
-  AtomicOperation ACTIVITY_END = new AtomicOperationActivityEnd();
-  AtomicOperation FIRE_ACTIVITY_END = new AtomicOperationFireActivityEnd();
+  AtomicOperation ACTIVITY_START = PvmAtomicOperation.ACTIVITY_START;
+  AtomicOperation ACTIVITY_START_CONCURRENT = PvmAtomicOperation.ACTIVITY_START_CONCURRENT;
+  AtomicOperation ACTIVITY_START_CANCEL_SCOPE = PvmAtomicOperation.ACTIVITY_START_CANCEL_SCOPE;
+  AtomicOperation ACTIVITY_EXECUTE = PvmAtomicOperation.ACTIVITY_EXECUTE;
+  AtomicOperation ACTIVITY_END = PvmAtomicOperation.ACTIVITY_END;
+  AtomicOperation FIRE_ACTIVITY_END = PvmAtomicOperation.FIRE_ACTIVITY_END;
 
-  AtomicOperation TRANSITION_NOTIFY_LISTENER_END = new AtomicOperationTransitionNotifyListenerEnd();
-  AtomicOperation TRANSITION_DESTROY_SCOPE = new AtomicOperationTransitionDestroyScope();
-  AtomicOperation TRANSITION_NOTIFY_LISTENER_TAKE = new AtomicOperationTransitionNotifyListenerTake();
-  AtomicOperation TRANSITION_CREATE_SCOPE = new AtomicOperationTransitionCreateScope();
-  AtomicOperation TRANSITION_CANCEL_SCOPE = new AtomicOperationTransitionCancelScope();
-  AtomicOperation TRANSITION_NOTIFY_LISTENER_START = new AtomicOperationTransitionNotifyListenerStart();
+  AtomicOperation TRANSITION_NOTIFY_LISTENER_END = PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_END;
+  AtomicOperation TRANSITION_DESTROY_SCOPE = PvmAtomicOperation.TRANSITION_DESTROY_SCOPE;
+  AtomicOperation TRANSITION_NOTIFY_LISTENER_TAKE = PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE;
+  AtomicOperation TRANSITION_CREATE_SCOPE = PvmAtomicOperation.TRANSITION_CREATE_SCOPE;
+  AtomicOperation TRANSITION_CANCEL_SCOPE = PvmAtomicOperation.TRANSITION_CANCEL_SCOPE;
+  AtomicOperation TRANSITION_NOTIFY_LISTENER_START = PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_START;
 
-  AtomicOperation DELETE_CASCADE = new AtomicOperationDeleteCascade();
-  AtomicOperation DELETE_CASCADE_FIRE_ACTIVITY_END = new AtomicOperationDeleteCascadeFireActivityEnd();
+  AtomicOperation DELETE_CASCADE = PvmAtomicOperation.DELETE_CASCADE;
+  AtomicOperation DELETE_CASCADE_FIRE_ACTIVITY_END = PvmAtomicOperation.DELETE_CASCADE_FIRE_ACTIVITY_END;
 
-  void execute(InterpretableExecution execution);
-
-  boolean isAsync(InterpretableExecution execution);
-
-  String getCanonicalName();
 }

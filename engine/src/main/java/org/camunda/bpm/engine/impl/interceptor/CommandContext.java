@@ -27,8 +27,6 @@ import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
-
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
@@ -66,7 +64,7 @@ public class CommandContext {
     this.transactionContext = transactionContextFactory.openTransactionContext(this);
   }
 
-  public void performOperation(final AtomicOperation executionOperation, final InterpretableExecution execution) {
+  public void performOperation(final AtomicOperation executionOperation, final ExecutionEntity execution) {
 
     ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);
 
@@ -101,7 +99,7 @@ public class CommandContext {
 
   }
 
-  protected ProcessApplicationReference getTargetProcessApplication(InterpretableExecution execution) {
+  protected ProcessApplicationReference getTargetProcessApplication(ExecutionEntity execution) {
 
     return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
   }

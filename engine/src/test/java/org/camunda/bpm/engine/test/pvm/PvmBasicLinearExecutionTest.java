@@ -1,6 +1,4 @@
 package org.camunda.bpm.engine.test.pvm;
-import java.util.ArrayList;
-
 import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -10,6 +8,8 @@ import org.camunda.bpm.engine.test.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.pvm.activities.End;
 import org.camunda.bpm.engine.test.pvm.activities.WaitState;
 import org.camunda.bpm.engine.test.pvm.activities.While;
+
+import java.util.ArrayList;
 
 
 /* Licensed under the Apache License, Version 2.0 (the "License");
@@ -182,7 +182,7 @@ public class PvmBasicLinearExecutionTest extends PvmTestCase {
         .transition("loop")
       .endActivity()
       .createActivity("loop")
-        .behavior(new While("count", 0, 500))
+        .behavior(new While("count", 0, 10))
         .transition("one", "more")
         .transition("end", "done")
       .endActivity()

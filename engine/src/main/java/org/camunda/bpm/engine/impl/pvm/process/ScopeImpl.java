@@ -14,53 +14,41 @@
 package org.camunda.bpm.engine.impl.pvm.process;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.core.model.CoreActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
-public abstract class ScopeImpl extends ProcessElementImpl implements PvmScope {
+public abstract class ScopeImpl extends CoreActivity implements PvmScope {
 
   private static final long serialVersionUID = 1L;
 
   protected List<ActivityImpl> activities = new ArrayList<ActivityImpl>();
   protected Map<String, ActivityImpl> namedActivities = new HashMap<String, ActivityImpl>();
-  protected Map<String, List<ExecutionListener>> executionListeners = new HashMap<String, List<ExecutionListener>>();
+
+  protected ProcessDefinitionImpl processDefinition;
 
   public ScopeImpl(String id, ProcessDefinitionImpl processDefinition) {
-    super(id, processDefinition);
+    super(id);
+    this.processDefinition = processDefinition;
   }
 
-  /** searches for the activity recursively */
   public ActivityImpl findActivity(String activityId) {
-    ActivityImpl localActivity = getChildActivity(activityId);
-    if (localActivity!=null) {
-      return localActivity;
-    }
-    for (ActivityImpl activity: activities) {
-      ActivityImpl nestedActivity = activity.findActivity(activityId);
-      if (nestedActivity!=null) {
-        return nestedActivity;
-      }
-    }
-    return null;
+    return (ActivityImpl) super.findActivity(activityId);
   }
 
   /** searches for the activity locally */
   public ActivityImpl getChildActivity(String activityId) {
     return namedActivities.get(activityId);
-  }
-
-  public ActivityImpl createActivity() {
-    return createActivity(null);
   }
 
   public ActivityImpl createActivity(String activityId) {
@@ -91,39 +79,35 @@ public abstract class ScopeImpl extends ProcessElementImpl implements PvmScope {
   // event listeners //////////////////////////////////////////////////////////
 
   @SuppressWarnings("unchecked")
+  @Deprecated
   public List<ExecutionListener> getExecutionListeners(String eventName) {
-    List<ExecutionListener> executionListenerList = getExecutionListeners().get(eventName);
-    if (executionListenerList!=null) {
-      return executionListenerList;
-    }
-    return Collections.EMPTY_LIST;
+    return (List) super.getListeners(eventName);
   }
 
+  @Deprecated
   public void addExecutionListener(String eventName, ExecutionListener executionListener) {
-    addExecutionListener(eventName, executionListener, -1);
+    super.addListener(eventName, executionListener);
   }
 
+  @Deprecated
   public void addExecutionListener(String eventName, ExecutionListener executionListener, int index) {
-    List<ExecutionListener> listeners = executionListeners.get(eventName);
-    if (listeners==null) {
-      listeners = new ArrayList<ExecutionListener>();
-      executionListeners.put(eventName, listeners);
-    }
-    if (index<0) {
-      listeners.add(executionListener);
-    } else {
-      listeners.add(index, executionListener);
-    }
+    super.addListener(eventName, executionListener, index);
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @Deprecated
   public Map<String, List<ExecutionListener>> getExecutionListeners() {
-    return executionListeners;
+    return (Map) super.getListeners();
   }
 
   // getters and setters //////////////////////////////////////////////////////
 
   public List<ActivityImpl> getActivities() {
     return activities;
+  }
+
+  public ProcessDefinitionImpl getProcessDefinition() {
+    return processDefinition;
   }
 
   public abstract ScopeImpl getParentScope();

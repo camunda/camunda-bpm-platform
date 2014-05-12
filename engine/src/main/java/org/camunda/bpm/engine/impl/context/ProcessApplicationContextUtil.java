@@ -6,13 +6,13 @@ import java.util.logging.Logger;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 public class ProcessApplicationContextUtil {
 
   private static final Logger LOGG = Logger.getLogger(ProcessApplicationContextUtil.class.getName());
 
-  public static ProcessApplicationReference getTargetProcessApplication(InterpretableExecution execution) {
+  public static ProcessApplicationReference getTargetProcessApplication(ExecutionEntity execution) {
     if (execution == null) {
       return null;
     }
@@ -32,7 +32,7 @@ public class ProcessApplicationContextUtil {
     return processApplicationForDeployment;
   }
 
-  private static void loggContextSwitchDetails(InterpretableExecution execution, ProcessApplicationManager processApplicationManager) {
+  private static void loggContextSwitchDetails(ExecutionEntity execution, ProcessApplicationManager processApplicationManager) {
 
     final ExecutionContext executionContext = Context.getExecutionContext();
     // only log for first atomic op:

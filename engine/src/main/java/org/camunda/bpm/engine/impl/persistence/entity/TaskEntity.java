@@ -19,6 +19,8 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
@@ -28,6 +30,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContextCloseListener;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
@@ -45,13 +48,14 @@ import java.util.*;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask, Serializable, PersistentObject, HasRevision, CommandContextCloseListener {
+public class TaskEntity extends CoreVariableScope implements Task, DelegateTask, Serializable, PersistentObject, HasRevision, CommandContextCloseListener {
 
   public static final String DELETE_REASON_COMPLETED = "completed";
   public static final String DELETE_REASON_DELETED = "deleted";
 
   private static final long serialVersionUID = 1L;
 
+  protected String id;
   protected int revision;
 
   protected String owner;
@@ -87,6 +91,8 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
 
   protected String eventName;
 
+  protected AbstractVariableStore variableStore;
+
   /**
    * contains all changed properties of this entity
    */
@@ -105,10 +111,12 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   public static final String PRIORITY = "priority";
 
   public TaskEntity() {
+    this(null);
   }
 
   public TaskEntity(String taskId) {
     this.id = taskId;
+    this.variableStore = createVariableStore();
   }
 
   /** creates and initializes a new persistent task. */
@@ -289,22 +297,27 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
 
   // variables ////////////////////////////////////////////////////////////////
 
-  @Override
-  protected VariableScopeImpl getParentVariableScope() {
+  protected AbstractVariableStore createVariableStore() {
+    return new TaskEntityVariableStore(this);
+  }
+
+  protected CoreVariableStore getVariableStore() {
+    return variableStore;
+  }
+
+  protected CoreVariableScope getParentVariableScope() {
     if (getExecution()!=null) {
       return execution;
     }
     return null;
   }
 
-  @Override
   protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
     variableInstance.setTaskId(id);
     variableInstance.setExecutionId(executionId);
     variableInstance.setProcessInstanceId(processInstanceId);
   }
 
-  @Override
   protected List<VariableInstanceEntity> loadVariableInstances() {
     return Context
       .getCommandContext()
@@ -630,6 +643,14 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
 
   // getters and setters //////////////////////////////////////////////////////
 
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
   public int getRevision() {
     return revision;
   }
@@ -759,8 +780,8 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     return parentTaskId;
   }
   public Map<String, VariableInstanceEntity> getVariableInstances() {
-    ensureVariableInstancesInitialized();
-    return variableInstances;
+    variableStore.ensureVariableInstancesInitialized();
+    return variableStore.getVariableInstances();
   }
   public int getSuspensionState() {
     return suspensionState;

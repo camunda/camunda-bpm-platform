@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.history.event;
 
-import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceState;
+import org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState;
 
 
 /**

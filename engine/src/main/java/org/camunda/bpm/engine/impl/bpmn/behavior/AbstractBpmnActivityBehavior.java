@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,19 +20,18 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 
 
 /**
- * Denotes an 'activity' in the sense of BPMN 2.0: 
- * a parent class for all tasks, subprocess and callActivity. 
- * 
+ * Denotes an 'activity' in the sense of BPMN 2.0:
+ * a parent class for all tasks, subprocess and callActivity.
+ *
  * @author Joram Barrez
  */
 public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
-  
+
   protected MultiInstanceActivityBehavior multiInstanceActivityBehavior;
-  
+
   /**
    * Subclasses that call leave() will first pass through this method, before
    * the regular {@link FlowNodeActivityBehavior#leave(ActivityExecution)} is
@@ -49,27 +48,27 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       multiInstanceActivityBehavior.leave(execution);
     }
   }
-  
+
   protected boolean hasCompensationHandler(ActivityExecution execution) {
     return execution.getActivity().getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID) != null;
   }
 
   protected void createCompensateEventSubscription(ActivityExecution execution) {
     String compensationHandlerId = (String) execution.getActivity().getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID);
-    
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;    
+
+    ExecutionEntity executionEntity = (ExecutionEntity) execution;
     ActivityImpl compensationHandlder = executionEntity.getProcessDefinition().findActivity(compensationHandlerId);
-    PvmScope scopeActivitiy = compensationHandlder.getParent(); 
-    ExecutionEntity scopeExecution = ScopeUtil.findScopeExecutionForScope(executionEntity, scopeActivitiy);      
+    PvmScope scopeActivitiy = compensationHandlder.getParent();
+    ExecutionEntity scopeExecution = ScopeUtil.findScopeExecutionForScope(executionEntity, scopeActivitiy);
 
     CompensateEventSubscriptionEntity compensateEventSubscriptionEntity = CompensateEventSubscriptionEntity.createAndInsert(scopeExecution);
-    compensateEventSubscriptionEntity.setActivity(compensationHandlder);        
+    compensateEventSubscriptionEntity.setActivity(compensationHandlder);
   }
 
   protected boolean hasLoopCharacteristics() {
     return hasMultiInstanceCharacteristics();
   }
-  
+
   protected boolean hasMultiInstanceCharacteristics() {
     return multiInstanceActivityBehavior != null;
   }
@@ -77,11 +76,11 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   public MultiInstanceActivityBehavior getMultiInstanceActivityBehavior() {
     return multiInstanceActivityBehavior;
   }
-  
+
   public void setMultiInstanceActivityBehavior(MultiInstanceActivityBehavior multiInstanceActivityBehavior) {
     this.multiInstanceActivityBehavior = multiInstanceActivityBehavior;
   }
-  
+
   @Override
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
     if("compensationDone".equals(signalName)) {
@@ -92,20 +91,20 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   }
 
   protected void signalCompensationDone(ActivityExecution execution, Object signalData) {
-    // default behavior is to join compensating executions and propagate the signal if all executions 
+    // default behavior is to join compensating executions and propagate the signal if all executions
     // have compensated
-    
-    // join compensating executions    
+
+    // join compensating executions
     if(execution.getExecutions().isEmpty()) {
       if(execution.getParent() != null) {
         ActivityExecution parent = execution.getParent();
-        ((InterpretableExecution)execution).remove();
-        ((InterpretableExecution)parent).signal("compensationDone", signalData);
-      }      
-    } else {      
-      ((ExecutionEntity)execution).forceUpdate();  
+        execution.remove();
+        parent.signal("compensationDone", signalData);
+      }
+    } else {
+      ((ExecutionEntity)execution).forceUpdate();
     }
-    
+
   }
 
 }

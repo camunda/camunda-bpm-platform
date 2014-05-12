@@ -13,9 +13,6 @@
 
 package org.camunda.bpm.engine.test.pvm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -25,6 +22,9 @@ import org.camunda.bpm.engine.test.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.pvm.activities.End;
 import org.camunda.bpm.engine.test.pvm.activities.ParallelGateway;
 import org.camunda.bpm.engine.test.pvm.activities.WaitState;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -456,7 +456,6 @@ public class PvmScopesAndConcurrencyTest extends PvmTestCase {
     expectedEvents.add("start on Activity(end)");
     expectedEvents.add("end on Activity(end)");
     expectedEvents.add("end on ProcessDefinition(scopes and concurrency)");
-    expectedEvents.add("end on Activity(join)");
 
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
     eventCollector.events.clear();

@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
@@ -26,7 +27,7 @@ import java.util.Map;
 /**
  * @author Tom Baeyens
  */
-public class VariableInstanceEntity implements VariableInstance, ValueFields, PersistentObject, HasRevision, Serializable {
+public class VariableInstanceEntity implements CoreVariableInstance, VariableInstance, ValueFields, PersistentObject, HasRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -218,6 +219,10 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Pe
   public void setValue(Object value) {
     type.setValue(value, this);
     cachedValue = value;
+  }
+
+  public boolean isAbleToStore(Object value) {
+    return type.isAbleToStore(value);
   }
 
   // getters and setters //////////////////////////////////////////////////////

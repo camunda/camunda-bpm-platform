@@ -168,7 +168,7 @@ public interface ActivityExecution extends DelegateExecution {
    * Takes the given outgoing transitions, and potentially reusing
    * the given list of executions that were previously joined.
    */
-  void takeAll(List<PvmTransition> outgoingTransitions, List<ActivityExecution> joinedExecutions);
+  void takeAll(List<PvmTransition> outgoingTransitions, List<? extends ActivityExecution> joinedExecutions);
 
   /**
    * Executes the {@link ActivityBehavior} associated with the given activity.
@@ -183,5 +183,13 @@ public interface ActivityExecution extends DelegateExecution {
 
   /** An activity which is to be started next. */
   PvmActivity getNextActivity();
+
+  void remove();
+
+  void signal(String string, Object signalData);
+
+  void cancelScope(String string);
+
+  void setActivity(PvmActivity cancelBoundaryEvent);
 
 }
