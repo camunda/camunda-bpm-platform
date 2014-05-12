@@ -240,7 +240,14 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     // THEN
     // the variable is defined
     Object variable = runtimeService.getVariable(pi.getId(), "foo");
-    assertEquals(3.0, variable);
+
+    if (variable instanceof Double) {
+      // jdk 6/7 - rhino returns Double 3.0 for 1+2
+      assertEquals(3.0, variable);
+    } else if (variable instanceof Integer) {
+      // jdk8 - nashorn returns Integer 3 for 1+2
+      assertEquals(3, variable);
+    }
 
   }
 
