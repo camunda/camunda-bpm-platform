@@ -17,7 +17,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.spin.DataFormats.xml;
@@ -30,7 +30,7 @@ import static org.camunda.spin.Spin.XML;
 public class SpinXmlTest {
 
   public final static String TEST_STRING = "<customers><customer id=\"customer1\" /><customer id=\"customer2\" /></customers>";
-  public final static InputStream TEST_INPUT_STREAM = new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8));
+  public final static InputStream TEST_INPUT_STREAM = new ByteArrayInputStream(TEST_STRING.getBytes(Charset.forName("UTF-8")));
 
   @Test
   public void shouldWrapXmlString() {
