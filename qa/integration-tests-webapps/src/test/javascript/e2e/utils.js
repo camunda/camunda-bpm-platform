@@ -80,7 +80,7 @@ utils.loginAndGoTo = function(url, username, password) {
   password = password || 'jonny1';
 
   browser.get(url).then(function() {
-    element(by.binding('authentication.user.name'))
+    element(by.css('[ng-controller="AuthenticationController"] li[if-logged-in] a.dropdown-toggle .icon-user'))
       .isPresent()
       .then(function(yepNope) {
 
