@@ -68,6 +68,17 @@ utils.selectActivityInDiagram = function(activityName, maximize) {
 };
 
 /**
+  Sets the width of the cockpit sidebar
+  @param {number} width of the sidebar
+ */
+utils.setSidebarWidth = function(width) {
+  width = width || 310;
+  protractor.getInstance().executeScript('localStorage.set("ctnCollapsableParent:size:sidebar", "'+ width +'")').then(function() {
+    console.info('sidebar width set to '+ width, arguments);
+  });
+};
+
+/**
   Ensure proper session and go to a given URL
   @memberof cam.test.e2e.utils
 
