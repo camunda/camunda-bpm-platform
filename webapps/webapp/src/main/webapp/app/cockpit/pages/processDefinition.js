@@ -185,8 +185,7 @@ ngDefine('cockpit.pages.processDefinition', [
       if (!parentId) {
         return null;
       } else {
-        // return ProcessDefinitionResource.get({ id : parentId }).$promise;
-        return ProcessDefinitionResource.get({ id : parentId }).$promise.promise;
+        return ProcessDefinitionResource.get({ id : parentId }).$promise;
       }
     }]);
 
