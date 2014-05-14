@@ -45,17 +45,20 @@ describe('cockpit dashboard', function() {
 
 
 // ---- start page ----
-  xdescribe('start page', function() {
+  describe('start page', function() {
+    //set preconditions
+    browser.get('/camunda');
+    browser.driver.manage().window().maximize();
+
     it('should validate start page', function() {
-      //TODO
+        var appName = element(by.css('.brand'));
+        expect(appName.getText()).toEqual('camunda Cockpit');
     });
   });
 
 // ---- user login ----
   describe('user login', function() {
     it('should validate user credentials', function() {
-      //set preconditions
-      browser.driver.manage().window().maximize();
 
       utils.login('jonny1', 'jonny3', false);
       utils.login('jonny1', 'jonny1', true);
@@ -92,17 +95,16 @@ describe('cockpit dashboard', function() {
 
 // ---- process defintions view
   describe('process defintions view', function() {
-    it('it should select process in Deployed Process (List)', function() {
-      var items = element(by.repeater('statistic in statistics').row(4).column('definition.name'));
+    it('should select process in Deployed Process (List)', function() {
+      var processName = "Cornercases Process";
+      var items = element(by.repeater('statistic in statistics').row(5).column('definition.name'));    
 
-      expect(items.getText()).toEqual('Cornercases Process');
-
+      expect(items.getText()).toEqual(processName);
       items.click();
 
+      var processDefintionName = element(by.binding('processDefinition.key'));
 
-      var processDefintionName = element(by.binding('processDefinition.name'));
-
-      expect(processDefintionName.getText()).toEqual('Cornercases Process');
+      expect(processDefintionName.getText()).toEqual('PROCESS DEFINITION\n' + processName);
     });
 
     it('should validate action buttons', function() {
@@ -110,18 +112,42 @@ describe('cockpit dashboard', function() {
 
       expect(items.count()).toBe(1);
     });
+    
+    it('should select task in diagram', function() {
+      utils.selectActivityInDiagram('UserTask_2');
 
-    it('it should select process instance in Process Instances Table', function() {
-      var instance = element(by.repeater('processInstance in processInstances').row(1).column('id'));
-      var instanceId = instance.getAttribute('title');   //instance.getText();
+      var filterText = element(by.binding('activity.name'));
+      expect(filterText.getText()).toEqual('Inner Task');
+    });
 
-      instance.click();
-      expect(element(by.binding('processInstance.id')).getText()).toBe(instanceId);
+    it('should select process instance in Process Instances Table and check instance ID', function() {
+      var tableInstance = element(by.repeater('processInstance in processInstances').row(1).column('id'));
+      var tableInstanceId = tableInstance.getAttribute('title');   //instance.getText();
+      
+      tableInstance.click();
+
+      var tableInstanceIdString;
+      var instanceViewInstanceIdString;
+
+      tableInstanceId.then(function(instanceIDString) {
+        tableInstanceIdString = instanceIDString;
+      });
+      element(by.binding('processInstance.id')).getText().then(function(instanceViewInstanceId) {
+        instanceViewInstanceId = instanceViewInstanceId.replace('<', '');
+        instanceViewInstanceId = instanceViewInstanceId.replace('>', '');
+        instanceViewInstanceIdString = instanceViewInstanceId;
+      }).then(function() {
+        expect(instanceViewInstanceIdString).toBe(tableInstanceIdString);
+      });
     });
   });
 
 // ---- instance detail view
   describe('instance detail view', function() {
+    it('should zoom diagram view', function() {
+      //TODO zoom out of diagram to increase accessibility of diagram elements
+    });
+
     it('should select activity in diagram', function() {
       utils.selectActivityInDiagram('UserTask_2');
       expect(element(by.css('.process-diagram *[data-activity-id="UserTask_2"]'))
@@ -137,7 +163,7 @@ describe('cockpit dashboard', function() {
       expect(tabContent.getText()).toEqual('Inner Task');
     });
 
-    it('should dispaly variables of selected activity only', function() {
+    it('should display variables of selected activity only', function() {
       element(by.css('view[provider=selectedTab]'))
             .findElement(by.repeater('userTask in userTasks').row(0).column('name')).click();
 
@@ -180,25 +206,6 @@ describe('cockpit dashboard', function() {
     });
   });
 
-// ---- history view ----
-  describe('history view', function() {
-    it('should switch to full view', function() {
-      var items = element.all(by.repeater('tabProvider in processInstanceActions'));
-
-      expect(items.count()).toBe(4);
-      fullView();
-      expect(items.count()).toBe(0);
-    });
-
-    it('should switch to live view', function() {
-      var items = element.all(by.repeater('tabProvider in processInstanceActions'));
-
-      expect(items.count()).toBe(0);
-      liveView();
-      expect(items.count()).toBe(4);
-    });
-  });
-
   // ---- instance tree view ----
   describe('instance tree view', function() {
     it('should validate activity instance tree filter - sidebar', function() {
@@ -218,7 +225,7 @@ describe('cockpit dashboard', function() {
       expect(filterSidebar.findElement(by.model('name')).getText()).not.toBe('some task');
     });
 
-    it('should validate activity instance tree filter - filter activities', function() {
+    xit('should validate activity instance tree filter - filter activities', function() {
       var filterSidebar = element(by.css('.filters'));
       var filterResult = filterSidebar.findElement(by.css('.filter'));
 
@@ -235,7 +242,7 @@ describe('cockpit dashboard', function() {
     });
   });
 
-  describe('filtering and selection', function() {
+  xdescribe('filtering and selection', function() {
     it('goes on a corner cases process instance', function() {
       var url = '/camunda/app/cockpit/default/#/dashboard';
 
