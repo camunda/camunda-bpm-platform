@@ -2,7 +2,7 @@
 define([
   './email',
   './engineSelect',
-  './help',
+  //'./help',
   './inPlaceTextField',
   // './paginator',
   './password',
