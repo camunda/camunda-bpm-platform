@@ -84,7 +84,6 @@
     'domReady':              'assets/vendor/requirejs-domready/index',
     'jquery-mousewheel':     'assets/vendor/jquery-mousewheel/index',
     'jquery-overscroll':     'assets/vendor/jquery-overscroll-fixed/index',
-    'bootstrap-slider':      'assets/vendor/bootstrap-slider/bootstrap-slider',
 
     'jquery':                'assets/vendor/jquery/dist/jquery',
     'bootstrap':             'assets/vendor/bootstrap/dist/js/bootstrap',
@@ -96,14 +95,6 @@
     'angular-ui':            'assets/vendor/angular-ui/build/angular-ui',
     'angular-bootstrap':     'assets/vendor/angular-bootstrap/ui-bootstrap-tpls',
     'jquery-ui':             'assets/vendor/jquery.ui',
-
-    // 'bootstrap':             'assets/vendor/bootstrap/js/bootstrap',
-    // 'jquery':                'assets/vendor/jquery/index',
-    // 'jquery-ui':             'assets/vendor/jquery-ui/index',
-    // 'angular':               'assets/vendor/angular/index',
-    // 'angular-resource':      'assets/vendor/angular-resource/index',
-    // 'angular-sanitize':      'assets/vendor/angular-sanitize/index',
-    // 'angular-ui':            'assets/vendor/angular-ui/index',
 
     'angular-data-depend':   'assets/vendor/angular-data-depend/src/dataDepend'
   };
@@ -118,7 +109,6 @@
     'jquery-overscroll' :               ['jquery'],
     'jquery-ui-core' :                  ['jquery'],
     'bootstrap' :                       ['jquery'],
-    'bootstrap-slider' :                ['jquery'],
     'angular' :                         {
                                           deps: ['jquery'],
                                           exports: 'angular'
