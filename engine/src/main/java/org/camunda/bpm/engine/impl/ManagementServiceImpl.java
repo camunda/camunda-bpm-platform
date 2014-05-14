@@ -111,6 +111,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new SetPropertyCmd(name, value));
   }
 
+  public void deleteProperty(String name) {
+    commandExecutor.execute(new DeletePropertyCmd(name));
+  }
+
   public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
     return commandExecutor.execute(new Command<String>(){
       public String execute(CommandContext commandContext) {

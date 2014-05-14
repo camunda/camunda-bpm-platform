@@ -540,6 +540,13 @@ public interface ManagementService {
    */
   void setProperty(String name, String value);
 
+  /**
+   * Deletes a property by name. If the property does not exist, the request is ignored.
+   *
+   * @param name the name of the property to delete
+   */
+  void deleteProperty(String name);
+
   /** programmatic schema update on a given connection returning feedback about what happened */
   String databaseSchemaUpgrade(Connection connection, String catalog, String schema);
 
