@@ -18,7 +18,6 @@
     "angular-data-depend": "camunda/angular-data-depend",
     "better-dom": "1.6.6",
     "better-placeholder-polyfill": "1.1.1",
-    "bootstrap-slider": "*",
     "camunda-bpmn.js": "camunda/camunda-bpmn.js",
     "dojo": "./src/main/webapp/assets/local/dojo",
     "jquery-mousewheel": "https://raw.github.com/brandonaaron/jquery-mousewheel/09bb82c73c5650812e36dfd27d605d64d3ed32b8/jquery.mousewheel.js",
