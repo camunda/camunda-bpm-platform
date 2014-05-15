@@ -31,7 +31,7 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -44,7 +44,7 @@
     </dependency>
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy</artifactId>
+      <artifactId>groovy-all</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -57,7 +57,7 @@
       <artifactId>geronimo-jta_1.1_spec</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
@@ -87,7 +87,7 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-    </dependency> 
+    </dependency>
 
     <dependency>
       <groupId>org.jboss.spec</groupId>
@@ -95,13 +95,13 @@
       <type>pom</type>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
@@ -113,38 +113,38 @@
       <artifactId>catalina</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.jboss</groupId>
       <artifactId>jboss-vfs</artifactId>
       <version>3.1.0.Final</version>
-      <scope>provided</scope>    
+      <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm.model</groupId>
       <artifactId>camunda-bpmn-model</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.python</groupId>
       <artifactId>jython</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby-complete</artifactId>
       <scope>provided</scope>
     </dependency>
-            
-            
+
+
   </dependencies>
-  
+
   <properties>
       <history.level>full</history.level>
       <mail.server.port>5025</mail.server.port>
-  
+
       <camunda.artifact>
         org.camunda.bpm
       </camunda.artifact>
@@ -187,8 +187,8 @@
         </includes>
       </testResource>
     </testResources>
-        
-    <plugins>     
+
+    <plugins>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
@@ -265,7 +265,7 @@
       </plugins>
     </pluginManagement>
   </build>
-  
+
   <profiles>
 
     <profile>
@@ -274,7 +274,7 @@
         <skipTests>true</skipTests>
       </properties>
     </profile>
-    
+
     <profile>
       <id>create-test-jar</id>
       <build>
@@ -289,7 +289,7 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>         
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -324,15 +324,15 @@
         </plugins>
       </build>
     </profile>
-    
+
     <!--  database qa profile -->
     <profile>
       <id>database</id>
-      
+
       <properties>
         <db.properties.file>${user.home}/.camunda/jdbc/engine.${database}.properties</db.properties.file>
       </properties>
-      
+
       <activation>
         <property>
           <name>database</name>
@@ -355,12 +355,12 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>                                     
+                  <tasks>
                     <echo message="updating configuration to db ${database}" />
                     <copy file="target/test-classes/camunda.cfg.db.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true">
                       <filterset filtersfile="${db.properties.file}" />
                     </copy>
-                    
+
                     <echo message="dropping schema in ${database}" />
                     <java classname="org.camunda.bpm.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
                   </tasks>
@@ -546,7 +546,7 @@
         </dependency>
       </dependencies>
     </profile>
-  
+
   <profile>
       <id>oracle10g</id>
       <activation>
@@ -571,8 +571,8 @@
               <trimStackTrace>false</trimStackTrace>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
               <excludes>
-                <exclude>**/ManagementServiceTest.java</exclude>    
-                                
+                <exclude>**/ManagementServiceTest.java</exclude>
+
                 <exclude>**/*TestCase.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
               </excludes>
@@ -581,7 +581,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <profile>
       <id>db2</id>
       <activation>
@@ -649,7 +649,7 @@
         </dependency>
        </dependencies>
     </profile>
-    
+
     <profile>
       <id>postgresql</id>
         <activation>
