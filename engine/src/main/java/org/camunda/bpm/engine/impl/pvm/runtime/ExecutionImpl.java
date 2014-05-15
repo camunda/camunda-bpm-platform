@@ -186,7 +186,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   // process instance /////////////////////////////////////////////////////////
 
   public void start(String businessKey, Map<String, Object> variables) {
-    if (isProcessInstance()) {
+    if (isProcessInstanceExecution()) {
       if (processInstanceStartContext == null) {
         processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
       }
@@ -240,7 +240,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   // toString /////////////////////////////////////////////////////////////////
 
   public String toString() {
-    if (isProcessInstance()) {
+    if (isProcessInstanceExecution()) {
       return "ProcessInstance["+getToStringIdentity()+"]";
     } else {
       return (isEventScope? "EventScope":"")+(isConcurrent? "Concurrent" : "")+(isScope() ? "Scope" : "")+"Execution["+getToStringIdentity()+"]";

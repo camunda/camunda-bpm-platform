@@ -52,7 +52,7 @@ public class PvmAtomicOperationActivityEnd extends PvmAtomicOperationActivityIns
       execution.setActivity(parentActivity);
       execution.performOperation(ACTIVITY_END);
 
-    } else if (execution.isProcessInstance()) {
+    } else if (execution.isProcessInstanceExecution()) {
       execution.performOperation(PROCESS_END);
 
     } else if (execution.isScope()) {

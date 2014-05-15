@@ -336,7 +336,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
    public void startWithFormProperties(Map<String, Object> properties) {
-     if(isProcessInstance()) {
+     if(isProcessInstanceExecution()) {
        ActivityImpl initial = processDefinition.getInitial();
        if(processInstanceStartContext != null) {
          initial = processInstanceStartContext.getInitial();
@@ -559,7 +559,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     }
   }
 
-  public boolean isProcessInstance() {
+  public boolean isProcessInstanceExecution() {
     return parentId == null;
   }
 
@@ -940,7 +940,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     for (ExecutionEntity execution : executions) {
       execution.executions = new ArrayList<ExecutionEntity>();
       executionMap.put(execution.getId(), execution);
-      if(execution.isProcessInstance()) {
+      if(execution.isProcessInstanceExecution()) {
         processInstance = execution;
       }
     }
@@ -948,7 +948,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     for (ExecutionEntity execution : executions) {
       String parentId = execution.getParentId();
       ExecutionEntity parent = executionMap.get(parentId);
-      if(!execution.isProcessInstance()) {
+      if(!execution.isProcessInstanceExecution()) {
         execution.processInstance = processInstance;
         execution.parent = parent;
         parent.executions.add(execution);
@@ -1004,7 +1004,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   // toString /////////////////////////////////////////////////////////////////
 
   public String toString() {
-    if (isProcessInstance()) {
+    if (isProcessInstanceExecution()) {
       return "ProcessInstance["+getToStringIdentity()+"]";
     } else {
       return (isConcurrent? "Concurrent" : "")+(isScope ? "Scope" : "")+"Execution["+getToStringIdentity()+"]";
@@ -1244,7 +1244,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
   public ProcessInstanceStartContext getProcessInstanceStartContext() {
-    if(isProcessInstance()) {
+    if(isProcessInstanceExecution()) {
       if(processInstanceStartContext == null) {
         processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
       }

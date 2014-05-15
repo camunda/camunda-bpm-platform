@@ -130,7 +130,7 @@ public interface ActivityExecution extends DelegateExecution {
   /**
    * returns whether this execution is a process instance or not.
    */
-  boolean isProcessInstance();
+  boolean isProcessInstanceExecution();
 
   /**
    * Inactivates this execution.

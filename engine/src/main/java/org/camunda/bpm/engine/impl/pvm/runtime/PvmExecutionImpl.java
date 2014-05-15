@@ -430,7 +430,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   protected boolean hasConcurrentSiblings(PvmExecutionImpl concurrentRoot) {
-    if(concurrentRoot.isProcessInstance()) {
+    if(concurrentRoot.isProcessInstanceExecution()) {
       return false;
     } else {
       List<? extends PvmExecutionImpl> executions = concurrentRoot.getParent().getExecutions();
@@ -595,7 +595,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public String getParentActivityInstanceId() {
-    if(isProcessInstance()) {
+    if(isProcessInstanceExecution()) {
       return getId();
 
     } else {
@@ -655,7 +655,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   protected ScopeImpl getScopeActivity() {
     ScopeImpl scope = null;
-    if (isProcessInstance()) {
+    if (isProcessInstanceExecution()) {
       scope = getProcessDefinition();
     } else {
       scope = getActivity();
@@ -674,7 +674,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   // toString /////////////////////////////////////////////////////////////////
 
   public String toString() {
-    if (isProcessInstance()) {
+    if (isProcessInstanceExecution()) {
       return "ProcessInstance["+getToStringIdentity()+"]";
     } else {
       return (isConcurrent? "Concurrent" : "")+(isScope ? "Scope" : "")+"Execution["+getToStringIdentity()+"]";
@@ -798,7 +798,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return nextActivity;
   }
 
-  public boolean isProcessInstance() {
+  public boolean isProcessInstanceExecution() {
     return getParent() == null;
   }
 

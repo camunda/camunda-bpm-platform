@@ -66,7 +66,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     // find process instance && index executions by parentActivityInstanceId
     Map<String, List<ExecutionEntity>> executionsByParentActIds = new HashMap<String, List<ExecutionEntity>>();
     for (ExecutionEntity executionEntity : executionList) {
-      if(executionEntity.isProcessInstance()) {
+      if(executionEntity.isProcessInstanceExecution()) {
         processInstance = executionEntity;
       }
       String parentActivityInstanceId = executionEntity.getParentActivityInstanceId();
