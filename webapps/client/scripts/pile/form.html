@@ -1,0 +1,76 @@
+<form class="form-horizontal" role="form">
+  <div class="row">
+    <div class="col-xs-8">
+      <div class="form-group">
+        <label for="form-{{ elUID }}-name" class="col-sm-{{ labelsWidth }} control-label">Name</label>
+        <div class="col-sm-{{ fieldsWidth }}">
+          <input class="form-control"
+                 id="form-{{ elUID }}-name"
+                 type="text"
+                 required
+                 value="{{ pile.name }}"
+                 placeholder="Pile name" />
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-4">
+      <div class="form-group">
+        <label for="form-{{ elUID }}-color" class="col-sm-{{ labelsWidth }} control-label">Color</label>
+        <div class="col-sm-{{ fieldsWidth }}">
+          <input class="form-control minicolors"
+                 id="form-{{ elUID }}-color"
+                 type="text"
+                 value="{{ pile.color }}"
+                 data-control="wheel" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label for="form-{{ elUID }}-description" class="col-sm-2 control-label">Description</label>
+    <div class="col-sm-10">
+      <input class="form-control"
+             id="form-{{ elUID }}-description"
+             type="text"
+             value="{{ pile.description }}"
+             placeholder="Description" />
+    </div>
+  </div>
+
+
+
+  <div class="form-group filter-add">
+    <div class="col-sm-12 align-right">
+      <a ng-click="addFilter()" href="#">Add filter <span class="glyphicon glyphicon-plus-sign"></span></a>
+    </div>
+  </div>
+
+  <fieldset ng-repeat="(delta, filter) in pile.filters" class="pile-filter">
+    <div class="form-group">
+      <div class="col-xs-4">
+        <select class="form-control" id="form-{{ elUID }}-field-{{ delta }}-key">
+          <option value="keyName">Key name</option>
+        </select>
+      </div>
+
+      <div class="col-xs-4">
+        <select class="form-control" id="form-{{ elUID }}-field-{{ delta }}-operator">
+          <option value="keyName">Operator</option>
+        </select>
+      </div>
+
+      <div class="col-xs-4">
+        <input class="form-control" id="form-{{ elUID }}-field-{{ delta }}-val" value="{{ filter.value }}" type="text" />
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="form-group form-actions">
+    <div class="col-sm-offset-{{ labelsWidth }} col-sm-{{ fieldsWidth }}">
+      <button ng-click="abort()" type="cancel" class="btn btn-link btn-xs">Abort</button>
+      <button ng-click="ok()" type="submit" class="btn btn-success">Save</button>
+    </div>
+  </div>
+</form>

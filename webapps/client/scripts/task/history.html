@@ -1,0 +1,50 @@
+<div class="day row" ng-repeat="day in days">
+  <div class="col-xs-2">
+    <div class="date-badge">
+      <span class="day">{{ day.date.day }}</span>
+      <span class="month">{{ day.date.month }}</span>
+      <span class="year">{{ day.date.year }}</span>
+    </div>
+  </div>
+
+  <div class="col-xs-10 instant">
+    <div class="instant row" ng-repeat="(time, events) in day.events">
+      <div class="col-xs-2 time-badge">
+        <a href="#"
+           data-toggle="tooltip"
+           data-placement="top"
+           title="User Name"
+           class="user-picture"></a>
+        {{ time }}
+      </div>
+
+      <div class="col-xs-10">
+        <div class="event" ng-repeat="(delta, event) in events">
+          <div ng-if="(event.orgValue || event.newValue) && event.operationType" class="row">
+            <div class="operation col-xs-12">
+              <span class="label">Operation:</span> {{ event.operationType }}
+            </div>
+
+            <div class="col-lg-6 original-value">
+              <div class="label">
+                Original value:
+              </div>
+              <div class="value">
+                {{ event.orgValue }}
+              </div>
+            </div>
+
+            <div class="col-lg-6 new-value">
+              <div class="label">
+                New value:
+              </div>
+              <div class="value">
+                {{ event.newValue }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

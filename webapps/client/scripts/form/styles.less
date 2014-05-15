@@ -1,0 +1,34 @@
+
+
+[cam-form-inline-field] {
+  display: inline-block;
+  .view {
+    border: 1px solid transparent;
+    margin: 0 2px;
+    padding: 3px 4px;
+    position: relative;
+    &:hover {
+      z-index: 99;
+      cursor: pointer;
+      border: 1px dashed @gray-light;
+      background-color: @body-bg;
+    }
+  }
+
+  .edit {
+    position: relative;
+    z-index: 99;
+  }
+
+  .btn-group {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 2px;
+    background-color: @body-bg;
+  }
+}
+
+.form-actions {
+  text-align: right;
+}

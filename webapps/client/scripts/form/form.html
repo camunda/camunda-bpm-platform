@@ -1,0 +1,99 @@
+<form class="form-horizontal" role="form">
+
+  <div ng-repeat="(delta, field) in fields">
+    <div ng-switch on="field.type">
+
+      <div class="form-group" ng-switch-when="text">
+        <label for="field-{{ elUID }}-{{ delta }}"
+               class="col-sm-{{ labelsWidth }} control-label">{{ field.label }}</label>
+
+        <div class="col-sm-{{ fieldsWidth }}">
+          <input type="text"
+                 name="{{ field.name }}"
+                 class="form-control"
+                 id="field-{{ elUID }}-{{ delta }}"
+                 placeholder="{{ field.placeholder }}">
+        </div>
+      </div>
+
+      <div class="form-group" ng-switch-when="email">
+        <label for="field-{{ elUID }}-{{ delta }}"
+               class="col-sm-{{ labelsWidth }} control-label">{{ field.label }}</label>
+
+        <div class="col-sm-{{ fieldsWidth }}">
+          <input type="email"
+                 name="{{ field.name }}"
+                 class="form-control"
+                 id="field-{{ elUID }}-{{ delta }}"
+                 placeholder="{{ field.placeholder }}">
+        </div>
+      </div>
+
+      <div class="form-group" ng-switch-when="password">
+        <label for="field-{{ elUID }}-{{ delta }}"
+               class="col-sm-{{ labelsWidth }} control-label">{{ field.label }}</label>
+
+        <div class="col-sm-{{ fieldsWidth }}">
+          <input type="password"
+                 name="{{ field.name }}"
+                 class="form-control"
+                 id="field-{{ elUID }}-{{ delta }}"
+                 placeholder="{{ field.placeholder }}">
+          <input type="password"
+                 name="{{ field.name }}-verif"
+                 class="form-control"
+                 id="field-{{ elUID }}-{{ delta }}"
+                 placeholder="Please re-type to confirm">
+        </div>
+      </div>
+
+      <div class="form-group" ng-switch-when="checkboxes">
+        <label class="col-sm-{{ labelsWidth }} control-label">{{ field.label }}</label>
+        <div class="col-sm-{{ fieldsWidth }} choices">
+
+          <div class="checkbox"
+               ng-repeat="(zeta, choice) in field.choices">
+            <label>
+              <input type="checkbox"
+                     name="{{ field.name }}"
+                     value="{{ choice.value }}"
+                     id="field-{{ elUID }}-{{ delta }}-{{ zeta }}">
+               {{ choice.label }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" ng-switch-when="radios">
+        <label class="col-sm-{{ labelsWidth }} control-label">{{ field.label }}</label>
+        <div class="col-sm-{{ fieldsWidth }} choices">
+
+          <div class="radio"
+               ng-repeat="(zeta, choice) in field.choices">
+            <label>
+              <input type="radio"
+                     name="{{ field.name }}"
+                     value="{{ choice.value }}"
+                     id="field-{{ elUID }}-{{ delta }}-{{ zeta }}">
+               {{ choice.label }}
+            </label>
+          </div>
+        </div>
+      </div>
+<!--
+      <div class="form-group" ng-switch-default>
+        <div class="col-sm-12">
+          <div class="alert alert-danger">{{ field.type }} is not (yet) supported</div>
+        </div>
+      </div>
+ -->
+    </div>
+  </div>
+
+  <div class="form-group form-actions">
+    <div class="col-sm-offset-{{ labelsWidth }} col-sm-{{ fieldsWidth }}">
+      <button type="cancel" class="btn btn-link btn-xs">Cancel</button>
+      <button type="submit" class="btn btn-success">Submit</button>
+    </div>
+  </div>
+</form>

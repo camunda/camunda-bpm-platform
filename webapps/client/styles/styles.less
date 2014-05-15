@@ -1,0 +1,244 @@
+
+/*
+┌─────────────────────────────────────────┐
+│                                         │
+│                                         │
+│                                         │
+│                                         │
+├─────────────────────────────────────────┤
+│                                         │
+│                                         │
+└─────────────────────────────────────────┘
+*/
+@import "../bower_components/bootstrap/less/variables";
+
+@brand-primary:             #B5152B;
+@link-color:                @brand-primary;
+
+@border-radius-base:        0;
+@border-radius-large:       0;
+@border-radius-small:       0;
+
+@icon-font-path: '../fonts/bootstrap/';
+
+@font-face {
+    font-family: 'open_sanslight';
+    src: url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.eot');
+    src: url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.woff') format('woff'),
+         url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.ttf') format('truetype'),
+         url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.svg#open_sanslight') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'open_sansregular';
+    src: url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.eot');
+    src: url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.woff') format('woff'),
+         url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.ttf') format('truetype'),
+         url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.svg#open_sansregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'open_sansbold';
+    src: url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.eot');
+    src: url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.woff') format('woff'),
+         url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.ttf') format('truetype'),
+         url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.svg#open_sansbold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'open_sansitalic';
+    src: url('../fonts/opensans_italic_macroman/OpenSans-Italic-webfont.eot');
+    src: url('../fonts/opensans_italic_macroman/OpenSans-Italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/opensans_italic_macroman/OpenSans-Italic-webfont.woff') format('woff'),
+         url('../fonts/opensans_italic_macroman/OpenSans-Italic-webfont.ttf') format('truetype'),
+         url('../fonts/opensans_italic_macroman/OpenSans-Italic-webfont.svg#open_sansitalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+// fonts mixins
+.font-regular {
+  font-family: 'open_sansregular', Helvetica, Arial, Verdana, sans-serif;
+  font-weight: normal;
+}
+.font-bold {
+  font-family: 'open_sansbold', Helvetica, Arial, Verdana, sans-serif;
+  font-weight: normal;
+}
+.font-light {
+  font-family: 'open_sanslight', Helvetica, Arial, Verdana, sans-serif;
+  font-weight: normal;
+}
+.font-italic {
+  font-family: 'open_sansitalic', Helvetica, Arial, Verdana, sans-serif;
+  font-weight: normal;
+}
+
+// Core variables and mixins
+  @import "../bower_components/bootstrap/less/mixins";
+
+  // Reset and dependencies
+  @import "../bower_components/bootstrap/less/normalize";
+  @import "../bower_components/bootstrap/less/print";
+  @import "../bower_components/bootstrap/less/glyphicons";
+
+  // Core CSS
+  @import "../bower_components/bootstrap/less/scaffolding";
+  @import "../bower_components/bootstrap/less/type";
+  // @import "../bower_components/bootstrap/less/code";
+  @import "../bower_components/bootstrap/less/grid";
+  @import "../bower_components/bootstrap/less/tables";
+  @import "../bower_components/bootstrap/less/forms";
+  @import "../bower_components/bootstrap/less/buttons";
+
+  // Components
+  @import "../bower_components/bootstrap/less/component-animations";
+  @import "../bower_components/bootstrap/less/dropdowns";
+  @import "../bower_components/bootstrap/less/button-groups";
+  @import "../bower_components/bootstrap/less/input-groups";
+  @import "../bower_components/bootstrap/less/navs";
+  @import "../bower_components/bootstrap/less/navbar";
+  // @import "../bower_components/bootstrap/less/breadcrumbs";
+  @import "../bower_components/bootstrap/less/pagination";
+  @import "../bower_components/bootstrap/less/pager";
+  // @import "../bower_components/bootstrap/less/labels";
+  // @import "../bower_components/bootstrap/less/badges";
+  // @import "../bower_components/bootstrap/less/jumbotron";
+  // @import "../bower_components/bootstrap/less/thumbnails";
+  @import "../bower_components/bootstrap/less/alerts";
+  // @import "../bower_components/bootstrap/less/progress-bars";
+  // @import "../bower_components/bootstrap/less/media";
+  @import "../bower_components/bootstrap/less/list-group";
+  // @import "../bower_components/bootstrap/less/panels";
+  // @import "../bower_components/bootstrap/less/responsive-embed";
+  // @import "../bower_components/bootstrap/less/wells";
+  // @import "../bower_components/bootstrap/less/close";
+
+  // Components w/ JavaScript
+  @import "../bower_components/bootstrap/less/modals";
+  @import "../bower_components/bootstrap/less/tooltip";
+  @import "../bower_components/bootstrap/less/popovers";
+  // @import "../bower_components/bootstrap/less/carousel";
+
+  // Utility classes
+  @import "../bower_components/bootstrap/less/utilities";
+  @import "../bower_components/bootstrap/less/responsive-utilities";
+
+
+
+
+
+/*
+╭─────────────────────────────────────────╮
+│                                         │
+│                                         │
+│                                         │
+│                                         │
+├─────────────────────────────────────────┤
+│                                         │
+│                                         │
+╰─────────────────────────────────────────╯
+*/
+
+
+@import "layout";
+@import "navbar";
+
+@import "./jquery.minicolors.less";
+
+@import "../scripts/controls/styles";
+
+.titled {
+  > .title,
+  > .dropdown-toggle {
+    line-height: 1.1;
+    display: inline-block;
+    font-size: 18px;
+    margin: 10px 5px 10px 0;
+    cursor: pointer;
+  }
+}
+
+.task-pile {
+  .inner {
+    background-color: @gray-light;
+    margin-top: 1rem;
+    box-shadow: 0 0 2px @gray-darker inset;
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .cards {
+    min-height: 50px;
+  }
+
+  .collapsed {
+    &.cards {
+      display: none;
+    }
+  }
+}
+
+.pile-header {
+  position: relative;
+  height: 4rem;
+}
+
+@import "../scripts/pile/styles";
+@import "../scripts/task/styles";
+
+
+.task-group {
+  background-color: @gray-lighter;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  header {
+    h2,
+    h4 {
+      margin: 0;
+    }
+    h2 { font-size: 1.8rem; }
+    h4 { font-size: 1.4rem; }
+  }
+}
+
+.modal-content {
+  padding: @grid-gutter-width / 2;
+  .form-actions {
+    margin-bottom: 0;
+  }
+}
+
+@import "../scripts/form/styles.less";
+
+.unassigned {
+  .assignee,
+  .owner,
+  footer {
+    display: none;
+  }
+}
+
+.overdue {
+  color: @brand-primary;
+}

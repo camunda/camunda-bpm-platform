@@ -1,0 +1,93 @@
+
+
+
+html, body {
+  height: 100%;
+  .font-regular;
+}
+
+
+.page-wrap {
+  min-height: 100%;
+  /* equal to footer height */
+  margin-bottom: -32px;
+}
+.page-wrap:after {
+  content: "";
+  display: block;
+}
+.footer.page,
+.page-wrap:after {
+  /* .push must be the same height as footer */
+  height: 32px;
+}
+.site-footer {
+  background: orange;
+}
+
+
+body {
+  padding-top: 50px;
+  padding-bottom: 25px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  .font-light;
+  // font-family: volkswagents-regular;
+  // font-weight: normal;
+}
+
+h2,
+h4 {
+  text-transform: uppercase;
+}
+
+a,
+a:link,
+a:hover,
+a:focus,
+a:active {
+  color: @brand-primary;
+  text-decoration: none;
+}
+
+[ng-click],
+[onclick] {
+  cursor: pointer;
+}
+
+label {
+  .font-bold;
+}
+
+footer.page {
+  position: fixed;
+  z-index: 99;
+  height: 25px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: right;
+  background-color: @body-bg;
+  border-top: 1px solid @gray-lighter;
+  // color: @gray-light;
+}
+
+.page-wrap {
+  // background-color: @gray-darker;
+
+  // background-image: url('/images/camunda-bear.jpg');
+  // background-position: middle center;
+  // background-size: contain;
+}
+
+
+.task-piles,
+.focused-task {
+  > .actions {
+    min-height: 50px;
+  }
+}

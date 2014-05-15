@@ -1,0 +1,50 @@
+{
+  "private": true,
+  "name": "camunda-tasklist",
+  "version": "0.0.1",
+  "homepage": "https://github.com/camunda/camunda-tasklist",
+  "authors": [
+    "Valentin Vago <valentin.vago@camunda.com>"
+  ],
+  "description": "A web based interface for camunda BPM platform tasks.",
+  "main": "client/index.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "camunda",
+    "bpm",
+    "camunda bpm",
+    "tasklist"
+  ],
+  "license": "Apache-2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.1.1",
+    "hyperagent": "zeropaper/hyperagent",
+    "angular": "~1.2.16",
+    "jquery": "~2.1.1",
+    "angular-ui-bootstrap": "~0.11.0",
+    "angular-moment": "~0.7.0",
+    "requirejs-domready": "~2.0.1",
+    "angular-bootstrap": "~0.11.0"
+  },
+  "devDependencies": {
+    "jquery-mockjax": "~1.5.3",
+    "underscore": "./node_modules/underscore/underscore.js",
+    "underscore.string": "./node_modules/underscore.string/lib/underscore.string.js",
+    "fixturer": "./node_modules/fixturer/index.js",
+    "node-uuid": "~1.4.1"
+  },
+  "resolutions": {
+    "jquery": "~2.1.1"
+  }
+}
