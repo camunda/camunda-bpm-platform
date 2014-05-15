@@ -39,13 +39,13 @@ var utils = module.exports = {};
   @param {string} selector              - a CSS selctor
   @return {!webdriver.promise.Promise}  - A promise
  */
-utils.waitForElementToBePresent = function(selector) {
-  // maximum waiting time of 10 seconds
-  var max = 10000;
+utils.waitForElementToBePresent = function(selector, max) {
+  // maximum waiting time of 2 seconds
+  max = max || 2000;
   return browser
     .wait(function() {
       return element(by.css(selector)).isPresent();
-    });
+    }, max, 'Waiting for element (with selector "'+ selector +'") took too long.');
 };
 
 /**

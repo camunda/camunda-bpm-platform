@@ -9,7 +9,9 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="variable in variables">
+    <tr ng-repeat="variable in variables"
+        data-variable-name="{{ variable.name }}"
+        data-variable-type="{{ variable.value.type }}">
       <td class="variable-name">
         {{ variable.name }}
       </td>

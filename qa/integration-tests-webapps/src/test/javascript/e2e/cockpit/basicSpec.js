@@ -97,7 +97,7 @@ describe('cockpit dashboard', function() {
   describe('process defintions view', function() {
     it('should select process in Deployed Process (List)', function() {
       var processName = "Cornercases Process";
-      var items = element(by.repeater('statistic in statistics').row(5).column('definition.name'));    
+      var items = element(by.repeater('statistic in statistics').row(5).column('definition.name'));
 
       expect(items.getText()).toEqual(processName);
       items.click();
@@ -112,7 +112,7 @@ describe('cockpit dashboard', function() {
 
       expect(items.count()).toBe(1);
     });
-    
+
     it('should select task in diagram', function() {
       utils.selectActivityInDiagram('UserTask_2');
 
@@ -123,7 +123,7 @@ describe('cockpit dashboard', function() {
     it('should select process instance in Process Instances Table and check instance ID', function() {
       var tableInstance = element(by.repeater('processInstance in processInstances').row(1).column('id'));
       var tableInstanceId = tableInstance.getAttribute('title');   //instance.getText();
-      
+
       tableInstance.click();
 
       var tableInstanceIdString;
