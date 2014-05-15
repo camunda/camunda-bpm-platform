@@ -19,8 +19,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     $scope.confirmed = false;
 
     function uploadComplete(parsedValue) {
-      /* jshint validthis: true */
-      var self = this;
+      var self = $scope.xhr;
       $scope.$apply(function(){
         if(self.status == 204) {
           $scope.status = CHANGE_SUCCESS;
@@ -47,20 +46,31 @@ ngDefine('cockpit.plugin.base.views', function(module) {
             exclusive: ['type']
           });
         }
+        // cleanup
+        delete $scope.xhr;
       });
     }
+
+    $scope.typeIn = function(formScope) {
+      $scope.currentValue = formScope.currentValue;
+
+      if ($scope.hasChanged()) {
+        $scope.status = CONFIRM_CHANGE;
+      }
+      else {
+        $scope.status = BEFORE_CHANGE;
+      }
+    };
 
     $scope.hasChanged = function() {
       return $scope.initialValue != $scope.currentValue;
     };
 
     $scope.change = function () {
-
       if($scope.status == BEFORE_CHANGE) {
         $scope.status = CONFIRM_CHANGE;
-
-      } else {
-
+      }
+      else {
         var newValue = $scope.currentValue;
         var parsedValue;
 
@@ -71,7 +81,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
           $scope.status = BEFORE_CHANGE;
           Notifications.addError({
             status: 'Variable',
-            message: 'Could not parse json input: '+e,
+            message: 'Could not parse JSON input: '+e,
             exclusive: true
           });
           return;
@@ -82,7 +92,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         fd.append('data', new Blob([$scope.currentValue], {type : 'application/json'}));
         fd.append('type', variableInstance.value.type);
 
-        var xhr = new XMLHttpRequest();
+        var xhr = $scope.xhr = new XMLHttpRequest();
         xhr.addEventListener('load', function() {
           uploadComplete(parsedValue);
         }, false);

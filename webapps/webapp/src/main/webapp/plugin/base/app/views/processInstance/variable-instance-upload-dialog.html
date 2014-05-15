@@ -1,4 +1,4 @@
-<!-- # CE - src/main/webapp/plugin/base/app/views/processInstnace/cancel-process-instance-dialog.html -->
+<!-- # CE - src/main/webapp/plugin/base/app/views/processInstance/variable-instance-upload-dialog.html -->
 <div class="modal-header">
   <h3>Upload binary variable</h3>
 </div>
@@ -15,14 +15,14 @@ This feature is unsupported in your Browser.
   <div notifications-panel></div>
 
   <div ng-show="status === 'beforeUpload'">
-    
+
     <p>Select a file containing the binary content for  the variable:</p>
 
     <p>
-      <input 
-        name="data" type="file" 
-        size="50" 
-        maxlength="100000" 
+      <input
+        name="data" type="file"
+        size="50"
+        maxlength="100000"
         accept="*/*"
         onchange="angular.element(this).scope().setFile(this)" />
     </p>
@@ -33,17 +33,17 @@ This feature is unsupported in your Browser.
     Upload progress: {{progress}}%
   </div>
 
-  <div ng-show="status === 'uploadSuccess'">   
+  <div ng-show="status === 'uploadSuccess'">
     <p>
       Variable <code>{{variableInstance.name}}</code> of execution <code>{{variableInstance.executionId}}</code>
       was successfully replaced with the content of the uploaded file.
     </p>
   </div>
 
-  <div ng-show="status === 'uploadFailed'">      
+  <div ng-show="status === 'uploadFailed'">
       Could not update variable <code>{{variableInstance.name}}</code> of execution <code>{{variableInstance.executionId}}</code>.
   </div>
-   
+
 </div>
 
 <div class="modal-footer">
@@ -58,4 +58,4 @@ This feature is unsupported in your Browser.
 
 <![endif]>
 
-<!-- / CE - src/main/webapp/plugin/base/app/views/processInstnace/cancel-process-instance-dialog.html -->
+<!-- / CE - src/main/webapp/plugin/base/app/views/processInstance/variable-instance-upload-dialog.html -->

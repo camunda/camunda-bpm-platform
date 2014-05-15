@@ -1,4 +1,4 @@
-<!-- # CE - src/main/webapp/plugin/base/app/views/processInstnace/cancel-process-instance-dialog.html -->
+<!-- # CE - src/main/webapp/plugin/base/app/views/processInstance/variable-instance-inspect-dialog.html -->
 <div class="modal-header">
   <h3>Inspect Serializable Variable</h3>
 </div>
@@ -6,8 +6,9 @@
 <div class="modal-body">
   <div notifications-panel></div>
 
-  <div ng-show="status === 'beforeChange' || status === 'confirmChange'">
-    
+  <form name="serializableVariable"
+        ng-show="status === 'beforeChange' || status === 'confirmChange'">
+
     <p>
       Serializable Variable of type <code>{{variableInstance.value.type}}</code>:
     </p>
@@ -16,20 +17,24 @@
       <strong>Value:</strong>
     </p>
     <p>
-      <textarea ng-model="currentValue" rows="10" class="input-xxlarge" ng-disabled="status === 'confirmChange'">
+      <textarea name="currentValue"
+                ng-model="currentValue"
+                ng-keyup="typeIn(this)"
+                rows="10"
+                class="input-xxlarge">
       </textarea>
     </p>
-   
-  </div>
+
+  </form>
 
   <div class="alert alert-block" ng-show="status === 'confirmChange'">
     <i class="icon-warning-sign"></i>
     <strong>Warning:</strong>
-    Are you sure you want to change the value of this serialized Java Object? Changing the variable in an incompatible 
+    Are you sure you want to change the value of this serialized Java Object? Changing the variable in an incompatible
     way may lead to severe runtime problems.
   </div>
- 
-  <div ng-show="status === 'changeSuccess'">   
+
+  <div ng-show="status === 'changeSuccess'">
     <p>
       Variable <code>{{variableInstance.name}}</code> of execution <code>{{variableInstance.executionId}}</code>
       was successfully updated.
@@ -55,4 +60,4 @@
 
 
 
-<!-- / CE - src/main/webapp/plugin/base/app/views/processInstnace/cancel-process-instance-dialog.html -->
+<!-- / CE - src/main/webapp/plugin/base/app/views/processInstance/variable-instance-inspect-dialog.html -->
