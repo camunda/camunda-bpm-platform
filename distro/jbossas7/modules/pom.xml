@@ -43,6 +43,22 @@
       <groupId>org.camunda.bpm.identity</groupId>
       <artifactId>camunda-identity-ldap</artifactId>
     </dependency>
+
+    <!-- script engine dependencies -->
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
