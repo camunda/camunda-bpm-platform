@@ -16,6 +16,8 @@ package org.camunda.bpm.engine.test.bpmn.gateway;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -143,6 +145,26 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     assertTrue(processInstance.isEnded());
+  }
+
+  @Deployment
+  public void testAsyncParallelGateway() {
+
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+    assertNotNull(jobDefinition);
+    assertEquals("parallelJoinEnd", jobDefinition.getActivityId());
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertFalse(processInstance.isEnded());
+
+    // there are two jobs to continue the gateway:
+    List<Job> list = managementService.createJobQuery()
+      .list();
+    assertEquals(2, list.size());
+
+    waitForJobExecutorToProcessAllJobs(6000);
+
+    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
   }
 
   @Deployment

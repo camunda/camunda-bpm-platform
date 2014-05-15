@@ -1405,6 +1405,8 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(parallelGwElement, scope);
     activity.setActivityBehavior(new ParallelGatewayActivityBehavior());
 
+    parseAsynchronousContinuation(parallelGwElement, activity);
+
     parseExecutionListenersOnScope(parallelGwElement, activity);
 
     for (BpmnParseListener parseListener : parseListeners) {
@@ -1525,7 +1527,6 @@ public class BpmnParse extends Parse {
       // create message event declaration:
       MessageJobDeclaration messageJobDecl = new MessageJobDeclaration();
       boolean exclusive = isExclusive(element);
-      activity.setExclusive(exclusive);
       messageJobDecl.setExclusive(exclusive);
       messageJobDecl.setActivityId(activity.getId());
       activity.setProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION, messageJobDecl);

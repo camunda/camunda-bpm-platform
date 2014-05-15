@@ -44,8 +44,6 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   protected boolean isAsync;
 
-  protected boolean isExclusive;
-
   protected boolean isCancelScope = false;
 
   protected boolean isConcurrent = false;
@@ -195,15 +193,6 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   public void setAsync(boolean isAsync) {
     this.isAsync = isAsync;
-  }
-
-  public boolean isExclusive() {
-    return isExclusive;
-  }
-
-  @Deprecated
-  public void setExclusive(boolean isExclusive) {
-    this.isExclusive = isExclusive;
   }
 
   public String getActivityId() {

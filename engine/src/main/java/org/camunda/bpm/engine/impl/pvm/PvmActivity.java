@@ -48,9 +48,6 @@ public interface PvmActivity extends PvmScope {
 
   boolean isScope();
 
-  @Deprecated
-  boolean isExclusive();
-
   PvmScope getParent();
 
   List<PvmTransition> getIncomingTransitions();
