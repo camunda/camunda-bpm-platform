@@ -9,6 +9,7 @@ ngDefine('tasklist.directives', [
    * @param $scope {Scope}
    */
   var TaskVariablesController = function TaskVariablesController($scope) {
+    this.variables = [];
 
     this.getVariable = function(name) {
       var variables = this.variables;
