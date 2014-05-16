@@ -12,17 +12,45 @@
  */
 package org.camunda.spin;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
 import org.camunda.spin.json.SpinJson;
 import org.camunda.spin.json.SpinJsonDataFormat;
 import org.camunda.spin.xml.SpinXml;
 import org.camunda.spin.xml.SpinXmlDataFormat;
 
 /**
+ * Provides access to all builtin dataformats.
  *
  * @author Sebastian Menski
  * @author Daniel Meyer
  */
 public class DataFormats {
+
+  /** the collection of builtin dataformats */
+  private static Collection<DataFormat<?>> BUILTIN_DATAFORMATS;
+
+  /** map containing all dataformats: the list of builtin dataformats
+   * unified with additional dataformats discovered at runtime.
+   */
+  private static Map<String, DataFormat<?>> DATAFORMAT_MAP;
+
+  static {
+    BUILTIN_DATAFORMATS = Arrays.asList(new DataFormat<?>[] {
+        SpinXmlDataFormat.INSTANCE,
+        SpinXmlDataFormat.INSTANCE
+    });
+  }
+
+  public static DataFormat<?> list() {
+
+  }
+
+  public static DataFormat<?> dataformat(String formatName) {
+    return DATAFORMAT_MAP.get(key)
+  }
 
   public static DataFormat<SpinXml> xml() {
     return SpinXmlDataFormat.INSTANCE;

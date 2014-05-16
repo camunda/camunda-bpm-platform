@@ -12,6 +12,8 @@
  */
 package org.camunda.spin.logging;
 
+import org.camunda.spin.SpinRuntimeException;
+
 
 /**
  * The Logger for the core api.
@@ -26,6 +28,14 @@ public class SpinCoreLogger extends BaseLogger {
 
   public SpinCoreLogger() {
     super("SPIN", "org.camunda.spin", "01");
+  }
+
+  public IllegalArgumentException parameterIsNullException(String parameterName) {
+    return new IllegalArgumentException(prepareExceptionMessage("001", "Parameter '{}' is null", parameterName));
+  }
+
+  public SpinRuntimeException unableToInstantiateClass(String className, Exception cause) {
+    return new SpinRuntimeException(prepareExceptionMessage("002", "Unable to instantiate class '{}'", className), cause);
   }
 
 }

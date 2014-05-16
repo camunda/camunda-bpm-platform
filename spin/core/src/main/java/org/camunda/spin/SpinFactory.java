@@ -12,12 +12,16 @@
  */
 package org.camunda.spin;
 
+import java.util.Collection;
+
+import org.camunda.spin.impl.SpinFactoryImpl;
+
 /**
  *
  * @author Sebastian Menski
  * @author Daniel Meyer
  */
-public class SpinFactory {
+public abstract class SpinFactory {
 
   protected static SpinFactory INSTANCE;
 
@@ -25,15 +29,20 @@ public class SpinFactory {
     if(INSTANCE == null) {
       synchronized (SpinFactory.class) {
         if(INSTANCE == null) {
-          INSTANCE = new SpinFactory();
+          INSTANCE = new SpinFactoryImpl();
         }
       }
     }
     return INSTANCE;
   }
 
-  public Spin createSpin(Object parameter) {
-    return null;
-  }
+  /**
+   * Returns the list of supported dataformats. This list is the union of the built-in dataformats
+   * as returned by {@link DataFormats#}
+   * @return
+   */
+  public abstract Collection<DataFormat<?>> getSupportedDataformats();
+
+  public abstract Spin<?> createSpin(Object parameter);
 
 }
