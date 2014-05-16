@@ -20,13 +20,13 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate;
-import org.camunda.bpm.container.impl.jmx.deployment.PlatformXmlStartProcessEnginesStep;
-import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationsStep;
-import org.camunda.bpm.container.impl.jmx.deployment.StopProcessEnginesStep;
-import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StartJobExecutorStep;
-import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StartManagedThreadPoolStep;
-import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StopJobExecutorStep;
+import org.camunda.bpm.container.impl.RuntimeContainerDelegateImpl;
+import org.camunda.bpm.container.impl.deployment.PlatformXmlStartProcessEnginesStep;
+import org.camunda.bpm.container.impl.deployment.StopProcessApplicationsStep;
+import org.camunda.bpm.container.impl.deployment.StopProcessEnginesStep;
+import org.camunda.bpm.container.impl.deployment.jobexecutor.StartJobExecutorStep;
+import org.camunda.bpm.container.impl.deployment.jobexecutor.StartManagedThreadPoolStep;
+import org.camunda.bpm.container.impl.deployment.jobexecutor.StopJobExecutorStep;
 import org.camunda.bpm.container.impl.tomcat.deployment.TomcatAttachments;
 import org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -43,14 +43,14 @@ public class TomcatBpmPlatformBootstrap implements LifecycleListener {
   
   protected ProcessEngine processEngine;
 
-  protected JmxRuntimeContainerDelegate containerDelegate;
+  protected RuntimeContainerDelegateImpl containerDelegate;
     
   public void lifecycleEvent(LifecycleEvent event) {
 
     if (Lifecycle.START_EVENT.equals(event.getType())) {
       
       // the Apache Tomcat integration uses the Jmx Container for managing process engines and applications.
-      containerDelegate = (JmxRuntimeContainerDelegate) RuntimeContainerDelegate.INSTANCE.get();
+      containerDelegate = (RuntimeContainerDelegateImpl) RuntimeContainerDelegate.INSTANCE.get();
             
       deployBpmPlatform(event);
       

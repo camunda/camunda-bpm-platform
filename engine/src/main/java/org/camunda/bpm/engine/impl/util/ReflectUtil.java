@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 public abstract class ReflectUtil {
 
   private static final Logger LOG = Logger.getLogger(ReflectUtil.class.getName());
-  
+
   public static ClassLoader getClassLoader() {
     ClassLoader loader = getCustomClassLoader();
     if(loader == null) {
@@ -42,14 +42,14 @@ public abstract class ReflectUtil {
     }
     return loader;
   }
-  
+
   public static Class<?> loadClass(String className) {
    Class<?> clazz = null;
    ClassLoader classLoader = getCustomClassLoader();
-   
+
    // First exception in chain of classloaders will be used as cause when no class is found in any of them
    Throwable throwable = null;
-   
+
    if(classLoader != null) {
      try {
        LOG.finest("Trying to load class with custom classloader: " + className);
@@ -81,20 +81,20 @@ public abstract class ReflectUtil {
        }
      }
    }
-  
+
    if(clazz == null) {
      throw new ClassLoadingException(className, throwable);
    }
    return clazz;
   }
-  
+
   public static InputStream getResourceAsStream(String name) {
     InputStream resourceStream = null;
     ClassLoader classLoader = getCustomClassLoader();
     if(classLoader != null) {
       resourceStream = classLoader.getResourceAsStream(name);
     }
-    
+
     if(resourceStream == null) {
       // Try the current Thread context classloader
       classLoader = Thread.currentThread().getContextClassLoader();
@@ -107,7 +107,7 @@ public abstract class ReflectUtil {
     }
     return resourceStream;
    }
-  
+
   public static URL getResource(String name) {
     URL url = null;
     ClassLoader classLoader = getCustomClassLoader();
@@ -124,7 +124,7 @@ public abstract class ReflectUtil {
         url = classLoader.getResource(name);
       }
     }
-   
+
     return url;
    }
 
@@ -148,7 +148,7 @@ public abstract class ReflectUtil {
    */
   public static URI urlToURI(URL url) {
     try {
-      return new URI(url.getProtocol(), url.getPath(), null);
+      return url.toURI();
     } catch (URISyntaxException e) {
       throw new ProcessEngineException("couldn't convert URL to URI " + url, e);
     }
@@ -173,14 +173,14 @@ public abstract class ReflectUtil {
       throw new ProcessEngineException("couldn't invoke "+methodName+" on "+target, e);
     }
   }
-  
+
   /**
    * Returns the field of the given object or null if it doesnt exist.
    */
   public static Field getField(String fieldName, Object object) {
     return getField(fieldName, object.getClass());
   }
-  
+
   /**
    * Returns the field of the given class or null if it doesnt exist.
    */
@@ -200,7 +200,7 @@ public abstract class ReflectUtil {
     }
     return field;
   }
-  
+
   public static void setField(Field field, Object object, Object value) {
     try {
       field.setAccessible(true);
@@ -211,7 +211,7 @@ public abstract class ReflectUtil {
       throw new ProcessEngineException("Could not set field " + field.toString(), e);
     }
   }
-  
+
   /**
    * Returns the setter-method for the given field name or null if no setter exists.
    */
@@ -234,7 +234,7 @@ public abstract class ReflectUtil {
       throw new ProcessEngineException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
     }
   }
-  
+
   /**
    * Returns a setter method based on the fieldName and the java beans setter naming convention or null if none exists.
    * If multiple setters with different parameter types are present, an exception is thrown.
@@ -251,27 +251,27 @@ public abstract class ReflectUtil {
       for(Method method : methods) {
         if(method.getName().equals(setterName)) {
           Class<?>[] paramTypes = method.getParameterTypes();
-          
+
           if(paramTypes != null && paramTypes.length == 1) {
             candidates.add(method);
             parameterTypes.add(paramTypes[0]);
           }
         }
       }
-      
+
       if (parameterTypes.size() > 1) {
         throw new ProcessEngineException("There exists more than one setter method with different argument types named " + setterName + " on class " + clazz.getCanonicalName());
       }
       if (candidates.size() >= 1) {
         return candidates.get(0);
       }
-      
+
       return null;
     } catch (SecurityException e) {
       throw new ProcessEngineException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
     }
   }
-  
+
   private static String buildSetterName(String fieldName) {
     return "set" + Character.toTitleCase(fieldName.charAt(0)) +
         fieldName.substring(1, fieldName.length());
@@ -298,7 +298,7 @@ public abstract class ReflectUtil {
     Constructor< ? > constructor = findMatchingConstructor(clazz, args);
     if (constructor==null) {
       throw new ProcessEngineException("couldn't find constructor for "+className+" with args "+Arrays.asList(args));
-    } 
+    }
     try {
       return constructor.newInstance(args);
     } catch (Exception e) {
@@ -338,7 +338,7 @@ public abstract class ReflectUtil {
     }
     return true;
   }
-  
+
   private static ClassLoader getCustomClassLoader() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     if(processEngineConfiguration != null) {
