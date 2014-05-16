@@ -93,7 +93,17 @@ ngDefine('tasklist.pages', [], function(module) {
         return;
       }
 
-      var variablesMap = Forms.variablesToMap(variables);
+      // var variablesMap = Forms.variablesToMap(variables);
+      var variablesMap = {};
+      angular.forEach($scope.variablesForm, function(value, key) {
+        // if (key[0] !== '$' && !!value.$modelValue) {
+        if (key[0] !== '$') {
+          variablesMap[key] = {
+            // type:
+            value: value.$modelValue
+          };
+        }
+      });
 
       var taskList = EngineApi.getTaskList();
 
