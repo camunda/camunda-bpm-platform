@@ -15,6 +15,7 @@ package org.camunda.bpm.container.impl.jboss.deployment.processor;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
+import org.camunda.bpm.container.impl.deployment.scanning.VfsProcessApplicationScanner;
 import org.camunda.bpm.container.impl.jboss.deployment.marker.ProcessApplicationAttachments;
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessApplication;
 import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationDeploymentService;
@@ -22,7 +23,6 @@ import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationStartServi
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.jboss.util.JBossCompatibilityExtension;
 import org.camunda.bpm.container.impl.jboss.util.ProcessesXmlWrapper;
-import org.camunda.bpm.container.impl.jmx.deployment.scanning.VfsProcessApplicationScanner;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.util.IoUtil;

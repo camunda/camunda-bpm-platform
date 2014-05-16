@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,34 +18,34 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+import org.camunda.bpm.container.impl.spi.PlatformService;
+import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.threading.se.SeExecutorService;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class JmxManagedThreadPool extends SeExecutorService implements JmxManagedThreadPoolMBean, MBeanService<JmxManagedThreadPool> {
-  
+public class JmxManagedThreadPool extends SeExecutorService implements JmxManagedThreadPoolMBean, PlatformService<JmxManagedThreadPool> {
+
   private Logger LOGGER = Logger.getLogger(JmxManagedThreadPool.class.getName());
 
   protected final BlockingQueue<Runnable> threadPoolQueue;
-  
+
   public JmxManagedThreadPool(BlockingQueue<Runnable> queue, ThreadPoolExecutor executor) {
     super(executor);
     threadPoolQueue = queue;
   }
-  
-  public void start(MBeanServiceContainer mBeanServiceContainer) {
+
+  public void start(PlatformServiceContainer mBeanServiceContainer) {
     // nothing to do
   }
 
-  public void stop(MBeanServiceContainer mBeanServiceContainer) {
-    
+  public void stop(PlatformServiceContainer mBeanServiceContainer) {
+
     // clear the queue
     threadPoolQueue.clear();
-    
+
     // Ask the thread pool to finish and exit
     threadPoolExecutor.shutdown();
 
@@ -53,14 +53,14 @@ public class JmxManagedThreadPool extends SeExecutorService implements JmxManage
     try {
       if(!threadPoolExecutor.awaitTermination(60L, TimeUnit.SECONDS)) {
         LOGGER.log(Level.WARNING, "Timeout during shutdown of managed thread pool. "
-                + "The current running tasks could not end within 60 seconds after shutdown operation.");        
-      }              
+                + "The current running tasks could not end within 60 seconds after shutdown operation.");
+      }
     } catch (InterruptedException e) {
       LOGGER.log(Level.WARNING, "Interrupted while shutting down the thread pool. ", e);
     }
-    
+
   }
-  
+
   public JmxManagedThreadPool getValue() {
     return this;
   }
@@ -104,7 +104,7 @@ public class JmxManagedThreadPool extends SeExecutorService implements JmxManage
   public long getCompletedTaskCount() {
     return threadPoolExecutor.getCompletedTaskCount();
   }
-  
+
   public int getQueueCount() {
     return threadPoolQueue.size();
   }

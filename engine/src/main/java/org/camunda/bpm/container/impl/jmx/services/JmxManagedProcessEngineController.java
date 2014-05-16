@@ -12,7 +12,8 @@
  */
 package org.camunda.bpm.container.impl.jmx.services;
 
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+import org.camunda.bpm.container.impl.jmx.MBeanServiceContainer;
+import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 
 /**
@@ -29,11 +30,11 @@ public class JmxManagedProcessEngineController extends JmxManagedProcessEngine i
     this.processEngineConfiguration = processEngineConfiguration;
   }
   
-  public void start(MBeanServiceContainer contanier) {
+  public void start(PlatformServiceContainer contanier) {
     processEngine = processEngineConfiguration.buildProcessEngine();
   }
   
-  public void stop(MBeanServiceContainer container) {
+  public void stop(PlatformServiceContainer container) {
     processEngine.close();
   }
   

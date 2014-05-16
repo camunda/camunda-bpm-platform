@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment.util;
 
-import org.camunda.bpm.container.impl.jmx.deployment.scanning.ProcessApplicationScanningUtil;
+import org.camunda.bpm.container.impl.deployment.scanning.ProcessApplicationScanningUtil;
 import org.junit.Test;
 
 import java.net.MalformedURLException;

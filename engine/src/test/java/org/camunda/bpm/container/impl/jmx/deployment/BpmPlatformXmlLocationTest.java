@@ -8,14 +8,14 @@ import org.springframework.mock.jndi.SimpleNamingContext;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep.*;
+import static org.camunda.bpm.container.impl.deployment.AbstractParseBpmPlatformXmlStep.*;
 import static org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep.CATALINA_HOME;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Checks the correct retrieval of bpm-platform.xml file through JNDI,

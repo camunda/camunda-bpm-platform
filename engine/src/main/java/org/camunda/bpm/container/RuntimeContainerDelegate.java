@@ -15,7 +15,7 @@ package org.camunda.bpm.container;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate;
+import org.camunda.bpm.container.impl.RuntimeContainerDelegateImpl;
 import org.camunda.bpm.engine.ProcessEngine;
 
 /**
@@ -83,9 +83,9 @@ public interface RuntimeContainerDelegate {
     
     // hide
     private RuntimeContainerDelegateInstance() {}
-
-    private RuntimeContainerDelegate delegate = new JmxRuntimeContainerDelegate();
     
+    private RuntimeContainerDelegate delegate = new RuntimeContainerDelegateImpl();
+
     public RuntimeContainerDelegate get() {
       return delegate;
     }

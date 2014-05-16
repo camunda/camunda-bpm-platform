@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.container.impl.tomcat.deployment;
 
-import org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
+import org.camunda.bpm.container.impl.deployment.AbstractParseBpmPlatformXmlStep;
+import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 import java.io.File;
@@ -23,9 +23,9 @@ import java.util.logging.Level;
 
 /**
  * <p>This deployment operation step is responsible for parsing and attaching the bpm-platform.xml file on tomcat.</p>
- * 
+ *
  * <p>We assume that the bpm-platform.xml file is located under <code>$CATALINA_HOME/conf/bpm-platform.xml</code>.</p>
- * 
+ *
  * @author Daniel Meyer
  * @author Christian Lipphardt
  *
@@ -35,7 +35,7 @@ public class TomcatParseBpmPlatformXmlStep extends AbstractParseBpmPlatformXmlSt
   public static final String CATALINA_BASE = "catalina.base";
   public static final String CATALINA_HOME = "catalina.home";
 
-  protected URL getBpmPlatformXmlStream(MBeanDeploymentOperation operationcontext) {
+  public URL getBpmPlatformXmlStream(DeploymentOperation operationcontext) {
     URL fileLocation = lookupBpmPlatformXml();
 
     if (fileLocation == null) {
