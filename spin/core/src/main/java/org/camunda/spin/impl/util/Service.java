@@ -12,16 +12,13 @@
  */
 package org.camunda.spin.impl.util;
 
+import org.camunda.spin.SpinRuntimeException;
+
+import java.util.*;
+
 import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 import static org.camunda.spin.logging.SpinCoreLogger.LOG;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ServiceLoader;
-
-import org.camunda.spin.SpinRuntimeException;
 
 /**
  * A simple facility for using a {@link ServiceLoader}.
@@ -79,7 +76,7 @@ public class Service {
   /**
    * Instantiates the class provided as parameter.
    *
-   * @param defaultImplementation
+   * @param clazz the class to create an instance of
    * @return an instance of the class.
    *
    * @throws SpinRuntimeException in case no instance of the class could be constructed

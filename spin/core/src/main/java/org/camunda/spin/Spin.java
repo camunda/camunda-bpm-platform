@@ -22,8 +22,9 @@ import org.camunda.spin.xml.SpinXml;
  */
 public abstract class Spin<T extends Spin<?>> {
 
+  @SuppressWarnings("unchecked")
   public static <T extends Spin<?>> T S(Object parameter,  DataFormat<T> format) {
-    return SpinFactory.getInstance().createSpin(parameter, format);
+    return (T) SpinFactory.getInstance().createSpin(parameter, format);
   }
 
   @SuppressWarnings("unchecked")
@@ -35,14 +36,17 @@ public abstract class Spin<T extends Spin<?>> {
     return S(parameter, DataFormats.json());
   }
 
+  @SuppressWarnings("unchecked")
   public static <T extends SpinXml> T XML(Object parameter) {
     return (T) new SpinXml();
   }
 
+  @SuppressWarnings("unchecked")
   public static <T extends SpinXml> T XML(Object parameter,  DataFormat<T> format) {
-    return S(parameter, DataFormats.xml());
+    return (T) S(parameter, DataFormats.xml());
   }
 
+  @SuppressWarnings("unchecked")
   public <U extends Spin<?>> U as(DataFormat<U> format) {
     return (U) new SpinXml();
   }

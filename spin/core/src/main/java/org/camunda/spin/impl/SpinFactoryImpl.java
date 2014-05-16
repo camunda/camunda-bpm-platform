@@ -12,13 +12,15 @@
  */
 package org.camunda.spin.impl;
 
-import java.util.Collection;
-
 import org.camunda.spin.DataFormat;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
 import org.camunda.spin.impl.util.Service;
+import org.camunda.spin.xml.SpinXml;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author Daniel Meyer
@@ -28,27 +30,37 @@ public class SpinFactoryImpl extends SpinFactory {
 
   /**
    * This method returns a {@link Spin} objects and makes a best effort to automatically detect the
-   * underlying dataformat.
+   * underlying data format.
    *
    */
   public Spin<?> createSpin(Object parameter) {
 
-    Collection<DataFormat<?>> availableDataformats = getAvailableDataformats();
+    Collection<DataFormat<?>> availableDataFormats = getAvailableDataformats();
 
-    Collection<DataFormat<?>> builtInDataformats = DataFormats.list();
-    Collection<DataFormat> additionalDataformats = Service.getAll(DataFormat.class);
+    Collection<DataFormat<?>> builtInDataFormats = DataFormats.list();
+    Collection<DataFormat> additionalDataFormats = Service.getAll(DataFormat.class);
 
 
 
-    return null;
+    return new SpinXml();
+  }
+
+  public Spin<?> createSpin(Object parameter, DataFormat<?> format) {
+    // TODO: implement
+    return new SpinXml();
   }
 
   /**
-   * @return the list of supported dataformats
+   * @return the list of supported data formats
    */
   protected Collection<DataFormat<?>> getAvailableDataformats() {
     // TODO Auto-generated method stub
-    return null;
+    return Collections.emptyList();
+  }
+
+  public Collection<DataFormat<?>> getSupportedDataFormats() {
+    // TODO: implement
+    return Collections.emptyList();
   }
 
 }

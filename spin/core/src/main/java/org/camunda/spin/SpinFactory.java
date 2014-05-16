@@ -12,9 +12,9 @@
  */
 package org.camunda.spin;
 
-import java.util.Collection;
-
 import org.camunda.spin.impl.SpinFactoryImpl;
+
+import java.util.Collection;
 
 /**
  *
@@ -37,12 +37,14 @@ public abstract class SpinFactory {
   }
 
   /**
-   * Returns the list of supported dataformats. This list is the union of the built-in dataformats
+   * Returns the list of supported data formats. This list is the union of the built-in data formats
    * as returned by {@link DataFormats#}
    * @return
    */
-  public abstract Collection<DataFormat<?>> getSupportedDataformats();
+  public abstract Collection<DataFormat<?>> getSupportedDataFormats();
 
   public abstract Spin<?> createSpin(Object parameter);
+
+  public abstract Spin<?> createSpin(Object parameter, DataFormat<?> format);
 
 }
