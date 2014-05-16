@@ -165,6 +165,7 @@
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
       <version>2.1.2</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
