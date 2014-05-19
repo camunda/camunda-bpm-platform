@@ -12,20 +12,22 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
-import org.camunda.bpm.engine.ClassLoadingException;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.context.Context;
-
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.ClassLoadingException;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 
 
 /**
@@ -127,32 +129,6 @@ public abstract class ReflectUtil {
    
     return url;
    }
-
-  /**
-   * Gets the encoded url of the resource.
-   *
-   * @param name  the name of the resource
-   * @return the encoded url of the resource
-   */
-  public static String getResourceUrlAsString(String name) {
-    URL url = getResource(name);
-    return urlToURI(url).toASCIIString();
-  }
-
-  /**
-   * Converts an url to an uri. Escapes whitespaces if needed.
-   *
-   * @param url  the url to convert
-   * @return the resulting uri
-   * @throws ProcessEngineException if the url has invalid syntax
-   */
-  public static URI urlToURI(URL url) {
-    try {
-      return new URI(url.getProtocol(), url.getPath(), null);
-    } catch (URISyntaxException e) {
-      throw new ProcessEngineException("couldn't convert URL to URI " + url, e);
-    }
-  }
 
   public static Object instantiate(String className) {
     try {

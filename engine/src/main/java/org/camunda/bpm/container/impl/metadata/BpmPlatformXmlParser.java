@@ -40,7 +40,7 @@ public class BpmPlatformXmlParser extends Parser {
    */
   public BpmPlatformXmlParse createParse() {
     BpmPlatformXmlParse parse = new BpmPlatformXmlParse(this);
-    parse.setSchemaResource(ReflectUtil.getResourceUrlAsString(BPM_PLATFORM_XSD));
+    parse.setSchemaResource(ReflectUtil.getResource(BPM_PLATFORM_XSD).toString());
     return parse;
   }
 
