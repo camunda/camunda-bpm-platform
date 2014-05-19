@@ -50,6 +50,19 @@
       <artifactId>postgresql</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -61,6 +74,10 @@
           <include>configuration/standalone.xml</include>
           <include>deployments/${jboss.datasource.filename}</include>
         </includes>
+      </resource> 
+      <resource>
+        <directory>src/main/modules</directory>
+        <filtering>true</filtering>
       </resource>
       <resource>
         <directory>src/main/domain</directory>
@@ -181,10 +198,14 @@
                   <target unless="maven.test.skip">
                     <dependencyfilesets scopes="test" />
 
-                    <copy todir="${jboss.runtime.location}/modules" flatten="false">
+                    <copy todir="${jboss.runtime.location}/modules" flatten="false" overwrite="true">
                       <fileset refid="maven.project.dependencies" />
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                     </copy>
+                    
+                    <replace dir="${jboss.runtime.location}/modules" token="@project.version@" value="${project.version}">
+                      <include name="**/module.xml" />
+                    </replace>
 
                   </target>
                 </configuration>

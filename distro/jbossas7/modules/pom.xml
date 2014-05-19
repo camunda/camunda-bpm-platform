@@ -50,15 +50,6 @@
       <artifactId>groovy-all</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jruby</groupId>
-      <artifactId>jruby-complete</artifactId>
-    </dependency>
   </dependencies>
 
   <build>

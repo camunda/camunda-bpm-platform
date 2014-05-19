@@ -75,16 +75,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jruby</groupId>
-      <artifactId>jruby-complete</artifactId>
-    </dependency>
-
-    <dependency>
       <!-- this dependency is to make sure that we are executed after camunda-modules 
         in the reactor -->
       <groupId>org.camunda.bpm.jboss</groupId>

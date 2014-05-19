@@ -19,6 +19,8 @@
     <module name="com.fasterxml.uuid.java-uuid-generator"/>
     <module name="org.joda.time" slot="2.1" />
     <module name="org.codehaus.groovy.groovy-all" services="import"/>
+    <module name="org.python.jython" services="import"/>
+    <module name="org.jruby.jruby-complete" services="import"/>
 
     <module name="sun.jdk" services="import"/>
 

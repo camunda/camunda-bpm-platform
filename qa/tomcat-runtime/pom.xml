@@ -58,7 +58,19 @@
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
   </dependencies>
 
   <profiles>

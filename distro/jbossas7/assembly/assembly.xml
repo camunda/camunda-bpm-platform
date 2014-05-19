@@ -37,8 +37,6 @@
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
         <include>org.codehaus.groovy:groovy-all:jar:*</include>
-        <include>org.python:jython:jar:*</include>
-        <include>org.jruby:jruby-complete:*</include>
       </includes>
     </dependencySet>
   </dependencySets>

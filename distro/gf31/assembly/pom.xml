@@ -133,16 +133,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jruby</groupId>
-      <artifactId>jruby-complete</artifactId>
-    </dependency>
-
-    <dependency>
     	<groupId>org.camunda.bpm.javaee</groupId>
     	<artifactId>camunda-jobexecutor-rar</artifactId>
     	<version>${project.version}</version>

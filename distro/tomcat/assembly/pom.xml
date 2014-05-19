@@ -57,17 +57,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jruby</groupId>
-      <artifactId>jruby-complete</artifactId>
-    </dependency>
-
-
-    <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
     </dependency>
