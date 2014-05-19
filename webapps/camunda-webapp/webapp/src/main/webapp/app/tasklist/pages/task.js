@@ -93,15 +93,12 @@ ngDefine('tasklist.pages', [], function(module) {
         return;
       }
 
-      // var variablesMap = Forms.variablesToMap(variables);
       var variablesMap = {};
-      angular.forEach($scope.variablesForm, function(value, key) {
-        // if (key[0] !== '$' && !!value.$modelValue) {
-        if (key[0] !== '$') {
-          variablesMap[key] = {
-            // type:
-            value: value.$modelValue
-          };
+      var $formEl = angular.element('[name="variablesForm"]');
+      angular.forEach(angular.element('[name]', $formEl), function(element, delta) {
+        var varScope = angular.element(element).scope();
+        if (!varScope.variable.readOnly && varScope.variable.value) {
+          variablesMap[varScope.variable.name] = varScope.variable;
         }
       });
 
