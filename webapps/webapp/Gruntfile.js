@@ -16,7 +16,20 @@ var _ = require('underscore');
 var commentLineExp =  /^[\s]*<!-- (\/|#) (CE|EE)/;
 var requireConfExp =  /require-conf.js$/;
 var seleniumJarNameExp = /selenium-server-standalone/;
+var tasklistIndexExp = /camunda-tasklist-ui\/dist\/index\.html/;
 
+function tasklistPunches(content, srcpath, dev) {
+  return tasklistIndexExp.test(srcpath) ?
+          content
+            .replace('<base href="/" />', '<base href="$BASE" />')
+
+            .replace('scripts/deps-n-mocks.js', dev ? 'scripts/deps-n-mocks.js' : 'scripts/deps.js')
+
+            .replace('var tasklistConf = {};', 'var tasklistConf = '+ JSON.stringify({
+            }) +';') :
+
+          content;
+}
 
 function distFileProcessing(content, srcpath) {
   // removes the template comments
@@ -31,7 +44,7 @@ function distFileProcessing(content, srcpath) {
             .replace(/\/\* cache-busting /, '/* cache-busting */')
             .replace(/CACHE_BUSTER/g, requireConfExp.test(srcpath) ? '\''+ cacheBuster +'\'' : cacheBuster);
 
-  return content;
+  return tasklistPunches(content, srcpath);
 }
 
 function standaloneSeleniumJar() {
@@ -94,17 +107,22 @@ module.exports = function(grunt) {
             cwd: 'src/main/webapp/',
             src: [
               'require-conf.js',
-              'index.html'
+              'index.html',
+              '{app,plugin,develop,common}/**/*.{js,html}'
             ],
             dest: 'target/webapp/'
           },
           {
             expand: true,
-            cwd: 'src/main/webapp/',
-            src: [
-              '{app,plugin,develop,common}/**/*.{js,html}'
-            ],
-            dest: 'target/webapp/'
+            cwd: 'node_modules/camunda-tasklist-ui/dist/',
+            src: ['**'],
+            dest: 'target/webapp/app/tasklist/default/'
+          },
+          {
+            expand: true,
+            cwd: 'node_modules/camunda-tasklist-ui/dist/',
+            src: ['index.html'],
+            dest: 'target/webapp/app/tasklist/'
           },
           {
             expand: true,
@@ -117,7 +135,6 @@ module.exports = function(grunt) {
         ],
         options: {
           process: function(content, srcpath) {
-
             var liveReloadPort = grunt.config('app.liveReloadPort');
 
             if (requireConfExp.test(srcpath)) {
@@ -129,7 +146,8 @@ module.exports = function(grunt) {
             content = content
                       .replace(/\/\* cache-busting/, '/* cache-busting */')
                       .replace(/CACHE_BUSTER/g, (new Date()).getTime());
-            return content;
+
+            return tasklistPunches(content, srcpath, true);
           }
         }
       },
@@ -201,6 +219,18 @@ module.exports = function(grunt) {
         ],
         tasks: [
           // 'newer:jshint:scripts',
+          'newer:copy:development'
+        ]
+      },
+
+      tasklist: {
+        options: {
+          livereload: '<%= app.liveReloadPort %>'
+        },
+        files: [
+          'node_modules/camunda-tasklist-ui/dist/**'
+        ],
+        tasks: [
           'newer:copy:development'
         ]
       },
@@ -428,8 +458,7 @@ module.exports = function(grunt) {
         files: {
           'target/webapp/assets/css/common.css': 'src/main/webapp/assets/styles/common.less',
           'target/webapp/assets/css/cockpit/loader.css': 'src/main/webapp/assets/styles/cockpit/loader.less',
-          'target/webapp/assets/css/admin/loader.css': 'src/main/webapp/assets/styles/admin/loader.less',
-          'target/webapp/assets/css/tasklist/loader.css': 'src/main/webapp/assets/styles/tasklist/loader.less'
+          'target/webapp/assets/css/admin/loader.css': 'src/main/webapp/assets/styles/admin/loader.less'
         }
       },
 
@@ -437,8 +466,7 @@ module.exports = function(grunt) {
         files: {
           'target/webapp/assets/css/common.css': 'src/main/webapp/assets/styles/common.less',
           'target/webapp/assets/css/cockpit/loader.css': 'src/main/webapp/assets/styles/cockpit/loader.less',
-          'target/webapp/assets/css/admin/loader.css': 'src/main/webapp/assets/styles/admin/loader.less',
-          'target/webapp/assets/css/tasklist/loader.css': 'src/main/webapp/assets/styles/tasklist/loader.less'
+          'target/webapp/assets/css/admin/loader.css': 'src/main/webapp/assets/styles/admin/loader.less'
         }
       }
     },
@@ -610,6 +638,8 @@ module.exports = function(grunt) {
 
   // Aimed to hold more complex build processes
   grunt.registerTask('build', 'Build the frontend assets', function(target) {
+    target = target || 'dist';
+
     var tasks = [
       'clean',
       'bower'
@@ -625,8 +655,12 @@ module.exports = function(grunt) {
         'copy:dist'
       ]);
     }
+    else {
+    }
 
-    target = target || 'dist';
+
+    tasks.push('app-build:camunda-tasklist-ui');
+
 
     tasks = tasks.concat([
       'less:'+ target,
@@ -635,6 +669,70 @@ module.exports = function(grunt) {
     ]);
 
     return grunt.task.run(tasks);
+  });
+
+
+
+  grunt.registerTask('app-build', function(app) {
+    app = app || 'camunda-tasklist-ui';
+    var done = this.async();
+
+    var appGruntPath = __dirname +'/node_modules/.bin/grunt';
+    // var npmPath = __dirname +'/node/npm/bin/npm';
+    var npmPath = 'npm';
+
+    var appPath = __dirname +'/node_modules/'+ app;
+
+    var stdout = ''
+    var stderr = '';
+
+    function logOut(data) {
+      grunt.log.write(data);
+      stdout += data;
+    }
+
+    function logErr(data) {
+      grunt.log.write(data);
+      stdout += data;
+    }
+
+
+    var install = spawn(npmPath, [
+      'install'
+    ], {
+      cwd: appPath
+    });
+
+    install.stdout.on('data', logOut);
+    install.stderr.on('data', logErr);
+
+    install.on('exit', function (code) {
+      if (code) {
+        grunt.log.warn(app +' app-build failed:\nstdout:\n'+ stdout +'\nstderr:\n'+ stderr);
+        return done(new Error(npmPath +' install exit with code: '+ code));
+      }
+
+      var build = spawn(appGruntPath, [
+        '--gruntfile', './node_modules/'+ app +'/Gruntfile.js',
+        'build:prod'
+      ], {
+        // cwd: appPath
+      });
+
+      build.stdout.on('data', logOut);
+      build.stderr.on('data', logErr);
+
+      build.on('exit', function (code) {
+        if (code) {
+          grunt.log.warn(app +' app-build failed:\nstdout:\n'+ stdout +'\nstderr:\n'+ stderr);
+          return done(new Error(app +' app-build exit with code: '+ code));
+        }
+
+        grunt.log.writeln(app +' app built');
+        done();
+      });
+    });
+
   });
 
   // Default task(s).

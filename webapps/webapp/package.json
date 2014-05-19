@@ -25,7 +25,6 @@
     "load-grunt-tasks": "~0.2.0",
     "time-grunt": "~0.2.1",
     "requirejs": "~2.1.0",
-    "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define.git",
     "bower": "~1.2.8",
     "underscore": "~1.5.2",
     "karma": "0.11.14",
@@ -40,6 +39,8 @@
     "karma-html2js-preprocessor": "~0.1.0",
     "grunt-protractor-runner": "~0.2.3",
     "unzip": "~0.1.9",
-    "async": "~0.2.10"
+    "async": "~0.2.10",
+    "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define.git",
+    "camunda-tasklist-ui": "git://github.com/camunda/camunda-tasklist-ui.git"
   }
 }

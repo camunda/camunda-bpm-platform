@@ -110,6 +110,9 @@
     'jquery-overscroll' :               ['jquery'],
     'jquery-ui-core' :                  ['jquery'],
     'bootstrap' :                       ['jquery'],
+    'bootstrap-part' :                  ['jquery'],
+    'bootstrap-part/transition' :       ['jquery'],
+    'bootstrap-part/collapse' :         ['jquery'],
     'angular' :                         {
                                           deps: [
                                             'jquery',
