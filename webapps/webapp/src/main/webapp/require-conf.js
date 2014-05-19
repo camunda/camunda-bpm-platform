@@ -87,6 +87,7 @@
 
     'jquery':                'assets/vendor/jquery/dist/jquery',
     'bootstrap':             'assets/vendor/bootstrap/dist/js/bootstrap',
+    'bootstrap-part':        'assets/vendor/bootstrap/js',
     'angular':               'assets/vendor/angular/angular',
     'angular-resource':      'assets/vendor/angular-resource/angular-resource',
     'angular-route':         'assets/vendor/angular-route/angular-route',
@@ -110,7 +111,12 @@
     'jquery-ui-core' :                  ['jquery'],
     'bootstrap' :                       ['jquery'],
     'angular' :                         {
-                                          deps: ['jquery'],
+                                          deps: [
+                                            'jquery',
+                                            // needed to ensure responsive navigation
+                                            'bootstrap-part/transition',
+                                            'bootstrap-part/collapse'
+                                          ],
                                           exports: 'angular'
                                         },
     'angular-resource':                 ['angular'],
@@ -118,7 +124,9 @@
     'angular-route':                    ['angular'],
     'angular-animate':                  ['angular'],
     'angular-bootstrap':                ['angular'],
-    'angular-ui':                       ['angular-bootstrap'],
+    'angular-ui':                       [
+                                          'angular-bootstrap'
+                                        ],
 
     'jquery-ui/ui/jquery.ui.widget':    ['jquery-ui/ui/jquery.ui.core'],
     'jquery-ui/ui/jquery.ui.mouse':     [
