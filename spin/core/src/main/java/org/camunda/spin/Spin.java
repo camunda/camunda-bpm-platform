@@ -12,7 +12,6 @@
  */
 package org.camunda.spin;
 
-import org.camunda.spin.json.SpinJson;
 import org.camunda.spin.xml.SpinXml;
 
 /**
@@ -22,45 +21,28 @@ import org.camunda.spin.xml.SpinXml;
  */
 public abstract class Spin<T extends Spin<?>> {
 
-  @SuppressWarnings("unchecked")
+  protected final static SpinFactory SPIN_FACTORY = SpinFactory.getInstance();
+
   public static <T extends Spin<?>> T S(Object parameter,  DataFormat<T> format) {
-    return (T) SpinFactory.getInstance().createSpin(parameter, format);
+    return SPIN_FACTORY.createSpin(parameter, format);
   }
 
   @SuppressWarnings("unchecked")
   public static <T extends Spin<?>> T S(Object parameter) {
-    return (T) SpinFactory.getInstance().createSpin(parameter);
+    return (T) SPIN_FACTORY.createSpin(parameter);
   }
 
-  public static SpinJson JSON(Object parameter) {
-    return S(parameter, DataFormats.json());
+  public static SpinXml XML(Object parameter) {
+    return SPIN_FACTORY.createSpin(parameter, DataFormats.xml());
   }
 
-  @SuppressWarnings("unchecked")
-  public static <T extends SpinXml> T XML(Object parameter) {
-    return (T) new SpinXml();
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T extends SpinXml> T XML(Object parameter,  DataFormat<T> format) {
-    return (T) S(parameter, DataFormats.xml());
-  }
-
-  @SuppressWarnings("unchecked")
   public <U extends Spin<?>> U as(DataFormat<U> format) {
-    return (U) new SpinXml();
+    return SPIN_FACTORY.createSpin(unwrap(), format);
   }
 
   public Object unwrap() {
     return null;
   }
 
-  public SpinCollection<T> queryList(String queryString) {
-    return null;
-  }
-
-  public T query(String queryString) {
-    return null;
-  }
 
 }

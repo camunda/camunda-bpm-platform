@@ -22,8 +22,8 @@ import org.camunda.spin.Spin;
  */
 public class SpinXml extends Spin<SpinXml> {
 
-  public SpinXml attribute(String name) {
-    return this;
+  public SpinXml(Object parameter) {
+    // TODO: wrap input into DOM
   }
 
 }

@@ -14,8 +14,6 @@ package org.camunda.spin;
 
 import org.camunda.spin.impl.SpinFactoryImpl;
 
-import java.util.Collection;
-
 /**
  *
  * @author Sebastian Menski
@@ -36,15 +34,10 @@ public abstract class SpinFactory {
     return INSTANCE;
   }
 
-  /**
-   * Returns the list of supported data formats. This list is the union of the built-in data formats
-   * as returned by {@link DataFormats#}
-   * @return
-   */
-  public abstract Collection<DataFormat<?>> getSupportedDataFormats();
+  public abstract <T extends Spin<?>> DataFormat<T> detectDataFormat(Object parameter);
 
-  public abstract Spin<?> createSpin(Object parameter);
+  public abstract <T extends Spin<?>> T createSpin(Object parameter);
 
-  public abstract Spin<?> createSpin(Object parameter, DataFormat<?> format);
+  public abstract <T extends Spin<?>> T createSpin(Object parameter, DataFormat<T> format);
 
 }
