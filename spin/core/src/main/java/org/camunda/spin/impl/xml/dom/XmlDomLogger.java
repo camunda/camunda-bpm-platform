@@ -44,6 +44,10 @@ public class XmlDomLogger extends SpinLogger {
     return new SpinXmlDomAttributeException(exceptionMessage("006", "Unable to find attribute with namespace '{}' and name '{}'", namespace, attributeName));
   }
 
+  public SpinXmlDomElementException unableToFindChildElementWithNamespaceAndName(String namespace, String elementName) {
+    return new SpinXmlDomElementException(exceptionMessage("007", "Unable to find child element with namespace '{}' and name '{}'", namespace, elementName));
+  }
+
   public SpinXmlDomElementException moreThanOneChildElementFoundForNamespaceAndName(String namespace, String elementName) {
     return new SpinXmlDomElementException(exceptionMessage("008", "More than one child element was found for namespace '{}' and name '{}'", namespace, elementName));
   }

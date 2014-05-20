@@ -14,15 +14,12 @@
 package org.camunda.spin.impl.xml.dom;
 
 import org.camunda.spin.SpinCollection;
+import org.camunda.spin.impl.SpinCollectionImpl;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.xml.SpinXmlElement;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
+import org.w3c.dom.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -42,14 +39,40 @@ public class SpinXmlDomElement extends SpinXmlElement {
     return DomDataFormat.INSTANCE.getName();
   }
 
+  public String name() {
+    return domElement.getLocalName();
+  }
+
+  public String namespace() {
+    String namespaceURI = domElement.getNamespaceURI();
+    if (namespaceURI != null) {
+      return namespaceURI;
+    }
+    else {
+      return domElement.getOwnerDocument().lookupNamespaceURI(domElement.getPrefix());
+    }
+  }
+
+  public boolean hasNamespace(String namespace) {
+    if (namespace == null) {
+      return domElement.getNamespaceURI() == null;
+    }
+    else {
+      return namespace.equals(namespace());
+    }
+  }
+
   public SpinXmlDomAttribute attr(String attributeName) {
     return attrNs(null, attributeName);
   }
 
   public SpinXmlDomAttribute attrNs(String namespace, String attributeName) {
+    if (hasNamespace(namespace)) {
+      namespace = null;
+    }
     Attr attributeNode = domElement.getAttributeNodeNS(namespace, attributeName);
     if (attributeNode == null) {
-
+      throw LOG.unableToFindAttributeWithNamespaceAndName(namespace, attributeName);
     }
     return new SpinXmlDomAttribute(attributeNode);
   }
@@ -60,14 +83,17 @@ public class SpinXmlDomElement extends SpinXmlElement {
 
   public SpinCollection<SpinXmlDomAttribute> attrs(String namespace) {
     NamedNodeMap domAttributes = domElement.getAttributes();
-    Collection<SpinXmlDomAttribute> attributes = new ArrayList<SpinXmlDomAttribute>();
+    SpinCollection<SpinXmlDomAttribute> attributes = new SpinCollectionImpl<SpinXmlDomAttribute>();
     for (int i = 0; i < domAttributes.getLength(); i++) {
-      Node attr = domAttributes.item(i);
-      if ((namespace == null && attr.getNamespaceURI() == null) || (namespace != null && attr.getNamespaceURI().equals(namespace))) {
-        attributes.add(new SpinXmlDomAttribute((Attr) attr));
+      Attr attr = (Attr) domAttributes.item(i);
+      if (attr != null) {
+        SpinXmlDomAttribute attribute = new SpinXmlDomAttribute(attr);
+        if (attribute.hasNamespace(namespace)) {
+          attributes.add(attribute);
+        }
       }
     }
-    return (SpinCollection<SpinXmlDomAttribute>) attributes;
+    return attributes;
   }
 
   public List<String> attrNames() {
@@ -75,30 +101,48 @@ public class SpinXmlDomElement extends SpinXmlElement {
   }
 
   public List<String> attrNames(String namespace) {
-    NamedNodeMap domAttributes = domElement.getAttributes();
+    SpinCollection<SpinXmlDomAttribute> attributes = attrs(namespace);
     List<String> attributeNames = new ArrayList<String>();
-    for (int i = 0; i < domAttributes.getLength(); i++) {
-      Node attr = domAttributes.item(i);
-      if ((namespace == null && attr.getNamespaceURI() == null) || (namespace != null && attr.getNamespaceURI().equals(namespace))) {
-        attributeNames.add(attr.getLocalName());
-      }
+    for (SpinXmlDomAttribute attribute : attributes) {
+      attributeNames.add(attribute.name());
     }
     return attributeNames;
   }
 
-  public SpinCollection<SpinXmlDomElement> childElements(String elementName) {
-    return childElements(null, elementName);
-  }
-
-  public SpinCollection<SpinXmlDomElement> childElements(String namespace, String elementName) {
-    return null;
-  }
-
   public SpinXmlDomElement childElement(String elementName) {
-    return childElement(null, elementName);
+    return childElement(namespace(), elementName);
   }
 
   public SpinXmlDomElement childElement(String namespace, String elementName) {
-    return null;
+    SpinCollection<SpinXmlDomElement> childElements = childElements(namespace, elementName);
+    if (childElements.size() > 1) {
+      throw LOG.moreThanOneChildElementFoundForNamespaceAndName(namespace, elementName);
+    }
+    else {
+      return childElements.iterator().next();
+    }
   }
+
+  public SpinCollection<SpinXmlDomElement> childElements(String elementName) {
+    return childElements(namespace(), elementName);
+  }
+
+  public SpinCollection<SpinXmlDomElement> childElements(String namespace, String elementName) {
+    NodeList childNodes = domElement.getChildNodes();
+    SpinCollection<SpinXmlDomElement> childElements = new SpinCollectionImpl<SpinXmlDomElement>();
+    for (int i = 0; i < childNodes.getLength(); i++) {
+      Node childNode = childNodes.item(i);
+      if (childNode instanceof Element) {
+        SpinXmlDomElement childElement = new SpinXmlDomElement((Element) childNode);
+        if (childElement.hasNamespace(namespace) && childElement.name().equals(elementName)) {
+          childElements.add(childElement);
+        }
+      }
+    }
+    if (childElements.isEmpty()) {
+      throw LOG.unableToFindChildElementWithNamespaceAndName(namespace, elementName);
+    }
+    return childElements;
+  }
+
 }

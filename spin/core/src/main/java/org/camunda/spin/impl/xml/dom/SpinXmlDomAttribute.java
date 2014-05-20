@@ -31,8 +31,30 @@ public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
     return DomDataFormat.INSTANCE.getName();
   }
 
-  public String getStringValue() {
+  public String stringValue() {
     return attributeNode.getValue();
   }
 
+  public String name() {
+    return attributeNode.getLocalName();
+  }
+
+  public String namespace() {
+    String namespaceURI = attributeNode.getNamespaceURI();
+    if (namespaceURI != null) {
+      return namespaceURI;
+    }
+    else {
+      return attributeNode.lookupNamespaceURI(attributeNode.getPrefix());
+    }
+  }
+
+  public boolean hasNamespace(String namespace) {
+    if (namespace == null) {
+      return attributeNode.getNamespaceURI() == null;
+    }
+    else {
+      return namespace.equals(namespace());
+    }
+  }
 }

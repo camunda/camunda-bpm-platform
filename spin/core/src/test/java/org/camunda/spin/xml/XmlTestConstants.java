@@ -12,6 +12,10 @@
  */
 package org.camunda.spin.xml;
 
+import org.camunda.spin.impl.util.IoUtil;
+
+import java.io.InputStream;
+
 /**
  * @author Daniel Meyer
  *
@@ -29,5 +33,9 @@ public class XmlTestConstants {
   public final static String EXAMPLE_EMPTY_STRING = "";
 
   public final static String NON_EXISTING = "nonExisting";
+
+  public static InputStream exampleXmlFileAsStream() {
+    return IoUtil.getFileAsStream(EXAMPLE_XML_FILE_NAME);
+  }
 
 }

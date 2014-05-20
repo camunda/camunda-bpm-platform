@@ -1,4 +1,5 @@
 <customers xmlns="http://camunda.org/example" order="order1" dueUntil="20150112">
+  <date name="20140512" />
   <customer id="customer1">
     <name>Kermit</name>
     <contractStartDate>1354539722</contractStartDate>

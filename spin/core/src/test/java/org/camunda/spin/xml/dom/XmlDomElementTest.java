@@ -30,7 +30,7 @@ import static org.camunda.spin.xml.XmlTestConstants.*;
 /**
  * @author Sebastian Menski
  */
-public class SpinXmlDomElementTest {
+public class XmlDomElementTest {
 
   protected SpinXmlDomElement element;
 
@@ -59,18 +59,18 @@ public class SpinXmlDomElementTest {
   }
 
   @Test(expected = SpinXmlDomAttributeException.class)
-  public void cannotReadAttributeByNonExistingNameAndNamespace() {
-    element.attrNs(NON_EXISTING, NON_EXISTING);
-  }
-
-  @Test(expected = SpinXmlDomAttributeException.class)
-  public void cannotReadAttributeByNameAndWrongNamespace() {
+  public void cannotReadAttributeByNonExistingNamespaceAndName() {
     element.attrNs(NON_EXISTING, "order");
   }
 
   @Test(expected = SpinXmlDomAttributeException.class)
-  public void cannotReadAttributeByNamespaceAndWrongName() {
+  public void cannotReadAttributeByNamespaceAndNonExistingName() {
     element.attrNs(EXAMPLE_NAMESPACE, NON_EXISTING);
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  public void cannotReadAttributeByNonExistingNamespaceAndNonExistingName() {
+    element.attrNs(NON_EXISTING, NON_EXISTING);
   }
 
   @Test
@@ -121,7 +121,7 @@ public class SpinXmlDomElementTest {
   public void canGetSingleChildElementByName() {
     SpinXmlDomElement childElement = element.childElement("date");
     assertThat(childElement).isNotNull();
-    assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");;
+    assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");
   }
 
   @Test(expected = SpinXmlDomElementException.class)
@@ -130,7 +130,7 @@ public class SpinXmlDomElementTest {
   }
 
   @Test
-  public void canGetSingleChildElementByNameAndNamespace() {
+  public void canGetSingleChildElementByNamespaceAndName() {
     SpinXmlDomElement childElement = element.childElement(EXAMPLE_NAMESPACE, "date");
     assertThat(childElement).isNotNull();
     assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");

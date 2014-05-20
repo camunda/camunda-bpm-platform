@@ -13,15 +13,6 @@
 
 package org.camunda.spin.test;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-
 import org.camunda.spin.SpinScriptException;
 import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.logging.SpinLogger;
@@ -29,6 +20,14 @@ import org.junit.ClassRule;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import java.io.File;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A jUnit4 {@link TestRule} to load and execute a script. To
@@ -243,6 +242,17 @@ public class ScriptRule implements TestRule {
   }
 
   /**
+   * Execute the script
+   *
+   * @return the variables map after execution of the script
+   * @throws SpinScriptException if an error occurs during the script execution
+   */
+  public Map<String, Object> execute() {
+    executeScript();
+    return variables;
+  }
+
+  /**
    * Determines the base filename of the script.
    *
    * @param scriptAnnotation the script annotation of the test method
@@ -317,18 +327,33 @@ public class ScriptRule implements TestRule {
   @SuppressWarnings("unchecked")
   public <T> T getVariable(String name) {
     try {
-      return (T) variables.get(name);
-
+      if (scriptEngine.getFactory().getLanguageName().equals("ECMAScript")) {
+        return (T) getVariableJs(name);
+      }
+      else {
+        return (T) variables.get(name);
+      }
     } catch(ClassCastException e) {
       throw LOG.cannotCastVariableError(name, e);
-
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Object getVariableJs(String name) {
+    Object variable = variables.get(name);
+    if (variable != null) {
+      return JavaScriptVariableUnwrapper.unwrap(name, variable);
+    }
+    else if (variables.containsKey("nashorn.global")) {
+      variable = ((Map<String, Object>) variables.get("nashorn.global")).get(name);
+    }
+    return variable;
   }
 
   /**
    * Set the variable with the given name
    * @param name the name of the variable
-   * @param the value of the variable
+   * @param value value of the variable
    */
   public void setVariable(String name, Object value) {
     variables.put(name, value);
