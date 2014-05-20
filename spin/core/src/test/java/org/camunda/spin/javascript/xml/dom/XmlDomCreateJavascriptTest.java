@@ -10,22 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin;
+package org.camunda.spin.javascript.xml.dom;
 
-import org.camunda.spin.impl.xml.dom.DomDataFormat;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
-import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.test.ScriptEngine;
+import org.camunda.spin.xml.dom.XmlDomCreateScriptTest;
 
 /**
- * Provides access to all builtin data formats.
- *
- * @author Sebastian Menski
  * @author Daniel Meyer
+ *
  */
-public class DataFormats {
-
-  public static DataFormat<SpinXmlDomElement> xmlDom() {
-    return DomDataFormat.INSTANCE;
-  }
+@ScriptEngine("javascript")
+public class XmlDomCreateJavascriptTest extends XmlDomCreateScriptTest {
 
 }

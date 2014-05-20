@@ -10,22 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin;
-
-import org.camunda.spin.impl.xml.dom.DomDataFormat;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
-import org.camunda.spin.spi.DataFormat;
+package org.camunda.spin.xml;
 
 /**
- * Provides access to all builtin data formats.
- *
- * @author Sebastian Menski
  * @author Daniel Meyer
+ *
  */
-public class DataFormats {
+public class XmlTestConstants {
 
-  public static DataFormat<SpinXmlDomElement> xmlDom() {
-    return DomDataFormat.INSTANCE;
-  }
+  public final static String EXAMPLE_NAMESPACE = "http://camunda.org/example";
+
+  public final static String EXAMPLE_XML_FILE_NAME = "org/camunda/spin/xml/example.xml";
+
+  public final static String EXAMPLE_XML = "<customers><customer id=\"customer1\" /><customer id=\"customer2\" /></customers>";
+
+  public final static String EXAMPLE_INVALID_XML = "<invalid";
+
+  public final static String EXAMPLE_EMPTY_STRING = "";
+
+  public final static String NON_EXISTING = "nonExisting";
 
 }

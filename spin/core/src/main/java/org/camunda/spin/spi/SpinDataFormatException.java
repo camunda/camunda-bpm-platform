@@ -10,22 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin;
+package org.camunda.spin.spi;
 
-import org.camunda.spin.impl.xml.dom.DomDataFormat;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
-import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.SpinRuntimeException;
+
 
 /**
- * Provides access to all builtin data formats.
+ * Indicates an error in the underlying DataFormat layer
  *
- * @author Sebastian Menski
  * @author Daniel Meyer
+ *
  */
-public class DataFormats {
+public class SpinDataFormatException extends SpinRuntimeException {
 
-  public static DataFormat<SpinXmlDomElement> xmlDom() {
-    return DomDataFormat.INSTANCE;
+  private static final long serialVersionUID = 1L;
+
+  public SpinDataFormatException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public SpinDataFormatException(String message) {
+    super(message);
   }
 
 }

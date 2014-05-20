@@ -1,1 +1,0 @@
-binding.variables.remove 'xml'

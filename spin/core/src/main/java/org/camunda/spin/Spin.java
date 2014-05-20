@@ -12,7 +12,9 @@
  */
 package org.camunda.spin;
 
-import org.camunda.spin.xml.SpinXml;
+import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
+import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.spi.SpinDataFormatException;
 
 /**
  *
@@ -23,26 +25,50 @@ public abstract class Spin<T extends Spin<?>> {
 
   protected final static SpinFactory SPIN_FACTORY = SpinFactory.getInstance();
 
-  public static <T extends Spin<?>> T S(Object parameter,  DataFormat<T> format) {
-    return SPIN_FACTORY.createSpin(parameter, format);
+  /**
+   *
+   * @param input
+   * @param format
+   * @return
+   *
+   * @throws SpinDataFormatException in case the input cannot be read using this data format
+   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+   */
+  public static <T extends Spin<?>> T S(Object input, DataFormat<T> format) {
+    return SPIN_FACTORY.createSpin(input, format);
   }
 
+  /**
+   *
+   * @param input
+   * @param format
+   * @return
+   *
+   * @throws SpinDataFormatException in case the input cannot be read using the detected data format
+   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+   */
   @SuppressWarnings("unchecked")
   public static <T extends Spin<?>> T S(Object parameter) {
     return (T) SPIN_FACTORY.createSpin(parameter);
   }
 
-  public static SpinXml XML(Object parameter) {
-    return SPIN_FACTORY.createSpin(parameter, DataFormats.xml());
+  /**
+   *
+   * @param input
+   * @return
+   *
+   * @throws SpinDataFormatException in case the input cannot be read as XML
+   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+   */
+  public static SpinXmlDomElement XML(Object parameter) {
+    return SPIN_FACTORY.createSpin(parameter, DataFormats.xmlDom());
   }
 
-  public <U extends Spin<?>> U as(DataFormat<U> format) {
-    return SPIN_FACTORY.createSpin(unwrap(), format);
-  }
-
-  public Object unwrap() {
-    return null;
-  }
-
+  /**
+   * Provides the name of the dataformat used by this spin.
+   *
+   * @return the name of the dataformat used by this Spin.
+   */
+  public abstract String getDataFormatName();
 
 }

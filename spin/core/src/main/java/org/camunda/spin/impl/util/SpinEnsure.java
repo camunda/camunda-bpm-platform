@@ -13,6 +13,7 @@
 package org.camunda.spin.impl.util;
 
 import org.camunda.spin.logging.SpinCoreLogger;
+import org.camunda.spin.logging.SpinLogger;
 
 
 /**
@@ -23,7 +24,7 @@ import org.camunda.spin.logging.SpinCoreLogger;
  */
 public class SpinEnsure {
 
-  private final static SpinCoreLogger LOG = SpinCoreLogger.LOG;
+  private final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
   public static void ensureNotNull(String parameterName, Object value) {
     if(value == null) {

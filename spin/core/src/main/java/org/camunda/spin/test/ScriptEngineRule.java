@@ -13,17 +13,17 @@
 
 package org.camunda.spin.test;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
+import org.camunda.spin.logging.SpinLogger;
 import org.junit.ClassRule;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.camunda.spin.test.SpinTestLogger.LOG;
 
 /**
  * A jUnit4 {@link ClassRule} to define create a {@link ScriptEngine}
@@ -32,6 +32,8 @@ import static org.camunda.spin.test.SpinTestLogger.LOG;
  * @author Sebastian Menski
  */
 public class ScriptEngineRule implements TestRule {
+
+  private final static SpinTestLogger LOG = SpinLogger.TEST_LOGGER;
 
   private javax.script.ScriptEngine scriptEngine;
 

@@ -13,22 +13,15 @@
 
 package org.camunda.spin.test;
 
-import org.camunda.spin.SpinFileNotFoundException;
 import org.camunda.spin.SpinScriptException;
-import org.camunda.spin.logging.BaseLogger;
+import org.camunda.spin.logging.SpinLogger;
 
 /**
  * Logger for test cases.
  *
  * @author Sebastian Menski
  */
-public class SpinTestLogger extends BaseLogger {
-
-  public static final SpinTestLogger LOG = new SpinTestLogger();
-
-  public SpinTestLogger() {
-    super("SPIN", "org.camunda.spin.test", "02");
-  }
+public class SpinTestLogger extends SpinLogger {
 
   public void scriptEngineFoundForLanguage(String scriptLanguage) {
     logInfo("001", "Script engine found for script language '{}'", scriptLanguage);
@@ -54,14 +47,6 @@ public class SpinTestLogger extends BaseLogger {
     logInfo("006", "Execute script '{}' with script engine '{}'", scriptPath, engineName);
   }
 
-  public SpinFileNotFoundException fileNotFoundException(String filename, Throwable cause) {
-    return new SpinFileNotFoundException(exceptionMessage("001", "Unable to find file with path '{}'", filename), cause);
-  }
-
-  public SpinFileNotFoundException fileNotFoundException(String filename) {
-    return fileNotFoundException(filename, null);
-  }
-
   public SpinScriptException noScriptEngineFoundForLanguage(String scriptLanguage) {
     return new SpinScriptException(exceptionMessage("002", "No script engine found for script language '{}'", scriptLanguage));
   }
@@ -72,5 +57,9 @@ public class SpinTestLogger extends BaseLogger {
 
   public SpinScriptException scriptExecutionError(String scriptPath, Throwable cause) {
     return new SpinScriptException(exceptionMessage("004", "Error during execution of script '{}'", scriptPath), cause);
+  }
+
+  public SpinScriptException cannotCastVariableError(String name, ClassCastException e) {
+    return new SpinScriptException(exceptionMessage("005", "Cannot cast variable '{}', wrong type", name), e);
   }
 }

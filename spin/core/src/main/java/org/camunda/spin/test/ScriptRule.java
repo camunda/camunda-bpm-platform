@@ -13,23 +13,22 @@
 
 package org.camunda.spin.test;
 
-import org.camunda.spin.SpinFileNotFoundException;
-import org.camunda.spin.SpinScriptException;
-import org.junit.ClassRule;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import java.io.File;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
-import static org.camunda.spin.test.SpinTestLogger.LOG;
+import org.camunda.spin.SpinScriptException;
+import org.camunda.spin.impl.util.IoUtil;
+import org.camunda.spin.logging.SpinLogger;
+import org.junit.ClassRule;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 /**
  * A jUnit4 {@link TestRule} to load and execute a script. To
@@ -39,6 +38,8 @@ import static org.camunda.spin.test.SpinTestLogger.LOG;
  * @author Sebastian Menski
  */
 public class ScriptRule implements TestRule {
+
+  private final static SpinTestLogger LOG = SpinLogger.TEST_LOGGER;
 
   /**
    * Mapping of known {@link ScriptEngine} language names and
@@ -54,10 +55,25 @@ public class ScriptRule implements TestRule {
 
   private static final Map<String, String> testEnvironment = new HashMap<String, String>();
   static {
-    testEnvironment.put("python", "import org.camunda.spin.Spin.S as S");
-    testEnvironment.put("ECMAScript", "var S = org.camunda.spin.Spin.S");
-    testEnvironment.put("Groovy", "S = org.camunda.spin.Spin.&S");
-    testEnvironment.put("ruby", "def S(*args)\norg.camunda.spin.Spin.S(args)\nend");
+    testEnvironment.put("python",
+        "import org.camunda.spin.Spin.S as S\n"
+      + "import org.camunda.spin.Spin.XML as XML"
+    );
+
+    testEnvironment.put("ECMAScript",
+        "var S = org.camunda.spin.Spin.S;\n"
+      + "var XML = org.camunda.spin.Spin.XML;\n"
+    );
+
+    testEnvironment.put("Groovy",
+        "S = org.camunda.spin.Spin.&S\n"
+      + "XML = org.camunda.spin.Spin.&XML"
+    );
+
+    testEnvironment.put("ruby",
+        "def S(*args)\norg.camunda.spin.Spin.S(*args)\nend\n"
+      + "def XML(*args)\norg.camunda.spin.Spin.XML(*args)\nend"
+    );
   }
 
   private String script;
@@ -67,7 +83,7 @@ public class ScriptRule implements TestRule {
   /**
    * The variables of the script accessed during script execution.
    */
-  public final Map<String, Object> variables = new HashMap<String, Object>();
+  protected final Map<String, Object> variables = new HashMap<String, Object>();
 
   public Statement apply(final Statement base, final Description description) {
     return new Statement() {
@@ -130,7 +146,8 @@ public class ScriptRule implements TestRule {
     }
     String scriptBasename = getScriptBasename(scriptAnnotation, description);
     scriptPath = getScriptPath(scriptBasename, description);
-    return getScriptAsString(scriptPath, description);
+    File file = IoUtil.getClasspathFile(scriptPath, description.getTestClass().getClassLoader());
+    return IoUtil.fileAsString(file);
   }
 
   /**
@@ -170,8 +187,8 @@ public class ScriptRule implements TestRule {
       LOG.scriptVariableFound(name, "string", value);
     }
     else if (!filename.isEmpty()) {
-      File file = getFile(filename, description);
-      InputStream fileAsStream = getFileAsStream(file);
+      File file = IoUtil.getClasspathFile(filename, description.getTestClass().getClassLoader());
+      InputStream fileAsStream = IoUtil.fileAsStream(file);
       variables.put(name, fileAsStream);
       LOG.scriptVariableFound(name, "input stream", filename);
     }
@@ -293,71 +310,28 @@ public class ScriptRule implements TestRule {
   }
 
   /**
-   * Returns the script as {@link String}.
-   *
-   * @param scriptPath the path of the script file
-   * @param description the description of the test method
-   * @return the script as string
-   * @throws SpinFileNotFoundException if the script was cannot be loaded
+   * Returns the value of a named script variable
+   * @param name the name of the variable
+   * @return the value of the variable or null if the variable does not exist.
    */
-  private String getScriptAsString(String scriptPath, Description description) {
-    File file = getFile(scriptPath, description);
-    InputStream inputStream = null;
+  @SuppressWarnings("unchecked")
+  public <T> T getVariable(String name) {
     try {
-      inputStream = getFileAsStream(file);
-      byte[] buffer = new byte[(int) file.length()];
-      inputStream.read(buffer);
-      LOG.scriptLoaded(scriptPath);
-      return new String(buffer);
-    } catch (IOException e) {
-      throw LOG.fileNotFoundException(scriptPath, e);
-    }
-    finally {
-      if (inputStream != null) {
-        try {
-          inputStream.close();
-        } catch (IOException e) {
-          // ignore
-        }
-      }
+      return (T) variables.get(name);
+
+    } catch(ClassCastException e) {
+      throw LOG.cannotCastVariableError(name, e);
+
     }
   }
 
   /**
-   * Returns the input stream of a file.
-   *
-   * @param file the {@link File} to load
-   * @return the file content as input stream
-   * @throws SpinFileNotFoundException if the file cannot be loaded
+   * Set the variable with the given name
+   * @param name the name of the variable
+   * @param the value of the variable
    */
-  private InputStream getFileAsStream(File file) {
-    try {
-      return new BufferedInputStream(new FileInputStream(file));
-    } catch (FileNotFoundException e) {
-      throw LOG.fileNotFoundException(file.getAbsolutePath());
-    }
-  }
-
-  /**
-   * Returns the {@link File} for a filename.
-   *
-   * @param filename the filename to load
-   * @param description the description of the test method
-   * @return the file object
-   * @throws SpinFileNotFoundException if the file cannot be loaded
-   */
-  private File getFile(String filename, Description description) {
-    ClassLoader classLoader = description.getTestClass().getClassLoader();
-    URL fileUrl = classLoader.getResource(filename);
-    if (fileUrl == null) {
-      throw LOG.fileNotFoundException(filename);
-    }
-
-    try {
-      return new File(fileUrl.toURI());
-    } catch (URISyntaxException e) {
-      throw LOG.fileNotFoundException(filename, e);
-    }
+  public void setVariable(String name, Object value) {
+    variables.put(name, value);
   }
 
 }

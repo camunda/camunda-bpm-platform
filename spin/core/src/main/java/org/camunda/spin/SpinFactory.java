@@ -13,6 +13,7 @@
 package org.camunda.spin;
 
 import org.camunda.spin.impl.SpinFactoryImpl;
+import org.camunda.spin.spi.DataFormat;
 
 /**
  *

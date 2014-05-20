@@ -1,1 +1,0 @@
-xml = S(input);

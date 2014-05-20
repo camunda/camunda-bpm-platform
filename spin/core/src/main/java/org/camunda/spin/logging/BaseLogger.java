@@ -70,22 +70,39 @@ public abstract class BaseLogger {
   /** the max size of a message identifier. */
   protected static final int MSG_IDENTIFIER_MAX_SIZE = 12;
 
-  protected final Logger delegateLogger;
+  protected Logger delegateLogger;
 
-  protected final String projectCode;
-  protected final String componentId;
+  protected String projectCode;
+  protected String componentId;
+
+  BaseLogger() {
+    // hidden
+  }
 
   /**
-   * Creates a new instance of the {@link BaseLogger}.
+   * Creates a new instance of the {@link BaseLogger Logger}.
    *
+   * @param loggerClass the type of the logger
    * @param projectCode the unique code for a complete project.
    * @param name the name of the slf4j logger to use.
    * @param componentId the unique id of the component.
    */
-  public BaseLogger(String projectCode, String name, String componentId) {
-    this.projectCode = projectCode;
-    this.componentId = componentId;
-    delegateLogger = LoggerFactory.getLogger(name);
+  public static <T extends BaseLogger> T createLogger(Class<T> loggerClass, String projectCode, String name, String componentId) {
+    try {
+      T logger = loggerClass.newInstance();
+      logger.projectCode = projectCode;
+      logger.componentId = componentId;
+      logger.delegateLogger = LoggerFactory.getLogger(name);
+
+      return logger;
+
+    } catch (InstantiationException e) {
+      throw new RuntimeException("Unable to instantiate logger '"+loggerClass.getName()+"'", e);
+
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException("Unable to instantiate logger '"+loggerClass.getName()+"'", e);
+
+    }
   }
 
   /**

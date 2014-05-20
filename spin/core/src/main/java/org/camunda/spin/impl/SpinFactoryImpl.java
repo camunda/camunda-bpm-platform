@@ -12,11 +12,17 @@
  */
 package org.camunda.spin.impl;
 
-import org.camunda.spin.DataFormat;
+import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
+
+import java.io.InputStream;
+
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
-import org.camunda.spin.xml.SpinXml;
+import org.camunda.spin.logging.SpinCoreLogger;
+import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.spi.DataFormatReader;
+import org.camunda.spin.spi.SpinDataFormatException;
 
 /**
  * @author Daniel Meyer
@@ -25,10 +31,12 @@ import org.camunda.spin.xml.SpinXml;
  */
 public class SpinFactoryImpl extends SpinFactory {
 
+  private final static SpinCoreLogger LOG = SpinCoreLogger.CORE_LOGGER;
+
   @SuppressWarnings("unchecked")
   public <T extends Spin<?>> DataFormat<T> detectDataFormat(Object parameter) {
     // TODO: use parameter content to automatically detect the data format
-    return (DataFormat<T>) DataFormats.xml();
+    return (DataFormat<T>) DataFormats.xmlDom();
   }
 
 
@@ -37,10 +45,39 @@ public class SpinFactoryImpl extends SpinFactory {
     return createSpin(parameter, spinDataFormat);
   }
 
+  /**
+   *
+   * @throws SpinDataFormatException in case the parameter cannot be read using this data format
+   */
   @SuppressWarnings("unchecked")
   public <T extends Spin<?>> T createSpin(Object parameter, DataFormat<T> format) {
-    // TODO: use format to figure out which spin class to instantiate
-    return (T) new SpinXml(parameter);
+
+    InputStream input;
+    if(parameter == null) {
+      throw LOG.unsupportedNullInputParameter();
+
+    } else if (format.getWrapperType().isAssignableFrom(parameter.getClass())) {
+      return (T) parameter;
+
+    } else if(parameter instanceof Spin) {
+      Spin<?> spinParameter = (Spin<?>) parameter;
+      throw LOG.wrongDataFormatException(format.getName(), spinParameter.getDataFormatName());
+
+    } else if (parameter instanceof InputStream) {
+      input = (InputStream) parameter;
+
+    } else if (parameter instanceof String) {
+      String stringInput = (String) parameter;
+      input = stringAsInputStream(stringInput);
+
+    } else {
+      throw LOG.unsupportedInputParameter(parameter.getClass());
+
+    }
+
+    DataFormatReader reader = format.getReader();
+    Object dataFormatInput = reader.readInput(input);
+    return format.createWrapperInstance(dataFormatInput);
   }
 
 }

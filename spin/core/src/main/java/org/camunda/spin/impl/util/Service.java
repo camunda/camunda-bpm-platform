@@ -12,12 +12,17 @@
  */
 package org.camunda.spin.impl.util;
 
-import org.camunda.spin.SpinRuntimeException;
-
-import java.util.*;
-
 import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
-import static org.camunda.spin.logging.SpinCoreLogger.LOG;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ServiceLoader;
+
+import org.camunda.spin.SpinRuntimeException;
+import org.camunda.spin.logging.SpinCoreLogger;
+import org.camunda.spin.logging.SpinLogger;
 
 
 /**
@@ -27,6 +32,8 @@ import static org.camunda.spin.logging.SpinCoreLogger.LOG;
  *
  */
 public class Service {
+
+  private final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
   /**
    * Returns the service provider for the given interface. This method allows passing

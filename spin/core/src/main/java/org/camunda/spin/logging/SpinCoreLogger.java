@@ -12,7 +12,9 @@
  */
 package org.camunda.spin.logging;
 
+import org.camunda.spin.SpinFileNotFoundException;
 import org.camunda.spin.SpinRuntimeException;
+import org.camunda.spin.spi.SpinDataFormatException;
 
 
 /**
@@ -22,13 +24,7 @@ import org.camunda.spin.SpinRuntimeException;
  * @author Sebastian Menski
  *
  */
-public class SpinCoreLogger extends BaseLogger {
-
-  public static SpinCoreLogger LOG = new SpinCoreLogger();
-
-  public SpinCoreLogger() {
-    super("SPIN", "org.camunda.spin", "01");
-  }
+public class SpinCoreLogger extends SpinLogger {
 
   public IllegalArgumentException parameterIsNullException(String parameterName) {
     return new IllegalArgumentException(exceptionMessage("001", "Parameter '{}' is null", parameterName));
@@ -36,6 +32,30 @@ public class SpinCoreLogger extends BaseLogger {
 
   public SpinRuntimeException unableToInstantiateClass(String className, Exception cause) {
     return new SpinRuntimeException(exceptionMessage("002", "Unable to instantiate class '{}'", className), cause);
+  }
+
+  public IllegalArgumentException unsupportedInputParameter(Class<?> parameterClass) {
+    return new IllegalArgumentException(exceptionMessage("003", "Unsupported input of type '{}'", parameterClass.getName()));
+  }
+
+  public IllegalArgumentException unsupportedNullInputParameter() {
+    return new IllegalArgumentException(exceptionMessage("005", "Unsupported input: input is 'null'"));
+  }
+
+  public SpinFileNotFoundException fileNotFoundException(String filename, Throwable cause) {
+    return new SpinFileNotFoundException(exceptionMessage("004", "Unable to find file with path '{}'", filename), cause);
+  }
+
+  public SpinFileNotFoundException fileNotFoundException(String filename) {
+    return fileNotFoundException(filename, null);
+  }
+
+  public SpinRuntimeException unableToReadInputStream(Exception e) {
+    return new SpinRuntimeException("Unable to read input stream", e);
+  }
+
+  public SpinDataFormatException wrongDataFormatException(String requestedDataformat, String givenDataformat) {
+    return new SpinDataFormatException(exceptionMessage("Wrong data format: requested '{}', given '{}'", requestedDataformat, givenDataformat));
   }
 
 }

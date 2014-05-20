@@ -10,22 +10,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin;
+package org.camunda.spin.impl.xml.dom;
 
-import org.camunda.spin.impl.xml.dom.DomDataFormat;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
 import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.spi.DataFormatReader;
+import org.w3c.dom.Element;
 
 /**
- * Provides access to all builtin data formats.
- *
- * @author Sebastian Menski
  * @author Daniel Meyer
+ *
  */
-public class DataFormats {
+public class DomDataFormat implements DataFormat<SpinXmlDomElement> {
 
-  public static DataFormat<SpinXmlDomElement> xmlDom() {
-    return DomDataFormat.INSTANCE;
+  public final static DomDataFormat INSTANCE = new DomDataFormat();
+
+  public Class<SpinXmlDomElement> getWrapperType() {
+    return SpinXmlDomElement.class;
+  }
+
+  public SpinXmlDomElement createWrapperInstance(Object parameter) {
+    return new SpinXmlDomElement((Element) parameter);
+  }
+
+  public DataFormatReader getReader() {
+    return new DomDataFormatReader();
+  }
+
+  public String getName() {
+    return "application/xml; implementation=dom";
   }
 
 }
