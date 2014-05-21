@@ -14,12 +14,16 @@ package org.camunda.bpm.model.xml.impl.type.attribute;
 
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelException;
+import org.camunda.bpm.model.xml.impl.ModelBuildOperation;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.type.reference.AttributeReferenceBuilderImpl;
+import org.camunda.bpm.model.xml.impl.type.reference.AttributeReferenceCollectionBuilderImpl;
 import org.camunda.bpm.model.xml.impl.type.reference.QNameAttributeReferenceBuilderImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.attribute.StringAttributeBuilder;
 import org.camunda.bpm.model.xml.type.reference.AttributeReferenceBuilder;
+import org.camunda.bpm.model.xml.type.reference.AttributeReferenceCollection;
+import org.camunda.bpm.model.xml.type.reference.AttributeReferenceCollectionBuilder;
 
 
 /**
@@ -29,7 +33,7 @@ import org.camunda.bpm.model.xml.type.reference.AttributeReferenceBuilder;
  */
 public class StringAttributeBuilderImpl extends AttributeBuilderImpl<String> implements StringAttributeBuilder {
 
-  private AttributeReferenceBuilderImpl<?> referenceBuilder;
+  private AttributeReferenceBuilder<?> referenceBuilder;
 
   public StringAttributeBuilderImpl(String attributeName, ModelElementTypeImpl modelType) {
     super(attributeName, modelType, new StringAttribute(modelType));
@@ -75,7 +79,15 @@ public class StringAttributeBuilderImpl extends AttributeBuilderImpl<String> imp
     return referenceBuilder;
   }
 
-  protected <V extends ModelElementInstance> void setAttributeReference(AttributeReferenceBuilderImpl<V> referenceBuilder) {
+  @SuppressWarnings("rawtypes")
+  public <V extends ModelElementInstance> AttributeReferenceCollectionBuilder<V> idAttributeReferenceCollection(Class<V> referenceTargetElement, Class<? extends AttributeReferenceCollection> attributeReferenceCollection) {
+    AttributeImpl<String> attribute = (AttributeImpl<String>) build();
+    AttributeReferenceCollectionBuilder<V> referenceBuilder = new AttributeReferenceCollectionBuilderImpl<V>(attribute, referenceTargetElement, attributeReferenceCollection);
+    setAttributeReference(referenceBuilder);
+    return referenceBuilder;
+  }
+
+  protected <V extends ModelElementInstance> void setAttributeReference(AttributeReferenceBuilder<V> referenceBuilder) {
     if (this.referenceBuilder != null) {
       throw new ModelException("An attribute cannot have more than one reference");
     }
@@ -87,7 +99,7 @@ public class StringAttributeBuilderImpl extends AttributeBuilderImpl<String> imp
   public void performModelBuild(Model model) {
     super.performModelBuild(model);
     if (referenceBuilder != null) {
-      referenceBuilder.performModelBuild(model);
+      ((ModelBuildOperation) referenceBuilder).performModelBuild(model);
     }
   }
 

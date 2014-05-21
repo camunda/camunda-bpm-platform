@@ -14,6 +14,7 @@
 package org.camunda.bpm.model.xml.impl.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,6 +49,18 @@ public final class StringUtil {
    * @return the resulting comma separated string
    */
   public static String joinCommaSeparatedList(List<String> list) {
+    return joinList(list, ", ");
+  }
+
+  public static List<String> splitListBySeparator(String text, String separator) {
+    String[] result = new String[]{};
+    if (text != null) {
+      result = text.split(separator);
+    }
+    return new ArrayList<String>(Arrays.asList(result));
+  }
+
+  public static String joinList(List<String> list, String separator) {
     if (list == null) {
       return null;
     }
@@ -63,7 +76,7 @@ public final class StringUtil {
       StringBuilder builder = new StringBuilder(size * 8);
       builder.append(list.get(0));
       for (Object element : list.subList(1, size)) {
-        builder.append(", ");
+        builder.append(separator);
         builder.append(element);
       }
       return builder.toString();

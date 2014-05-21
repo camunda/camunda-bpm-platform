@@ -24,7 +24,7 @@ import org.camunda.bpm.model.xml.type.reference.AttributeReference;
  */
 public class AttributeReferenceImpl<T extends ModelElementInstance> extends ReferenceImpl<T> implements AttributeReference<T> {
 
-  private final AttributeImpl<String> referenceSourceAttribute;
+  protected final AttributeImpl<String> referenceSourceAttribute;
 
   public AttributeReferenceImpl(AttributeImpl<String> referenceSourceAttribute) {
     this.referenceSourceAttribute = referenceSourceAttribute;
@@ -58,7 +58,7 @@ public class AttributeReferenceImpl<T extends ModelElementInstance> extends Refe
     }
   }
 
-  protected void removeReference(ModelElementInstance referenceSourceElement) {
+  protected void removeReference(ModelElementInstance referenceSourceElement, ModelElementInstance referenceTargetElement) {
     referenceSourceAttribute.removeAttribute(referenceSourceElement);
   }
 

@@ -25,6 +25,7 @@
     <attribute name="isEndangered" type="boolean" default="false"/>
     <attribute name="gender" type="tns:tGender" use="required"/>
     <attribute name="age" type="integer"/>
+    <attribute name="bestFriendRefs" type="IDREFS" />
     <anyAttribute namespace="##other" processContents="lax"/>
   </complexType>
 

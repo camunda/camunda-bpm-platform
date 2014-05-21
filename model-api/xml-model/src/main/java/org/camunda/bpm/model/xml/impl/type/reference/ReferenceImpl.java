@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.model.xml.impl.type.reference;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelReferenceException;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
@@ -20,9 +23,6 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.reference.Reference;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author Sebastian Menski
@@ -152,7 +152,7 @@ public abstract class ReferenceImpl<T extends ModelElementInstance> implements R
    *
    * @param referenceSourceElement the reference source model element instance
    */
-  protected abstract void removeReference(ModelElementInstance referenceSourceElement);
+  protected abstract void removeReference(ModelElementInstance referenceSourceElement, ModelElementInstance referenceTargetElement);
 
   /**
    * Remove the reference if the target element is removed
@@ -163,7 +163,7 @@ public abstract class ReferenceImpl<T extends ModelElementInstance> implements R
   public void referencedElementRemoved(ModelElementInstance referenceTargetElement, Object referenceIdentifier) {
     for (ModelElementInstance referenceSourceElement : findReferenceSourceElements(referenceTargetElement)) {
       if (referenceIdentifier.equals(getReferenceIdentifier(referenceSourceElement))) {
-        removeReference(referenceSourceElement);
+        removeReference(referenceSourceElement, referenceTargetElement);
       }
     }
   }

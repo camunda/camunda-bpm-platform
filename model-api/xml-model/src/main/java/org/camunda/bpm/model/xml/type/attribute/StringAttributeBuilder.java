@@ -14,6 +14,8 @@ package org.camunda.bpm.model.xml.type.attribute;
 
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.reference.AttributeReferenceBuilder;
+import org.camunda.bpm.model.xml.type.reference.AttributeReferenceCollection;
+import org.camunda.bpm.model.xml.type.reference.AttributeReferenceCollectionBuilder;
 
 /**
  * @author Sebastian Menski
@@ -32,5 +34,8 @@ public interface StringAttributeBuilder extends AttributeBuilder<String> {
   <V extends ModelElementInstance> AttributeReferenceBuilder<V> qNameAttributeReference(Class<V> referenceTargetElement);
 
   <V extends ModelElementInstance> AttributeReferenceBuilder<V> idAttributeReference(Class<V>  referenceTargetElement);
+
+  @SuppressWarnings("rawtypes")
+  <V extends ModelElementInstance> AttributeReferenceCollectionBuilder<V> idAttributeReferenceCollection(Class<V> referenceTargetElement, Class<? extends AttributeReferenceCollection> attributeReferenceCollection);
 
 }

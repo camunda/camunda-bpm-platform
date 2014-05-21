@@ -13,6 +13,15 @@
 
 package org.camunda.bpm.model.xml.testmodel.instance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
+import static org.junit.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelValidationException;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
@@ -21,16 +30,7 @@ import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
-import static org.junit.Assert.fail;
-import static org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author Sebastian Menski
@@ -94,6 +94,9 @@ public class AnimalTest extends TestModelTest {
     tweety.getRelationshipDefinitionRefs().add(birdoRelationship);
     tweety.getRelationshipDefinitionRefs().add(pluckyRelationship);
     tweety.getRelationshipDefinitionRefs().add(fiffyRelationship);
+
+    tweety.getBestFriends().add(birdo);
+    tweety.getBestFriends().add(plucky);
 
     return new Object[]{"created", modelInstance, modelParser};
   }
@@ -544,5 +547,65 @@ public class AnimalTest extends TestModelTest {
     assertThat(tweety.getRelationshipDefinitionRefElements()).isEmpty();
     // should affect animal relationship definitions
     assertThat(tweety.getRelationshipDefinitions()).isEmpty();
+  }
+
+  @Test
+  public void testGetBestFriends() {
+    Collection<Animal> bestFriends = tweety.getBestFriends();
+
+    assertThat(bestFriends)
+      .isNotEmpty()
+      .hasSize(2)
+      .containsOnly(birdo, plucky);
+  }
+
+  @Test
+  public void testAddBestFriend() {
+    tweety.getBestFriends().add(daisy);
+
+    Collection<Animal> bestFriends = tweety.getBestFriends();
+
+    assertThat(bestFriends)
+      .isNotEmpty()
+      .hasSize(3)
+      .containsOnly(birdo, plucky, daisy);
+  }
+
+  @Test
+  public void testRemoveBestFriendRef() {
+    tweety.getBestFriends().remove(plucky);
+
+    Collection<Animal> bestFriends = tweety.getBestFriends();
+
+    assertThat(bestFriends)
+      .isNotEmpty()
+      .hasSize(1)
+      .containsOnly(birdo);
+  }
+
+  @Test
+  public void testClearBestFriendRef() {
+    tweety.getBestFriends().clear();
+
+    Collection<Animal> bestFriends = tweety.getBestFriends();
+
+    assertThat(bestFriends)
+      .isEmpty();
+  }
+
+  @Test
+  public void testClearAndAddBestFriendRef() {
+    tweety.getBestFriends().clear();
+
+    Collection<Animal> bestFriends = tweety.getBestFriends();
+
+    assertThat(bestFriends)
+      .isEmpty();
+
+    bestFriends.add(daisy);
+
+    assertThat(bestFriends)
+      .hasSize(1)
+      .containsOnly(daisy);
   }
 }
