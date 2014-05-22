@@ -16,6 +16,8 @@ package org.camunda.spin.impl.xml.dom;
 import org.camunda.spin.SpinRuntimeException;
 
 /**
+ * Throw if an error occurs during the access of a xml dom attribute.
+ *
  * @author Sebastian Menski
  */
 public class SpinXmlDomAttributeException extends SpinRuntimeException {

@@ -17,28 +17,53 @@ import org.camunda.spin.Spin;
 import org.w3c.dom.Attr;
 
 /**
+ * Wrapper of a xml dom attribute.
+ *
  * @author Sebastian Menski
  */
 public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
 
   private final Attr attributeNode;
 
+  /**
+   * Create a new wrapper.
+   *
+   * @param attributeNode the dom xml attribute to wrap
+   */
   public SpinXmlDomAttribute(Attr attributeNode) {
     this.attributeNode = attributeNode;
   }
 
+  /**
+   * @return the xml dom data format name
+   */
   public String getDataFormatName() {
     return DomDataFormat.INSTANCE.getName();
   }
 
+  /**
+   * Returns the value of the attribute as {@link String}.
+   *
+   * @return the string value of the attribute
+   */
   public String stringValue() {
     return attributeNode.getValue();
   }
 
+  /**
+   * Returns the local name of the attribute without namespace or prefix.
+   *
+   * @return the name of the attribute
+   */
   public String name() {
     return attributeNode.getLocalName();
   }
 
+  /**
+   * Returns the namespace uri of the attribute and not the prefix.
+   *
+   * @return the namespace of the attribute
+   */
   public String namespace() {
     String namespaceURI = attributeNode.getNamespaceURI();
     if (namespaceURI != null) {
@@ -49,6 +74,12 @@ public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
     }
   }
 
+  /**
+   * Checks if the attribute has the same namespace.
+   *
+   * @param namespace the namespace to check
+   * @return true if the attribute has the same namespace
+   */
   public boolean hasNamespace(String namespace) {
     if (namespace == null) {
       return attributeNode.getNamespaceURI() == null;
@@ -57,4 +88,5 @@ public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
       return namespace.equals(namespace());
     }
   }
+
 }

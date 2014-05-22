@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Wrapper for a xml dom element.
+ *
  * @author Sebastian Menski
  */
 public class SpinXmlDomElement extends SpinXmlElement {
@@ -31,18 +33,36 @@ public class SpinXmlDomElement extends SpinXmlElement {
 
   private final Element domElement;
 
+  /**
+   * Create a new wrapper.
+   *
+   * @param domElement the xml dom element to wrap
+   */
   public SpinXmlDomElement(Element domElement) {
     this.domElement = domElement;
   }
 
+  /**
+   * @return the xml dom data format name
+   */
   public String getDataFormatName() {
     return DomDataFormat.INSTANCE.getName();
   }
 
+  /**
+   * The local name of the element without namespace or prefix.
+   *
+   * @return the name of the element
+   */
   public String name() {
     return domElement.getLocalName();
   }
 
+  /**
+   * The full namespace uri of the element and not the prefix.
+   *
+   * @return the namespace uri
+   */
   public String namespace() {
     String namespaceURI = domElement.getNamespaceURI();
     if (namespaceURI != null) {
@@ -53,6 +73,12 @@ public class SpinXmlDomElement extends SpinXmlElement {
     }
   }
 
+  /**
+   * Checks if the element has the same namespace.
+   *
+   * @param namespace the namespace to test
+   * @return true if the element has the same namespace, false otherwise
+   */
   public boolean hasNamespace(String namespace) {
     if (namespace == null) {
       return domElement.getNamespaceURI() == null;
@@ -62,10 +88,27 @@ public class SpinXmlDomElement extends SpinXmlElement {
     }
   }
 
+  /**
+   * Returns the wrapped attribute for the given name under
+   * the local namespace.
+   *
+   * @param attributeName the name of the attribute
+   * @return the wrapped xml dom attribute
+   * @throws SpinXmlDomAttributeException if the attribute is not found
+   */
   public SpinXmlDomAttribute attr(String attributeName) {
     return attrNs(null, attributeName);
   }
 
+  /**
+   * Returns the wrapped attribute for the given namespace
+   * and name.
+   *
+   * @param namespace the namespace of the attribute
+   * @param attributeName the name of the attribute
+   * @return the wrapped xml dom attribute
+   * @throws SpinXmlDomAttributeException if the attribute is not found
+   */
   public SpinXmlDomAttribute attrNs(String namespace, String attributeName) {
     if (hasNamespace(namespace)) {
       namespace = null;
@@ -77,10 +120,21 @@ public class SpinXmlDomElement extends SpinXmlElement {
     return new SpinXmlDomAttribute(attributeNode);
   }
 
+  /**
+   * Returns all wrapped attributes for the local namespace.
+   *
+   * @return the wrapped attributes or an empty list of no attributes are found
+   */
   public SpinCollection<SpinXmlDomAttribute> attrs() {
     return attrs(null);
   }
 
+  /**
+   * Returns all wrapped attributes for the given namespace.
+   *
+   * @param namespace the namespace of the attributes
+   * @return the wrapped attributes or an empty list of no attributes are found
+   */
   public SpinCollection<SpinXmlDomAttribute> attrs(String namespace) {
     NamedNodeMap domAttributes = domElement.getAttributes();
     SpinCollection<SpinXmlDomAttribute> attributes = new SpinCollectionImpl<SpinXmlDomAttribute>();
@@ -96,10 +150,20 @@ public class SpinXmlDomElement extends SpinXmlElement {
     return attributes;
   }
 
+  /**
+   * Returns all names of the attributes in the local namespace.
+   *
+   * @return the names of the attributes
+   */
   public List<String> attrNames() {
     return attrNames(null);
   }
 
+  /**
+   * Returns all names of the attributes in the given namespace.
+   *
+   * @return the names of the attributes
+   */
   public List<String> attrNames(String namespace) {
     SpinCollection<SpinXmlDomAttribute> attributes = attrs(namespace);
     List<String> attributeNames = new ArrayList<String>();
@@ -109,10 +173,27 @@ public class SpinXmlDomElement extends SpinXmlElement {
     return attributeNames;
   }
 
+  /**
+   * Returns a single wrapped child element for the given name
+   * in the local namespace.
+   *
+   * @param elementName the element name
+   * @return the wrapped child element
+   * @throws SpinXmlDomElementException if none or more than one child element is found
+   */
   public SpinXmlDomElement childElement(String elementName) {
     return childElement(namespace(), elementName);
   }
 
+  /**
+   * Returns a single wrapped child element for the given namespace
+   * and name.
+   *
+   * @param namespace the namespace of the element
+   * @param elementName the element name
+   * @return the wrapped child element
+   * @throws SpinXmlDomElementException if none or more than one child element is found
+   */
   public SpinXmlDomElement childElement(String namespace, String elementName) {
     SpinCollection<SpinXmlDomElement> childElements = childElements(namespace, elementName);
     if (childElements.size() > 1) {
@@ -123,10 +204,25 @@ public class SpinXmlDomElement extends SpinXmlElement {
     }
   }
 
+  /**
+   * Returns all child element with a given name in the local namespace.
+   *
+   * @param elementName the element name
+   * @return a collection of wrapped elements
+   * @throws SpinXmlDomElementException if no child element was found
+   */
   public SpinCollection<SpinXmlDomElement> childElements(String elementName) {
     return childElements(namespace(), elementName);
   }
 
+  /**
+   * Returns all child element with a given namespace and name.
+   *
+   * @param namespace the namespace of the element
+   * @param elementName the element name
+   * @return a collection of wrapped elements
+   * @throws SpinXmlDomElementException if no child element was found
+   */
   public SpinCollection<SpinXmlDomElement> childElements(String namespace, String elementName) {
     NodeList childNodes = domElement.getChildNodes();
     SpinCollection<SpinXmlDomElement> childElements = new SpinCollectionImpl<SpinXmlDomElement>();

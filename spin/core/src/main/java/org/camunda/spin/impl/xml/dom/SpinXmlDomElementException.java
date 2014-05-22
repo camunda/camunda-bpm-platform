@@ -16,6 +16,8 @@ package org.camunda.spin.impl.xml.dom;
 import org.camunda.spin.SpinRuntimeException;
 
 /**
+ * Thrown if an error occurs during the access of a xml dom element.
+ *
  * @author Sebastian Menski
  */
 public class SpinXmlDomElementException extends SpinRuntimeException {

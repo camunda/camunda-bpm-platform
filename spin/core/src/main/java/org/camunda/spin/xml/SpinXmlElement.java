@@ -26,5 +26,6 @@ public abstract class SpinXmlElement extends Spin<SpinXmlElement> {
 
   public SpinCollection<SpinXmlDomAttribute> attrs() {
     return null;
-  };
+  }
+
 }
