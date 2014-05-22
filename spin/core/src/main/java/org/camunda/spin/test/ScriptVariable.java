@@ -42,4 +42,6 @@ public @interface ScriptVariable {
 
   String file() default "";
 
+  boolean isNull() default false;
+
 }

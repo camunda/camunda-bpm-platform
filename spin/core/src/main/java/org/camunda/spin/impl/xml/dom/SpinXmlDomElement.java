@@ -224,6 +224,9 @@ public class SpinXmlDomElement extends SpinXmlElement {
    * @throws SpinXmlDomElementException if no child element was found
    */
   public SpinCollection<SpinXmlDomElement> childElements(String namespace, String elementName) {
+    if (namespace == null) {
+      namespace = namespace();
+    }
     NodeList childNodes = domElement.getChildNodes();
     SpinCollection<SpinXmlDomElement> childElements = new SpinCollectionImpl<SpinXmlDomElement>();
     for (int i = 0; i < childNodes.getLength(); i++) {

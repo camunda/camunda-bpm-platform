@@ -51,9 +51,21 @@ public class XmlDomElementTest {
     element.attr(NON_EXISTING);
   }
 
+  @Test(expected = SpinXmlDomAttributeException.class)
+  public void cannotReadAttributeByNullName() {
+    element.attr(null);
+  }
+
   @Test
   public void canReadAttributeByNamespaceAndName() {
     SpinXmlDomAttribute attribute = element.attrNs(EXAMPLE_NAMESPACE, "order");
+    String value = attribute.stringValue();
+    assertThat(value).isEqualTo("order1");
+  }
+
+  @Test
+  public void canReadAttributeByNullNamespaceAndName() {
+    SpinXmlDomAttribute attribute = element.attrNs(null, "order");
     String value = attribute.stringValue();
     assertThat(value).isEqualTo("order1");
   }
@@ -69,8 +81,18 @@ public class XmlDomElementTest {
   }
 
   @Test(expected = SpinXmlDomAttributeException.class)
+  public void cannotReadAttributeByNamespaceAndNullName() {
+    element.attrNs(EXAMPLE_NAMESPACE, null);
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
   public void cannotReadAttributeByNonExistingNamespaceAndNonExistingName() {
     element.attrNs(NON_EXISTING, NON_EXISTING);
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  public void cannotReadAttributeByNullNamespaceAndNullName() {
+    element.attrNs(null, null);
   }
 
   @Test
@@ -86,6 +108,16 @@ public class XmlDomElementTest {
   @Test
   public void canGetAllAttributesByNamespace() {
     SpinCollection<SpinXmlDomAttribute> attributes = element.attrs(EXAMPLE_NAMESPACE);
+    for (SpinXmlDomAttribute attribute : attributes) {
+      assertThat(attribute.name()).isIn("order", "dueUntil");
+      assertThat(attribute.stringValue()).isIn("order1", "20150112");
+      assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
+    }
+  }
+
+  @Test
+  public void canGetAllAttributesByNullNamespace() {
+    SpinCollection<SpinXmlDomAttribute> attributes = element.attrs(null);
     for (SpinXmlDomAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.stringValue()).isIn("order1", "20150112");
@@ -112,6 +144,12 @@ public class XmlDomElementTest {
   }
 
   @Test
+  public void canGetAllAttributeNamesByNullNamespace() {
+    List<String> names = element.attrNames(null);
+    assertThat(names).containsOnly("order", "dueUntil");
+  }
+
+  @Test
   public void canGetAllAttributeNamesByNonExistingNamespace() {
     List<String> names = element.attrNames(NON_EXISTING);
     assertThat(names).isEmpty();
@@ -129,8 +167,20 @@ public class XmlDomElementTest {
     element.childElement(NON_EXISTING);
   }
 
+  @Test(expected = SpinXmlDomElementException.class)
+  public void cannotGetSingleChildElementByNullName() {
+    element.childElement(null);
+  }
+
   @Test
   public void canGetSingleChildElementByNamespaceAndName() {
+    SpinXmlDomElement childElement = element.childElement(EXAMPLE_NAMESPACE, "date");
+    assertThat(childElement).isNotNull();
+    assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");
+  }
+
+  @Test
+  public void canGetSingleChildElementByNullNamespaceAndName() {
     SpinXmlDomElement childElement = element.childElement(EXAMPLE_NAMESPACE, "date");
     assertThat(childElement).isNotNull();
     assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");
@@ -139,6 +189,11 @@ public class XmlDomElementTest {
   @Test(expected = SpinXmlDomElementException.class)
   public void cannotGetChildElementByNamespaceAndNonExistingName() {
     element.childElement(EXAMPLE_NAMESPACE, NON_EXISTING);
+  }
+
+  @Test(expected = SpinXmlDomElementException.class)
+  public void cannotGetChildElementByNamespaceAndNullName() {
+    element.childElement(EXAMPLE_NAMESPACE, null);
   }
 
   @Test(expected = SpinXmlDomElementException.class)
@@ -151,6 +206,11 @@ public class XmlDomElementTest {
     element.childElement(NON_EXISTING, NON_EXISTING);
   }
 
+  @Test(expected = SpinXmlDomElementException.class)
+  public void cannotGetChildElementByNullNamespaceAndNullName() {
+    element.childElement(null, null);
+  }
+
   @Test
   public void canGetAllChildElementsByName() {
     SpinCollection<SpinXmlDomElement> childElements = element.childElements("customer");
@@ -159,12 +219,23 @@ public class XmlDomElementTest {
 
   @Test(expected = SpinXmlDomElementException.class)
   public void cannotGetAllChildElementsByNonExistingName() {
-    SpinCollection<SpinXmlDomElement> childElements = element.childElements(NON_EXISTING);
+    element.childElements(NON_EXISTING);
+  }
+
+  @Test(expected = SpinXmlDomElementException.class)
+  public void cannotGetAllChildElementsByNullName() {
+    element.childElements(null);
   }
 
   @Test
   public void canGetAllChildElementsByNamespaceAndName() {
     SpinCollection<SpinXmlDomElement> childElements = element.childElements(EXAMPLE_NAMESPACE, "customer");
+    assertThat(childElements).hasSize(3);
+  }
+
+  @Test
+  public void canGetAllChildElementsByNullNamespaceAndName() {
+    SpinCollection<SpinXmlDomElement> childElements = element.childElements(null, "customer");
     assertThat(childElements).hasSize(3);
   }
 
@@ -179,8 +250,18 @@ public class XmlDomElementTest {
   }
 
   @Test(expected = SpinXmlDomElementException.class)
+  public void cannotGetAllChildElementsByNamespaceAndNullName() {
+    element.childElements(EXAMPLE_NAMESPACE, null);
+  }
+
+  @Test(expected = SpinXmlDomElementException.class)
   public void cannotGetAllChildElementsByNonExistingNamespaceAndNonExistingName() {
     element.childElements(NON_EXISTING, NON_EXISTING);
+  }
+
+  @Test(expected = SpinXmlDomElementException.class)
+  public void cannotGetAllChildElementsByNullNamespaceAndNullName() {
+    element.childElements(null, null);
   }
 
 }

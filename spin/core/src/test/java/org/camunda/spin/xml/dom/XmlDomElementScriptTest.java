@@ -66,6 +66,19 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
+  @Test(expected = SpinXmlDomAttributeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.readAttributeValueByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotReadAttributeByNullName() throws Throwable {
+    failingWithException();
+  }
+
   @Test
   @Script(
     name = "XmlDomElementScriptTest.readAttributeValueByNamespaceAndName",
@@ -76,6 +89,20 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canReadAttributeByNamespaceAndName() {
+    String value = script.getVariable("value");
+    assertThat(value).isEqualTo("order1");
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.readAttributeValueByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", isNull = true),
+      @ScriptVariable(name = "name", value = "order")
+    }
+  )
+  public void canReadAttributeByNullNamespaceAndName() {
     String value = script.getVariable("value");
     assertThat(value).isEqualTo("order1");
   }
@@ -113,12 +140,40 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     name = "XmlDomElementScriptTest.readAttributeValueByNamespaceAndName",
     variables = {
       @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotReadAttributeByNamespaceAndNullName() throws Throwable {
+    failingWithException();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.readAttributeValueByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
       @ScriptVariable(name = "namespace", value = NON_EXISTING),
       @ScriptVariable(name = "name", value = NON_EXISTING)
     },
     execute = false
   )
   public void cannotReadAttributeByNonExistingNamespaceAndNonExistingName() throws Throwable {
+    failingWithException();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.readAttributeValueByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", isNull = true),
+      @ScriptVariable(name = "name", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotReadAttributeByNullNamespaceAndNullName() throws Throwable {
     failingWithException();
   }
 
@@ -143,6 +198,23 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllAttributesByNamespace() {
+    SpinCollection<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
+    for (SpinXmlDomAttribute attribute : attributes) {
+      assertThat(attribute.name()).isIn("order", "dueUntil");
+      assertThat(attribute.stringValue()).isIn("order1", "20150112");
+      assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
+    }
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.getAllAttributesAndNamesByNamespace",
+    variables = {
+      @ScriptVariable(name= "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", isNull = true)
+    }
+  )
+  public void canGetAllAttributesByNullNamespace() {
     SpinCollection<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
     for (SpinXmlDomAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
@@ -190,6 +262,19 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     name = "XmlDomElementScriptTest.getAllAttributesAndNamesByNamespace",
     variables = {
       @ScriptVariable(name= "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", isNull = true)
+    }
+  )
+  public void canGetAllAttributeNamesByNullNamespace() {
+    List<String> names = script.getVariable("names");
+    assertThat(names).containsOnly("order", "dueUntil");
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.getAllAttributesAndNamesByNamespace",
+    variables = {
+      @ScriptVariable(name= "input", file = EXAMPLE_XML_FILE_NAME),
       @ScriptVariable(name = "namespace", value = NON_EXISTING)
     }
   )
@@ -225,6 +310,19 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
+  @Test(expected = SpinXmlDomElementException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.getChildElementByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotGetSingleChildElementByNullName() throws Throwable {
+    failingWithException();
+  }
+
   @Test
   @Script(
     name = "XmlDomElementScriptTest.getChildElementByNamespaceAndName",
@@ -235,6 +333,21 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetSingleChildElementByNamespaceAndName() {
+    SpinXmlDomElement childElement = script.getVariable("childElement");
+    assertThat(childElement).isNotNull();
+    assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.getChildElementByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name= "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", isNull = true),
+      @ScriptVariable(name = "name", value = "date")
+    }
+  )
+  public void canGetSingleChildElementByNullNamespaceAndName() {
     SpinXmlDomElement childElement = script.getVariable("childElement");
     assertThat(childElement).isNotNull();
     assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");
@@ -251,6 +364,20 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void cannotGetChildElementByNamespaceAndNonExistingName() throws Throwable {
+    failingWithException();
+  }
+
+  @Test(expected = SpinXmlDomElementException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.getChildElementByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name= "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotGetChildElementByNamespaceAndNullName() throws Throwable {
     failingWithException();
   }
 
@@ -282,6 +409,20 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
+  @Test(expected = SpinXmlDomElementException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.getChildElementByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name= "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", isNull = true),
+      @ScriptVariable(name = "name", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotGetChildElementByNullNamespaceAndNullName() throws Throwable {
+    failingWithException();
+  }
+
   @Test
   @Script(
     name = "XmlDomElementScriptTest.getChildElementsByName",
@@ -308,6 +449,19 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
+  @Test(expected = SpinXmlDomElementException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.getChildElementsByName",
+    variables = {
+      @ScriptVariable(name= "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotGetAllChildElementsByNullName() throws Throwable {
+    failingWithException();
+  }
+
   @Test
   @Script(
     name = "XmlDomElementScriptTest.getChildElementsByNamespaceAndName",
@@ -318,6 +472,20 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllChildElementsByNamespaceAndName() {
+    SpinCollection<SpinXmlDomElement> childElements = script.getVariable("childElements");
+    assertThat(childElements).hasSize(3);
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.getChildElementsByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name= "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", isNull = true),
+      @ScriptVariable(name = "name", value = "customer")
+    }
+  )
+  public void canGetAllChildElementsByNullNamespaceAndName() {
     SpinCollection<SpinXmlDomElement> childElements = script.getVariable("childElements");
     assertThat(childElements).hasSize(3);
   }
@@ -355,12 +523,40 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     name = "XmlDomElementScriptTest.getChildElementsByNamespaceAndName",
     variables = {
       @ScriptVariable(name= "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotGetAllChildElementsByNamespaceAndNonNullName() throws Throwable {
+    failingWithException();
+  }
+
+  @Test(expected = SpinXmlDomElementException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.getChildElementsByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name= "input", file = EXAMPLE_XML_FILE_NAME),
       @ScriptVariable(name = "namespace", value = NON_EXISTING),
       @ScriptVariable(name = "name", value = NON_EXISTING)
     },
     execute = false
   )
   public void cannotGetAllChildElementsByNonExistingNamespaceAndNonExistingName() throws Throwable {
+    failingWithException();
+  }
+
+  @Test(expected = SpinXmlDomElementException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.getChildElementsByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name= "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", isNull = true),
+      @ScriptVariable(name = "name", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotGetAllChildElementsByNullNamespaceAndNullName() throws Throwable {
     failingWithException();
   }
 

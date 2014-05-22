@@ -181,7 +181,12 @@ public class ScriptRule implements TestRule {
     String name = scriptVariable.name();
     String value = scriptVariable.value();
     String filename = scriptVariable.file();
-    if (!value.isEmpty()) {
+    boolean isNull = scriptVariable.isNull();
+    if (isNull) {
+      variables.put(name, null);
+      LOG.scriptVariableFound(name, "isNull", null);
+    }
+    else if (!value.isEmpty()) {
       variables.put(name, value);
       LOG.scriptVariableFound(name, "string", value);
     }
