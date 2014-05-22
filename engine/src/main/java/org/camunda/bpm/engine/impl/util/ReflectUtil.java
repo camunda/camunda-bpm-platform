@@ -21,8 +21,6 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
@@ -34,6 +32,17 @@ import java.util.logging.Logger;
 public abstract class ReflectUtil {
 
   private static final Logger LOG = Logger.getLogger(ReflectUtil.class.getName());
+
+  private static final Map<String, String> charEncodings = new HashMap<String, String>();
+
+  static {
+    charEncodings.put("ä", "%C3%A4");
+    charEncodings.put("ö", "%C3%B6");
+    charEncodings.put("ü", "%C3%BC");
+    charEncodings.put("Ä", "%C3%84");
+    charEncodings.put("Ö", "%C3%96");
+    charEncodings.put("Ü", "%C3%9C");
+  }
   
   public static ClassLoader getClassLoader() {
     ClassLoader loader = getCustomClassLoader();
@@ -107,7 +116,7 @@ public abstract class ReflectUtil {
     }
     return resourceStream;
    }
-  
+
   public static URL getResource(String name) {
     URL url = null;
     ClassLoader classLoader = getCustomClassLoader();
@@ -124,35 +133,18 @@ public abstract class ReflectUtil {
         url = classLoader.getResource(name);
       }
     }
-   
+
     return url;
-   }
+  }
 
-  /**
-   * Gets the encoded url of the resource.
-   *
-   * @param name  the name of the resource
-   * @return the encoded url of the resource
-   */
   public static String getResourceUrlAsString(String name) {
-    URL url = getResource(name);
-    return urlToURI(url).toASCIIString();
+    String url = getResource(name).toString();
+    for (Map.Entry<String, String> mapping : charEncodings.entrySet()) {
+      url = url.replaceAll(mapping.getKey(), mapping.getValue());
+    }
+    return url;
   }
 
-  /**
-   * Converts an url to an uri. Escapes whitespaces if needed.
-   *
-   * @param url  the url to convert
-   * @return the resulting uri
-   * @throws ProcessEngineException if the url has invalid syntax
-   */
-  public static URI urlToURI(URL url) {
-    try {
-      return new URI(url.getProtocol(), url.getPath(), null);
-    } catch (URISyntaxException e) {
-      throw new ProcessEngineException("couldn't convert URL to URI " + url, e);
-    }
-  }
 
   public static Object instantiate(String className) {
     try {
