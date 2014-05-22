@@ -5,7 +5,7 @@ The camunda BPMN model API is a simple, lightweight Java library for parsing, cr
 * Web Site: http://www.camunda.org/
 * User Guide: link:http://docs.camunda.org/latest/guides/user-guide/#bpmn-model-api[http://docs.camunda.org]
 * Examples: link:https://github.com/camunda/camunda-bpm-examples/tree/master/bpmn-model-api[https://github.com/camunda/camunda-bpm-examples]
-* Issue Tracker: link:https://app.camunda.com/jira/secure/RapidBoard.jspa?rapidView=39&selectedIssue=CAM-1799&quickFilter=156[https://app.camunda.com/jira]
+* Issue Tracker: https://app.camunda.com/jira/
 * Contribution Guidelines: http://www.camunda.org/community/contribute.html
 * License: Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
 
@@ -27,7 +27,7 @@ BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("processId")
 ----
 
 For more complex examples see the link:http://docs.camunda.org/latest/guides/user-guide/#bpmn-model-api-fluent-builder-api[docs],
-the tests in link:bpmn-model/src/test/java/org/camunda/bpm/model/bpmn/builder/ProcessBuilderTest.java[ProcessBuilderTest.java] or this
+the tests in link:src/test/java/org/camunda/bpm/model/bpmn/builder/ProcessBuilderTest.java[ProcessBuilderTest.java] or this
 link:https://github.com/camunda/camunda-bpm-examples/tree/master/bpmn-model-api/generate-process-fluent-api[example].
 
 === Create an empty BPMN model
@@ -54,12 +54,12 @@ Bpmn.validateModel(modelInstance);
 
 === Creating a Process using the full API
 
-The fluent API is usually a good choice for creating a new BPMN process. 
+The fluent API is usually a good choice for creating a new BPMN process.
 However, not all elements supported by the model are exposed through fluent
 builders and the fluent api may not be the appropriate API style for all usecases.
-In such cases, the full API can be used for creating a process model. 
-The following code creates a simple Process as a jUnit4 test using the full API: 
-link:bpmn-model/src/test/java/org/camunda/bpm/model/bpmn/CreateModelTest.java[CreateModelTest.java].
+In such cases, the full API can be used for creating a process model.
+The following code creates a simple Process as a jUnit4 test using the full API:
+link:src/test/java/org/camunda/bpm/model/bpmn/CreateModelTest.java[CreateModelTest.java].
 
 === Find elements inside the model
 
@@ -119,5 +119,5 @@ Apache License 2.0.
 === Does this API support all BPMN 2.0 Elements?
 
 No, but support is already quite extensive. See
-link:bpmn-model/src/main/java/org/camunda/bpm/model/bpmn/instance[org.camunda.bpm.model.bpmn.instance] 
+link:src/main/java/org/camunda/bpm/model/bpmn/instance[org.camunda.bpm.model.bpmn.instance]
 for a list of currently supported elements.
