@@ -5,6 +5,7 @@ define([
            'angular',
            'camunda-tasklist/mocks/pile',
            'camunda-tasklist/mocks/task',
+           'camunda-tasklist/mocks/user',
            'camunda-tasklist/mocks/session'
 ], function(angular) {
   return angular.module('cam.tasklist.mocks', []);
