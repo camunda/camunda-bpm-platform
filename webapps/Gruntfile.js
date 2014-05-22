@@ -23,7 +23,7 @@ module.exports = function(grunt) {
     bower:            require('./grunt/config/bower')(config),
 
     // sadly, this is not ready yet.
-    // jasmine_node:     require('./grunt/config/jasmine_node')(config),
+    jasmine_node:     require('./grunt/config/jasmine_node')(config),
 
     karma:            require('./grunt/config/karma')(config),
 

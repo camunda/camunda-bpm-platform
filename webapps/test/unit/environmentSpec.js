@@ -2,7 +2,7 @@
 'use strict';
 var path = require('path');
 
-describe('The environment', function() {
+xdescribe('The environment', function() {
   var tasklist;
   var rjs;
 

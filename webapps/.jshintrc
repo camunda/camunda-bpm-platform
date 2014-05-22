@@ -4,6 +4,7 @@
     "element": false,
     "by": false,
     "describe": false,
+    "xdescribe": false,
     "ddescribe": false,
     "it": false,
     "xit": false,
