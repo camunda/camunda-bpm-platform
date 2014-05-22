@@ -12,10 +12,6 @@
  */
 package org.camunda.spin.impl;
 
-import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
-
-import java.io.InputStream;
-
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
@@ -23,6 +19,10 @@ import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
 import org.camunda.spin.spi.SpinDataFormatException;
+
+import java.io.InputStream;
+
+import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
 
 /**
  * @author Daniel Meyer
@@ -39,6 +39,11 @@ public class SpinFactoryImpl extends SpinFactory {
     return (DataFormat<T>) DataFormats.xmlDom();
   }
 
+  /**
+   *
+   * @throws SpinDataFormatException in case the parameter cannot be read using this data format
+   * @throws IllegalArgumentException in case the parameter is null or dd:
+   */
 
   public <T extends Spin<?>> T createSpin(Object parameter) {
     DataFormat<T> spinDataFormat = detectDataFormat(parameter);
@@ -48,6 +53,7 @@ public class SpinFactoryImpl extends SpinFactory {
   /**
    *
    * @throws SpinDataFormatException in case the parameter cannot be read using this data format
+   * @throws IllegalArgumentException in case the parameter is null or dd:
    */
   @SuppressWarnings("unchecked")
   public <T extends Spin<?>> T createSpin(Object parameter, DataFormat<T> format) {
