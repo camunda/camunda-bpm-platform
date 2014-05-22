@@ -15,6 +15,16 @@ You just need to (optionally) build the project and serve its `dist` folder.
 
 You can start the development environement with the `grunt serve` command.
 
+
+### Contributing
+
+You are more than welcome to take part on the development of this project!
+
+Clone the repository, add, fix or improve and send us a pull request.    
+But please take care about the commit messages, [our conventions can be found
+here](https://github.com/ajoslin/conventional-changelog/blob/master/CONVENTIONS.md).
+
+
 ## Browsers support
 
 The supported browsers are:
@@ -26,7 +36,12 @@ The supported browsers are:
 
 ### Unit tests
 
-You can run the unit tests with `grunt jasmine_node`.
+~~You can run the unit tests with `grunt jasmine_node`.~~
+
+Actually, no. Because only very specific parts of the code
+(due to the dependencies) can be tested on the "node side".    
+This might be a future feature but for now the 2 other testing
+environments, although slower, should be enough.
 
 ### Integration tests
 
