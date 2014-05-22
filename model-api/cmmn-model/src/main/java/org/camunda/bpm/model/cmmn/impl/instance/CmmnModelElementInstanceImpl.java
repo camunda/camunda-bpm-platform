@@ -26,12 +26,4 @@ public abstract class CmmnModelElementInstanceImpl extends ModelElementInstanceI
     super(instanceContext);
   }
 
-  public boolean isScope() {
-    return false;
-  }
-
-  public CmmnModelElementInstance getScope() {
-    return null;
-  }
-
 }

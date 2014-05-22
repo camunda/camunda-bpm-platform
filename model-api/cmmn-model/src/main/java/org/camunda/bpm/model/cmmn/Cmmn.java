@@ -96,10 +96,10 @@ public class Cmmn {
 
   /** the singleton instance of {@link Cmmn}. If you want to customize the behavior of Cmmn,
    * replace this instance with an instance of a custom subclass of {@link Cmmn}. */
-  public static final Cmmn INSTANCE = new Cmmn();
+  public static Cmmn INSTANCE = new Cmmn();
 
   /** the parser used by the Cmmn implementation. */
-  private final CmmnParser cmmnParser = new CmmnParser();
+  private CmmnParser cmmnParser = new CmmnParser();
   private final ModelBuilder cmmnModelBuilder;
 
   /** The {@link Model}
@@ -187,7 +187,7 @@ public class Cmmn {
   /**
    * Register known types of the Cmmn model
    */
-  private Cmmn() {
+  protected Cmmn() {
     cmmnModelBuilder = ModelBuilder.createInstance("CMMN Model");
     doRegisterTypes(cmmnModelBuilder);
     cmmnModel = cmmnModelBuilder.build();
