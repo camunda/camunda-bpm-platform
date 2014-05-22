@@ -35,7 +35,8 @@
     "angular-ui-bootstrap": "~0.11.0",
     "angular-moment": "~0.7.0",
     "requirejs-domready": "~2.0.1",
-    "angular-bootstrap": "~0.11.0"
+    "angular-bootstrap": "~0.11.0",
+    "angular-route": "~1.2.16"
   },
   "devDependencies": {
     "jquery-mockjax": "~1.5.3",

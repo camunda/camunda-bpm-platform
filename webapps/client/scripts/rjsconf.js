@@ -9,6 +9,7 @@ define(function() {
       'domready':                   'bower_components/requirejs-domready/domReady',
 
       'angular':                    'bower_components/angular/angular',
+      'angular-route':              'bower_components/angular-route/angular-route',
       'moment':                     'bower_components/moment/moment',
       'jquery':                     'bower_components/jquery/dist/jquery',
       'angular-bootstrap':          'bower_components/angular-bootstrap/ui-bootstrap-tpls',
@@ -38,6 +39,8 @@ define(function() {
                                       exports: 'angular',
                                       deps: ['jquery']
                                     },
+      'angular-route':              ['angular'],
+
       'angular-bootstrap':          ['angular'],
       'angular-moment':             ['angular', 'moment'],
 
@@ -50,8 +53,10 @@ define(function() {
 
 
       'camunda-tasklist':           [
-                                      'angular-bootstrap',
-                                      'angular-moment',
+                                      // 'angular-bootstrap',
+                                      // 'angular-moment',
+
+                                      'angular-route',
 
                                       'camunda-tasklist/controls',
                                       'camunda-tasklist/form',

@@ -24,29 +24,27 @@ define('camunda-tasklist', [
     return translated;
   }
 
+
   function loaded() {
     var angular = require('angular');
     var $ = angular.element;
 
-    tasklistApp = angular.module('cam.tasklist', rj2ngNames(appModules));
-
-
+    var ngDeps = rj2ngNames(appModules).concat([
+      'ngRoute'
+    ]);
+    console.info('rj2ngNames(appModules)', appModules.join('\n'), '\n\n\n', ngDeps.join('\n'));
+    tasklistApp = angular.module('cam.tasklist', ngDeps);
 
     tasklistApp.controller('TasklistCtrl', [
-             '$scope', '$rootScope', '$modal', 'camPileData',
-    function ($scope,   $rootScope,   $modal,   camPileData) {
+            '$rootScope',
+    function($rootScope) {
       $rootScope.batchActions = {
         selected: []
       };
+
       $rootScope.focusedPile = {};
+
       $rootScope.focusedTask = {};
-
-      $scope.user = {
-        id:   'max',
-        name: 'Max Mustermann'
-      };
-
-      $scope.piles = [];
 
       $rootScope.$on('tasklist.pile.focused', function() {
         $('.task-board').removeClass('pile-edit');
