@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="http://camunda.org/test">
+
+  <!-- NOTE: this document is not valid and is only used to test all camunda extensions -->
+
+  <process id="process"
+      camunda:candidateStarterGroups="group1, ${group2(a, b)}, group3"
+      camunda:candidateStarterUsers="user1, ${user2(a, b)}, user3">
+    <extensionElements>
+      <camunda:executionListener event="start" class="org.camunda.test.Test"/>
+    </extensionElements>
+
+    <startEvent id="startEvent"
+        camunda:initiator="test"
+        camunda:formHandlerClass="org.camunda.test.Test"
+        camunda:formKey="test">
+      <extensionElements>
+        <camunda:executionListener event="start" expression="${test}"/>
+        <camunda:potentialStarter>
+          <resourceAssignmentExpression>
+            <formalExpression>group1, ${group2(a, b)}, group3</formalExpression>
+          </resourceAssignmentExpression>
+        </camunda:potentialStarter>
+        <camunda:formProperty id="test" name="test" type="test" variable="test" expression="${test}" datePattern="test" default="test"/>
+      </extensionElements>
+    </startEvent>
+
+    <userTask id="userTask"
+        camunda:assignee="test"
+        camunda:async="true"
+        camunda:candidateGroups="group1, ${group2(a, b)}, group3"
+        camunda:candidateUsers="user1, ${user2(a, b)}, user3"
+        camunda:dueDate="2014-02-27"
+        camunda:exclusive="false"
+        camunda:formHandlerClass="org.camunda.test.Test"
+        camunda:formKey="test"
+        camunda:priority="12">
+      <extensionElements>
+        <camunda:taskListener event="create" class="org.camunda.test.Test" expression="${test}" delegateExpression="${org.camunda.test.Test}">
+          <camunda:field name="test">
+            <camunda:string>test</camunda:string>
+          </camunda:field>
+        </camunda:taskListener>
+        <camunda:formData>
+          <camunda:formField id="test" label="test" type="test" datePattern="test" defaultValue="test">
+            <camunda:properties>
+              <camunda:property id="test" value="test"/>
+            </camunda:properties>
+            <camunda:validation>
+              <camunda:constraint name="test" config="test"/>
+            </camunda:validation>
+            <camunda:value id="test" name="test"/>
+          </camunda:formField>
+        </camunda:formData>
+      </extensionElements>
+    </userTask>
+
+    <serviceTask id="serviceTask"
+        camunda:expression="${test}"
+        camunda:class="org.camunda.test.Test"
+        camunda:delegateExpression="${org.camunda.test.Test}"
+        camunda:resultVariable="test"
+        camunda:type="mail">
+      <extensionElements>
+        <camunda:executionListener event="start" delegateExpression="${org.camunda.test.Test}"/>
+      </extensionElements>
+    </serviceTask>
+
+    <sendTask id="sendTask">
+      <extensionElements>
+        <camunda:failedJobRetryTimeCycle>test</camunda:failedJobRetryTimeCycle>
+        <camunda:field name="test" stringValue="test" expression="${test}">
+          <camunda:expression>${test}</camunda:expression>
+          <camunda:string>test</camunda:string>
+        </camunda:field>
+      </extensionElements>
+    </sendTask>
+
+    <callActivity id="callActivity" camunda:calledElementBinding="test" camunda:calledElementVersion="test">
+      <extensionElements>
+        <camunda:in source="test" sourceExpression="${test}" variables="test" businessKey="${test}" target="test"/>
+        <camunda:out source="test" sourceExpression="${test}" variables="test" target="test"/>
+      </extensionElements>
+    </callActivity>
+
+    <endEvent id="endEvent">
+      <extensionElements>
+        <camunda:properties>
+          <camunda:property name="name1" value="value1"/>
+          <camunda:property name="name2" value="value2"/>
+        </camunda:properties>
+      </extensionElements>
+      <messageEventDefinition camunda:class="org.camunda.test.Test" camunda:expression="${test}" camunda:delegateExpression="${org.camunda.test.Test}" camunda:resultVariable="test"/>
+    </endEvent>
+
+    <parallelGateway id="parallelGateway" camunda:async="true">
+
+    </parallelGateway>
+
+  </process>
+</definitions>

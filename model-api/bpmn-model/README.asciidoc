@@ -9,21 +9,6 @@ The camunda BPMN model API is a simple, lightweight Java library for parsing, cr
 * Contribution Guidelines: http://www.camunda.org/community/contribute.html
 * License: Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
 
-== Components
-
-The model API currently consists of two Components.
-
-=== XML model API
-
-The XML model API is the foundation of the BPMN model API. It is a generic XML API to read, edit and write
-XML files. It allows the access of all attributes and elements even if they are not implemented in the BPMN
-model API.
-
-=== BPMN model API
-
-The main component the BPMN model API extends the XML model API by the BPMN 2.0 elements. It allows the
-simple access of the attributes and child elements of a BPMN element.
-
 == Features
 
 === Fluent builder API
