@@ -45,10 +45,10 @@ public class Bpmn {
 
   /** the singleton instance of {@link Bpmn}. If you want to customize the behavior of Bpmn,
    * replace this instance with an instance of a custom subclass of {@link Bpmn}. */
-  public static final Bpmn INSTANCE = new Bpmn();
+  public static Bpmn INSTANCE = new Bpmn();
 
   /** the parser used by the Bpmn implementation. */
-  private final BpmnParser bpmnParser = new BpmnParser();
+  private BpmnParser bpmnParser = new BpmnParser();
   private final ModelBuilder bpmnModelBuilder;
 
   /** The {@link Model}
@@ -162,7 +162,7 @@ public class Bpmn {
   /**
    * Register known types of the BPMN model
    */
-  private Bpmn() {
+  protected Bpmn() {
     bpmnModelBuilder = ModelBuilder.createInstance("BPMN Model");
     doRegisterTypes(bpmnModelBuilder);
     bpmnModel = bpmnModelBuilder.build();
