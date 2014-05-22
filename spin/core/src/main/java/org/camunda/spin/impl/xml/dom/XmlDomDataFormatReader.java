@@ -27,7 +27,7 @@ import java.io.InputStream;
  * @author Daniel Meyer
  *
  */
-public class DomDataFormatReader implements DataFormatReader {
+public class XmlDomDataFormatReader implements DataFormatReader {
 
   private static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
 

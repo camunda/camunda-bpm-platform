@@ -12,7 +12,7 @@
  */
 package org.camunda.spin;
 
-import org.camunda.spin.impl.xml.dom.DomDataFormat;
+import org.camunda.spin.impl.xml.dom.XmlDomDataFormat;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
 import org.camunda.spin.spi.DataFormat;
 
@@ -25,7 +25,7 @@ import org.camunda.spin.spi.DataFormat;
 public class DataFormats {
 
   public static DataFormat<SpinXmlDomElement> xmlDom() {
-    return DomDataFormat.INSTANCE;
+    return XmlDomDataFormat.INSTANCE;
   }
 
 }

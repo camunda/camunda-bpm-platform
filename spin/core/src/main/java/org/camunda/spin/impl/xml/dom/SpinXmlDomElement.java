@@ -46,7 +46,7 @@ public class SpinXmlDomElement extends SpinXmlElement {
    * @return the xml dom data format name
    */
   public String getDataFormatName() {
-    return DomDataFormat.INSTANCE.getName();
+    return XmlDomDataFormat.INSTANCE.getName();
   }
 
   /**

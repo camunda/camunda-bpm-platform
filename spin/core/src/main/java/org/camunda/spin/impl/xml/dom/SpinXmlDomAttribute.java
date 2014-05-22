@@ -38,7 +38,7 @@ public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
    * @return the xml dom data format name
    */
   public String getDataFormatName() {
-    return DomDataFormat.INSTANCE.getName();
+    return XmlDomDataFormat.INSTANCE.getName();
   }
 
   /**

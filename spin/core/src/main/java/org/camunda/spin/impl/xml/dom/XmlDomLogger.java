@@ -36,8 +36,8 @@ public class XmlDomLogger extends SpinLogger {
     logDebug("004", "Parsing input into DOM document.");
   }
 
-  public SpinXmlDomDataFormatException unableToCreateParser(Exception cause) {
-    return new SpinXmlDomDataFormatException(exceptionMessage("005", "Unable to create DocumentBuilder"), cause);
+  public XmlDomDataFormatException unableToCreateParser(Exception cause) {
+    return new XmlDomDataFormatException(exceptionMessage("005", "Unable to create DocumentBuilder"), cause);
   }
 
   public SpinXmlDomAttributeException unableToFindAttributeWithNamespaceAndName(String namespace, String attributeName) {
@@ -52,8 +52,8 @@ public class XmlDomLogger extends SpinLogger {
     return new SpinXmlDomElementException(exceptionMessage("008", "More than one child element was found for namespace '{}' and name '{}'", namespace, elementName));
   }
 
-  public SpinXmlDomDataFormatException unableToParseInput(Exception e) {
-    return new SpinXmlDomDataFormatException(exceptionMessage("009", "Unable to parse input into DOM document"), e);
+  public XmlDomDataFormatException unableToParseInput(Exception e) {
+    return new XmlDomDataFormatException(exceptionMessage("009", "Unable to parse input into DOM document"), e);
   }
 
 }

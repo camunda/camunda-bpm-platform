@@ -20,9 +20,9 @@ import org.w3c.dom.Element;
  * @author Daniel Meyer
  *
  */
-public class DomDataFormat implements DataFormat<SpinXmlDomElement> {
+public class XmlDomDataFormat implements DataFormat<SpinXmlDomElement> {
 
-  public final static DomDataFormat INSTANCE = new DomDataFormat();
+  public final static XmlDomDataFormat INSTANCE = new XmlDomDataFormat();
 
   public Class<SpinXmlDomElement> getWrapperType() {
     return SpinXmlDomElement.class;
@@ -33,7 +33,7 @@ public class DomDataFormat implements DataFormat<SpinXmlDomElement> {
   }
 
   public DataFormatReader getReader() {
-    return new DomDataFormatReader();
+    return new XmlDomDataFormatReader();
   }
 
   public String getName() {

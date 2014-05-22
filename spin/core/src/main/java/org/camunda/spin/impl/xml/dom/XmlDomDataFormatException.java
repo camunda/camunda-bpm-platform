@@ -18,15 +18,15 @@ import org.camunda.spin.spi.SpinDataFormatException;
  * @author Daniel Meyer
  *
  */
-public class SpinXmlDomDataFormatException extends SpinDataFormatException {
+public class XmlDomDataFormatException extends SpinDataFormatException {
 
   private static final long serialVersionUID = 1L;
 
-  public SpinXmlDomDataFormatException(String message, Throwable cause) {
+  public XmlDomDataFormatException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public SpinXmlDomDataFormatException(String message) {
+  public XmlDomDataFormatException(String message) {
     super(message);
   }
 
