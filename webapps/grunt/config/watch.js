@@ -37,15 +37,15 @@ module.exports = function(config) {
       ]
     },
 
-    // unitTest: {
-    //   files: [
-    //     'grunt/config/jasmine_node.js',
-    //     'test/unit/**/*Spec.js'
-    //   ],
-    //   tasks: [
-    //     'jasmine_node:unit'
-    //   ]
-    // },
+    unitTest: {
+      files: [
+        'grunt/config/jasmine_node.js',
+        'test/unit/**/*Spec.js'
+      ],
+      tasks: [
+        'jasmine_node:unit'
+      ]
+    },
 
     integrationTest: {
       files: [

@@ -34,21 +34,24 @@ The supported browsers are:
 
 ## Test
 
+They are 3 "testing methods" provide for development.
+
 ### Unit tests
 
-~~You can run the unit tests with `grunt jasmine_node`.~~
-
-Actually, no. Because only very specific parts of the code
-(due to the dependencies) can be tested on the "node side".    
-This might be a future feature but for now the 2 other testing
-environments, although slower, should be enough.
+Is the fastest executed testing suite, perfect for testing objects
+(who do not rely on something normally provided by a browser).   
+You can run the unit tests with `grunt jasmine_node`.
 
 ### Integration tests
 
+A little slower but allows to test things in browsers.   
 You can run the unit tests with `grunt karma`.
 
 ### E2E tests
 
+Very slow and especially annoying to write tests for, install and maintain
+(OK, OK, personal point of view), writing E2E tests is still one of
+the best ways to test the application in its whole.   
 You can run the unit tests with `grunt build connect protractor`.
 
 ## Coding styleguide
@@ -61,5 +64,5 @@ The camunda tasklist is licensed under [Apache License Version 2.0](./LICENSE).
 
 ## Authors
 
-[Valentin `zeropaper` Vago](https://github.com/zeropaper)
-[Nico `Nikku` Rehwaldt](https://github.com/nikku)
+ - [Valentin `zeropaper` Vago](https://github.com/zeropaper)
+ - [Nico `Nikku` Rehwaldt](https://github.com/nikku)
