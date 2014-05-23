@@ -6,13 +6,16 @@ module.exports = function() {
         {
           expand: true,
           cwd: 'client',
-          src: ['*.{html,ico,txt}'],
+          src: [
+            '*.{ico,txt}',
+            'index.html'
+          ],
           dest: 'dist/'
         },
         {
           expand: true,
           cwd: 'client/fonts',
-          src: ['**'],
+          src: ['*/*.{eot,svg,ttf,woff}'],
           dest: 'dist/fonts/'
         },
         {
@@ -31,7 +34,7 @@ module.exports = function() {
         {
           expand: true,
           cwd: 'client/scripts',
-          src: ['**/*.{html,jpg,png,gif,webp}'],
+          src: ['**/*.{jpg,png,gif,webp}'],
           dest: 'dist/scripts/'
         }
       ]

@@ -12,12 +12,19 @@
 */
 @import "../bower_components/bootstrap/less/variables";
 
-@brand-primary:             #B5152B;
-@link-color:                @brand-primary;
+@brand-primary:                     #B5152B;
+@link-color:                        @brand-primary;
 
-@border-radius-base:        0;
-@border-radius-large:       0;
-@border-radius-small:       0;
+@border-radius-base:                0;
+@border-radius-large:               0;
+@border-radius-small:               0;
+
+@navbar-default-bg:                 @brand-primary;
+@navbar-default-color:              #fff;
+@navbar-default-link-color:         @navbar-default-color;
+@navbar-default-link-hover-color:   darken(@navbar-default-link-color, 12%);
+@navbar-default-link-active-color:  @navbar-default-color;
+@navbar-default-link-active-bg:     @brand-primary;
 
 @icon-font-path: '../fonts/bootstrap/';
 
@@ -113,11 +120,11 @@
   @import "../bower_components/bootstrap/less/input-groups";
   @import "../bower_components/bootstrap/less/navs";
   @import "../bower_components/bootstrap/less/navbar";
-  // @import "../bower_components/bootstrap/less/breadcrumbs";
+  @import "../bower_components/bootstrap/less/breadcrumbs";
   @import "../bower_components/bootstrap/less/pagination";
   @import "../bower_components/bootstrap/less/pager";
-  // @import "../bower_components/bootstrap/less/labels";
-  // @import "../bower_components/bootstrap/less/badges";
+  @import "../bower_components/bootstrap/less/labels";
+  @import "../bower_components/bootstrap/less/badges";
   // @import "../bower_components/bootstrap/less/jumbotron";
   // @import "../bower_components/bootstrap/less/thumbnails";
   @import "../bower_components/bootstrap/less/alerts";
@@ -161,6 +168,14 @@
 
 @import "./jquery.minicolors.less";
 
+
+.text-help {
+  font-style: italic;
+  font-size: 90%;
+  color: @gray-light;
+}
+
+
 @import "../scripts/controls/styles";
 
 .titled {
@@ -202,6 +217,8 @@
 
 @import "../scripts/pile/styles";
 @import "../scripts/task/styles";
+@import "../scripts/navigation/styles";
+@import "../scripts/notifier/styles";
 
 
 .task-group {
@@ -222,6 +239,10 @@
   }
 }
 
+.modal[ng-click] {
+  cursor: default;
+}
+
 .modal-content {
   padding: @grid-gutter-width / 2;
   .form-actions {
@@ -230,6 +251,10 @@
 }
 
 @import "../scripts/form/styles.less";
+@import "../scripts/user/styles.less";
+@import "../scripts/process/styles.less";
+
+
 
 .unassigned {
   .assignee,

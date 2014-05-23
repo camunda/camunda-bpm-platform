@@ -1,0 +1,153 @@
+<form role="form"
+      name="processStart"
+      ng-class="{loading: loadingProcesses}"
+      ng-controller="processStartModalFormCtrl"
+      ng-submit="submitForm(processStart)">
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-xs-6">
+        <h3 class="modal-title">Start a process</h3>
+      </div>
+
+      <div class="col-xs-6">
+        <div class="input-group has-feedback"
+             ng-if="!startingProcess">
+          <input type="text"
+                 ng-model="searchModel"
+                 placeholder="Process name"
+                 typeahead="process for process in getProcess($viewValue)"
+                 typeahead-loading="loadingProcesses"
+                 class="form-control">
+          <span class="input-group-addon">
+            <i ng-show="loadingProcesses"
+               class="glyphicon glyphicon-refresh"></i>
+
+            <i ng-show="!loadingProcesses"
+               class="glyphicon glyphicon-search"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-body">
+    <div ng-if="!startingProcess"
+         class="available-processes">
+      <div class="text-help">
+        <i class="glyphicon glyphicon-info-sign"></i>
+        Click on the process to start.
+      </div>
+
+      <ul class="processes">
+        <li ng-repeat="process in processes">
+          <a ng-click="getStartForm(process)">
+            {{ process.name || process.key }}
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div ng-if="startingProcess"
+         class="starting-process">
+      <h4>
+        {{ startingProcess.name || startingProcess.key }}
+      </h4>
+
+      <!-- <div></div> -->
+
+      <div class="process-form-fields">
+        <div ng-repeat="(delta, variable) in variables"
+             class="form-group row">
+          <div class="col-xs-2 text-right">
+            <a ng-click="removeVariable(delta)">
+              <i class="glyphicon glyphicon-minus-sign"></i>
+            </a>
+          </div>
+
+          <div class="col-xs-3">
+            <input required
+                   type="text"
+                   class="form-control"
+                   placeholder="Variable name"
+                   ng-model="variable.name" />
+          </div>
+
+          <div class="col-xs-3">
+            <select required
+                    class="form-control"
+                    placeholder="Variable name"
+                    ng-model="variable.type">
+
+              <option disabled value="">Type</options>
+
+              <option ng-repeat="(type, inputType) in variableTypes"
+                      value="{{ type }}">{{ type }}</option>
+            </select>
+          </div>
+
+          <div class="col-xs-4">
+            <div ng-switch="variable.type">
+              <div ng-switch-when="Boolean" class="checkbox">
+                <label>
+                  <input type="checkbox"
+                         ng-model="variable.value"
+                         ng-checked="variable.value" />
+                </label>
+              </div>
+
+              <!--
+              <input ng-switch-when="Date"
+                     required
+                     type="date"
+                     class="form-control"
+                     placeholder="2014-06-22"
+                     ng-model="variable.value" />
+              -->
+
+              <input ng-switch-default
+                     required
+                     type="{{ variableTypes[variable.type] }}"
+                     class="form-control"
+                     placeholder="Value"
+                     ng-model="variable.value" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-12 col-md-2 text-right">
+            <a ng-click="addVariable()">
+              Add a variable
+              <i class="glyphicon glyphicon-plus-sign"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <div ng-if="!startingProcess">
+      <pagination boundary-links="true"
+                  total-items="totalProcesses"
+                  ng-model="currentPage"
+                  class="pagination-sm"
+                  previous-text="&lsaquo;"
+                  next-text="&rsaquo;"
+                  first-text="&laquo;"
+                  last-text="&raquo;"></pagination>
+    </div>
+
+    <div ng-if="startingProcess">
+      <button class="btn btn-xs btn-link"
+              type="button"
+              ng-click="showList()">back</button>
+
+      <button class="btn btn-primary"
+              type="submit"
+              ng-disabled="$invalid"
+              ng-click="startProcess()">Fly rocket, fly!</button>
+    </div>
+  </div>
+</form>

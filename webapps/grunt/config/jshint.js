@@ -3,7 +3,7 @@ module.exports = function() {
     options: {
       jshintrc: true
     },
-    client: {
+    scripts: {
       files: {
         src: [
           'client/scripts/**/*.js'

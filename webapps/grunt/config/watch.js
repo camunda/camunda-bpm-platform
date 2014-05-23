@@ -9,17 +9,18 @@ module.exports = function(config) {
     assets: {
       files: [
         'client/{fonts,images}/**/*',
-        'client/*.html',
+        'client/index.html',
         'client/favicon.ico'
       ],
       tasks: [
-        'copy:assets'
+        'newer:copy:assets'
       ]
     },
 
     styles: {
       files: [
-        'client/styles/**/*.{css,less}'
+        'client/styles/**/*.{css,less}',
+        'client/scripts/*/*.{css,less}'
       ],
       tasks: [
         'less'
@@ -29,10 +30,12 @@ module.exports = function(config) {
     scripts: {
       files: [
         'grunt/config/requirejs.js',
+        'client/tasklist.html',
         'client/scripts/**/*.{js,html}'
       ],
       tasks: [
-        'newer:jshint',
+        'newer:jshint:scripts',
+        // 'requirejs:dependencies',
         'requirejs:scripts'
       ]
     },
@@ -69,7 +72,7 @@ module.exports = function(config) {
     },
 
     served: {
-      files: ['dist/**/*'],
+      files: ['dist/**/*.{js,css,jpg,png,webp,eot,svg,ttf,otf,woff}'],
       tasks: [],
       options: {
         livereload: parseInt(config.livereloadPort || 35729)

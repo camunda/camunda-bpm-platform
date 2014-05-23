@@ -2,8 +2,15 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
-           'angular', 'angular-moment'
+           'angular', 'angular-moment',
+           'text!camunda-tasklist/form/inline-field.html',
+           'text!camunda-tasklist/form/form.html'
 ], function(angular) {
+
+  /**
+   * @module cam.form
+   */
+
   var formModule = angular.module('cam.form', [
     'angularMoment'
   ]);
@@ -38,7 +45,7 @@ define([
 
       transclude: true,
 
-      templateUrl: 'scripts/form/inline-field.html'
+      template: require('text!camunda-tasklist/form/inline-field.html')
     };
   });
 
@@ -53,7 +60,7 @@ define([
 
         // scope.fields = camTasklistForm(null, null);
       },
-      templateUrl: 'scripts/form/form.html'
+      template: require('text!camunda-tasklist/form/form.html')
     };
   });
 

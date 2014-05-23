@@ -55,7 +55,7 @@ module.exports = function(grunt) {
 
     var tasks = [
       'clean',
-      'jshint:client',
+      'jshint',
       'jsdoc',
       'bower',
       'copy',

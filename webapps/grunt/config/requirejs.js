@@ -8,8 +8,6 @@ module.exports = function(config) {
 
   var deps = [
     './../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require',
-    'domready',
-    'jquery-mockjax',
     'angular',
     'moment',
     'angular-bootstrap',
@@ -25,27 +23,22 @@ module.exports = function(config) {
 
   var rConf = {
     options: {
-      // optimize: 'uglify2',
-      // preserveLicenseComments: false,
-      // generateSourceMaps: true,
+      stubModules: ['text'],
 
-      optimize: 'none',
-      preserveLicenseComments: true,
-      generateSourceMaps: false,
+      optimize: 'uglify2',
+      preserveLicenseComments: false,
+      generateSourceMaps: true,
 
-      // baseUrl: rjsConf.baseUrl,
+      // optimize: 'none',
+      // preserveLicenseComments: true,
+      // generateSourceMaps: false,
+
+
       baseUrl: './client',
       paths: rjsConf.paths,
       shim: rjsConf.shim,
       packages: rjsConf.packages,
 
-
-      //A function that is called for each JS module bundle that has been
-      //completed. This function is called after all module bundles have
-      //completed, but it is called for each bundle. A module bundle is a
-      //"modules" entry or if just a single file JS optimization, the
-      //optimized JS file.
-      //Introduced in r.js version 2.1.6
       onModuleBundleComplete: function (data) {
         /*
         data.name: the bundle name.
@@ -56,7 +49,7 @@ module.exports = function(config) {
         on the plugin, may or may not have something inlined in the
         module bundle.
         */
-        // console.info('onModuleBundleComplete', data);
+        console.info('onModuleBundleComplete', data.path+':\n'+data.included.join('\n'));
 
         // // add a timestamp to the sourcemap URL to prevent caching
         // fs.readFile(data.path, {encoding: 'utf8'}, function(err, content) {
@@ -64,25 +57,6 @@ module.exports = function(config) {
         //   content = content + '?' + (new Date()).getTime();
         //   fs.writeFileSync(data.path, content);
         // });
-      },
-
-      // //A function that if defined will be called for every file read in the
-      // //build that is done to trace JS dependencies. This allows transforms of
-      // //the content.
-      // onBuildRead: function (moduleName, path, contents) {
-      //   console.info('onBuildRead', moduleName);
-      //   //Always return a value.
-      //   //This is just a contrived example.
-      //   return contents;//.replace(/foo/g, 'bar');
-      // },
-
-      //A function that will be called for every write to an optimized bundle
-      //of modules. This allows transforms of the content before serialization.
-      onBuildWrite: function (moduleName, path, contents) {
-        console.info('onBuildWrite', moduleName);
-        //Always return a value.
-        //This is just a contrived example.
-        return contents;//.replace(/bar/g, 'foo');
       }
     },
 
@@ -93,30 +67,29 @@ module.exports = function(config) {
         name: '<%= pkg.name %>-deps',
         out: 'dist/scripts/deps.js',
         // include: deps
-        include: deps.concat(['camunda-tasklist/rjsconf'])
+        include: deps.concat([
+          'camunda-tasklist/rjsconf',
+          'angular-route'
+        ])
       }
     },
 
 
 
-    // mocks: {
-    //   options: {
-    //     // name: 'scripts/index',
-    //     name: 'camunda-tasklist/mocks',
-    //     out: 'dist/scripts/<%= pkg.name %>/mocks.js',
-    //     // exclude: deps.concat([
-    //     //   'camunda-tasklist',
-    //     //   'camunda-tasklist/controls',
-    //     //   'camunda-tasklist/form',
-    //     //   'camunda-tasklist/pile',
-    //     //   'camunda-tasklist/task'
-    //     // ]),
-    //     include: [
-    //       'uuid',
-    //       'fixturer'
-    //     ]
-    //   }
-    // },
+    mocks: {
+      options: {
+        // name: 'scripts/index',
+        name: '<%= pkg.name %>/mocks',
+        out: 'dist/scripts/deps-n-mocks.js',
+        exclude: [],
+        include: deps.concat([
+          'camunda-tasklist/rjsconf',
+          'angular-route'
+        ], rjsConf.shim['camunda-tasklist/mocks'], ['camunda-tasklist/mocks'])
+      }
+    },
+
+
 
     scripts: {
       options: {
@@ -124,11 +97,12 @@ module.exports = function(config) {
         name: 'camunda-tasklist',
         out: 'dist/scripts/<%= pkg.name %>.js',
         // exclude: deps,
-        exclude: deps.concat(['camunda-tasklist/rjsconf']),
-        include: rjsConf.shim['camunda-tasklist'].concat([
-          // 'hyperagent',
-          'camunda-tasklist/mocks'
-        ])
+        exclude: deps.concat([
+          'camunda-tasklist/rjsconf',
+          // 'camunda-tasklist/mocks',
+          'angular-route'
+        ]),
+        include: rjsConf.shim['camunda-tasklist']
       }
     }
   };

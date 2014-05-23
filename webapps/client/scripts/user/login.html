@@ -1,0 +1,45 @@
+<form role="form"
+      name="userLogin"
+      ng-controller="userLoginModalFormCtrl"
+      ng-submit="submitForm(userLogin)">
+
+  <div class="modal-header">
+    <h3 class="modal-title">camunda Tasklist | Login</h3>
+  </div>
+
+  <div class="modal-body">
+    <div class="form-group">
+      <!-- <label for="userLoginInputUsername">User name</label> -->
+      <input required
+             ng-model="username"
+             name="username"
+             type="text"
+             class="form-control"
+             id="userLoginInputUsername"
+             placeholder="User name">
+    </div>
+
+    <div class="form-group">
+      <!-- <label for="userLoginInputPassword">Password</label> -->
+      <input required
+             ng-model="password"
+             name="password"
+             type="password"
+             class="form-control"
+             id="userLoginInputPassword"
+             placeholder="Password">
+    </div>
+  </div>
+
+  <div class="modal-footer">
+<!--
+    <button class="btn btn-xs btn-link"
+            type="button"
+            ng-click="cancel()">Cancel</button>
+ -->
+    <button class="btn btn-primary"
+            type="submit"
+            ng-disabled="userLogin.$invalid"
+            ng-click="ok()">Login</button>
+  </div>
+</form>

@@ -1,19 +1,37 @@
 
-.navbar-inverse {
-  background-color: @brand-primary;
-  .brand {
-    display: block;
-    // background: no-repeat url('../images/app-logo.png');
-    text-indent: -999em;
-    width: 215px;
-    height: 39px;
-    margin-top: 3px;
-  }
-  a,
-  a:link,
-  a:hover,
-  a:focus,
-  a:active {
-    color: @body-bg;
+// .navbar-inverse {
+//   background-color: @brand-primary;
+//   .brand {
+//     display: block;
+//     // background: no-repeat url('../images/app-logo.png');
+//     text-indent: -999em;
+//     width: 215px;
+//     height: 39px;
+//     margin-top: 3px;
+//   }
+//   a,
+//   a:link,
+//   a:hover,
+//   a:focus,
+//   a:active {
+//     color: @body-bg;
+//   }
+// }
+
+.navbar {
+  border: none;
+}
+
+// Default navbar
+.navbar-default {
+  .navbar-nav {
+    > .active > a {
+      &,
+      &:hover,
+      &:focus {
+        border-bottom: 2px solid @navbar-default-link-color;
+        padding-bottom: 13px;
+      }
+    }
   }
 }

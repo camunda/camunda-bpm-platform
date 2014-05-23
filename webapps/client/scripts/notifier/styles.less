@@ -1,0 +1,47 @@
+.notifier {
+  &:empty {
+    display: none;
+  }
+  position: fixed;
+  top: 0;
+  width: 50%;
+  left: 25%;
+  z-index: 2000;
+  border: 1px solid @gray;
+  border-width: 0 1px 1px 1px;
+  color: @state-info-text;
+  border-color: @state-info-border;
+  background-color: @state-info-bg;
+
+  padding: 15px;
+
+  .notification {
+    padding: 15px;
+    color: @state-info-text;
+    border-color: @state-info-border;
+    background-color: @state-info-bg;
+    overflow: hidden;
+
+
+    .text,
+    .dismiss {
+
+    }
+
+    .text {
+      float: left;
+    }
+    .dismiss {
+      float: right;
+    }
+  }
+
+  .notification-error {
+    color: @state-danger-text;
+    border-color: @state-danger-border;
+    background-color: @state-danger-bg;
+    .dismiss {
+      color: @state-danger-color;
+    }
+  }
+}

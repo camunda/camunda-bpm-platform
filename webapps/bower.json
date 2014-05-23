@@ -36,16 +36,19 @@
     "angular-moment": "~0.7.0",
     "requirejs-domready": "~2.0.1",
     "angular-bootstrap": "~0.11.0",
-    "angular-route": "~1.2.16"
+    "angular-route": "~1.2.16",
+    "angular-messages": "~1.3.0-build.2771+sha.4eb9522"
   },
   "devDependencies": {
     "jquery-mockjax": "~1.5.3",
     "underscore": "./node_modules/underscore/underscore.js",
     "underscore.string": "./node_modules/underscore.string/lib/underscore.string.js",
     "fixturer": "./node_modules/fixturer/index.js",
-    "node-uuid": "~1.4.1"
+    "node-uuid": "~1.4.1",
+    "requirejs-text": "~2.0.12"
   },
   "resolutions": {
-    "jquery": "~2.1.1"
+    "jquery": "~2.1.1",
+    "angular": "1.2.16"
   }
 }

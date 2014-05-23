@@ -6,63 +6,67 @@ define([
 // ], function(angular,   $,        Hyperagent) {
            'angular', 'jquery'
 ], function(angular,   $) {
+
+  /**
+   * @module cam.tasklist.session.data
+   */
+
+  /**
+   * @memberof cam.tasklist.session
+   */
+
   var sessionDataModule = angular.module('cam.tasklist.session.data', []);
 
 
-  function CamSessionData(config) {
+
+  function replaceVars(str, vars) {
+    for (var v in vars) {
+      str = str.replace(new RegExp('{{'+ v +'}}', 'g'), vars[v]);
+    }
+    return str;
+  }
+
+
+
+
+
+
+
+
+
+
+  function CamLegacySessionData(config) {
     config = config || {};
     if (!config.defer) { throw new Error('defer must be passed in the configuration'); }
     this.defer = config.defer;
+    this.baseUrl = config.baseUrl || '/camunda/api/admin/auth/user/default';
   }
 
-  CamSessionData.prototype.get   = function(id, options) {
-    var deferred = this.defer();
+  CamLegacySessionData.prototype.query = function(options) {
     options = options || {};
-    var session;
-    var query = {};
-    if (id.id) {
-      session = id;
-      id = session.id;
+
+    var deferred = this.defer();
+    var reqParams = {
+      type:         options.type || 'GET',
+      dataType:     'json',
+      contentType:  'application/x-www-form-urlencoded',
+      url:          this.baseUrl + replaceVars(options.path || '', options.instance || {})
+    };
+    // var stack = (new Error()).stack;
+
+    if (options.data) {
+      reqParams.data = options.data;
     }
-
-
-    $.ajax({
-      url: '/tasklist/sessions/'+ id,
-      data: query
-    })
-    .done(function(data) {
-      deferred.resolve(data._embedded.sessions);
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-      deferred.reject(textStatus);
-    })
-    .always(function() {
-      deferred.notify('request:complete');
-    });
-
-    return deferred.promise;
-  };
-
-  CamSessionData.prototype.query = function(options) {
-    var deferred = this.defer();
-    options = options || {};
 
     deferred.notify('request:start');
 
-    var query = {};
-    if (options.session) {
-      query.session = options.session.id || options.session;
-    }
-
-    $.ajax({
-      url: '/tasklist/sessions',
-      data: query
-    })
+    $.ajax(reqParams)
     .done(function(data) {
-      deferred.resolve(data._embedded.sessions);
+      deferred.resolve(data);
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
-      deferred.reject(textStatus);
+      // console.warn('request error', errorThrown, stack);
+      deferred.reject(errorThrown instanceof Error ? errorThrown : new Error(errorThrown));
     })
     .always(function() {
       deferred.notify('request:complete');
@@ -71,10 +75,32 @@ define([
     return deferred.promise;
   };
 
-  sessionDataModule.factory('camSessionData', [
+  CamLegacySessionData.prototype.create = function(username, password) {
+    return this.query({
+      type: 'POST',
+      path: '/login/tasklist',
+      data: {
+        username: username,
+        password: password
+      }
+    });
+  };
+
+  CamLegacySessionData.prototype.retrieve = function() {
+    return this.query();
+  };
+
+  CamLegacySessionData.prototype.destroy = function(username, password) {
+    return this.query({
+      type: 'POST',
+      path: '/logout'
+    });
+  };
+
+  sessionDataModule.factory('camLegacySessionData', [
           '$q',
   function($q) {
-    return new CamSessionData({$q: $q});
+    return new CamLegacySessionData({defer: $q.defer});
   }]);
 
   return sessionDataModule;

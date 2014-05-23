@@ -55,7 +55,7 @@
     box-shadow: 0 0 0 @gray-lighter;
     // text-align: left;
 
-    transition: max-height 0.218s;
+    transition: max-height 0.218s ease-in-out 1s;
   }
   .key {
     .font-bold;
@@ -67,7 +67,7 @@
     .font-italic;
   }
 
-  &.focused,
+  &.current,
   &:hover {
     z-index: 2;
     .info {

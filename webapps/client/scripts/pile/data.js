@@ -38,8 +38,8 @@ define([
 
   function CamPileData(config) {
     config = config || {};
-    if (!config.$q) { throw new Error('$q must be passed in the configuration'); }
-    this.$q = config.$q;
+    if (!config.defer) { throw new Error('$q must be passed in the configuration'); }
+    this.defer = config.defer;
   }
 
   CamPileData.prototype.get   = function() {
@@ -47,7 +47,7 @@ define([
   };
 
   CamPileData.prototype.query = function(options) {
-    var deferred = this.$q.defer();
+    var deferred = this.defer();
     options = options || {};
 
     deferred.notify('request:start');
@@ -74,28 +74,32 @@ define([
     return deferred.promise;
   };
 
-  // pileDataModule.factory('camPileData', [function() {
+  CamPileData.prototype.tasks = function(options) {
+    var deferred = this.defer();
+    options = options || {};
 
-  //   // Configure Hyperagent to prefix every URL with the unicorn proxy.
-  //   Hyperagent.configure('ajax', function(options) {
-  //     options.url = 'https://unicorn-cors-proxy.herokuapp.com/' + options.url;
+    deferred.notify('request:start');
 
-  //     return $.ajax(options);
-  //   });
+    $.ajax({
+      url: '/tasklist/piles/'+ options.id
+    })
+    .done(function(data) {
+      deferred.resolve(data);
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+      deferred.reject(textStatus);
+    })
+    .always(function() {
+      deferred.notify('request:complete');
+    });
 
-  //   return new Hyperagent.Resource({
-  //     url: '/',
-  //     headers: {
-  //       // 'X-Requested-With': 'Hyperagent'
-  //     }
-  //   });
-  //   return new CamPileData();
-  // }]);
+    return deferred.promise;
+  };
 
   pileDataModule.factory('camPileData', [
           '$q',
   function($q) {
-    return new CamPileData({$q: $q});
+    return new CamPileData({defer: $q.defer});
   }]);
 
   return pileDataModule;

@@ -4,6 +4,15 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
 define([
            'angular'
 ], function(angular) {
+
+  /**
+   * @module cam.tasklist.controls
+   */
+
+  /**
+   * @memberof cam.tasklist
+   */
+
   var controlsModule = angular.module('cam.tasklist.controls', [
   ]);
 

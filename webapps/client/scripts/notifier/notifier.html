@@ -1,0 +1,15 @@
+<div class="notifier"
+     ng-class="{hidden: !messages.length}">
+  <div ng-repeat="message in messages"
+       class="notification notification-{{ message.type }}">
+    <div class="text">
+      {{ message.text }}
+    </div>
+
+    <a href
+       class="dismiss"
+       ng-click="remove(message.id)">
+      <span class="glyphicon glyphicon-remove"></span>
+    </a>
+  </div>
+</diV>

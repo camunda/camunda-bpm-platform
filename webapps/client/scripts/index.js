@@ -2,15 +2,27 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define('camunda-tasklist', [
-           'camunda-tasklist/rjsconf'
-], function(rjsConf) {
+           'camunda-tasklist/rjsconf',
+           'camunda-tasklist/utils'
+], function(rjsConf, utils) {
+  rjsConf.shim['camunda-tasklist'].push('camunda-tasklist/mocks');
+  var tasklistConf = typeof window !== 'undefined' ? (window.tasklistConf || {}) : {};
+
+  /**
+   * @namespace cam
+   */
+
+  /**
+   * @module cam.tasklist
+   */
 
   var tasklistApp;
 
   var appModules = rjsConf.shim['camunda-tasklist'];
 
   var deps = [
-    'angular'
+    'angular',
+    'text!camunda-tasklist/index.html'
   ].concat(appModules);
 
   // converts AMD paths to angular module names
@@ -32,80 +44,77 @@ define('camunda-tasklist', [
     var ngDeps = rj2ngNames(appModules).concat([
       'ngRoute'
     ]);
-    console.info('rj2ngNames(appModules)', appModules.join('\n'), '\n\n\n', ngDeps.join('\n'));
+
     tasklistApp = angular.module('cam.tasklist', ngDeps);
 
-    tasklistApp.controller('TasklistCtrl', [
-            '$rootScope',
-    function($rootScope) {
-      $rootScope.batchActions = {
-        selected: []
-      };
+    // tasklistApp.controller('TasklistAppCtrl', [
+    //         '$rootScope', 'camStorage', 'camLegacySessionData',
+    // function($rootScope,   camStorage,   camLegacySessionData) {
+    //   console.info('tasklistApp', tasklistApp, camLegacySessionData);
 
-      $rootScope.focusedPile = {};
+    //   $rootScope.$on('tasklist.pile.current', function() {
+    //     $('.task-board').removeClass('pile-edit');
+    //     if ($rootScope.currentPile) {
+    //       $('.controls .current-pile h5').text($rootScope.currentPile.name || '&nbsp;');
+    //     }
+    //   });
 
-      $rootScope.focusedTask = {};
+    //   $rootScope.batchActions = {
+    //     selected: []
+    //   };
 
-      $rootScope.$on('tasklist.pile.focused', function() {
-        $('.task-board').removeClass('pile-edit');
-        if ($rootScope.focusedPile) {
-          $('.controls .focused-pile h5').text($rootScope.focusedPile.name || '&nbsp;');
-        }
-      });
+    //   $rootScope.currentPile = camStorage('currentPile') || {};
 
-      $scope.newPile = function() {
-        $rootScope.focusedPile = {
-          name: '',
-          description: '',
-          color: '',
-          filters: []
-        };
+    //   $rootScope.currentTask = camStorage('currentTask') || {};
 
-        $('.task-board').addClass('pile-edit');
+    //   camLegacySessionData.retrieve().success(function(data) {
+    //     $rootScope.user = data;
+    //   });
+    // }]);
 
 
+    tasklistApp.config([
+            '$routeProvider', '$locationProvider',
+    function($routeProvider,   $locationProvider) {
+      var tasklistTemplate = require('text!camunda-tasklist/index.html');
 
-
-        var newPileModalCtrl = [
-                '$modalInstance',
-        function($modalInstance) {
-          console.info('Hello from the modal instance controller', $modalInstance);
-        }];
-
-        function created(result) {
-          console.info('modalInstance created', result);
-        }
-
-        function aborted(reason) {
-          console.info('modalInstance aborted', reason);
-        }
-
-        var modalInstance = $modal.open({
-          // pass the current scope to the $modalInstance
-          scope: $scope,
-
-          size: 'lg',
-
-          template: '<div>papi papo {{ user }}  {{ piles }}</div>',
-
-          controller: newPileModalCtrl
+      $routeProvider
+        .when('/', {
+          template: tasklistTemplate,
+          controller: 'pilesCtrl'
         })
-        .result.then(created, aborted);
-      };
 
-      camPileData.query({
-        user: $scope.user
-      }).then(function(piles) {
-        $scope.piles = piles;
-        $rootScope.focusedPile = $scope.piles[2];
-        $rootScope.$emit('tasklist.pile.focused');
-      }, function(err) {
-        console.info('camPileData query error', err.stack);
-      });
+
+        .when('/processes', {
+          template: tasklistTemplate,
+          controller: 'processStartCtrl'
+        })
+
+
+        .when('/piles/new', {
+          template: tasklistTemplate,
+          controller: 'pileNewCtrl'
+        })
+
+
+        .when('/login', {
+          template: tasklistTemplate,
+          controller: 'userLoginCtrl'
+        })
+
+
+        .when('/logout', {
+          template: tasklistTemplate,
+          controller: 'userLogoutCtrl'
+        })
+
+
+        .otherwise({
+          redirectTo: '/'
+        });
     }]);
 
-    // with require.js, you need to bootstrap manually
-    require(['domready'], function() {
+    $(document).ready(function() {
       angular.bootstrap(document, ['cam.tasklist']);
     });
   }

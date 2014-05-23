@@ -14,12 +14,14 @@
     baseUrl: '/base',
 
     paths: {
-      'camunda-tasklist': '/base/dist/scripts/camunda-tasklist'
+      'camunda-tasklist': '/base/dist/camunda-tasklist',
+      'scripts': '/base/client/scripts',
+      'bower_components': '/base/client/bower_components'
     }
   });
 
   setTimeout(function() {
-    requirejs(tests, function() {
+    require(tests, function() {
       root.__karma__.start();
     }, function(err) {
       console.error('Something went wrong while loading the tests.', err.stack);

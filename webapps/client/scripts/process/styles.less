@@ -1,0 +1,35 @@
+ul.processes {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0 0 0;
+
+  max-height: 300px;
+  overflow: auto;
+}
+
+.processes {
+  li {
+    padding: 7px 0;
+    border-bottom: dashed 1px @gray-light;
+
+    // &:nth-child(even) {
+    //   background-color: @gray-lighter;
+    // }
+
+    &:hover {
+      background-color: @gray-lighter;
+    }
+
+    &:first-child {
+      // padding-top: 0;
+    }
+    &:last-child {
+      // padding-bottom: 0;
+      border-bottom: 0;
+    }
+  }
+}
+
+.process-form-fields .text-right a{
+  line-height: 33px;
+}

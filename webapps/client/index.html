@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <title>camunda Tasklist</title>
+
+  <base href="/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
   <meta name="author" content="">
@@ -15,102 +18,15 @@
   <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
 
-  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="shortcut icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
   <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
 </head>
 
-<body ng-controller="TasklistCtrl">
-  <div class="page-wrap">
-
-
-
-    <!-- # page-navigation partial -->
-    <!-- <div ng-include="'partials/page-navigation.html'"></div> -->
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <a class="brand ir"
-            href="#/">
-            camunda Tasklist
-          </a>
-        </div>
-      </div>
-    </div>
-    <!-- / page-navigation partial -->
-
-
-
-
-    <div class="container-fluid">
-      <div class="row controls">
-        <div class="cols col-sm-2 task-piles">
-          <div class="inner">
-            <h5>
-              <a ng-click="newPile()">New pile <span class="glyphicon glyphicon-plus-sign"></span></a>
-            </h5>
-          </div>
-        </div>
-
-        <div class="cols col-sm-4 focused-pile">
-          <div class="inner">
-            <div class="row">
-              <div class="col-xs-6">
-                <h5>&nbsp;</h5>
-              </div>
-              <div class="col-xs-6 dropdown sorting">
-                <a data-toggle="dropdown" href="#">Sort by <span class="sort-by">Due date</span></a>
-                <a href="#" class="sort-direction glyphicon glyphicon-chevron-up"></a>
-                <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                  <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#">Due date</a>
-                  </li>
-
-                  <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#">Follow up date</a>
-                  </li>
-
-                  <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#">Task name</a>
-                  </li>
-
-                  <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#">Assignee</a>
-                  </li>
-                  <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#">Owner</a>
-                  </li>
-
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="cols col-sm-6 focused-task">
-          <div class="inner">
-            <h5>&nbsp;</h5>
-          </div>
-        </div>
-      </div>
-
-      <div class="row task-board">
-        <div class="cols col-sm-2 task-piles">
-          <div class="inner">
-            <div ng-repeat="pile in piles" cam-tasklist-pile></div>
-          </div>
-        </div>
-
-        <div class="cols col-sm-4 task-list">
-          <div cam-tasklist-pile-tasks></div>
-        </div>
-
-        <div class="cols col-sm-6 focused-task">
-          <div cam-tasklist-task></div>
-        </div>
-      </div>
-    </div>
+<body>
+  <!-- <body ng-controller="TasklistAppCtrl"> -->
+  <div class="page-wrap" ng-view>
   </div>
 
   <footer class="page">
@@ -119,7 +35,37 @@
     </div>
   </footer>
 
-  <script type="text/javascript" src="scripts/deps.js" data-main="scripts/camunda-tasklist"></script>
+  <div cam-tasklist-notifier></div>
+
+  <script type="text/javascript">
+    var root = '//'+ location.host +'/'; // $APP_ROOT, $BASE
+    var tasklistConf = {
+      'cam.tasklist': {
+        useMocks: true
+      },
+
+      'cam.tasklist.navigation': {
+        links: [
+          {
+            // title: '',
+            // css: '',
+            icon: 'home',
+            links: [
+              {
+                title: 'Cockpit',
+                href: root +'camunda/app/cockpit'
+              },
+              {
+                title: 'Admin',
+                href: root +'camunda/app/admin'
+              }
+            ]
+          }
+        ]
+      }
+    };
+  </script>
+  <script type="text/javascript" src="scripts/deps-n-mocks.js" data-main="scripts/camunda-tasklist"></script>
   <script type="text/javascript">
   document.write('<s'+'cript src="//'+ location.hostname +':'+ (parseInt(location.port, 10)+1) +'/livereload.js?snipver=1"><'+'/script>')
   </script>

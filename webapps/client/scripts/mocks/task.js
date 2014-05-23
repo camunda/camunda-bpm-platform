@@ -5,6 +5,15 @@ define([
            'angular', 'uuid', 'fixturer', 'underscore', 'jquery', 'camunda-tasklist/task/data'
 ], function(angular,   uuid,   fix,        _,            $) {
 
+
+  /**
+   * @module cam.tasklist.mocks.task
+   */
+
+  /**
+   * @memberof cam.tasklist.mocks
+   */
+
   var mockedModule = angular.module('cam.tasklist.task.data');
 
 

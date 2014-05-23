@@ -7,8 +7,10 @@ define([
 
   var mockedModule = angular.module('cam.tasklist.pile.data');
 
-  var _mockedPiles = {
-    'pile-1': {
+  var _mockedPiles = {};
+  _.each([
+    {
+      id: uuid(),
       name: 'Overdue',
       description: '',
       filters: [
@@ -20,7 +22,8 @@ define([
       ],
       color: '#FFB4B4'
     },
-    'pile-2': {
+    {
+      id: uuid(),
       name: 'Due in 3 days',
       description: '',
       filters: [
@@ -32,7 +35,8 @@ define([
       ],
       color: '#FFD2D2'
     },
-    'pile-3': {
+    {
+      id: uuid(),
       name: 'Mines',
       description: '',
       filters: [
@@ -43,7 +47,8 @@ define([
       ],
       color: '#AFB3E2'
     },
-    'pile-4': {
+    {
+      id: uuid(),
       name: 'Group A',
       description: '',
       filters: [
@@ -55,7 +60,8 @@ define([
       ],
       color: ''
     },
-    'pile-5': {
+    {
+      id: uuid(),
       name: 'Group B',
       description: '',
       filters: [
@@ -67,7 +73,10 @@ define([
       ],
       color: ''
     }
-  };
+  ], function(pile) {
+    _mockedPiles[pile.id] = pile;
+  });
+
 
 
 
@@ -101,10 +110,11 @@ define([
     url: /\/tasklist\/piles\/([0-9a-z-]+)$/g,
     data: ['pileId'],
     response: function(settings) {
+      console.info('pile details', settings.url.match(/\/tasklist\/piles\/([0-9a-z-]+)$/g));
       var hal = {
         _links: {
           self: {
-            href: '/tasklist/piles/'+ settings.pileId
+            href: settings.url //'/tasklist/piles/'+ settings.pileId
           }
         }
       };

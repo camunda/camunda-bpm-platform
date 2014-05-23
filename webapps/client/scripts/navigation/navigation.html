@@ -1,0 +1,79 @@
+
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button"
+                  class="navbar-toggle"
+                  data-toggle="collapse"
+                  data-target="#cam-tasklist-navigation">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">camunda Tasklist</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse"
+             id="cam-tasklist-navigation">
+          <ul class="nav navbar-nav navbar-right"
+              ng-if="user.id">
+
+            <li>
+              <a tooltip-placement="bottom"
+                 tooltip="Start a process"
+                 href="#/processes">
+                <i class="glyphicon glyphicon-list-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a tooltip-placement="bottom"
+                 tooltip="Log out"
+                 href="#/logout">
+                <i class="glyphicon glyphicon-log-out"></i>
+              </a>
+            </li>
+
+
+            <li class="divider"></li>
+
+
+            <li ng-repeat="link in links" class="dropdown" ng-class="{dropdown: (link.links && link.links.length)}">
+              <a ng-if="!link.links || !link.links.length"
+                 href="{{ link.href }}">
+                {{ link.title }}
+                <i class="glyphicon glyphicon-{{ link.icon }}"></i>
+              </a>
+
+              <a ng-if="link.links && link.links.length"
+                 href
+                 class="dropdown-toggle"
+                 data-toggle="dropdown">
+                {{ link.title }}
+                <i ng-if="link.icon" class="glyphicon glyphicon-{{ link.icon }}"></i>
+                <b class="caret"></b>
+              </a>
+              <ul ng-if="link.links && link.links.length"
+                  class="dropdown-menu">
+                <li ng-repeat="link in link.links">
+                  <a href="{{ link.href }}">
+                    {{ link.title }}
+                    <i ng-if="link.icon" class="glyphicon glyphicon-{{ link.icon }}"></i>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right" ng-if="!user.id">
+            <li>
+              <a tooltip-placement="bottom"
+                 tooltip="Log in"
+                 href="#/login">
+                <i class="glyphicon glyphicon-log-in"></i>
+              </a>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
