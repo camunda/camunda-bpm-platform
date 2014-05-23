@@ -34,6 +34,16 @@ Now you can reference individual commons projects:
 </dependency>
 ```
 
+## FAQ
+
+### Which Java (JRE) Version is required?
+
+Java JRE 1.6+ is required.
+
+### Under which License is this project distributed?
+
+Apache License 2.0.
+
 [logging]: logging/
 [utils]: utils/
 
