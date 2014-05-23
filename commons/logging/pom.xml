@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>camunda-commons-logging</artifactId>
-  <name>camunda Commons - logging</name>
+  <name>camunda Commons - Logging</name>
   <packaging>jar</packaging>
 
   <dependencyManagement>

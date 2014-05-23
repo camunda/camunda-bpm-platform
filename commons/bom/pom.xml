@@ -11,14 +11,16 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <dependencies>
+  <dependencyManagement>
+    <dependencies>
 
-    <dependency>
-      <groupId>org.camunda.commons</groupId>
-      <artifactId>camunda-commons-logging</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+      <dependency>
+        <groupId>org.camunda.commons</groupId>
+        <artifactId>camunda-commons-logging</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-  </dependencies>
+    </dependencies>
+  </dependencyManagement>
 
 </project>
