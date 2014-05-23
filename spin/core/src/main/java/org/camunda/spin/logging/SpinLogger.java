@@ -12,6 +12,7 @@
  */
 package org.camunda.spin.logging;
 
+import org.camunda.commons.logging.BaseLogger;
 import org.camunda.spin.impl.xml.dom.XmlDomLogger;
 import org.camunda.spin.test.SpinTestLogger;
 

@@ -15,43 +15,7 @@ All docs are written in Markdown and are located in the `docs/` folder.
 
 ## Logging & Exception Handling
 
-### Logging
-
-camunda spin uses [slf4j][] as logging library. This allows the user of camunda spin to decide which
-underlying logging framework should be used or to easily integrate camunda spin into existing ones.
-For testing purpose camunda spin itself uses [logback][] as logging backend.
-
-All log messages of camunda spin follow the same convention. The message contains several parts
-which are described in the following:
-
-- `ComponentId`: a short identifier for the logging component like `SPIN`
-- `MessageCode`: a unique five-digit `LLMMM` number code which identifies the
-  corresponding logging event for example `20023`. The first two digest identify
-  the logger and the last three digits identify the log message.
-- `LogMessage`: the meaningful log message of the logging event with detailed
-  information (surrounded by single quotes) where appropriate for example
-  `Attribute with name 'abc' not found`
-
-A possible log message would be:
-
-```
-SPIN-20023 The attribute with the name 'invalidId' was not found in the element with id 'elementId' returning an empty string.
-```
-
-Every log message/event is associated with a log level. The following log levels are used (sorted by
-severity):
-
-
-| Level   | Description
-|---------|-------------
-| `ERROR` | Signals an error which is severe but may allow the application to continue. <br/>**Example:** `SPIN-10033 Unable to change attribute with name 'id' to value '#-test'`
-| `WARN`  | Signals a warning which can interfere with the correct execution of the application. <br/>**Example:** `SPIN-20023 The attribute with the name 'invalidId' was not found in the element with id 'elementId' returning an empty string.`
-| `INFO`  | Informs about the progress of the application. <br/>**Example:** `SPIN-30001 File with name 'existingData.xml' successful read and parsed`
-| `DEBUG` | Information to help debugging an application. <br/>**Example:** `SPIN-41233 Found '12' child elements of element with id 'testElement'`
-| `TRACE` | Only allowed during development. Should not be commited or at leased removed after completion of a feature. <br/>**Example:** `SPIN-50123 Recursively searching for child elements (current recursion depth '3')`
-
-**TODO**: Describe code usage/patterns
-
+This project uses [camunda commons logging][camunda-commons-logging].
 
 ### Exception handling
 
@@ -104,3 +68,5 @@ SPIN-12052 The element has the wrong format to be handled as Xml element
 
 [slf4j]: http://www.slf4j.org/
 [logback]: http://logback.qos.ch/
+[camunda-commons-logging]: https://github.com/camunda/camunda-commons/tree/master/logging
+
