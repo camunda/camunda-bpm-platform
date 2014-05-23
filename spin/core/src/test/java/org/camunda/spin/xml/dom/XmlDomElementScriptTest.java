@@ -782,6 +782,53 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
+  // append child element
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.appendChildElement",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "child", value = "<child/>")
+    }
+  )
+  public void canAppendChildElement() {
+    SpinXmlDomElement element = script.getVariable("element");
+
+    SpinXmlDomElement child = element.childElement("child");
+    assertThat(child).isNotNull();
+    assertThat(child.attr("id").value()).isEqualTo("child");
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.appendChildElement",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "child", value = "<child xmlns=\"" + EXAMPLE_NAMESPACE + "\"/>")
+    }
+  )
+  public void canAppendChildElementWithNamespace() {
+    SpinXmlDomElement element = script.getVariable("element");
+
+    SpinXmlDomElement child = element.childElement(EXAMPLE_NAMESPACE, "child");
+    assertThat(child).isNotNull();
+    assertThat(child.attr("id").value()).isEqualTo("child");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.appendChildElement",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "child", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotAppendNullChildElement() throws Throwable {
+    failingWithException();
+  }
+
   // get child elements
 
   @Test

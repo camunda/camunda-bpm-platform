@@ -22,6 +22,8 @@ import org.w3c.dom.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
+
 /**
  * Wrapper for a xml dom element.
  *
@@ -31,7 +33,7 @@ public class SpinXmlDomElement extends SpinXmlElement {
 
   private final static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
 
-  private final Element domElement;
+  protected Element domElement;
 
   /**
    * Create a new wrapper.
@@ -352,6 +354,37 @@ public class SpinXmlDomElement extends SpinXmlElement {
     }
     domElement.removeAttributeNS(namespace, attributeName);
     return this;
+  }
+
+  /**
+   * Appends a child element to this element.
+   *
+   * @param childElement the child element to append
+   * @return the wrapped xml dom element
+   * @throws IllegalArgumentException if the child element is null
+   */
+  public SpinXmlDomElement append(SpinXmlDomElement childElement) {
+    ensureNotNull("childElement", childElement);
+    adoptElement(childElement);
+    domElement.appendChild(childElement.domElement);
+    return this;
+  }
+
+  /**
+   * Adopts a xml dom element to the owner document of this element if nessesary.
+   *
+   * @param elementToAdopt the element to adopt
+   */
+  protected void adoptElement(SpinXmlDomElement elementToAdopt) {
+    Document document = this.domElement.getOwnerDocument();
+    Element element = elementToAdopt.domElement;
+
+    if (!document.equals(element.getOwnerDocument())) {
+      Node node = document.adoptNode(element);
+      if (node == null) {
+        throw LOG.unableToAdoptElement(elementToAdopt.namespace(), elementToAdopt.name());
+      }
+    }
   }
 
 }

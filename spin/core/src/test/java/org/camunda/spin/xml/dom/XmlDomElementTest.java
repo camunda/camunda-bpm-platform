@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.spin.Spin.S;
+import static org.camunda.spin.Spin.XML;
 import static org.camunda.spin.xml.XmlTestConstants.*;
 
 /**
@@ -366,6 +367,38 @@ public class XmlDomElementTest {
   public void cannotGetChildElementByNullNamespaceAndNullName() {
     element.childElement(null, null);
   }
+
+  // append child element
+
+  @Test
+  public void canAppendChildElement() {
+    SpinXmlDomElement child = XML("<child/>");
+    element = element.append(child);
+
+    child.attr("id", "child");
+    child = element.childElement("child");
+
+    assertThat(child).isNotNull();
+    assertThat(child.attr("id").value()).isEqualTo("child");
+  }
+
+  @Test
+  public void canAppendChildElementWithNamespace() {
+    SpinXmlDomElement child = XML("<child xmlns=\"" + EXAMPLE_NAMESPACE + "\"/>");
+    element = element.append(child);
+
+    child.attr("id", "child");
+    child = element.childElement(EXAMPLE_NAMESPACE, "child");
+
+    assertThat(child).isNotNull();
+    assertThat(child.attr("id").value()).isEqualTo("child");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotAppendNullChildElement() {
+    element.append(null);
+  }
+
 
   // get child elements
 

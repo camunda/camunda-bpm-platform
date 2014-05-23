@@ -71,4 +71,8 @@ public class XmlDomLogger extends SpinLogger {
   public SpinXmlDomAttributeException unableToRemoveAttributeWithNullName() {
     return new SpinXmlDomAttributeException(exceptionMessage("013", "Unable to remove attribute with name 'null'"));
   }
+
+  public SpinXmlDomElementException unableToAdoptElement(String namespace, String name) {
+    return new SpinXmlDomElementException(exceptionMessage("014", "Unable to adopt element with namespace '{}' and name '{}'", namespace, name));
+  }
 }

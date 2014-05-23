@@ -26,6 +26,13 @@ public class SpinEnsure {
 
   private final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
+  /**
+   * Ensures that the parameter is not null.
+   *
+   * @param parameterName the parameter name
+   * @param value the value to ensure to be not null
+   * @throws IllegalArgumentException if the parameter value is null
+   */
   public static void ensureNotNull(String parameterName, Object value) {
     if(value == null) {
       throw LOG.parameterIsNullException(parameterName);
