@@ -22,6 +22,7 @@ import org.w3c.dom.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.camunda.spin.impl.util.SpinEnsure.ensureChildElement;
 import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 
 /**
@@ -49,6 +50,15 @@ public class SpinXmlDomElement extends SpinXmlElement {
    */
   public String getDataFormatName() {
     return XmlDomDataFormat.INSTANCE.getName();
+  }
+
+  /**
+   * Unwrappes the xml dom element.
+   *
+   * @return the unwrapped xml dom element
+   */
+  public Element unwrap() {
+    return domElement;
   }
 
   /**
@@ -357,16 +367,62 @@ public class SpinXmlDomElement extends SpinXmlElement {
   }
 
   /**
-   * Appends a child element to this element.
+   * Appends child elements to this element.
    *
-   * @param childElement the child element to append
+   * @param childElements the child elements to append
    * @return the wrapped xml dom element
    * @throws IllegalArgumentException if the child element is null
    */
-  public SpinXmlDomElement append(SpinXmlDomElement childElement) {
+  public SpinXmlDomElement append(SpinXmlDomElement... childElements) {
+    ensureNotNull("childElements", childElements);
+    for (SpinXmlDomElement childElement : childElements) {
+      ensureNotNull("childElement", childElement);
+      adoptElement(childElement);
+      domElement.appendChild(childElement.domElement);
+    }
+    return this;
+  }
+
+  /**
+   * Appends a child element to this element before the existing child element.
+   *
+   * @param childElement the child element to append
+   * @param existingChildElement the child element to append before
+   * @throws IllegalArgumentException if the child element or existing child element is null
+   * @throws SpinXmlDomElementException if the existing child element is not a child of this element
+   */
+  public SpinXmlDomElement appendBefore(SpinXmlDomElement childElement, SpinXmlDomElement existingChildElement) {
     ensureNotNull("childElement", childElement);
+    ensureNotNull("existingChildElement", existingChildElement);
+    ensureChildElement(this, existingChildElement);
+
     adoptElement(childElement);
-    domElement.appendChild(childElement.domElement);
+    domElement.insertBefore(childElement.domElement, existingChildElement.domElement);
+    return this;
+  }
+
+  /**
+   * Appends a child element to this element after the existing child element.
+   *
+   * @param childElement the child element to append
+   * @param existingChildElement the child element to append after
+   * @throws IllegalArgumentException if the child element or existing child element is null
+   * @throws SpinXmlDomElementException if the existing child element is not a child of this element
+   */
+  public SpinXmlDomElement appendAfter(SpinXmlDomElement childElement, SpinXmlDomElement existingChildElement) {
+    ensureNotNull("childElement", childElement);
+    ensureNotNull("existingChildElement", existingChildElement);
+    ensureChildElement(this, existingChildElement);
+
+    adoptElement(childElement);
+
+    Node nextSibling = existingChildElement.domElement.getNextSibling();
+    if (nextSibling != null) {
+      domElement.insertBefore(childElement.domElement, nextSibling);
+    }
+    else {
+      domElement.appendChild(childElement.domElement);
+    }
     return this;
   }
 

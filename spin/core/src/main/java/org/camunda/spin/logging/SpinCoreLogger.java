@@ -14,6 +14,8 @@ package org.camunda.spin.logging;
 
 import org.camunda.spin.SpinFileNotFoundException;
 import org.camunda.spin.SpinRuntimeException;
+import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
+import org.camunda.spin.impl.xml.dom.SpinXmlDomElementException;
 import org.camunda.spin.spi.SpinDataFormatException;
 
 
@@ -38,10 +40,6 @@ public class SpinCoreLogger extends SpinLogger {
     return new IllegalArgumentException(exceptionMessage("003", "Unsupported input of type '{}'", parameterClass.getName()));
   }
 
-  public IllegalArgumentException unsupportedNullInputParameter() {
-    return new IllegalArgumentException(exceptionMessage("005", "Unsupported input: input is 'null'"));
-  }
-
   public SpinFileNotFoundException fileNotFoundException(String filename, Throwable cause) {
     return new SpinFileNotFoundException(exceptionMessage("004", "Unable to find file with path '{}'", filename), cause);
   }
@@ -50,12 +48,24 @@ public class SpinCoreLogger extends SpinLogger {
     return fileNotFoundException(filename, null);
   }
 
+  public IllegalArgumentException unsupportedNullInputParameter() {
+    return new IllegalArgumentException(exceptionMessage("005", "Unsupported input: input is 'null'"));
+  }
+
   public SpinRuntimeException unableToReadInputStream(Exception e) {
-    return new SpinRuntimeException("Unable to read input stream", e);
+    return new SpinRuntimeException(exceptionMessage("006", "Unable to read input stream"), e);
   }
 
   public SpinDataFormatException wrongDataFormatException(String requestedDataformat, String givenDataformat) {
-    return new SpinDataFormatException(exceptionMessage("Wrong data format: requested '{}', given '{}'", requestedDataformat, givenDataformat));
+    return new SpinDataFormatException(exceptionMessage("007", "Wrong data format: requested '{}', given '{}'", requestedDataformat, givenDataformat));
+  }
+
+  public SpinXmlDomElementException elementIsNotChildOfThisElement(SpinXmlDomElement existingChildElement, SpinXmlDomElement parentDomElement) {
+    return new SpinXmlDomElementException(exceptionMessage("008", "The element with namespace '{}' and name '{}' " +
+        "is not a child element of the element with namespace '{}' and name '{}'",
+      existingChildElement.namespace(), existingChildElement.name(),
+      parentDomElement.namespace(), parentDomElement.name()
+    ));
   }
 
 }

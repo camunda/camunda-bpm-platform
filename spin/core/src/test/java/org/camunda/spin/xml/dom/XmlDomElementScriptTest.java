@@ -829,6 +829,26 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.appendChildElementAtPosition",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "child", value = "<child/>")
+    }
+  )
+  public void canAppendChildElementAtPosition() {
+    SpinXmlDomElement element = script.getVariable("element");
+
+    SpinList<SpinXmlDomElement> childs = element.childElements();
+    assertThat(childs).hasSize(7);
+
+    assertThat(childs.get(0).name()).isEqualTo("child");
+    assertThat(childs.get(2).name()).isEqualTo("child");
+    assertThat(childs.get(childs.size() - 1).name()).isEqualTo("child");
+  }
+
+
   // get child elements
 
   @Test

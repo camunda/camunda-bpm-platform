@@ -75,4 +75,5 @@ public class XmlDomLogger extends SpinLogger {
   public SpinXmlDomElementException unableToAdoptElement(String namespace, String name) {
     return new SpinXmlDomElementException(exceptionMessage("014", "Unable to adopt element with namespace '{}' and name '{}'", namespace, name));
   }
+
 }

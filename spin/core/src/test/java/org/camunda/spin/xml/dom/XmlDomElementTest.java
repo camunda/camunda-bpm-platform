@@ -394,11 +394,77 @@ public class XmlDomElementTest {
     assertThat(child.attr("id").value()).isEqualTo("child");
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void cannotAppendNullChildElement() {
-    element.append(null);
+  @Test
+  public void canAppendMultipleChildElements() {
+    SpinXmlDomElement child1 = XML("<child/>");
+    SpinXmlDomElement child2 = XML("<child/>");
+    SpinXmlDomElement child3 = XML("<child/>");
+
+    element = element.append(child1, child2, child3);
+
+    child1.attr("id", "child");
+    child2.attr("id", "child");
+    child3.attr("id", "child");
+
+    SpinList<SpinXmlDomElement> childs = element.childElements("child");
+    assertThat(childs).hasSize(3);
+
+    for (SpinXmlDomElement childElement : childs) {
+      assertThat(childElement).isNotNull();
+      assertThat(childElement.attr("id").value()).isEqualTo("child");
+    }
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotAppendNullChildElements() {
+    element.append((SpinXmlDomElement[]) null);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotAppendNullChildElement() {
+    SpinXmlDomElement child = XML("<child/>");
+    element.append(child, null);
+  }
+
+  @Test
+  public void canAppendChildElementBeforeExistingElement() {
+    SpinXmlDomElement child = XML("<child/>");
+    SpinXmlDomElement date = element.childElement("date");
+    element.appendBefore(child, date);
+    SpinXmlDomElement insertedElement = element.childElements().get(0);
+    assertThat(insertedElement.name()).isEqualTo("child");
+  }
+
+  @Test(expected = SpinXmlDomElementException.class)
+  public void cannotAppendChildElementBeforeNonChildElement() {
+    SpinXmlDomElement child = XML("<child/>");
+    element.appendBefore(child, child);
+  }
+
+  @Test
+  public void canAppendChildElementAfterExistingElement() {
+    SpinXmlDomElement child = XML("<child/>");
+    SpinXmlDomElement date = element.childElement("date");
+    element.appendAfter(child, date);
+    SpinXmlDomElement insertedElement = element.childElements().get(1);
+    assertThat(insertedElement.name()).isEqualTo("child");
+  }
+
+  @Test
+  public void canAppendChildElementAfterLastChildElement() {
+    SpinXmlDomElement child = XML("<child/>");
+    int childCount = element.childElements().size();
+    SpinXmlDomElement lastChildElement = element.childElements().get(childCount - 1);
+    element.appendAfter(child, lastChildElement);
+    SpinXmlDomElement insertedElement = element.childElements().get(childCount);
+    assertThat(insertedElement.name()).isEqualTo("child");
+  }
+
+  @Test(expected = SpinXmlDomElementException.class)
+  public void cannotAppendChildElementAfterNonChildElement() {
+    SpinXmlDomElement child = XML("<child/>");
+    element.appendAfter(child, child);
+  }
 
   // get child elements
 

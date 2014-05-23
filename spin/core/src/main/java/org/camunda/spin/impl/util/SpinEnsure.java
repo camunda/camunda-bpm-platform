@@ -12,6 +12,8 @@
  */
 package org.camunda.spin.impl.util;
 
+import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
+import org.camunda.spin.impl.xml.dom.SpinXmlDomElementException;
 import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.logging.SpinLogger;
 
@@ -39,4 +41,17 @@ public class SpinEnsure {
     }
   }
 
+  /**
+   * Ensures that the element is child element of the parent element.
+   *
+   * @param parentElement the parent xml dom element
+   * @param childElement the child element
+   * @throws SpinXmlDomElementException if the element is not child of the parent element
+   */
+  public static void ensureChildElement(SpinXmlDomElement parentElement, SpinXmlDomElement childElement) {
+    if (!parentElement.unwrap().isEqualNode(childElement.unwrap().getParentNode())) {
+      throw LOG.elementIsNotChildOfThisElement(childElement, parentElement);
+    }
+
+  }
 }
