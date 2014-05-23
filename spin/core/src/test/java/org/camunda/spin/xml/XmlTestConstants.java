@@ -26,7 +26,7 @@ public class XmlTestConstants {
 
   public final static String EXAMPLE_XML_FILE_NAME = "org/camunda/spin/xml/example.xml";
 
-  public final static String EXAMPLE_XML = "<customers><customer id=\"customer1\" /><customer id=\"customer2\" /></customers>";
+  public final static String EXAMPLE_XML = "<customers order=\"order1\"><customer id=\"customer1\" /><customer id=\"customer2\" /></customers>";
 
   public final static String EXAMPLE_INVALID_XML = "<invalid";
 

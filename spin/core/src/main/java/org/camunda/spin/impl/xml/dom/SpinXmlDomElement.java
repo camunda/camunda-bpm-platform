@@ -121,6 +121,34 @@ public class SpinXmlDomElement extends SpinXmlElement {
   }
 
   /**
+   * Checks whether this element has a attribute with the given name.
+   *
+   * @param attributeName the name of the attribute
+   * @return true if the element has an attribute with this name under the local namespace, false otherwise
+   */
+  public boolean hasAttr(String attributeName) {
+    return hasAttrNs(null, attributeName);
+  }
+
+  /**
+   * Checks whether this element has a attribute with the given name.
+   *
+   * @param namespace the namespace of the attribute
+   * @param attributeName the name of the attribute
+   * @return true if the element has an attribute with this name under given namespace, false otherwise
+   * @throws SpinXmlDomAttributeException if the attributeName is null
+   */
+  public boolean hasAttrNs(String namespace, String attributeName) {
+    if (attributeName == null) {
+      throw LOG.unableToCheckAttributeWithNullName();
+    }
+    if (hasNamespace(namespace)) {
+      namespace = null;
+    }
+    return domElement.hasAttributeNS(namespace, attributeName);
+  }
+
+  /**
    * Returns all wrapped attributes for the local namespace.
    *
    * @return the wrapped attributes or an empty list of no attributes are found
@@ -242,6 +270,71 @@ public class SpinXmlDomElement extends SpinXmlElement {
       throw LOG.unableToFindChildElementWithNamespaceAndName(namespace, elementName);
     }
     return childElements;
+  }
+
+  /**
+   * Sets the attribute value in the local namespace of the element.
+   *
+   * @param attributeName the name of the attribute
+   * @param value the value to set
+   * @return the wrapped xml dom element
+   * @throws SpinXmlDomAttributeException if the name is null
+   */
+  public SpinXmlDomElement attr(String attributeName, String value) {
+    return attrNs(null, attributeName, value);
+  }
+
+  /**
+   * Sets the attribute value in the given namespace.
+   *
+   * @param namespace the namespace of the attribute
+   * @param attributeName the name of the attribute
+   * @param value the value to set
+   * @return the wrapped xml dom element
+   * @throws SpinXmlDomAttributeException if the name is null
+   */
+  public SpinXmlDomElement attrNs(String namespace, String attributeName, String value) {
+    if (attributeName == null) {
+      throw LOG.unableToCreateAttributeWithNullName();
+    }
+    if (value == null) {
+      throw LOG.unableToSetAttributeValueToNull(namespace, attributeName);
+    }
+    if (hasNamespace(namespace)) {
+      namespace = null;
+    }
+    domElement.setAttributeNS(namespace, attributeName, value);
+    return this;
+  }
+
+  /**
+   * Removes the attribute under the local namespace.
+   *
+   * @param attributeName the name of the attribute
+   * @return the wrapped xml dom element
+   * @throws SpinXmlDomAttributeException if the attributeName is null
+   */
+  public SpinXmlDomElement removeAttr(String attributeName) {
+    return removeAttrNs(null, attributeName);
+  }
+
+  /**
+   * Removes the attribute under the given namespace.
+   *
+   * @param namespace the namespace of the attribute
+   * @param attributeName the name of the attribute
+   * @return the wrapped xml dom element
+   * @throws SpinXmlDomAttributeException if the attributeName is null
+   */
+  public SpinXmlDomElement removeAttrNs(String namespace, String attributeName) {
+    if (attributeName == null) {
+      throw LOG.unableToRemoveAttributeWithNullName();
+    }
+    if (hasNamespace(namespace)) {
+      namespace = null;
+    }
+    domElement.removeAttributeNS(namespace, attributeName);
+    return this;
   }
 
 }

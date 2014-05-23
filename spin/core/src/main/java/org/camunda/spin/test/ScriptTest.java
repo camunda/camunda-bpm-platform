@@ -13,6 +13,7 @@
 
 package org.camunda.spin.test;
 
+import org.camunda.spin.SpinScriptException;
 import org.junit.ClassRule;
 import org.junit.Rule;
 
@@ -30,4 +31,18 @@ public abstract class ScriptTest {
   @Rule
   public ScriptRule script = new ScriptRule();
 
+  protected void failingWithException() throws Throwable {
+    try {
+      script.execute();
+    }
+    catch (SpinScriptException e) {
+      Throwable cause = e.getCause();
+      if (cause.getCause() != null) {
+        throw cause.getCause().getCause();
+      }
+      else {
+        throw JavaScriptExceptionUnwrapper.unwrap(cause);
+      }
+    }
+  }
 }

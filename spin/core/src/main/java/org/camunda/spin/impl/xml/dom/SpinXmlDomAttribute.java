@@ -14,7 +14,9 @@
 package org.camunda.spin.impl.xml.dom;
 
 import org.camunda.spin.Spin;
+import org.camunda.spin.logging.SpinLogger;
 import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
 
 /**
  * Wrapper of a xml dom attribute.
@@ -22,6 +24,8 @@ import org.w3c.dom.Attr;
  * @author Sebastian Menski
  */
 public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
+
+  private final static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
 
   private final Attr attributeNode;
 
@@ -39,15 +43,6 @@ public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
    */
   public String getDataFormatName() {
     return XmlDomDataFormat.INSTANCE.getName();
-  }
-
-  /**
-   * Returns the value of the attribute as {@link String}.
-   *
-   * @return the string value of the attribute
-   */
-  public String value() {
-    return attributeNode.getValue();
   }
 
   /**
@@ -87,6 +82,41 @@ public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
     else {
       return namespace.equals(namespace());
     }
+  }
+
+  /**
+   * Returns the value of the attribute as {@link String}.
+   *
+   * @return the string value of the attribute
+   */
+  public String value() {
+    return attributeNode.getValue();
+  }
+
+  /**
+   * Sets the value of the attribute.
+   *
+   * @param value the value to set
+   * @return the wrapped xml dom attribute
+   * @throws SpinXmlDomAttributeException if the value is null
+   */
+  public SpinXmlDomAttribute value(String value) {
+    if (value == null) {
+      throw LOG.unableToSetAttributeValueToNull(namespace(), name());
+    }
+    attributeNode.setValue(value);
+    return this;
+  }
+
+  /**
+   * Removes the attribute.
+   *
+   * @return the wrapped owner xml dom element
+   */
+  public SpinXmlDomElement remove() {
+    Element ownerElement = attributeNode.getOwnerElement();
+    ownerElement.removeAttributeNode(attributeNode);
+    return new SpinXmlDomElement(ownerElement);
   }
 
 }

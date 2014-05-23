@@ -2,7 +2,26 @@
 
 The Xml data type supports manipulating Xml attributes and child elements..
 
-## Reading attributes from Xml
+
+## Attributes
+
+
+### Checking for attributes in Xml
+
+```java
+import static org.camunda.spin.Spin.XML;
+
+String xml = "<order xmlns:cam=\"http://camunda.org/example\" id=\"order1\" cam:name=\"name\" />";
+
+boolean hasAttr = XML(xml).hasAttr("id");
+assertTrue(hasAttr);
+
+hasAttr = XML(xml).hasAttrNs("http://camunda.org/example", "id");
+assertTrue(hasAttr);
+```
+
+
+### Reading attributes from Xml
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -52,7 +71,74 @@ List<String> names = XML(xml).attrNames();
 names = XML(xml).attrNames("http://camunda.org/example");
 ```
 
-## Reading child elements from Xml
+
+### Writing attributes to Xml
+
+It is possible to set a new attribute value directly from the element wrapper or on the attribute
+wrapper.
+
+```java
+import static org.camunda.spin.Spin.XML;
+
+String xml = "<order id=\"order1\" />";
+
+XML(xml).attr("id", "newId");
+
+SpinXmlDomAttribute attribute = XML(xml).attr("id");
+attribute.value("newId");
+```
+
+Also you can specify the namespace of the attribute to set.
+
+```java
+import static org.camunda.spin.Spin.XML;
+
+String xml = "<order xmlns:cam=\"http://camunda.org/example\" id=\"order1\" cam:name=\"name\" />";
+
+XML(xml).attrNs("http://camunda.org/example", "name", "newName");
+
+SpinXmlDomAttribute attribute = XML(xml).attrNs("http://camunda.org/example", "name");
+attribute.value("newName");
+```
+
+
+### Removing attributes from Xml
+
+It is possible to remove a attribute from the element directly or to remove the attribute itself.
+
+```java
+import static org.camunda.spin.Spin.XML;
+
+String xml = "<order id=\"order1\" />";
+
+SpinXmlDomElement element = XML(xml).removeAttr("id");
+assertFalse(element.hasAttr("id));
+
+SpinXmlDomAttribute attribute = XML(xml).attr("id");
+element = attribute.remove();
+assertFalse(element.hasAttr("id));
+```
+
+Also you can specify the namespace of the attribute to remove.
+
+```java
+import static org.camunda.spin.Spin.XML;
+
+String xml = "<order xmlns:cam=\"http://camunda.org/example\" id=\"order1\" cam:name=\"name\" />";
+
+SpinXmlDomElement element = XML(xml).removeAttrNs("http://camunda.org/example", "name");
+assertFalse(element.hasAttrNs("http://camunda.org/example/", "name"));
+
+SpinXmlDomAttribute attribute = XML(xml).attrNs("http://camunda.org/example", "name");
+element = attribute.remove()
+assertFalse(element.hasAttrNs("http://camunda.org/example", "name"));
+```
+
+
+## Child Elements
+
+
+### Reading child elements from Xml
 
 Besides attributes you can also get an unique or all child elements of a specific type. Optionally
 can a namespace be passed to the methods as first parameter.
@@ -73,8 +159,8 @@ SpinCollection<SpinXmlDomElement> ops = XML(xml).childElements("http://camunda.o
 
 ## Manipulating Xml using a Script Language
 
-Xml can be manipulated from scrip languages in the same was as from Java. Since script languages use
-dynamic typing, you do not need to hint the data format but you can use auto detection. The
+Xml can be manipulated from script languages in the same was as from Java. Since script languages
+use dynamic typing, you do not need to hint the data format but you can use auto detection. The
 following example demonstrates how to access an attribute and a child element from Xml in Python:
 
 ```python
@@ -84,9 +170,18 @@ xml = """
 </order>
 """
 
+assert S(xml).hasAttr('id')
+
 order_id = S(xml).attr('id').value()
-assert order_id == "1231"
+assert order_id == '1231'
+
+element = S(xml).attr('order', 'order1')
+assert element.hasAttr('order')
+assert element.Attr('order').value() == 'order1'
+
+element.removeAttr('order')
+assert not element.hasAttr('order')
 
 item_id = S(xml).childElement('item').attr('id').value()
-assert item_id == "1"
+assert item_id == '1'
 ```

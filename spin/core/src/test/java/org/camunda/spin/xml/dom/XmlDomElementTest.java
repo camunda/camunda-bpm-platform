@@ -39,6 +39,56 @@ public class XmlDomElementTest {
     element = S(exampleXmlFileAsStream());
   }
 
+  // has attribute
+
+  @Test
+  public void canCheckAttributeByName() {
+    boolean hasAttribute = element.hasAttr("order");
+    assertThat(hasAttribute).isTrue();
+  }
+
+  @Test
+  public void canCheckAttributeByNonExistingName() {
+    boolean hasAttribute = element.hasAttr(NON_EXISTING);
+    assertThat(hasAttribute).isFalse();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  public void cannotCheckAttributeByNullName() {
+    element.hasAttr(null);
+  }
+
+  @Test
+  public void canCheckAttributeByNamespaceAndName() {
+    boolean hasAttribute = element.hasAttrNs(EXAMPLE_NAMESPACE, "order");
+    assertThat(hasAttribute).isTrue();
+  }
+
+  @Test
+  public void canCheckAttributeByNamespaceAndNonExistingName() {
+    boolean hasAttribute = element.hasAttrNs(EXAMPLE_NAMESPACE, NON_EXISTING);
+    assertThat(hasAttribute).isFalse();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  public void canCheckAttributeByNamespaceAndNullName() {
+    element.hasAttrNs(EXAMPLE_NAMESPACE, null);
+  }
+
+  @Test
+  public void canCheckAttributeByNonExistingNamespaceAndName() {
+    boolean hasAttribute = element.hasAttrNs(NON_EXISTING, "order");
+    assertThat(hasAttribute).isFalse();
+  }
+
+  @Test
+  public void canCheckAttributeByNullNamespaceAndName() {
+    boolean hasAttribute = element.hasAttrNs(null, "order");
+    assertThat(hasAttribute).isTrue();
+  }
+
+  // read attribute
+
   @Test
   public void canReadAttributeByName() {
     SpinXmlDomAttribute attribute = element.attr("order");
@@ -95,6 +145,108 @@ public class XmlDomElementTest {
     element.attrNs(null, null);
   }
 
+  // write attribute
+
+  @Test
+  public void canWriteAttributeByName() {
+    String newValue = element.attr("order", "order2").attr("order").value();
+    assertThat(newValue).isEqualTo("order2");
+  }
+
+  @Test
+  public void canWriteAttributeByNonExistingName() {
+    String newValue = element.attr(NON_EXISTING, "newValue").attr(NON_EXISTING).value();
+    assertThat(newValue).isEqualTo("newValue");
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  public void cannotWriteAttributeByNullName() {
+    element.attr(null, NON_EXISTING);
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  public void canWriteAttributeByNameWithNullValue() {
+    element.attr("order", null);
+  }
+
+  @Test
+  public void canWriteAttributeByNamespaceAndName() {
+    String newValue = element.attrNs(EXAMPLE_NAMESPACE, "order", "order2").attrNs(EXAMPLE_NAMESPACE, "order").value();
+    assertThat(newValue).isEqualTo("order2");
+  }
+
+  @Test
+  public void canWriteAttributeByNamespaceAndNonExistingName() {
+    String newValue = element.attrNs(EXAMPLE_NAMESPACE, NON_EXISTING, "newValue").attrNs(EXAMPLE_NAMESPACE, NON_EXISTING).value();
+    assertThat(newValue).isEqualTo("newValue");
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  public void cannotWriteAttributeByNamespaceAndNullName() {
+    element.attrNs(EXAMPLE_NAMESPACE, null, "newValue");
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  public void cannotWriteAttributeByNamespaceAndNameWithNullValue() {
+    element.attrNs(EXAMPLE_NAMESPACE, "order", null);
+  }
+
+  @Test
+  public void canWriteAttributeByNonExistingNamespaceAndName() {
+    String newValue = element.attrNs(NON_EXISTING, "order", "newValue").attrNs(NON_EXISTING, "order").value();
+    assertThat(newValue).isEqualTo("newValue");
+  }
+
+  @Test
+  public void canWriteAttributeByNullNamespaceAndName() {
+    String newValue = element.attrNs(null, "order", "order2").attrNs(null, "order").value();
+    assertThat(newValue).isEqualTo("order2");
+  }
+
+  // remove attribute
+
+  @Test
+  public void canRemoveAttributeByName() {
+    element.removeAttr("order");
+    assertThat(element.hasAttr("order")).isFalse();
+  }
+
+  @Test
+  public void canRemoveAttributeByNonExistingName() {
+    element.removeAttr(NON_EXISTING);
+    assertThat(element.hasAttr(NON_EXISTING)).isFalse();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  public void cannotRemoveAttributeByNullName() {
+    element.removeAttr(null);
+  }
+
+  @Test
+  public void canRemoveAttributeByNamespaceAndName() {
+    element.removeAttrNs(EXAMPLE_NAMESPACE, "order");
+    assertThat(element.hasAttrNs(EXAMPLE_NAMESPACE, "order")).isFalse();
+  }
+
+  @Test
+  public void canRemoveAttributeByNullNamespaceAndName() {
+    element.removeAttrNs(null, "order");
+    assertThat(element.hasAttrNs(null, "order")).isFalse();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  public void cannotRemoveAttributeByNamespaceAndNullName() {
+    element.removeAttrNs(EXAMPLE_NAMESPACE, null);
+  }
+
+  @Test
+  public void canRemoveAttributeByNonExistingNamespaceAndName() {
+    element.removeAttrNs(NON_EXISTING, "order");
+    assertThat(element.hasAttrNs(NON_EXISTING, "order")).isFalse();
+  }
+
+  // get attributes
+
   @Test
   public void canGetAllAttributes() {
     SpinCollection<SpinXmlDomAttribute> attributes = element.attrs();
@@ -131,6 +283,8 @@ public class XmlDomElementTest {
     assertThat(attributes).isEmpty();
   }
 
+  // get attribute names
+
   @Test
   public void canGetAllAttributeNames() {
     List<String> names = element.attrNames();
@@ -154,6 +308,8 @@ public class XmlDomElementTest {
     List<String> names = element.attrNames(NON_EXISTING);
     assertThat(names).isEmpty();
   }
+
+  // get child element
 
   @Test
   public void canGetSingleChildElementByName() {
@@ -210,6 +366,8 @@ public class XmlDomElementTest {
   public void cannotGetChildElementByNullNamespaceAndNullName() {
     element.childElement(null, null);
   }
+
+  // get child elements
 
   @Test
   public void canGetAllChildElementsByName() {

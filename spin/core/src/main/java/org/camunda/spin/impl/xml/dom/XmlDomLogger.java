@@ -56,4 +56,19 @@ public class XmlDomLogger extends SpinLogger {
     return new XmlDomDataFormatException(exceptionMessage("009", "Unable to parse input into DOM document"), e);
   }
 
+  public SpinXmlDomAttributeException unableToCreateAttributeWithNullName() {
+    return new SpinXmlDomAttributeException(exceptionMessage("010", "Unable to create attribute with name 'null'"));
+  }
+
+  public SpinXmlDomAttributeException unableToSetAttributeValueToNull(String namespace, String attributeName) {
+    return new SpinXmlDomAttributeException(exceptionMessage("011", "Unable to set value of attribute of namespace '{}' and '{}' to 'null'", namespace, attributeName));
+  }
+
+  public SpinXmlDomAttributeException unableToCheckAttributeWithNullName() {
+    return new SpinXmlDomAttributeException(exceptionMessage("012", "Unable to check for existence of attribute with name 'null'"));
+  }
+
+  public SpinXmlDomAttributeException unableToRemoveAttributeWithNullName() {
+    return new SpinXmlDomAttributeException(exceptionMessage("013", "Unable to remove attribute with name 'null'"));
+  }
 }

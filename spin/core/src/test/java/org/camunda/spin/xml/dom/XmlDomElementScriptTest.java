@@ -14,12 +14,10 @@
 package org.camunda.spin.xml.dom;
 
 import org.camunda.spin.SpinCollection;
-import org.camunda.spin.SpinScriptException;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomAttribute;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomAttributeException;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomElementException;
-import org.camunda.spin.test.JavaScriptExceptionUnwrapper;
 import org.camunda.spin.test.Script;
 import org.camunda.spin.test.ScriptTest;
 import org.camunda.spin.test.ScriptVariable;
@@ -36,15 +34,127 @@ import static org.camunda.spin.xml.XmlTestConstants.*;
  */
 public abstract class XmlDomElementScriptTest extends ScriptTest {
 
+  // has attribute
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.checkAttributeByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name", value = "order")
+    }
+  )
+  public void canCheckAttributeByName() {
+    boolean hasAttribute = script.getVariable("hasAttribute");
+    assertThat(hasAttribute).isTrue();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.checkAttributeByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name", value = NON_EXISTING)
+    }
+  )
+  public void canCheckAttributeByNonExistingName() {
+    boolean hasAttribute = script.getVariable("hasAttribute");
+    assertThat(hasAttribute).isFalse();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.checkAttributeByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name", isNull = true)
+    },
+    execute = false
+  )
+  public void canCheckAttributeByNullName() throws Throwable {
+    failingWithException();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.checkAttributeByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name", value = "order")
+    }
+  )
+  public void canCheckAttributeByNamespaceAndName() {
+    boolean hasAttribute = script.getVariable("hasAttribute");
+    assertThat(hasAttribute).isTrue();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.checkAttributeByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = NON_EXISTING),
+      @ScriptVariable(name = "name", value = "order")
+    }
+  )
+  public void canCheckAttributeByNonExistingNamespaceAndName() {
+    boolean hasAttribute = script.getVariable("hasAttribute");
+    assertThat(hasAttribute).isFalse();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.checkAttributeByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name", isNull = true)
+    },
+    execute = false
+  )
+  public void canCheckAttributeByNamespaceAndNullName() throws Throwable {
+    failingWithException();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.checkAttributeByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name", value = NON_EXISTING)
+    }
+  )
+  public void canCheckAttributeByNamespaceAndNonExistingName() {
+    boolean hasAttribute = script.getVariable("hasAttribute");
+    assertThat(hasAttribute).isFalse();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.checkAttributeByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", isNull = true),
+      @ScriptVariable(name = "name", value = "order")
+    }
+  )
+  public void canCheckAttributeByNullNamespaceAndName() {
+    boolean hasAttribute = script.getVariable("hasAttribute");
+    assertThat(hasAttribute).isTrue();
+  }
+
+  // read attribute
+
   @Test
   @Script(
     name = "XmlDomElementScriptTest.readAttributeValueByName",
     variables = {
       @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
-      @ScriptVariable(name = "name", value = "order"),
+      @ScriptVariable(name = "name", value = "order")
     },
     execute = false
-
   )
   public void canReadAttributeByName() {
     script.setVariable("variables", new HashMap<String, Object>());
@@ -177,6 +287,253 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
+  // write attribute
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.writeAttributeValueByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name", value = "order"),
+      @ScriptVariable(name = "value", value = "order2")
+    }
+  )
+  public void canWriteAttributeByName() {
+    String newValue = script.getVariable("newValue");
+    assertThat(newValue).isEqualTo("order2");
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.writeAttributeValueByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name", value = NON_EXISTING),
+      @ScriptVariable(name = "value", value = "newValue")
+    }
+  )
+  public void canWriteAttributeByNonExistingName() {
+    String newValue = script.getVariable("newValue");
+    assertThat(newValue).isEqualTo("newValue");
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.writeAttributeValueByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name", isNull = true),
+      @ScriptVariable(name = "value", value = "order2")
+    },
+    execute = false
+  )
+  public void canWriteAttributeByNullName() throws Throwable {
+    failingWithException();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.writeAttributeValueByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name", value = "order"),
+      @ScriptVariable(name = "value", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotWriteAttributeByNameWithNullValue() throws Throwable {
+    failingWithException();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.writeAttributeValueByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name", value = "order"),
+      @ScriptVariable(name = "value", value = "order2")
+    }
+  )
+  public void canWriteAttributeByNamespaceAndName() {
+    String newValue = script.getVariable("newValue");
+    assertThat(newValue).isEqualTo("order2");
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.writeAttributeValueByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name", value = NON_EXISTING),
+      @ScriptVariable(name = "value", value = "order2")
+    }
+  )
+  public void canWriteAttributeByNamespaceAndNonExistingName() {
+    String newValue = script.getVariable("newValue");
+    assertThat(newValue).isEqualTo("order2");
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.writeAttributeValueByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name", isNull = true),
+      @ScriptVariable(name = "value", value = "order2")
+    },
+    execute = false
+  )
+  public void canWriteAttributeByNamespaceAndNullName() throws Throwable {
+    failingWithException();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.writeAttributeValueByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name", value = "order"),
+      @ScriptVariable(name = "value", isNull = true)
+    },
+    execute = false
+  )
+  public void canWriteAttributeByNamespaceAndNameWithNullValue() throws Throwable {
+    failingWithException();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.writeAttributeValueByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", isNull = true),
+      @ScriptVariable(name = "name", value = "order"),
+      @ScriptVariable(name = "value", value = "order2")
+    }
+  )
+  public void canWriteAttributeByNullNamespaceAndName() {
+    String newValue = script.getVariable("newValue");
+    assertThat(newValue).isEqualTo("order2");
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.writeAttributeValueByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace", value = NON_EXISTING),
+      @ScriptVariable(name = "name", value = "order"),
+      @ScriptVariable(name = "value", value = "order2")
+    }
+  )
+  public void canWriteAttributeByNonExistingNamespaceAndName() {
+    String newValue = script.getVariable("newValue");
+    assertThat(newValue).isEqualTo("order2");
+  }
+
+  // remove attribute
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.removeAttributeByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name",  value = "order")
+    }
+  )
+  public void canRemoveAttributeByName() {
+    SpinXmlDomElement element = script.getVariable("element");
+    assertThat(element.hasAttr("order")).isFalse();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.removeAttributeByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name",  value = NON_EXISTING)
+    }
+  )
+  public void canRemoveAttributeByNonExistingName() {
+    SpinXmlDomElement element = script.getVariable("element");
+    assertThat(element.hasAttr(NON_EXISTING)).isFalse();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.removeAttributeByName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "name",  isNull = true)
+    },
+    execute = false
+  )
+  public void cannotRemoveAttributeByNullName() throws Throwable {
+    failingWithException();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.removeAttributeByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace",  value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name",  value = "order")
+    }
+  )
+  public void canRemoveAttributeByNamespaceAndName() {
+    SpinXmlDomElement element = script.getVariable("element");
+    assertThat(element.hasAttrNs(EXAMPLE_NAMESPACE, "order")).isFalse();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.removeAttributeByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace",  isNull = true),
+      @ScriptVariable(name = "name",  value = "order")
+    }
+  )
+  public void canRemoveAttributeByNullNamespaceAndName() {
+    SpinXmlDomElement element = script.getVariable("element");
+    assertThat(element.hasAttrNs(null, "order")).isFalse();
+  }
+
+  @Test(expected = SpinXmlDomAttributeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.removeAttributeByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace",  value = EXAMPLE_NAMESPACE),
+      @ScriptVariable(name = "name",  isNull = true)
+    },
+    execute = false
+  )
+  public void canRemoveAttributeByNamespaceAndNullName() throws Throwable {
+    failingWithException();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.removeAttributeByNamespaceAndName",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "namespace",  value = NON_EXISTING),
+      @ScriptVariable(name = "name",  value = "order")
+    }
+  )
+  public void canRemoveAttributeByNonExistingNamespaceAndName() {
+    SpinXmlDomElement element = script.getVariable("element");
+    assertThat(element.hasAttrNs(NON_EXISTING, "order")).isFalse();
+  }
+
+  // get attributes
+
   @Test
   @Script("XmlDomElementScriptTest.getAllAttributesAndNames")
   @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME)
@@ -282,6 +639,8 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     List<String> names = script.getVariable("names");
     assertThat(names).isEmpty();
   }
+
+  // get child element
 
   @Test
   @Script(
@@ -423,6 +782,8 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
+  // get child elements
+
   @Test
   @Script(
     name = "XmlDomElementScriptTest.getChildElementsByName",
@@ -558,21 +919,6 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
   )
   public void cannotGetAllChildElementsByNullNamespaceAndNullName() throws Throwable {
     failingWithException();
-  }
-
-  private void failingWithException() throws Throwable {
-    try {
-      script.execute();
-    }
-    catch (SpinScriptException e) {
-      Throwable cause = e.getCause();
-      if (cause.getCause() != null) {
-        throw cause.getCause().getCause();
-      }
-      else {
-        throw JavaScriptExceptionUnwrapper.unwrap(cause);
-      }
-    }
   }
 
 }
