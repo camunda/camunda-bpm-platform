@@ -42,7 +42,7 @@ public class XmlDomElementTest {
   @Test
   public void canReadAttributeByName() {
     SpinXmlDomAttribute attribute = element.attr("order");
-    String value = attribute.stringValue();
+    String value = attribute.value();
     assertThat(value).isEqualTo("order1");
   }
 
@@ -59,14 +59,14 @@ public class XmlDomElementTest {
   @Test
   public void canReadAttributeByNamespaceAndName() {
     SpinXmlDomAttribute attribute = element.attrNs(EXAMPLE_NAMESPACE, "order");
-    String value = attribute.stringValue();
+    String value = attribute.value();
     assertThat(value).isEqualTo("order1");
   }
 
   @Test
   public void canReadAttributeByNullNamespaceAndName() {
     SpinXmlDomAttribute attribute = element.attrNs(null, "order");
-    String value = attribute.stringValue();
+    String value = attribute.value();
     assertThat(value).isEqualTo("order1");
   }
 
@@ -101,7 +101,7 @@ public class XmlDomElementTest {
     for (SpinXmlDomAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
-      assertThat(attribute.stringValue()).isIn("order1", "20150112");
+      assertThat(attribute.value()).isIn("order1", "20150112");
     }
   }
 
@@ -110,7 +110,7 @@ public class XmlDomElementTest {
     SpinCollection<SpinXmlDomAttribute> attributes = element.attrs(EXAMPLE_NAMESPACE);
     for (SpinXmlDomAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
-      assertThat(attribute.stringValue()).isIn("order1", "20150112");
+      assertThat(attribute.value()).isIn("order1", "20150112");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
     }
   }
@@ -120,7 +120,7 @@ public class XmlDomElementTest {
     SpinCollection<SpinXmlDomAttribute> attributes = element.attrs(null);
     for (SpinXmlDomAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
-      assertThat(attribute.stringValue()).isIn("order1", "20150112");
+      assertThat(attribute.value()).isIn("order1", "20150112");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
     }
   }
@@ -159,7 +159,7 @@ public class XmlDomElementTest {
   public void canGetSingleChildElementByName() {
     SpinXmlDomElement childElement = element.childElement("date");
     assertThat(childElement).isNotNull();
-    assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");
+    assertThat(childElement.attr("name").value()).isEqualTo("20140512");
   }
 
   @Test(expected = SpinXmlDomElementException.class)
@@ -176,14 +176,14 @@ public class XmlDomElementTest {
   public void canGetSingleChildElementByNamespaceAndName() {
     SpinXmlDomElement childElement = element.childElement(EXAMPLE_NAMESPACE, "date");
     assertThat(childElement).isNotNull();
-    assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");
+    assertThat(childElement.attr("name").value()).isEqualTo("20140512");
   }
 
   @Test
   public void canGetSingleChildElementByNullNamespaceAndName() {
     SpinXmlDomElement childElement = element.childElement(EXAMPLE_NAMESPACE, "date");
     assertThat(childElement).isNotNull();
-    assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");
+    assertThat(childElement.attr("name").value()).isEqualTo("20140512");
   }
 
   @Test(expected = SpinXmlDomElementException.class)

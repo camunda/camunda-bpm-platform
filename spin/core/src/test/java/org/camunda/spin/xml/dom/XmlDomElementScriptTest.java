@@ -185,7 +185,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     for (SpinXmlDomAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
-      assertThat(attribute.stringValue()).isIn("order1", "20150112");
+      assertThat(attribute.value()).isIn("order1", "20150112");
     }
   }
 
@@ -201,7 +201,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     SpinCollection<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
     for (SpinXmlDomAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
-      assertThat(attribute.stringValue()).isIn("order1", "20150112");
+      assertThat(attribute.value()).isIn("order1", "20150112");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
     }
   }
@@ -218,7 +218,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     SpinCollection<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
     for (SpinXmlDomAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
-      assertThat(attribute.stringValue()).isIn("order1", "20150112");
+      assertThat(attribute.value()).isIn("order1", "20150112");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
     }
   }
@@ -294,7 +294,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
   public void canGetSingleChildElementByName() {
     SpinXmlDomElement childElement = script.getVariable("childElement");
     assertThat(childElement).isNotNull();
-    assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");
+    assertThat(childElement.attr("name").value()).isEqualTo("20140512");
   }
 
   @Test(expected = SpinXmlDomElementException.class)
@@ -335,7 +335,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
   public void canGetSingleChildElementByNamespaceAndName() {
     SpinXmlDomElement childElement = script.getVariable("childElement");
     assertThat(childElement).isNotNull();
-    assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");
+    assertThat(childElement.attr("name").value()).isEqualTo("20140512");
   }
 
   @Test
@@ -350,7 +350,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
   public void canGetSingleChildElementByNullNamespaceAndName() {
     SpinXmlDomElement childElement = script.getVariable("childElement");
     assertThat(childElement).isNotNull();
-    assertThat(childElement.attr("name").stringValue()).isEqualTo("20140512");
+    assertThat(childElement.attr("name").value()).isEqualTo("20140512");
   }
 
   @Test(expected = SpinXmlDomElementException.class)

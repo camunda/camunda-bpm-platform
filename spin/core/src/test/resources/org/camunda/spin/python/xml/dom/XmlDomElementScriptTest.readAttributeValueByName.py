@@ -1,1 +1,1 @@
-value = S(input).attr(name).stringValue()
+value = S(input).attr(name).value()

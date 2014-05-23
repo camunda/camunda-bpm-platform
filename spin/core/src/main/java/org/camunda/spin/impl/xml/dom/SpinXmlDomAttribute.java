@@ -46,7 +46,7 @@ public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
    *
    * @return the string value of the attribute
    */
-  public String stringValue() {
+  public String value() {
     return attributeNode.getValue();
   }
 

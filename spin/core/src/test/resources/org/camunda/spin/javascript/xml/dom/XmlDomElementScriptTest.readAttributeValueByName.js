@@ -1,4 +1,4 @@
 xml = S(input)
 
-value = xml.attr(name).stringValue();
-var value2 = xml.attr(name).stringValue();
+value = xml.attr(name).value();
+var value2 = xml.attr(name).value();

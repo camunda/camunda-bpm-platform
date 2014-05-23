@@ -8,10 +8,10 @@ The Xml data type supports manipulating Xml attributes and child elements..
 import static org.camunda.spin.Spin.XML;
 
 SpinXmlDomAttribute attribute = XML("<order id=\"order1\" />").attr("id");
-String id = XML("<order id=\"order1\" />").attr("id").stringValue();
+String id = XML("<order id=\"order1\" />").attr("id").value();
 ```
 
-The `attr` method returns a wrapper of the Xml attribute and with `stringValue` the value of the
+The `attr` method returns a wrapper of the Xml attribute and with `value` the value of the
 attribute can be accessed.
 
 If you want to access an attribute in another namespace you have to use the `attrNs` method.
@@ -84,9 +84,9 @@ xml = """
 </order>
 """
 
-order_id = S(xml).attr('id').stringValue()
+order_id = S(xml).attr('id').value()
 assert order_id == "1231"
 
-item_id = S(xml).childElement('item').attr('id').stringValue()
+item_id = S(xml).childElement('item').attr('id').value()
 assert item_id == "1"
 ```

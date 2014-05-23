@@ -1,2 +1,2 @@
-value = S(input).attrNs(namespace, name).stringValue()
+value = S(input).attrNs(namespace, name).value()
 
