@@ -13,8 +13,8 @@
 
 package org.camunda.spin.impl.xml.dom;
 
-import org.camunda.spin.SpinCollection;
-import org.camunda.spin.impl.SpinCollectionImpl;
+import org.camunda.spin.SpinList;
+import org.camunda.spin.impl.SpinListImpl;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.w3c.dom.*;
@@ -153,7 +153,7 @@ public class SpinXmlDomElement extends SpinXmlElement {
    *
    * @return the wrapped attributes or an empty list of no attributes are found
    */
-  public SpinCollection<SpinXmlDomAttribute> attrs() {
+  public SpinList<SpinXmlDomAttribute> attrs() {
     return attrs(null);
   }
 
@@ -163,9 +163,9 @@ public class SpinXmlDomElement extends SpinXmlElement {
    * @param namespace the namespace of the attributes
    * @return the wrapped attributes or an empty list of no attributes are found
    */
-  public SpinCollection<SpinXmlDomAttribute> attrs(String namespace) {
+  public SpinList<SpinXmlDomAttribute> attrs(String namespace) {
     NamedNodeMap domAttributes = domElement.getAttributes();
-    SpinCollection<SpinXmlDomAttribute> attributes = new SpinCollectionImpl<SpinXmlDomAttribute>();
+    SpinList<SpinXmlDomAttribute> attributes = new SpinListImpl<SpinXmlDomAttribute>();
     for (int i = 0; i < domAttributes.getLength(); i++) {
       Attr attr = (Attr) domAttributes.item(i);
       if (attr != null) {
@@ -193,7 +193,7 @@ public class SpinXmlDomElement extends SpinXmlElement {
    * @return the names of the attributes
    */
   public List<String> attrNames(String namespace) {
-    SpinCollection<SpinXmlDomAttribute> attributes = attrs(namespace);
+    SpinList<SpinXmlDomAttribute> attributes = attrs(namespace);
     List<String> attributeNames = new ArrayList<String>();
     for (SpinXmlDomAttribute attribute : attributes) {
       attributeNames.add(attribute.name());
@@ -223,7 +223,7 @@ public class SpinXmlDomElement extends SpinXmlElement {
    * @throws SpinXmlDomElementException if none or more than one child element is found
    */
   public SpinXmlDomElement childElement(String namespace, String elementName) {
-    SpinCollection<SpinXmlDomElement> childElements = childElements(namespace, elementName);
+    SpinList<SpinXmlDomElement> childElements = childElements(namespace, elementName);
     if (childElements.size() > 1) {
       throw LOG.moreThanOneChildElementFoundForNamespaceAndName(namespace, elementName);
     }
@@ -233,13 +233,30 @@ public class SpinXmlDomElement extends SpinXmlElement {
   }
 
   /**
+   * Returns all child elements of this element.
+   *
+   * @return list of wrapped child elements
+   */
+  public SpinList<SpinXmlDomElement> childElements() {
+    NodeList childNodes = domElement.getChildNodes();
+    SpinList<SpinXmlDomElement> childElements = new SpinListImpl<SpinXmlDomElement>();
+    for (int i = 0; i < childNodes.getLength(); i++) {
+      Node node = childNodes.item(i);
+      if (node instanceof Element) {
+        childElements.add(new SpinXmlDomElement((Element) node));
+      }
+    }
+    return childElements;
+  }
+
+  /**
    * Returns all child element with a given name in the local namespace.
    *
    * @param elementName the element name
    * @return a collection of wrapped elements
    * @throws SpinXmlDomElementException if no child element was found
    */
-  public SpinCollection<SpinXmlDomElement> childElements(String elementName) {
+  public SpinList<SpinXmlDomElement> childElements(String elementName) {
     return childElements(namespace(), elementName);
   }
 
@@ -251,12 +268,12 @@ public class SpinXmlDomElement extends SpinXmlElement {
    * @return a collection of wrapped elements
    * @throws SpinXmlDomElementException if no child element was found
    */
-  public SpinCollection<SpinXmlDomElement> childElements(String namespace, String elementName) {
+  public SpinList<SpinXmlDomElement> childElements(String namespace, String elementName) {
     if (namespace == null) {
       namespace = namespace();
     }
     NodeList childNodes = domElement.getChildNodes();
-    SpinCollection<SpinXmlDomElement> childElements = new SpinCollectionImpl<SpinXmlDomElement>();
+    SpinList<SpinXmlDomElement> childElements = new SpinListImpl<SpinXmlDomElement>();
     for (int i = 0; i < childNodes.getLength(); i++) {
       Node childNode = childNodes.item(i);
       if (childNode instanceof Element) {

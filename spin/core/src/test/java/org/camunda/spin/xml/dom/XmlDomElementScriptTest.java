@@ -13,7 +13,7 @@
 
 package org.camunda.spin.xml.dom;
 
-import org.camunda.spin.SpinCollection;
+import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomAttribute;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomAttributeException;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
@@ -538,7 +538,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
   @Script("XmlDomElementScriptTest.getAllAttributesAndNames")
   @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME)
   public void canGetAllAttributes() {
-    SpinCollection<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
+    SpinList<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
     for (SpinXmlDomAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
@@ -555,7 +555,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllAttributesByNamespace() {
-    SpinCollection<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
+    SpinList<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
     for (SpinXmlDomAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.value()).isIn("order1", "20150112");
@@ -572,7 +572,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllAttributesByNullNamespace() {
-    SpinCollection<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
+    SpinList<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
     for (SpinXmlDomAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.value()).isIn("order1", "20150112");
@@ -589,7 +589,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllAttributesByNonExistingNamespace() {
-    SpinCollection<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
+    SpinList<SpinXmlDomAttribute> attributes = script.getVariable("attributes");
     assertThat(attributes).isEmpty();
   }
 
@@ -793,7 +793,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllChildElementsByName() {
-    SpinCollection<SpinXmlDomElement> childElements = script.getVariable("childElements");
+    SpinList<SpinXmlDomElement> childElements = script.getVariable("childElements");
     assertThat(childElements).hasSize(3);
   }
 
@@ -833,7 +833,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllChildElementsByNamespaceAndName() {
-    SpinCollection<SpinXmlDomElement> childElements = script.getVariable("childElements");
+    SpinList<SpinXmlDomElement> childElements = script.getVariable("childElements");
     assertThat(childElements).hasSize(3);
   }
 
@@ -847,7 +847,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllChildElementsByNullNamespaceAndName() {
-    SpinCollection<SpinXmlDomElement> childElements = script.getVariable("childElements");
+    SpinList<SpinXmlDomElement> childElements = script.getVariable("childElements");
     assertThat(childElements).hasSize(3);
   }
 

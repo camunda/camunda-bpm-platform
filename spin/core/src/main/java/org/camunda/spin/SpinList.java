@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,22 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.xml;
 
-import org.camunda.spin.Spin;
-import org.camunda.spin.SpinList;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomAttribute;
+package org.camunda.spin;
+
+import java.util.List;
 
 /**
- *
  * @author Sebastian Menski
- * @author Daniel Meyer
- *
  */
-public abstract class SpinXmlElement extends Spin<SpinXmlElement> {
-
-  public SpinList<SpinXmlDomAttribute> attrs() {
-    return null;
-  }
-
+public interface SpinList<E extends Spin<?>> extends List<E> {
 }
