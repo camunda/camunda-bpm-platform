@@ -45,7 +45,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canCheckAttributeByName() {
-    boolean hasAttribute = script.getVariable("hasAttribute");
+    Boolean hasAttribute = script.getVariable("hasAttribute");
     assertThat(hasAttribute).isTrue();
   }
 
@@ -58,7 +58,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canCheckAttributeByNonExistingName() {
-    boolean hasAttribute = script.getVariable("hasAttribute");
+    Boolean hasAttribute = script.getVariable("hasAttribute");
     assertThat(hasAttribute).isFalse();
   }
 
@@ -85,7 +85,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canCheckAttributeByNamespaceAndName() {
-    boolean hasAttribute = script.getVariable("hasAttribute");
+    Boolean hasAttribute = script.getVariable("hasAttribute");
     assertThat(hasAttribute).isTrue();
   }
 
@@ -99,7 +99,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canCheckAttributeByNonExistingNamespaceAndName() {
-    boolean hasAttribute = script.getVariable("hasAttribute");
+    Boolean hasAttribute = script.getVariable("hasAttribute");
     assertThat(hasAttribute).isFalse();
   }
 
@@ -127,7 +127,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canCheckAttributeByNamespaceAndNonExistingName() {
-    boolean hasAttribute = script.getVariable("hasAttribute");
+    Boolean hasAttribute = script.getVariable("hasAttribute");
     assertThat(hasAttribute).isFalse();
   }
 
@@ -141,7 +141,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canCheckAttributeByNullNamespaceAndName() {
-    boolean hasAttribute = script.getVariable("hasAttribute");
+    Boolean hasAttribute = script.getVariable("hasAttribute");
     assertThat(hasAttribute).isTrue();
   }
 
