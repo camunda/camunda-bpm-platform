@@ -72,8 +72,7 @@ public abstract class BaseLogger {
   /** the component Id of the logger. */
   protected String componentId;
 
-  BaseLogger() {
-    // hidden
+  protected BaseLogger() {
   }
 
   /**
