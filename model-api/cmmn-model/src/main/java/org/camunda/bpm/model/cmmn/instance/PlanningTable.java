@@ -18,7 +18,7 @@ import java.util.Collection;
  * @author Roman Smirnov
  *
  */
-public interface PlanningTable extends CmmnElement {
+public interface PlanningTable extends TableItem {
 
   Collection<TableItem> getTableItems();
 
