@@ -21,28 +21,6 @@ package org.camunda.spin.xml.tree;
 public abstract class SpinXmlTreeAttribute extends SpinXmlTreeNode<SpinXmlTreeAttribute> {
 
   /**
-   * Returns the local name of the attribute without namespace or prefix.
-   *
-   * @return the name of the attribute
-   */
-  public abstract String name();
-
-  /**
-   * Returns the namespace uri of the attribute and not the prefix.
-   *
-   * @return the namespace of the attribute
-   */
-  public abstract String namespace();
-
-  /**
-   * Checks if the attribute has the same namespace.
-   *
-   * @param namespace the namespace to check
-   * @return true if the attribute has the same namespace
-   */
-  public abstract boolean hasNamespace(String namespace);
-
-  /**
    * Returns the value of the attribute as {@link String}.
    *
    * @return the string value of the attribute

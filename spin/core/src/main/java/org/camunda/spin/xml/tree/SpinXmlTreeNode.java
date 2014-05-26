@@ -22,4 +22,26 @@ import org.camunda.spin.Spin;
  */
 public abstract class SpinXmlTreeNode<T extends SpinXmlTreeNode<?>> extends Spin<T> {
 
+  /**
+   * Returns the local name of the node without namespace or prefix.
+   *
+   * @return the name of the node
+   */
+  public abstract String name();
+
+  /**
+   * Returns the namespace uri of the node and not the prefix.
+   *
+   * @return the namespace of the node
+   */
+  public abstract String namespace();
+
+  /**
+   * Checks if the node has a given namespace.
+   *
+   * @param namespace the namespace to check
+   * @return true if the node has the same namespace
+   */
+  public abstract boolean hasNamespace(String namespace);
+
 }

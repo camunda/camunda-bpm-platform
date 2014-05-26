@@ -25,28 +25,6 @@ import org.camunda.spin.SpinList;
 public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElement> {
 
   /**
-   * The local name of the element without namespace or prefix.
-   *
-   * @return the name of the element
-   */
-  public abstract String name();
-
-  /**
-   * The full namespace uri of the element and not the prefix.
-   *
-   * @return the namespace uri
-   */
-  public abstract String namespace();
-
-  /**
-   * Checks if the element has the same namespace.
-   *
-   * @param namespace the namespace to test
-   * @return true if the element has the same namespace, false otherwise
-   */
-  public abstract boolean hasNamespace(String namespace);
-
-  /**
    * Returns the wrapped attribute for the given name under
    * the local namespace.
    *
