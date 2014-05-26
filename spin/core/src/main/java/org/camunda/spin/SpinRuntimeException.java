@@ -18,6 +18,8 @@ package org.camunda.spin;
  */
 public class SpinRuntimeException extends RuntimeException {
 
+  private static final long serialVersionUID = 1L;
+
   public SpinRuntimeException(String message) {
     super(message);
   }

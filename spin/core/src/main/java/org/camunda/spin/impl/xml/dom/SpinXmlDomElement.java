@@ -16,65 +16,45 @@ package org.camunda.spin.impl.xml.dom;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.SpinListImpl;
 import org.camunda.spin.logging.SpinLogger;
-import org.camunda.spin.xml.SpinXmlElement;
+import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.w3c.dom.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.camunda.spin.impl.util.SpinEnsure.ensureChildElement;
-import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
+import static org.camunda.spin.impl.util.SpinEnsure.*;
 
 /**
  * Wrapper for a xml dom element.
  *
  * @author Sebastian Menski
  */
-public class SpinXmlDomElement extends SpinXmlElement {
+public class SpinXmlDomElement extends SpinXmlTreeElement {
 
   private final static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
 
-  protected Element domElement;
+  protected final Element domElement;
 
-  /**
-   * Create a new wrapper.
-   *
-   * @param domElement the xml dom element to wrap
-   */
-  public SpinXmlDomElement(Element domElement) {
+  protected final XmlDomDataFormat dataFormat;
+
+  public SpinXmlDomElement(Element domElement, XmlDomDataFormat dataFormat) {
     this.domElement = domElement;
+    this.dataFormat = dataFormat;
   }
 
-  /**
-   * @return the xml dom data format name
-   */
   public String getDataFormatName() {
-    return XmlDomDataFormat.INSTANCE.getName();
+    return dataFormat.getName();
   }
 
-  /**
-   * Unwrappes the xml dom element.
-   *
-   * @return the unwrapped xml dom element
-   */
   public Element unwrap() {
     return domElement;
   }
 
-  /**
-   * The local name of the element without namespace or prefix.
-   *
-   * @return the name of the element
-   */
   public String name() {
     return domElement.getLocalName();
   }
 
-  /**
-   * The full namespace uri of the element and not the prefix.
-   *
-   * @return the namespace uri
-   */
   public String namespace() {
     String namespaceURI = domElement.getNamespaceURI();
     if (namespaceURI != null) {
@@ -85,12 +65,6 @@ public class SpinXmlDomElement extends SpinXmlElement {
     }
   }
 
-  /**
-   * Checks if the element has the same namespace.
-   *
-   * @param namespace the namespace to test
-   * @return true if the element has the same namespace, false otherwise
-   */
   public boolean hasNamespace(String namespace) {
     if (namespace == null) {
       return domElement.getNamespaceURI() == null;
@@ -100,27 +74,10 @@ public class SpinXmlDomElement extends SpinXmlElement {
     }
   }
 
-  /**
-   * Returns the wrapped attribute for the given name under
-   * the local namespace.
-   *
-   * @param attributeName the name of the attribute
-   * @return the wrapped xml dom attribute
-   * @throws SpinXmlDomAttributeException if the attribute is not found
-   */
   public SpinXmlDomAttribute attr(String attributeName) {
     return attrNs(null, attributeName);
   }
 
-  /**
-   * Returns the wrapped attribute for the given namespace
-   * and name.
-   *
-   * @param namespace the namespace of the attribute
-   * @param attributeName the name of the attribute
-   * @return the wrapped xml dom attribute
-   * @throws SpinXmlDomAttributeException if the attribute is not found
-   */
   public SpinXmlDomAttribute attrNs(String namespace, String attributeName) {
     if (hasNamespace(namespace)) {
       namespace = null;
@@ -129,27 +86,13 @@ public class SpinXmlDomElement extends SpinXmlElement {
     if (attributeNode == null) {
       throw LOG.unableToFindAttributeWithNamespaceAndName(namespace, attributeName);
     }
-    return new SpinXmlDomAttribute(attributeNode);
+    return dataFormat.createAttributeWrapper(attributeNode);
   }
 
-  /**
-   * Checks whether this element has a attribute with the given name.
-   *
-   * @param attributeName the name of the attribute
-   * @return true if the element has an attribute with this name under the local namespace, false otherwise
-   */
   public boolean hasAttr(String attributeName) {
     return hasAttrNs(null, attributeName);
   }
 
-  /**
-   * Checks whether this element has a attribute with the given name.
-   *
-   * @param namespace the namespace of the attribute
-   * @param attributeName the name of the attribute
-   * @return true if the element has an attribute with this name under given namespace, false otherwise
-   * @throws SpinXmlDomAttributeException if the attributeName is null
-   */
   public boolean hasAttrNs(String namespace, String attributeName) {
     if (attributeName == null) {
       throw LOG.unableToCheckAttributeWithNullName();
@@ -160,28 +103,17 @@ public class SpinXmlDomElement extends SpinXmlElement {
     return domElement.hasAttributeNS(namespace, attributeName);
   }
 
-  /**
-   * Returns all wrapped attributes for the local namespace.
-   *
-   * @return the wrapped attributes or an empty list of no attributes are found
-   */
-  public SpinList<SpinXmlDomAttribute> attrs() {
+  public SpinList<SpinXmlTreeAttribute> attrs() {
     return attrs(null);
   }
 
-  /**
-   * Returns all wrapped attributes for the given namespace.
-   *
-   * @param namespace the namespace of the attributes
-   * @return the wrapped attributes or an empty list of no attributes are found
-   */
-  public SpinList<SpinXmlDomAttribute> attrs(String namespace) {
+  public SpinList<SpinXmlTreeAttribute> attrs(String namespace) {
     NamedNodeMap domAttributes = domElement.getAttributes();
-    SpinList<SpinXmlDomAttribute> attributes = new SpinListImpl<SpinXmlDomAttribute>();
+    SpinList<SpinXmlTreeAttribute> attributes = new SpinListImpl<SpinXmlTreeAttribute>();
     for (int i = 0; i < domAttributes.getLength(); i++) {
       Attr attr = (Attr) domAttributes.item(i);
       if (attr != null) {
-        SpinXmlDomAttribute attribute = new SpinXmlDomAttribute(attr);
+        SpinXmlDomAttribute attribute = dataFormat.createAttributeWrapper(attr);
         if (attribute.hasNamespace(namespace)) {
           attributes.add(attribute);
         }
@@ -190,106 +122,59 @@ public class SpinXmlDomElement extends SpinXmlElement {
     return attributes;
   }
 
-  /**
-   * Returns all names of the attributes in the local namespace.
-   *
-   * @return the names of the attributes
-   */
   public List<String> attrNames() {
     return attrNames(null);
   }
 
-  /**
-   * Returns all names of the attributes in the given namespace.
-   *
-   * @return the names of the attributes
-   */
   public List<String> attrNames(String namespace) {
-    SpinList<SpinXmlDomAttribute> attributes = attrs(namespace);
+    SpinList<SpinXmlTreeAttribute> attributes = attrs(namespace);
     List<String> attributeNames = new ArrayList<String>();
-    for (SpinXmlDomAttribute attribute : attributes) {
+    for (SpinXmlTreeAttribute attribute : attributes) {
       attributeNames.add(attribute.name());
     }
     return attributeNames;
   }
 
-  /**
-   * Returns a single wrapped child element for the given name
-   * in the local namespace.
-   *
-   * @param elementName the element name
-   * @return the wrapped child element
-   * @throws SpinXmlDomElementException if none or more than one child element is found
-   */
   public SpinXmlDomElement childElement(String elementName) {
     return childElement(namespace(), elementName);
   }
 
-  /**
-   * Returns a single wrapped child element for the given namespace
-   * and name.
-   *
-   * @param namespace the namespace of the element
-   * @param elementName the element name
-   * @return the wrapped child element
-   * @throws SpinXmlDomElementException if none or more than one child element is found
-   */
   public SpinXmlDomElement childElement(String namespace, String elementName) {
-    SpinList<SpinXmlDomElement> childElements = childElements(namespace, elementName);
+    SpinList<SpinXmlTreeElement> childElements = childElements(namespace, elementName);
     if (childElements.size() > 1) {
       throw LOG.moreThanOneChildElementFoundForNamespaceAndName(namespace, elementName);
     }
     else {
-      return childElements.iterator().next();
+      return (SpinXmlDomElement) childElements.iterator().next();
     }
   }
 
-  /**
-   * Returns all child elements of this element.
-   *
-   * @return list of wrapped child elements
-   */
-  public SpinList<SpinXmlDomElement> childElements() {
+  public SpinList<SpinXmlTreeElement> childElements() {
     NodeList childNodes = domElement.getChildNodes();
-    SpinList<SpinXmlDomElement> childElements = new SpinListImpl<SpinXmlDomElement>();
+    SpinList<SpinXmlTreeElement> childElements = new SpinListImpl<SpinXmlTreeElement>();
     for (int i = 0; i < childNodes.getLength(); i++) {
       Node node = childNodes.item(i);
       if (node instanceof Element) {
-        childElements.add(new SpinXmlDomElement((Element) node));
+        childElements.add(dataFormat.createElementWrapper((Element) node));
       }
     }
     return childElements;
   }
 
-  /**
-   * Returns all child element with a given name in the local namespace.
-   *
-   * @param elementName the element name
-   * @return a collection of wrapped elements
-   * @throws SpinXmlDomElementException if no child element was found
-   */
-  public SpinList<SpinXmlDomElement> childElements(String elementName) {
+  public SpinList<SpinXmlTreeElement> childElements(String elementName) {
     return childElements(namespace(), elementName);
   }
 
-  /**
-   * Returns all child element with a given namespace and name.
-   *
-   * @param namespace the namespace of the element
-   * @param elementName the element name
-   * @return a collection of wrapped elements
-   * @throws SpinXmlDomElementException if no child element was found
-   */
-  public SpinList<SpinXmlDomElement> childElements(String namespace, String elementName) {
+  public SpinList<SpinXmlTreeElement> childElements(String namespace, String elementName) {
     if (namespace == null) {
       namespace = namespace();
     }
     NodeList childNodes = domElement.getChildNodes();
-    SpinList<SpinXmlDomElement> childElements = new SpinListImpl<SpinXmlDomElement>();
+    SpinList<SpinXmlTreeElement> childElements = new SpinListImpl<SpinXmlTreeElement>();
     for (int i = 0; i < childNodes.getLength(); i++) {
       Node childNode = childNodes.item(i);
       if (childNode instanceof Element) {
-        SpinXmlDomElement childElement = new SpinXmlDomElement((Element) childNode);
+        SpinXmlDomElement childElement = dataFormat.createElementWrapper((Element) childNode);
         if (childElement.hasNamespace(namespace) && childElement.name().equals(elementName)) {
           childElements.add(childElement);
         }
@@ -301,27 +186,10 @@ public class SpinXmlDomElement extends SpinXmlElement {
     return childElements;
   }
 
-  /**
-   * Sets the attribute value in the local namespace of the element.
-   *
-   * @param attributeName the name of the attribute
-   * @param value the value to set
-   * @return the wrapped xml dom element
-   * @throws SpinXmlDomAttributeException if the name is null
-   */
   public SpinXmlDomElement attr(String attributeName, String value) {
     return attrNs(null, attributeName, value);
   }
 
-  /**
-   * Sets the attribute value in the given namespace.
-   *
-   * @param namespace the namespace of the attribute
-   * @param attributeName the name of the attribute
-   * @param value the value to set
-   * @return the wrapped xml dom element
-   * @throws SpinXmlDomAttributeException if the name is null
-   */
   public SpinXmlDomElement attrNs(String namespace, String attributeName, String value) {
     if (attributeName == null) {
       throw LOG.unableToCreateAttributeWithNullName();
@@ -336,25 +204,10 @@ public class SpinXmlDomElement extends SpinXmlElement {
     return this;
   }
 
-  /**
-   * Removes the attribute under the local namespace.
-   *
-   * @param attributeName the name of the attribute
-   * @return the wrapped xml dom element
-   * @throws SpinXmlDomAttributeException if the attributeName is null
-   */
   public SpinXmlDomElement removeAttr(String attributeName) {
     return removeAttrNs(null, attributeName);
   }
 
-  /**
-   * Removes the attribute under the given namespace.
-   *
-   * @param namespace the namespace of the attribute
-   * @param attributeName the name of the attribute
-   * @return the wrapped xml dom element
-   * @throws SpinXmlDomAttributeException if the attributeName is null
-   */
   public SpinXmlDomElement removeAttrNs(String namespace, String attributeName) {
     if (attributeName == null) {
       throw LOG.unableToRemoveAttributeWithNullName();
@@ -366,62 +219,45 @@ public class SpinXmlDomElement extends SpinXmlElement {
     return this;
   }
 
-  /**
-   * Appends child elements to this element.
-   *
-   * @param childElements the child elements to append
-   * @return the wrapped xml dom element
-   * @throws IllegalArgumentException if the child element is null
-   */
-  public SpinXmlDomElement append(SpinXmlDomElement... childElements) {
+  public SpinXmlDomElement append(SpinXmlTreeElement... childElements) {
     ensureNotNull("childElements", childElements);
-    for (SpinXmlDomElement childElement : childElements) {
+    for (SpinXmlTreeElement childElement : childElements) {
       ensureNotNull("childElement", childElement);
-      adoptElement(childElement);
-      domElement.appendChild(childElement.domElement);
+      SpinXmlDomElement spinDomElement = ensureParamInstanceOf("childElement", childElement, SpinXmlDomElement.class);
+      adoptElement(spinDomElement);
+      domElement.appendChild(spinDomElement.domElement);
     }
     return this;
   }
 
-  /**
-   * Appends a child element to this element before the existing child element.
-   *
-   * @param childElement the child element to append
-   * @param existingChildElement the child element to append before
-   * @throws IllegalArgumentException if the child element or existing child element is null
-   * @throws SpinXmlDomElementException if the existing child element is not a child of this element
-   */
-  public SpinXmlDomElement appendBefore(SpinXmlDomElement childElement, SpinXmlDomElement existingChildElement) {
+  public SpinXmlDomElement appendBefore(SpinXmlTreeElement childElement, SpinXmlTreeElement existingChildElement) {
     ensureNotNull("childElement", childElement);
     ensureNotNull("existingChildElement", existingChildElement);
-    ensureChildElement(this, existingChildElement);
+    SpinXmlDomElement childDomElement = ensureParamInstanceOf("childElement", childElement, SpinXmlDomElement.class);
+    SpinXmlDomElement existingChildDomElement = ensureParamInstanceOf("existingChildElement", existingChildElement, SpinXmlDomElement.class);
+    ensureChildElement(this, existingChildDomElement);
 
-    adoptElement(childElement);
-    domElement.insertBefore(childElement.domElement, existingChildElement.domElement);
+    adoptElement(childDomElement);
+    domElement.insertBefore(childDomElement.domElement, existingChildDomElement.domElement);
     return this;
   }
 
-  /**
-   * Appends a child element to this element after the existing child element.
-   *
-   * @param childElement the child element to append
-   * @param existingChildElement the child element to append after
-   * @throws IllegalArgumentException if the child element or existing child element is null
-   * @throws SpinXmlDomElementException if the existing child element is not a child of this element
-   */
-  public SpinXmlDomElement appendAfter(SpinXmlDomElement childElement, SpinXmlDomElement existingChildElement) {
+
+  public SpinXmlDomElement appendAfter(SpinXmlTreeElement childElement, SpinXmlTreeElement existingChildElement) {
     ensureNotNull("childElement", childElement);
     ensureNotNull("existingChildElement", existingChildElement);
-    ensureChildElement(this, existingChildElement);
+    SpinXmlDomElement childDomElement = ensureParamInstanceOf("childElement", childElement, SpinXmlDomElement.class);
+    SpinXmlDomElement existingChildDomElement = ensureParamInstanceOf("existingChildElement", existingChildElement, SpinXmlDomElement.class);
+    ensureChildElement(this, existingChildDomElement);
 
-    adoptElement(childElement);
+    adoptElement(childDomElement);
 
-    Node nextSibling = existingChildElement.domElement.getNextSibling();
+    Node nextSibling = existingChildDomElement.domElement.getNextSibling();
     if (nextSibling != null) {
-      domElement.insertBefore(childElement.domElement, nextSibling);
+      domElement.insertBefore(childDomElement.domElement, nextSibling);
     }
     else {
-      domElement.appendChild(childElement.domElement);
+      domElement.appendChild(childDomElement.domElement);
     }
     return this;
   }

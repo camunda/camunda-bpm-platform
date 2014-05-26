@@ -71,4 +71,12 @@ public abstract class Spin<T extends Spin<?>> {
    */
   public abstract String getDataFormatName();
 
+  /**
+   * Return the wrapped object. The return type of this method
+   * depends on the concrete data format.
+   *
+   * @return the object wrapped by this wrapper.
+   */
+  public abstract Object unwrap();
+
 }

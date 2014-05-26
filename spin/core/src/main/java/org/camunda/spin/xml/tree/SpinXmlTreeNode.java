@@ -10,11 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.xml;
+package org.camunda.spin.xml.tree;
 
 import org.camunda.spin.Spin;
-import org.camunda.spin.SpinList;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomAttribute;
 
 /**
  *
@@ -22,10 +20,6 @@ import org.camunda.spin.impl.xml.dom.SpinXmlDomAttribute;
  * @author Daniel Meyer
  *
  */
-public abstract class SpinXmlElement extends Spin<SpinXmlElement> {
-
-  public SpinList<SpinXmlDomAttribute> attrs() {
-    return null;
-  }
+public abstract class SpinXmlTreeNode<T extends SpinXmlTreeNode<?>> extends Spin<T> {
 
 }

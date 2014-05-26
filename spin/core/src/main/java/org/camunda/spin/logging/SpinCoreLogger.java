@@ -68,4 +68,8 @@ public class SpinCoreLogger extends SpinLogger {
     ));
   }
 
+  public IllegalArgumentException unsupprtedParameterType(String parameterName, Object param, Class<?> expectedType) {
+    return new IllegalArgumentException(exceptionMessage("009", "Unsupported parameter '{}' of type '{}'. Expected type '{}'.", parameterName, param.getClass(), expectedType.getName()));
+  }
+
 }

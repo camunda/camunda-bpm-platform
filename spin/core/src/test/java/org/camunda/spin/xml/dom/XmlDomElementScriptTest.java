@@ -21,6 +21,7 @@ import org.camunda.spin.impl.xml.dom.SpinXmlDomElementException;
 import org.camunda.spin.test.Script;
 import org.camunda.spin.test.ScriptTest;
 import org.camunda.spin.test.ScriptVariable;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -840,7 +841,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
   public void canAppendChildElementAtPosition() {
     SpinXmlDomElement element = script.getVariable("element");
 
-    SpinList<SpinXmlDomElement> childs = element.childElements();
+    SpinList<SpinXmlTreeElement> childs = element.childElements();
     assertThat(childs).hasSize(7);
 
     assertThat(childs.get(0).name()).isEqualTo("child");

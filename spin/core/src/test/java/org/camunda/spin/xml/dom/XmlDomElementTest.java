@@ -13,20 +13,24 @@
 
 package org.camunda.spin.xml.dom;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.spin.Spin.S;
+import static org.camunda.spin.Spin.XML;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_NAMESPACE;
+import static org.camunda.spin.xml.XmlTestConstants.NON_EXISTING;
+import static org.camunda.spin.xml.XmlTestConstants.exampleXmlFileAsStream;
+
+import java.util.List;
+
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomAttribute;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomAttributeException;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomElementException;
+import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.spin.Spin.S;
-import static org.camunda.spin.Spin.XML;
-import static org.camunda.spin.xml.XmlTestConstants.*;
 
 /**
  * @author Sebastian Menski
@@ -250,8 +254,8 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetAllAttributes() {
-    SpinList<SpinXmlDomAttribute> attributes = element.attrs();
-    for (SpinXmlDomAttribute attribute : attributes) {
+    SpinList<SpinXmlTreeAttribute> attributes = element.attrs();
+    for (SpinXmlTreeAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
       assertThat(attribute.value()).isIn("order1", "20150112");
@@ -260,8 +264,8 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetAllAttributesByNamespace() {
-    SpinList<SpinXmlDomAttribute> attributes = element.attrs(EXAMPLE_NAMESPACE);
-    for (SpinXmlDomAttribute attribute : attributes) {
+    SpinList<SpinXmlTreeAttribute> attributes = element.attrs(EXAMPLE_NAMESPACE);
+    for (SpinXmlTreeAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.value()).isIn("order1", "20150112");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
@@ -270,8 +274,8 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetAllAttributesByNullNamespace() {
-    SpinList<SpinXmlDomAttribute> attributes = element.attrs(null);
-    for (SpinXmlDomAttribute attribute : attributes) {
+    SpinList<SpinXmlTreeAttribute> attributes = element.attrs(null);
+    for (SpinXmlTreeAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.value()).isIn("order1", "20150112");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
@@ -280,7 +284,7 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetAllAttributesByNonExistingNamespace() {
-    SpinList<SpinXmlDomAttribute> attributes = element.attrs(NON_EXISTING);
+    SpinList<SpinXmlTreeAttribute> attributes = element.attrs(NON_EXISTING);
     assertThat(attributes).isEmpty();
   }
 
@@ -406,10 +410,10 @@ public class XmlDomElementTest {
     child2.attr("id", "child");
     child3.attr("id", "child");
 
-    SpinList<SpinXmlDomElement> childs = element.childElements("child");
+    SpinList<SpinXmlTreeElement> childs = element.childElements("child");
     assertThat(childs).hasSize(3);
 
-    for (SpinXmlDomElement childElement : childs) {
+    for (SpinXmlTreeElement childElement : childs) {
       assertThat(childElement).isNotNull();
       assertThat(childElement.attr("id").value()).isEqualTo("child");
     }
@@ -431,7 +435,7 @@ public class XmlDomElementTest {
     SpinXmlDomElement child = XML("<child/>");
     SpinXmlDomElement date = element.childElement("date");
     element.appendBefore(child, date);
-    SpinXmlDomElement insertedElement = element.childElements().get(0);
+    SpinXmlTreeElement insertedElement = element.childElements().get(0);
     assertThat(insertedElement.name()).isEqualTo("child");
   }
 
@@ -446,7 +450,7 @@ public class XmlDomElementTest {
     SpinXmlDomElement child = XML("<child/>");
     SpinXmlDomElement date = element.childElement("date");
     element.appendAfter(child, date);
-    SpinXmlDomElement insertedElement = element.childElements().get(1);
+    SpinXmlTreeElement insertedElement = element.childElements().get(1);
     assertThat(insertedElement.name()).isEqualTo("child");
   }
 
@@ -454,9 +458,9 @@ public class XmlDomElementTest {
   public void canAppendChildElementAfterLastChildElement() {
     SpinXmlDomElement child = XML("<child/>");
     int childCount = element.childElements().size();
-    SpinXmlDomElement lastChildElement = element.childElements().get(childCount - 1);
+    SpinXmlTreeElement lastChildElement = element.childElements().get(childCount - 1);
     element.appendAfter(child, lastChildElement);
-    SpinXmlDomElement insertedElement = element.childElements().get(childCount);
+    SpinXmlTreeElement insertedElement = element.childElements().get(childCount);
     assertThat(insertedElement.name()).isEqualTo("child");
   }
 
@@ -470,13 +474,13 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetAllChildElements() {
-    SpinList<SpinXmlDomElement> childElements = element.childElements();
+    SpinList<SpinXmlTreeElement> childElements = element.childElements();
     assertThat(childElements).hasSize(4);
   }
 
   @Test
   public void canGetAllChildElementsByName() {
-    SpinList<SpinXmlDomElement> childElements = element.childElements("customer");
+    SpinList<SpinXmlTreeElement> childElements = element.childElements("customer");
     assertThat(childElements).hasSize(3);
   }
 
@@ -492,13 +496,13 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetAllChildElementsByNamespaceAndName() {
-    SpinList<SpinXmlDomElement> childElements = element.childElements(EXAMPLE_NAMESPACE, "customer");
+    SpinList<SpinXmlTreeElement> childElements = element.childElements(EXAMPLE_NAMESPACE, "customer");
     assertThat(childElements).hasSize(3);
   }
 
   @Test
   public void canGetAllChildElementsByNullNamespaceAndName() {
-    SpinList<SpinXmlDomElement> childElements = element.childElements(null, "customer");
+    SpinList<SpinXmlTreeElement> childElements = element.childElements(null, "customer");
     assertThat(childElements).hasSize(3);
   }
 

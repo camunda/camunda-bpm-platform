@@ -13,8 +13,8 @@
 
 package org.camunda.spin.impl.xml.dom;
 
-import org.camunda.spin.Spin;
 import org.camunda.spin.logging.SpinLogger;
+import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
@@ -23,42 +23,37 @@ import org.w3c.dom.Element;
  *
  * @author Sebastian Menski
  */
-public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
+public class SpinXmlDomAttribute extends SpinXmlTreeAttribute {
 
   private final static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
 
-  private final Attr attributeNode;
+  protected final Attr attributeNode;
+
+  protected final XmlDomDataFormat dataFormat;
 
   /**
    * Create a new wrapper.
    *
    * @param attributeNode the dom xml attribute to wrap
+   * @param xmlDomDataFormat
    */
-  public SpinXmlDomAttribute(Attr attributeNode) {
+  public SpinXmlDomAttribute(Attr attributeNode, XmlDomDataFormat dataFormat) {
     this.attributeNode = attributeNode;
+    this.dataFormat = dataFormat;
   }
 
-  /**
-   * @return the xml dom data format name
-   */
   public String getDataFormatName() {
-    return XmlDomDataFormat.INSTANCE.getName();
+    return dataFormat.getName();
   }
 
-  /**
-   * Returns the local name of the attribute without namespace or prefix.
-   *
-   * @return the name of the attribute
-   */
+  public Attr unwrap() {
+    return attributeNode;
+  }
+
   public String name() {
     return attributeNode.getLocalName();
   }
 
-  /**
-   * Returns the namespace uri of the attribute and not the prefix.
-   *
-   * @return the namespace of the attribute
-   */
   public String namespace() {
     String namespaceURI = attributeNode.getNamespaceURI();
     if (namespaceURI != null) {
@@ -69,12 +64,6 @@ public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
     }
   }
 
-  /**
-   * Checks if the attribute has the same namespace.
-   *
-   * @param namespace the namespace to check
-   * @return true if the attribute has the same namespace
-   */
   public boolean hasNamespace(String namespace) {
     if (namespace == null) {
       return attributeNode.getNamespaceURI() == null;
@@ -84,22 +73,10 @@ public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
     }
   }
 
-  /**
-   * Returns the value of the attribute as {@link String}.
-   *
-   * @return the string value of the attribute
-   */
   public String value() {
     return attributeNode.getValue();
   }
 
-  /**
-   * Sets the value of the attribute.
-   *
-   * @param value the value to set
-   * @return the wrapped xml dom attribute
-   * @throws SpinXmlDomAttributeException if the value is null
-   */
   public SpinXmlDomAttribute value(String value) {
     if (value == null) {
       throw LOG.unableToSetAttributeValueToNull(namespace(), name());
@@ -108,15 +85,10 @@ public class SpinXmlDomAttribute extends Spin<SpinXmlDomAttribute> {
     return this;
   }
 
-  /**
-   * Removes the attribute.
-   *
-   * @return the wrapped owner xml dom element
-   */
   public SpinXmlDomElement remove() {
     Element ownerElement = attributeNode.getOwnerElement();
     ownerElement.removeAttributeNode(attributeNode);
-    return new SpinXmlDomElement(ownerElement);
+    return dataFormat.createElementWrapper(ownerElement);
   }
 
 }

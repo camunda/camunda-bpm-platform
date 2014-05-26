@@ -14,6 +14,7 @@ package org.camunda.spin.impl.xml.dom;
 
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 /**
@@ -29,7 +30,7 @@ public class XmlDomDataFormat implements DataFormat<SpinXmlDomElement> {
   }
 
   public SpinXmlDomElement createWrapperInstance(Object parameter) {
-    return new SpinXmlDomElement((Element) parameter);
+    return createElementWrapper((Element) parameter);
   }
 
   public DataFormatReader getReader() {
@@ -38,6 +39,14 @@ public class XmlDomDataFormat implements DataFormat<SpinXmlDomElement> {
 
   public String getName() {
     return "application/xml; implementation=dom";
+  }
+
+  public SpinXmlDomElement createElementWrapper(Element element) {
+    return new SpinXmlDomElement(element, this);
+  }
+
+  public SpinXmlDomAttribute createAttributeWrapper(Attr attr) {
+    return new SpinXmlDomAttribute(attr, this);
   }
 
 }

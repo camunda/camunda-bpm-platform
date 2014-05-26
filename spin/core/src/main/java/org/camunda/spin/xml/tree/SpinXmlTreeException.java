@@ -11,24 +11,24 @@
  * limitations under the License.
  */
 
-package org.camunda.spin.impl.xml.dom;
+package org.camunda.spin.xml.tree;
 
-import org.camunda.spin.xml.tree.SpinXmlTreeException;
+import org.camunda.spin.SpinRuntimeException;
 
 /**
- * Thrown if an error occurs during the access of a xml dom element.
+ * Throw if an error occurs during the access of a xml dom attribute.
  *
  * @author Sebastian Menski
  */
-public class SpinXmlDomElementException extends SpinXmlTreeException {
+public class SpinXmlTreeException extends SpinRuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public SpinXmlDomElementException(String message) {
+  public SpinXmlTreeException(String message) {
     super(message);
   }
 
-  public SpinXmlDomElementException(String message, Throwable cause) {
+  public SpinXmlTreeException(String message, Throwable cause) {
     super(message, cause);
   }
 }

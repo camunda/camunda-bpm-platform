@@ -54,4 +54,25 @@ public class SpinEnsure {
     }
 
   }
+
+
+  /**
+   * Ensure the object is of a given type and return the casted object
+   *
+   * @param objectName the name of the parameter
+   * @param object the parameter value
+   * @param type the expected type
+   * @return the parameter casted to the requested type
+   * @throws IllegalArgumentException in case object cannot be casted to type
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T ensureParamInstanceOf(String objectName, Object object, Class<T> type) {
+    if(type.isAssignableFrom(object.getClass())) {
+      return (T) object;
+
+    } else {
+      throw LOG.unsupprtedParameterType(objectName, object, type);
+
+    }
+  }
 }

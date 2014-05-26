@@ -13,14 +13,16 @@
 
 package org.camunda.spin.impl.xml.dom;
 
-import org.camunda.spin.SpinRuntimeException;
+import org.camunda.spin.xml.tree.SpinXmlTreeException;
 
 /**
  * Throw if an error occurs during the access of a xml dom attribute.
  *
  * @author Sebastian Menski
  */
-public class SpinXmlDomAttributeException extends SpinRuntimeException {
+public class SpinXmlDomAttributeException extends SpinXmlTreeException {
+
+  private static final long serialVersionUID = 1L;
 
   public SpinXmlDomAttributeException(String message) {
     super(message);
