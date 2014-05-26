@@ -147,6 +147,23 @@ public class BpmnDiTest {
     assertThat(association.getDiagramElement()).isInstanceOf(BpmnEdge.class);
   }
 
+  @Test
+  public void shouldNotRemoveBpmElementReference() {
+    assertThat(startEvent.getOutgoing()).contains(sequenceFlow);
+    assertThat(endEvent.getIncoming()).contains(sequenceFlow);
+
+    BpmnEdge edge = sequenceFlow.getDiagramElement();
+    assertThat(edge.getBpmnElement()).isEqualTo(sequenceFlow);
+
+    startEvent.getOutgoing().remove(sequenceFlow);
+    endEvent.getIncoming().remove(sequenceFlow);
+
+    assertThat(startEvent.getOutgoing()).doesNotContain(sequenceFlow);
+    assertThat(endEvent.getIncoming()).doesNotContain(sequenceFlow);
+
+    assertThat(edge.getBpmnElement()).isEqualTo(sequenceFlow);
+  }
+
   @After
   public void validateModel() {
     Bpmn.validateModel(modelInstance);
