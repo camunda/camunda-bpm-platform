@@ -53,9 +53,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       throw new ProcessEngineException("processInstanceId cannot be null");
     }
 
-    List<ExecutionEntity> executionList = (List) new ExecutionQueryImpl(commandContext)
-      .processInstanceId(processInstanceId)
-      .list();
+    List<ExecutionEntity> executionList = loadProcessInstance(processInstanceId, commandContext);
 
     if(executionList.isEmpty()) {
       return null;
@@ -95,6 +93,61 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     initActivityInstanceTree(processActInst, executionsByParentActIds);
 
     return processActInst;
+  }
+
+  protected List<ExecutionEntity> loadProcessInstance(String processInstanceId, CommandContext commandContext) {
+
+    List<ExecutionEntity> result = null;
+
+    // first try to load from cache
+    // check whether the process instance is already (partially) loaded in command context
+    List<ExecutionEntity> cachedExecutions = commandContext.getDbSqlSession().findInCache(ExecutionEntity.class);
+    for (ExecutionEntity executionEntity : cachedExecutions) {
+      if(processInstanceId.equals(executionEntity.getProcessInstanceId())) {
+        // found one execution from process instance
+        result = new ArrayList<ExecutionEntity>();
+        ExecutionEntity processInstance= null;
+        // check whether it is the process instance
+        if(!executionEntity.isProcessInstanceExecution()) {
+          processInstance = executionEntity.getProcessInstance();
+        } else {
+          processInstance = executionEntity;
+        }
+        result.add(processInstance);
+        loadChildExecutionsFromCache(processInstance, result);
+      }
+    }
+
+    if(result == null) {
+      // if the process instance could not be found in cache, load from database
+      result = loadFromDb(processInstanceId, commandContext);
+    }
+
+    return result;
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected List<ExecutionEntity> loadFromDb(String processInstanceId, CommandContext commandContext) {
+    return (List) new ExecutionQueryImpl(commandContext)
+    .processInstanceId(processInstanceId)
+    .list();
+  }
+
+  /**
+   * Loads all executions that are part of this process instance tree from the dbSqlSession cache.
+   * (optionally querying the db if a child is not already loaded.
+   *
+   * @param execution the current root execution (already contained in childExecutions)
+   * @param childExecutions the list in which all child executions should be collected
+   */
+  protected void loadChildExecutionsFromCache(ExecutionEntity execution, List<ExecutionEntity> childExecutions) {
+    List<ExecutionEntity> childrenOfThisExection = execution.getExecutions();
+    if(childrenOfThisExection != null) {
+      childExecutions.addAll(childrenOfThisExection);
+      for (ExecutionEntity child : childrenOfThisExection) {
+        loadChildExecutionsFromCache(child, childExecutions);
+      }
+    }
   }
 
   protected void initActivityInstanceTree(ActivityInstanceImpl parentActInst, Map<String, List<ExecutionEntity>> executionsByParentActIds) {
