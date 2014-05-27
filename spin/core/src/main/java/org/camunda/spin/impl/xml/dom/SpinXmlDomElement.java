@@ -74,11 +74,11 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     }
   }
 
-  public SpinXmlDomAttribute attr(String attributeName) {
+  public SpinXmlTreeAttribute attr(String attributeName) {
     return attrNs(null, attributeName);
   }
 
-  public SpinXmlDomAttribute attrNs(String namespace, String attributeName) {
+  public SpinXmlTreeAttribute attrNs(String namespace, String attributeName) {
     if (hasNamespace(namespace)) {
       namespace = null;
     }
@@ -113,7 +113,7 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     for (int i = 0; i < domAttributes.getLength(); i++) {
       Attr attr = (Attr) domAttributes.item(i);
       if (attr != null) {
-        SpinXmlDomAttribute attribute = dataFormat.createAttributeWrapper(attr);
+        SpinXmlTreeAttribute attribute = dataFormat.createAttributeWrapper(attr);
         if (attribute.hasNamespace(namespace)) {
           attributes.add(attribute);
         }
@@ -135,11 +135,11 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     return attributeNames;
   }
 
-  public SpinXmlDomElement childElement(String elementName) {
+  public SpinXmlTreeElement childElement(String elementName) {
     return childElement(namespace(), elementName);
   }
 
-  public SpinXmlDomElement childElement(String namespace, String elementName) {
+  public SpinXmlTreeElement childElement(String namespace, String elementName) {
     SpinList<SpinXmlTreeElement> childElements = childElements(namespace, elementName);
     if (childElements.size() > 1) {
       throw LOG.moreThanOneChildElementFoundForNamespaceAndName(namespace, elementName);
@@ -174,7 +174,7 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     for (int i = 0; i < childNodes.getLength(); i++) {
       Node childNode = childNodes.item(i);
       if (childNode instanceof Element) {
-        SpinXmlDomElement childElement = dataFormat.createElementWrapper((Element) childNode);
+        SpinXmlTreeElement childElement = dataFormat.createElementWrapper((Element) childNode);
         if (childElement.hasNamespace(namespace) && childElement.name().equals(elementName)) {
           childElements.add(childElement);
         }
@@ -186,11 +186,11 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     return childElements;
   }
 
-  public SpinXmlDomElement attr(String attributeName, String value) {
+  public SpinXmlTreeElement attr(String attributeName, String value) {
     return attrNs(null, attributeName, value);
   }
 
-  public SpinXmlDomElement attrNs(String namespace, String attributeName, String value) {
+  public SpinXmlTreeElement attrNs(String namespace, String attributeName, String value) {
     if (attributeName == null) {
       throw LOG.unableToCreateAttributeWithNullName();
     }
@@ -204,11 +204,11 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     return this;
   }
 
-  public SpinXmlDomElement removeAttr(String attributeName) {
+  public SpinXmlTreeElement removeAttr(String attributeName) {
     return removeAttrNs(null, attributeName);
   }
 
-  public SpinXmlDomElement removeAttrNs(String namespace, String attributeName) {
+  public SpinXmlTreeElement removeAttrNs(String namespace, String attributeName) {
     if (attributeName == null) {
       throw LOG.unableToRemoveAttributeWithNullName();
     }
@@ -219,18 +219,22 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     return this;
   }
 
-  public SpinXmlDomElement append(SpinXmlTreeElement... childElements) {
+  public SpinXmlTreeElement append(SpinXmlTreeElement... childElements) {
     ensureNotNull("childElements", childElements);
     for (SpinXmlTreeElement childElement : childElements) {
       ensureNotNull("childElement", childElement);
       SpinXmlDomElement spinDomElement = ensureParamInstanceOf("childElement", childElement, SpinXmlDomElement.class);
-      adoptElement(spinDomElement);
-      domElement.appendChild(spinDomElement.domElement);
+      appendChildElement(spinDomElement);
     }
     return this;
   }
 
-  public SpinXmlDomElement appendBefore(SpinXmlTreeElement childElement, SpinXmlTreeElement existingChildElement) {
+  protected void appendChildElement(SpinXmlDomElement childElement) {
+    adoptElement(childElement);
+    domElement.appendChild(childElement.domElement);
+  }
+
+  public SpinXmlTreeElement appendBefore(SpinXmlTreeElement childElement, SpinXmlTreeElement existingChildElement) {
     ensureNotNull("childElement", childElement);
     ensureNotNull("existingChildElement", existingChildElement);
     SpinXmlDomElement childDomElement = ensureParamInstanceOf("childElement", childElement, SpinXmlDomElement.class);
@@ -243,7 +247,7 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
   }
 
 
-  public SpinXmlDomElement appendAfter(SpinXmlTreeElement childElement, SpinXmlTreeElement existingChildElement) {
+  public SpinXmlTreeElement appendAfter(SpinXmlTreeElement childElement, SpinXmlTreeElement existingChildElement) {
     ensureNotNull("childElement", childElement);
     ensureNotNull("existingChildElement", existingChildElement);
     SpinXmlDomElement childDomElement = ensureParamInstanceOf("childElement", childElement, SpinXmlDomElement.class);

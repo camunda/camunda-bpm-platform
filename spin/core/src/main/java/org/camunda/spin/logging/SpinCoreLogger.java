@@ -14,9 +14,9 @@ package org.camunda.spin.logging;
 
 import org.camunda.spin.SpinFileNotFoundException;
 import org.camunda.spin.SpinRuntimeException;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElementException;
 import org.camunda.spin.spi.SpinDataFormatException;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
+import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
 
 
 /**
@@ -56,19 +56,19 @@ public class SpinCoreLogger extends SpinLogger {
     return new SpinRuntimeException(exceptionMessage("006", "Unable to read input stream"), e);
   }
 
-  public SpinDataFormatException wrongDataFormatException(String requestedDataformat, String givenDataformat) {
-    return new SpinDataFormatException(exceptionMessage("007", "Wrong data format: requested '{}', given '{}'", requestedDataformat, givenDataformat));
+  public SpinDataFormatException wrongDataFormatException(String requestedDataFormat, String givenDataFormat) {
+    return new SpinDataFormatException(exceptionMessage("007", "Wrong data format: requested '{}', given '{}'", requestedDataFormat, givenDataFormat));
   }
 
-  public SpinXmlDomElementException elementIsNotChildOfThisElement(SpinXmlDomElement existingChildElement, SpinXmlDomElement parentDomElement) {
-    return new SpinXmlDomElementException(exceptionMessage("008", "The element with namespace '{}' and name '{}' " +
+  public SpinXmlTreeElementException elementIsNotChildOfThisElement(SpinXmlTreeElement existingChildElement, SpinXmlTreeElement parentDomElement) {
+    return new SpinXmlTreeElementException(exceptionMessage("008", "The element with namespace '{}' and name '{}' " +
         "is not a child element of the element with namespace '{}' and name '{}'",
       existingChildElement.namespace(), existingChildElement.name(),
       parentDomElement.namespace(), parentDomElement.name()
     ));
   }
 
-  public IllegalArgumentException unsupprtedParameterType(String parameterName, Object param, Class<?> expectedType) {
+  public IllegalArgumentException unsupportedParameterType(String parameterName, Object param, Class<?> expectedType) {
     return new IllegalArgumentException(exceptionMessage("009", "Unsupported parameter '{}' of type '{}'. Expected type '{}'.", parameterName, param.getClass(), expectedType.getName()));
   }
 

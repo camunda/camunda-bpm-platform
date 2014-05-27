@@ -13,8 +13,8 @@
 package org.camunda.spin;
 
 import org.camunda.spin.impl.xml.dom.XmlDomDataFormat;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
 import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 
 /**
  * Provides access to all builtin data formats.
@@ -24,7 +24,7 @@ import org.camunda.spin.spi.DataFormat;
  */
 public class DataFormats {
 
-  public static DataFormat<SpinXmlDomElement> xmlDom() {
+  public static DataFormat<? extends SpinXmlTreeElement> xmlDom() {
     return XmlDomDataFormat.INSTANCE;
   }
 

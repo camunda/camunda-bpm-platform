@@ -14,6 +14,8 @@ package org.camunda.spin.impl.xml.dom;
 
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
+import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
@@ -21,15 +23,15 @@ import org.w3c.dom.Element;
  * @author Daniel Meyer
  *
  */
-public class XmlDomDataFormat implements DataFormat<SpinXmlDomElement> {
+public class XmlDomDataFormat implements DataFormat<SpinXmlTreeElement> {
 
   public final static XmlDomDataFormat INSTANCE = new XmlDomDataFormat();
 
-  public Class<SpinXmlDomElement> getWrapperType() {
+  public Class<? extends SpinXmlTreeElement> getWrapperType() {
     return SpinXmlDomElement.class;
   }
 
-  public SpinXmlDomElement createWrapperInstance(Object parameter) {
+  public SpinXmlTreeElement createWrapperInstance(Object parameter) {
     return createElementWrapper((Element) parameter);
   }
 
@@ -41,11 +43,11 @@ public class XmlDomDataFormat implements DataFormat<SpinXmlDomElement> {
     return "application/xml; implementation=dom";
   }
 
-  public SpinXmlDomElement createElementWrapper(Element element) {
+  public SpinXmlTreeElement createElementWrapper(Element element) {
     return new SpinXmlDomElement(element, this);
   }
 
-  public SpinXmlDomAttribute createAttributeWrapper(Attr attr) {
+  public SpinXmlTreeAttribute createAttributeWrapper(Attr attr) {
     return new SpinXmlDomAttribute(attr, this);
   }
 

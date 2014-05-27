@@ -14,8 +14,8 @@
 package org.camunda.spin.test;
 
 import org.camunda.spin.SpinRuntimeException;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomAttributeException;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElementException;
+import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
+import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
 
 /**
  * @author Sebastian Menski
@@ -25,10 +25,10 @@ public class JavaScriptExceptionUnwrapper {
 
   public static SpinRuntimeException unwrap(Throwable cause) {
     if (cause.getMessage().contains("SpinXmlDomElementException")) {
-      return new SpinXmlDomElementException(cause.getMessage());
+      return new SpinXmlTreeElementException(cause.getMessage());
     }
     else if (cause.getMessage().contains("SpinXmlDomAttributeException")) {
-      return new SpinXmlDomAttributeException(cause.getMessage());
+      return new SpinXmlTreeAttributeException(cause.getMessage());
     }
     else {
       return SpinTestLogger.TEST_LOGGER.unableToUnwrapRhinoJsWrappedException(cause.getMessage());

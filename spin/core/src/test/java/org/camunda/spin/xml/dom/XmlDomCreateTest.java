@@ -12,15 +12,17 @@
  */
 package org.camunda.spin.xml.dom;
 
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
 import org.camunda.spin.spi.SpinDataFormatException;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.junit.Test;
 
-import static org.camunda.spin.impl.util.IoUtil.*;
-import static org.camunda.spin.Spin.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.spin.DataFormats.xmlDom;
+import static org.camunda.spin.Spin.S;
+import static org.camunda.spin.Spin.XML;
+import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
 import static org.camunda.spin.xml.XmlTestConstants.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.camunda.spin.DataFormats.*;
 
 /**
  * @author Daniel Meyer
@@ -30,7 +32,7 @@ public class XmlDomCreateTest {
 
   @Test
   public void shouldCreateForString() {
-    SpinXmlDomElement xml = XML(EXAMPLE_XML);
+    SpinXmlTreeElement xml = XML(EXAMPLE_XML);
     assertThat(xml).isNotNull();
 
     xml = S(EXAMPLE_XML, xmlDom());
@@ -42,7 +44,7 @@ public class XmlDomCreateTest {
 
   @Test
   public void shouldCreateForInputStream() {
-    SpinXmlDomElement xml = XML(stringAsInputStream(EXAMPLE_XML));
+    SpinXmlTreeElement xml = XML(stringAsInputStream(EXAMPLE_XML));
     assertThat(xml).isNotNull();
 
     xml = S(stringAsInputStream(EXAMPLE_XML), xmlDom());
@@ -54,7 +56,7 @@ public class XmlDomCreateTest {
 
   @Test
   public void shouldBeIdempotent() {
-    SpinXmlDomElement xml = XML(EXAMPLE_XML);
+    SpinXmlTreeElement xml = XML(EXAMPLE_XML);
     assertThat(xml).isEqualTo(XML(xml));
     assertThat(xml).isEqualTo(S(xml, xmlDom()));
     assertThat(xml).isEqualTo(S(xml));

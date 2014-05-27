@@ -15,6 +15,7 @@ package org.camunda.spin.impl.xml.dom;
 
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
@@ -35,7 +36,7 @@ public class SpinXmlDomAttribute extends SpinXmlTreeAttribute {
    * Create a new wrapper.
    *
    * @param attributeNode the dom xml attribute to wrap
-   * @param xmlDomDataFormat
+   * @param dataFormat the xml dom data format
    */
   public SpinXmlDomAttribute(Attr attributeNode, XmlDomDataFormat dataFormat) {
     this.attributeNode = attributeNode;
@@ -77,7 +78,7 @@ public class SpinXmlDomAttribute extends SpinXmlTreeAttribute {
     return attributeNode.getValue();
   }
 
-  public SpinXmlDomAttribute value(String value) {
+  public SpinXmlTreeAttribute value(String value) {
     if (value == null) {
       throw LOG.unableToSetAttributeValueToNull(namespace(), name());
     }
@@ -85,7 +86,7 @@ public class SpinXmlDomAttribute extends SpinXmlTreeAttribute {
     return this;
   }
 
-  public SpinXmlDomElement remove() {
+  public SpinXmlTreeElement remove() {
     Element ownerElement = attributeNode.getOwnerElement();
     ownerElement.removeAttributeNode(attributeNode);
     return dataFormat.createElementWrapper(ownerElement);

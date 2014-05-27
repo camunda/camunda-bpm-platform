@@ -15,6 +15,7 @@ package org.camunda.spin;
 import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.SpinDataFormatException;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 
 /**
  *
@@ -60,7 +61,7 @@ public abstract class Spin<T extends Spin<?>> {
    * @throws SpinDataFormatException in case the input cannot be read as XML
    * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
    */
-  public static SpinXmlDomElement XML(Object parameter) {
+  public static SpinXmlTreeElement XML(Object parameter) {
     return SPIN_FACTORY.createSpin(parameter, DataFormats.xmlDom());
   }
 

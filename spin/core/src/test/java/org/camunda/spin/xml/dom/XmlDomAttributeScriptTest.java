@@ -13,11 +13,11 @@
 
 package org.camunda.spin.xml.dom;
 
-import org.camunda.spin.impl.xml.dom.SpinXmlDomAttributeException;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
 import org.camunda.spin.test.Script;
 import org.camunda.spin.test.ScriptTest;
 import org.camunda.spin.test.ScriptVariable;
+import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +45,7 @@ public abstract class XmlDomAttributeScriptTest extends ScriptTest {
     assertThat(script.getVariable("newValue")).isEqualTo("order2");
   }
 
-  @Test(expected = SpinXmlDomAttributeException.class)
+  @Test(expected = SpinXmlTreeAttributeException.class)
   @Script(
     name = "XmlDomAttributeScriptTest.testAttribute",
     variables = {
@@ -68,7 +68,7 @@ public abstract class XmlDomAttributeScriptTest extends ScriptTest {
     }
   )
   public void remove() {
-    SpinXmlDomElement element = script.getVariable("element");
+    SpinXmlTreeElement element = script.getVariable("element");
     assertThat(element.hasAttr("order")).isFalse();
   }
 

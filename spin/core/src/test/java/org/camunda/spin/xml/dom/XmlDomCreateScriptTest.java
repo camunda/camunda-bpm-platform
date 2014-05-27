@@ -12,14 +12,15 @@
  */
 package org.camunda.spin.xml.dom;
 
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
 import org.camunda.spin.test.Script;
 import org.camunda.spin.test.ScriptTest;
 import org.camunda.spin.test.ScriptVariable;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.junit.Test;
 
-import static org.camunda.spin.xml.XmlTestConstants.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML_FILE_NAME;
 
 /**
  * @author Daniel Meyer
@@ -32,13 +33,13 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
   @ScriptVariable(name="input", value=EXAMPLE_XML)
   public void shouldCreateForString() {
 
-    SpinXmlDomElement xml1 = script.getVariable("xml1");
+    SpinXmlTreeElement xml1 = script.getVariable("xml1");
     assertThat(xml1).isNotNull();
 
-    SpinXmlDomElement xml2 = script.getVariable("xml2");
+    SpinXmlTreeElement xml2 = script.getVariable("xml2");
     assertThat(xml2).isNotNull();
 
-    SpinXmlDomElement xml3 = script.getVariable("xml3");
+    SpinXmlTreeElement xml3 = script.getVariable("xml3");
     assertThat(xml3).isNotNull();
 
   }
@@ -53,13 +54,13 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
   )
   public void shouldCreateForInputStream() {
 
-    SpinXmlDomElement xml1 = script.getVariable("xml1");
+    SpinXmlTreeElement xml1 = script.getVariable("xml1");
     assertThat(xml1).isNotNull();
 
-    SpinXmlDomElement xml2 = script.getVariable("xml2");
+    SpinXmlTreeElement xml2 = script.getVariable("xml2");
     assertThat(xml2).isNotNull();
 
-    SpinXmlDomElement xml3 = script.getVariable("xml3");
+    SpinXmlTreeElement xml3 = script.getVariable("xml3");
     assertThat(xml3).isNotNull();
 
   }
@@ -69,7 +70,7 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
   @ScriptVariable(name="input", value=EXAMPLE_XML)
   public void shouldBeIdempotent() {
 
-    SpinXmlDomElement xml = script.getVariable("xml");
+    SpinXmlTreeElement xml = script.getVariable("xml");
     assertThat(xml).isNotNull();
 
   }

@@ -13,7 +13,6 @@
 package org.camunda.spin.impl.util;
 
 import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElementException;
 import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.logging.SpinLogger;
 
@@ -71,7 +70,7 @@ public class SpinEnsure {
       return (T) object;
 
     } else {
-      throw LOG.unsupprtedParameterType(objectName, object, type);
+      throw LOG.unsupportedParameterType(objectName, object, type);
 
     }
   }

@@ -16,19 +16,19 @@ package org.camunda.spin.xml.tree;
 import org.camunda.spin.SpinRuntimeException;
 
 /**
- * Throw if an error occurs during the access of a xml dom attribute.
+ * Indicates an error in the underlying xml tree node.
  *
  * @author Sebastian Menski
  */
-public class SpinXmlTreeException extends SpinRuntimeException {
+public class SpinXmlTreeNodeException extends SpinRuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public SpinXmlTreeException(String message) {
+  public SpinXmlTreeNodeException(String message) {
     super(message);
   }
 
-  public SpinXmlTreeException(String message, Throwable cause) {
+  public SpinXmlTreeNodeException(String message, Throwable cause) {
     super(message, cause);
   }
 }

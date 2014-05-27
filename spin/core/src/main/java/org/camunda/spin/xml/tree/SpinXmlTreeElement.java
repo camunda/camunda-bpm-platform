@@ -12,9 +12,9 @@
  */
 package org.camunda.spin.xml.tree;
 
-import java.util.List;
-
 import org.camunda.spin.SpinList;
+
+import java.util.List;
 
 /**
  *
@@ -30,7 +30,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    *
    * @param attributeName the name of the attribute
    * @return the wrapped {@link SpinXmlTreeAttribute attribute}
-   * @throws SpinXmlTreeException if the attribute is not found
+   * @throws SpinXmlTreeNodeException if the attribute is not found
    */
   public abstract SpinXmlTreeAttribute attr(String attributeName);
 
@@ -41,7 +41,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    * @param namespace the namespace of the attribute
    * @param attributeName the name of the attribute
    * @return the wrapped {@link SpinXmlTreeAttribute attribute}
-   * @throws SpinXmlTreeException if the attribute is not found
+   * @throws SpinXmlTreeNodeException if the attribute is not found
    */
   public abstract SpinXmlTreeAttribute attrNs(String namespace, String attributeName);
 
@@ -59,7 +59,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    * @param namespace the namespace of the attribute
    * @param attributeName the name of the attribute
    * @return true if the element has an attribute with this name under given namespace, false otherwise
-   * @throws SpinXmlTreeException if the attributeName is null
+   * @throws SpinXmlTreeNodeException if the attributeName is null
    */
   public abstract boolean hasAttrNs(String namespace, String attributeName);
 
@@ -98,7 +98,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    *
    * @param elementName the element name
    * @return the wrapped child {@link SpinXmlTreeElement element}
-   * @throws SpinXmlTreeException if none or more than one child element is found
+   * @throws SpinXmlTreeNodeException if none or more than one child element is found
    */
   public abstract SpinXmlTreeElement childElement(String elementName);
 
@@ -109,7 +109,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    * @param namespace the namespace of the element
    * @param elementName the element name
    * @return the wrapped child {@link SpinXmlTreeElement element}
-   * @throws SpinXmlTreeException if none or more than one child element is found
+   * @throws SpinXmlTreeNodeException if none or more than one child element is found
    */
   public abstract SpinXmlTreeElement childElement(String namespace, String elementName);
 
@@ -125,7 +125,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    *
    * @param elementName the element name
    * @return a collection of wrapped {@link SpinXmlTreeElement elements}
-   * @throws SpinXmlTreeException if no child element was found
+   * @throws SpinXmlTreeNodeException if no child element was found
    */
   public abstract SpinList<SpinXmlTreeElement> childElements(String elementName);
 
@@ -135,7 +135,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    * @param namespace the namespace of the element
    * @param elementName the element name
    * @return a collection of wrapped {@link SpinXmlTreeElement elements}
-   * @throws SpinXmlTreeException if no child element was found
+   * @throws SpinXmlTreeNodeException if no child element was found
    */
   public abstract SpinList<SpinXmlTreeElement> childElements(String namespace, String elementName);
 
@@ -145,7 +145,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    * @param attributeName the name of the attribute
    * @param value the value to set
    * @return the wrapped {@link SpinXmlTreeElement element}
-   * @throws SpinXmlTreeException if the name is null
+   * @throws SpinXmlTreeNodeException if the name is null
    */
   public abstract SpinXmlTreeElement attr(String attributeName, String value);
 
@@ -156,7 +156,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    * @param attributeName the name of the attribute
    * @param value the value to set
    * @return the wrapped {@link SpinXmlTreeElement element}
-   * @throws SpinXmlTreeException if the name is null
+   * @throws SpinXmlTreeNodeException if the name is null
    */
   public abstract SpinXmlTreeElement attrNs(String namespace, String attributeName, String value);
 
@@ -165,7 +165,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    *
    * @param attributeName the name of the attribute
    * @return the wrapped {@link SpinXmlTreeElement element}
-   * @throws SpinXmlTreeException if the attributeName is null
+   * @throws SpinXmlTreeNodeException if the attributeName is null
    */
   public abstract SpinXmlTreeElement removeAttr(String attributeName);
 
@@ -175,7 +175,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    * @param namespace the namespace of the attribute
    * @param attributeName the name of the attribute
    * @return the wrapped {@link SpinXmlTreeElement element}
-   * @throws SpinXmlTreeException if the attributeName is null
+   * @throws SpinXmlTreeNodeException if the attributeName is null
    */
   public abstract SpinXmlTreeElement removeAttrNs(String namespace, String attributeName);
 
@@ -184,7 +184,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    *
    * @param childElements the child elements to append
    * @return the wrapped {@link SpinXmlTreeElement element}
-   * @throws SpinXmlTreeException if the child element is null
+   * @throws SpinXmlTreeNodeException if the child element is null
    */
   public abstract SpinXmlTreeElement append(SpinXmlTreeElement... childElements);
 
@@ -195,7 +195,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    * @param existingChildElement the child element to append before
    * @return the wrapped {@link SpinXmlTreeElement element}
    * @throws IllegalArgumentException if the child element or existing child element is null
-   * @throws SpinXmlTreeException if the existing child element is not a child of this element
+   * @throws SpinXmlTreeNodeException if the existing child element is not a child of this element
    */
   public abstract SpinXmlTreeElement appendBefore(SpinXmlTreeElement childElement, SpinXmlTreeElement existingChildElement);
 
@@ -206,7 +206,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    * @param existingChildElement the child element to append after
    * @return the wrapped {@link SpinXmlTreeElement element}
    * @throws IllegalArgumentException if the child element or existing child element is null
-   * @throws SpinXmlTreeException if the existing child element is not a child of this element
+   * @throws SpinXmlTreeNodeException if the existing child element is not a child of this element
    */
   public abstract SpinXmlTreeElement appendAfter(SpinXmlTreeElement childElement, SpinXmlTreeElement existingChildElement);
 

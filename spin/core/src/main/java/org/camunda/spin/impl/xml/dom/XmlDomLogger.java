@@ -13,6 +13,8 @@
 package org.camunda.spin.impl.xml.dom;
 
 import org.camunda.spin.logging.SpinLogger;
+import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
+import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
 
 /**
  * @author Daniel Meyer
@@ -40,40 +42,40 @@ public class XmlDomLogger extends SpinLogger {
     return new XmlDomDataFormatException(exceptionMessage("005", "Unable to create DocumentBuilder"), cause);
   }
 
-  public SpinXmlDomAttributeException unableToFindAttributeWithNamespaceAndName(String namespace, String attributeName) {
-    return new SpinXmlDomAttributeException(exceptionMessage("006", "Unable to find attribute with namespace '{}' and name '{}'", namespace, attributeName));
+  public SpinXmlTreeAttributeException unableToFindAttributeWithNamespaceAndName(String namespace, String attributeName) {
+    return new SpinXmlTreeAttributeException(exceptionMessage("006", "Unable to find attribute with namespace '{}' and name '{}'", namespace, attributeName));
   }
 
-  public SpinXmlDomElementException unableToFindChildElementWithNamespaceAndName(String namespace, String elementName) {
-    return new SpinXmlDomElementException(exceptionMessage("007", "Unable to find child element with namespace '{}' and name '{}'", namespace, elementName));
+  public SpinXmlTreeElementException unableToFindChildElementWithNamespaceAndName(String namespace, String elementName) {
+    return new SpinXmlTreeElementException(exceptionMessage("007", "Unable to find child element with namespace '{}' and name '{}'", namespace, elementName));
   }
 
-  public SpinXmlDomElementException moreThanOneChildElementFoundForNamespaceAndName(String namespace, String elementName) {
-    return new SpinXmlDomElementException(exceptionMessage("008", "More than one child element was found for namespace '{}' and name '{}'", namespace, elementName));
+  public SpinXmlTreeElementException moreThanOneChildElementFoundForNamespaceAndName(String namespace, String elementName) {
+    return new SpinXmlTreeElementException(exceptionMessage("008", "More than one child element was found for namespace '{}' and name '{}'", namespace, elementName));
   }
 
   public XmlDomDataFormatException unableToParseInput(Exception e) {
     return new XmlDomDataFormatException(exceptionMessage("009", "Unable to parse input into DOM document"), e);
   }
 
-  public SpinXmlDomAttributeException unableToCreateAttributeWithNullName() {
-    return new SpinXmlDomAttributeException(exceptionMessage("010", "Unable to create attribute with name 'null'"));
+  public SpinXmlTreeAttributeException unableToCreateAttributeWithNullName() {
+    return new SpinXmlTreeAttributeException(exceptionMessage("010", "Unable to create attribute with name 'null'"));
   }
 
-  public SpinXmlDomAttributeException unableToSetAttributeValueToNull(String namespace, String attributeName) {
-    return new SpinXmlDomAttributeException(exceptionMessage("011", "Unable to set value of attribute of namespace '{}' and '{}' to 'null'", namespace, attributeName));
+  public SpinXmlTreeAttributeException unableToSetAttributeValueToNull(String namespace, String attributeName) {
+    return new SpinXmlTreeAttributeException(exceptionMessage("011", "Unable to set value of attribute of namespace '{}' and '{}' to 'null'", namespace, attributeName));
   }
 
-  public SpinXmlDomAttributeException unableToCheckAttributeWithNullName() {
-    return new SpinXmlDomAttributeException(exceptionMessage("012", "Unable to check for existence of attribute with name 'null'"));
+  public SpinXmlTreeAttributeException unableToCheckAttributeWithNullName() {
+    return new SpinXmlTreeAttributeException(exceptionMessage("012", "Unable to check for existence of attribute with name 'null'"));
   }
 
-  public SpinXmlDomAttributeException unableToRemoveAttributeWithNullName() {
-    return new SpinXmlDomAttributeException(exceptionMessage("013", "Unable to remove attribute with name 'null'"));
+  public SpinXmlTreeAttributeException unableToRemoveAttributeWithNullName() {
+    return new SpinXmlTreeAttributeException(exceptionMessage("013", "Unable to remove attribute with name 'null'"));
   }
 
-  public SpinXmlDomElementException unableToAdoptElement(String namespace, String name) {
-    return new SpinXmlDomElementException(exceptionMessage("014", "Unable to adopt element with namespace '{}' and name '{}'", namespace, name));
+  public SpinXmlTreeElementException unableToAdoptElement(String namespace, String name) {
+    return new SpinXmlTreeElementException(exceptionMessage("014", "Unable to adopt element with namespace '{}' and name '{}'", namespace, name));
   }
 
 }

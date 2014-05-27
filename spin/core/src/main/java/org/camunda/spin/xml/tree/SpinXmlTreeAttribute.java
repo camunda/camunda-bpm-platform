@@ -32,7 +32,7 @@ public abstract class SpinXmlTreeAttribute extends SpinXmlTreeNode<SpinXmlTreeAt
    *
    * @param value the value to set
    * @return the wrapped xml dom attribute
-   * @throws SpinXmlTreeException if the value is null
+   * @throws SpinXmlTreeNodeException if the value is null
    */
   public abstract SpinXmlTreeAttribute value(String value);
 
