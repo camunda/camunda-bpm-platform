@@ -10,23 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.impl.xml.dom;
-
-import org.camunda.spin.spi.SpinDataFormatException;
+package org.camunda.spin.spi;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class XmlDomDataFormatException extends SpinDataFormatException {
+public class SpinXmlDataFormatException extends org.camunda.spin.spi.SpinDataFormatException {
 
   private static final long serialVersionUID = 1L;
 
-  public XmlDomDataFormatException(String message, Throwable cause) {
+  public SpinXmlDataFormatException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public XmlDomDataFormatException(String message) {
+  public SpinXmlDataFormatException(String message) {
     super(message);
   }
 

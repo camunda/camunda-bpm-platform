@@ -12,6 +12,7 @@
  */
 package org.camunda.spin.impl.xml.dom;
 
+import org.camunda.spin.spi.SpinXmlDataFormatException;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
 import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
@@ -38,8 +39,8 @@ public class XmlDomLogger extends SpinLogger {
     logDebug("004", "Parsing input into DOM document.");
   }
 
-  public XmlDomDataFormatException unableToCreateParser(Exception cause) {
-    return new XmlDomDataFormatException(exceptionMessage("005", "Unable to create DocumentBuilder"), cause);
+  public SpinXmlDataFormatException unableToCreateParser(Exception cause) {
+    return new SpinXmlDataFormatException(exceptionMessage("005", "Unable to create DocumentBuilder"), cause);
   }
 
   public SpinXmlTreeAttributeException unableToFindAttributeWithNamespaceAndName(String namespace, String attributeName) {
@@ -54,8 +55,8 @@ public class XmlDomLogger extends SpinLogger {
     return new SpinXmlTreeElementException(exceptionMessage("008", "More than one child element was found for namespace '{}' and name '{}'", namespace, elementName));
   }
 
-  public XmlDomDataFormatException unableToParseInput(Exception e) {
-    return new XmlDomDataFormatException(exceptionMessage("009", "Unable to parse input into DOM document"), e);
+  public SpinXmlDataFormatException unableToParseInput(Exception e) {
+    return new SpinXmlDataFormatException(exceptionMessage("009", "Unable to parse input into DOM document"), e);
   }
 
   public SpinXmlTreeAttributeException unableToCreateAttributeWithNullName() {
