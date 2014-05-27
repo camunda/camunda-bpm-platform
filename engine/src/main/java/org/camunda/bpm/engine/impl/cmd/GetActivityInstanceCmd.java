@@ -12,12 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -30,6 +24,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
+
+import java.util.*;
 
 /**
  * @author Daniel Meyer
@@ -106,15 +102,11 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       if(processInstanceId.equals(executionEntity.getProcessInstanceId())) {
         // found one execution from process instance
         result = new ArrayList<ExecutionEntity>();
-        ExecutionEntity processInstance= null;
-        // check whether it is the process instance
-        if(!executionEntity.isProcessInstanceExecution()) {
-          processInstance = executionEntity.getProcessInstance();
-        } else {
-          processInstance = executionEntity;
-        }
+        ExecutionEntity processInstance = executionEntity.getProcessInstance();
+        // add process instance
         result.add(processInstance);
         loadChildExecutionsFromCache(processInstance, result);
+        break;
       }
     }
 
@@ -141,10 +133,10 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
    * @param childExecutions the list in which all child executions should be collected
    */
   protected void loadChildExecutionsFromCache(ExecutionEntity execution, List<ExecutionEntity> childExecutions) {
-    List<ExecutionEntity> childrenOfThisExection = execution.getExecutions();
-    if(childrenOfThisExection != null) {
-      childExecutions.addAll(childrenOfThisExection);
-      for (ExecutionEntity child : childrenOfThisExection) {
+    List<ExecutionEntity> childrenOfThisExecution = execution.getExecutions();
+    if(childrenOfThisExecution != null) {
+      childExecutions.addAll(childrenOfThisExecution);
+      for (ExecutionEntity child : childrenOfThisExecution) {
         loadChildExecutionsFromCache(child, childExecutions);
       }
     }
