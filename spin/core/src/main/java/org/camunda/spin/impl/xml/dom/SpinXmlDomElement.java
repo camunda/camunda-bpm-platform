@@ -224,14 +224,10 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     for (SpinXmlTreeElement childElement : childElements) {
       ensureNotNull("childElement", childElement);
       SpinXmlDomElement spinDomElement = ensureParamInstanceOf("childElement", childElement, SpinXmlDomElement.class);
-      appendChildElement(spinDomElement);
+      adoptElement(spinDomElement);
+      domElement.appendChild(spinDomElement.domElement);
     }
     return this;
-  }
-
-  protected void appendChildElement(SpinXmlDomElement childElement) {
-    adoptElement(childElement);
-    domElement.appendChild(childElement.domElement);
   }
 
   public SpinXmlTreeElement appendBefore(SpinXmlTreeElement childElement, SpinXmlTreeElement existingChildElement) {
