@@ -145,7 +145,7 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
       throw LOG.moreThanOneChildElementFoundForNamespaceAndName(namespace, elementName);
     }
     else {
-      return (SpinXmlDomElement) childElements.iterator().next();
+      return (SpinXmlDomElement) childElements.get(0);
     }
   }
 
@@ -263,7 +263,7 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
   }
 
   /**
-   * Adopts a xml dom element to the owner document of this element if nessesary.
+   * Adopts a xml dom element to the owner document of this element if necessary.
    *
    * @param elementToAdopt the element to adopt
    */
