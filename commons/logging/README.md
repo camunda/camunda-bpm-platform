@@ -41,7 +41,7 @@ public class UserRepository {
 This would produce output of the following form:
 
 ```
-MYAPP-01001 Created user with id '992112'
+com.myapp.user - MYAPP-01001 Created user with id '992112'
 ```
 
 
