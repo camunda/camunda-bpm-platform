@@ -17,6 +17,8 @@ import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
 import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
 
+import java.util.NoSuchElementException;
+
 /**
  * @author Daniel Meyer
  *
@@ -59,24 +61,19 @@ public class XmlDomLogger extends SpinLogger {
     return new SpinXmlDataFormatException(exceptionMessage("009", "Unable to parse input into DOM document"), e);
   }
 
-  public SpinXmlTreeAttributeException unableToCreateAttributeWithNullName() {
-    return new SpinXmlTreeAttributeException(exceptionMessage("010", "Unable to create attribute with name 'null'"));
-  }
-
   public SpinXmlTreeAttributeException unableToSetAttributeValueToNull(String namespace, String attributeName) {
-    return new SpinXmlTreeAttributeException(exceptionMessage("011", "Unable to set value of attribute of namespace '{}' and '{}' to 'null'", namespace, attributeName));
-  }
-
-  public SpinXmlTreeAttributeException unableToCheckAttributeWithNullName() {
-    return new SpinXmlTreeAttributeException(exceptionMessage("012", "Unable to check for existence of attribute with name 'null'"));
-  }
-
-  public SpinXmlTreeAttributeException unableToRemoveAttributeWithNullName() {
-    return new SpinXmlTreeAttributeException(exceptionMessage("013", "Unable to remove attribute with name 'null'"));
+    return new SpinXmlTreeAttributeException(exceptionMessage("010", "Unable to set value of attribute of namespace '{}' and '{}' to 'null'", namespace, attributeName));
   }
 
   public SpinXmlTreeElementException unableToAdoptElement(String namespace, String name) {
-    return new SpinXmlTreeElementException(exceptionMessage("014", "Unable to adopt element with namespace '{}' and name '{}'", namespace, name));
+    return new SpinXmlTreeElementException(exceptionMessage("011", "Unable to adopt element with namespace '{}' and name '{}'", namespace, name));
   }
 
+  public UnsupportedOperationException methodNotSupportedByClass(String methodName, Class<?> implementationClass) {
+    return new UnsupportedOperationException(exceptionMessage("012", "The method '{}' is not implemented by class '{}'", methodName, implementationClass.getName()));
+  }
+
+  public NoSuchElementException iteratorHasNoMoreElements(Class<?> iteratorClass) {
+    return new NoSuchElementException(exceptionMessage("013", "The iterator '{}' has no more elements", iteratorClass.getName()));
+  }
 }

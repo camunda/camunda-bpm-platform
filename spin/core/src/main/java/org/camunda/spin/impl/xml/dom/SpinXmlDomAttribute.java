@@ -56,21 +56,16 @@ public class SpinXmlDomAttribute extends SpinXmlTreeAttribute {
   }
 
   public String namespace() {
-    String namespaceURI = attributeNode.getNamespaceURI();
-    if (namespaceURI != null) {
-      return namespaceURI;
-    }
-    else {
-      return attributeNode.lookupNamespaceURI(attributeNode.getPrefix());
-    }
+    return attributeNode.getNamespaceURI();
   }
 
   public boolean hasNamespace(String namespace) {
-    if (namespace == null) {
-      return attributeNode.getNamespaceURI() == null;
+    String attributeNamespace = attributeNode.getNamespaceURI();
+    if (attributeNamespace == null) {
+      return namespace == null;
     }
     else {
-      return namespace.equals(namespace());
+      return attributeNamespace.equals(namespace);
     }
   }
 

@@ -17,9 +17,30 @@ import org.camunda.spin.Spin;
 import org.camunda.spin.SpinList;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Sebastian Menski
  */
 public class SpinListImpl<E extends Spin<?>> extends ArrayList<E> implements SpinList<E> {
+
+  public SpinListImpl() {
+    super();
+  }
+
+  public SpinListImpl(int initialCapacity) {
+    super(initialCapacity);
+  }
+
+  public SpinListImpl(Collection<? extends E> c) {
+    super(c);
+  }
+
+  public SpinListImpl(Iterable<E> iterable) {
+    super();
+    for (E e : iterable) {
+      add(e);
+    }
+  }
+
 }

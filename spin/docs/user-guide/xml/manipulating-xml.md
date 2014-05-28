@@ -43,17 +43,17 @@ String xml = "<order xmlns:cam=\"http://camunda.org/example\" id=\"order1\" cam:
 SpinXmlDomAttribute attribute = XML(xml).attrNs("http://camunda.org/example", "name");
 ```
 
-You can also get a collection of all attributes under the default or a specific namespace.
+You can also get a collection of all attributes or only of a specific namespace.
 
 ```java
 import static org.camunda.spin.Spin.XML;
 
 String xml = "<order xmlns:cam=\"http://camunda.org/example\" id=\"order1\" cam:name=\"order1\" />";
 
-// All attributes under the default namespace
+// All attributes
 SpinCollection<SpinXmlDomAttribute> attributes = XML(xml).attrs();
 
-// All attributes under a specific namespace
+// All attributes of a specific namespace
 attributes = XML(xml).attrs("http://camunda.org/example");
 ```
 
@@ -64,10 +64,10 @@ import static org.camunda.spin.Spin.XML;
 
 String xml = "<order xmlns:cam=\"http://camunda.org/example\" id=\"order1\" cam:name=\"order1\" />";
 
-// All attribute names under the default namespace
+// All attribute names 
 List<String> names = XML(xml).attrNames();
 
-// All attribute names under a specific namespace
+// All attribute names of a specific namespace
 names = XML(xml).attrNames("http://camunda.org/example");
 ```
 

@@ -25,46 +25,87 @@ import java.util.List;
 public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElement> {
 
   /**
-   * Returns the wrapped attribute for the given name under
-   * the local namespace.
+   * Checks whether this element has a attribute with an empty namespace and the given name.
+   *
+   * @param attributeName the name of the attribute
+   * @return true if the element has an attribute with this name under the local namespace, false otherwise
+   * @throws IllegalArgumentException if the attributeName is null
+   */
+  public abstract boolean hasAttr(String attributeName);
+
+  /**
+   * Returns the wrapped attribute for an empty namespace and the given name.
    *
    * @param attributeName the name of the attribute
    * @return the wrapped {@link SpinXmlTreeAttribute attribute}
+   * @throws IllegalArgumentException if the attributeName is null
    * @throws SpinXmlTreeNodeException if the attribute is not found
    */
   public abstract SpinXmlTreeAttribute attr(String attributeName);
 
   /**
-   * Returns the wrapped attribute for the given namespace
-   * and name.
+   * Sets the attribute value in the local namespace of this element.
+   *
+   * @param attributeName the name of the attribute
+   * @param value the value to set
+   * @return the wrapped {@link SpinXmlTreeElement element}
+   * @throws IllegalArgumentException if the attributeName or value is null
+   */
+  public abstract SpinXmlTreeElement attr(String attributeName, String value);
+
+  /**
+   * Removes the attribute with an empty namespace.
+   *
+   * @param attributeName the name of the attribute
+   * @return the wrapped {@link SpinXmlTreeElement element}
+   * @throws IllegalArgumentException if the attributeName is null
+   */
+  public abstract SpinXmlTreeElement removeAttr(String attributeName);
+
+  /**
+   * Checks whether this element has a attribute with the given namespace and name.
+   *
+   * @param namespace the namespace of the attribute
+   * @param attributeName the name of the attribute
+   * @return true if the element has an attribute with this name under given namespace, false otherwise
+   * @throws IllegalArgumentException if the attributeName is null
+   */
+  public abstract boolean hasAttrNs(String namespace, String attributeName);
+
+  /**
+   * Returns the wrapped attribute for the given namespace and name.
    *
    * @param namespace the namespace of the attribute
    * @param attributeName the name of the attribute
    * @return the wrapped {@link SpinXmlTreeAttribute attribute}
+   * @throws IllegalArgumentException if the attributeName is null
    * @throws SpinXmlTreeNodeException if the attribute is not found
    */
   public abstract SpinXmlTreeAttribute attrNs(String namespace, String attributeName);
 
   /**
-   * Checks whether this element has a attribute with the given name.
-   *
-   * @param attributeName the name of the attribute
-   * @return true if the element has an attribute with this name under the local namespace, false otherwise
-   */
-  public abstract boolean hasAttr(String attributeName);
-
-  /**
-   * Checks whether this element has a attribute with the given name.
+   * Sets the attribute value in the given namespace.
    *
    * @param namespace the namespace of the attribute
    * @param attributeName the name of the attribute
-   * @return true if the element has an attribute with this name under given namespace, false otherwise
-   * @throws SpinXmlTreeNodeException if the attributeName is null
+   * @param value the value to set
+   * @return the wrapped {@link SpinXmlTreeElement element}
+   * @throws IllegalArgumentException if attributeName or value is null
    */
-  public abstract boolean hasAttrNs(String namespace, String attributeName);
+  public abstract SpinXmlTreeElement attrNs(String namespace, String attributeName, String value);
 
   /**
-   * Returns all wrapped attributes for the local namespace.
+   * Removes the attribute under the given namespace.
+   *
+   * @param namespace the namespace of the attribute
+   * @param attributeName the name of the attribute
+   * @return the wrapped {@link SpinXmlTreeElement element}
+   * @throws IllegalArgumentException if the attributeName is null
+   */
+  public abstract SpinXmlTreeElement removeAttrNs(String namespace, String attributeName);
+
+  /**
+   * Returns all wrapped attributes of this element.
    *
    * @return the wrapped attributes or an empty list of no attributes are found
    */
@@ -79,7 +120,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
   public abstract SpinList<SpinXmlTreeAttribute> attrs(String namespace);
 
   /**
-   * Returns all names of the attributes in the local namespace.
+   * Returns all names of the attributes of this element.
    *
    * @return the names of the attributes
    */
@@ -94,10 +135,11 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
 
   /**
    * Returns a single wrapped child element for the given name
-   * in the local namespace.
+   * in the local namespace of this element.
    *
    * @param elementName the element name
    * @return the wrapped child {@link SpinXmlTreeElement element}
+   * @throws IllegalArgumentException if the elementName is null
    * @throws SpinXmlTreeNodeException if none or more than one child element is found
    */
   public abstract SpinXmlTreeElement childElement(String elementName);
@@ -109,6 +151,7 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    * @param namespace the namespace of the element
    * @param elementName the element name
    * @return the wrapped child {@link SpinXmlTreeElement element}
+   * @throws IllegalArgumentException if the elementName is null
    * @throws SpinXmlTreeNodeException if none or more than one child element is found
    */
   public abstract SpinXmlTreeElement childElement(String namespace, String elementName);
@@ -121,10 +164,12 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
   public abstract SpinList<SpinXmlTreeElement> childElements();
 
   /**
-   * Returns all child {@link SpinXmlTreeElement elements} with a given name in the local namespace.
+   * Returns all child {@link SpinXmlTreeElement elements} with a given name in the local namespace
+   * of this element.
    *
    * @param elementName the element name
    * @return a collection of wrapped {@link SpinXmlTreeElement elements}
+   * @throws IllegalArgumentException if the element name is null
    * @throws SpinXmlTreeNodeException if no child element was found
    */
   public abstract SpinList<SpinXmlTreeElement> childElements(String elementName);
@@ -135,55 +180,17 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    * @param namespace the namespace of the element
    * @param elementName the element name
    * @return a collection of wrapped {@link SpinXmlTreeElement elements}
+   * @throws IllegalArgumentException if the element name is null
    * @throws SpinXmlTreeNodeException if no child element was found
    */
   public abstract SpinList<SpinXmlTreeElement> childElements(String namespace, String elementName);
-
-  /**
-   * Sets the attribute value in the local namespace of the element.
-   *
-   * @param attributeName the name of the attribute
-   * @param value the value to set
-   * @return the wrapped {@link SpinXmlTreeElement element}
-   * @throws SpinXmlTreeNodeException if the name is null
-   */
-  public abstract SpinXmlTreeElement attr(String attributeName, String value);
-
-  /**
-   * Sets the attribute value in the given namespace.
-   *
-   * @param namespace the namespace of the attribute
-   * @param attributeName the name of the attribute
-   * @param value the value to set
-   * @return the wrapped {@link SpinXmlTreeElement element}
-   * @throws SpinXmlTreeNodeException if the name is null
-   */
-  public abstract SpinXmlTreeElement attrNs(String namespace, String attributeName, String value);
-
-  /**
-   * Removes the attribute under the local namespace.
-   *
-   * @param attributeName the name of the attribute
-   * @return the wrapped {@link SpinXmlTreeElement element}
-   * @throws SpinXmlTreeNodeException if the attributeName is null
-   */
-  public abstract SpinXmlTreeElement removeAttr(String attributeName);
-
-  /**
-   * Removes the attribute under the given namespace.
-   *
-   * @param namespace the namespace of the attribute
-   * @param attributeName the name of the attribute
-   * @return the wrapped {@link SpinXmlTreeElement element}
-   * @throws SpinXmlTreeNodeException if the attributeName is null
-   */
-  public abstract SpinXmlTreeElement removeAttrNs(String namespace, String attributeName);
 
   /**
    * Appends child elements to this {@link SpinXmlTreeElement element}.
    *
    * @param childElements the child elements to append
    * @return the wrapped {@link SpinXmlTreeElement element}
+   * @throws IllegalArgumentException if the childElements is null or one of them
    * @throws SpinXmlTreeNodeException if the child element is null
    */
   public abstract SpinXmlTreeElement append(SpinXmlTreeElement... childElements);
