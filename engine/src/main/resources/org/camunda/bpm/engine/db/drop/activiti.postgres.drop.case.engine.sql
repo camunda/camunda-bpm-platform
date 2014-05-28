@@ -1,0 +1,4 @@
+alter table ACT_RE_CASE_DEF
+    drop CONSTRAINT ACT_UNIQ_CASE_DEF;
+
+drop table ACT_RE_CASE_DEF;

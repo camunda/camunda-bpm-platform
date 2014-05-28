@@ -127,6 +127,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-cmmn-model</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.python</groupId>
       <artifactId>jython</artifactId>
       <scope>provided</scope>

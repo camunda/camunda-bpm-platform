@@ -1,0 +1,1 @@
+drop table if exists ACT_RE_CASE_DEF;

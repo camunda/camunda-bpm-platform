@@ -13,6 +13,27 @@
 
 package org.camunda.bpm.engine.impl.cfg;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -23,16 +44,44 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
-import org.camunda.bpm.engine.*;
-import org.camunda.bpm.engine.impl.*;
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
+import org.camunda.bpm.engine.impl.FormServiceImpl;
+import org.camunda.bpm.engine.impl.HistoryServiceImpl;
+import org.camunda.bpm.engine.impl.IdentityServiceImpl;
+import org.camunda.bpm.engine.impl.ManagementServiceImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
+import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
+import org.camunda.bpm.engine.impl.ServiceImpl;
+import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
-import org.camunda.bpm.engine.impl.calendar.*;
+import org.camunda.bpm.engine.impl.calendar.BusinessCalendarManager;
+import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
+import org.camunda.bpm.engine.impl.calendar.DueDateBusinessCalendar;
+import org.camunda.bpm.engine.impl.calendar.DurationBusinessCalendar;
+import org.camunda.bpm.engine.impl.calendar.MapBusinessCalendarManager;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
+import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistry;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformFactory;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
+import org.camunda.bpm.engine.impl.cmmn.transformer.DefaultCmmnTranformFactory;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.db.IbatisVariableTypeHandler;
@@ -47,8 +96,20 @@ import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
 import org.camunda.bpm.engine.impl.form.engine.HtmlFormEngine;
 import org.camunda.bpm.engine.impl.form.engine.JuelFormEngine;
-import org.camunda.bpm.engine.impl.form.type.*;
-import org.camunda.bpm.engine.impl.form.validator.*;
+import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
+import org.camunda.bpm.engine.impl.form.type.BooleanFormType;
+import org.camunda.bpm.engine.impl.form.type.DateFormType;
+import org.camunda.bpm.engine.impl.form.type.FormTypes;
+import org.camunda.bpm.engine.impl.form.type.LongFormType;
+import org.camunda.bpm.engine.impl.form.type.StringFormType;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
+import org.camunda.bpm.engine.impl.form.validator.FormValidators;
+import org.camunda.bpm.engine.impl.form.validator.MaxLengthValidator;
+import org.camunda.bpm.engine.impl.form.validator.MaxValidator;
+import org.camunda.bpm.engine.impl.form.validator.MinLengthValidator;
+import org.camunda.bpm.engine.impl.form.validator.MinValidator;
+import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
+import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
@@ -59,34 +120,87 @@ import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
-import org.camunda.bpm.engine.impl.interceptor.*;
-import org.camunda.bpm.engine.impl.jobexecutor.*;
+import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
+import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
+import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.RejectedJobsHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.mail.MailScanner;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
+import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
+import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
+import org.camunda.bpm.engine.impl.persistence.entity.IncidentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
-import org.camunda.bpm.engine.impl.scripting.*;
+import org.camunda.bpm.engine.impl.scripting.BeansResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.ResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.ScriptingEngines;
+import org.camunda.bpm.engine.impl.scripting.VariableScopeResolverFactory;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
-import org.camunda.bpm.engine.impl.variable.*;
+import org.camunda.bpm.engine.impl.variable.BooleanType;
+import org.camunda.bpm.engine.impl.variable.ByteArrayType;
+import org.camunda.bpm.engine.impl.variable.DateType;
+import org.camunda.bpm.engine.impl.variable.DefaultVariableTypes;
+import org.camunda.bpm.engine.impl.variable.DoubleType;
+import org.camunda.bpm.engine.impl.variable.EntityManagerSession;
+import org.camunda.bpm.engine.impl.variable.EntityManagerSessionFactory;
+import org.camunda.bpm.engine.impl.variable.IntegerType;
+import org.camunda.bpm.engine.impl.variable.JPAEntityVariableType;
+import org.camunda.bpm.engine.impl.variable.LongType;
+import org.camunda.bpm.engine.impl.variable.NullType;
+import org.camunda.bpm.engine.impl.variable.SerializableType;
+import org.camunda.bpm.engine.impl.variable.ShortType;
+import org.camunda.bpm.engine.impl.variable.StringType;
+import org.camunda.bpm.engine.impl.variable.VariableType;
+import org.camunda.bpm.engine.impl.variable.VariableTypes;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
-
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -202,6 +316,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<ResolverFactory> resolverFactories;
   protected boolean autoStoreScriptVariables = false;
   protected boolean enableScriptCompilation = true;
+  protected boolean cmmnEnabled = true;
 
   protected BusinessCalendarManager businessCalendarManager;
 
@@ -210,6 +325,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected CommandContextFactory commandContextFactory;
   protected TransactionContextFactory transactionContextFactory;
   protected BpmnParseFactory bpmnParseFactory;
+
+  // cmmn
+  protected CmmnTransformFactory cmmnTransformFactory;
+  protected DefaultCmmnElementHandlerRegistry cmmnElementHandlerRegistry;
 
   protected int historyLevel;
 
@@ -667,6 +786,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
       dbSqlSessionFactory.setDbIdentityUsed(isDbIdentityUsed);
       dbSqlSessionFactory.setDbHistoryUsed(isDbHistoryUsed);
+      dbSqlSessionFactory.setCmmnEnabled(cmmnEnabled);
       dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
       dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
       addSessionFactory(dbSqlSessionFactory);
@@ -698,6 +818,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(StatisticsManager.class));
       addSessionFactory(new GenericManagerFactory(IncidentManager.class));
       addSessionFactory(new GenericManagerFactory(AuthorizationManager.class));
+
+      addSessionFactory(new GenericManagerFactory(CaseDefinitionManager.class));
 
       sessionFactories.put(ReadOnlyIdentityProvider.class, identityProviderSessionFactory);
 
@@ -750,6 +872,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Collection< ? extends Deployer> getDefaultDeployers() {
     List<Deployer> defaultDeployers = new ArrayList<Deployer>();
 
+    BpmnDeployer bpmnDeployer = getBpmnDeployer();
+    defaultDeployers.add(bpmnDeployer);
+
+    if (isCmmnEnabled()) {
+      CmmnDeployer cmmnDeployer = getCmmnDeployer();
+      defaultDeployers.add(cmmnDeployer);
+    }
+
+    return defaultDeployers;
+  }
+
+  protected BpmnDeployer getBpmnDeployer() {
     BpmnDeployer bpmnDeployer = new BpmnDeployer();
     bpmnDeployer.setExpressionManager(expressionManager);
     bpmnDeployer.setIdGenerator(idGenerator);
@@ -770,16 +904,37 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     bpmnDeployer.setBpmnParser(bpmnParser);
 
-    defaultDeployers.add(bpmnDeployer);
-    return defaultDeployers;
+    return bpmnDeployer;
   }
 
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
-        if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
     }
     return defaultListeners;
+  }
+
+  protected CmmnDeployer getCmmnDeployer() {
+    CmmnDeployer cmmnDeployer = new CmmnDeployer();
+
+    cmmnDeployer.setIdGenerator(idGenerator);
+
+    if (cmmnTransformFactory == null) {
+      cmmnTransformFactory = new DefaultCmmnTranformFactory();
+    }
+
+    if (cmmnElementHandlerRegistry == null) {
+      cmmnElementHandlerRegistry = new DefaultCmmnElementHandlerRegistry();
+    }
+
+    CmmnTransformer cmmnTransformer = new CmmnTransformer(expressionManager, cmmnElementHandlerRegistry, cmmnTransformFactory);
+
+    // TODO: pre- and postParseListener
+
+    cmmnDeployer.setTransformer(cmmnTransformer);
+
+    return cmmnDeployer;
   }
 
   // job executor /////////////////////////////////////////////////////////////
@@ -2053,5 +2208,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   public void setDeploymentLockUsed(boolean isDeploymentLockUsed) {
     this.isDeploymentLockUsed = isDeploymentLockUsed;
+  }
+
+  public boolean isCmmnEnabled() {
+    return cmmnEnabled;
+  }
+
+  public void setCmmnEnabled(boolean cmmnEnabled) {
+    this.cmmnEnabled = cmmnEnabled;
   }
 }

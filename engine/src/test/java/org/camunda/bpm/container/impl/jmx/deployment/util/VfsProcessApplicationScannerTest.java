@@ -12,15 +12,17 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment.util;
 
-import org.camunda.bpm.container.impl.jmx.deployment.scanning.ProcessApplicationScanningUtil;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import org.camunda.bpm.container.impl.jmx.deployment.scanning.ProcessApplicationScanningUtil;
+import org.junit.Test;
 
 
 /**
@@ -41,6 +43,22 @@ public class VfsProcessApplicationScannerTest {
     String processFileName = "VfsProcessScannerTest.bpmn20.xml";
     assertTrue("'" + processFileName + "' found", contains(scanResult, processFileName));
     assertFalse("'bpmn' folder in resource path not found", contains(scanResult, "bpmn"));
+    assertFalse("'cmmn' in resource path not found", contains(scanResult, "cmmn"));
+  }
+
+  @Test
+  public void testScanProcessArchivePathForCmmnResources() throws MalformedURLException {
+
+    // given: scanning the relative test resource root
+    URLClassLoader classLoader = new URLClassLoader(new URL[]{new URL("file:")});
+    String processRootPath = "classpath:org/camunda/bpm/container/impl/jmx/deployment/case/";
+    Map<String, byte[]> scanResult = ProcessApplicationScanningUtil.findResources(classLoader, processRootPath, null);
+
+    // expect: finds only the BPMN process file and not treats the 'bpmn' folder
+    assertEquals(1, scanResult.size());
+    String processFileName = "VfsProcessScannerTest.cmmn";
+    assertTrue("'" + processFileName + "' found", contains(scanResult, processFileName));
+    assertFalse("'bpmn' in resource path not found", contains(scanResult, "bpmn"));
   }
 
   private boolean contains(Map<String, byte[]> scanResult, String suffix) {

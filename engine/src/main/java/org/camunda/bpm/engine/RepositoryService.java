@@ -18,14 +18,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
-import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -103,6 +105,9 @@ public interface RepositoryService {
 
   /** Query process definitions. */
   ProcessDefinitionQuery createProcessDefinitionQuery();
+
+  /** Query case definitions. */
+  CaseDefinitionQuery createCaseDefinitionQuery();
 
   /** Query process definitions. */
   DeploymentQuery createDeploymentQuery();
@@ -300,5 +305,21 @@ public interface RepositoryService {
    * is authorized for a certain process definition
    */
   List<IdentityLink> getIdentityLinksForProcessDefinition(String processDefinitionId);
+
+  /**
+   * Returns the {@link CaseDefinition}.
+   */
+  CaseDefinition getCaseDefinition(String caseDefinitionId);
+
+  /**
+   * Gives access to a deployed case model, e.g., a CMMN 1.0 XML file,
+   * through a stream of bytes.
+   *
+   * @param caseDefinitionId
+   *          id of a {@link CaseDefinition}, cannot be null.
+   * @throws ProcessEngineException
+   *           when the case model doesn't exist.
+   */
+  InputStream getCaseModel(String caseDefinitionId);
 
 }

@@ -109,6 +109,7 @@
         <directory>src/test/resources</directory>
         <filtering>true</filtering>
         <includes>
+          <include>**/*.cmmn</include>
           <include>**/*.xml</include>
           <include>**/*.properties</include>
           <include>**/*.png</include>

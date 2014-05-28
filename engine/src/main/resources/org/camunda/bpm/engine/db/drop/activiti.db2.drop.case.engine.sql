@@ -1,0 +1,1 @@
+drop table ACT_RE_CASE_DEF;

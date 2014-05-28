@@ -13,15 +13,15 @@
 
 package org.camunda.bpm.engine.impl.db;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -254,6 +254,7 @@ public class DbSqlSessionFactory implements SessionFactory {
   protected Map<Class<?>,String>  selectStatements = new ConcurrentHashMap<Class<?>, String>();
   protected boolean isDbIdentityUsed = true;
   protected boolean isDbHistoryUsed = true;
+  protected boolean cmmnEnabled = true;
 
   public Class< ? > getSessionType() {
     return DbSqlSession.class;
@@ -407,6 +408,14 @@ public class DbSqlSessionFactory implements SessionFactory {
     this.isDbHistoryUsed = isDbHistoryUsed;
   }
 
+  public boolean isCmmnEnabled() {
+    return cmmnEnabled;
+  }
+
+  public void setCmmnEnabled(boolean cmmnEnabled) {
+    this.cmmnEnabled = cmmnEnabled;
+  }
+
   public void setDatabaseTablePrefix(String databaseTablePrefix) {
     this.databaseTablePrefix = databaseTablePrefix;
   }
@@ -422,5 +431,6 @@ public class DbSqlSessionFactory implements SessionFactory {
   public void setDatabaseSchema(String databaseSchema) {
     this.databaseSchema = databaseSchema;
   }
+
 
 }

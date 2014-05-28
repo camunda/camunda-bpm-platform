@@ -29,11 +29,11 @@ import org.junit.runner.RunWith;
 public class TestWarDeployment extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive processArchive() {    
+  public static WebArchive processArchive() {
     return initWebArchiveDeployment()
             .addAsResource("org/camunda/bpm/integrationtest/testDeployProcessArchive.bpmn20.xml");
   }
-  
+
   @Test
   public void testDeployProcessArchive() {
     Assert.assertNotNull(processEngine);
@@ -41,7 +41,7 @@ public class TestWarDeployment extends AbstractFoxPlatformIntegrationTest {
     long count = repositoryService.createProcessDefinitionQuery()
       .processDefinitionKey("testDeployProcessArchive")
       .count();
-    
+
     Assert.assertEquals(1, count);
   }
 

@@ -239,6 +239,7 @@ public abstract class TestHelper {
             dbSqlSession.executeMandatorySchemaResource("create", "engine");
             dbSqlSession.executeMandatorySchemaResource("create", "history");
             dbSqlSession.executeMandatorySchemaResource("create", "identity");
+            dbSqlSession.executeMandatorySchemaResource("create", "case.engine");
             return null;
           }
         });

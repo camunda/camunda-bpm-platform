@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -22,8 +24,6 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
-
-import java.util.List;
 
 
 /**
@@ -96,6 +96,9 @@ public class DeploymentManager extends AbstractManager {
     // delete process definitions from db
     getProcessDefinitionManager()
       .deleteProcessDefinitionsByDeploymentId(deploymentId);
+
+    getCaseDefinitionManager()
+      .deleteCaseDefinitionsByDeploymentId(deploymentId);
 
     for (ProcessDefinition processDefinition : processDefinitions) {
       String processDefinitionId = processDefinition.getId();

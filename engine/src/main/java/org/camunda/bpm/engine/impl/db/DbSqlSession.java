@@ -13,9 +13,45 @@
 
 package org.camunda.bpm.engine.impl.db;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.ibatis.session.SqlSession;
-import org.camunda.bpm.engine.*;
-import org.camunda.bpm.engine.impl.*;
+import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.WrongDbException;
+import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
+import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
+import org.camunda.bpm.engine.impl.GroupQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.JobQueryImpl;
+import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.TaskQueryImpl;
+import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.upgrade.DbUpgradeStep;
@@ -28,15 +64,6 @@ import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.variable.DeserializedObject;
-
-import java.io.*;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /** responsibilities:
@@ -769,6 +796,9 @@ public class DbSqlSession implements Session {
       if (dbSqlSessionFactory.isDbIdentityUsed() && !isIdentityTablePresent()) {
         errorMessage = addMissingComponent(errorMessage, "identity");
       }
+      if (dbSqlSessionFactory.isCmmnEnabled() && !isCaseDefinitionTablePresent()) {
+        errorMessage = addMissingComponent(errorMessage, "case.engine");
+      }
 
       if (errorMessage!=null) {
         throw new ProcessEngineException("Activiti database problem: "+errorMessage);
@@ -856,6 +886,10 @@ public class DbSqlSession implements Session {
     if (processEngineConfiguration.isDbIdentityUsed()) {
       dbSchemaCreateIdentity();
     }
+
+    if (processEngineConfiguration.isCmmnEnabled()) {
+      dbSchemaCreateCmmn();
+    }
   }
 
   protected void dbSchemaCreateIdentity() {
@@ -870,6 +904,10 @@ public class DbSqlSession implements Session {
     executeMandatorySchemaResource("create", "engine");
   }
 
+  protected void dbSchemaCreateCmmn() {
+    executeMandatorySchemaResource("create", "case.engine");
+  }
+
   public void dbSchemaDrop() {
     executeMandatorySchemaResource("drop", "engine");
     if (dbSqlSessionFactory.isDbHistoryUsed()) {
@@ -877,6 +915,9 @@ public class DbSqlSession implements Session {
     }
     if (dbSqlSessionFactory.isDbIdentityUsed()) {
       executeMandatorySchemaResource("drop", "identity");
+    }
+    if (dbSqlSessionFactory.isCmmnEnabled()) {
+      executeMandatorySchemaResource("drop", "case.engine");
     }
   }
 
@@ -886,6 +927,9 @@ public class DbSqlSession implements Session {
     }
     if (isIdentityTablePresent() && dbSqlSessionFactory.isDbIdentityUsed()) {
       executeMandatorySchemaResource("drop", "identity");
+    }
+    if (isCaseDefinitionTablePresent() && dbSqlSessionFactory.isCmmnEnabled()) {
+      executeMandatorySchemaResource("drop", "case.engine");
     }
   }
 
@@ -944,6 +988,14 @@ public class DbSqlSession implements Session {
       dbSchemaCreateIdentity();
     }
 
+    if (isCaseDefinitionTablePresent()) {
+      if (isUpgradeNeeded) {
+        dbSchemaUpgrade("case.engine", dbVersion);
+      }
+    } else if (dbSqlSessionFactory.isCmmnEnabled()) {
+      dbSchemaCreateCmmn();
+    }
+
     return feedback;
   }
 
@@ -955,6 +1007,10 @@ public class DbSqlSession implements Session {
   }
   public boolean isIdentityTablePresent(){
     return isTablePresent("ACT_ID_USER");
+  }
+
+  public boolean isCaseDefinitionTablePresent() {
+    return isTablePresent("ACT_RE_CASE_DEF");
   }
 
   public boolean isTablePresent(String tableName) {

@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.core.model.CoreActivity;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
 /**
  * @author Roman Smirnov
@@ -31,6 +31,8 @@ public class CmmnActivity extends CoreActivity {
 
   protected List<CmmnActivity> activities = new ArrayList<CmmnActivity>();
   protected Map<String, CmmnActivity> namedActivities = new HashMap<String, CmmnActivity>();
+
+  protected CmmnElement cmmnElement;
 
   protected CmmnActivityBehavior activityBehavior;
 
@@ -48,9 +50,6 @@ public class CmmnActivity extends CoreActivity {
   public CmmnActivity createActivity(String activityId) {
     CmmnActivity activity = new CmmnActivity(activityId, caseDefinition);
     if (activityId!=null) {
-      if (caseDefinition.findActivity(activityId) != null) {
-        throw new PvmException("duplicate activity id '" + activityId + "'");
-      }
       namedActivities.put(activityId, activity);
     }
     activity.setParent(this);
@@ -98,6 +97,16 @@ public class CmmnActivity extends CoreActivity {
 
   public void setCaseDefinition(CmmnCaseDefinition caseDefinition) {
     this.caseDefinition = caseDefinition;
+  }
+
+  // cmmn element
+
+  public CmmnElement getCmmnElement() {
+    return cmmnElement;
+  }
+
+  public void setCmmnElement(CmmnElement cmmnElement) {
+    this.cmmnElement = cmmnElement;
   }
 
 }

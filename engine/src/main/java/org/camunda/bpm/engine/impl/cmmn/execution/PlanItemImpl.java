@@ -20,10 +20,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
+import org.camunda.bpm.engine.delegate.CmmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStrore;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
 /**
  * @author Roman Smirnov
@@ -176,6 +179,14 @@ public class PlanItemImpl extends CmmnExecution implements Serializable {
 
   public String getId() {
     return String.valueOf(System.identityHashCode(this));
+  }
+
+  public CmmnElement getCmmnModelElementInstance() {
+    throw new UnsupportedOperationException(CmmnModelExecutionContext.class.getName() +" is unsupported in transient PlanItemImpl");
+  }
+
+  public CmmnModelInstance getCmmnModelInstance() {
+    throw new UnsupportedOperationException(CmmnModelExecutionContext.class.getName() +" is unsupported in transient PlanItemImpl");
   }
 
 }
