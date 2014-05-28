@@ -343,13 +343,17 @@ public class ScriptRule implements TestRule {
     }
   }
 
+  /**
+   * If javascript engine is used the variable may be placed in the nashorn.globel
+   * variable map.
+   *
+   * @param name the name of the variable
+   * @return the variable if found or null
+   */
   @SuppressWarnings("unchecked")
   private Object getVariableJs(String name) {
     Object variable = variables.get(name);
-    if (variable != null) {
-      return JavaScriptVariableUnwrapper.unwrap(name, variable);
-    }
-    else if (variables.containsKey("nashorn.global")) {
+    if (variable == null && variables.containsKey("nashorn.global")) {
       variable = ((Map<String, Object>) variables.get("nashorn.global")).get(name);
     }
     return variable;

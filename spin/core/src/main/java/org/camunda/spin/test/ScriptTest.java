@@ -36,13 +36,7 @@ public abstract class ScriptTest {
       script.execute();
     }
     catch (SpinScriptException e) {
-      Throwable cause = e.getCause();
-      if (cause.getCause() != null) {
-        throw cause.getCause().getCause();
-      }
-      else {
-        throw JavaScriptExceptionUnwrapper.unwrap(cause);
-      }
+      throw e.getCause().getCause().getCause();
     }
   }
 }
