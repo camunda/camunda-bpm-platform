@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionSta
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
-import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResourceImpl;
+import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
 
 public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements ProcessDefinitionRestService {
 

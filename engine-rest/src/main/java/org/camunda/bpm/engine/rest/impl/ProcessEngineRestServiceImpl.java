@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.camunda.bpm.engine.rest.AuthorizationRestService;
+import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.GroupRestService;
@@ -163,6 +164,14 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
   }
 
   @Override
+  public CaseDefinitionRestService getCaseDefinitionRestService(String engineName) {
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    CaseDefinitionRestServiceImpl subResource = new CaseDefinitionRestServiceImpl(engineName);
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
+  }
+
+  @Override
   public List<ProcessEngineDto> getProcessEngineNames() {
     ProcessEngineProvider provider = getProcessEngineProvider();
     Set<String> engineNames = provider.getProcessEngineNames();
@@ -176,7 +185,6 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
 
     return results;
   }
-
 
   private URI getRelativeEngineUri(String engineName) {
     return UriBuilder.fromResource(ProcessEngineRestService.class).path("{name}").build(engineName);

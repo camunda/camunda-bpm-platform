@@ -12,12 +12,38 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.form.*;
-import org.camunda.bpm.engine.history.*;
+import org.camunda.bpm.engine.form.FormField;
+import org.camunda.bpm.engine.form.FormProperty;
+import org.camunda.bpm.engine.form.FormType;
+import org.camunda.bpm.engine.form.StartFormData;
+import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricActivityStatistics;
+import org.camunda.bpm.engine.history.HistoricDetail;
+import org.camunda.bpm.engine.history.HistoricFormField;
+import org.camunda.bpm.engine.history.HistoricIncident;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -31,21 +57,22 @@ import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
-import org.camunda.bpm.engine.runtime.*;
+import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
-
-import java.util.*;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Provides mocks for the basic engine entities, such as
@@ -362,6 +389,14 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HIST_INCIDENT_STATE_OPEN = false;
   public static final boolean EXAMPLE_HIST_INCIDENT_STATE_DELETED = false;
   public static final boolean EXAMPLE_HIST_INCIDENT_STATE_RESOLVED = true;
+
+  // case definition
+  public static final String EXAMPLE_CASE_DEFINITION_ID = "aCaseDefnitionId";
+  public static final String EXAMPLE_CASE_DEFINITION_KEY = "aCaseDefinitionKey";
+  public static final int EXAMPLE_CASE_DEFINITION_VERSION = 1;
+  public static final String EXAMPLE_CASE_DEFINITION_CATEGORY = "aCaseDefinitionCategory";
+  public static final String EXAMPLE_CASE_DEFINITION_NAME = "aCaseDefinitionName";
+  public static final String EXAMPLE_CASE_DEFINITION_RESOURCE_NAME = "aCaseDefinitionResourceName";
 
   // tasks
   public static Task createMockTask() {
@@ -1220,4 +1255,28 @@ public abstract class MockProvider {
     entries.add(createMockHistoricIncident());
     return entries;
   }
+
+  // case definition
+  public static List<CaseDefinition> createMockCaseDefinitions() {
+    List<CaseDefinition> mocks = new ArrayList<CaseDefinition>();
+    mocks.add(createMockCaseDefinition());
+    return mocks;
+  }
+
+  public static CaseDefinition createMockCaseDefinition() {
+    MockCaseDefinitionBuilder builder = new MockCaseDefinitionBuilder();
+
+    CaseDefinition mockDefinition = builder
+        .id(EXAMPLE_CASE_DEFINITION_ID)
+        .category(EXAMPLE_CASE_DEFINITION_CATEGORY)
+        .name(EXAMPLE_CASE_DEFINITION_NAME)
+        .key(EXAMPLE_CASE_DEFINITION_KEY)
+        .version(EXAMPLE_CASE_DEFINITION_VERSION)
+        .resource(EXAMPLE_CASE_DEFINITION_RESOURCE_NAME)
+        .deploymentId(EXAMPLE_DEPLOYMENT_ID)
+        .build();
+
+    return mockDefinition;
+  }
+
 }
