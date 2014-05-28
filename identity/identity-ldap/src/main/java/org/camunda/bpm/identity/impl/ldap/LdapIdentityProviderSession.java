@@ -402,7 +402,13 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       addFilter(ldapConfiguration.getGroupNameAttribute(), query.getNameLike(), search);
     }
     if(query.getUserId() != null) {
-      addFilter(ldapConfiguration.getGroupMemberAttribute(), getDnForUser(query.getUserId()), search);
+      String userDn = null;
+      if(ldapConfiguration.isUsePosixGroups()) {
+        userDn = query.getUserId();
+      } else {
+        userDn = getDnForUser(query.getUserId());
+      }
+      addFilter(ldapConfiguration.getGroupMemberAttribute(), userDn, search);
     }
     search.write(")");
 

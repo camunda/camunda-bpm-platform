@@ -57,8 +57,9 @@ public class LdapConfiguration {
   protected String groupTypeAttribute = "";
   protected String groupMemberAttribute = "memberOf";
 
-  protected boolean sortControlSupported = false; 
+  protected boolean sortControlSupported = false;
   protected boolean useSsl = false;
+  protected boolean usePosixGroups = false;
 
   // getters / setters //////////////////////////////////////
 
@@ -230,15 +231,23 @@ public class LdapConfiguration {
   public void setGroupMemberAttribute(String groupMemberAttribute) {
     this.groupMemberAttribute = groupMemberAttribute;
   }
-  
+
   public boolean isUseSsl() {
     return useSsl;
   }
-  
+
   public void setUseSsl(boolean useSsl) {
     this.useSsl = useSsl;
   }
-  
+
+  public boolean isUsePosixGroups() {
+    return usePosixGroups;
+  }
+
+  public void setUsePosixGroups(boolean usePosixGroups) {
+    this.usePosixGroups = usePosixGroups;
+  }
+
   public SearchControls getSearchControls() {
     SearchControls searchControls = new SearchControls();
     searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
