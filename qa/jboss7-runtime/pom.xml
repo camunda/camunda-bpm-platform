@@ -230,7 +230,7 @@
                   <goal>resources</goal>
                 </goals>
                 <configuration>
-                  <override>true</override>
+                  <overwrite>true</overwrite>
                   <outputDirectory>${jboss.runtime.location}/standalone</outputDirectory>
                 </configuration>
               </execution>
@@ -304,6 +304,10 @@
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                     </copy>
 
+                    <replace dir="${jboss.runtime.location}/modules" token="@project.version@" value="${project.version}">
+                      <include name="**/module.xml" />
+                    </replace>
+
                   </target>
                 </configuration>
               </execution>
@@ -327,7 +331,7 @@
                   <goal>resources</goal>
                 </goals>
                 <configuration>
-                  <override>true</override>
+                  <overwrite>true</overwrite>
                   <outputDirectory>${jboss.runtime.location}/domain</outputDirectory>
                 </configuration>
               </execution>
