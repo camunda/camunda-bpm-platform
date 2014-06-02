@@ -16,26 +16,26 @@ import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
 
 
 /**
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
 
   private Logger log = Logger.getLogger(JcaInflowExecuteJobsRunnable.class.getName());
-  
+
   protected final JcaExecutorServiceConnector ra;
-  
+
   protected static Method method;
 
   public JcaInflowExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine, JcaExecutorServiceConnector connector) {
     super(jobIds, processEngine);
     this.ra = connector;
     if(method == null) {
-      loadMethod();      
+      loadMethod();
     }
   }
-  
+
   protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
     JobExecutionHandlerActivation jobHandlerActivation = ra.getJobHandlerActivation();
     if(jobHandlerActivation == null) {
@@ -46,7 +46,7 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
     MessageEndpoint endpoint = null;
     try {
       endpoint = jobHandlerActivation.getMessageEndpointFactory().createEndpoint(null);
-      
+
       try {
         endpoint.beforeDelivery(method);
       } catch (NoSuchMethodException e) {
@@ -54,26 +54,26 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
       } catch (ResourceException e) {
         log.log(Level.WARNING, "ResourceException while invoking beforeDelivery() on MessageEndpoint '"+endpoint+"'", e);
       }
-      
+
       try {
         ((JobExecutionHandler)endpoint).executeJob(nextJobId, commandExecutor);
       }catch (Exception e) {
-        log.log(Level.WARNING, "Exception while executing job", e);
+        log.log(Level.WARNING, "Exception while executing job with id '"+nextJobId+"'.", e);
       }
-            
+
       try {
         endpoint.afterDelivery();
       } catch (ResourceException e) {
         log.log(Level.WARNING, "ResourceException while invoking afterDelivery() on MessageEndpoint '"+endpoint+"'", e);
       }
-      
+
     } catch (UnavailableException e) {
       log.log(Level.SEVERE, "UnavailableException while attempting to create messaging endpoint for executing job", e);
     } finally {
       if(endpoint != null) {
         endpoint.release();
-      }      
-    }    
+      }
+    }
   }
 
   protected void loadMethod() {
@@ -83,6 +83,6 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
       throw new RuntimeException("SecurityException while invoking getMethod() on class "+JobExecutionHandler.class, e);
     } catch (NoSuchMethodException e) {
       throw new RuntimeException("NoSuchMethodException while invoking getMethod() on class "+JobExecutionHandler.class, e);
-    }    
+    }
   }
 }

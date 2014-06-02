@@ -86,6 +86,8 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
     } catch (RuntimeException exception) {
 
+      log.warning("Exception while excuting job '"+job+"': "+exception.getMessage());
+
       // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
       FailedJobListener failedJobListener = createFailedJobListener(exception, commandExecutor);
 

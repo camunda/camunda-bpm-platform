@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -42,6 +43,8 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Frederik Heremans
  */
 public abstract class JobEntity implements Serializable, Job, PersistentObject, HasRevision {
+
+  private final static Logger LOG = Logger.getLogger(JobEntity.class.getName());
 
   public static final boolean DEFAULT_EXCLUSIVE = true;
   public static final int DEFAULT_RETRIES = 3;
@@ -86,6 +89,9 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     ExecutionEntity execution = null;
     if (executionId != null) {
       execution = commandContext.getExecutionManager().findExecutionById(executionId);
+      if(execution == null) {
+        throw new ProcessEngineException("Cannot find execution with id '"+executionId+"' referenced from job '"+ this +"'.");
+      }
     }
 
     Map<String, JobHandler> jobHandlers = Context.getProcessEngineConfiguration().getJobHandlers();
