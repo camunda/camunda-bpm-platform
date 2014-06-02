@@ -15,3 +15,21 @@ SET
 -- set incident revision column to not null --
 ALTER TABLE ACT_RU_INCIDENT
   MODIFY (REV_ NOT NULL);
+
+-- case management
+
+create table ACT_RE_CASE_DEF (
+    ID_ NVARCHAR2(64) NOT NULL,
+    REV_ INTEGER,
+    CATEGORY_ NVARCHAR2(255),
+    NAME_ NVARCHAR2(255),
+    KEY_ NVARCHAR2(255) NOT NULL,
+    VERSION_ INTEGER NOT NULL,
+    DEPLOYMENT_ID_ NVARCHAR2(64),
+    RESOURCE_NAME_ NVARCHAR2(2000),
+    primary key (ID_)
+);
+
+alter table ACT_RE_CASE_DEF
+    add constraint ACT_UNIQ_CASE_DEF
+    unique (KEY_,VERSION_);
