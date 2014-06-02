@@ -21,9 +21,12 @@ import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.spin.Spin.S;
 import static org.camunda.spin.Spin.XML;
 import static org.camunda.spin.xml.XmlTestConstants.*;
@@ -413,6 +416,19 @@ public class XmlDomElementTest {
     }
   }
 
+  @Test
+  public void canAppendChildElementCollection() {
+    Collection<SpinXmlTreeElement> childElements = new ArrayList<SpinXmlTreeElement>();
+    childElements.add(XML("<child/>"));
+    childElements.add(XML("<child/>"));
+    childElements.add(XML("<child/>"));
+
+    element = element.append(childElements);
+
+    SpinList<SpinXmlTreeElement> childs = element.childElements(null, "child");
+    assertThat(childs).hasSize(3);
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void cannotAppendNullChildElements() {
     element.append((SpinXmlTreeElement[]) null);
@@ -462,6 +478,90 @@ public class XmlDomElementTest {
   public void cannotAppendChildElementAfterNonChildElement() {
     SpinXmlTreeElement child = XML("<child/>");
     element.appendAfter(child, child);
+  }
+
+  // remove child elements
+
+  @Test
+  public void canRemoveAChildElement() {
+    SpinXmlTreeElement child = XML("<child/>");
+    element.append(child);
+
+    assertThat(element.childElement(null, "child")).isNotNull();
+
+    element.remove(child);
+
+    try {
+      assertThat(element.childElement(null, "child"));
+      fail("Child element should be removed");
+    }
+    catch (Exception e) {
+      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+    }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotRemoveANullChildElement() {
+    SpinXmlTreeElement child = XML("<child/>");
+    element.append(child);
+
+    element.remove(child, null);
+  }
+
+  @Test(expected = SpinXmlTreeElementException.class)
+  public void cannotRemoveNonChildElement() {
+    SpinXmlTreeElement child1 = XML("<child/>");
+    SpinXmlTreeElement child2 = XML("<child/>");
+
+    element.append(child1);
+
+    element.remove(child1, child2);
+  }
+
+  @Test
+  public void canRemoveMultipleChildElements() {
+    SpinXmlTreeElement child1 = XML("<child/>");
+    SpinXmlTreeElement child2 = XML("<child/>");
+    SpinXmlTreeElement child3 = XML("<child/>");
+    element.append(child1, child2, child3);
+
+    assertThat(element.childElements(null, "child")).hasSize(3);
+
+    element.remove(child1, child2, child3);
+
+    try {
+      assertThat(element.childElements(null, "child"));
+      fail("Child element should be removed");
+    }
+    catch (Exception e) {
+      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+    }
+  }
+
+  @Test
+  public void canRemoveChildElementCollection() {
+    SpinXmlTreeElement child1 = XML("<child/>");
+    SpinXmlTreeElement child2 = XML("<child/>");
+    SpinXmlTreeElement child3 = XML("<child/>");
+    element.append(child1, child2, child3);
+
+    assertThat(element.childElements(null, "child")).hasSize(3);
+
+    element.remove(element.childElements(null, "child"));
+
+    try {
+      assertThat(element.childElements(null, "child"));
+      fail("Child element should be removed");
+    }
+    catch (Exception e) {
+      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+    }
+
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotRemoveNullChildElements() {
+    element.remove((SpinXmlTreeElement[]) null);
   }
 
   // get child elements

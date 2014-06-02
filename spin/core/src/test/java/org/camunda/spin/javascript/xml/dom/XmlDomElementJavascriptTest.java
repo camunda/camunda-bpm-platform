@@ -13,12 +13,54 @@
 
 package org.camunda.spin.javascript.xml.dom;
 
+import org.camunda.spin.test.Script;
 import org.camunda.spin.test.ScriptEngine;
+import org.camunda.spin.test.ScriptVariable;
 import org.camunda.spin.xml.dom.XmlDomElementScriptTest;
+import org.junit.Test;
+
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML_FILE_NAME;
 
 /**
  * @author Sebastian Menski
  */
 @ScriptEngine("javascript")
 public class XmlDomElementJavascriptTest extends XmlDomElementScriptTest {
+
+  /**
+   * The Nashorn scripting engine cannot determine the method to call if the
+   * parameter is null.
+   */
+
+  @Test(expected = RuntimeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.appendChildElement",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "child", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotAppendNullChildElement() throws Throwable {
+    failingWithException();
+  }
+
+  /**
+   * The Nashorn scripting engine cannot determine the method to call if the
+   * parameter is null.
+   */
+  @Test(expected = RuntimeException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.removeChildElement",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "child", isNull = true),
+      @ScriptVariable(name = "child2", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotRemoveANullChildElement() throws Throwable {
+    failingWithException();
+  }
+
 }

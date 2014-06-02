@@ -237,24 +237,24 @@ public class ScriptRule implements TestRule {
    * Execute the script and add the given variables to the script variables.
    *
    * @param scriptVariables the variables to set additionally
-   * @return the variables map after execution of the script
+   * @return this script rule
    * @throws SpinScriptException if an error occurs during the script execution
    */
-  public Map<String, Object> execute(Map<String, Object> scriptVariables) {
+  public ScriptRule execute(Map<String, Object> scriptVariables) {
     variables.putAll(scriptVariables);
     executeScript();
-    return variables;
+    return this;
   }
 
   /**
    * Execute the script
    *
-   * @return the variables map after execution of the script
+   * @return this script rule
    * @throws SpinScriptException if an error occurs during the script execution
    */
-  public Map<String, Object> execute() {
+  public ScriptRule execute() {
     executeScript();
-    return variables;
+    return this;
   }
 
   /**
@@ -363,9 +363,11 @@ public class ScriptRule implements TestRule {
    * Set the variable with the given name
    * @param name the name of the variable
    * @param value value of the variable
+   * @return this script rule
    */
-  public void setVariable(String name, Object value) {
+  public ScriptRule setVariable(String name, Object value) {
     variables.put(name, value);
+    return this;
   }
 
 }

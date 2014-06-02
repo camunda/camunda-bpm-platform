@@ -21,6 +21,7 @@ import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.w3c.dom.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.camunda.spin.impl.util.SpinEnsure.*;
@@ -179,6 +180,11 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     return this;
   }
 
+  public SpinXmlTreeElement append(Collection<SpinXmlTreeElement> childElements) {
+    ensureNotNull("childElements", childElements);
+    return append(childElements.toArray(new SpinXmlTreeElement[childElements.size()]));
+  }
+
   public SpinXmlTreeElement appendBefore(SpinXmlTreeElement childElement, SpinXmlTreeElement existingChildElement) {
     ensureNotNull("childElement", childElement);
     ensureNotNull("existingChildElement", existingChildElement);
@@ -209,6 +215,22 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
       domElement.appendChild(childDomElement.domElement);
     }
     return this;
+  }
+
+  public SpinXmlTreeElement remove(SpinXmlTreeElement... childElements) {
+    ensureNotNull("childElements", childElements);
+    for (SpinXmlTreeElement childElement : childElements) {
+      ensureNotNull("childElement", childElement);
+      SpinXmlDomElement child = ensureParamInstanceOf("childElement", childElement, SpinXmlDomElement.class);
+      ensureChildElement(this, child);
+      domElement.removeChild(child.domElement);
+    }
+    return this;
+  }
+
+  public SpinXmlTreeElement remove(Collection<SpinXmlTreeElement> childElements) {
+    ensureNotNull("childElements", childElements);
+    return remove(childElements.toArray(new SpinXmlTreeElement[childElements.size()]));
   }
 
   /**

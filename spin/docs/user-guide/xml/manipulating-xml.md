@@ -64,7 +64,7 @@ import static org.camunda.spin.Spin.XML;
 
 String xml = "<order xmlns:cam=\"http://camunda.org/example\" id=\"order1\" cam:name=\"order1\" />";
 
-// All attribute names 
+// All attribute names
 List<String> names = XML(xml).attrNames();
 
 // All attribute names of a specific namespace
@@ -154,6 +154,37 @@ SpinXmlDomElement due = XML(xml).childElement("http://camunda.org/example", "due
 
 SpinCollection<SpinXmlDomElement> items = XML(xml).childElements("item");
 SpinCollection<SpinXmlDomElement> ops = XML(xml).childElements("http://camunda.org/example", "ops");
+```
+
+
+### Append child elements
+
+The method `append` is used to append a single or multiple child elements to a Xml element.
+
+```java
+import static org.camunda.spin.Spin.XML;
+
+SpinXmlTreeElement root = XML("<root/>");
+
+SpinXmlTreeElement child1 = XML("<child/>");
+SpinXmlTreeElement child2 = XML("<child/>");
+SpinXmlTreeElement child3 = XML("<child/>");
+
+root.append(child1, child2, child3);
+```
+
+
+### Remove child elements
+
+To remove child elements from a Xml element the method `remove` is used. It accepts
+a single or multiple child elements and removes them from the parent element.
+
+```java
+import static org.camunda.spin.Spin.XML;
+
+SpinXmlTreeElement root = XML("<root><child/><child/><child/></root>");
+
+root.remove(root.childElements("child"));
 ```
 
 

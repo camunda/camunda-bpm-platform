@@ -14,6 +14,7 @@ package org.camunda.spin.xml.tree;
 
 import org.camunda.spin.SpinList;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -196,6 +197,16 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
   public abstract SpinXmlTreeElement append(SpinXmlTreeElement... childElements);
 
   /**
+   * Appends child elements to this {@link SpinXmlTreeElement element}.
+   *
+   * @param childElements the child elements to append
+   * @return the wrapped {@link SpinXmlTreeElement element}
+   * @throws IllegalArgumentException if the childElements is null or one of them
+   * @throws SpinXmlTreeNodeException if the child element is null
+   */
+  public abstract SpinXmlTreeElement append(Collection<SpinXmlTreeElement> childElements);
+
+  /**
    * Appends a child element to this element before the existing child element.
    *
    * @param childElement the child element to append
@@ -217,4 +228,21 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    */
   public abstract SpinXmlTreeElement appendAfter(SpinXmlTreeElement childElement, SpinXmlTreeElement existingChildElement);
 
+  /**
+   * Removes all child elements from this element.
+   *
+   * @param childElements the child elements to remove
+   * @throws IllegalArgumentException if child elements is null or any of them
+   * @throws SpinXmlTreeElementException if one of the child elements does not exist
+   */
+  public abstract SpinXmlTreeElement remove(SpinXmlTreeElement... childElements);
+
+  /**
+   * Removes all child elements from this element.
+   *
+   * @param childElements the child elements to remove
+   * @throws IllegalArgumentException if child elements is null or any of them
+   * @throws SpinXmlTreeElementException if one of the child elements does not exist
+   */
+  public abstract SpinXmlTreeElement remove(Collection<SpinXmlTreeElement> childElements);
 }

@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.spin.Spin.S;
+import static org.camunda.spin.Spin.XML;
 import static org.camunda.spin.xml.XmlTestConstants.*;
 
 /**
@@ -844,6 +847,122 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     assertThat(childs.get(childs.size() - 1).name()).isEqualTo("child");
   }
 
+  // remove child elements
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.removeChildElement",
+    variables = {
+      @ScriptVariable(name = "input", isNull = true),
+      @ScriptVariable(name = "child2", isNull = true)
+    },
+    execute = false
+  )
+  public void canRemoveAChildElement() {
+    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    SpinXmlTreeElement child = XML("<child/>");
+    element.append(child);
+
+    element = script
+      .setVariable("element", element)
+      .setVariable("child", child)
+      .execute()
+      .getVariable("element");
+
+    try {
+      assertThat(element.childElement(null, "child"));
+      fail("Child element should be removed");
+    }
+    catch (Exception e) {
+      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+    }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.removeChildElement",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "child", isNull = true),
+      @ScriptVariable(name = "child2", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotRemoveANullChildElement() throws Throwable {
+    failingWithException();
+  }
+
+  @Test(expected = SpinXmlTreeElementException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.removeChildElement",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "child2", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotRemoveANonChildElement() throws Throwable {
+    script.setVariable("child", S("<child/>"));
+    failingWithException();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.removeChildElement",
+    variables = {
+      @ScriptVariable(name = "input", isNull = true)
+    },
+    execute = false
+  )
+  public void canRemoveMultipleChildElements() {
+    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    SpinXmlTreeElement child1 = XML("<child/>");
+    SpinXmlTreeElement child2 = XML("<child/>");
+    element.append(child1, child2);
+
+    element = script
+      .setVariable("element", element)
+      .setVariable("child", child1)
+      .setVariable("child2", child2)
+      .execute()
+      .getVariable("element");
+
+    try {
+      assertThat(element.childElement(null, "child"));
+      fail("Child elements should be removed");
+    }
+    catch (Exception e) {
+      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+    }
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.removeChildElement",
+    variables = {
+      @ScriptVariable(name = "input", isNull = true),
+      @ScriptVariable(name = "child2", isNull = true)
+    },
+    execute = false
+  )
+  public void canRemoveChildElementCollection() {
+    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    element.append(XML("<child/>"), XML("<child/>"), XML("<child/>"));
+
+    element = script
+      .setVariable("element", element)
+      .setVariable("child", element.childElements(null, "child"))
+      .execute()
+      .getVariable("element");
+
+    try {
+      assertThat(element.childElement(null, "child"));
+      fail("Child elements should be removed");
+    }
+    catch (Exception e) {
+      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+    }
+  }
 
   // get child elements
 
