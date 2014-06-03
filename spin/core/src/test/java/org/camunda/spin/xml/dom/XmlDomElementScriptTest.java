@@ -1103,4 +1103,139 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
+  // replace child element
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.replaceChildElement",
+    variables = {
+      @ScriptVariable(name = "input", isNull = true),
+      @ScriptVariable(name = "newChild", value = "<child/>")
+    },
+    execute = false
+  )
+  public void canReplaceAChildElement() {
+    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    SpinXmlTreeElement date = element.childElement("date");
+
+    element = script
+      .setVariable("element", element)
+      .setVariable("existingChild", date)
+      .execute()
+      .getVariable("element");
+
+    assertThat(element.childElement(null, "child")).isNotNull();
+    try {
+      element.childElement("date");
+    } catch (Exception e) {
+      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+    }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.replaceChildElement",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "existingChild", isNull = true),
+      @ScriptVariable(name = "newChild", value = "<child/>")
+    },
+    execute = false
+  )
+  public void cannotReplaceANullChildElement() throws Throwable {
+    failingWithException();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.replaceChildElement",
+    variables = {
+      @ScriptVariable(name = "input", isNull = true),
+      @ScriptVariable(name = "newChild", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotReplaceByANullChildElement() throws Throwable {
+    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    SpinXmlTreeElement date = element.childElement("date");
+
+    script
+      .setVariable("element", element)
+      .setVariable("existingChild", date);
+    failingWithException();
+  }
+
+  @Test(expected = SpinXmlTreeElementException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.replaceChildElement",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name = "newChild", value = "<child/>")
+    },
+    execute = false
+  )
+  public void cannotReplaceANoneChildElement() throws Throwable {
+    script.setVariable("existingChild", XML("<child/>"));
+    failingWithException();
+  }
+
+  // replace element
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.replaceElement",
+    variables = {
+      @ScriptVariable(name = "newElement", value = "<child/>")
+    },
+    execute = false
+  )
+  public void canReplaceElement() {
+    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    script
+      .setVariable("oldElement", element.childElement("date"))
+      .execute();
+
+    assertThat(element.childElement(null, "child")).isNotNull();
+    try {
+      element.childElement("date");
+    } catch (Exception e) {
+      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+    }
+
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.replaceElement",
+    variables = {
+      @ScriptVariable(name = "newElement", value = "<root/>")
+    },
+    execute = false
+  )
+  public void canReplaceRootElement() {
+    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    element = script
+      .setVariable("oldElement", element)
+      .execute()
+      .getVariable("element");
+
+    assertThat(element.name()).isEqualTo("root");
+    assertThat(element.childElements()).isEmpty();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.replaceElement",
+    variables = {
+      @ScriptVariable(name = "newElement", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotReplaceByNullElement() throws Throwable {
+    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    script
+      .setVariable("oldElement", element);
+    failingWithException();
+  }
+
 }

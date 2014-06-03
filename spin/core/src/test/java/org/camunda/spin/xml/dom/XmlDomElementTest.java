@@ -494,8 +494,7 @@ public class XmlDomElementTest {
     try {
       assertThat(element.childElement(null, "child"));
       fail("Child element should be removed");
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
     }
   }
@@ -532,8 +531,7 @@ public class XmlDomElementTest {
     try {
       assertThat(element.childElements(null, "child"));
       fail("Child element should be removed");
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
     }
   }
@@ -552,8 +550,7 @@ public class XmlDomElementTest {
     try {
       assertThat(element.childElements(null, "child"));
       fail("Child element should be removed");
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
     }
 
@@ -623,6 +620,77 @@ public class XmlDomElementTest {
   @Test(expected = IllegalArgumentException.class)
   public void cannotGetAllChildElementsByNullNamespaceAndNullName() {
     element.childElements(null, null);
+  }
+
+  // replace child element
+
+  @Test
+  public void canReplaceAChildElement() {
+    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlTreeElement date = element.childElement("date");
+    assertThat(date).isNotNull();
+
+    element.replaceChild(date, child);
+
+    assertThat(element.childElement(null, "child")).isNotNull();
+    try {
+      element.childElement("date");
+    } catch (Exception e) {
+      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+    }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotReplaceANullChildElement() {
+    SpinXmlTreeElement child = XML("<child/>");
+    element.replaceChild(null, child);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotReplaceByANullChildElement() {
+    SpinXmlTreeElement date = element.childElement("date");
+    element.replaceChild(date, null);
+  }
+
+  @Test(expected = SpinXmlTreeElementException.class)
+  public void cannotReplaceANonChildElement() {
+    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlTreeElement nonChild = XML("<child/>");
+    element.replaceChild(nonChild, child);
+  }
+
+
+  // replace element
+
+  @Test
+  public void canReplaceAElement() {
+    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlTreeElement date = element.childElement("date");
+    assertThat(date).isNotNull();
+
+    date.replace(child);
+
+    assertThat(element.childElement(null, "child")).isNotNull();
+    try {
+      element.childElement("date");
+    } catch (Exception e) {
+      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+    }
+  }
+
+  @Test
+  public void canReplaceRootElement() {
+    SpinXmlTreeElement root = XML("<root/>");
+    assertThat(element.name()).isEqualTo("customers");
+    assertThat(element.childElements()).isNotEmpty();
+    element = element.replace(root);
+    assertThat(element.name()).isEqualTo("root");
+    assertThat(element.childElements()).isEmpty();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotReplaceByNullElement() {
+    element.replace(null);
   }
 
 }

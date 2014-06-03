@@ -155,7 +155,14 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
   public SpinXmlTreeElement attrNs(String namespace, String attributeName, String value) {
     ensureNotNull("attributeName", attributeName);
     ensureNotNull("value", value);
-    domElement.setAttributeNS(namespace, attributeName, value);
+
+    try {
+      domElement.setAttributeNS(namespace, attributeName, value);
+    }
+    catch (DOMException e) {
+      throw LOG.unableToSetAttributeInImplementation(this, namespace, attributeName, value, e);
+    }
+
     return this;
   }
 
@@ -175,7 +182,12 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
       ensureNotNull("childElement", childElement);
       SpinXmlDomElement spinDomElement = ensureParamInstanceOf("childElement", childElement, SpinXmlDomElement.class);
       adoptElement(spinDomElement);
-      domElement.appendChild(spinDomElement.domElement);
+      try {
+        domElement.appendChild(spinDomElement.domElement);
+      }
+      catch (DOMException e) {
+        throw LOG.unableToAppendElementInImplementation(this, childElement, e);
+      }
     }
     return this;
   }
@@ -193,7 +205,14 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     ensureChildElement(this, existingChildDomElement);
 
     adoptElement(childDomElement);
-    domElement.insertBefore(childDomElement.domElement, existingChildDomElement.domElement);
+
+    try {
+      domElement.insertBefore(childDomElement.domElement, existingChildDomElement.domElement);
+    }
+    catch (DOMException e) {
+      throw LOG.unableToInsertElementInImplementation(this, childElement, e);
+    }
+
     return this;
   }
 
@@ -208,12 +227,18 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     adoptElement(childDomElement);
 
     Node nextSibling = existingChildDomElement.domElement.getNextSibling();
-    if (nextSibling != null) {
-      domElement.insertBefore(childDomElement.domElement, nextSibling);
+
+    try {
+      if (nextSibling != null) {
+        domElement.insertBefore(childDomElement.domElement, nextSibling);
+      } else {
+        domElement.appendChild(childDomElement.domElement);
+      }
     }
-    else {
-      domElement.appendChild(childDomElement.domElement);
+    catch (DOMException e) {
+      throw LOG.unableToInsertElementInImplementation(this, childElement, e);
     }
+
     return this;
   }
 
@@ -223,7 +248,12 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
       ensureNotNull("childElement", childElement);
       SpinXmlDomElement child = ensureParamInstanceOf("childElement", childElement, SpinXmlDomElement.class);
       ensureChildElement(this, child);
-      domElement.removeChild(child.domElement);
+      try {
+        domElement.removeChild(child.domElement);
+      }
+      catch (DOMException e) {
+        throw LOG.unableToRemoveChildInImplementation(this, childElement, e);
+      }
     }
     return this;
   }
@@ -231,6 +261,43 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
   public SpinXmlTreeElement remove(Collection<SpinXmlTreeElement> childElements) {
     ensureNotNull("childElements", childElements);
     return remove(childElements.toArray(new SpinXmlTreeElement[childElements.size()]));
+  }
+
+  public SpinXmlTreeElement replace(SpinXmlTreeElement newElement) {
+    ensureNotNull("newElement", newElement);
+    SpinXmlDomElement element = ensureParamInstanceOf("newElement", newElement, SpinXmlDomElement.class);
+    adoptElement(element);
+
+    Node parentNode = domElement.getParentNode();
+    if (parentNode == null) {
+      throw LOG.elementHasNoParent(this);
+    }
+
+    try {
+      parentNode.replaceChild(element.domElement, domElement);
+    }
+    catch (DOMException e) {
+      throw LOG.unableToReplaceElementInImplementation(this, newElement, e);
+    }
+    return element;
+  }
+
+  public SpinXmlTreeElement replaceChild(SpinXmlTreeElement existingChildElement, SpinXmlTreeElement newChildElement) {
+    ensureNotNull("existingChildElement", existingChildElement);
+    ensureNotNull("newChildElement", newChildElement);
+    ensureChildElement(this, (SpinXmlDomElement) existingChildElement);
+    SpinXmlDomElement existingChild = ensureParamInstanceOf("existingChildElement", existingChildElement, SpinXmlDomElement.class);
+    SpinXmlDomElement newChild = ensureParamInstanceOf("newChildElement", newChildElement, SpinXmlDomElement.class);
+    adoptElement(newChild);
+
+    try {
+      domElement.replaceChild(newChild.domElement, existingChild.domElement);
+    }
+    catch (DOMException e) {
+      throw LOG.unableToReplaceElementInImplementation(existingChild, newChildElement, e);
+    }
+
+    return this;
   }
 
   /**
@@ -245,7 +312,7 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     if (!document.equals(element.getOwnerDocument())) {
       Node node = document.adoptNode(element);
       if (node == null) {
-        throw LOG.unableToAdoptElement(elementToAdopt.namespace(), elementToAdopt.name());
+        throw LOG.unableToAdoptElement(elementToAdopt);
       }
     }
   }

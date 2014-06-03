@@ -12,10 +12,12 @@
  */
 package org.camunda.spin.impl.xml.dom;
 
-import org.camunda.spin.spi.SpinXmlDataFormatException;
 import org.camunda.spin.logging.SpinLogger;
+import org.camunda.spin.spi.SpinXmlDataFormatException;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
+import org.camunda.spin.xml.tree.SpinXmlTreeElementImplementationException;
 
 import java.util.NoSuchElementException;
 
@@ -62,11 +64,11 @@ public class XmlDomLogger extends SpinLogger {
   }
 
   public SpinXmlTreeAttributeException unableToSetAttributeValueToNull(String namespace, String attributeName) {
-    return new SpinXmlTreeAttributeException(exceptionMessage("010", "Unable to set value of attribute of namespace '{}' and '{}' to 'null'", namespace, attributeName));
+    return new SpinXmlTreeAttributeException(exceptionMessage("010", "Unable to set value of the attribute '{}:{}' to 'null'", namespace, attributeName));
   }
 
-  public SpinXmlTreeElementException unableToAdoptElement(String namespace, String name) {
-    return new SpinXmlTreeElementException(exceptionMessage("011", "Unable to adopt element with namespace '{}' and name '{}'", namespace, name));
+  public SpinXmlTreeElementException unableToAdoptElement(SpinXmlTreeElement elementToAdopt) {
+    return new SpinXmlTreeElementException(exceptionMessage("011", "Unable to adopt element '{}:{}'", elementToAdopt.namespace(), elementToAdopt.name()));
   }
 
   public UnsupportedOperationException methodNotSupportedByClass(String methodName, Class<?> implementationClass) {
@@ -75,5 +77,34 @@ public class XmlDomLogger extends SpinLogger {
 
   public NoSuchElementException iteratorHasNoMoreElements(Class<?> iteratorClass) {
     return new NoSuchElementException(exceptionMessage("013", "The iterator '{}' has no more elements", iteratorClass.getName()));
+  }
+
+  public SpinXmlTreeElementException elementHasNoParent(SpinXmlTreeElement element) {
+    return new SpinXmlTreeElementException(exceptionMessage("014", "The element '{}:{}' has no parent element.", element.namespace(), element.name()));
+  }
+
+  public SpinXmlTreeElementImplementationException unableToReplaceElementInImplementation(SpinXmlTreeElement existingElement, SpinXmlTreeElement newElement, Exception cause) {
+    return new SpinXmlTreeElementImplementationException(exceptionMessage("015", "Unable to replace the existing element '{}:{}' by the new element '{}:{}' in the underlying implementation",
+      existingElement.namespace(), existingElement.name(), newElement.namespace(), newElement.name()), cause);
+  }
+
+  public SpinXmlTreeElementImplementationException unableToSetAttributeInImplementation(SpinXmlTreeElement element, String namespace, String attributeName, String value, Exception cause) {
+    return new SpinXmlTreeElementImplementationException(exceptionMessage("016", "Unable to set attribute '{}:{}' to value '{}' on element '{}:{}' in the underlying implementation",
+      namespace, attributeName, value, element.namespace(), element.name()), cause);
+  }
+
+  public SpinXmlTreeElementImplementationException unableToAppendElementInImplementation(SpinXmlTreeElement element, SpinXmlTreeElement childElement, Exception cause) {
+    return new SpinXmlTreeElementImplementationException(exceptionMessage("017", "Unable to append new child element '{}:{}' to element '{}:{}' in the underlying implementation",
+      childElement.namespace(), childElement.name(), element.namespace(), element.name()), cause);
+  }
+
+  public SpinXmlTreeElementImplementationException unableToInsertElementInImplementation(SpinXmlTreeElement element, SpinXmlTreeElement childElement, Exception cause) {
+    return new SpinXmlTreeElementImplementationException(exceptionMessage("018", "Unable to insert new child element '{}:{}' to element '{}:{}' in the underlying implementation",
+      childElement.namespace(), childElement.name(), element.namespace(), element.name()), cause);
+  }
+
+  public SpinXmlTreeElementImplementationException unableToRemoveChildInImplementation(SpinXmlTreeElement element, SpinXmlTreeElement childElement, Exception cause) {
+    return new SpinXmlTreeElementImplementationException(exceptionMessage("019", "Unable to remove child element '{}:{}' from element '{}:{}' in the underlying implementation",
+      childElement.namespace(), childElement.name(), element.namespace(), element.name()), cause);
   }
 }

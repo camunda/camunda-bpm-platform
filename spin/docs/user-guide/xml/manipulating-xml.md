@@ -188,6 +188,24 @@ root.remove(root.childElements("child"));
 ```
 
 
+### Replace elements
+
+To replace an element or a child element the methods `replace` and `replaceChild`
+are used.
+
+```java
+import static org.camunda.spin.Spin.XML;
+
+SpinXmlTreeElement root = XML("<root><date/><order/></root>");
+
+SpinXmlTreeElement child1 = XML("<child/>");
+root.replaceChild(root.childElement("date"), child1);
+
+SpinXmlTreeElement child2 = XML("<child/>");
+root.childElement("order").replace(child2);
+```
+
+
 ## Manipulating Xml using a Script Language
 
 Xml can be manipulated from script languages in the same was as from Java. Since script languages
