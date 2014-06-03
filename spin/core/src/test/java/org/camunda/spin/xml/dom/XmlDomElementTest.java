@@ -14,6 +14,7 @@
 package org.camunda.spin.xml.dom;
 
 import org.camunda.spin.SpinList;
+import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
@@ -21,6 +22,7 @@ import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -691,6 +693,44 @@ public class XmlDomElementTest {
   @Test(expected = IllegalArgumentException.class)
   public void cannotReplaceByNullElement() {
     element.replace(null);
+  }
+
+  // test io
+
+  @Test
+  public void canWriteToString() {
+    assertThat(element.toString()).isXmlEqualTo(EXAMPLE_XML);
+  }
+
+  @Test
+  public void canWriteToStream() throws IOException {
+    OutputStream outputStream = element.toStream();
+    InputStream inputStream = IoUtil.convertOutputStreamToInputStream(outputStream);
+    String value = IoUtil.getStringFromInputStream(inputStream, false);
+    assertThat(value).isXmlEqualTo(EXAMPLE_XML);
+
+
+    outputStream = new ByteArrayOutputStream();
+    element.writeToStream(outputStream);
+    inputStream = IoUtil.convertOutputStreamToInputStream(outputStream);
+    value = IoUtil.getStringFromInputStream(inputStream, false);
+    assertThat(value).isXmlEqualTo(EXAMPLE_XML);
+  }
+
+  @Test
+  public void canWriteToWriter() {
+    StringWriter writer = element.writeToWriter(new StringWriter());
+    String value = writer.toString();
+    assertThat(value).isXmlEqualTo(EXAMPLE_XML);
+  }
+
+  @Test
+  public void canWriteToStreamAndReadAgain() {
+    OutputStream outputStream = element.toStream();
+    InputStream inputStream = IoUtil.convertOutputStreamToInputStream(outputStream);
+    SpinXmlTreeElement xml = XML(inputStream);
+    assertThat(xml).isNotNull();
+    assertThat(xml.childElements()).isNotEmpty();
   }
 
 }

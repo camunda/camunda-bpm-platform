@@ -18,8 +18,16 @@ import org.camunda.spin.impl.SpinListImpl;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
+import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
 import org.w3c.dom.*;
 
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,6 +42,8 @@ import static org.camunda.spin.impl.util.SpinEnsure.*;
 public class SpinXmlDomElement extends SpinXmlTreeElement {
 
   private final static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
+
+  protected static Transformer cachedTransformer = null;
 
   protected final Element domElement;
 
@@ -316,5 +326,61 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
       }
     }
   }
+
+  public String toString() {
+    return writeToWriter(new StringWriter()).toString();
+  }
+
+  public OutputStream toStream() {
+    return writeToStream(new ByteArrayOutputStream());
+  }
+
+  public <T extends OutputStream> T writeToStream(T outputStream) {
+    writeToStreamResult(new StreamResult(outputStream));
+    return outputStream;
+  }
+
+  public <T extends Writer> T writeToWriter(T writer) {
+    writeToStreamResult(new StreamResult(writer));
+    return writer;
+  }
+
+  /**
+   * Writes the dom element to a stream result.
+   *
+   * @param streamResult the stream result to transform in
+   * @throws SpinXmlTreeElementException if the element cannot be transformed or no new transformer can be created
+   */
+  protected void writeToStreamResult(StreamResult streamResult) {
+    DOMSource domSource = new DOMSource(domElement);
+    try {
+      getTransformer().transform(domSource, streamResult);
+    } catch (TransformerException e) {
+      throw LOG.unableToTransformElement(this, e);
+    }
+  }
+
+  /**
+   * Returns a configured transformer to write XML. Creates a new one
+   * if non is cached.
+   *
+   * @return the XML configured transformer
+   * @throws SpinXmlTreeElementException if no new transformer can be created
+   */
+  protected Transformer getTransformer() {
+    if (cachedTransformer == null) {
+      TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      try {
+        cachedTransformer = transformerFactory.newTransformer();
+      } catch (TransformerConfigurationException e) {
+        throw LOG.unableToCreateTransformer(e);
+      }
+      cachedTransformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+      cachedTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      cachedTransformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+    }
+    return cachedTransformer;
+  }
+
 
 }

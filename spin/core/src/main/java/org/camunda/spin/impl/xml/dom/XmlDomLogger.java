@@ -14,10 +14,7 @@ package org.camunda.spin.impl.xml.dom;
 
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.SpinXmlDataFormatException;
-import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
-import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
-import org.camunda.spin.xml.tree.SpinXmlTreeElementImplementationException;
+import org.camunda.spin.xml.tree.*;
 
 import java.util.NoSuchElementException;
 
@@ -106,5 +103,17 @@ public class XmlDomLogger extends SpinLogger {
   public SpinXmlTreeElementImplementationException unableToRemoveChildInImplementation(SpinXmlTreeElement element, SpinXmlTreeElement childElement, Exception cause) {
     return new SpinXmlTreeElementImplementationException(exceptionMessage("019", "Unable to remove child element '{}:{}' from element '{}:{}' in the underlying implementation",
       childElement.namespace(), childElement.name(), element.namespace(), element.name()), cause);
+  }
+
+  public SpinXmlTreeAttributeException unableToWriteAttribute(SpinXmlTreeAttribute attribute, Exception cause) {
+    return new SpinXmlTreeAttributeException(exceptionMessage("020", "Unable to write attribute '{}:{}'", attribute.namespace(), attribute.name()), cause);
+  }
+
+  public SpinXmlTreeElementException unableToCreateTransformer(Exception cause) {
+    return new SpinXmlTreeElementException(exceptionMessage("021", "Unable to create a transformer to write element"), cause);
+  }
+
+  public SpinXmlTreeElementException unableToTransformElement(SpinXmlTreeElement element, Exception cause) {
+    return new SpinXmlTreeElementException(exceptionMessage("022", "Unable to transform element '{}:{}'", element.namespace(), element.name()), cause);
   }
 }

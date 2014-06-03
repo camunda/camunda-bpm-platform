@@ -21,7 +21,7 @@ import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML_FILE_NAME;
 
 /**
  * @author Sebastian Menski
@@ -32,7 +32,7 @@ public abstract class XmlDomAttributeScriptTest extends ScriptTest {
   @Script(
     name = "XmlDomAttributeScriptTest.testAttribute",
     variables = {
-      @ScriptVariable(name = "input", value = EXAMPLE_XML),
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
       @ScriptVariable(name = "attributeName", value = "order"),
       @ScriptVariable(name = "valueToSet", value = "order2")
     }
@@ -49,7 +49,7 @@ public abstract class XmlDomAttributeScriptTest extends ScriptTest {
   @Script(
     name = "XmlDomAttributeScriptTest.testAttribute",
     variables = {
-      @ScriptVariable(name = "input", value = EXAMPLE_XML),
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
       @ScriptVariable(name = "attributeName", value = "order"),
       @ScriptVariable(name = "valueToSet", isNull = true)
     },
@@ -63,7 +63,7 @@ public abstract class XmlDomAttributeScriptTest extends ScriptTest {
   @Script(
     name = "XmlDomAttributeScriptTest.removeAttribute",
     variables = {
-      @ScriptVariable(name = "input", value = EXAMPLE_XML),
+      @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME),
       @ScriptVariable(name = "attributeName", value = "order")
     }
   )

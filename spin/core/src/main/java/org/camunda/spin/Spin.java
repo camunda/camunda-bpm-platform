@@ -16,6 +16,9 @@ import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.SpinDataFormatException;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 
+import java.io.OutputStream;
+import java.io.Writer;
+
 /**
  *
  * @author Sebastian Menski
@@ -78,5 +81,35 @@ public abstract class Spin<T extends Spin<?>> {
    * @return the object wrapped by this wrapper.
    */
   public abstract Object unwrap();
+
+  /**
+   * Returns the wrapped object as string representation.
+   *
+   * @return the string representation
+   */
+  public abstract String toString();
+
+  /**
+   * Returns the wrapped object as output stream.
+   *
+   * @return the output stream
+   */
+  public abstract OutputStream toStream();
+
+  /**
+   * Writes the wrapped object to a existing stream.
+   *
+   * @param outputStream the stream to write to
+   * @return the stream after the object was written
+   */
+  public abstract <S extends OutputStream> S writeToStream(S outputStream);
+
+  /**
+   * Writes the wrapped object to a existing writer.
+   *
+   * @param writer the writer to write to
+   * @return the Writer after the object was written
+   */
+  public abstract <W extends Writer> W writeToWriter(W writer);
 
 }

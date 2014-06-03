@@ -19,7 +19,6 @@ import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML;
 import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML_FILE_NAME;
 
 /**
@@ -30,7 +29,7 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
 
   @Test
   @Script
-  @ScriptVariable(name="input", value=EXAMPLE_XML)
+  @ScriptVariable(name="input", value = "<root/>")
   public void shouldCreateForString() {
 
     SpinXmlTreeElement xml1 = script.getVariable("xml1");
@@ -47,9 +46,9 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
   @Test
   @Script(
     variables = {
-      @ScriptVariable(name="input1", file=EXAMPLE_XML_FILE_NAME),
-      @ScriptVariable(name="input2", file=EXAMPLE_XML_FILE_NAME),
-      @ScriptVariable(name="input3", file=EXAMPLE_XML_FILE_NAME)
+      @ScriptVariable(name="input1", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name="input2", file = EXAMPLE_XML_FILE_NAME),
+      @ScriptVariable(name="input3", file = EXAMPLE_XML_FILE_NAME)
     }
   )
   public void shouldCreateForInputStream() {
@@ -67,7 +66,7 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
 
   @Test
   @Script
-  @ScriptVariable(name="input", value=EXAMPLE_XML)
+  @ScriptVariable(name="input", file = EXAMPLE_XML_FILE_NAME)
   public void shouldBeIdempotent() {
 
     SpinXmlTreeElement xml = script.getVariable("xml");

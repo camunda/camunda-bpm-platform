@@ -12,21 +12,15 @@
  */
 package org.camunda.spin.impl.util;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import org.camunda.spin.SpinFileNotFoundException;
+import org.camunda.spin.SpinRuntimeException;
+import org.camunda.spin.logging.SpinCoreLogger;
+import org.camunda.spin.logging.SpinLogger;
+
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
-
-import org.camunda.spin.SpinFileNotFoundException;
-import org.camunda.spin.logging.SpinCoreLogger;
-import org.camunda.spin.logging.SpinLogger;
 
 /**
  * @author Daniel Meyer
@@ -35,6 +29,16 @@ import org.camunda.spin.logging.SpinLogger;
 public class IoUtil {
 
   private final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
+
+  public static void closeSilently(Closeable closeable) {
+    try {
+      if (closeable != null) {
+        closeable.close();
+      }
+    } catch (Exception e) {
+      // ignored
+    }
+  }
 
   public static String fileAsString(File file) {
     try {
@@ -64,13 +68,7 @@ public class IoUtil {
       throw LOG.unableToReadInputStream(e);
     }
     finally {
-      if (inputStream != null) {
-        try {
-          inputStream.close();
-        } catch (IOException e) {
-          // ignore
-        }
-      }
+      closeSilently(inputStream);
     }
   }
 
@@ -98,7 +96,7 @@ public class IoUtil {
    * Returns the {@link File} for a filename.
    *
    * @param filename the filename to load
-   * @param description the description of the test method
+   * @param classLoader the classLoader to load file with
    * @return the file object
    * @throws SpinFileNotFoundException if the file cannot be loaded
    */
@@ -127,6 +125,59 @@ public class IoUtil {
   public static InputStream getFileAsStream(String filename) {
     File classpathFile = getClasspathFile(filename);
     return fileAsStream(classpathFile);
+  }
+
+  /**
+   * Converts a {@link OutputStream} to an {@link InputStream} by coping the data directly.
+   * WARNING: Do not use for large data (>100MB). Only for testing purpose.
+   *
+   * @param outputStream the {@link OutputStream} to convert
+   * @return the resulting {@link InputStream}
+   */
+  public static InputStream convertOutputStreamToInputStream(OutputStream outputStream) {
+    byte[] data = ((ByteArrayOutputStream) outputStream).toByteArray();
+    return new ByteArrayInputStream(data);
+  }
+
+  /**
+   * Convert an {@link InputStream} to a {@link String}
+   *
+   * @param inputStream the {@link InputStream} to convert
+   * @return the resulting {@link String}
+   * @throws IOException
+   */
+  public static String getStringFromInputStream(InputStream inputStream) throws IOException {
+    return getStringFromInputStream(inputStream, true);
+  }
+
+  /**
+   * Convert an {@link InputStream} to a {@link String}
+   *
+   * @param inputStream the {@link InputStream} to convert
+   * @param trim trigger if whitespaces are trimmed in the output
+   * @return the resulting {@link String}
+   * @throws IOException
+   */
+  public static String getStringFromInputStream(InputStream inputStream, boolean trim) throws IOException {
+    BufferedReader bufferedReader = null;
+    StringBuilder stringBuilder = new StringBuilder();
+    try {
+      bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+      String line;
+      while ((line = bufferedReader.readLine()) != null) {
+        if (trim) {
+          stringBuilder.append(line.trim());
+        }
+        else {
+          stringBuilder.append(line).append("\n");
+        }
+      }
+    }
+    finally {
+      closeSilently(bufferedReader);
+    }
+
+    return stringBuilder.toString();
   }
 
 }

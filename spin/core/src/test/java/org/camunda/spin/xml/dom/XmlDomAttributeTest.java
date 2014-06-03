@@ -13,12 +13,15 @@
 
 package org.camunda.spin.xml.dom;
 
+import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.xml.XmlTestConstants;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.spin.Spin.XML;
@@ -72,6 +75,29 @@ public class XmlDomAttributeTest {
 
     SpinXmlTreeElement element = attribute.remove();
     assertThat(element.hasAttrNs(namespace, name)).isFalse();
+  }
+
+  // test io
+
+  @Test
+  public void canWriteToString() {
+    assertThat(attribute.toString()).isEqualTo("order1");
+  }
+
+  @Test
+  public void canWriteToStream() throws IOException {
+    OutputStream outputStream = attribute.toStream();
+    attribute.writeToStream(outputStream);
+    InputStream inputStream = IoUtil.convertOutputStreamToInputStream(outputStream);
+    String value = IoUtil.getStringFromInputStream(inputStream);
+    assertThat(value).isEqualTo("order1order1");
+  }
+
+  @Test
+  public void canWriteToWriter() {
+    StringWriter writer = attribute.writeToWriter(new StringWriter());
+    String value = writer.toString();
+    assertThat(value).isEqualTo("order1");
   }
 
 }

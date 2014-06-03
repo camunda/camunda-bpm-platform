@@ -19,6 +19,12 @@ import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.nio.charset.Charset;
+
 /**
  * Wrapper of a xml dom attribute.
  *
@@ -85,6 +91,33 @@ public class SpinXmlDomAttribute extends SpinXmlTreeAttribute {
     Element ownerElement = attributeNode.getOwnerElement();
     ownerElement.removeAttributeNode(attributeNode);
     return dataFormat.createElementWrapper(ownerElement);
+  }
+
+  public String toString() {
+    return value();
+  }
+
+  public OutputStream toStream() {
+    return writeToStream(new ByteArrayOutputStream());
+  }
+
+  public <T extends OutputStream> T writeToStream(T outputStream) {
+    byte[] bytes = toString().getBytes(Charset.forName("UTF-8"));
+    try {
+      outputStream.write(bytes);
+    } catch (IOException e) {
+      throw LOG.unableToWriteAttribute(this, e);
+    }
+    return outputStream;
+  }
+
+  public <T extends Writer> T writeToWriter(T writer) {
+    try {
+      writer.write(toString());
+    } catch (IOException e) {
+      throw LOG.unableToWriteAttribute(this, e);
+    }
+    return writer;
   }
 
 }

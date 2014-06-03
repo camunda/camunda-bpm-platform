@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <customers xmlns="http://camunda.org/example" xmlns:ex="http://camunda.org/example" order="order1" ex:dueUntil="20150112">
   <date name="20140512" />
   <file xmlns=""/>

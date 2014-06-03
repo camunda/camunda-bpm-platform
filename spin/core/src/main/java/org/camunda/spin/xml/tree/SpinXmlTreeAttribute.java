@@ -12,6 +12,9 @@
  */
 package org.camunda.spin.xml.tree;
 
+import java.io.OutputStream;
+import java.io.Writer;
+
 /**
  * An attribute in a tree-oriented XML data format.
  *
@@ -43,5 +46,35 @@ public abstract class SpinXmlTreeAttribute extends SpinXmlTreeNode<SpinXmlTreeAt
    * @return the wrapped owner {@link SpinXmlTreeElement tree element}
    */
   public abstract SpinXmlTreeElement remove();
+
+  /**
+   * Returns the wrapped XML attribute value as string representation.
+   *
+   * @return the string representation
+   */
+  public abstract String toString();
+
+  /**
+   * Returns the wrapped XML attribute value as output stream.
+   *
+   * @return the output stream
+   */
+  public abstract OutputStream toStream();
+
+  /**
+   * Writes the wrapped XML attribute value to a existing stream.
+   *
+   * @param outputStream the stream to write to
+   * @return the stream after the object was written
+   */
+  public abstract <S extends OutputStream> S writeToStream(S outputStream);
+
+  /**
+   * Writes the wrapped XML attribute value to a existing writer.
+   *
+   * @param writer the writer to write to
+   * @return the Writer after the object was written
+   */
+  public abstract <W extends Writer> W writeToWriter(W writer);
 
 }

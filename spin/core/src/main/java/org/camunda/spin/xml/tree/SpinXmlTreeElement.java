@@ -14,6 +14,8 @@ package org.camunda.spin.xml.tree;
 
 import org.camunda.spin.SpinList;
 
+import java.io.OutputStream;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
 
@@ -277,4 +279,37 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
    */
   public abstract SpinXmlTreeElement replaceChild(SpinXmlTreeElement existingChildElement, SpinXmlTreeElement newChildElement);
 
+  /**
+   * Returns the wrapped XML element as string representation.
+   *
+   * @return the string representation
+   * @throws SpinXmlTreeElementException if the element cannot be transformed or no new transformer can be created
+   */
+  public abstract String toString();
+
+  /**
+   * Returns the wrapped XML element as output stream.
+   *
+   * @return the output stream
+   * @throws SpinXmlTreeElementException if the element cannot be transformed or no new transformer can be created
+   */
+  public abstract OutputStream toStream();
+
+  /**
+   * Writes the wrapped XML element to a existing stream.
+   *
+   * @param outputStream the stream to write to
+   * @return the stream after the object was written
+   * @throws SpinXmlTreeElementException if the element cannot be transformed or no new transformer can be created
+   */
+  public abstract <S extends OutputStream> S writeToStream(S outputStream);
+
+  /**
+   * Writes the wrapped XML element to a existing writer.
+   *
+   * @param writer the writer to write to
+   * @return the Writer after the object was written
+   * @throws SpinXmlTreeElementException if the element cannot be transformed or no new transformer can be created
+   */
+  public abstract <W extends Writer> W writeToWriter(W writer);
 }
