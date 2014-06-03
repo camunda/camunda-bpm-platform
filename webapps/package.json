@@ -1,11 +1,12 @@
 {
   "private": true,
   "name": "camunda-tasklist",
-  "version": "0.0.1",
+  "version": "7.2.0-SNAPSHOT",
   "description": "A web based interface for camunda BPM platform tasks.",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha --recursive test/*Spec.js"
+    "test": "./node_modules/grunt-cli/bin/grunt jasmine_node",
+    "postinstall": "./node_modules/grunt-cli/bin/grunt build:prod"
   },
   "repository": {
     "type": "git",
@@ -56,6 +57,7 @@
     "grunt-seleniuminstall": "camunda-third-party/grunt-seleniuminstall.git",
     "cheerio": "~0.16.0",
     "q": "~1.0.1",
-    "jquery": "~2.1.1"
+    "jquery": "~2.1.1",
+    "grunt-cli": "~0.1.13"
   }
 }
