@@ -13,7 +13,6 @@
 
 package org.camunda.spin.impl.xml.dom;
 
-import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -28,16 +27,18 @@ import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
  */
 public class SpinXmlDomElementIterable implements Iterable<SpinXmlTreeElement> {
 
-  private final static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
-
-  protected final Element domElement;
+  protected final NodeList nodeList;
   protected final XmlDomDataFormat dataFormat;
   protected final String namespace;
   protected final String name;
   protected boolean validating;
 
   public SpinXmlDomElementIterable(Element domElement, XmlDomDataFormat dataFormat) {
-    this.domElement = domElement;
+    this(domElement.getChildNodes(), dataFormat);
+  }
+
+  public SpinXmlDomElementIterable(NodeList nodeList, XmlDomDataFormat dataFormat) {
+    this.nodeList = nodeList;
     this.dataFormat = dataFormat;
     this.namespace = null;
     this.name = null;
@@ -45,8 +46,12 @@ public class SpinXmlDomElementIterable implements Iterable<SpinXmlTreeElement> {
   }
 
   public SpinXmlDomElementIterable(Element domElement, XmlDomDataFormat dataFormat, String namespace, String name) {
+    this(domElement.getChildNodes(), dataFormat, namespace, name);
+  }
+
+  public SpinXmlDomElementIterable(NodeList nodeList, XmlDomDataFormat dataFormat, String namespace, String name) {
     ensureNotNull("name", name);
-    this.domElement = domElement;
+    this.nodeList = nodeList;
     this.dataFormat = dataFormat;
     this.namespace = namespace;
     this.name = name;
@@ -54,12 +59,15 @@ public class SpinXmlDomElementIterable implements Iterable<SpinXmlTreeElement> {
   }
 
   public Iterator<SpinXmlTreeElement> iterator() {
-    return new Iterator<SpinXmlTreeElement>() {
+    return new SpinXmlDomNodeIterator<SpinXmlTreeElement>() {
 
-      private int index = 0;
-      private NodeList childs = domElement.getChildNodes();
+      private NodeList childs = nodeList;
 
-      private SpinXmlTreeElement getCurrent() {
+      protected int getLength() {
+        return childs.getLength();
+      }
+
+      protected SpinXmlTreeElement getCurrent() {
         if (childs != null) {
           Node item = childs.item(index);
           if (item != null && item instanceof Element) {
@@ -71,31 +79,8 @@ public class SpinXmlDomElementIterable implements Iterable<SpinXmlTreeElement> {
         }
         return null;
       }
-
-      public boolean hasNext() {
-        for (; index < childs.getLength(); index++) {
-          if (getCurrent() != null) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      public SpinXmlTreeElement next() {
-        if (hasNext()) {
-          SpinXmlTreeElement current = getCurrent();
-          index++;
-          return current;
-        }
-        else {
-          throw LOG.iteratorHasNoMoreElements(SpinXmlDomElementIterable.class);
-        }
-      }
-
-      public void remove() {
-        throw LOG.methodNotSupportedByClass("remove", SpinXmlDomElementIterable.class);
-      }
     };
+
   }
 
 }

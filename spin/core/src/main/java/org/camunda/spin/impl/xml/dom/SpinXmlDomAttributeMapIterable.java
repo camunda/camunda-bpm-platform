@@ -15,29 +15,30 @@ package org.camunda.spin.impl.xml.dom;
 
 import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
 import org.w3c.dom.Attr;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 
 import java.util.Iterator;
 
 /**
  * @author Sebastian Menski
  */
-public class SpinXmlDomAttributeIterable implements Iterable<SpinXmlTreeAttribute> {
+public class SpinXmlDomAttributeMapIterable implements Iterable<SpinXmlTreeAttribute> {
 
-  protected final NodeList nodeList;
+  protected final Element domElement;
   protected final XmlDomDataFormat dataFormat;
   protected final String namespace;
   protected final boolean validating;
 
-  public SpinXmlDomAttributeIterable(NodeList nodeList, XmlDomDataFormat dataFormat) {
-    this.nodeList = nodeList;
+  public SpinXmlDomAttributeMapIterable(Element domElement, XmlDomDataFormat dataFormat) {
+    this.domElement = domElement;
     this.dataFormat = dataFormat;
     this.namespace = null;
     validating = false;
   }
 
-  public SpinXmlDomAttributeIterable(NodeList nodeList, XmlDomDataFormat dataFormat, String namespace) {
-    this.nodeList = nodeList;
+  public SpinXmlDomAttributeMapIterable(Element domElement, XmlDomDataFormat dataFormat, String namespace) {
+    this.domElement = domElement;
     this.dataFormat = dataFormat;
     this.namespace = namespace;
     validating = true;
@@ -46,7 +47,7 @@ public class SpinXmlDomAttributeIterable implements Iterable<SpinXmlTreeAttribut
   public Iterator<SpinXmlTreeAttribute> iterator() {
     return new SpinXmlDomNodeIterator<SpinXmlTreeAttribute>() {
 
-      private NodeList attributes = nodeList;
+      private NamedNodeMap attributes = domElement.getAttributes();
 
       protected int getLength() {
         return attributes.getLength();

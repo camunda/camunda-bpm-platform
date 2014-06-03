@@ -5,9 +5,9 @@ The Xml datatype supports writing Xml to Strings, output streams or writers.
 ## Writing to a String:
 
 ```java
-import static org.camunda.spin.Spin.S;
+import static org.camunda.spin.Spin.XML;
 
-SpinXmlTreeElement element = S("<root id=\"test\"/>");
+SpinXmlTreeElement element = XML("<root id=\"test\"/>");
 
 String xml = element.toString();
 
@@ -18,9 +18,9 @@ String value = element.attr("id").toString();
 ## Writing to a output stream:
 
 ```java
-import static org.camunda.spin.Spin.S;
+import static org.camunda.spin.Spin.XML;
 
-SpinXmlTreeElement element = S("<root id=\"test\"/>");
+SpinXmlTreeElement element = XML("<root id=\"test\"/>");
 
 OutputStream ouputStream = element.toStream();
 
@@ -38,9 +38,9 @@ attr.writeToStream(outputStream);
 ## Write to writer
 
 ```java
-import static org.camunda.spin.Spin.S;
+import static org.camunda.spin.Spin.XML;
 
-SpinXmlTreeElement element = S("<root id=\"test\"/>");
+SpinXmlTreeElement element = XML("<root id=\"test\"/>");
 
 StringWriter writer = element.writeToWriter(new StringWriter());
 

@@ -16,6 +16,7 @@ import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.SpinXmlDataFormatException;
 import org.camunda.spin.xml.tree.*;
 
+import javax.xml.xpath.XPathExpressionException;
 import java.util.NoSuchElementException;
 
 /**
@@ -115,5 +116,17 @@ public class XmlDomLogger extends SpinLogger {
 
   public SpinXmlTreeElementException unableToTransformElement(SpinXmlTreeElement element, Exception cause) {
     return new SpinXmlTreeElementException(exceptionMessage("022", "Unable to transform element '{}:{}'", element.namespace(), element.name()), cause);
+  }
+
+  public SpinXmlTreeXPathException unableToCompileXPathQuery(String expression, XPathExpressionException cause) {
+    return new SpinXmlTreeXPathException(exceptionMessage("023", "Unable to compile xPath query '{}'", expression), cause);
+  }
+
+  public SpinXmlTreeXPathException unableToEvaluateXPathExpressionOnElement(SpinXmlTreeElement element, Exception cause) {
+    return new SpinXmlTreeXPathException(exceptionMessage("024", "Unable to evaluate XPath expression on element '{}:{}'", element.namespace(), element.name()), cause);
+  }
+
+  public SpinXmlTreeXPathException unableToCastXPathResultTo(Class<?> castClass, Exception cause) {
+    return new SpinXmlTreeXPathException(exceptionMessage("025", "Unable to cast XPath expression to class '{}'", castClass.getName()), cause);
   }
 }

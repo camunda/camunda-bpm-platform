@@ -280,6 +280,14 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
   public abstract SpinXmlTreeElement replaceChild(SpinXmlTreeElement existingChildElement, SpinXmlTreeElement newChildElement);
 
   /**
+   * Creates a XPath query on this element.
+   *
+   * @param expression the XPath expression
+   * @return the XPath query
+   */
+  public abstract SpinXmlTreeXPathQuery xPath(String expression);
+
+  /**
    * Returns the wrapped XML element as string representation.
    *
    * @return the string representation

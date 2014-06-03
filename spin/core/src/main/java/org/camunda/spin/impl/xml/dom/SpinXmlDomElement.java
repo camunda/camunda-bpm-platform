@@ -19,11 +19,13 @@ import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
+import org.camunda.spin.xml.tree.SpinXmlTreeXPathQuery;
 import org.w3c.dom.*;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.*;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
@@ -45,8 +47,9 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
 
   protected static Transformer cachedTransformer = null;
 
-  protected final Element domElement;
+  protected static XPathFactory cachedXPathFactory;
 
+  protected final Element domElement;
   protected final XmlDomDataFormat dataFormat;
 
   public SpinXmlDomElement(Element domElement, XmlDomDataFormat dataFormat) {
@@ -103,11 +106,11 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
   }
 
   public SpinList<SpinXmlTreeAttribute> attrs() {
-    return new SpinListImpl<SpinXmlTreeAttribute>(new SpinXmlDomAttributeIterable(domElement, dataFormat));
+    return new SpinListImpl<SpinXmlTreeAttribute>(new SpinXmlDomAttributeMapIterable(domElement, dataFormat));
   }
 
   public SpinList<SpinXmlTreeAttribute> attrs(String namespace) {
-    return new SpinListImpl<SpinXmlTreeAttribute>(new SpinXmlDomAttributeIterable(domElement, dataFormat, namespace));
+    return new SpinListImpl<SpinXmlTreeAttribute>(new SpinXmlDomAttributeMapIterable(domElement, dataFormat, namespace));
   }
 
   public List<String> attrNames() {
@@ -310,6 +313,15 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     return this;
   }
 
+  public SpinXmlTreeXPathQuery xPath(String expression) {
+    try {
+      XPathExpression query = getXPathFactory().newXPath().compile(expression);
+      return new SpinXmlDomXPathQuery(this, query, dataFormat);
+    } catch (XPathExpressionException e) {
+      throw LOG.unableToCompileXPathQuery(expression, e);
+    }
+  }
+
   /**
    * Adopts a xml dom element to the owner document of this element if necessary.
    *
@@ -382,5 +394,16 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     return cachedTransformer;
   }
 
+  /**
+   * Returns a XPath Factory
+   *
+   * @return the XPath factory
+   */
+  protected XPathFactory getXPathFactory() {
+    if (cachedXPathFactory == null) {
+      cachedXPathFactory = XPathFactory.newInstance();
+    }
+    return cachedXPathFactory;
+  }
 
 }
