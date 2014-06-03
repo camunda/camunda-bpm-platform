@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * An element in a tree-oriented XML data format.
  *
  * @author Sebastian Menski
  * @author Daniel Meyer

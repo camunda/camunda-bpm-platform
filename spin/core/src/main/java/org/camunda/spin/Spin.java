@@ -12,7 +12,6 @@
  */
 package org.camunda.spin;
 
-import org.camunda.spin.impl.xml.dom.SpinXmlDomElement;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.SpinDataFormatException;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;

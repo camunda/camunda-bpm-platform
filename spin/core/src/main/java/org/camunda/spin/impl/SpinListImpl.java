@@ -24,6 +24,8 @@ import java.util.Collection;
  */
 public class SpinListImpl<E extends Spin<?>> extends ArrayList<E> implements SpinList<E> {
 
+  private static final long serialVersionUID = 1L;
+
   public SpinListImpl() {
     super();
   }

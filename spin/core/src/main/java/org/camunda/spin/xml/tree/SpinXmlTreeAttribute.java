@@ -13,6 +13,7 @@
 package org.camunda.spin.xml.tree;
 
 /**
+ * An attribute in a tree-oriented XML data format.
  *
  * @author Sebastian  Menski
  * @author Daniel Meyer

@@ -20,6 +20,8 @@ package org.camunda.spin.xml.tree;
  */
 public class SpinXmlTreeElementException extends SpinXmlTreeNodeException {
 
+  private static final long serialVersionUID = 1L;
+
   public SpinXmlTreeElementException(String message) {
     super(message);
   }

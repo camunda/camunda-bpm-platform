@@ -15,6 +15,7 @@ package org.camunda.spin.xml.tree;
 import org.camunda.spin.Spin;
 
 /**
+ * An element in a tree-oriented XML data format.
  *
  * @author Sebastian Menski
  * @author Daniel Meyer
