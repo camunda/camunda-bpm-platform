@@ -7,7 +7,7 @@ module.exports = function(config) {
   config = config || {};
 
   var deps = [
-    './../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require',
+    './../node_modules/requirejs/require',
     'angular',
     'moment',
     'angular-bootstrap',
