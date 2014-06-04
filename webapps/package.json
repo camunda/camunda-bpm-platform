@@ -5,8 +5,8 @@
   "description": "A web based interface for camunda BPM platform tasks.",
   "main": "client/scripts/index.js",
   "scripts": {
-    "test": "./node_modules/grunt-cli/bin/grunt jasmine_node",
-    "postinstall": "./node_modules/grunt-cli/bin/grunt build:prod"
+    "test": "grunt jasmine_node",
+    "postinstall": "grunt build:prod"
   },
   "repository": {
     "type": "git",
