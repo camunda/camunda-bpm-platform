@@ -19,14 +19,14 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionManager;
 
 /**
  * @author Roman Smirnov
@@ -65,6 +65,8 @@ public class CmmnDeployer implements Deployer {
       if (keys.contains(key)) {
         throw new ProcessEngineException("The deployment contains case definitions with the same key '" + key + "' (case id attribute), this is not allowed");
       }
+
+      keys.add(key);
 
     }
 
