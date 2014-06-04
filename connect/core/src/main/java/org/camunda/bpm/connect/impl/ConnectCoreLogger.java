@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.connect.impl;
 
-import java.io.IOException;
+import org.camunda.bpm.connect.ConnectorCloseException;
 
 /**
  * @author Daniel Meyer
@@ -25,11 +25,11 @@ public class ConnectCoreLogger extends ConnectLogger {
   }
 
   public void successfullyClosedResponse(AbstractCloseableConnectorResponse response) {
-    logDebug("001", "Successfully closed closeable connector response '{}'", response);
+    logDebug("002", "Successfully closed closeable connector response '{}'", response);
   }
 
-  public Exception exceptionWhileClosingResponse(IOException e) {
-    return
+  public ConnectorCloseException exceptionWhileClosingResponse(Exception cause) {
+    return new ConnectorCloseException(exceptionMessage("003", "Unable to close response"), cause);
   }
 
 }

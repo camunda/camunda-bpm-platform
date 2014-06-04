@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,22 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.camunda.bpm.connect;
 
 /**
- * Base class for all connector exceptions
+ * Indicates an error during the closing of a connector.
  *
- * @author Daniel Meyer
- *
+ * @author Sebastian Menski
  */
-public class ConnectorException extends RuntimeException {
+public class ConnectorCloseException extends ConnectorException {
 
-  public ConnectorException(String message) {
+  public ConnectorCloseException(String message) {
     super(message);
   }
 
-  public ConnectorException(String message, Throwable cause) {
+  public ConnectorCloseException(String message, Throwable cause) {
     super(message, cause);
   }
-
 }
