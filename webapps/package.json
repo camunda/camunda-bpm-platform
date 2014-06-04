@@ -5,8 +5,8 @@
   "description": "A web based interface for camunda BPM platform tasks.",
   "main": "client/scripts/index.js",
   "scripts": {
-    "test": "CUR=`pwd` && echo \"camunda-tasklist-ui path $CUR\" && $CUR/node_modules/grunt-cli/bin/grunt jasmine_node",
-    "postinstall": "CUR=`pwd` && echo \"camunda-tasklist-ui path $CUR\" && $CUR/node_modules/grunt-cli/bin/grunt build:prod"
+    "test": "./node_modules/grunt-cli/bin/grunt jasmine_node",
+    "dist": "./node_modules/grunt-cli/bin/grunt build:prod"
   },
   "repository": {
     "type": "git",
