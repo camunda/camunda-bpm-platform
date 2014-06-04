@@ -12,19 +12,20 @@
  */
 package org.camunda.bpm.model.cmmn.impl;
 
-import java.io.InputStream;
-import java.net.URL;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.validation.SchemaFactory;
-
 import org.camunda.bpm.model.cmmn.Cmmn;
+import org.camunda.bpm.model.cmmn.CmmnModelException;
+import org.camunda.bpm.model.xml.ModelParseException;
 import org.camunda.bpm.model.xml.ModelValidationException;
 import org.camunda.bpm.model.xml.impl.ModelImpl;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.impl.util.ReflectUtil;
 import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.validation.SchemaFactory;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * @author Roman Smirnov
@@ -61,7 +62,12 @@ public class CmmnParser extends AbstractModelParser {
 
    @Override
    public CmmnModelInstanceImpl parseModelFromStream(InputStream inputStream) {
-     return (CmmnModelInstanceImpl) super.parseModelFromStream(inputStream);
+     try {
+       return (CmmnModelInstanceImpl) super.parseModelFromStream(inputStream);
+     }
+     catch (ModelParseException e) {
+      throw new CmmnModelException("Unable to parse model", e);
+     }
    }
 
    @Override
