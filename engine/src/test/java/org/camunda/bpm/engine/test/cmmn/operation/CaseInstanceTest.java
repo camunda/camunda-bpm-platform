@@ -18,7 +18,7 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.cmmn.execution.PlanItemImpl;
+import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
@@ -46,7 +46,7 @@ public class CaseInstanceTest extends PvmTestCase {
   @Test
   public void testCaseInstanceWithOneTask() {
 
-    PlanItemStateTransitionCollector stateTransitionCollector = new PlanItemStateTransitionCollector();
+    CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
 
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
       .listener("create", stateTransitionCollector)
@@ -80,13 +80,13 @@ public class CaseInstanceTest extends PvmTestCase {
     // case instance is active
     assertTrue(caseInstance.isActive());
 
-    PlanItemImpl instance = (PlanItemImpl) caseInstance;
+    CaseExecutionImpl instance = (CaseExecutionImpl) caseInstance;
 
     // case instance has one child plan item
-    List<PlanItemImpl> childPlanItems = instance.getPlanItems();
+    List<CaseExecutionImpl> childPlanItems = instance.getCaseExecutions();
     assertEquals(1, childPlanItems.size());
 
-    PlanItemImpl planItemA = childPlanItems.get(0);
+    CaseExecutionImpl planItemA = childPlanItems.get(0);
 
     // the child plan item is enabled
     assertTrue(planItemA.isEnabled());
@@ -126,7 +126,7 @@ public class CaseInstanceTest extends PvmTestCase {
   @Test
   public void testCaseInstanceWithOneState() {
 
-    PlanItemStateTransitionCollector stateTransitionCollector = new PlanItemStateTransitionCollector();
+    CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
 
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
       .listener("create", stateTransitionCollector)
@@ -171,13 +171,13 @@ public class CaseInstanceTest extends PvmTestCase {
     // case instance is active
     assertTrue(caseInstance.isActive());
 
-    PlanItemImpl instance = (PlanItemImpl) caseInstance;
+    CaseExecutionImpl instance = (CaseExecutionImpl) caseInstance;
 
     // case instance has one child plan item
-    List<PlanItemImpl> childPlanItems = instance.getPlanItems();
+    List<CaseExecutionImpl> childPlanItems = instance.getCaseExecutions();
     assertEquals(1, childPlanItems.size());
 
-    PlanItemImpl planItemX = childPlanItems.get(0);
+    CaseExecutionImpl planItemX = childPlanItems.get(0);
 
     // the case instance should be the parent of X
     assertEquals(caseInstance, planItemX.getParent());
@@ -186,7 +186,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertTrue(planItemX.isEnabled());
 
     // before activation (ie. manual start) X should not have any children
-    assertTrue(planItemX.getPlanItems().isEmpty());
+    assertTrue(planItemX.getCaseExecutions().isEmpty());
 
     // manual start of x
     planItemX.manualStart();
@@ -213,7 +213,7 @@ public class CaseInstanceTest extends PvmTestCase {
     stateTransitionCollector.stateTransitions.clear();
 
     // X should have two chil plan items
-    childPlanItems = planItemX.getPlanItems();
+    childPlanItems = planItemX.getCaseExecutions();
     assertEquals(2, childPlanItems.size());
 
     for (CmmnExecution childPlanItem : childPlanItems) {
@@ -281,7 +281,7 @@ public class CaseInstanceTest extends PvmTestCase {
   @Test
   public void testStartComplexCaseInstance() {
 
-    PlanItemStateTransitionCollector stateTransitionCollector = new PlanItemStateTransitionCollector();
+    CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
 
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
       .listener("create", stateTransitionCollector)
@@ -367,18 +367,18 @@ public class CaseInstanceTest extends PvmTestCase {
     expectedStateTransitions.clear();
     stateTransitionCollector.stateTransitions.clear();
 
-    PlanItemImpl instance = (PlanItemImpl) caseInstance;
+    CaseExecutionImpl instance = (CaseExecutionImpl) caseInstance;
 
     // the case instance should be active
     assertTrue(instance.isActive());
 
     // the case instance should have three child plan items (A1, X1, Y)
-    List<PlanItemImpl> childPlanItems = instance.getPlanItems();
+    List<CaseExecutionImpl> childPlanItems = instance.getCaseExecutions();
     assertEquals(3, childPlanItems.size());
 
     // handle plan item A1 //////////////////////////////////////////////////
 
-    PlanItemImpl planItemA1 = (PlanItemImpl) instance.findPlanItem("A1");
+    CaseExecutionImpl planItemA1 = (CaseExecutionImpl) instance.findCaseExecution("A1");
 
     // case instance should be the parent of A1
     assertEquals(caseInstance, planItemA1.getParent());
@@ -404,7 +404,7 @@ public class CaseInstanceTest extends PvmTestCase {
 
     // handle plan item X1 ///////////////////////////////////////////////////
 
-    PlanItemImpl planItemX1 = (PlanItemImpl) instance.findPlanItem("X1");
+    CaseExecutionImpl planItemX1 = (CaseExecutionImpl) instance.findCaseExecution("X1");
 
     // case instance should be the parent of X1
     assertEquals(caseInstance, planItemX1.getParent());
@@ -419,7 +419,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertTrue(planItemX1.isActive());
 
     // X1 should have two children
-    childPlanItems = planItemX1.getPlanItems();
+    childPlanItems = planItemX1.getCaseExecutions();
     assertEquals(2, childPlanItems.size());
 
     // expected state transitions after manual start of X1:
@@ -442,7 +442,7 @@ public class CaseInstanceTest extends PvmTestCase {
 
     // handle plan item A2 ////////////////////////////////////////////////
 
-    PlanItemImpl planItemA2 = (PlanItemImpl) instance.findPlanItem("A2");
+    CaseExecutionImpl planItemA2 = (CaseExecutionImpl) instance.findCaseExecution("A2");
 
     // X1 should be the parent of A2
     assertEquals(planItemX1, planItemA2.getParent());
@@ -468,7 +468,7 @@ public class CaseInstanceTest extends PvmTestCase {
 
     // handle plan item B1 /////////////////////////////////////////////////
 
-    PlanItemImpl planItemB1 = (PlanItemImpl) instance.findPlanItem("B1");
+    CaseExecutionImpl planItemB1 = (CaseExecutionImpl) instance.findCaseExecution("B1");
 
     // X1 should be the parent of B1
     assertEquals(planItemX1, planItemB1.getParent());
@@ -494,7 +494,7 @@ public class CaseInstanceTest extends PvmTestCase {
 
     // handle plan item Y ////////////////////////////////////////////////
 
-    PlanItemImpl planItemY = (PlanItemImpl) instance.findPlanItem("Y");
+    CaseExecutionImpl planItemY = (CaseExecutionImpl) instance.findCaseExecution("Y");
 
     // case instance should be the parent of Y
     assertEquals(caseInstance, planItemY.getParent());
@@ -509,7 +509,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertTrue(planItemY.isActive());
 
     // Y should have two children
-    childPlanItems = planItemY.getPlanItems();
+    childPlanItems = planItemY.getCaseExecutions();
     assertEquals(2, childPlanItems.size());
 
     // expected state transitions after manual start of Y:
@@ -532,7 +532,7 @@ public class CaseInstanceTest extends PvmTestCase {
 
     // handle plan item C //////////////////////////////////////////////////
 
-    PlanItemImpl planItemC = (PlanItemImpl) instance.findPlanItem("C");
+    CaseExecutionImpl planItemC = (CaseExecutionImpl) instance.findCaseExecution("C");
 
     // Y should be the parent of C
     assertEquals(planItemY, planItemC.getParent());
@@ -558,7 +558,7 @@ public class CaseInstanceTest extends PvmTestCase {
 
     // handle plan item X2 ///////////////////////////////////////////
 
-    PlanItemImpl planItemX2 = (PlanItemImpl) instance.findPlanItem("X2");
+    CaseExecutionImpl planItemX2 = (CaseExecutionImpl) instance.findCaseExecution("X2");
 
     // Y should be the parent of X2
     assertEquals(planItemY, planItemX2.getParent());
@@ -573,7 +573,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertTrue(planItemX2.isActive());
 
     // X2 should have two children
-    childPlanItems = planItemX2.getPlanItems();
+    childPlanItems = planItemX2.getCaseExecutions();
     assertEquals(2, childPlanItems.size());
 
     // expected state transitions after manual start of X2:
@@ -596,7 +596,7 @@ public class CaseInstanceTest extends PvmTestCase {
 
     // handle plan item A3 //////////////////////////////////////////////
 
-    PlanItemImpl planItemA3 = (PlanItemImpl) instance.findPlanItem("A3");
+    CaseExecutionImpl planItemA3 = (CaseExecutionImpl) instance.findCaseExecution("A3");
 
     // A3 should be the parent of X2
     assertEquals(planItemX2, planItemA3.getParent());
@@ -622,7 +622,7 @@ public class CaseInstanceTest extends PvmTestCase {
 
     // handle plan item B2 /////////////////////////////////////////////////
 
-    PlanItemImpl planItemB2 = (PlanItemImpl) instance.findPlanItem("B2");
+    CaseExecutionImpl planItemB2 = (CaseExecutionImpl) instance.findCaseExecution("B2");
 
     // B2 should be the parent of X2
     assertEquals(planItemX2, planItemB2.getParent());

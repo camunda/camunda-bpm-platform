@@ -16,7 +16,7 @@ package org.camunda.bpm.engine.delegate;
  * @author Roman Smirnov
  *
  */
-public interface DelegatePlanItem extends BaseDelegateExecution, ProcessEngineServicesAware, CmmnModelExecutionContext {
+public interface DelegateCaseExecution extends BaseDelegateExecution, ProcessEngineServicesAware, CmmnModelExecutionContext {
 
   String getId();
 
@@ -33,10 +33,6 @@ public interface DelegatePlanItem extends BaseDelegateExecution, ProcessEngineSe
   String getActivityId();
 
   String getActivityName();
-
-  String getActivityInstanceId();
-
-  String getParentActivityInstanceId();
 
   boolean isAvailable();
 

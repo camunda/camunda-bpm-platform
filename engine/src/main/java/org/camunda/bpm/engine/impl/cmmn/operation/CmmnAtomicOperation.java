@@ -22,57 +22,57 @@ import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 public interface CmmnAtomicOperation extends CoreAtomicOperation<CmmnExecution> {
 
   // lifecycle of a case //////////////////////////////////
-  CmmnAtomicOperation CASE_NOTIFY_LISTENER_CREATE = new AtomicOperationCaseNotifyListenerCreate();
+  CmmnAtomicOperation CASE_INSTANCE_NOTIFY_LISTENER_CREATE = new AtomicOperationCaseInstanceNotifyListenerCreate();
 
-  // lifecycle of a plan item: ////////////////////////////
+  // lifecycle of a case execution: ////////////////////////////
 
-  // create a new plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_CREATE = new AtomicOperationPlanItemNotifyListenerCreate();
+  // create a new case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_CREATE = new AtomicOperationCaseExecutionNotifyListenerCreate();
 
-  // start a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_START = new AtomicOperationPlanItemNotifyListenerStart();
+  // start a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_START = new AtomicOperationCaseExecutionNotifyListenerStart();
 
-  // enable plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_ENABLE = new AtomicOperationPlanItemNotifyListenerEnable();
+  // enable case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_ENABLE = new AtomicOperationCaseExecutionNotifyListenerEnable();
 
-  // disable a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_DISABLE = new AtomicOperationPlanItemNotifyListenerDisable();
+  // disable a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_DISABLE = new AtomicOperationCaseExecutionNotifyListenerDisable();
 
-  // re-enable a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_RE_ENABLE = new AtomicOperationPlanItemNotifyListenerReEnable();
+  // re-enable a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_RE_ENABLE = new AtomicOperationCaseExecutionNotifyListenerReEnable();
 
-  // start manual a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_MANUAL_START = new AtomicOperationPlanItemNotifyListenerManualStart();
+  // start manual a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_MANUAL_START = new AtomicOperationCaseExecutionNotifyListenerManualStart();
 
-  // fault of a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_FAULT = new AtomicOperationPlanItemNotifyListenerFault();
+  // fault of a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_FAULT = new AtomicOperationCaseExecutionNotifyListenerFault();
 
   // execute activity behavior
   CmmnAtomicOperation ACTIVITY_EXECUTE = new AtomicOperationActivityExecute();
 
-  // re-activate a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_RE_ACTIVATE = new AtomicOperationPlanItemNotifyListenerReActivate();
+  // re-activate a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_RE_ACTIVATE = new AtomicOperationCaseExecutionNotifyListenerReActivate();
 
-  // complete a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_COMPLETE = new AtomicOperationPlanItemNotifyListenerComplete();
+  // complete a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_COMPLETE = new AtomicOperationCaseExecutionNotifyListenerComplete();
 
-  // terminate a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_TERMINATE = new AtomicOperationPlanItemNotifyListenerTerminate();
+  // terminate a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_TERMINATE = new AtomicOperationCaseExecutionNotifyListenerTerminate();
 
-  // exit a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_EXIT = new AtomicOperationPlanItemNotifyListenerExit();
+  // exit a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_EXIT = new AtomicOperationCaseExecutionNotifyListenerExit();
 
-  // suspend a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_SUSPEND = new AtomicOperationPlanItemNotifyListenerSuspend();
+  // suspend a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_SUSPEND = new AtomicOperationCaseExecutionNotifyListenerSuspend();
 
-  // resume a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_RESUME = new AtomicOperationPlanItemNotifyListenerResume();
+  // resume a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_RESUME = new AtomicOperationCaseExecutionNotifyListenerResume();
 
-  // parent suspend a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_PARENT_SUSPEND = new AtomicOperationPlanItemNotifyListenerParentSuspend();
+  // parent suspend a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_PARENT_SUSPEND = new AtomicOperationCaseExecutionNotifyListenerParentSuspend();
 
-  // parent resume a plan item
-  CmmnAtomicOperation PLAN_ITEM_NOTIFY_LISTENER_PARENT_RESUME = new AtomicOperationPlanItemNotifyListenerParentResume();
+  // parent resume a case execution
+  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_PARENT_RESUME = new AtomicOperationCaseExecutionNotifyListenerParentResume();
 
   public void execute(CmmnExecution execution);
 

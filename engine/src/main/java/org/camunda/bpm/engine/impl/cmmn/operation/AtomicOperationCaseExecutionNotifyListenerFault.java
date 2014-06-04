@@ -12,21 +12,21 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import org.camunda.bpm.engine.delegate.PlanItemListener;
+import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationPlanItemNotifyListenerFault extends AbstractAtomicOperationNotifyListener {
+public class AtomicOperationCaseExecutionNotifyListenerFault extends AbstractAtomicOperationNotifyListener {
 
   public String getCanonicalName() {
     return "plan-item-notify-listener-fault";
   }
 
   protected String getEventName() {
-    return PlanItemListener.FAULT;
+    return CaseExecutionListener.FAULT;
   }
 
 }

@@ -18,28 +18,28 @@ package org.camunda.bpm.engine.impl.cmmn.execution;
  * @author Roman Smirnov
  *
  */
-public interface PlanItemState {
+public interface CaseExecutionState {
 
-  PlanItemState AVAILABLE = new PlanItemStateImpl(1, "available");
-  PlanItemState ENABLED = new PlanItemStateImpl(2, "enabled");
-  PlanItemState DISABLED = new PlanItemStateImpl(3, "disabled");
-  PlanItemState ACTIVE = new PlanItemStateImpl(4, "active");
-  PlanItemState SUSPENDED = new PlanItemStateImpl(5, "suspended");
-  PlanItemState TERMINATED = new PlanItemStateImpl(6, "terminated");
-  PlanItemState COMPLETED = new PlanItemStateImpl(7, "completed");
-  PlanItemState FAILED = new PlanItemStateImpl(8, "failed");
-  PlanItemState CLOSED = new PlanItemStateImpl(9, "closed");
+  CaseExecutionState AVAILABLE = new CaseExecutionStateImpl(1, "available");
+  CaseExecutionState ENABLED = new CaseExecutionStateImpl(2, "enabled");
+  CaseExecutionState DISABLED = new CaseExecutionStateImpl(3, "disabled");
+  CaseExecutionState ACTIVE = new CaseExecutionStateImpl(4, "active");
+  CaseExecutionState SUSPENDED = new CaseExecutionStateImpl(5, "suspended");
+  CaseExecutionState TERMINATED = new CaseExecutionStateImpl(6, "terminated");
+  CaseExecutionState COMPLETED = new CaseExecutionStateImpl(7, "completed");
+  CaseExecutionState FAILED = new CaseExecutionStateImpl(8, "failed");
+  CaseExecutionState CLOSED = new CaseExecutionStateImpl(9, "closed");
 
   int getStateCode();
 
   ///////////////////////////////////////////////////// default implementation
 
-  static class PlanItemStateImpl implements PlanItemState {
+  static class CaseExecutionStateImpl implements CaseExecutionState {
 
     public final int stateCode;
     protected final String name;
 
-    public PlanItemStateImpl(int stateCode, String string) {
+    public CaseExecutionStateImpl(int stateCode, String string) {
       this.stateCode = stateCode;
       this.name = string;
     }
@@ -64,7 +64,7 @@ public interface PlanItemState {
         return false;
       if (getClass() != obj.getClass())
         return false;
-      PlanItemStateImpl other = (PlanItemStateImpl) obj;
+      CaseExecutionStateImpl other = (CaseExecutionStateImpl) obj;
       if (stateCode != other.stateCode)
         return false;
       return true;

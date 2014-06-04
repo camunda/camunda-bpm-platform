@@ -12,21 +12,26 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import org.camunda.bpm.engine.delegate.PlanItemListener;
-
+import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationPlanItemNotifyListenerSuspend extends AbstractAtomicOperationNotifyListener {
+public class AtomicOperationCaseExecutionNotifyListenerStart extends AbstractAtomicOperationNotifyListener {
 
   public String getCanonicalName() {
-    return "plan-item-notify-listener-suspend";
+    return "plan-item-notify-listener-start";
   }
 
   protected String getEventName() {
-    return PlanItemListener.SUSPEND;
+    return CaseExecutionListener.START;
+  }
+
+  @Override
+  protected void eventNotificationsCompleted(CmmnExecution execution) {
+    execution.performOperation(ACTIVITY_EXECUTE);
   }
 
 }

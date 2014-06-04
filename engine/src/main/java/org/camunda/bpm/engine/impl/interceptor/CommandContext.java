@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
@@ -66,7 +67,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
 /**

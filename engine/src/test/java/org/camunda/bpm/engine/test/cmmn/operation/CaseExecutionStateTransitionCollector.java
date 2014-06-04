@@ -12,15 +12,15 @@
  */
 package org.camunda.bpm.engine.test.cmmn.operation;
 
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.ACTIVE;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.AVAILABLE;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.CLOSED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.COMPLETED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.DISABLED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.ENABLED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.FAILED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.SUSPENDED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.TERMINATED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAILABLE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.CLOSED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,23 +28,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.delegate.DelegatePlanItem;
-import org.camunda.bpm.engine.delegate.PlanItemListener;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
+import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState;
+import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class PlanItemStateTransitionCollector implements PlanItemListener {
+public class CaseExecutionStateTransitionCollector implements CaseExecutionListener {
 
-  private static Logger log = Logger.getLogger(PlanItemStateTransitionCollector.class.getName());
+  private static Logger log = Logger.getLogger(CaseExecutionStateTransitionCollector.class.getName());
 
-  protected static Map<Integer, PlanItemState> states;
+  protected static Map<Integer, CaseExecutionState> states;
 
   static {
-    states = new HashMap<Integer, PlanItemState>();
+    states = new HashMap<Integer, CaseExecutionState>();
 
     states.put(ACTIVE.getStateCode(), ACTIVE);
     states.put(AVAILABLE.getStateCode(), AVAILABLE);
@@ -59,18 +59,18 @@ public class PlanItemStateTransitionCollector implements PlanItemListener {
 
   public List<String> stateTransitions = new ArrayList<String>();
 
-  public void notify(DelegatePlanItem planItem) throws Exception {
+  public void notify(DelegateCaseExecution planItem) throws Exception {
     CmmnExecution execution = (CmmnExecution) planItem;
 
     String activityId = execution.getEventSource().getId();
 
-    PlanItemState previousState = states.get(execution.getPreviousState());
+    CaseExecutionState previousState = states.get(execution.getPreviousState());
     String previousStateName = "()";
     if (previousState != null) {
       previousStateName = previousState.toString();
     }
 
-    PlanItemState newState = states.get(execution.getState());
+    CaseExecutionState newState = states.get(execution.getCurrentState());
 
     String stateTransition = previousStateName + " --" + execution.getEventName() + "(" + activityId + ")--> " + newState;
 

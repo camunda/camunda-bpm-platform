@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.model;
 
+import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.cmmn.execution.PlanItemImpl;
 
 
 /**
@@ -50,8 +50,7 @@ public class CmmnCaseDefinition extends CmmnActivity {
   }
 
   protected CmmnExecution newCaseInstance() {
-    return new PlanItemImpl();
+    return new CaseExecutionImpl();
   }
-
 
 }

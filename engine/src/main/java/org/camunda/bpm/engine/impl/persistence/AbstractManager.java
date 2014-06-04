@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.persistence;
 
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
@@ -31,7 +32,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionManager;
 
 
 /**

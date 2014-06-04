@@ -12,21 +12,28 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import org.camunda.bpm.engine.delegate.PlanItemListener;
-
+import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationPlanItemNotifyListenerEnable extends AbstractAtomicOperationNotifyListener {
+public class AtomicOperationCaseExecutionNotifyListenerReActivate extends AbstractAtomicOperationNotifyListener {
 
   public String getCanonicalName() {
-    return "plan-item-notify-listener";
+    return "plan-item-notify-listener-re-activate";
   }
 
   protected String getEventName() {
-    return PlanItemListener.ENABLE;
+    return CaseExecutionListener.RE_ACTIVATE;
+  }
+
+  @Override
+  protected void eventNotificationsCompleted(CmmnExecution execution) {
+    // TODO: clarify what to do here?
+    // Re-Activate means that the plan-item was already active and that's why
+    // there is nothing to do (?)
   }
 
 }

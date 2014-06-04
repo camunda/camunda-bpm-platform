@@ -58,7 +58,7 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     try {
       String cmmnResourceName1 = "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testSimpleDeployment.cmmn";
       String cmmnResourceName2 = "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testSimpleDeployment2.cmmn";
-      repositoryService.createDeployment().enableDuplicateFiltering()
+      repositoryService.createDeployment()
               .addClasspathResource(cmmnResourceName1)
               .addClasspathResource(cmmnResourceName2)
               .name("duplicateAtTheSameTime")

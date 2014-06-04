@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.Case;

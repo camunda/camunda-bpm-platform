@@ -2,11 +2,11 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
 
-<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionEntity">
+<mapper namespace="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity">
 
   <!-- CASEDEFINITION INSERT -->
 
-  <insert id="insertCaseDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionEntity">
+  <insert id="insertCaseDefinition" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity">
     insert into ${prefix}ACT_RE_CASE_DEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, REV_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
@@ -21,7 +21,7 @@
 
   <!-- CASEDEFINITION UPDATE -->
 
-  <update id="updateCaseDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionEntity">
+  <update id="updateCaseDefinition" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity">
     update ${prefix}ACT_RE_CASE_DEF set
       REV_ = #{revisionNext, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
@@ -36,7 +36,7 @@
 
   <!-- CASEDEFINITION RESULTMAP -->
 
-  <resultMap id="caseDefinitionResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionEntity">
+  <resultMap id="caseDefinitionResultMap" type="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" />
     <result property="category" column="CATEGORY_" />
@@ -74,7 +74,7 @@
       and VERSION_ = #{caseDefinitionVersion}
   </select>
 
-  <select id="selectCaseDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
+  <select id="selectCaseDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
     ${limitBefore}
     select RES.* ${limitBetween}
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
@@ -82,13 +82,13 @@
     ${limitAfter}
   </select>
 
-  <select id="selectCaseDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionQueryImpl" resultType="long">
+  <select id="selectCaseDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
   </select>
 
   <!-- mysql specific sql -->
-  <select id="selectCaseDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
+  <select id="selectCaseDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
     ${limitBefore}
     select distinct RES.* ${limitBetween}
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
@@ -97,7 +97,7 @@
   </select>
 
   <!-- mysql specific sql -->
-  <select id="selectCaseDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionQueryImpl" resultType="long">
+  <select id="selectCaseDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultType="long">
     select distinct count(RES.ID_)
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
   </select>

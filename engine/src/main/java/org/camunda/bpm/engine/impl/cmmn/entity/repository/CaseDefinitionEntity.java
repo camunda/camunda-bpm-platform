@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository;
+package org.camunda.bpm.engine.impl.cmmn.entity.repository;
 
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.db.HasRevision;
@@ -87,7 +87,6 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
   public void setResourceName(String resourceName) {
     this.resourceName = resourceName;
   }
-
 
   public Object getPersistentState() {
     return CaseDefinitionEntity.class;

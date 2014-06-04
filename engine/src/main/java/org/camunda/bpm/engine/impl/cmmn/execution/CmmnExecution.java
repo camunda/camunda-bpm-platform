@@ -12,23 +12,23 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.execution;
 
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.ACTIVE;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.AVAILABLE;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.CLOSED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.COMPLETED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.DISABLED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.ENABLED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.FAILED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.SUSPENDED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.PlanItemState.TERMINATED;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_NOTIFY_LISTENER_CREATE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.PLAN_ITEM_NOTIFY_LISTENER_COMPLETE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.PLAN_ITEM_NOTIFY_LISTENER_CREATE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.PLAN_ITEM_NOTIFY_LISTENER_DISABLE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.PLAN_ITEM_NOTIFY_LISTENER_ENABLE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.PLAN_ITEM_NOTIFY_LISTENER_MANUAL_START;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.PLAN_ITEM_NOTIFY_LISTENER_RE_ENABLE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.PLAN_ITEM_NOTIFY_LISTENER_START;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAILABLE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.CLOSED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_COMPLETE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_CREATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_DISABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_ENABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_MANUAL_START;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_RE_ENABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_START;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_INSTANCE_NOTIFY_LISTENER_CREATE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,26 +62,23 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   /** the activity which is to be started next */
   protected transient CmmnActivity nextActivity;
 
-  /** the unique id of the current activity instance */
-  protected String activityInstanceId;
+  protected int previousState;
 
-  protected int previousState = -1;
-
-  protected int state;
+  protected int currentState;
 
   public CmmnExecution() {
   }
 
   // plan items ///////////////////////////////////////////////////////////////
 
-  public abstract List<? extends CmmnExecution> getPlanItems();
+  public abstract List<? extends CmmnExecution> getCaseExecutions();
 
-  public CmmnExecution findPlanItem(String activityId) {
+  public CmmnExecution findCaseExecution(String activityId) {
     if ((getActivity()!=null) && (getActivity().getId().equals(activityId))) {
      return this;
    }
-   for (CmmnExecution nestedExecution : getPlanItems()) {
-     CmmnExecution result = nestedExecution.findPlanItem(activityId);
+   for (CmmnExecution nestedExecution : getCaseExecutions()) {
+     CmmnExecution result = nestedExecution.findCaseExecution(activityId);
      if (result != null) {
        return result;
      }
@@ -112,7 +109,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   public abstract void setCaseInstance(CmmnExecution caseInstance);
 
-  public boolean isCaseInstance() {
+  public boolean isCaseInstanceExecution() {
     return getParent() == null;
   }
 
@@ -141,18 +138,6 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     this.activity = activity;
   }
 
-  // activity instance id //////////////////////////////////////////////////////
-
-  public String getActivityInstanceId() {
-    return activityInstanceId;
-  }
-
-  public void setActivityInstanceId(String activityInstanceId) {
-    this.activityInstanceId = activityInstanceId;
-  }
-
-  protected abstract String generateActivityInstanceId(String activityId);
-
   // next activity /////////////////////////////////////////////////////////////
 
   public CmmnActivity getNextActivity() {
@@ -163,23 +148,6 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     this.nextActivity = nextActivity;
   }
 
-  // parent activity instance id ////////////////////////////////
-
-  public String getParentActivityInstanceId() {
-    if(isCaseInstance()) {
-      return id;
-
-    } else {
-      CmmnExecution parent = getParent();
-
-      if (parent != null) {
-        return parent.getActivityInstanceId();
-      }
-
-      return null;
-    }
-  }
-
   // variables ////////////////////////////////////////////
 
   protected CoreVariableScope getParentVariableScope() {
@@ -188,53 +156,53 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   // state /////////////////////////////////////////////////////
 
-  public int getState() {
-    return state;
+  public int getCurrentState() {
+    return currentState;
   }
 
-  public void setState(PlanItemState state) {
-    previousState = this.state;
-    this.state = state.getStateCode();
+  public void setCurrentState(CaseExecutionState currentState) {
+    previousState = this.currentState;
+    this.currentState = currentState.getStateCode();
   }
 
-  public void setState(int state) {
-    this.state = state;
+  public void setCurrentState(int currentState) {
+    this.currentState = currentState;
   }
 
   public boolean isAvailable() {
-    return state == AVAILABLE.getStateCode();
+    return currentState == AVAILABLE.getStateCode();
   }
 
   public boolean isEnabled() {
-    return state == ENABLED.getStateCode();
+    return currentState == ENABLED.getStateCode();
   }
 
   public boolean isDisabled() {
-    return state == DISABLED.getStateCode();
+    return currentState == DISABLED.getStateCode();
   }
 
   public boolean isActive() {
-    return state == ACTIVE.getStateCode();
+    return currentState == ACTIVE.getStateCode();
   }
 
   public boolean isCompleted() {
-    return state == COMPLETED.getStateCode();
+    return currentState == COMPLETED.getStateCode();
   }
 
   public boolean isSuspended() {
-    return state == SUSPENDED.getStateCode();
+    return currentState == SUSPENDED.getStateCode();
   }
 
   public boolean isTerminated() {
-    return state == TERMINATED.getStateCode();
+    return currentState == TERMINATED.getStateCode();
   }
 
   public boolean isFailed() {
-    return state == FAILED.getStateCode();
+    return currentState == FAILED.getStateCode();
   }
 
   public boolean isClosed() {
-    return state == CLOSED.getStateCode();
+    return currentState == CLOSED.getStateCode();
   }
 
   // previous state /////////////////////////////////////////////
@@ -244,7 +212,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   public void setPreviousState(int previousState) {
-    this.previousState = state;
+    this.previousState = currentState;
   }
 
   // state transition ///////////////////////////////////////////
@@ -276,9 +244,9 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     }
 
     // the case instance is "ACTIVE" after creation
-    setState(ACTIVE);
+    setCurrentState(ACTIVE);
 
-    performOperation(CASE_NOTIFY_LISTENER_CREATE);
+    performOperation(CASE_INSTANCE_NOTIFY_LISTENER_CREATE);
   }
 
   public void create(List<CmmnActivity> activities) {
@@ -291,57 +259,57 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     List<CmmnExecution> children = new ArrayList<CmmnExecution>();
 
     for (CmmnActivity currentActivity : activities) {
-      CmmnExecution child = createPlanItem(currentActivity);
+      CmmnExecution child = createCaseExecution(currentActivity);
       children.add(child);
     }
 
     for (CmmnExecution child : children) {
       if (isActive()) {
-        child.performOperation(PLAN_ITEM_NOTIFY_LISTENER_CREATE);
+        child.performOperation(CASE_EXECUTION_NOTIFY_LISTENER_CREATE);
       } else {
         log.fine("Not taking child '" + child + "', parent plan item has ended.");
       }
     }
   }
 
-  protected abstract CmmnExecution createPlanItem(CmmnActivity activity);
+  protected abstract CmmnExecution createCaseExecution(CmmnActivity activity);
 
-  protected abstract CmmnExecution newPlanItem();
+  protected abstract CmmnExecution newCaseExecution();
 
   public void enable() {
-    transition(AVAILABLE, ENABLED, PLAN_ITEM_NOTIFY_LISTENER_ENABLE);
+    transition(AVAILABLE, ENABLED, CASE_EXECUTION_NOTIFY_LISTENER_ENABLE);
   }
 
   public void disable() {
-    transition(ENABLED, DISABLED, PLAN_ITEM_NOTIFY_LISTENER_DISABLE);
+    transition(ENABLED, DISABLED, CASE_EXECUTION_NOTIFY_LISTENER_DISABLE);
   }
 
   public void reenable() {
-    transition(DISABLED, ENABLED, PLAN_ITEM_NOTIFY_LISTENER_RE_ENABLE);
+    transition(DISABLED, ENABLED, CASE_EXECUTION_NOTIFY_LISTENER_RE_ENABLE);
   }
 
   public void manualStart() {
-    transition(ENABLED, ACTIVE, PLAN_ITEM_NOTIFY_LISTENER_MANUAL_START);
+    transition(ENABLED, ACTIVE, CASE_EXECUTION_NOTIFY_LISTENER_MANUAL_START);
   }
 
   public void start() {
-    transition(AVAILABLE, ACTIVE, PLAN_ITEM_NOTIFY_LISTENER_START);
+    transition(AVAILABLE, ACTIVE, CASE_EXECUTION_NOTIFY_LISTENER_START);
   }
 
   public void complete() {
-    transition(ACTIVE, COMPLETED, PLAN_ITEM_NOTIFY_LISTENER_COMPLETE);
+    transition(ACTIVE, COMPLETED, CASE_EXECUTION_NOTIFY_LISTENER_COMPLETE);
   }
 
-  protected void transition(PlanItemState from, PlanItemState to, CmmnAtomicOperation nextOperation) {
+  protected void transition(CaseExecutionState from, CaseExecutionState to, CmmnAtomicOperation nextOperation) {
     // is this execution in the expected state
-    if (state != from.getStateCode()) {
+    if (currentState != from.getStateCode()) {
       // if not throw an exception
       // TODO: provide proper exception message
       throw new ProcessEngineException();
     }
 
     // perform transition: set the new state
-    setState(to);
+    setCurrentState(to);
 
     // if a next operation is provided, execute it.
     if (nextOperation != null) {
@@ -352,7 +320,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   // toString() /////////////////////////////////////////////////
 
   public String toString() {
-    if (isCaseInstance()) {
+    if (isCaseInstanceExecution()) {
       return "CaseInstance[" + getToStringIdentity() + "]";
     } else {
       return "CmmnExecution["+getToStringIdentity() + "]";

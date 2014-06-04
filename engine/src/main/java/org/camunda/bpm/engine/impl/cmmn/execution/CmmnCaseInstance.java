@@ -28,6 +28,6 @@ public interface CmmnCaseInstance extends CmmnActivityExecution {
 
   void create(String businessKey, Map<String, Object> variables);
 
-  CmmnActivityExecution findPlanItem(String activityId);
+  CmmnActivityExecution findCaseExecution(String activityId);
 
 }

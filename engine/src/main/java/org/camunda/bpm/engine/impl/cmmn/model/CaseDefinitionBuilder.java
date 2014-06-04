@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.impl.cmmn.model;
 
 import java.util.Stack;
 
-import org.camunda.bpm.engine.delegate.PlanItemListener;
+import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
@@ -72,7 +72,7 @@ public class CaseDefinitionBuilder {
     return caseDefinition;
   }
 
-  public CaseDefinitionBuilder listener(String eventName, PlanItemListener planItemListener) {
+  public CaseDefinitionBuilder listener(String eventName, CaseExecutionListener planItemListener) {
     activityStack.peek().addListener(eventName, planItemListener);
     return this;
   }

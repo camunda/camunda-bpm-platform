@@ -14,14 +14,14 @@ package org.camunda.bpm.engine.impl.cmmn.execution;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.delegate.DelegatePlanItem;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 
 /**
  * @author Roman Smirnov
  *
  */
-public interface CmmnActivityExecution extends DelegatePlanItem {
+public interface CmmnActivityExecution extends DelegateCaseExecution {
 
   CmmnActivity getActivity();
 

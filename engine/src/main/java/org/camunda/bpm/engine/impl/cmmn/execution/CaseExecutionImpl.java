@@ -32,27 +32,27 @@ import org.camunda.bpm.model.cmmn.instance.CmmnElement;
  * @author Roman Smirnov
  *
  */
-public class PlanItemImpl extends CmmnExecution implements Serializable {
+public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private static Logger log = Logger.getLogger(PlanItemImpl.class.getName());
+  private static Logger log = Logger.getLogger(CaseExecutionImpl.class.getName());
 
   private static AtomicInteger idGenerator = new AtomicInteger();
 
   // current position /////////////////////////////////////////////////////////
 
-  protected List<PlanItemImpl> planItems;
+  protected List<CaseExecutionImpl> caseExecutions;
 
-  protected PlanItemImpl caseInstance;
+  protected CaseExecutionImpl caseInstance;
 
-  protected PlanItemImpl parent;
+  protected CaseExecutionImpl parent;
 
   // variables ////////////////////////////////////////////////////////////////
 
   protected SimpleVariableStrore variableStrore = new SimpleVariableStrore();
 
-  public PlanItemImpl() {
+  public CaseExecutionImpl() {
   }
 
   // case definition id ///////////////////////////////////////////////////////
@@ -63,12 +63,12 @@ public class PlanItemImpl extends CmmnExecution implements Serializable {
 
   // parent ////////////////////////////////////////////////////////////////////
 
-  public PlanItemImpl getParent() {
+  public CaseExecutionImpl getParent() {
     return parent;
   }
 
   public void setParent(CmmnExecution parent) {
-    this.parent = (PlanItemImpl) parent;
+    this.parent = (CaseExecutionImpl) parent;
   }
 
   public String getParentId() {
@@ -85,45 +85,30 @@ public class PlanItemImpl extends CmmnExecution implements Serializable {
     return getActivity().getName();
   }
 
-  // plan items ////////////////////////////////////////////////////////////////
+  // case executions ////////////////////////////////////////////////////////////////
 
-  public List<PlanItemImpl> getPlanItems() {
-    if (planItems == null) {
-      planItems = new ArrayList<PlanItemImpl>();
+  public List<CaseExecutionImpl> getCaseExecutions() {
+    if (caseExecutions == null) {
+      caseExecutions = new ArrayList<CaseExecutionImpl>();
     }
-    return planItems;
+    return caseExecutions;
   }
 
   // case instance /////////////////////////////////////////////////////////////
 
-  public PlanItemImpl getCaseInstance() {
+  public CaseExecutionImpl getCaseInstance() {
     return caseInstance;
   }
 
   public void setCaseInstance(CmmnExecution caseInstance) {
-    this.caseInstance = (PlanItemImpl) caseInstance;
+    this.caseInstance = (CaseExecutionImpl) caseInstance;
   }
 
-  // activity instance id //////////////////////////////////////////////////////
 
-  protected String generateActivityInstanceId(String activityId) {
-    int nextId = idGenerator.incrementAndGet();
-    String compositeId = activityId+":"+nextId;
-    if(compositeId.length()>64) {
-      return String.valueOf(nextId);
-    } else {
-      return compositeId;
-    }
-  }
+  // new case executions /////////////////////////////////////////////////////////
 
-  public ProcessEngineServices getProcessEngineServices() {
-    throw new UnsupportedOperationException(ProcessEngineServicesAware.class.getName() +" is unsupported in transient PlanItemImpl");
-  }
-
-  // new plan items /////////////////////////////////////////////////////////
-
-  protected PlanItemImpl createPlanItem(CmmnActivity activity) {
-    PlanItemImpl child = newPlanItem();
+  protected CaseExecutionImpl createCaseExecution(CmmnActivity activity) {
+    CaseExecutionImpl child = newCaseExecution();
 
     // TODO: evaluate "RepetitionRule" and "RequiredRule"
 
@@ -132,7 +117,7 @@ public class PlanItemImpl extends CmmnExecution implements Serializable {
 
     // handle child/parent-relation
     child.setParent(this);
-    getPlanItems().add(child);
+    getCaseExecutions().add(child);
 
     // set case instance
     child.setCaseInstance(getCaseInstance());
@@ -141,20 +126,17 @@ public class PlanItemImpl extends CmmnExecution implements Serializable {
     child.setCaseDefinition(getCaseDefinition());
 
     // set state to available
-    child.setState(PlanItemState.AVAILABLE);
-
-    // set activity instance id
-    activityInstanceId = child.generateActivityInstanceId(activity.getId());
+    child.setCurrentState(CaseExecutionState.AVAILABLE);
 
     if (log.isLoggable(Level.FINE)) {
-      log.fine("Child planItem " + child + " created with parent " + this);
+      log.fine("Child caseExecution " + child + " created with parent " + this);
     }
 
     return child;
   };
 
-  protected PlanItemImpl newPlanItem() {
-    return new PlanItemImpl();
+  protected CaseExecutionImpl newCaseExecution() {
+    return new CaseExecutionImpl();
   }
 
   // variables //////////////////////////////////////////////////////////////
@@ -166,7 +148,7 @@ public class PlanItemImpl extends CmmnExecution implements Serializable {
   // toString /////////////////////////////////////////////////////////////////
 
   public String toString() {
-    if (isCaseInstance()) {
+    if (isCaseInstanceExecution()) {
       return "CaseInstance[" + getToStringIdentity() + "]";
     } else {
       return "CmmnExecution["+getToStringIdentity() + "]";
@@ -181,12 +163,16 @@ public class PlanItemImpl extends CmmnExecution implements Serializable {
     return String.valueOf(System.identityHashCode(this));
   }
 
+  public ProcessEngineServices getProcessEngineServices() {
+    throw new UnsupportedOperationException(ProcessEngineServicesAware.class.getName() +" is unsupported in transient CaseExecutionImpl");
+  }
+
   public CmmnElement getCmmnModelElementInstance() {
-    throw new UnsupportedOperationException(CmmnModelExecutionContext.class.getName() +" is unsupported in transient PlanItemImpl");
+    throw new UnsupportedOperationException(CmmnModelExecutionContext.class.getName() +" is unsupported in transient CaseExecutionImpl");
   }
 
   public CmmnModelInstance getCmmnModelInstance() {
-    throw new UnsupportedOperationException(CmmnModelExecutionContext.class.getName() +" is unsupported in transient PlanItemImpl");
+    throw new UnsupportedOperationException(CmmnModelExecutionContext.class.getName() +" is unsupported in transient CaseExecutionImpl");
   }
 
 }

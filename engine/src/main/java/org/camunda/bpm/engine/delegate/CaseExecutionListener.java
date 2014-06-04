@@ -16,7 +16,7 @@ package org.camunda.bpm.engine.delegate;
  * @author Roman Smirnov
  *
  */
-public interface PlanItemListener extends DelegateListener<DelegatePlanItem> {
+public interface CaseExecutionListener extends DelegateListener<DelegateCaseExecution> {
 
   String CREATE = "create";
   String ENABLE = "enable";
@@ -35,6 +35,6 @@ public interface PlanItemListener extends DelegateListener<DelegatePlanItem> {
   String PARENT_RESUME = "parentResume";
   String CLOSE = "close";
 
-  void notify(DelegatePlanItem planItem) throws Exception;
+  void notify(DelegateCaseExecution planItem) throws Exception;
 
 }
