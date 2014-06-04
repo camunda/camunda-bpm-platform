@@ -1,6 +1,6 @@
 # Manipulating XML
 
-The Xml data type supports manipulating Xml attributes and child elements..
+The Xml data type supports manipulation of Xml attributes and child elements.
 
 
 ## Attributes
@@ -88,7 +88,7 @@ SpinXmlDomAttribute attribute = XML(xml).attr("id");
 attribute.value("newId");
 ```
 
-Also you can specify the namespace of the attribute to set.
+You can also specify the namespace of the attribute to set.
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -119,7 +119,7 @@ element = attribute.remove();
 assertFalse(element.hasAttr("id));
 ```
 
-Also you can specify the namespace of the attribute to remove.
+You can also specify the namespace of the attribute to remove.
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -140,8 +140,7 @@ assertFalse(element.hasAttrNs("http://camunda.org/example", "name"));
 
 ### Reading child elements from Xml
 
-Besides attributes you can also get an unique or all child elements of a specific type. Optionally
-can a namespace be passed to the methods as first parameter.
+Besides attributes you can also get a unique or all child elements of a specific type. Optionally a namespace can be passed to the methods as first parameter.
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -176,7 +175,7 @@ root.append(child1, child2, child3);
 
 ### Remove child elements
 
-To remove child elements from a Xml element the method `remove` is used. It accepts
+To remove child elements from an Xml element the method `remove` is used. It accepts
 a single or multiple child elements and removes them from the parent element.
 
 ```java
