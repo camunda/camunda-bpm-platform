@@ -909,15 +909,17 @@ public class DbSqlSession implements Session {
   }
 
   public void dbSchemaDrop() {
+    if (dbSqlSessionFactory.isCmmnEnabled()) {
+      executeMandatorySchemaResource("drop", "case.engine");
+    }
+
     executeMandatorySchemaResource("drop", "engine");
+
     if (dbSqlSessionFactory.isDbHistoryUsed()) {
       executeMandatorySchemaResource("drop", "history");
     }
     if (dbSqlSessionFactory.isDbIdentityUsed()) {
       executeMandatorySchemaResource("drop", "identity");
-    }
-    if (dbSqlSessionFactory.isCmmnEnabled()) {
-      executeMandatorySchemaResource("drop", "case.engine");
     }
   }
 
