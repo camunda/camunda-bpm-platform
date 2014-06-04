@@ -12,17 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.transformer;
 
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cmmn.handler.CmmnElementHandler;
-import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
-import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistry;
-import org.camunda.bpm.engine.impl.cmmn.handler.DiscretionaryItemHandler;
-import org.camunda.bpm.engine.impl.cmmn.handler.PlanItemHandler;
+import org.camunda.bpm.engine.impl.cmmn.handler.*;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.transformer.Transform;
@@ -31,20 +22,15 @@ import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.cmmn.repository.CaseDefinitionEntity;
 import org.camunda.bpm.model.cmmn.Cmmn;
+import org.camunda.bpm.model.cmmn.CmmnModelException;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
-import org.camunda.bpm.model.cmmn.instance.Case;
-import org.camunda.bpm.model.cmmn.instance.CmmnElement;
-import org.camunda.bpm.model.cmmn.instance.Definitions;
-import org.camunda.bpm.model.cmmn.instance.HumanTask;
-import org.camunda.bpm.model.cmmn.instance.PlanFragment;
-import org.camunda.bpm.model.cmmn.instance.PlanItem;
-import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
-import org.camunda.bpm.model.cmmn.instance.PlanningTable;
-import org.camunda.bpm.model.cmmn.instance.Sentry;
-import org.camunda.bpm.model.cmmn.instance.Stage;
-import org.camunda.bpm.model.cmmn.instance.Task;
-import org.camunda.bpm.model.xml.ModelParseException;
+import org.camunda.bpm.model.cmmn.instance.*;
+
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Roman Smirnov
@@ -94,7 +80,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
       // read input stream
       model = Cmmn.readModelFromStream(inputStream);
 
-    } catch (ModelParseException e) {
+    } catch (CmmnModelException e) {
       throw new ProcessEngineException("Couldn't transform '" + resourceName + "': " + e.getMessage(), e);
     }
 

@@ -46,6 +46,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
   public static ModuleIdentifier MODULE_IDENTIFYER_PROCESS_ENGINE = ModuleIdentifier.create("org.camunda.bpm.camunda-engine");
   public static ModuleIdentifier MODULE_IDENTIFYER_XML_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-xml-model");
   public static ModuleIdentifier MODULE_IDENTIFYER_BPMN_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-bpmn-model");
+  public static ModuleIdentifier MODULE_IDENTIFYER_CMMN_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-cmmn-model");
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
@@ -90,6 +91,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_PROCESS_ENGINE);
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_XML_MODEL);
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_BPMN_MODEL);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_CMMN_MODEL);
   }
 
   private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, ModuleIdentifier dependency) {
