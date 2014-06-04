@@ -12,17 +12,15 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.camunda.bpm.container.impl.jmx.deployment.scanning.ProcessApplicationScanningUtil;
+import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Map;
 
-import org.camunda.bpm.container.impl.jmx.deployment.scanning.ProcessApplicationScanningUtil;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 /**
@@ -41,9 +39,8 @@ public class VfsProcessApplicationScannerTest {
     // expect: finds only the BPMN process file and not treats the 'bpmn' folder
     assertEquals(1, scanResult.size());
     String processFileName = "VfsProcessScannerTest.bpmn20.xml";
-    assertTrue("'" + processFileName + "' found", contains(scanResult, processFileName));
-    assertFalse("'bpmn' folder in resource path not found", contains(scanResult, "bpmn"));
-    assertFalse("'cmmn' in resource path not found", contains(scanResult, "cmmn"));
+    assertTrue("'" + processFileName + "'not found", contains(scanResult, processFileName));
+    assertFalse("'bpmn' folder in resource path found", contains(scanResult, "bpmn"));
   }
 
   @Test
@@ -54,16 +51,16 @@ public class VfsProcessApplicationScannerTest {
     String processRootPath = "classpath:org/camunda/bpm/container/impl/jmx/deployment/case/";
     Map<String, byte[]> scanResult = ProcessApplicationScanningUtil.findResources(classLoader, processRootPath, null);
 
-    // expect: finds only the BPMN process file and not treats the 'bpmn' folder
+    // expect: finds only the CMMN process file and not treats the 'cmmn' folder
     assertEquals(1, scanResult.size());
     String processFileName = "VfsProcessScannerTest.cmmn";
-    assertTrue("'" + processFileName + "' found", contains(scanResult, processFileName));
-    assertFalse("'bpmn' in resource path not found", contains(scanResult, "bpmn"));
+    assertTrue("'" + processFileName + "' not found", contains(scanResult, processFileName));
+    assertFalse("'cmmn' in resource path found", contains(scanResult, "cmmn"));
   }
 
-  private boolean contains(Map<String, byte[]> scanResult, String suffix) {
+  private boolean contains(Map<String, byte[]> scanResult, String prefix) {
     for (String string : scanResult.keySet()) {
-      if (string.endsWith(suffix)) {
+      if (string.startsWith(prefix)) {
         return true;
       }
     }
