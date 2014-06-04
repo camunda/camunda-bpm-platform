@@ -68,7 +68,7 @@ module.exports = function(config) {
         out: 'dist/scripts/deps.js',
         // include: deps
         include: deps.concat([
-          'camunda-tasklist/rjsconf',
+          'camunda-tasklist-ui/rjsconf',
           'angular-route'
         ])
       }
@@ -83,9 +83,9 @@ module.exports = function(config) {
         out: 'dist/scripts/deps-n-mocks.js',
         exclude: [],
         include: deps.concat([
-          'camunda-tasklist/rjsconf',
+          'camunda-tasklist-ui/rjsconf',
           'angular-route'
-        ], rjsConf.shim['camunda-tasklist/mocks'], ['camunda-tasklist/mocks'])
+        ], rjsConf.shim['camunda-tasklist-ui/mocks'], ['camunda-tasklist-ui/mocks'])
       }
     },
 
@@ -94,15 +94,15 @@ module.exports = function(config) {
     scripts: {
       options: {
         // name: 'scripts/index',
-        name: 'camunda-tasklist',
+        name: 'camunda-tasklist-ui',
         out: 'dist/scripts/<%= pkg.name %>.js',
         // exclude: deps,
         exclude: deps.concat([
-          'camunda-tasklist/rjsconf',
-          // 'camunda-tasklist/mocks',
+          'camunda-tasklist-ui/rjsconf',
+          // 'camunda-tasklist-ui/mocks',
           'angular-route'
         ]),
-        include: rjsConf.shim['camunda-tasklist']
+        include: rjsConf.shim['camunda-tasklist-ui']
       }
     }
   };
