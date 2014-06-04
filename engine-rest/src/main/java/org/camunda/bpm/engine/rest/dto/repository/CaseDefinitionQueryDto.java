@@ -12,17 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
+
+import javax.ws.rs.core.MultivaluedMap;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -176,7 +175,7 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
     if (version != null) {
       query.caseDefinitionVersion(version);
     }
-    if (latestVersion != null && latestVersion == true) {
+    if (latestVersion != null && latestVersion) {
       query.latestVersion();
     }
   }

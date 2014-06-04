@@ -12,11 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.sub.repository.impl;
 
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -27,6 +22,10 @@ import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.CaseDefinitionResource;
+
+import javax.ws.rs.core.Response.Status;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  *
@@ -56,9 +55,7 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
       throw new InvalidRequestException(Status.NOT_FOUND, e, "No matching definition with id " + caseDefinitionId);
     }
 
-    CaseDefinitionDto result = CaseDefinitionDto.fromCaseDefinition(definition);
-
-    return result;
+    return CaseDefinitionDto.fromCaseDefinition(definition);
   }
 
   @Override

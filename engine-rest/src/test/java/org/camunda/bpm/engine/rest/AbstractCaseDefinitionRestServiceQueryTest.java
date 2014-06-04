@@ -12,20 +12,8 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.Response.Status;
-
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -35,8 +23,17 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import javax.ws.rs.core.Response.Status;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Roman Smirnov
@@ -326,6 +323,15 @@ public abstract class AbstractCaseDefinitionRestServiceQueryTest extends Abstrac
     verify(mockedQuery).caseDefinitionResourceName(queryParameters.get("resourceName"));
     verify(mockedQuery).caseDefinitionResourceNameLike(queryParameters.get("resourceNameLike"));
     verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryCount() {
+    expect().statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when().get(CASE_DEFINITION_COUNT_QUERY_URL);
+
+    verify(mockedQuery).count();
   }
 
   private Map<String, String> getCompleteQueryParameters() {

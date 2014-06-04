@@ -12,19 +12,8 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.InputStream;
-
-import javax.ws.rs.core.Response.Status;
-
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -35,8 +24,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import javax.ws.rs.core.Response.Status;
+import java.io.InputStream;
+
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Roman Smirnov
@@ -62,7 +56,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
 
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
     when(repositoryServiceMock.getCaseDefinition(eq(MockProvider.EXAMPLE_CASE_DEFINITION_ID))).thenReturn(mockCaseDefinition);
-    when(repositoryServiceMock.getCaseModel(eq(MockProvider.EXAMPLE_CASE_DEFINITION_ID))).thenReturn(createMockCaseDefinionCmmnXml());
+    when(repositoryServiceMock.getCaseModel(eq(MockProvider.EXAMPLE_CASE_DEFINITION_ID))).thenReturn(createMockCaseDefinitionCmmnXml());
 
     caseDefinitionQueryMock = mock(CaseDefinitionQuery.class);
     when(caseDefinitionQueryMock.caseDefinitionKey(MockProvider.EXAMPLE_CASE_DEFINITION_KEY)).thenReturn(caseDefinitionQueryMock);
@@ -71,10 +65,9 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     when(repositoryServiceMock.createCaseDefinitionQuery()).thenReturn(caseDefinitionQueryMock);
   }
 
-  private InputStream createMockCaseDefinionCmmnXml() {
+  private InputStream createMockCaseDefinitionCmmnXml() {
     // do not close the input stream, will be done in implementation
-    InputStream cmmnXmlInputStream = null;
-    cmmnXmlInputStream = ReflectUtil.getResourceAsStream("cases/case-model.cmmn");
+    InputStream cmmnXmlInputStream = ReflectUtil.getResourceAsStream("cases/case-model.cmmn");
     Assert.assertNotNull(cmmnXmlInputStream);
     return cmmnXmlInputStream;
   }
@@ -112,6 +105,21 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
       .get(SINGLE_CASE_DEFINITION_URL);
 
     verify(repositoryServiceMock).getCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+  }
+
+  @Test
+  public void testCaseDefinitionCmmnXmlRetrieval_ByKey() {
+    Response response = given()
+        .pathParam("key", MockProvider.EXAMPLE_CASE_DEFINITION_KEY)
+      .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(XML_DEFINITION_BY_KEY_URL);
+
+    String responseContent = response.asString();
+    Assert.assertTrue(responseContent.contains(MockProvider.EXAMPLE_CASE_DEFINITION_ID));
+    Assert.assertTrue(responseContent.contains("<?xml"));
   }
 
   @Test
