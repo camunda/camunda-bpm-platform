@@ -3,8 +3,8 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
            'angular', 'angular-moment',
-           'text!camunda-tasklist/form/inline-field.html',
-           'text!camunda-tasklist/form/form.html'
+           'text!camunda-tasklist-ui/form/inline-field.html',
+           'text!camunda-tasklist-ui/form/form.html'
 ], function(angular) {
 
   /**
@@ -45,7 +45,7 @@ define([
 
       transclude: true,
 
-      template: require('text!camunda-tasklist/form/inline-field.html')
+      template: require('text!camunda-tasklist-ui/form/inline-field.html')
     };
   });
 
@@ -60,7 +60,7 @@ define([
 
         // scope.fields = camTasklistForm(null, null);
       },
-      template: require('text!camunda-tasklist/form/form.html')
+      template: require('text!camunda-tasklist-ui/form/form.html')
     };
   });
 

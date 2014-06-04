@@ -20,7 +20,7 @@ xdescribe('The environment', function() {
   });
 
   it('loads with requirejs', function(done) {
-    rjs(['camunda-tasklist/controls'], function(loaded) {
+    rjs(['camunda-tasklist-ui/controls'], function(loaded) {
       console.info('loaded', loaded);
 
       done();

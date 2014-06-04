@@ -18,7 +18,7 @@ module.exports = function() {
 
         {pattern: 'client/scripts/**/*.js', included: false},
         {pattern: 'dist/scripts/deps.js', included: false},
-        {pattern: 'dist/scripts/camunda-tasklist.js', included: false},
+        {pattern: 'dist/scripts/camunda-tasklist-ui.js', included: false},
 
         'test/integration/main.js'
       ],

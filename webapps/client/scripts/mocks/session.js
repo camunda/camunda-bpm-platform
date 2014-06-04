@@ -2,7 +2,7 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
-           'angular', 'fixturer', 'underscore', 'jquery', 'camunda-tasklist/session/data'
+           'angular', 'fixturer', 'underscore', 'jquery', 'camunda-tasklist-ui/session/data'
 ], function(angular,   fix,        _,            $) {
 
   var mockedModule = angular.module('cam.tasklist.session.data');

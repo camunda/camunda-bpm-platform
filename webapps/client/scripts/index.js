@@ -1,11 +1,11 @@
 'use strict';
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
-define('camunda-tasklist', [
-           'camunda-tasklist/rjsconf',
-           'camunda-tasklist/utils'
+define('camunda-tasklist-ui', [
+           'camunda-tasklist-ui/rjsconf',
+           'camunda-tasklist-ui/utils'
 ], function(rjsConf, utils) {
-  rjsConf.shim['camunda-tasklist'].push('camunda-tasklist/mocks');
+  rjsConf.shim['camunda-tasklist-ui'].push('camunda-tasklist-ui/mocks');
   var tasklistConf = typeof window !== 'undefined' ? (window.tasklistConf || {}) : {};
 
   /**
@@ -18,15 +18,15 @@ define('camunda-tasklist', [
 
   var tasklistApp;
 
-  var appModules = rjsConf.shim['camunda-tasklist'];
+  var appModules = rjsConf.shim['camunda-tasklist-ui'];
 
   var deps = [
     'angular',
-    'text!camunda-tasklist/index.html'
+    'text!camunda-tasklist-ui/index.html'
   ].concat(appModules);
 
   // converts AMD paths to angular module names
-  // "camunda-tasklist/pile" will be "cam.tasklist.pile"
+  // "camunda-tasklist-ui/pile" will be "cam.tasklist.pile"
   function rj2ngNames(names) {
     var name, translated = [];
     for (var n = 0; n < names.length; n++) {
@@ -76,7 +76,7 @@ define('camunda-tasklist', [
     tasklistApp.config([
             '$routeProvider', '$locationProvider',
     function($routeProvider,   $locationProvider) {
-      var tasklistTemplate = require('text!camunda-tasklist/index.html');
+      var tasklistTemplate = require('text!camunda-tasklist-ui/index.html');
 
       $routeProvider
         .when('/', {

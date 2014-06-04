@@ -14,7 +14,7 @@
     baseUrl: '/base',
 
     paths: {
-      'camunda-tasklist': '/base/dist/camunda-tasklist',
+      'camunda-tasklist-ui': '/base/dist/camunda-tasklist-ui',
       'scripts': '/base/client/scripts',
       'bower_components': '/base/client/bower_components'
     }

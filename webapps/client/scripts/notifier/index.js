@@ -1,7 +1,7 @@
 'use strict';
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
-define(['angular', 'text!camunda-tasklist/notifier/notifier.html'],
+define(['angular', 'text!camunda-tasklist-ui/notifier/notifier.html'],
 function(angular) {
   var notifierModule = angular.module('cam.tasklist.notifier', []);
 
@@ -115,7 +115,7 @@ function(angular) {
 
         $scope.messages = camTasklistNotifier.get();
       }],
-      template: require('text!camunda-tasklist/notifier/notifier.html')
+      template: require('text!camunda-tasklist-ui/notifier/notifier.html')
     };
   });
 

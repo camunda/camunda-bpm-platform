@@ -6,7 +6,6 @@ define(function() {
     baseUrl: './',
 
     paths: {
-      // 'domready':                   'bower_components/requirejs-domready/domReady',
       'text':                       'bower_components/requirejs-text/text',
 
       'angular':                    'bower_components/angular/angular',
@@ -23,18 +22,11 @@ define(function() {
       // 'hyperagent':                 'bower_components/hyperagent/dist/amd',
 
 
-      'camunda-tasklist':           'scripts',
-      // 'camunda-tasklist/controls':  'scripts/controls',
-      // 'camunda-tasklist/user':      'scripts/user',
-      // 'camunda-tasklist/form':      'scripts/form',
-      // 'camunda-tasklist/pile':      'scripts/pile',
-      // 'camunda-tasklist/task':      'scripts/task',
-      // 'camunda-tasklist/session':   'scripts/session',
-      // 'camunda-tasklist/process':   'scripts/process',
+      'camunda-tasklist-ui':        'scripts',
 
 
       'jquery-mockjax':             'bower_components/jquery-mockjax/jquery.mockjax',
-      'camunda-tasklist/mocks':     'scripts/mocks',
+      'camunda-tasklist-ui/mocks':  'scripts/mocks',
       'uuid':                       'bower_components/node-uuid/uuid',
       'fixturer':                   'bower_components/fixturer/index',
       'underscore':                 'bower_components/underscore/index',
@@ -57,34 +49,34 @@ define(function() {
       //                                 exports: 'Hyperagent',
       //                                 deps: [],
       //                               },
-      // 'camunda-tasklist/pile/data': ['hyperagent'],
-      // 'camunda-tasklist/task/data': ['hyperagent'],
+      // 'camunda-tasklist-ui/pile/data': ['hyperagent'],
+      // 'camunda-tasklist-ui/task/data': ['hyperagent'],
 
 
-      'camunda-tasklist':           [
+      'camunda-tasklist-ui':        [
                                       'angular-route',
 
 
-                                      'camunda-tasklist/utils',
-                                      'camunda-tasklist/user',
-                                      'camunda-tasklist/controls',
-                                      'camunda-tasklist/form',
-                                      'camunda-tasklist/pile',
-                                      'camunda-tasklist/task',
-                                      'camunda-tasklist/process',
-                                      'camunda-tasklist/session',
+                                      'camunda-tasklist-ui/utils',
+                                      'camunda-tasklist-ui/user',
+                                      'camunda-tasklist-ui/controls',
+                                      'camunda-tasklist-ui/form',
+                                      'camunda-tasklist-ui/pile',
+                                      'camunda-tasklist-ui/task',
+                                      'camunda-tasklist-ui/process',
+                                      'camunda-tasklist-ui/session',
 
                                       'bootstrap/collapse',
-                                      'camunda-tasklist/navigation/index',
-                                      'camunda-tasklist/notifier/index',
+                                      'camunda-tasklist-ui/navigation/index',
+                                      'camunda-tasklist-ui/notifier/index',
 
-                                      'text!camunda-tasklist/index.html'
+                                      'text!camunda-tasklist-ui/index.html'
                                     ],
 
       'jquery-mockjax':             ['jquery'],
       'underscore.string':          ['underscore'],
       'fixturer':                   ['underscore.string'],
-      'camunda-tasklist/mocks':     [
+      'camunda-tasklist-ui/mocks':  [
                                       'uuid',
                                       'fixturer',
                                       'angular',
@@ -94,46 +86,41 @@ define(function() {
     },
 
     packages: [
-      // {
-      //   name: 'hyperagent',
-      //   main: 'hyperagent'
-      // },
-
       {
-        name: 'camunda-tasklist',
+        name: 'camunda-tasklist-ui',
         main: 'index'
       },
       {
-        name: 'camunda-tasklist/controls',
+        name: 'camunda-tasklist-ui/controls',
         main: 'index'
       },
       {
-        name: 'camunda-tasklist/process',
+        name: 'camunda-tasklist-ui/process',
         main: 'index'
       },
       {
-        name: 'camunda-tasklist/session',
+        name: 'camunda-tasklist-ui/session',
         main: 'index'
       },
       {
-        name: 'camunda-tasklist/form',
+        name: 'camunda-tasklist-ui/form',
         main: 'index'
       },
       {
-        name: 'camunda-tasklist/pile',
+        name: 'camunda-tasklist-ui/pile',
         main: 'index'
       },
       {
-        name: 'camunda-tasklist/task',
+        name: 'camunda-tasklist-ui/task',
         main: 'index'
       },
       {
-        name: 'camunda-tasklist/user',
+        name: 'camunda-tasklist-ui/user',
         main: 'index'
       },
 
       {
-        name: 'camunda-tasklist/mocks',
+        name: 'camunda-tasklist-ui/mocks',
         main: 'index'
       }
     ]

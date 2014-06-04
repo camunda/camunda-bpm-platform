@@ -3,8 +3,8 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
            'angular', 'angular-bootstrap',
-           'camunda-tasklist/process/data',
-           'text!camunda-tasklist/process/start.html'
+           'camunda-tasklist-ui/process/data',
+           'text!camunda-tasklist-ui/process/start.html'
 ], function(angular) {
 
   var processModule = angular.module('cam.tasklist.process', [
@@ -142,7 +142,7 @@ define([
     $modal.open({
       size: 'lg',
       scope: $scope,
-      template: require('text!camunda-tasklist/process/start.html')
+      template: require('text!camunda-tasklist-ui/process/start.html')
     });
   }]);
 

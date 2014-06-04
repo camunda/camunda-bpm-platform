@@ -3,9 +3,9 @@ describe('The - integration - environement', function() {
   describe('module loading', function() {
     var camundaTasklist;
 
-    it('loads camunda-tasklist.js', function() {
+    it('loads camunda-tasklist-ui.js', function() {
       runs(function() {
-        require(['camunda-tasklist'], function(loaded) {
+        require(['camunda-tasklist-ui'], function(loaded) {
           camundaTasklist = loaded;
         });
       });

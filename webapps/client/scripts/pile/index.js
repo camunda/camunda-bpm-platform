@@ -3,11 +3,11 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
            'require', 'angular', 'moment',
-           'camunda-tasklist/pile/data',
-           'text!camunda-tasklist/pile/form.html',
-           'text!camunda-tasklist/pile/list.html',
-           'text!camunda-tasklist/pile/details.html',
-           'text!camunda-tasklist/pile/tasks.html'
+           'camunda-tasklist-ui/pile/data',
+           'text!camunda-tasklist-ui/pile/form.html',
+           'text!camunda-tasklist-ui/pile/list.html',
+           'text!camunda-tasklist-ui/pile/details.html',
+           'text!camunda-tasklist-ui/pile/tasks.html'
 ], function(require,   angular,   moment) {
   var pileModule = angular.module('cam.tasklist.pile', [
     'cam.tasklist.pile.data',
@@ -100,7 +100,7 @@ define([
         }
       },
 
-      template: require('text!camunda-tasklist/pile/details.html')
+      template: require('text!camunda-tasklist-ui/pile/details.html')
     };
   }]);
 
@@ -111,7 +111,7 @@ define([
           '$modal', '$rootScope',
   function($modal,   $rootScope) {
     return {
-      template: require('text!camunda-tasklist/pile/list.html')
+      template: require('text!camunda-tasklist-ui/pile/list.html')
     };
   }]);
 
@@ -153,7 +153,7 @@ define([
         };
       },
 
-      template: require('text!camunda-tasklist/pile/tasks.html')
+      template: require('text!camunda-tasklist-ui/pile/tasks.html')
     };
   }]);
 
@@ -200,7 +200,7 @@ define([
 
       size: 'lg',
 
-      template: require('text!camunda-tasklist/pile/form.html'),
+      template: require('text!camunda-tasklist-ui/pile/form.html'),
 
       controller: [
               '$modalInstance',

@@ -3,8 +3,8 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
            'require', 'angular', 'moment', 'jquery',
-           'camunda-tasklist/user/data',
-           'text!camunda-tasklist/user/login.html'
+           'camunda-tasklist-ui/user/data',
+           'text!camunda-tasklist-ui/user/login.html'
 ], function(require,   angular,   moment,   $) {
 
   /**
@@ -27,7 +27,7 @@ define([
   function($location,   $modal,   $scope,   $rootScope) {
     $modal.open({
       windowClass:  'user-login',
-      template:     require('text!camunda-tasklist/user/login.html')
+      template:     require('text!camunda-tasklist-ui/user/login.html')
     });
   }]);
 

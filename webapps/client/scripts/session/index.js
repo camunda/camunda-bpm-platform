@@ -2,7 +2,7 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
-           'angular', 'camunda-tasklist/session/data'
+           'angular', 'camunda-tasklist-ui/session/data'
 ], function(angular) {
 
   /**

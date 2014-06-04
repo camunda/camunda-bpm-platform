@@ -1,10 +1,10 @@
 'use strict';
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
-define(['angular', 'camunda-tasklist/utils', 'text!camunda-tasklist/navigation/navigation.html', 'camunda-tasklist/session'],
+define(['angular', 'camunda-tasklist-ui/utils', 'text!camunda-tasklist-ui/navigation/navigation.html', 'camunda-tasklist-ui/session'],
 function(angular) {
   var navigationModule = angular.module('cam.tasklist.navigation', [
-    require('camunda-tasklist/utils').name,
+    require('camunda-tasklist-ui/utils').name,
     'ui.bootstrap',
     'cam.tasklist.user',
     'cam.tasklist.session'
@@ -48,7 +48,7 @@ function(angular) {
               backdrop:     false,
               keyboard:     false,
               windowClass:  'user-login',
-              template:     require('text!camunda-tasklist/user/login.html')
+              template:     require('text!camunda-tasklist-ui/user/login.html')
             });
           });
         }
@@ -84,7 +84,7 @@ function(angular) {
           login(true);
         }
       }],
-      template: require('text!camunda-tasklist/navigation/navigation.html')
+      template: require('text!camunda-tasklist-ui/navigation/navigation.html')
     };
   });
 

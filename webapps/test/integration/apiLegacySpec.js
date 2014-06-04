@@ -8,9 +8,9 @@ describe('The legacy API', function() {
       runs(function() {
         // require.config({
         //   baseUrl: '/base',
-        //   paths: {'camunda-tasklist': 'client/scripts'}
+        //   paths: {'camunda-tasklist-ui': 'client/scripts'}
         // });
-        require(['dist/scripts/deps', 'dist/scripts/camunda-tasklist', 'scripts/api/index'], function() {
+        require(['dist/scripts/deps', 'dist/scripts/camunda-tasklist-ui', 'scripts/api/index'], function() {
           console.info('libraries are loaded');
           loaded = true;
         });

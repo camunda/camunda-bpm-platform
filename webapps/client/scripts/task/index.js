@@ -3,13 +3,13 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
            'angular', 'moment',
-           'camunda-tasklist/utils',
-           'camunda-tasklist/task/data',
-           'camunda-tasklist/form/data',
+           'camunda-tasklist-ui/utils',
+           'camunda-tasklist-ui/task/data',
+           'camunda-tasklist-ui/form/data',
            'angular-bootstrap',
-           'text!camunda-tasklist/task/task.html',
-           'text!camunda-tasklist/task/form.html',
-           'text!camunda-tasklist/task/history.html'
+           'text!camunda-tasklist-ui/task/task.html',
+           'text!camunda-tasklist-ui/task/form.html',
+           'text!camunda-tasklist-ui/task/history.html'
 ], function(angular,   moment) {
   var taskModule = angular.module('cam.tasklist.task', [
     'cam.tasklist.utils',
@@ -48,7 +48,7 @@ define([
           element.find('[data-toggle="tooltip"]').tooltip();
         });
       },
-      template: require('text!camunda-tasklist/task/task.html')
+      template: require('text!camunda-tasklist-ui/task/task.html')
     };
   }]);
 
@@ -68,7 +68,7 @@ define([
           element.find('[data-toggle="tooltip"]').tooltip();
         });
       },
-      template: require('text!camunda-tasklist/task/form.html')
+      template: require('text!camunda-tasklist-ui/task/form.html')
     };
   }]);
 
@@ -106,7 +106,7 @@ define([
           }, 10);
         });
       },
-      template: require('text!camunda-tasklist/task/history.html')
+      template: require('text!camunda-tasklist-ui/task/history.html')
     };
   }]);
 

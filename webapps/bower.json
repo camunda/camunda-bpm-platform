@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "camunda-tasklist",
+  "name": "camunda-tasklist-ui",
   "version": "7.2.0-SNAPSHOT",
-  "homepage": "https://github.com/camunda/camunda-tasklist",
+  "homepage": "https://github.com/camunda/camunda-tasklist-ui",
   "authors": [
     "Valentin Vago <valentin.vago@camunda.com>"
   ],

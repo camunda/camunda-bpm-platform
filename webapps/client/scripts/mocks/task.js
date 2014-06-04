@@ -2,7 +2,7 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
-           'angular', 'uuid', 'fixturer', 'underscore', 'jquery', 'camunda-tasklist/task/data'
+           'angular', 'uuid', 'fixturer', 'underscore', 'jquery', 'camunda-tasklist-ui/task/data'
 ], function(angular,   uuid,   fix,        _,            $) {
 
 

@@ -1,16 +1,16 @@
 {
   "private": true,
-  "name": "camunda-tasklist",
+  "name": "camunda-tasklist-ui",
   "version": "7.2.0-SNAPSHOT",
   "description": "A web based interface for camunda BPM platform tasks.",
-  "main": "index.js",
+  "main": "client/scripts/index.js",
   "scripts": {
     "test": "./node_modules/grunt-cli/bin/grunt jasmine_node",
     "postinstall": "./node_modules/grunt-cli/bin/grunt build:prod"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/camunda/camunda-tasklist.git"
+    "url": "git://github.com/camunda/camunda-tasklist-ui.git"
   },
   "keywords": [
     "camunda",
@@ -21,9 +21,9 @@
   "author": "Valentin Vago <valentin.vago@camunda.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/camunda/camunda-tasklist/issues"
+    "url": "https://github.com/camunda/camunda-tasklist-ui/issues"
   },
-  "homepage": "https://github.com/camunda/camunda-tasklist",
+  "homepage": "https://github.com/camunda/camunda-tasklist-ui",
   "devDependencies": {
     "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-clean": "~0.5.0",
