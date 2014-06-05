@@ -25,27 +25,53 @@
       </plugins>
     </pluginManagement>
     <plugins>
+      <!-- create distribution zip -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
+        <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
-            <id>assemble</id>
+            <id>generate-zip</id>
             <phase>package</phase>
             <goals>
-              <goal>single</goal>
+              <goal>run</goal>
             </goals>
+            <inherited>false</inherited>
             <configuration>
-              <descriptors>
-                <descriptor>assembly.xml</descriptor>
-              </descriptors>
-              <attach>true</attach>
-              <appendAssemblyId>false</appendAssemblyId>
-              <outputDirectory>target/</outputDirectory>
+              <tasks>
+                <mkdir dir="${basedir}/target/"/>
+                <zip
+                 destfile="${basedir}/target/dist.zip"
+                 basedir="${basedir}/../dist/" />
+              </tasks>
             </configuration>
           </execution>
         </executions>
       </plugin>
+      <!-- attach zip to the build -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>attach-artifacts</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${basedir}/target/dist.zip</file>
+                  <type>zip</type>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 
