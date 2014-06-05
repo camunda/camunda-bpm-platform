@@ -32,6 +32,15 @@
       <artifactId>camunda-webapp-core</artifactId>
     </dependency>
 
+    <!-- the tasklist UI -->
+    <dependency>
+      <groupId>org.camunda.bpm.webapp</groupId>
+      <artifactId>camunda-tasklist-ui</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- jee spec -->
     <dependency>
       <groupId>org.jboss.spec</groupId>
@@ -227,6 +236,30 @@
               <classifier>classes</classifier>
             </configuration>
           </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.camunda.bpm.webapp</groupId>
+                  <artifactId>camunda-tasklist-ui</artifactId>
+                  <type>zip</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/webapp/app/tasklist</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+           </execution>
         </executions>
       </plugin>
     </plugins>
