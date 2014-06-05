@@ -71,7 +71,7 @@ public class CaseDefinitionRestServiceImpl extends AbstractRestProcessEngineAwar
 
   @Override
   public CaseDefinitionResource getCaseDefinitionById(String caseDefinitionId) {
-    return new CaseDefinitionResourceImpl(getProcessEngine(), caseDefinitionId);
+    return new CaseDefinitionResourceImpl(getProcessEngine(), caseDefinitionId, relativeRootResourcePath);
   }
 
   @Override

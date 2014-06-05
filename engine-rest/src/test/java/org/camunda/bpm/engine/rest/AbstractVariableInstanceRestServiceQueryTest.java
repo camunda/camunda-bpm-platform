@@ -6,8 +6,8 @@ import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -210,6 +210,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     String returnedValue = from(content).getString("[0].value");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedExecutionId = from(content).getString("[0].executionId");
+    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
     String returnedTaskId = from(content).getString("[0].taskId");
     String returnedActivityId = from(content).getString("[0].activityInstanceId");
 
@@ -219,6 +221,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE, returnedValue);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID, returnedExecutionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID, returnedCaseInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID, returnedCaseExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TASK_ID, returnedTaskId);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID, returnedActivityId);
 
@@ -250,6 +254,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     String returnedValue = from(content).getString("[0].value");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedExecutionId = from(content).getString("[0].executionId");
+    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
     String returnedTaskId = from(content).getString("[0].taskId");
     String returnedActivityId = from(content).getString("[0].activityInstanceId");
 
@@ -258,6 +264,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE, returnedValue);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID, returnedExecutionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID, returnedCaseInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID, returnedCaseExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TASK_ID, returnedTaskId);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID, returnedActivityId);
 
@@ -272,6 +280,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     queryParameters.put("variableNameLike", "aVariableNameLike");
     queryParameters.put("executionIdIn", "anExecutionId");
     queryParameters.put("processInstanceIdIn", "aProcessInstanceId");
+    queryParameters.put("caseExecutionIdIn", "aCaseExecutionId");
+    queryParameters.put("caseInstanceIdIn", "aCaseInstanceId");
     queryParameters.put("taskIdIn", "aTaskId");
     queryParameters.put("activityInstanceIdIn", "anActivityInstanceId");
 
@@ -283,6 +293,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).variableNameLike(queryParameters.get("variableNameLike"));
     verify(mockedQuery).processInstanceIdIn(queryParameters.get("processInstanceIdIn"));
     verify(mockedQuery).executionIdIn(queryParameters.get("executionIdIn"));
+    verify(mockedQuery).caseInstanceIdIn(queryParameters.get("caseInstanceIdIn"));
+    verify(mockedQuery).caseExecutionIdIn(queryParameters.get("caseExecutionIdIn"));
     verify(mockedQuery).taskIdIn(queryParameters.get("taskIdIn"));
     verify(mockedQuery).activityInstanceIdIn(queryParameters.get("activityInstanceIdIn"));
     verify(mockedQuery).list();
@@ -298,6 +310,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     String anExecutionId = "anExecutionId";
     String aTaskId = "aTaskId";
     String anActivityInstanceId = "anActivityInstanceId";
+    String aCaseInstanceId = "aCaseInstanceId";
+    String aCaseExecutionId = "aCaseExecutionId";
 
     Map<String, Object> queryParameters = new HashMap<String, Object>();
 
@@ -311,6 +325,14 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     List<String> processInstanceIdIn = new ArrayList<String>();
     processInstanceIdIn.add(aProcessInstanceId);
     queryParameters.put("processInstanceIdIn", processInstanceIdIn);
+
+    List<String> caseExecutionIdIn = new ArrayList<String>();
+    caseExecutionIdIn.add(aCaseExecutionId);
+    queryParameters.put("caseExecutionIdIn", caseExecutionIdIn);
+
+    List<String> caseInstanceIdIn = new ArrayList<String>();
+    caseInstanceIdIn.add(aCaseInstanceId);
+    queryParameters.put("caseInstanceIdIn", caseInstanceIdIn);
 
     List<String> taskIdIn = new ArrayList<String>();
     taskIdIn.add(aTaskId);

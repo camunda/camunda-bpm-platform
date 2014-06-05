@@ -12,25 +12,43 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
+import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 
-import javax.ws.rs.core.Response.Status;
-import java.io.InputStream;
-
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 /**
  * @author Roman Smirnov
@@ -45,8 +63,13 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
   protected static final String XML_DEFINITION_URL = SINGLE_CASE_DEFINITION_URL + "/xml";
   protected static final String XML_DEFINITION_BY_KEY_URL = SINGLE_CASE_DEFINITION_BY_KEY_URL + "/xml";
 
+  protected static final String CREATE_INSTANCE_URL = SINGLE_CASE_DEFINITION_URL + "/create";
+  protected static final String CREATE_INSTANCE_BY_KEY_URL = SINGLE_CASE_DEFINITION_BY_KEY_URL + "/create";
+
   private RepositoryService repositoryServiceMock;
+  private CaseService caseServiceMock;
   private CaseDefinitionQuery caseDefinitionQueryMock;
+  private CaseInstanceBuilder caseInstanceBuilder;
 
   @Before
   public void setUpRuntime() {
@@ -63,6 +86,18 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     when(caseDefinitionQueryMock.latestVersion()).thenReturn(caseDefinitionQueryMock);
     when(caseDefinitionQueryMock.singleResult()).thenReturn(mockCaseDefinition);
     when(repositoryServiceMock.createCaseDefinitionQuery()).thenReturn(caseDefinitionQueryMock);
+
+    caseServiceMock = mock(CaseService.class);
+
+    when(processEngine.getCaseService()).thenReturn(caseServiceMock);
+
+    caseInstanceBuilder = mock(CaseInstanceBuilder.class);
+    CaseInstance mockCaseInstance = MockProvider.createMockCaseInstance();
+
+    when(caseServiceMock.createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID)).thenReturn(caseInstanceBuilder);
+    when(caseInstanceBuilder.businessKey(anyString())).thenReturn(caseInstanceBuilder);
+    when(caseInstanceBuilder.setVariables(Matchers.<Map<String, Object>>any())).thenReturn(caseInstanceBuilder);
+    when(caseInstanceBuilder.create()).thenReturn(mockCaseInstance);
   }
 
   private InputStream createMockCaseDefinitionCmmnXml() {
@@ -144,7 +179,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
   }
 
   @Test
-  public void testNonExistingProcessDefinitionRetrieval_ByKey() {
+  public void testNonExistingCaseDefinitionRetrieval_ByKey() {
     String nonExistingKey = "aNonExistingDefinitionKey";
 
     when(repositoryServiceMock.createCaseDefinitionQuery().caseDefinitionKey(nonExistingKey)).thenReturn(caseDefinitionQueryMock);
@@ -160,6 +195,264 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
         .body("message", containsString("No matching case definition with key: " + nonExistingKey))
     .when()
       .get(SINGLE_CASE_DEFINITION_BY_KEY_URL);
+  }
+
+  @Test
+  public void testCreateCaseInstanceByCaseDefinitionId() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+    .when()
+      .post(CREATE_INSTANCE_URL);
+
+    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseInstanceBuilder).businessKey(null);
+    verify(caseInstanceBuilder).setVariables(null);
+    verify(caseInstanceBuilder).create();
+
+  }
+
+  @Test
+  public void testCreateCaseInstanceByCaseDefinitionKey() {
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_CASE_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+    .when()
+      .post(CREATE_INSTANCE_BY_KEY_URL);
+
+    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseInstanceBuilder).businessKey(null);
+    verify(caseInstanceBuilder).setVariables(null);
+    verify(caseInstanceBuilder).create();
+  }
+
+  @Test
+  public void testCreateCaseInstanceByCaseDefinitionIdWithBusinessKey() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("businessKey", MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+    .when()
+      .post(CREATE_INSTANCE_URL);
+
+    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseInstanceBuilder).businessKey(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
+    verify(caseInstanceBuilder).setVariables(null);
+    verify(caseInstanceBuilder).create();
+
+  }
+
+  @Test
+  public void testCreateCaseInstanceByCaseDefinitionKeyWithBusinessKey() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("businessKey", MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_CASE_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+    .when()
+      .post(CREATE_INSTANCE_BY_KEY_URL);
+
+    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseInstanceBuilder).businessKey(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
+    verify(caseInstanceBuilder).setVariables(null);
+    verify(caseInstanceBuilder).create();
+  }
+
+  @Test
+  public void testCreateCaseInstanceByCaseDefinitionIdWithVariables() {
+    VariableValueDto aVariable = new VariableValueDto("abc", null);
+    VariableValueDto anotherVariable = new VariableValueDto(999, null);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariableName", aVariable);
+    variables.put("anotherVariableName", anotherVariable);
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("variables", variables);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+    .when()
+      .post(CREATE_INSTANCE_URL);
+
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("aVariableName", "abc");
+    expectedVariables.put("anotherVariableName", 999);
+
+    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseInstanceBuilder).businessKey(null);
+    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).create();
+
+  }
+
+  @Test
+  public void testCreateCaseInstanceByCaseDefinitionKeyWithVariables() {
+    VariableValueDto aVariable = new VariableValueDto("abc", null);
+    VariableValueDto anotherVariable = new VariableValueDto(999, null);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariableName", aVariable);
+    variables.put("anotherVariableName", anotherVariable);
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("variables", variables);
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_CASE_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+    .when()
+      .post(CREATE_INSTANCE_BY_KEY_URL);
+
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("aVariableName", "abc");
+    expectedVariables.put("anotherVariableName", 999);
+
+    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseInstanceBuilder).businessKey(null);
+    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).create();
+  }
+
+  @Test
+  public void testCreateCaseInstanceByCaseDefinitionIdWithBusinessKeyAndVariables() {
+    VariableValueDto aVariable = new VariableValueDto("abc", null);
+    VariableValueDto anotherVariable = new VariableValueDto(999, null);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariableName", aVariable);
+    variables.put("anotherVariableName", anotherVariable);
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("variables", variables);
+    params.put("businessKey", "aBusinessKey");
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+    .when()
+      .post(CREATE_INSTANCE_URL);
+
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("aVariableName", "abc");
+    expectedVariables.put("anotherVariableName", 999);
+
+    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseInstanceBuilder).businessKey("aBusinessKey");
+    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).create();
+
+  }
+
+  @Test
+  public void testCreateCaseInstanceByCaseDefinitionKeyWithBusinessKeyAndVariables() {
+    VariableValueDto aVariable = new VariableValueDto("abc", null);
+    VariableValueDto anotherVariable = new VariableValueDto(999, null);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariableName", aVariable);
+    variables.put("anotherVariableName", anotherVariable);
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("variables", variables);
+    params.put("businessKey", "aBusinessKey");
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_CASE_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+    .when()
+      .post(CREATE_INSTANCE_BY_KEY_URL);
+
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("aVariableName", "abc");
+    expectedVariables.put("anotherVariableName", 999);
+
+    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseInstanceBuilder).businessKey("aBusinessKey");
+    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).create();
+  }
+
+  @Test
+  public void testCreateCaseInstanceByInvalidCaseDefinitionId() {
+    when(caseInstanceBuilder.create())
+      .thenThrow(new ProcessEngineException("expected exception"));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot instantiate case definition aCaseDefnitionId: expected exception"))
+    .when()
+      .post(CREATE_INSTANCE_URL);
+  }
+
+  @Test
+  public void testCreateCaseInstanceByInvalidCaseDefinitionKey() {
+    when(caseInstanceBuilder.create())
+      .thenThrow(new ProcessEngineException("expected exception"));
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_CASE_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot instantiate case definition aCaseDefnitionId: expected exception"))
+    .when()
+      .post(CREATE_INSTANCE_BY_KEY_URL);
   }
 
 }

@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
@@ -67,6 +68,10 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
+import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -103,7 +108,10 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String DEPLOYMENT_URL = DEPLOYMENT_REST_SERVICE_URL + "/{id}";
 
   protected static final String JOB_DEFINITION_URL = SINGLE_ENGINE_URL + "/job-definition";
+
   protected static final String CASE_DEFINITION_URL = SINGLE_ENGINE_URL + "/case-definition";
+  protected static final String CASE_INSTANCE_URL = SINGLE_ENGINE_URL + "/case-instance";
+  protected static final String CASE_EXECUTION_URL = SINGLE_ENGINE_URL + "/case-execution";
 
   protected static final String HISTORY_URL = SINGLE_ENGINE_URL + "/history";
   protected static final String HISTORY_ACTIVITY_INSTANCE_URL = HISTORY_URL + "/activity-instance";
@@ -123,6 +131,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   private IdentityService mockIdentityService;
   private ManagementService mockManagementService;
   private HistoryService mockHistoryService;
+  private CaseService mockCaseService;
 
   @Before
   public void setUpRuntimeData() {
@@ -133,6 +142,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     mockIdentityService = mock(IdentityService.class);
     mockManagementService = mock(ManagementService.class);
     mockHistoryService = mock(HistoryService.class);
+    mockCaseService = mock(CaseService.class);
 
     when(namedProcessEngine.getRepositoryService()).thenReturn(mockRepoService);
     when(namedProcessEngine.getRuntimeService()).thenReturn(mockRuntimeService);
@@ -140,6 +150,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(namedProcessEngine.getIdentityService()).thenReturn(mockIdentityService);
     when(namedProcessEngine.getManagementService()).thenReturn(mockManagementService);
     when(namedProcessEngine.getHistoryService()).thenReturn(mockHistoryService);
+    when(namedProcessEngine.getCaseService()).thenReturn(mockCaseService);
 
     createProcessDefinitionMock();
     createProcessInstanceMock();
@@ -151,6 +162,8 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createIncidentMock();
     createDeploymentMock();
     createCaseDefinitionMock();
+    createCaseInstanceMock();
+    createCaseExecutionMock();
 
     createHistoricActivityInstanceMock();
     createHistoricProcessInstanceMock();
@@ -176,6 +189,26 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     CaseDefinitionQuery mockCaseDefinitionQuery = mock(CaseDefinitionQuery.class);
     when(mockCaseDefinitionQuery.list()).thenReturn(caseDefinitions);
     when(mockRepoService.createCaseDefinitionQuery()).thenReturn(mockCaseDefinitionQuery);
+  }
+
+  private void createCaseInstanceMock() {
+    List<CaseInstance> caseInstances = new ArrayList<CaseInstance>();
+    CaseInstance mockCaseInstance = MockProvider.createMockCaseInstance();
+    caseInstances.add(mockCaseInstance);
+
+    CaseInstanceQuery mockCaseInstanceQuery = mock(CaseInstanceQuery.class);
+    when(mockCaseInstanceQuery.list()).thenReturn(caseInstances);
+    when(mockCaseService.createCaseInstanceQuery()).thenReturn(mockCaseInstanceQuery);
+  }
+
+  private void createCaseExecutionMock() {
+    List<CaseExecution> caseExecutions = new ArrayList<CaseExecution>();
+    CaseExecution mockCaseExecution = MockProvider.createMockCaseExecution();
+    caseExecutions.add(mockCaseExecution);
+
+    CaseExecutionQuery mockCaseExecutionQuery = mock(CaseExecutionQuery.class);
+    when(mockCaseExecutionQuery.list()).thenReturn(caseExecutions);
+    when(mockCaseService.createCaseExecutionQuery()).thenReturn(mockCaseExecutionQuery);
   }
 
   private void createProcessInstanceMock() {
@@ -612,6 +645,34 @@ public abstract class AbstractProcessEngineRestServiceTest extends
         .get(CASE_DEFINITION_URL);
 
     verify(mockRepoService).createCaseDefinitionQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testCaseInstanceAccess() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(CASE_INSTANCE_URL);
+
+    verify(mockCaseService).createCaseInstanceQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testCaseExecutionAccess() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(CASE_EXECUTION_URL);
+
+    verify(mockCaseService).createCaseExecutionQuery();
     verifyZeroInteractions(processEngine);
   }
 }

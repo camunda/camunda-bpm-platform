@@ -55,6 +55,8 @@ public class CamundaRestResources {
     RESOURCE_CLASSES.add(DeploymentRestServiceImpl.class);
 
     RESOURCE_CLASSES.add(CaseDefinitionRestServiceImpl.class);
+    RESOURCE_CLASSES.add(CaseInstanceRestServiceImpl.class);
+    RESOURCE_CLASSES.add(CaseExecutionRestServiceImpl.class);
 
     CONFIGURATION_CLASSES.add(JacksonConfigurator.class);
     CONFIGURATION_CLASSES.add(JacksonJsonProvider.class);

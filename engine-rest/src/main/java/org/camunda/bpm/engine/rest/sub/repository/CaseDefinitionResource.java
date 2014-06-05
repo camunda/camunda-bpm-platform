@@ -12,13 +12,19 @@
  */
 package org.camunda.bpm.engine.rest.sub.repository;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionDto;
+import org.camunda.bpm.engine.rest.dto.runtime.CaseInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.CreateCaseInstanceDto;
 
 /**
  * @author Roman Smirnov
@@ -34,5 +40,11 @@ public interface CaseDefinitionResource {
   @Path("/xml")
   @Produces(MediaType.APPLICATION_JSON)
   CaseDefinitionDiagramDto getCaseDefinitionCmmnXml();
+
+  @POST
+  @Path("/create")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  CaseInstanceDto createCaseInstance(@Context UriInfo context, CreateCaseInstanceDto parameters);
 
 }

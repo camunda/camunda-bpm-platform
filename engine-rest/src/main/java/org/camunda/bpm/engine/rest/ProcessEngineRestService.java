@@ -76,7 +76,14 @@ public interface ProcessEngineRestService {
   @Path("/{name}" + CaseDefinitionRestService.PATH)
   CaseDefinitionRestService getCaseDefinitionRestService(@PathParam("name") String engineName);
 
+  @Path("/{name}" + CaseInstanceRestService.PATH)
+  CaseInstanceRestService getCaseInstanceRestService(@PathParam("name") String engineName);
+
+  @Path("/{name}" + CaseExecutionRestService.PATH)
+  CaseExecutionRestService getCaseExecutionRestService(@PathParam("name") String engineName);
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   List<ProcessEngineDto> getProcessEngineNames();
+
 }

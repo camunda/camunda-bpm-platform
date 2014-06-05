@@ -61,6 +61,8 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
+import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -152,6 +154,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_VARIABLE_INSTANCE_VALUE = "aVariableInstanceValue";
   public static final String EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID = "aVariableInstanceProcInstId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID = "aVariableInstanceExecutionId";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID = "aVariableInstanceCaseInstId";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID = "aVariableInstanceCaseExecutionId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_TASK_ID = "aVariableInstanceTaskId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID = "aVariableInstanceVariableInstanceId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_ERROR_MESSAGE = "aVariableInstanceErrorMessage";
@@ -398,6 +402,18 @@ public abstract class MockProvider {
   public static final String EXAMPLE_CASE_DEFINITION_NAME = "aCaseDefinitionName";
   public static final String EXAMPLE_CASE_DEFINITION_RESOURCE_NAME = "aCaseDefinitionResourceName";
 
+  // case instance
+  public static final String EXAMPLE_CASE_INSTANCE_ID = "aCaseInstId";
+  public static final String EXAMPLE_CASE_INSTANCE_BUSINESS_KEY = "aBusinessKey";
+  public static final String EXAMPLE_CASE_INSTANCE_CASE_DEFINITION_ID = "aCaseDefinitionId";
+  public static final boolean EXAMPLE_CASE_INSTANCE_IS_ACTIVE = true;
+
+  // case execution
+  public static final String EXAMPLE_CASE_EXECUTION_ID = "aCaseExecutionId";
+  public static final String EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID = "aCaseInstanceId";
+  public static final boolean EXAMPLE_CASE_EXECUTION_IS_ENABLED = true;
+  public static final boolean EXAMPLE_CASE_EXECUTION_IS_ACTIVE = true;
+
   // tasks
   public static Task createMockTask() {
     Task mockTask = new MockTaskBuilder().id(EXAMPLE_TASK_ID).name(EXAMPLE_TASK_NAME).assignee(EXAMPLE_TASK_ASSIGNEE_NAME)
@@ -563,6 +579,8 @@ public abstract class MockProvider {
     when(mock.getValue()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_VALUE);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID);
     when(mock.getExecutionId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID);
+    when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID);
+    when(mock.getCaseExecutionId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID);
     when(mock.getTaskId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_TASK_ID);
     when(mock.getActivityInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID);
     when(mock.getErrorMessage()).thenReturn(null);
@@ -1279,4 +1297,39 @@ public abstract class MockProvider {
     return mockDefinition;
   }
 
+  // case instance
+  public static List<CaseInstance> createMockCaseInstances() {
+    List<CaseInstance> mocks = new ArrayList<CaseInstance>();
+    mocks.add(createMockCaseInstance());
+    return mocks;
+  }
+
+  public static CaseInstance createMockCaseInstance() {
+    CaseInstance mock = mock(CaseInstance.class);
+
+    when(mock.getId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
+    when(mock.getBusinessKey()).thenReturn(EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
+    when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_INSTANCE_CASE_DEFINITION_ID);
+    when(mock.isActive()).thenReturn(EXAMPLE_CASE_INSTANCE_IS_ACTIVE);
+
+    return mock;
+  }
+
+  // case execution
+  public static List<CaseExecution> createMockCaseExecutions() {
+    List<CaseExecution> mocks = new ArrayList<CaseExecution>();
+    mocks.add(createMockCaseExecution());
+    return mocks;
+  }
+
+  public static CaseExecution createMockCaseExecution() {
+    CaseExecution mock = mock(CaseExecution.class);
+
+    when(mock.getId()).thenReturn(EXAMPLE_CASE_EXECUTION_ID);
+    when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID);
+    when(mock.isActive()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
+    when(mock.isEnabled()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_ENABLED);
+
+    return mock;
+  }
 }

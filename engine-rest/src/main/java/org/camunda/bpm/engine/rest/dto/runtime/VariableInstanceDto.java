@@ -27,6 +27,8 @@ public class VariableInstanceDto {
   private Object value;
   private String processInstanceId;
   private String executionId;
+  private String caseInstanceId;
+  private String caseExecutionId;
   private String taskId;
   private String activityInstanceId;
   private String errorMessage;
@@ -105,6 +107,14 @@ public class VariableInstanceDto {
     this.errorMessage = errorMessage;
   }
 
+  public String getCaseExecutionId() {
+    return caseExecutionId;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
   public static VariableInstanceDto fromVariableInstance(VariableInstance variableInstance) {
     VariableInstanceEntity entity = (VariableInstanceEntity) variableInstance;
 
@@ -114,6 +124,10 @@ public class VariableInstanceDto {
     dto.setName(entity.getName());
     dto.setProcessInstanceId(entity.getProcessInstanceId());
     dto.setExecutionId(entity.getExecutionId());
+
+    dto.caseExecutionId = entity.getCaseExecutionId();
+    dto.caseInstanceId = entity.getCaseInstanceId();
+
     dto.setTaskId(entity.getTaskId());
     dto.setActivityInstanceId(entity.getActivityInstanceId());
     if(SerializableType.TYPE_NAME.equals(entity.getType().getTypeName())) {

@@ -24,6 +24,8 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.camunda.bpm.engine.rest.AuthorizationRestService;
 import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
+import org.camunda.bpm.engine.rest.CaseExecutionRestService;
+import org.camunda.bpm.engine.rest.CaseInstanceRestService;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.GroupRestService;
@@ -167,6 +169,22 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
   public CaseDefinitionRestService getCaseDefinitionRestService(String engineName) {
     String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
     CaseDefinitionRestServiceImpl subResource = new CaseDefinitionRestServiceImpl(engineName);
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
+  }
+
+  @Override
+  public CaseInstanceRestService getCaseInstanceRestService(String engineName) {
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    CaseInstanceRestServiceImpl subResource = new CaseInstanceRestServiceImpl(engineName);
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
+  }
+
+  @Override
+  public CaseExecutionRestService getCaseExecutionRestService(String engineName) {
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    CaseExecutionRestServiceImpl subResource = new CaseExecutionRestServiceImpl(engineName);
     subResource.setRelativeRootResourceUri(rootResourcePath);
     return subResource;
   }
