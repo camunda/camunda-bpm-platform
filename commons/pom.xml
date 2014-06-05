@@ -21,6 +21,7 @@
 
   <modules>
     <module>logging</module>
+    <module>utils</module>
     <module>bom</module>
   </modules>
 
