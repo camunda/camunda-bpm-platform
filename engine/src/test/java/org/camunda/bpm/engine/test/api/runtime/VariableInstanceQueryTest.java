@@ -2294,13 +2294,18 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     assertEquals(2, result.size());
 
-    VariableInstance aVariable = result.get(0);
-    assertEquals("aVariableName", aVariable.getName());
-    assertEquals("abc", aVariable.getValue());
+    for (VariableInstance variableInstance : result) {
+      if (variableInstance.getName().equals("aVariableName")) {
+        assertEquals("aVariableName", variableInstance.getName());
+        assertEquals("abc", variableInstance.getValue());
+      } else if (variableInstance.getName().equals("anotherVariableName")) {
+        assertEquals("anotherVariableName", variableInstance.getName());
+        assertEquals("xyz", variableInstance.getValue());
+      } else {
+        fail("Unexpected variable: " + variableInstance.getName());
+      }
 
-    VariableInstance anotherVariable = result.get(1);
-    assertEquals("anotherVariableName", anotherVariable.getName());
-    assertEquals("xyz", anotherVariable.getValue());
+    }
   }
 
   @Test
@@ -2354,13 +2359,18 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     assertEquals(2, result.size());
 
-    VariableInstance aVariable = result.get(0);
-    assertEquals("aVariableName", aVariable.getName());
-    assertEquals("abc", aVariable.getValue());
+    for (VariableInstance variableInstance : result) {
+      if (variableInstance.getName().equals("aVariableName")) {
+        assertEquals("aVariableName", variableInstance.getName());
+        assertEquals("abc", variableInstance.getValue());
+      } else if (variableInstance.getName().equals("anotherVariableName")) {
+        assertEquals("anotherVariableName", variableInstance.getName());
+        assertEquals("xyz", variableInstance.getValue());
+      } else {
+        fail("Unexpected variable: " + variableInstance.getName());
+      }
 
-    VariableInstance anotherVariable = result.get(1);
-    assertEquals("anotherVariableName", anotherVariable.getName());
-    assertEquals("xyz", anotherVariable.getValue());
+    }
   }
 
   @Test
@@ -2415,13 +2425,18 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     assertEquals(2, result.size());
 
-    VariableInstance aVariable = result.get(0);
-    assertEquals("aVariableName", aVariable.getName());
-    assertEquals("abc", aVariable.getValue());
+    for (VariableInstance variableInstance : result) {
+      if (variableInstance.getName().equals("aVariableName")) {
+        assertEquals("aVariableName", variableInstance.getName());
+        assertEquals("abc", variableInstance.getValue());
+      } else if (variableInstance.getName().equals("anotherVariableName")) {
+        assertEquals("anotherVariableName", variableInstance.getName());
+        assertEquals("xyz", variableInstance.getValue());
+      } else {
+        fail("Unexpected variable: " + variableInstance.getName());
+      }
 
-    VariableInstance anotherVariable = result.get(1);
-    assertEquals("anotherVariableName", anotherVariable.getName());
-    assertEquals("xyz", anotherVariable.getValue());
+    }
   }
 
 }
