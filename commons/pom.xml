@@ -15,12 +15,6 @@
   <name>camunda Commons - Root Pom</name>
   <packaging>pom</packaging>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <version.java>1.6</version.java>
-  </properties>
-
   <modules>
     <module>logging</module>
     <module>utils</module>
@@ -67,15 +61,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
-          <configuration>
-            <source>${version.java}</source>
-            <target>${version.java}</target>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
           <version>2.3.7</version>
@@ -110,29 +95,6 @@
     </plugins>
   </build>
 
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
-
-  <organization>
-    <name>camunda services GmbH</name>
-    <url>http://www.camunda.com</url>
-  </organization>
-
-  <url>http://www.camunda.org</url>
-
-  <developers>
-    <developer>
-      <id>camunda.org</id>
-      <name>camunda BPM Community</name>
-      <organization>camunda.org</organization>
-      <organizationUrl>http://camunda.org</organizationUrl>
-    </developer>
-  </developers>
-
   <scm>
     <url>https://github.com/camunda/camunda-commons</url>
     <connection>scm:git:git@github.com:camunda/camunda-commons.git</connection>
@@ -140,8 +102,4 @@
     <tag>HEAD</tag>
   </scm>
 
-  <issueManagement>
-    <system>Jira</system>
-    <url>https://app.camunda.com/jira/browse/CAM/</url>
-  </issueManagement>
 </project>
