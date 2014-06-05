@@ -47,8 +47,8 @@ Using a __second terminal session__, run the auto-build for the platform
 # go in the platform webapp directory
 cd camunda-bpm-platform/webapps/camunda-webapp/webapp
 
-# run the automated build
-grunt auto-build
+# run the automated build, with livereload using port 9091
+LIVERELOAD_PORT=9091 grunt auto-build
 # alternatively, if you do not have grunt-cli installed globally,
 # grunt executable can also be found in node_modules/.bin/grunt
 ```
