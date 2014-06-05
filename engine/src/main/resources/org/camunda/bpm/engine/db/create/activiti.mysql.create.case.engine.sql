@@ -37,7 +37,7 @@ create index ACT_IDX_CASE_EXEC_BUSKEY on ACT_RU_CASE_EXECUTION(BUSINESS_KEY_);
 alter table ACT_RU_CASE_EXECUTION
     add constraint ACT_FK_CASE_EXE_CASE_INST
     foreign key (CASE_INST_ID_)
-    references ACT_RU_CASE_EXECUTION(ID_);
+    references ACT_RU_CASE_EXECUTION(ID_) on delete cascade on update cascade;
 
 alter table ACT_RU_CASE_EXECUTION
     add constraint ACT_FK_CASE_EXE_PARENT
