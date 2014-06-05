@@ -656,10 +656,10 @@ module.exports = function(grunt) {
       ]);
     }
     else {
+      tasks.push('app-build:camunda-tasklist-ui');
     }
 
 
-    tasks.push('app-build:camunda-tasklist-ui');
 
 
     tasks = tasks.concat([
