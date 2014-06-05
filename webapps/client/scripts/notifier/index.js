@@ -6,7 +6,7 @@ function(angular) {
   var notifierModule = angular.module('cam.tasklist.notifier', []);
 
   var each = angular.forEach;
-  // var this._messages = [];
+
   var _id = 0;
 
   function Notifier(scope) {
@@ -16,7 +16,7 @@ function(angular) {
 
   Notifier.prototype.scope = null;
 
-  Notifier.prototype.messages = [];
+  Notifier.prototype._messages = [];
 
   Notifier.prototype.get = function(type) {
     if (!type) {
@@ -101,15 +101,23 @@ function(angular) {
 
   notifierModule.directive('camTasklistNotifier', function() {
     return {
+      scope: {},
       controller: [
-              '$rootScope', '$scope', 'camTasklistNotifier',
-      function($rootScope,   $scope,   camTasklistNotifier) {
-
+              '$rootScope', '$scope', '$timeout', 'camTasklistNotifier',
+      function($rootScope,   $scope,   $timeout,   camTasklistNotifier) {
         $scope.remove = function(id) {
           camTasklistNotifier.dismiss(id);
         };
 
         $rootScope.$on('notifier:message', function(ev, msgs) {
+          each(msgs, function(msg) {
+            if (msg.duration !== false) {
+              $timeout(function() {
+                $scope.remove(msg.id);
+              }, msg.duration || 4000);
+            }
+          });
+
           $scope.messages = msgs;
         });
 
