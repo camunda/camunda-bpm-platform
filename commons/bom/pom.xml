@@ -15,10 +15,6 @@
   <name>camunda Commons - Bom</name>
   <packaging>pom</packaging>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
 
@@ -37,39 +33,11 @@
     </dependencies>
   </dependencyManagement>
 
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
-
-  <organization>
-    <name>camunda services GmbH</name>
-    <url>http://www.camunda.com</url>
-  </organization>
-
-  <url>http://www.camunda.org</url>
-
-  <developers>
-    <developer>
-      <id>camunda.org</id>
-      <name>camunda BPM Community</name>
-      <organization>camunda.org</organization>
-      <organizationUrl>http://camunda.org</organizationUrl>
-    </developer>
-  </developers>
-
   <scm>
     <url>https://github.com/camunda/camunda-commons</url>
     <connection>scm:git:git@github.com:camunda/camunda-commons.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-commons.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
-
-  <issueManagement>
-    <system>Jira</system>
-    <url>https://app.camunda.com/jira/browse/CAM/</url>
-  </issueManagement>
 
 </project>
