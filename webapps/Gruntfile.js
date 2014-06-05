@@ -22,7 +22,6 @@ module.exports = function(grunt) {
 
     bower:            require('./grunt/config/bower')(config),
 
-    // sadly, this is not ready yet.
     jasmine_node:     require('./grunt/config/jasmine_node')(config),
 
     karma:            require('./grunt/config/karma')(config),
@@ -51,7 +50,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('build', function(target) {
-    target = target || 'dist';
+    target = target || 'prod';
 
     var tasks = [
       'clean',
@@ -66,8 +65,8 @@ module.exports = function(grunt) {
     grunt.task.run(tasks);
   });
 
-  grunt.registerTask('serve', [
-    'build:dev',
+  grunt.registerTask('auto-build', [
+    'build',
     'connect',
     'watch'
   ]);
