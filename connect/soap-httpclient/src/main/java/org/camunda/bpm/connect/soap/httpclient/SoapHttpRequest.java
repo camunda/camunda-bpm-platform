@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.connect.soap.httpclient;
 
+import org.camunda.bpm.connect.impl.AbstractConnectorRequest;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.camunda.bpm.connect.impl.AbstractConnectorRequest;
 
 /**
  * Defines a soap http request.
@@ -62,7 +62,7 @@ public class SoapHttpRequest extends AbstractConnectorRequest<SoapHttpResponse> 
   }
 
   public SoapHttpRequest contentType(String value) {
-    return header("content-type", value);
+    return header("Content-Type", value);
   }
 
   // getters ///////////////////////////////////

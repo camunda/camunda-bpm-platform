@@ -12,16 +12,76 @@
  */
 package org.camunda.bpm.connect.soap.httpclient;
 
+import org.apache.http.client.methods.HttpPost;
+import org.camunda.commons.utils.IoUtil;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class SoapHttpClientTest<V> {
+public class SoapHttpClientTest {
+
+  private SoapHttpConnector connector;
+  private SoapHttpRequest request;
+
+  @Before
+  public void createRequest() {
+    connector = new SoapHttpConnector();
+    request = connector.createRequest()
+      .contentType("application/xml")
+      .endpointUrl("http://camunda.org/soap")
+      .soapAction("action")
+      .soapEnvelope(IoUtil.stringAsInputStream("test"));
+  }
 
   @Test
-  public void shouldInvokeClient() {
+  public void shouldComposeHttpPost() throws IOException {
+    HttpPost httpPost = connector.createHttpPost(request);
+
+    assertThat(httpPost.getMethod()).isEqualTo("POST");
+    assertThat(httpPost.getURI().toASCIIString()).isEqualTo("http://camunda.org/soap");
+    assertThat(httpPost.getAllHeaders()).hasSize(2);
+    assertThat(httpPost.getFirstHeader("Content-Type").getValue()).isEqualTo("application/xml");
+    assertThat(httpPost.getFirstHeader("SOAPAction").getValue()).isEqualTo("action");
+    String content = IoUtil.inputStreamAsString(httpPost.getEntity().getContent());
+    assertThat(content).isEqualTo("test");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void shouldFailIfNoEnvelopeIsSet() {
+    request.soapEnvelope(null);
+    connector.createHttpPost(request);
+  }
+
+  @Test
+  public void shouldSetAdditionalHeaders() {
+    request.header("Accept", "application/xml");
+
+    HttpPost httpPost = connector.createHttpPost(request);
+
+    assertThat(httpPost.getFirstHeader("Accept").getValue()).isEqualTo("application/xml");
+  }
+
+  @Test
+  public void shouldSetAdditionalRequestParameters() {
+    request.setRequestParameter("hello", "world");
+
+    HashMap<String, Object> params = new HashMap<String, Object>();
+    params.put("foo", "bar");
+    params.put("test", "test");
+    request.setRequestParameters(params);
+
+    assertThat(request.getRequestParameter("hello")).isEqualTo("world");
+    assertThat(request.getRequestParameter("foo")).isEqualTo("bar");
+    assertThat(request.getRequestParameter("test")).isEqualTo("test");
 
   }
+
 }

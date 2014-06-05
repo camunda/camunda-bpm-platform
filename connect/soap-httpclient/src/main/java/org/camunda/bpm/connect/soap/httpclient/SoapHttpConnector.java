@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.connect.soap.httpclient;
 
-import java.util.Map.Entry;
-
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.InputStreamEntity;
@@ -21,11 +19,15 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.camunda.bpm.connect.impl.AbstractConnector;
 
+import java.util.Map.Entry;
+
 /**
  * @author Daniel Meyer
  *
  */
 public class SoapHttpConnector extends AbstractConnector<SoapHttpRequest, SoapHttpResponse> {
+
+  private static final SoapHttpConnectorLogger LOG = SoapHttpLogger.SOAP_CONNECTOR_LOGGER;
 
   public static final String ID = "soap-http-connector";
 
@@ -81,6 +83,7 @@ public class SoapHttpConnector extends AbstractConnector<SoapHttpRequest, SoapHt
 
     for (Entry<String, String> entry : soapHttpRequest.getHeaders().entrySet()) {
       httpPost.setHeader(entry.getKey(), entry.getValue());
+      LOG.setHeader(entry.getKey(), entry.getValue());
     }
 
     httpPost.setEntity(new InputStreamEntity(soapHttpRequest.getSoapEnvelope()));
