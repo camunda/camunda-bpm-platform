@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity">
+
+  <!-- CASE EXECUTION INSERT -->
+
+  <insert id="insertCaseExecution" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity">
+    insert into ${prefix}ACT_RU_CASE_EXECUTION (ID_, CASE_INST_ID_, BUSINESS_KEY_, CASE_DEF_ID_, ACT_ID_, PARENT_ID_, CURRENT_STATE_, PREV_STATE_, REV_)
+    values (
+      #{id, jdbcType=VARCHAR},
+      #{caseInstanceId, jdbcType=VARCHAR},
+      #{businessKey, jdbcType=VARCHAR},
+      #{caseDefinitionId, jdbcType=VARCHAR},
+      #{activityId, jdbcType=VARCHAR},
+      #{parentId, jdbcType=VARCHAR},
+      #{currentState, jdbcType=INTEGER},
+      #{previousState, jdbcType=INTEGER},
+      1
+    )
+  </insert>
+
+  <!-- CASE EXECUTION UPDATE -->
+
+  <update id="updateCaseExecution" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity">
+    update ${prefix}ACT_RU_CASE_EXECUTION set
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      STATE_ = #{state, jdbcType=INTEGER},
+      PREV_STATE_ = #{previousState, jdbcType=INTEGER}
+    where ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <!-- CASE EXECUTION DELETE -->
+
+  <delete id="deleteCaseExecution" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity">
+    delete from ${prefix}ACT_RU_CASE_EXECUTION where ID_ = #{id} and REV_ = #{revision}
+  </delete>
+
+  <!-- CASE EXECUTION RESULTMAP -->
+
+  <resultMap id="caseExecutionResultMap" type="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
+    <result property="currentState" column="CURRENT_STATE_" jdbcType="INTEGER"/>
+    <result property="previousStage" column="PREVIOUS_STATE_" jdbcType="INTEGER"/>
+  </resultMap>
+
+  <!-- CASE EXECUTION SELECT -->
+
+  <select id="selectCaseExecution" parameterType="string" resultMap="caseExecutionResultMap">
+    select * from ${prefix}ACT_RU_CASE_EXECUTION where ID_ = #{id}
+  </select>
+
+  <select id="selectCaseExecutionsByParentCaseExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="caseExecutionResultMap">
+    select * from ${prefix}ACT_RU_CASE_EXECUTION
+    where PARENT_ID_ = #{parameter}
+  </select>
+
+  <select id="selectCaseInstanceIdsByCaseDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select ID_
+    from ${prefix}ACT_RU_CASE_EXECUTION
+    where CASE_DEF_ID_ = #{parameter} and PARENT_ID_ is null
+  </select>
+
+  <select id="selectCaseExecutionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionQueryImpl" resultMap="caseExecutionResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}, P.KEY_
+    <include refid="selectCaseExecutionsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectCaseExecutionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionQueryImpl" resultType="long">
+    select count(*)
+    <include refid="selectCaseExecutionsByQueryCriteriaSql"/>
+  </select>
+
+  <!--  same as selectCaseExecutionByQueryCriteria, but with different parameterType -->
+  <select id="selectCaseInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseInstanceQueryImpl" resultMap="caseExecutionResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}, P.KEY_
+    <include refid="selectCaseExecutionsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectCaseInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseInstanceQueryImpl" resultType="long">
+    select count(*)
+    <include refid="selectCaseExecutionsByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectCaseExecutionsByQueryCriteriaSql">
+    from ${prefix}ACT_RU_CASE_EXECUTION RES
+    <if test="businessKey != null">
+      inner join ${prefix}ACT_RU_CASE_EXECUTION INST on RES.CASE_INST_ID_ = INST.ID_
+    </if>
+    inner join ${prefix}ACT_RE_CASE_DEF P on RES.CASE_DEF_ID_ = P.ID_
+    <where>
+      <if test="caseInstancesOnly">
+        RES.PARENT_ID_ is null
+      </if>
+      <if test="caseDefinitionId != null">
+        and P.ID_ = #{caseDefinitionId}
+      </if>
+      <if test="caseDefinitionKey != null">
+        and P.KEY_ = #{caseDefinitionKey}
+      </if>
+      <if test="activityId != null">
+        and RES.ACT_ID_ = #{activityId}
+      </if>
+      <if test="caseExecutionId != null">
+        and RES.ID_ = #{caseExecutionId}
+      </if>
+      <if test="caseInstanceId != null">
+        and RES.CASE_INST_ID_ = #{caseInstanceId}
+      </if>
+      <if test="businessKey != null">
+        and INST.BUSINESS_KEY_ = #{businessKey}
+      </if>
+      <if test="state != null">
+        and RES.CURRENT_STATE_ = #{state.stateCode}
+      </if>
+
+      <!-- queryVariables -->
+      <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
+      <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+      and EXISTS (
+        select
+          ID_
+        from
+          ${prefix}ACT_RU_VARIABLE
+        where
+          NAME_= #{queryVariableValue.name}
+
+          <choose>
+            <when test="queryVariableValue.local">
+              and RES.ID_ = CASE_EXECUTION_ID_
+            </when>
+            <otherwise>
+              and RES.CASE_INST_ID_ = CASE_INST_ID_
+              <!-- When case instance variable is queried for, only case variables are taken into account -->
+              and CASE_EXECUTION_ID_ = CASE_INST_ID_
+            </otherwise>
+          </choose>
+
+          <if test="!queryVariableValue.type.equals('null')">
+          <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+          and TYPE_ = #{queryVariableValue.type}
+          </if>
+  
+          <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+            and TEXT_
+          <choose>
+            <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+            <otherwise><include refid="executionVariableOperator" /></otherwise>
+          </choose>
+            #{queryVariableValue.textValue}
+          </if>
+          <if test="queryVariableValue.textValue2 != null">
+            and TEXT2_
+          <choose>
+            <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+            <otherwise><include refid="executionVariableOperator" /></otherwise>
+          </choose>
+            #{queryVariableValue.textValue2}
+          </if>
+  
+          <!-- Have a look in both columns -->
+          <if test="queryVariableValue.longValue != null">
+            and LONG_
+            <include refid="executionVariableOperator" />
+            #{queryVariableValue.longValue}
+          </if>
+  
+          <if test="queryVariableValue.doubleValue != null">
+            and DOUBLE_
+            <include refid="executionVariableOperator" />
+            #{queryVariableValue.doubleValue}
+          </if>
+  
+          <!-- Null variable type -->
+          <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+            <choose>
+            <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+              and (TEXT_ is not null or TEXT2_ is not null or LONG_ is not null or DOUBLE_ is not null or BYTEARRAY_ID_ is not null)
+            </when>
+            <otherwise>
+              and TEXT_ is null and TEXT2_ is null and LONG_ is null and DOUBLE_ is null and BYTEARRAY_ID_ is null
+            </otherwise>
+          </choose>
+          </if>
+      )
+      </foreach>
+    </where>
+  </sql>
+
+  <sql id="executionVariableOperator">
+    <choose>
+      <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
+      <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
+      <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
+      <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
+      <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
+      <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+   </choose>
+  </sql>
+
+</mapper>

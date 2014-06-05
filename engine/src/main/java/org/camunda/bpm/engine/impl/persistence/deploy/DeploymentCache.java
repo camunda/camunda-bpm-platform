@@ -31,6 +31,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.cmmn.Cmmn;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 
 
 /**
@@ -44,6 +46,7 @@ public class DeploymentCache {
   protected Map<String, ProcessDefinitionEntity> processDefinitionCache = new HashMap<String, ProcessDefinitionEntity>();
   protected Map<String, CaseDefinitionEntity> caseDefinitionCache = new HashMap<String, CaseDefinitionEntity>();
   protected Map<String, BpmnModelInstance> bpmnModelInstanceCache = new HashMap<String, BpmnModelInstance>();
+  protected Map<String, CmmnModelInstance> cmmnModelInstanceCache = new HashMap<String, CmmnModelInstance>();
   protected List<Deployer> deployers;
 
   public void deploy(DeploymentEntity deployment) {
@@ -274,6 +277,30 @@ public class DeploymentCache {
     return cachedCaseDefinition;
   }
 
+  public CmmnModelInstance findCmmnModelInstanceForCaseDefinition(String caseDefinitionId) {
+    CmmnModelInstance cmmnModelInstance = cmmnModelInstanceCache.get(caseDefinitionId);
+    if(cmmnModelInstance == null) {
+
+      CaseDefinitionEntity caseDefinition = findDeployedCaseDefinitionById(caseDefinitionId);
+      String deploymentId = caseDefinition.getDeploymentId();
+      String resourceName = caseDefinition.getResourceName();
+
+      InputStream cmmnResourceInputStream = new GetDeploymentResourceCmd(deploymentId, resourceName)
+        .execute(Context.getCommandContext());
+
+      try {
+        cmmnModelInstance = Cmmn.readModelFromStream(cmmnResourceInputStream);
+      }catch(Exception e) {
+        throw new ProcessEngineException("Could not load Cmmn Model for case definition " + caseDefinitionId, e);
+      }
+
+      // put model instance into cache.
+      cmmnModelInstanceCache.put(caseDefinitionId, cmmnModelInstance);
+
+    }
+    return cmmnModelInstance;
+  }
+
   public void addCaseDefinition(CaseDefinitionEntity caseDefinition) {
     caseDefinitionCache.put(caseDefinition.getId(), caseDefinition);
   }
@@ -292,12 +319,24 @@ public class DeploymentCache {
     return bpmnModelInstanceCache;
   }
 
+  public Map<String, CmmnModelInstance> getCmmnModelInstanceCache() {
+    return cmmnModelInstanceCache;
+  }
+
   public Map<String, ProcessDefinitionEntity> getProcessDefinitionCache() {
     return processDefinitionCache;
   }
 
   public void setProcessDefinitionCache(Map<String, ProcessDefinitionEntity> processDefinitionCache) {
     this.processDefinitionCache = processDefinitionCache;
+  }
+
+  public Map<String, CaseDefinitionEntity> getCaseDefinitionCache() {
+    return caseDefinitionCache;
+  }
+
+  public void setCaseDefinitionCache(Map<String, CaseDefinitionEntity> caseDefinitionCache) {
+    this.caseDefinitionCache = caseDefinitionCache;
   }
 
   public List<Deployer> getDeployers() {

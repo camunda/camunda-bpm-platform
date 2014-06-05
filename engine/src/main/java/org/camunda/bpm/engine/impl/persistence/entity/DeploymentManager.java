@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -97,9 +98,6 @@ public class DeploymentManager extends AbstractManager {
     getProcessDefinitionManager()
       .deleteProcessDefinitionsByDeploymentId(deploymentId);
 
-    getCaseDefinitionManager()
-      .deleteCaseDefinitionsByDeploymentId(deploymentId);
-
     for (ProcessDefinition processDefinition : processDefinitions) {
       String processDefinitionId = processDefinition.getId();
 
@@ -125,10 +123,46 @@ public class DeploymentManager extends AbstractManager {
 
     }
 
+    deleteCaseDeployment(deploymentId, cascade);
+
     getResourceManager()
       .deleteResourcesByDeploymentId(deploymentId);
 
     getDbSqlSession().delete("deleteDeployment", deploymentId);
+  }
+
+  protected void deleteCaseDeployment(String deploymentId, boolean cascade) {
+    List<CaseDefinition> caseDefinitions = getDbSqlSession()
+        .createCaseDefinitionQuery()
+        .deploymentId(deploymentId)
+        .list();
+
+    if (cascade) {
+
+      // delete case instances
+      for (CaseDefinition caseDefinition: caseDefinitions) {
+        String caseDefinitionId = caseDefinition.getId();
+
+        getCaseInstanceManager()
+          .deleteCaseInstancesByCaseDefinition(caseDefinitionId, "deleted deployment", cascade);
+
+      }
+    }
+
+    // delete case definitions from db
+    getCaseDefinitionManager()
+      .deleteCaseDefinitionsByDeploymentId(deploymentId);
+
+    for (CaseDefinition caseDefinition : caseDefinitions) {
+      String processDefinitionId = caseDefinition.getId();
+
+      // remove case definitions from cache:
+      Context
+        .getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .removeCaseDefinition(processDefinitionId);
+    }
+
   }
 
 

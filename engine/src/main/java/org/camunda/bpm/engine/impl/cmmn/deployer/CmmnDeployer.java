@@ -180,7 +180,7 @@ public class CmmnDeployer implements Deployer {
       String caseDefinitionId = generateCaseDefinitionId(caseDefinition);
       caseDefinition.setId(caseDefinitionId);
 
-      caseDefinitionManager.insert(caseDefinition);
+      caseDefinitionManager.insertCaseDefinition(caseDefinition);
 
       // Add to cache
       addCaseDefinitionToDeploymentCache(caseDefinition);

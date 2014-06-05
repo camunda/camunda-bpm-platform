@@ -63,6 +63,10 @@ public class CmmnActivity extends CoreActivity {
     return activities;
   }
 
+  public CmmnActivity findActivity(String activityId) {
+    return (CmmnActivity) super.findActivity(activityId);
+  }
+
   // child activity ////////////////////////////////////////////
 
   public CmmnActivity getChildActivity(String activityId) {

@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENAB
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_DELETE_CASCADE;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_COMPLETE;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_CREATE;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_DISABLE;
@@ -152,6 +153,19 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   protected CoreVariableScope getParentVariableScope() {
     return getParent();
+  }
+
+  //delete/remove /////////////////////////////////////////////////////
+
+  public void deleteCascade() {
+   performOperation(CASE_EXECUTION_DELETE_CASCADE);
+  }
+
+  public void remove() {
+   CmmnExecution parent = getParent();
+   if (parent!=null) {
+     parent.getCaseExecutions().remove(this);
+   }
   }
 
   // state /////////////////////////////////////////////////////

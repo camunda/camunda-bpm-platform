@@ -42,6 +42,12 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
   /** Only select variable instances which have one of the process instance ids. **/
   VariableInstanceQuery processInstanceIdIn(String... processInstanceIds);
 
+  /** Only select variable instances which have one of the case execution ids. **/
+  VariableInstanceQuery caseExecutionIdIn(String... caseExecutionIds);
+
+  /** Only select variable instances which have one of the case instance ids. **/
+  VariableInstanceQuery caseInstanceIdIn(String... caseInstanceIds);
+
   /** Only select variable instances which have one of the task ids. **/
   VariableInstanceQuery taskIdIn(String... taskIds);
 

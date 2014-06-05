@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import junit.framework.AssertionFailedError;
 
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -79,6 +80,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   protected IdentityService identityService;
   protected ManagementService managementService;
   protected AuthorizationService authorizationService;
+  protected CaseService caseService;
 
   protected abstract void initializeProcessEngine();
 
@@ -180,6 +182,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     identityService = processEngine.getIdentityService();
     managementService = processEngine.getManagementService();
     authorizationService = processEngine.getAuthorizationService();
+    caseService = processEngine.getCaseService();
   }
 
   public void assertProcessEnded(final String processInstanceId) {

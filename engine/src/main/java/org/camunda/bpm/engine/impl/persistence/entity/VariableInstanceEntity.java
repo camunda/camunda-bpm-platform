@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.db.HasRevision;
@@ -19,10 +23,6 @@ import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
 import org.camunda.bpm.engine.runtime.VariableInstance;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Tom Baeyens
@@ -39,6 +39,8 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
   protected String processInstanceId;
   protected String executionId;
   protected String taskId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
   protected String activityInstanceId;
 
   protected Long longValue;
@@ -132,6 +134,14 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
 
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
+  }
+
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
   }
 
   // byte array value /////////////////////////////////////////////////////////
@@ -230,78 +240,111 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
   public String getId() {
     return id;
   }
+
   public void setId(String id) {
     this.id = id;
   }
+
   public String getTextValue() {
     return textValue;
   }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public String getExecutionId() {
     return executionId;
   }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
+  }
+
   public Long getLongValue() {
     return longValue;
   }
+
   public void setLongValue(Long longValue) {
     this.longValue = longValue;
   }
+
   public Double getDoubleValue() {
     return doubleValue;
   }
+
   public void setDoubleValue(Double doubleValue) {
     this.doubleValue = doubleValue;
   }
+
   public void setName(String name) {
     this.name = name;
   }
+
   public void setTextValue(String textValue) {
     this.textValue = textValue;
   }
+
   public String getName() {
     return name;
   }
+
   public int getRevision() {
     return revision;
   }
+
   public void setRevision(int revision) {
     this.revision = revision;
   }
+
   public void setType(VariableType type) {
     this.type = type;
   }
+
   public VariableType getType() {
     return type;
   }
+
   public Object getCachedValue() {
     return cachedValue;
   }
+
   public void setCachedValue(Object cachedValue) {
     this.cachedValue = cachedValue;
   }
+
   public String getTextValue2() {
     return textValue2;
   }
+
   public void setTextValue2(String textValue2) {
     this.textValue2 = textValue2;
   }
+
   public String getTaskId() {
     return taskId;
   }
+
   public void setTaskId(String taskId) {
     this.taskId = taskId;
   }
+
   public String getActivityInstanceId() {
     return activityInstanceId;
   }
+
   public void setActivityInstanceId(String acitivtyInstanceId) {
     this.activityInstanceId = acitivtyInstanceId;
   }
+
   public String getTypeName() {
     return (type != null ? type.getTypeName() : null);
   }
+
   public String getErrorMessage() {
     return errorMessage;
   }
@@ -310,7 +353,12 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
     if (taskId != null) {
       return taskId;
     }
-    return executionId;
+
+    if (executionId != null) {
+      return executionId;
+    }
+
+    return caseExecutionId;
   }
 
   @Override
@@ -321,6 +369,8 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
            + ", name=" + name
            + ", processInstanceId=" + processInstanceId
            + ", executionId=" + executionId
+           + ", caseInstanceId=" + caseInstanceId
+           + ", caseExecutionId=" + caseExecutionId
            + ", taskId=" + taskId
            + ", activityInstanceId=" + activityInstanceId
            + ", longValue=" + longValue

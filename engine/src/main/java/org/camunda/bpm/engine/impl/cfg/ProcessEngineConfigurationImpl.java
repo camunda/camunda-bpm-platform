@@ -45,6 +45,7 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -77,8 +78,10 @@ import org.camunda.bpm.engine.impl.calendar.MapBusinessCalendarManager;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.camunda.bpm.engine.impl.cmmn.CaseServiceImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
 import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistry;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformFactory;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
@@ -232,6 +235,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected FormService formService = new FormServiceImpl();
   protected ManagementService managementService = new ManagementServiceImpl();
   protected AuthorizationService authorizationService = new AuthorizationServiceImpl();
+  protected CaseService caseService = new CaseServiceImpl();
 
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
 
@@ -580,6 +584,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initService(formService);
     initService(managementService);
     initService(authorizationService);
+    initService(caseService);
   }
 
   protected void initService(Object service) {
@@ -820,6 +825,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(AuthorizationManager.class));
 
       addSessionFactory(new GenericManagerFactory(CaseDefinitionManager.class));
+      addSessionFactory(new GenericManagerFactory(CaseExecutionManager.class));
 
       sessionFactories.put(ReadOnlyIdentityProvider.class, identityProviderSessionFactory);
 
@@ -1432,6 +1438,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setManagementService(ManagementService managementService) {
     this.managementService = managementService;
     return this;
+  }
+
+  public CaseService getCaseService() {
+    return caseService;
+  }
+
+  public void setCaseService(CaseService caseService) {
+    this.caseService = caseService;
   }
 
   public Map<Class< ? >, SessionFactory> getSessionFactories() {

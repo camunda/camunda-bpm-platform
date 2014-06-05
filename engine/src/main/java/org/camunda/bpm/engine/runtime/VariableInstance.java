@@ -53,6 +53,16 @@ public interface VariableInstance {
   String getExecutionId();
 
   /**
+   * Returns the corresponding case instance id.
+   */
+  String getCaseInstanceId();
+
+  /**
+   * Returns the corresponding case execution id.
+   */
+  String getCaseExecutionId();
+
+  /**
    * Returns the corresponding task id.
    */
   String getTaskId();

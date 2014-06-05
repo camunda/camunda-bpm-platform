@@ -38,6 +38,8 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   protected String variableNameLike;
   protected String[] executionIds;
   protected String[] processInstanceIds;
+  protected String[] caseExecutionIds;
+  protected String[] caseInstanceIds;
   protected String[] taskIds;
   protected String[] activityInstanceIds;
 
@@ -72,6 +74,16 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   public VariableInstanceQuery processInstanceIdIn(String... processInstanceIds) {
     this.processInstanceIds = processInstanceIds;
+    return this;
+  }
+
+  public VariableInstanceQuery caseExecutionIdIn(String... caseExecutionIds) {
+    this.caseExecutionIds = caseExecutionIds;
+    return this;
+  }
+
+  public VariableInstanceQuery caseInstanceIdIn(String... caseInstanceIds) {
+    this.caseInstanceIds = caseInstanceIds;
     return this;
   }
 
@@ -169,6 +181,14 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   public String[] getProcessInstanceIds() {
     return processInstanceIds;
+  }
+
+  public String[] getCaseExecutionIds() {
+    return caseExecutionIds;
+  }
+
+  public String[] getCaseInstanceIds() {
+    return caseInstanceIds;
   }
 
   public String[] getTaskIds() {

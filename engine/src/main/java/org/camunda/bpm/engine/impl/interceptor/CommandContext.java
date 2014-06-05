@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
@@ -394,6 +395,10 @@ public class CommandContext {
 
   public CaseDefinitionManager getCaseDefinitionManager() {
     return getSession(CaseDefinitionManager.class);
+  }
+
+  public CaseExecutionManager getCaseExecutionManager() {
+    return getSession(CaseExecutionManager.class);
   }
 
   // getters and setters //////////////////////////////////////////////////////

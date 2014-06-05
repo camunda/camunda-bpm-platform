@@ -53,6 +53,7 @@ import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.upgrade.DbUpgradeStep;
 import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
@@ -1251,6 +1252,9 @@ public class DbSqlSession implements Session {
   }
   public ProcessDefinitionQueryImpl createProcessDefinitionQuery() {
     return new ProcessDefinitionQueryImpl();
+  }
+  public CaseDefinitionQueryImpl createCaseDefinitionQuery() {
+    return new CaseDefinitionQueryImpl();
   }
   public ProcessInstanceQueryImpl createProcessInstanceQuery() {
     return new ProcessInstanceQueryImpl();

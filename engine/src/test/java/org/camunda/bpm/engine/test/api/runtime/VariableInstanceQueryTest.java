@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -2240,6 +2241,187 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     // delete task
     taskService.deleteTask(task.getId(), true);
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseExecutionId() {
+    CaseInstance instance = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      .caseExecutionIdIn(instance.getId());
+
+    VariableInstance result = query.singleResult();
+
+    assertNotNull(result);
+
+    assertEquals("aVariableName", result.getName());
+    assertEquals("abc", result.getValue());
+    assertEquals(instance.getId(), result.getCaseExecutionId());
+    assertEquals(instance.getId(), result.getCaseInstanceId());
+
+    assertNull(result.getExecutionId());
+    assertNull(result.getProcessInstanceId());
+
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseExecutionIds() {
+    CaseInstance instance1 = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    CaseInstance instance2 = caseService
+        .createCaseInstanceByKey("oneTaskCase")
+        .setVariable("anotherVariableName", "xyz")
+        .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      .caseExecutionIdIn(instance1.getId(), instance2.getId())
+      .orderByVariableName()
+      .asc();
+
+    List<VariableInstance> result = query.list();
+
+    assertEquals(2, result.size());
+
+    VariableInstance aVariable = result.get(0);
+    assertEquals("aVariableName", aVariable.getName());
+    assertEquals("abc", aVariable.getValue());
+
+    VariableInstance anotherVariable = result.get(1);
+    assertEquals("anotherVariableName", anotherVariable.getName());
+    assertEquals("xyz", anotherVariable.getValue());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceId() {
+    CaseInstance instance = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      .caseInstanceIdIn(instance.getId());
+
+    VariableInstance result = query.singleResult();
+
+    assertNotNull(result);
+
+    assertEquals("aVariableName", result.getName());
+    assertEquals("abc", result.getValue());
+    assertEquals(instance.getId(), result.getCaseExecutionId());
+    assertEquals(instance.getId(), result.getCaseInstanceId());
+
+    assertNull(result.getExecutionId());
+    assertNull(result.getProcessInstanceId());
+
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceIds() {
+    CaseInstance instance1 = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    CaseInstance instance2 = caseService
+        .createCaseInstanceByKey("oneTaskCase")
+        .setVariable("anotherVariableName", "xyz")
+        .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      .caseInstanceIdIn(instance1.getId(), instance2.getId())
+      .orderByVariableName()
+      .asc();
+
+    List<VariableInstance> result = query.list();
+
+    assertEquals(2, result.size());
+
+    VariableInstance aVariable = result.get(0);
+    assertEquals("aVariableName", aVariable.getName());
+    assertEquals("abc", aVariable.getValue());
+
+    VariableInstance anotherVariable = result.get(1);
+    assertEquals("anotherVariableName", anotherVariable.getName());
+    assertEquals("xyz", anotherVariable.getValue());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseActivityInstanceId() {
+    CaseInstance instance = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      .activityInstanceIdIn(instance.getId());
+
+    VariableInstance result = query.singleResult();
+
+    assertNotNull(result);
+
+    assertEquals("aVariableName", result.getName());
+    assertEquals("abc", result.getValue());
+    assertEquals(instance.getId(), result.getCaseExecutionId());
+    assertEquals(instance.getId(), result.getCaseInstanceId());
+
+    assertNull(result.getExecutionId());
+    assertNull(result.getProcessInstanceId());
+
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseActivityInstanceIds() {
+    CaseInstance instance1 = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    CaseInstance instance2 = caseService
+        .createCaseInstanceByKey("oneTaskCase")
+        .setVariable("anotherVariableName", "xyz")
+        .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      // activityInstanceId == caseExecutionId
+      .activityInstanceIdIn(instance1.getId(), instance2.getId())
+      .orderByVariableName()
+      .asc();
+
+    List<VariableInstance> result = query.list();
+
+    assertEquals(2, result.size());
+
+    VariableInstance aVariable = result.get(0);
+    assertEquals("aVariableName", aVariable.getName());
+    assertEquals("abc", aVariable.getValue());
+
+    VariableInstance anotherVariable = result.get(1);
+    assertEquals("anotherVariableName", anotherVariable.getName());
+    assertEquals("xyz", anotherVariable.getValue());
   }
 
 }

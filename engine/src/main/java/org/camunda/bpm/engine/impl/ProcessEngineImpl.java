@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -50,6 +51,7 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected FormService formService;
   protected ManagementService managementService;
   protected AuthorizationService authorizationService;
+  protected CaseService caseService;
   protected String databaseSchemaUpdate;
   protected JobExecutor jobExecutor;
   protected CommandExecutor commandExecutor;
@@ -59,6 +61,7 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected int historyLevel;
   protected TransactionContextFactory transactionContextFactory;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
+
 
 
   public ProcessEngineImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -72,6 +75,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.formService = processEngineConfiguration.getFormService();
     this.managementService = processEngineConfiguration.getManagementService();
     this.authorizationService = processEngineConfiguration.getAuthorizationService();
+    this.caseService = processEngineConfiguration.getCaseService();
     this.databaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
     this.jobExecutor = processEngineConfiguration.getJobExecutor();
     this.commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
@@ -79,7 +83,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.sessionFactories = processEngineConfiguration.getSessionFactories();
     this.historyLevel = processEngineConfiguration.getHistoryLevel();
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
-    
+
     executeSchemaOperations();
 
     if (name == null) {
@@ -87,26 +91,26 @@ public class ProcessEngineImpl implements ProcessEngine {
     } else {
       log.info("ProcessEngine " + name + " created");
     }
-    
+
     ProcessEngines.registerProcessEngine(this);
-    
-    if ((jobExecutor != null)) {      
+
+    if ((jobExecutor != null)) {
       // register process engine with Job Executor
-      jobExecutor.registerProcessEngine(this);      
+      jobExecutor.registerProcessEngine(this);
     }
   }
-  
+
   protected void executeSchemaOperations() {
     commandExecutorSchemaOperations.execute(new SchemaOperationsProcessEngineBuild());
   }
-  
+
   public void close() {
-    
+
     ProcessEngines.unregister(this);
-    
-    if ((jobExecutor != null)) {      
+
+    if ((jobExecutor != null)) {
       // unregister process engine with Job Executor
-      jobExecutor.unregisterProcessEngine(this);      
+      jobExecutor.unregisterProcessEngine(this);
     }
 
     commandExecutorSchemaOperations.execute(new SchemaOperationProcessEngineClose());
@@ -115,7 +119,7 @@ public class ProcessEngineImpl implements ProcessEngine {
   public DbSqlSessionFactory getDbSqlSessionFactory() {
     return (DbSqlSessionFactory) sessionFactories.get(DbSqlSession.class);
   }
-  
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getName() {
@@ -141,17 +145,21 @@ public class ProcessEngineImpl implements ProcessEngine {
   public RuntimeService getRuntimeService() {
     return runtimeService;
   }
-  
+
   public RepositoryService getRepositoryService() {
     return repositoryService;
   }
-  
+
   public FormService getFormService() {
     return formService;
   }
-  
+
   public AuthorizationService getAuthorizationService() {
     return authorizationService;
+  }
+
+  public CaseService getCaseService() {
+    return caseService;
   }
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {

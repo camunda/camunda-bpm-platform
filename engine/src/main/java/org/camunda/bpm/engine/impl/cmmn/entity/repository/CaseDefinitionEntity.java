@@ -12,7 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.repository;
 
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -86,6 +89,16 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
 
   public void setResourceName(String resourceName) {
     this.resourceName = resourceName;
+  }
+
+  @Override
+  protected CmmnExecution newCaseInstance() {
+    CaseExecutionEntity caseInstance = new CaseExecutionEntity();
+    Context
+        .getCommandContext()
+        .getCaseExecutionManager()
+        .insertCaseExecution(caseInstance);
+    return caseInstance;
   }
 
   public Object getPersistentState() {

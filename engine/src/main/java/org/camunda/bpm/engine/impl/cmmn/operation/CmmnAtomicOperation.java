@@ -74,6 +74,9 @@ public interface CmmnAtomicOperation extends CoreAtomicOperation<CmmnExecution> 
   // parent resume a case execution
   CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_PARENT_RESUME = new AtomicOperationCaseExecutionNotifyListenerParentResume();
 
+  // delete cascade a case execution
+  CmmnAtomicOperation CASE_EXECUTION_DELETE_CASCADE = new AtomicOperationCaseExecutionDeleteCascade();
+
   public void execute(CmmnExecution execution);
 
   public boolean isAsync(CmmnExecution execution);
