@@ -13,10 +13,13 @@
 package org.camunda.bpm.webapp.impl.engine;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -75,6 +78,22 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
       if (pageUri.endsWith(".html")) {
         serveTemplate(requestUri, appName, pageUri, request, response, chain);
         return;
+      }
+
+      /** temporary hack until tasklist has multi-engine support */
+      if("tasklist".equals(appName)) {
+        InputStream resourceAsStream = request.getServletContext()
+          .getResourceAsStream("/app/tasklist/"+pageUri);
+        if(resourceAsStream != null) {
+          ServletOutputStream responseOutputStream = response.getOutputStream();
+          byte[] buffer = new byte[1024*16];
+          int read = 0;
+          while((read = resourceAsStream.read(buffer))>0) {
+            responseOutputStream.write(buffer, 0, read);
+          }
+          response.setStatus(200);
+          return;
+        }
       }
     }
 
@@ -168,7 +187,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
 
     if("tasklist".equals(appName)) {
       /** temporary hack until tasklist has multi-engine support */
-      data = data.replace("base href=\"/\"", String.format("base href=\"%s/app/%s/\"", contextPath, appName));
+      data = data.replace("base href=\"/\"", String.format("base href=\"%s/app/%s/%s/\"", contextPath, appName, engineName));
 
     } else {
       data = data.replace(APP_ROOT_PLACEHOLDER, contextPath)
