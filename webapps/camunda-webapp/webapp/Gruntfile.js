@@ -21,7 +21,7 @@ var tasklistIndexExp = /camunda-tasklist-ui\/dist\/index\.html/;
 function tasklistPunches(content, srcpath, dev) {
   return tasklistIndexExp.test(srcpath) ?
           content
-            .replace('<base href="/" />', '<base href="$BASE" />')
+            // .replace('<base href="/" />', '<base href="$BASE" />')
 
             .replace('scripts/deps-n-mocks.js', dev ? 'scripts/deps-n-mocks.js' : 'scripts/deps.js')
 
@@ -112,16 +112,22 @@ module.exports = function(grunt) {
             ],
             dest: 'target/webapp/'
           },
+          // {
+          //   expand: true,
+          //   cwd: 'node_modules/camunda-tasklist-ui/dist/',
+          //   src: ['**'],
+          //   dest: 'target/webapp/app/tasklist/default/'
+          // },
+          // {
+          //   expand: true,
+          //   cwd: 'node_modules/camunda-tasklist-ui/dist/',
+          //   src: ['index.html'],
+          //   dest: 'target/webapp/app/tasklist/'
+          // },
           {
             expand: true,
             cwd: 'node_modules/camunda-tasklist-ui/dist/',
             src: ['**'],
-            dest: 'target/webapp/app/tasklist/default/'
-          },
-          {
-            expand: true,
-            cwd: 'node_modules/camunda-tasklist-ui/dist/',
-            src: ['index.html'],
             dest: 'target/webapp/app/tasklist/'
           },
           {
