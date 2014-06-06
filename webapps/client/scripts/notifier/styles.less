@@ -1,7 +1,4 @@
 .notifier {
-  &:empty {
-    display: none;
-  }
   position: fixed;
   top: 0;
   width: 50%;
@@ -12,8 +9,53 @@
   color: @state-info-text;
   border-color: @state-info-border;
   background-color: @state-info-bg;
-
   padding: 15px;
+
+  opacity: 1;
+
+
+  // -moz-box-shadow: 0 0 14px @state-info-bg;
+  // -webkit-box-shadow: 0 0 14px @state-info-bg;
+  // box-shadow: 0 0 14px @state-info-bg;
+  -moz-box-shadow: 0 0 14px @gray-light;
+  -webkit-box-shadow: 0 0 14px @gray-light;
+  box-shadow: 0 0 14px @gray-light;
+
+  -webkit-transition: all linear 0.5s;
+  transition: all linear 0.5s;
+
+  &.ng-hide-add,
+  &.ng-hide-remove {
+    display:block!important;
+  }
+
+  &.ng-hide {
+    opacity: 0;
+  }
+
+
+  /* starting animations for enter */
+  &.ng-enter {
+    opacity: 0;
+  }
+  /* terminal animations for enter */
+  &.ng-enter-active,
+  &.ng-enter.ng-enter-active {
+    opacity: 1;
+  }
+  /* starting animations for leave */
+  &.ng-leave {
+    opacity: 1;
+  }
+  /* terminal animations for leave */
+  &.ng-leave-active,
+  &.ng-leave.ng-leave-active {
+    opacity: 0;
+  }
+
+
+
+
 
   .notification {
     padding: 15px;

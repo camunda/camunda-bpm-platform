@@ -11,6 +11,7 @@ define(function() {
       'angular':                    'bower_components/angular/angular',
       'angular-route':              'bower_components/angular-route/angular-route',
       'angular-messages':           'bower_components/angular-messages/angular-messages',
+      'angular-animate':            'bower_components/angular-animate/angular-animate',
 
       'moment':                     'bower_components/moment/moment',
       'jquery':                     'bower_components/jquery/dist/jquery',
@@ -41,6 +42,7 @@ define(function() {
                                       deps: ['jquery']
                                     },
       'angular-route':              ['angular'],
+      'angular-animate':            ['angular'],
 
       'angular-bootstrap':          ['angular'],
       'angular-moment':             ['angular', 'moment'],

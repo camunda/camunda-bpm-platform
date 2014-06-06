@@ -1,9 +1,11 @@
 'use strict';
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
-define(['angular', 'text!camunda-tasklist-ui/notifier/notifier.html'],
+define(['angular', 'angular-animate', 'text!camunda-tasklist-ui/notifier/notifier.html'],
 function(angular) {
-  var notifierModule = angular.module('cam.tasklist.notifier', []);
+  var notifierModule = angular.module('cam.tasklist.notifier', [
+    'ngAnimate'
+  ]);
 
   var each = angular.forEach;
 

@@ -1,5 +1,5 @@
 <div class="notifier"
-     ng-class="{hidden: !messages.length}">
+     ng-show="messages.length">
   <div ng-repeat="message in messages"
        class="notification notification-{{ message.type }}">
     <div class="text">
