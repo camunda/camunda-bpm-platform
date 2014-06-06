@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.management.TablePageQuery;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
@@ -488,6 +489,30 @@ public interface ManagementService {
   void setJobRetries(String jobId, int retries);
 
   /**
+   * <p>
+   * Set the number of retries of all <strong>failed</strong> {@link Job jobs}
+   * of the provided job definition id.
+   * </p>
+   *
+   * <p>
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be <strong>failed</strong> and
+   * not retried again. In that case, this method can be used to increase the
+   * number of retries.
+   * </p>
+   *
+   * <p>
+   * {@link Incident Incidents} of the involved failed {@link Job jobs} will not
+   * be resolved using this method! When the execution of a job was successful
+   * the corresponding incident will be resolved.
+   * </p>
+   *
+   * @param jobdefinitionId id of the job definition, cannot be null.
+   * @param retries number of retries.
+   */
+  void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries);
+
+  /**
    * Sets a new due date for the provided id.
    * When newDuedate is null, the job is executed with the next
    * job executor run.
@@ -507,6 +532,20 @@ public interface ManagementService {
 
   /** get the list of properties. */
   Map<String, String> getProperties();
+
+  /** Set the value for a property.
+   *
+   *  @param name the name of the property.
+   *  @param value the new value for the property.
+   */
+  void setProperty(String name, String value);
+
+  /**
+   * Deletes a property by name. If the property does not exist, the request is ignored.
+   *
+   * @param name the name of the property to delete
+   */
+  void deleteProperty(String name);
 
   /** programmatic schema update on a given connection returning feedback about what happened */
   String databaseSchemaUpgrade(Connection connection, String catalog, String schema);
@@ -545,5 +584,12 @@ public interface ManagementService {
    * jobs for the given deployment will no longer get acquired.
    */
   void unregisterDeploymentForJobExecutor(String deploymentId);
+
+  /**
+   * Get the configured history level for the process engine.
+   *
+   * @return the history level
+   */
+  int getHistoryLevel();
 
 }

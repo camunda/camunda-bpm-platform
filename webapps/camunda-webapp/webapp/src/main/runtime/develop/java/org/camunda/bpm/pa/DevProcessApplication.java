@@ -9,10 +9,13 @@ import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.pa.demo.InvoiceDemoDataGenerator;
 
 /**
@@ -29,7 +32,7 @@ public class DevProcessApplication extends ServletProcessApplication {
     createCockpitDemoData(engine);
   }
 
-  private void createCockpitDemoData(ProcessEngine engine) throws Exception {
+  private void createCockpitDemoData(final ProcessEngine engine) throws Exception {
     RuntimeService runtimeService = engine.getRuntimeService();
 
     Map<String, Object> vars1 = new HashMap<String, Object>();
@@ -113,7 +116,16 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("executionProcess");
     runtimeService.startProcessInstanceByKey("executionProcess");
 
-    ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("changeVariablesProcess");
+    TaskService taskService = engine.getTaskService();
+    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+    taskService.setVariableLocal(task.getId(), "localTaskVariable", "foo");
+
+    new Thread(){
+      public void run() {
+        ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
+      }
+    }.start();
   }
 
   private void createAdminDemoData(ProcessEngine engine) throws Exception {

@@ -1,9 +1,11 @@
+/* global ngDefine: false */
 ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
-
-  function JobRetryActionController ($scope, $http, search, Uri, $dialog) {
-
+  'use strict';
+  module.controller('JobRetryActionController', [
+          '$scope', '$modal',
+  function($scope,   $modal) {
     $scope.openDialog = function () {
-      var dialog = $dialog.dialog({
+      $modal.open({
         resolve: {
           processData: function() { return $scope.processData; },
           processInstance: function() { return $scope.processInstance; }
@@ -11,20 +13,11 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
         controller: 'JobRetriesController',
         templateUrl: require.toUrl('./job-retry-bulk-dialog.html')
       });
-
-      dialog.open().then(function(result) {
-
-        // dialog closed. YEA!
-      });
     };
-
-  };
-
-  module.controller('JobRetryActionController', [ '$scope', '$http', 'search', 'Uri', '$dialog', JobRetryActionController ]);
+  }]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
-
-    ViewsProvider.registerDefaultView('cockpit.processInstance.live.action', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.action', {
       id: 'job-retry-action',
       label: 'Job Retry Action',
       url: 'plugin://base/static/app/views/processInstance/job-retry-bulk-action.html',

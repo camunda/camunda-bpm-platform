@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.camunda.bpm.jboss</groupId>
     <artifactId>camunda-jboss</artifactId>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>7.2.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -43,6 +43,13 @@
       <groupId>org.camunda.bpm.identity</groupId>
       <artifactId>camunda-identity-ldap</artifactId>
     </dependency>
+
+    <!-- script engine dependencies -->
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>

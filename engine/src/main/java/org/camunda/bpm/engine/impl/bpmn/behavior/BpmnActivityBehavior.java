@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 
 /**
  * Helper class for implementing BPMN 2.0 activities, offering convenience
@@ -119,13 +118,17 @@ public class BpmnActivityBehavior {
         } else {
           throw new ProcessEngineException("Default sequence flow '" + defaultSequenceFlow + "' could not be not found");
         }
+
+      } else if (!outgoingTransitions.isEmpty()) {
+        throw new ProcessEngineException("No conditional sequence flow leaving the Flow Node '" + execution.getActivity().getId() + "' could be selected for continuing the process");
+
       } else {
 
         Object isForCompensation = execution.getActivity().getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION);
         if(isForCompensation != null && (Boolean) isForCompensation) {
 
-          InterpretableExecution parentExecution = (InterpretableExecution) execution.getParent();
-          ((InterpretableExecution)execution).remove();
+          ActivityExecution parentExecution = execution.getParent();
+          execution.remove();
           parentExecution.signal("compensationDone", null);
 
         } else {

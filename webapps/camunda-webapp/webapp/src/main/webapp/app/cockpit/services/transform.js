@@ -1,7 +1,7 @@
-'use strict';
-
+/* global ngDefine: false */
 ngDefine('cockpit.services', [ 'bpmn/Transformer' ], function(module, Transformer) {
-  
+  'use strict';
+
   var Service = function () {
     return {
       transformBpmn20Xml: function(bpmn20Xml) {
@@ -12,7 +12,7 @@ ngDefine('cockpit.services', [ 'bpmn/Transformer' ], function(module, Transforme
 
   module
     .factory('Transform', Service);
-  
+
   return module;
 
 });

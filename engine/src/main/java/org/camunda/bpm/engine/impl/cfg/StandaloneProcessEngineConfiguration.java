@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
 public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
 
@@ -33,10 +34,12 @@ public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigura
     defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
     return defaultCommandInterceptorsTxRequired;
   }
-  
+
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
-    // assumes this is already initialized and in standalone cases the required and requires new are the same
-    return commandInterceptorsTxRequired;
+    List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
+    defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
+    defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this, true));
+    return defaultCommandInterceptorsTxRequired;
   }
-  
+
 }

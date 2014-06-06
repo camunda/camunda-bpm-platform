@@ -7,30 +7,30 @@
   <!-- INFO INSERT -->
 
   <insert id="insertIdentityInfo" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity">
-    insert into ${prefix}ACT_ID_INFO (ID_, REV_, USER_ID_, TYPE_, KEY_, VALUE_, PASSWORD_, PARENT_ID_)
+    insert into ${prefix}ACT_ID_INFO (ID_, USER_ID_, TYPE_, KEY_, VALUE_, PASSWORD_, PARENT_ID_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
-      1,
       #{userId ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
       #{key ,jdbcType=VARCHAR},
       #{value ,jdbcType=VARCHAR},
       #{passwordBytes ,jdbcType=BLOB},
-      #{parentId ,jdbcType=VARCHAR}
+      #{parentId ,jdbcType=VARCHAR},
+      1
     )
   </insert>
   
    <insert id="insertIdentityInfo_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity">
-    insert into ${prefix}ACT_ID_INFO (ID_, REV_, USER_ID_, TYPE_, KEY_, VALUE_, PASSWORD_, PARENT_ID_)
+    insert into ${prefix}ACT_ID_INFO (ID_, USER_ID_, TYPE_, KEY_, VALUE_, PASSWORD_, PARENT_ID_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
-      1,
       #{userId ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
       #{key ,jdbcType=VARCHAR},
       #{value ,jdbcType=VARCHAR},
       #{passwordBytes ,jdbcType=BINARY},
-      #{parentId ,jdbcType=VARCHAR}
+      #{parentId ,jdbcType=VARCHAR},
+      1
     )
   </insert>
   

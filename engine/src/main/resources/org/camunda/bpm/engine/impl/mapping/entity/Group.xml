@@ -7,12 +7,12 @@
   <!-- GROUP INSERT -->
 
   <insert id="insertGroup" parameterType="org.camunda.bpm.engine.impl.persistence.entity.GroupEntity">
-    insert into ${prefix}ACT_ID_GROUP (ID_, REV_, NAME_, TYPE_)
+    insert into ${prefix}ACT_ID_GROUP (ID_, NAME_, TYPE_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
-      1, 
       #{name ,jdbcType=VARCHAR},
-      #{type ,jdbcType=VARCHAR}
+      #{type ,jdbcType=VARCHAR},
+      1
     )
   </insert>
 

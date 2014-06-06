@@ -292,12 +292,8 @@ public class BpmnDeployer implements Deployer {
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) processDefinition.getProperty(BpmnParse.PROPERTYNAME_START_TIMER);
     if (timerDeclarations!=null) {
       for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
-        TimerEntity timer = timerDeclaration.createJobInstance(null);
+        TimerEntity timer = timerDeclaration.createTimerInstance(null);
         timer.setDeploymentId(processDefinition.getDeploymentId());
-        Context
-          .getCommandContext()
-          .getJobManager()
-          .schedule(timer);
       }
     }
   }

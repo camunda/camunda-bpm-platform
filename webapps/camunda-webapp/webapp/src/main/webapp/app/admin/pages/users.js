@@ -8,21 +8,23 @@ define(['angular'], function(angular) {
 
     $scope.availableOperations={};
 
-    UserResource.query().$then(function(response) {
-      $scope.userList = response.data;
+    UserResource.query().$promise.then(function(response) {
+      // $scope.userList = response.data;
+      $scope.userList = response;
     });
 
-    UserResource.OPTIONS().$then(function(response) {
-      angular.forEach(response.data.links, function(link){
+    UserResource.OPTIONS().$promise.then(function(response) {
+      // angular.forEach(response.data.links, function(link){
+      angular.forEach(response.links, function(link){
         $scope.availableOperations[link.rel] = true;
-      });    
+      });
     });
 
   }];
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/users', {
-      templateUrl: 'pages/users.html',
+      templateUrl: require.toUrl('./app/admin/pages/users.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,

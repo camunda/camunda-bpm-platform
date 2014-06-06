@@ -103,27 +103,30 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
     }
 
     public <T> T getVariableLocal(String variableName) {
-	    Object value = cachedVariablesLocal.get(variableName);
-	    if(value == null) {
-	      if(execution != null) {
-	        value = runtimeService.getVariableLocal(execution.getId(), variableName);
-	        cachedVariablesLocal.put(variableName, value);
-	      }
-	    }
-	    return (T) value;
-	  }
-	
-	  public void setVariableLocal(String variableName, Object value) {
-	  	if(execution == null && task == null) {
-	  		throw new ProcessEngineCdiException("Cannot set a local cached variable: neither a Task nor an Execution is associated.");
-	  	}
-	  	
-	  	cachedVariablesLocal.put(variableName, value);
-	  }
-	
-	  public Map<String, Object> getCachedVariablesLocal() {
-	    return cachedVariablesLocal;
-	  }
+      Object value = cachedVariablesLocal.get(variableName);
+      if (value == null) {
+        if (task != null) {
+          value = taskService.getVariableLocal(task.getId(), variableName);
+          cachedVariablesLocal.put(variableName, value);
+        } else if (execution != null) {
+          value = runtimeService.getVariableLocal(execution.getId(), variableName);
+          cachedVariablesLocal.put(variableName, value);
+        }
+      }
+      return (T) value;
+    }
+
+    public void setVariableLocal(String variableName, Object value) {
+      if (execution == null && task == null) {
+        throw new ProcessEngineCdiException("Cannot set a local cached variable: neither a Task nor an Execution is associated.");
+      }
+
+      cachedVariablesLocal.put(variableName, value);
+    }
+
+    public Map<String, Object> getCachedVariablesLocal() {
+      return cachedVariablesLocal;
+    }
 
     public void flushVariableCache() {
       if(task != null) {

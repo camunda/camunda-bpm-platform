@@ -7,10 +7,9 @@
   <!-- TASK INSERT -->
   
   <insert id="insertTask" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TaskEntity">
-    insert into ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_,
-                      ASSIGNEE_, DELEGATION_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_KEY_, DUE_DATE_, FOLLOW_UP_DATE_, SUSPENSION_STATE_)
+    insert into ${prefix}ACT_RU_TASK (ID_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_,
+                      ASSIGNEE_, DELEGATION_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_KEY_, DUE_DATE_, FOLLOW_UP_DATE_, SUSPENSION_STATE_, REV_)
     values (#{id, jdbcType=VARCHAR},
-            1,
             #{name, jdbcType=VARCHAR},
             #{parentTaskId, jdbcType=VARCHAR},
             #{description, jdbcType=VARCHAR},
@@ -25,7 +24,8 @@
             #{taskDefinitionKey, jdbcType=VARCHAR},
             #{dueDate, jdbcType=TIMESTAMP},
             #{followUpDate, jdbcType=TIMESTAMP},
-            #{suspensionState, jdbcType=INTEGER}
+            #{suspensionState, jdbcType=INTEGER},
+            1
            )
   </insert>
   

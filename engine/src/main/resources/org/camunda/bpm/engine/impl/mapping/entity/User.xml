@@ -7,14 +7,14 @@
   <!-- USER INSERT -->
 
   <insert id="insertUser" parameterType="org.camunda.bpm.engine.impl.persistence.entity.UserEntity">
-    insert into ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, EMAIL_, PWD_)
+    insert into ${prefix}ACT_ID_USER (ID_, FIRST_, LAST_, EMAIL_, PWD_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
-      1,
       #{firstName ,jdbcType=VARCHAR},
       #{lastName ,jdbcType=VARCHAR},
       #{email ,jdbcType=VARCHAR},
-      #{password ,jdbcType=VARCHAR}
+      #{password ,jdbcType=VARCHAR},
+      1
     )
   </insert>
 

@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricVariableInstanceRestService;
+import org.camunda.bpm.engine.rest.sub.history.HistoricVariableInstanceResource;
+import org.camunda.bpm.engine.rest.sub.history.impl.HistoricVariableInstanceResourceImpl;
 
 public class HistoricVariableInstanceRestServiceImpl implements HistoricVariableInstanceRestService {
 
@@ -31,6 +33,10 @@ public class HistoricVariableInstanceRestServiceImpl implements HistoricVariable
 
   public HistoricVariableInstanceRestServiceImpl(ProcessEngine processEngine) {
     this.processEngine = processEngine;
+  }
+
+  public HistoricVariableInstanceResource variableInstanceResource(String variableId) {
+    return new HistoricVariableInstanceResourceImpl(variableId, processEngine);
   }
 
   @Override
@@ -42,6 +48,7 @@ public class HistoricVariableInstanceRestServiceImpl implements HistoricVariable
   @Override
   public List<HistoricVariableInstanceDto> queryHistoricVariableInstances(HistoricVariableInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     HistoricVariableInstanceQuery query = queryDto.toQuery(processEngine);
+    query.disableBinaryFetching();
 
     List<HistoricVariableInstance> matchingHistoricVariableInstances;
     if (firstResult != null || maxResults != null) {

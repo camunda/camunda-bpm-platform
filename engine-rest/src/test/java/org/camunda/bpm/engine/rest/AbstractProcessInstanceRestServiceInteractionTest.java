@@ -1,32 +1,7 @@
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Matchers.anyCollectionOf;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.Response.Status;
-
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
@@ -39,12 +14,26 @@ import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.type.TypeFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Matchers.anyCollectionOf;
+import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.*;
 
 public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -53,6 +42,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   protected static final String SINGLE_PROCESS_INSTANCE_URL = PROCESS_INSTANCE_URL + "/{id}";
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = SINGLE_PROCESS_INSTANCE_URL + "/variables";
   protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
+  protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_DATA_URL = SINGLE_PROCESS_INSTANCE_VARIABLE_URL + "/data";
   protected static final String PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL = SINGLE_PROCESS_INSTANCE_URL + "/activity-instances";
   private static final String EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE = "aProcessInstanceWithNullValueAsVariable";
   protected static final String SINGLE_PROCESS_INSTANCE_SUSPENDED_URL = SINGLE_PROCESS_INSTANCE_URL + "/suspended";
@@ -100,6 +90,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         .body("childActivityInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
         .body("childActivityInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
         .body("childActivityInstances[0].activityId", equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
+        .body("childActivityInstances[0].activityType", equalTo(CHILD_EXAMPLE_ACTIVITY_TYPE))
         .body("childActivityInstances[0].processInstanceId", equalTo(CHILD_EXAMPLE_PROCESS_INSTANCE_ID))
         .body("childActivityInstances[0].processDefinitionId", equalTo(CHILD_EXAMPLE_PROCESS_DEFINITION_ID))
         .body("childActivityInstances[0].executionIds", not(empty()))
@@ -115,7 +106,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         .body("childTransitionInstances[0].executionId", equalTo(EXAMPLE_EXECUTION_ID))
         .when().get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
 
-    Assert.assertEquals("Should return exactly eight properties", 9, response.jsonPath().getMap("").size());
+    Assert.assertEquals("Should return right number of properties", 10, response.jsonPath().getMap("").size());
   }
 
   @Test
@@ -684,6 +675,93 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot put process instance variable aVariableKey: The variable type 'X' is not supported."))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPutSingleBinaryVariable() throws Exception {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .multiPart("data", "unspecified", bytes)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_DATA_URL);
+
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
+        eq(bytes));
+  }
+
+  @Test
+  public void testPutSingleBinaryVariableWithNoValue() throws Exception {
+    byte[] bytes = new byte[0];
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .multiPart("data", "unspecified", bytes)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_DATA_URL);
+
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
+        eq(bytes));
+  }
+
+  @Test
+  public void testPutSingleSerializableVariable() throws Exception {
+
+    ArrayList<String> serializable = new ArrayList<String>();
+    serializable.add("foo");
+
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonBytes = mapper.writeValueAsString(serializable);
+    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .multiPart("data", jsonBytes, MediaType.APPLICATION_JSON)
+      .multiPart("type", typeName, MediaType.TEXT_PLAIN)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_DATA_URL);
+
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
+        eq(serializable));
+  }
+
+  @Test
+  public void testPutSingleSerializableVariableUnsupportedMediaType() throws Exception {
+
+    ArrayList<String> serializable = new ArrayList<String>();
+    serializable.add("foo");
+
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonBytes = mapper.writeValueAsString(serializable);
+    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .multiPart("data", jsonBytes, "unsupported")
+      .multiPart("type", typeName, MediaType.TEXT_PLAIN)
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body(containsString("Unrecognized content type for serialized java type: unsupported"))
+    .when()
+      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_DATA_URL);
+
+    verify(runtimeServiceMock, never()).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
+        eq(serializable));
   }
 
   @Test

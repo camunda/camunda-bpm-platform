@@ -12,17 +12,15 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.event;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
+import org.camunda.bpm.engine.cdi.annotation.event.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
-import org.camunda.bpm.engine.cdi.annotation.event.BusinessProcessDefinition;
-import org.camunda.bpm.engine.cdi.annotation.event.EndActivity;
-import org.camunda.bpm.engine.cdi.annotation.event.StartActivity;
-import org.camunda.bpm.engine.cdi.annotation.event.TakeTransition;
+import static org.junit.Assert.assertNotNull;
 
 @ApplicationScoped
 public class TestEventListener {
@@ -30,8 +28,12 @@ public class TestEventListener {
   public void reset() {
     startActivityService1 = 0;
     endActivityService1 = 0;
-    takeTransitiont1 = 0;
-    
+    takeTransition1 = 0;
+    createTaskUser1 = 0;
+    assignTaskUser1 = 0;
+    completeTaskUser1 = 0;
+    deleteTaskUser1 = 0;
+
     eventsReceivedByKey.clear();
     eventsReceived.clear();
   }
@@ -65,7 +67,7 @@ public class TestEventListener {
   
   private int startActivityService1 = 0;
   private int endActivityService1 = 0;
-  private int takeTransitiont1 = 0;
+  private int takeTransition1 = 0;
     
   public void onStartActivityService1(@Observes @StartActivity("service1") BusinessProcessEvent businessProcessEvent) {    
     startActivityService1 += 1;
@@ -75,8 +77,8 @@ public class TestEventListener {
     endActivityService1 += 1;
   }
 
-  public void takeTransitiont1(@Observes @TakeTransition("t1") BusinessProcessEvent businessProcessEvent) {
-    takeTransitiont1 += 1;    
+  public void takeTransition1(@Observes @TakeTransition("t1") BusinessProcessEvent businessProcessEvent) {
+    takeTransition1 += 1;
   }
     
   public int getEndActivityService1() {
@@ -87,7 +89,51 @@ public class TestEventListener {
     return startActivityService1;
   }
     
-  public int getTakeTransitiont1() {
-    return takeTransitiont1;
+  public int getTakeTransition1() {
+    return takeTransition1;
+  }
+
+
+  // ---------------------------------------------------------
+
+  private int createTaskUser1 = 0;
+  private int assignTaskUser1 = 0;
+  private int completeTaskUser1 = 0;
+  private int deleteTaskUser1 = 0;
+
+  public void onCreateTask(@Observes @CreateTask("user1") BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent.getTask());
+    createTaskUser1++;
+  }
+
+  public void onAssignTask(@Observes @AssignTask("user1") BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent.getTask());
+    assignTaskUser1++;
+  }
+
+  public void onCompleteTask(@Observes @CompleteTask("user1") BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent.getTask());
+    completeTaskUser1++;
+  }
+
+  public void onDeleteTask(@Observes @DeleteTask("user1") BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent.getTask());
+    deleteTaskUser1++;
+  }
+
+  public int getCreateTaskUser1() {
+    return createTaskUser1;
+  }
+
+  public int getAssignTaskUser1() {
+    return assignTaskUser1;
+  }
+
+  public int getCompleteTaskUser1() {
+    return completeTaskUser1;
+  }
+
+  public int getDeleteTaskUser1() {
+    return deleteTaskUser1;
   }
 }

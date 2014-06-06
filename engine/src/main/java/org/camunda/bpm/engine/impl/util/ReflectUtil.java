@@ -12,22 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import org.camunda.bpm.engine.ClassLoadingException;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
+
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
-
-import org.camunda.bpm.engine.ClassLoadingException;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.context.Context;
 
 
 /**
@@ -36,6 +32,17 @@ import org.camunda.bpm.engine.impl.context.Context;
 public abstract class ReflectUtil {
 
   private static final Logger LOG = Logger.getLogger(ReflectUtil.class.getName());
+
+  private static final Map<String, String> charEncodings = new HashMap<String, String>();
+
+  static {
+    charEncodings.put("ä", "%C3%A4");
+    charEncodings.put("ö", "%C3%B6");
+    charEncodings.put("ü", "%C3%BC");
+    charEncodings.put("Ä", "%C3%84");
+    charEncodings.put("Ö", "%C3%96");
+    charEncodings.put("Ü", "%C3%9C");
+  }
   
   public static ClassLoader getClassLoader() {
     ClassLoader loader = getCustomClassLoader();
@@ -109,7 +116,7 @@ public abstract class ReflectUtil {
     }
     return resourceStream;
    }
-  
+
   public static URL getResource(String name) {
     URL url = null;
     ClassLoader classLoader = getCustomClassLoader();
@@ -126,9 +133,18 @@ public abstract class ReflectUtil {
         url = classLoader.getResource(name);
       }
     }
-   
+
     return url;
-   }
+  }
+
+  public static String getResourceUrlAsString(String name) {
+    String url = getResource(name).toString();
+    for (Map.Entry<String, String> mapping : charEncodings.entrySet()) {
+      url = url.replaceAll(mapping.getKey(), mapping.getValue());
+    }
+    return url;
+  }
+
 
   public static Object instantiate(String className) {
     try {

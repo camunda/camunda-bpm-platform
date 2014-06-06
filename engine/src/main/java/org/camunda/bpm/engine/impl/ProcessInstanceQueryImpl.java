@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,23 +38,27 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String executionId;
   protected String businessKey;
   protected String processDefinitionId;
-  protected Set<String> processInstanceIds; 
+  protected Set<String> processInstanceIds;
   protected String processDefinitionKey;
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
   protected SuspensionState suspensionState;
-  
+  protected String incidentType;
+  protected String incidentId;
+  protected String incidentMessage;
+  protected String incidentMessageLike;
+
   // Unused, see dynamic query
   protected String activityId;
   protected List<EventSubscriptionQueryValue> eventSubscriptions;
-  
+
   public ProcessInstanceQueryImpl() {
   }
-  
+
   public ProcessInstanceQueryImpl(CommandContext commandContext) {
     super(commandContext);
   }
-  
+
   public ProcessInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
@@ -66,7 +70,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     this.executionId = processInstanceId;
     return this;
   }
-  
+
   public ProcessInstanceQuery processInstanceIds(Set<String> processInstanceIds) {
     if (processInstanceIds == null) {
       throw new ProcessEngineException("Set of process instance ids is null");
@@ -85,7 +89,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     this.businessKey = businessKey;
     return this;
   }
-  
+
   public ProcessInstanceQuery processInstanceBusinessKey(String businessKey, String processDefinitionKey) {
     if (businessKey == null) {
       throw new ProcessEngineException("Business key is null");
@@ -94,7 +98,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
-  
+
   public ProcessInstanceQueryImpl processDefinitionId(String processDefinitionId) {
     if (processDefinitionId == null) {
       throw new ProcessEngineException("Process definition id is null");
@@ -110,45 +114,69 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
-  
+
   public ProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
     this.superProcessInstanceId = superProcessInstanceId;
     return this;
   }
-  
+
   public ProcessInstanceQuery subProcessInstanceId(String subProcessInstanceId) {
     this.subProcessInstanceId = subProcessInstanceId;
     return this;
   }
-  
+
 
   public ProcessInstanceQuery orderByProcessInstanceId() {
     this.orderProperty = ProcessInstanceQueryProperty.PROCESS_INSTANCE_ID;
     return this;
   }
-  
+
   public ProcessInstanceQuery orderByProcessDefinitionId() {
     this.orderProperty = ProcessInstanceQueryProperty.PROCESS_DEFINITION_ID;
     return this;
   }
-  
+
   public ProcessInstanceQuery orderByProcessDefinitionKey() {
     this.orderProperty = ProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY;
     return this;
   }
-  
+
   public ProcessInstanceQuery active() {
     this.suspensionState = SuspensionState.ACTIVE;
     return this;
   }
-  
+
   public ProcessInstanceQuery suspended() {
     this.suspensionState = SuspensionState.SUSPENDED;
     return this;
   }
-  
+
+  public ProcessInstanceQuery incidentType(String incidentType) {
+    assertParamNotNull("incident type", incidentType);
+    this.incidentType = incidentType;
+    return this;
+  }
+
+  public ProcessInstanceQuery incidentId(String incidentId) {
+    assertParamNotNull("incident id", incidentId);
+    this.incidentId = incidentId;
+    return this;
+  }
+
+  public ProcessInstanceQuery incidentMessage(String incidentMessage) {
+    assertParamNotNull("incident message", incidentMessage);
+    this.incidentMessage = incidentMessage;
+    return this;
+  }
+
+  public ProcessInstanceQuery incidentMessageLike(String incidentMessageLike) {
+    assertParamNotNull("incident messageLike", incidentMessageLike);
+    this.incidentMessageLike = incidentMessageLike;
+    return this;
+  }
+
   //results /////////////////////////////////////////////////////////////////
-  
+
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -164,9 +192,9 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
       .getExecutionManager()
       .findProcessInstanceByQueryCriteria(this, page);
   }
-  
+
   //getters /////////////////////////////////////////////////////////////////
-  
+
   public boolean getOnlyProcessInstances() {
     return true; // See dynamic query in runtime.mapping.xml
   }
@@ -193,13 +221,13 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   }
   public String getSubProcessInstanceId() {
     return subProcessInstanceId;
-  }  
+  }
   public SuspensionState getSuspensionState() {
     return suspensionState;
-  }  
+  }
   public void setSuspensionState(SuspensionState suspensionState) {
     this.suspensionState = suspensionState;
-  }  
+  }
 
   public List<EventSubscriptionQueryValue> getEventSubscriptions() {
     return eventSubscriptions;
@@ -208,4 +236,21 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   public void setEventSubscriptions(List<EventSubscriptionQueryValue> eventSubscriptions) {
     this.eventSubscriptions = eventSubscriptions;
   }
+
+  public String getIncidentId() {
+    return incidentId;
+  }
+
+  public String getIncidentType() {
+    return incidentType;
+  }
+
+  public String getIncidentMessage() {
+    return incidentMessage;
+  }
+
+  public String getIncidentMessageLike() {
+    return incidentMessageLike;
+  }
+
 }

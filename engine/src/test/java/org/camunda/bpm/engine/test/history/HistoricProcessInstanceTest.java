@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -350,4 +351,28 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
       assertEquals(deleteReason, hpi.getDeleteReason());
     }
   }
+
+  @Deployment
+  public void testLongProcessDefinitionKey() {
+    // must be equals to attribute id of element process in process model
+    final String PROCESS_DEFINITION_KEY = "myrealrealrealrealrealrealrealrealrealrealreallongprocessdefinitionkeyawesome";
+
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).singleResult();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+
+    // get HPI by process instance id
+    HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(hpi);
+    assertProcessEnded(hpi.getId());
+
+    // get HPI by process definition key
+    HistoricProcessInstance hpi2 = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).singleResult();
+    assertNotNull(hpi2);
+    assertProcessEnded(hpi2.getId());
+
+    // check we got the same HPIs
+    assertEquals(hpi.getId(), hpi2.getId());
+
+  }
+
 }

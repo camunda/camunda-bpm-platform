@@ -61,7 +61,8 @@
                 <camunda:value id="a" name="A"/>
                 <camunda:value id="b" name="B"/>
                 <camunda:value id="c" name="C"/>
-            </camunda:formField>
+              </camunda:formField>
+              <camunda:formField id="boolField" label="Bool Field" type="boolean"/>
         </camunda:formData>
       </extensionElements>
       <outgoing>sequenceFlow_187</outgoing>

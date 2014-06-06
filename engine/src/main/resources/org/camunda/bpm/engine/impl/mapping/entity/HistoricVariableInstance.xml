@@ -21,11 +21,12 @@
   <!-- HISTORIC PROCESS VARIABLE INSERT -->
   
   <insert id="insertHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
-    insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
+    insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
     values (
       #{id, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
+      #{activityInstanceId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
       #{variableName, jdbcType=VARCHAR},
       #{revision, jdbcType=VARCHAR},
@@ -43,6 +44,7 @@
   <update id="updateHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     update ${prefix}ACT_HI_VARINST set
       REV_ = #{revisionNext, jdbcType=INTEGER},
+      VAR_TYPE_ = #{variableTypeName, jdbcType=VARCHAR},
       BYTEARRAY_ID_ = #{byteArrayId, jdbcType=VARCHAR},
       DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
       LONG_ = #{longValue, jdbcType=BIGINT},
@@ -67,6 +69,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
@@ -83,6 +86,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
@@ -96,6 +100,11 @@
   </resultMap>
   
   <!-- HISTORIC VARIABLE SELECT -->
+
+  <select id="selectHistoricVariablesByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicProcessVariableResultMap">
+    select * from ${prefix}ACT_HI_VARINST 
+    where PROC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
 
   <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicProcessVariableResultMap">
   	${limitBefore}
@@ -121,6 +130,9 @@
   <sql id="selectHistoricVariableInstanceByQueryCriteriaSql">
     from ${prefix}ACT_HI_VARINST RES
     <where>
+      <if test="variableId != null">
+        RES.ID_ = #{variableId}
+      </if>
       <if test="processInstanceId != null">
         RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
@@ -144,6 +156,15 @@
       <if test="executionIds != null &amp;&amp; executionIds.length > 0">
         and RES.EXECUTION_ID_ in
         <foreach item="item" index="index" collection="executionIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+
+      <!-- activityInstanceIds -->
+      <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
+        and RES.ACT_INST_ID_ in
+        <foreach item="item" index="index" collection="activityInstanceIds"
                  open="(" separator="," close=")">
           #{item}
         </foreach>
@@ -193,6 +214,7 @@
         </choose>
         </if>
       </if>
+      
     </where>
   </sql>
 

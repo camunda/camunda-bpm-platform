@@ -14,8 +14,9 @@ package org.camunda.bpm.integrationtest.functional.event.beans;
 
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
-import org.camunda.bpm.engine.cdi.impl.event.CdiExecutionListener;
+import org.camunda.bpm.engine.cdi.impl.event.CdiEventListener;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
 
 /**
  * @author Daniel Meyer
@@ -27,8 +28,10 @@ public class CdiEventSupportProcessApplication extends ServletProcessApplication
   public static final String LISTENER_INVOCATION_COUNT = "listenerInvocationCount";
 
   public ExecutionListener getExecutionListener() {
-    return new CdiExecutionListener();
+    return new CdiEventListener();
   }
 
-
+  public TaskListener getTaskListener() {
+    return new CdiEventListener();
+  }
 }

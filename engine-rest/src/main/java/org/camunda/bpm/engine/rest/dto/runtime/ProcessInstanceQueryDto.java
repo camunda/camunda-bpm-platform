@@ -20,14 +20,14 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
+import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
 
 public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQuery> {
 
@@ -51,6 +51,10 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private Boolean active;
   private Boolean suspended;
   private Set<String> processInstanceIds;
+  private String incidentId;
+  private String incidentType;
+  private String incidentMessage;
+  private String incidentMessageLike;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -111,6 +115,26 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.variables = variables;
   }
 
+  @CamundaQueryParam(value = "incidentId")
+  public void setIncidentId(String incidentId) {
+    this.incidentId = incidentId;
+  }
+
+  @CamundaQueryParam(value = "incidentType")
+  public void setIncidentType(String incidentType) {
+    this.incidentType = incidentType;
+  }
+
+  @CamundaQueryParam(value = "incidentMessage")
+  public void setIncidentMessage(String incidentMessage) {
+    this.incidentMessage = incidentMessage;
+  }
+
+  @CamundaQueryParam(value = "incidentMessageLike")
+  public void setIncidentMessageLike(String incidentMessageLike) {
+    this.incidentMessageLike = incidentMessageLike;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -147,6 +171,18 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (suspended != null && suspended == true) {
       query.suspended();
+    }
+    if (incidentId != null) {
+      query.incidentId(incidentId);
+    }
+    if (incidentType != null) {
+      query.incidentType(incidentType);
+    }
+    if (incidentMessage != null) {
+      query.incidentMessage(incidentMessage);
+    }
+    if (incidentMessageLike != null) {
+      query.incidentMessageLike(incidentMessageLike);
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {

@@ -24,6 +24,14 @@ import org.camunda.bpm.engine.runtime.Execution;
  */
 public interface HistoricDetailQuery extends Query<HistoricDetailQuery, HistoricDetail> {
 
+  /**
+   * Only select the historic detail with the given id.
+   *
+   * @param id the historic detail to select
+   * @return the query builder
+   */
+  HistoricDetailQuery detailId(String id);
+
   /** Only select historic variable updates with the given process instance.
    * {@link ProcessInstance) ids and {@link HistoricProcessInstance} ids match. */
   HistoricDetailQuery processInstanceId(String processInstanceId);
@@ -43,6 +51,9 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   /** Only select historic variable updates associated to the given {@link HistoricTaskInstance historic task instance}. */
   HistoricDetailQuery taskId(String taskId);
 
+  /** Only select historic variable updates associated to the given {@link HistoricVariableInstance historic variable instance}. */
+  HistoricDetailQuery variableInstanceId(String variableInstanceId);
+
   /** Only select {@link HistoricFormProperty}s. */
   @Deprecated
   HistoricDetailQuery formProperties();
@@ -53,8 +64,16 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   /** Only select {@link HistoricVariableUpdate}s. */
   HistoricDetailQuery variableUpdates();
 
+  /**
+   * Disable fetching of byte array values. By default, the query will fetch the value of a byte array.
+   * By calling this method you can prevent the values of (potentially large) blob data chunks to be fetched.
+   *
+   * @return the query builder
+   */
+  HistoricDetailQuery disableBinaryFetching();
+
   /** Exclude all task-related {@link HistoricDetail}s, so only items which have no
-   * task-id set will be selected. When used togheter with {@link #taskId(String)}, this
+   * task-id set will be selected. When used together with {@link #taskId(String)}, this
    * call is ignored task details are NOT excluded.
    */
   HistoricDetailQuery excludeTaskDetails();

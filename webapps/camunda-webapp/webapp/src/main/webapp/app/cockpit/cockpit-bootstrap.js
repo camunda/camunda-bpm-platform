@@ -1,16 +1,14 @@
 (function(document, window, require) {
-  /**
-   * A helper module to prepare the cockpit plugin for bootstrap.
-   * @module cockpit-bootstrap
-   */
+  'use strict';
 
-  var baseUrl = '../../../';
+  var baseUrl = document.getElementsByTagName('base')[0].getAttribute('app-root') +'/';
   var APP_NAME = 'cockpit';
   var pluginPackages = window.PLUGIN_PACKAGES || [];
 
-  require([baseUrl +'require-conf'], function(rjsConf) {
+  require([baseUrl +'require-conf.js'], function(rjsConf) {
     require({
       baseUrl:    baseUrl,
+      urlArgs:    rjsConf.urlArgs,
       paths:      rjsConf.paths,
       shim:       rjsConf.shim,
       packages:   rjsConf.packages.concat(pluginPackages)
@@ -22,20 +20,16 @@
       'angular-sanitize',
       'angular-ui',
       'ngDefine',
-      'bootstrap',
-      'jquery-ui'
+      // 'bootstrap',
+      'jquery-ui/ui/jquery.ui.draggable'
     ], function(angular) {
       require([
         APP_NAME,
         'domReady!'
       ], function() {
-        $('head title')
-          .attr('ng-model', 'pageTitle')
-          .text('{{ pageTitle }}');
         rjsConf.utils.bootAngular(angular, APP_NAME);
       });
     });
   });
-
 
 })(document, window || this, require);

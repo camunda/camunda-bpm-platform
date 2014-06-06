@@ -64,6 +64,12 @@ public interface ActivityExecution extends DelegateExecution {
   ActivityExecution createExecution();
 
   /**
+   * creates a new execution. This execution will be the parent of the newly created execution.
+   * properties processDefinition, processInstance and activity will be initialized.
+   */
+  ActivityExecution createExecution(boolean initializeExecutionStartContext);
+
+  /**
    * creates a new sub process instance.
    * The current execution will be the super execution of the created execution.
    *
@@ -124,7 +130,7 @@ public interface ActivityExecution extends DelegateExecution {
   /**
    * returns whether this execution is a process instance or not.
    */
-  boolean isProcessInstance();
+  boolean isProcessInstanceExecution();
 
   /**
    * Inactivates this execution.
@@ -162,7 +168,7 @@ public interface ActivityExecution extends DelegateExecution {
    * Takes the given outgoing transitions, and potentially reusing
    * the given list of executions that were previously joined.
    */
-  void takeAll(List<PvmTransition> outgoingTransitions, List<ActivityExecution> joinedExecutions);
+  void takeAll(List<PvmTransition> outgoingTransitions, List<? extends ActivityExecution> joinedExecutions);
 
   /**
    * Executes the {@link ActivityBehavior} associated with the given activity.
@@ -177,5 +183,13 @@ public interface ActivityExecution extends DelegateExecution {
 
   /** An activity which is to be started next. */
   PvmActivity getNextActivity();
+
+  void remove();
+
+  void signal(String string, Object signalData);
+
+  void cancelScope(String string);
+
+  void setActivity(PvmActivity cancelBoundaryEvent);
 
 }

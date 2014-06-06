@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
+import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
 import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -197,6 +198,10 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public void signal(String executionId) {
     commandExecutor.execute(new SignalCmd(executionId, null, null, null));
   }
+  
+  public void signal(String executionId, String signalName, Object signalData, Map<String, Object> processVariables) {
+    commandExecutor.execute(new SignalCmd(executionId, signalName, signalData, processVariables));
+  }
 
   public void signal(String executionId, Map<String, Object> processVariables) {
     commandExecutor.execute(new SignalCmd(executionId, null, null, processVariables));
@@ -280,6 +285,10 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables) {
     commandExecutor.execute(new MessageEventReceivedCmd(messageName, executionId, processVariables));
+  }
+
+  public MessageCorrelationBuilder createMessageCorrelation(String messageName) {
+    return new MessageCorrelationBuilderImpl(commandExecutor, messageName);
   }
 
   public void correlateMessage(String messageName, Map<String, Object> correlationKeys, Map<String, Object> processVariables) {

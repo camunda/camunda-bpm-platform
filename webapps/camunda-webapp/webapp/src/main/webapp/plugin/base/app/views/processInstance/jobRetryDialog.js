@@ -1,36 +1,46 @@
-ngDefine('cockpit.plugin.base.views', function(module, $) {
+/* global ngDefine: false */
+ngDefine('cockpit.plugin.base.views', function(module) {
+  'use strict';
 
-  var JobRetryController = [ '$scope', '$location', 'Notifications', 'JobResource', 'dialog', 'incident',
-                      function ($scope, $location, Notifications, JobResource, dialog, incident) {
+  module.controller('JobRetryController', [
+           '$scope', '$location', 'Notifications', 'JobResource', '$modalInstance', 'incident',
+  function ($scope,   $location,   Notifications,   JobResource,   $modalInstance,   incident) {
 
     var FINISHED = 'finished',
-        PERFORM = 'performing'
+        PERFORM = 'performing',
         FAILED = 'failed';
 
     $scope.$on('$routeChangeStart', function () {
-      dialog.close($scope.status);
+      $modalInstance.close($scope.status);
     });
 
     $scope.incrementRetry = function () {
       $scope.status = PERFORM;
 
-      JobResource.setRetries({ 'id': incident.configuration }, { 'retries': 1 }, function (response) {
+      JobResource.setRetries({
+        id: incident.configuration
+      }, {
+        retries: 1
+      }, function () {
         $scope.status = FINISHED;
-        Notifications.addMessage({ 'status': 'Finished', 'message': 'Incrementing the number of retries finished successfully.', 'exclusive': true });
 
+        Notifications.addMessage({
+          status: 'Finished',
+          message: 'Incrementing the number of retries finished successfully.',
+          exclusive: true
+        });
       }, function (error) {
         $scope.status = FAILED;
-        Notifications.addError({ 'status': 'Finished', 'message': 'Incrementing the number of retries was not successful: ' + error.data.message, 'exclusive': true });
+        Notifications.addError({
+          status: 'Finished',
+          message: 'Incrementing the number of retries was not successful: ' + error.data.message,
+          exclusive: true
+        });
       });
-
     };
 
     $scope.close = function (status) {
-      dialog.close(status);
+      $modalInstance.close(status);
     };
-
-  }];
-
-  module.controller('JobRetryController', JobRetryController);
-
+  }]);
 });

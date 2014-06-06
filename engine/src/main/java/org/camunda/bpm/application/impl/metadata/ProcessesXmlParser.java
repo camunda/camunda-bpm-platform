@@ -39,7 +39,7 @@ public class ProcessesXmlParser extends Parser {
    */
   public ProcessesXmlParse createParse() {
     ProcessesXmlParse processesXmlParse = new ProcessesXmlParse(this);
-    processesXmlParse.setSchemaResource(ReflectUtil.getResource(PROCESS_APPLICATION_XSD).toString());
+    processesXmlParse.setSchemaResource(ReflectUtil.getResourceUrlAsString(PROCESS_APPLICATION_XSD));
     return processesXmlParse;
   }
 

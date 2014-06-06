@@ -13,10 +13,12 @@
 package org.camunda.bpm.engine.cdi;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
 
 /**
  * The type of a business process event. Indicates what is happening/has
- * happened, i.e. whether a transition is taken, an activity is entered or left.
+ * happened, i.e. whether a transition is taken, an activity is entered or left,
+ * a task is created, assigned, completed or deleted.
  * 
  * @author Daniel Meyer
  */
@@ -30,6 +32,18 @@ public interface BusinessProcessEventType {
   
   /** Signifies that an activity is being left / was left **/
   public static final BusinessProcessEventType END_ACTIVITY = new DefaultBusinessProcessEventType(ExecutionListener.EVENTNAME_END);
+
+  /** Signifies that a task is created **/
+  public static final BusinessProcessEventType CREATE_TASK = new DefaultBusinessProcessEventType(TaskListener.EVENTNAME_CREATE);
+
+  /** Signifies that a task is assigned **/
+  public static final BusinessProcessEventType ASSIGN_TASK = new DefaultBusinessProcessEventType(TaskListener.EVENTNAME_ASSIGNMENT);
+
+  /** Signifies that a task is completed **/
+  public static final BusinessProcessEventType COMPLETE_TASK = new DefaultBusinessProcessEventType(TaskListener.EVENTNAME_COMPLETE);
+
+  /** Signifies that a task is deleted **/
+  public static final BusinessProcessEventType DELETE_TASK = new DefaultBusinessProcessEventType(TaskListener.EVENTNAME_DELETE);
 
   static class DefaultBusinessProcessEventType implements BusinessProcessEventType {
 

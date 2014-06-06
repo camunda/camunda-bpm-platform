@@ -28,9 +28,9 @@ import org.camunda.bpm.engine.runtime.Incident;
  * via {@link org.camunda.bpm.engine.ProcessEngineConfiguration#setCreateIncidentOnFailedJobEnabled(boolean)}.
  *
  * @see IncidentHandler
- * 
+ *
  * @author nico.rehwaldt
- * @author roman.smirnow
+ * @author roman.smirnov
  */
 public class FailedJobIncidentHandler implements IncidentHandler {
 
@@ -41,30 +41,37 @@ public class FailedJobIncidentHandler implements IncidentHandler {
   }
 
   public void handleIncident(String processDefinitionId, String activityId, String executionId, String jobId, String message) {
-
     if(executionId != null) {
       IncidentEntity newIncident = IncidentEntity.createAndInsertIncident(INCIDENT_HANDLER_TYPE, executionId, jobId, message);
       newIncident.createRecursiveIncidents();
 
     } else {
       IncidentEntity.createAndInsertIncident(INCIDENT_HANDLER_TYPE, processDefinitionId, activityId, jobId, message);
-
     }
-
   }
 
-  public void resolveIncident(String processDefinitionId, String activityId, String executionId, String jobId) {
+  public void resolveIncident(String processDefinitionId, String activityId, String executionId, String configuration) {
+    removeIncident(processDefinitionId, activityId, executionId, configuration, true);
+  }
 
+  public void deleteIncident(String processDefinitionId, String activityId, String executionId, String configuration) {
+    removeIncident(processDefinitionId, activityId, executionId, configuration, false);
+  }
+
+  protected void removeIncident(String processDefinitionId, String activityId, String executionId, String configuration, boolean incidentResolved) {
     List<Incident> incidents = Context
         .getCommandContext()
         .getIncidentManager()
-        .findIncidentByConfiguration(jobId);
+        .findIncidentByConfiguration(configuration);
 
     for (Incident currentIncident : incidents) {
       IncidentEntity incident = (IncidentEntity) currentIncident;
-      incident.delete();
+      if (incidentResolved) {
+        incident.resolve();
+      } else {
+        incident.delete();
+      }
     }
-
   }
 
 }

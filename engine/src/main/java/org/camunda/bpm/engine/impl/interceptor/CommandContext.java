@@ -23,12 +23,16 @@ import java.util.logging.Logger;
 
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
@@ -42,9 +46,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
@@ -60,9 +66,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 
 /**
  * @author Tom Baeyens
@@ -96,7 +102,7 @@ public class CommandContext {
     this.transactionContext = transactionContextFactory.openTransactionContext(this);
   }
 
-  public void performOperation(final AtomicOperation executionOperation, final InterpretableExecution execution) {
+  public void performOperation(final AtomicOperation executionOperation, final ExecutionEntity execution) {
 
     ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);
 
@@ -131,7 +137,7 @@ public class CommandContext {
 
   }
 
-  protected ProcessApplicationReference getTargetProcessApplication(InterpretableExecution execution) {
+  protected ProcessApplicationReference getTargetProcessApplication(ExecutionEntity execution) {
 
     return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
   }
@@ -170,10 +176,15 @@ public class CommandContext {
 
           if (exception != null) {
             Level loggingLevel = Level.SEVERE;
-            if (exception instanceof TaskAlreadyClaimedException) {
+            if (shouldLogInfo(exception)) {
               loggingLevel = Level.INFO; // reduce log level, because this is not really a technical exception
             }
-            log.log(loggingLevel, "Error while closing command context", exception);
+            else if (shouldLogFine(exception)) {
+              loggingLevel = Level.FINE;
+            }
+            if (log.isLoggable(loggingLevel)) {
+              log.log(loggingLevel, "Error while closing command context", exception);
+            }
             transactionContext.rollback();
           }
         }
@@ -199,6 +210,14 @@ public class CommandContext {
         throw new ProcessEngineException("exception while executing command " + command, exception);
       }
     }
+  }
+
+  protected boolean shouldLogInfo(Throwable exception) {
+    return exception instanceof TaskAlreadyClaimedException;
+  }
+
+  protected boolean shouldLogFine(Throwable exception) {
+    return exception instanceof OptimisticLockingException || exception instanceof BadUserRequestException;
   }
 
   protected void fireCommandContextClose() {
@@ -292,6 +311,10 @@ public class CommandContext {
     return getSession(HistoricDetailManager.class);
   }
 
+  public UserOperationLogManager getOperationLogManager() {
+    return getSession(UserOperationLogManager.class);
+  }
+
   public HistoricVariableInstanceManager getHistoricVariableInstanceManager() {
     return getSession(HistoricVariableInstanceManager.class);
   }
@@ -302,6 +325,10 @@ public class CommandContext {
 
   public HistoricTaskInstanceManager getHistoricTaskInstanceManager() {
     return getSession(HistoricTaskInstanceManager.class);
+  }
+
+  public HistoricIncidentManager getHistoricIncidentManager() {
+    return getSession(HistoricIncidentManager.class);
   }
 
   public JobManager getJobManager() {
@@ -362,6 +389,16 @@ public class CommandContext {
 
   public WritableIdentityProvider getWritableIdentityProvider() {
     return getSession(WritableIdentityProvider.class);
+  }
+
+  // CMMN /////////////////////////////////////////////////////////////////////
+
+  public CaseDefinitionManager getCaseDefinitionManager() {
+    return getSession(CaseDefinitionManager.class);
+  }
+
+  public CaseExecutionManager getCaseExecutionManager() {
+    return getSession(CaseExecutionManager.class);
   }
 
   // getters and setters //////////////////////////////////////////////////////

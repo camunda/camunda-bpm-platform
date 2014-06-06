@@ -12,13 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-import java.util.Collection;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+
+import java.io.Serializable;
+import java.util.Collection;
 
 
 /**
@@ -60,9 +61,23 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
   }
 
   protected void deleteTask(String taskId) {
-    Context
+    TaskEntity task = Context
       .getCommandContext()
       .getTaskManager()
-      .deleteTask(taskId, deleteReason, cascade);
+      .findTaskById(taskId);
+
+    if (task != null) {
+      if(task.getExecutionId() != null) {
+        throw new ProcessEngineException("The task cannot be deleted because is part of a running process");
+      }
+
+      String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
+      task.delete(reason, cascade);
+    } else if (cascade) {
+      Context
+        .getCommandContext()
+        .getHistoricTaskInstanceManager()
+        .deleteHistoricTaskInstanceById(taskId);
+    }
   }
 }

@@ -12,11 +12,12 @@
  */
 package org.camunda.bpm.webapp.impl.engine;
 
-import java.util.Set;
-
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+
+import java.util.Set;
 
 /**
  * <p>Uses the {@link BpmPlatform} and exposes the default process engine</p>
@@ -28,17 +29,22 @@ public class ContainerManagedProcessEngineProvider implements ProcessEngineProvi
 
   @Override
   public ProcessEngine getDefaultProcessEngine() {
-    return BpmPlatform.getDefaultProcessEngine();
+    ProcessEngine defaultProcessEngine = BpmPlatform.getDefaultProcessEngine();
+    if(defaultProcessEngine != null) {
+      return defaultProcessEngine;
+    } else {
+      return ProcessEngines.getDefaultProcessEngine(false);
+    }
   }
 
   @Override
   public ProcessEngine getProcessEngine(String name) {
-    return BpmPlatform.getProcessEngineService().getProcessEngine(name);
+    return ProcessEngines.getProcessEngine(name);
   }
 
   @Override
   public Set<String> getProcessEngineNames() {
-    return BpmPlatform.getProcessEngineService().getProcessEngineNames();
+    return ProcessEngines.getProcessEngines().keySet();
   }
 
 }

@@ -24,17 +24,25 @@ import org.camunda.bpm.engine.impl.cmd.AddIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeployCmd;
+import org.camunda.bpm.engine.impl.cmd.GetDeploymentBpmnModelInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramLayoutCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessModelCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
+import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceForIdCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceNamesCmd;
+import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourcesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessDefinitionCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDefinitionCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseModelCmd;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -42,7 +50,9 @@ import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.task.IdentityLink;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 
 /**
@@ -80,13 +90,26 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return new ProcessDefinitionQueryImpl(commandExecutor);
   }
 
+  public CaseDefinitionQuery createCaseDefinitionQuery() {
+    return new CaseDefinitionQueryImpl(commandExecutor);
+  }
+
   @SuppressWarnings("unchecked")
   public List<String> getDeploymentResourceNames(String deploymentId) {
     return commandExecutor.execute(new GetDeploymentResourceNamesCmd(deploymentId));
   }
 
+  @SuppressWarnings("unchecked")
+  public List<Resource> getDeploymentResources(String deploymentId) {
+    return commandExecutor.execute(new GetDeploymentResourcesCmd(deploymentId));
+  }
+
   public InputStream getResourceAsStream(String deploymentId, String resourceName) {
     return commandExecutor.execute(new GetDeploymentResourceCmd(deploymentId, resourceName));
+  }
+
+  public InputStream getResourceAsStreamById(String deploymentId, String resourceId) {
+    return commandExecutor.execute(new GetDeploymentResourceForIdCmd(deploymentId, resourceId));
   }
 
   public DeploymentQuery createDeploymentQuery() {
@@ -145,6 +168,10 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return commandExecutor.execute(new GetDeploymentProcessDiagramLayoutCmd(processDefinitionId));
   }
 
+  public BpmnModelInstance getBpmnModelInstance(String processDefinitionId) {
+    return commandExecutor.execute(new GetDeploymentBpmnModelInstanceCmd(processDefinitionId));
+  }
+
   public void addCandidateStarterUser(String processDefinitionId, String userId) {
     commandExecutor.execute(new AddIdentityLinkForProcessDefinitionCmd(processDefinitionId, userId, null));
   }
@@ -163,6 +190,14 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public List<IdentityLink> getIdentityLinksForProcessDefinition(String processDefinitionId) {
     return commandExecutor.execute(new GetIdentityLinksForProcessDefinitionCmd(processDefinitionId));
+  }
+
+  public CaseDefinition getCaseDefinition(String caseDefinitionId) {
+    return commandExecutor.execute(new GetDeploymentCaseDefinitionCmd(caseDefinitionId));
+  }
+
+  public InputStream getCaseModel(String caseDefinitionId) {
+    return commandExecutor.execute(new GetDeploymentCaseModelCmd(caseDefinitionId));
   }
 
 }

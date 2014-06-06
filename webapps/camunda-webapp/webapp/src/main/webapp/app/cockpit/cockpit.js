@@ -1,5 +1,24 @@
-(function(window) {
+/* global ngDefine: false */
 
+/**
+ * Cockpit app
+ *
+ * TODO:
+ * - describe the plugin mechanisms
+ *
+ * @module cockpit
+ */
+
+/**
+ * @namespace cam.cockpit
+ */
+(function(window) {
+  'use strict';
+
+  /**
+   * @memberof cam
+   * @name cockpit
+   */
   var cockpitCore = [
     'module:cockpit.plugin:cockpit-plugin',
     'module:cockpit.services:./services/main',
@@ -18,7 +37,7 @@
 
   var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ui.bootstrap:angular-ui' ].concat(commons, cockpitCore, plugins);
 
-  ngDefine('cockpit', dependencies, function(module, $, angular) {
+  ngDefine('cockpit', dependencies, function(module, $) {
 
     var ModuleConfig = [ '$routeProvider', 'UriProvider', function($routeProvider, UriProvider) {
 
@@ -35,9 +54,9 @@
 
       UriProvider.replace(':appName', 'cockpit');
       UriProvider.replace('app://', getUri('href'));
-      UriProvider.replace('adminbase://', getUri('app-root') + "/app/admin/");
+      UriProvider.replace('adminbase://', getUri('app-root') + '/app/admin/');
       UriProvider.replace('cockpit://', getUri('cockpit-api'));
-      UriProvider.replace('admin://', getUri('cockpit-api') + "../admin/");
+      UriProvider.replace('admin://', getUri('cockpit-api') + '../admin/');
       UriProvider.replace('plugin://', getUri('cockpit-api') + 'plugin/');
       UriProvider.replace('engine://', getUri('engine-api'));
 
@@ -54,6 +73,8 @@
     }];
 
     module.config(ModuleConfig);
+
+    return module;
   });
 
 })(window || this);

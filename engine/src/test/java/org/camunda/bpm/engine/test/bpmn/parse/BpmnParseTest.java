@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.test.Deployment;
 
 
 /**
- * 
+ *
  * @author Joram Barrez
  */
 public class BpmnParseTest extends PluggableProcessEngineTestCase {
@@ -43,7 +43,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       assertTextPresent("timerEventDefinition is not allowed on start event within a subprocess", e.getMessage());
     }
   }
-  
+
   public void testInvalidSubProcessWithMessageStartEvent() {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSubProcessWithMessageStartEvent");
@@ -173,7 +173,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       assertTextPresent("compensateEventDefinition is not allowed on start event within a subprocess", e.getMessage());
     }
   }
-  
+
   public void testInvalidProcessDefinition() {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidProcessDefinition");
@@ -185,32 +185,62 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       assertTextPresent("process", e.getMessage());
     }
   }
-  
+
+  public void testInvalidSequenceFlowInAndOutEventSubProcess() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSequenceFlowInAndOutEventSubProcess");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, although the sub process has incoming and outgoing sequence flows");
+    }
+    catch (ProcessEngineException e) {
+      assertTextPresent("Invalid incoming sequence flow of event subprocess", e.getMessage());
+      assertTextPresent("Invalid outgoing sequence flow of event subprocess", e.getMessage());
+    }
+  }
+
+  /** this test case check if the multiple start event is supported
+   *  the test case doesn't fail in this behavior because the {@link BpmnParse} parse
+   *  the event definitions with if-else, this means only the first event definition is taken
+   **/
+  public void testParseMultipleStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseMultipleStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail();
+    }
+    catch (ProcessEngineException e) {
+      // fail in "regular" subprocess
+      assertTextPresent("timerEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+      assertTextPresent("messageEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      // doesn't fail in event subprocess/process because the bpmn parser parse only this first event definition
+    }
+  }
+
   public void testParseWithBpmnNamespacePrefix() {
       repositoryService.createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseWithBpmnNamespacePrefix.bpmn20.xml")
         .deploy();
       assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
-      
+
       repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
   }
-  
+
   public void testParseWithMultipleDocumentation() {
       repositoryService.createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseWithMultipleDocumentation.bpmn20.xml")
         .deploy();
       assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
-      
+
       repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
   }
-  
+
   public void testParseCollaborationPlane() {
     repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseCollaborationPlane.bpmn").deploy();
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
 
     repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
   }
-  
+
   @Deployment
   public void testParseDiagramInterchangeElements() {
 
@@ -224,10 +254,10 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
           .findDeployedLatestProcessDefinitionByKey("myProcess");
       }
     });
-    
+
     assertNotNull(processDefinitionEntity);
     assertEquals(7, processDefinitionEntity.getActivities().size());
-    
+
     // Check if diagram has been created based on Diagram Interchange when it's not a headless instance
     List<String> resourceNames = repositoryService.getDeploymentResourceNames(processDefinitionEntity.getDeploymentId());
     if(processEngineConfiguration.isCreateDiagramOnDeploy()) {
@@ -235,9 +265,9 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     } else {
       assertEquals(1, resourceNames.size());
     }
-    
+
     for (ActivityImpl activity : processDefinitionEntity.getActivities()) {
-      
+
       if (activity.getId().equals("theStart")) {
         assertActivityBounds(activity, 70, 255, 30, 30);
       } else if (activity.getId().equals("task1")) {
@@ -252,11 +282,11 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
         assertActivityBounds(activity, 453, 304, 100, 80);
       } else if (activity.getId().equals("theEnd")) {
         assertActivityBounds(activity, 713, 256, 28, 28);
-      } 
-      
+      }
+
       for (PvmTransition sequenceFlow : activity.getOutgoingTransitions()) {
         assertTrue( ((TransitionImpl)sequenceFlow).getWaypoints().size() >= 4);
-        
+
         TransitionImpl transitionImpl = (TransitionImpl) sequenceFlow;
         if (transitionImpl.getId().equals("flowStartToTask1")) {
           assertSequenceFlowWayPoints(transitionImpl, 100, 270, 176, 270);
@@ -273,11 +303,11 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
         } else  if (transitionImpl.getId().equals("flowGateway2ToEnd")) {
           assertSequenceFlowWayPoints(transitionImpl, 660, 270, 713, 270);
         }
-        
+
       }
     }
   }
-  
+
   @Deployment
   public void testParseNamespaceInConditionExpressionType() {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
@@ -289,12 +319,12 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
           .findDeployedLatestProcessDefinitionByKey("resolvableNamespacesProcess");
       }
     });
-    
+
     // Test that the process definition has been deployed
     assertNotNull(processDefinitionEntity);
     ActivityImpl activity = processDefinitionEntity.findActivity("ExclusiveGateway_1");
     assertNotNull(activity);
-    
+
     // Test that the conditions has been resolved
     for (PvmTransition transition : activity.getOutgoingTransitions()) {
       if (transition.getDestination().getId().equals("Task_2")) {
@@ -304,32 +334,32 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       } else {
         fail("Something went wrong");
       }
-      
+
     }
   }
-  
+
   @Deployment
   public void testParseDiagramInterchangeElementsForUnknownModelElements() {
-            
+
   }
-  
+
   public void testParseSwitchedSourceAndTargetRefsForAssociations() {
     repositoryService.createDeployment()
       .addClasspathResource("org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseSwitchedSourceAndTargetRefsForAssociations.bpmn20.xml")
       .deploy();
-    
+
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
-    
+
     repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
   }
-  
+
   protected void assertActivityBounds(ActivityImpl activity, int x, int y, int width, int height) {
     assertEquals(x, activity.getX());
     assertEquals(y, activity.getY());
     assertEquals(width, activity.getWidth());
     assertEquals(height, activity.getHeight());
   }
-  
+
   protected void assertSequenceFlowWayPoints(TransitionImpl sequenceFlow, Integer ... waypoints) {
     assertEquals(waypoints.length, sequenceFlow.getWaypoints().size());
     for (int i = 0; i < waypoints.length; i++) {

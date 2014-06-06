@@ -39,13 +39,28 @@ public class VfsProcessApplicationScannerTest {
     // expect: finds only the BPMN process file and not treats the 'bpmn' folder
     assertEquals(1, scanResult.size());
     String processFileName = "VfsProcessScannerTest.bpmn20.xml";
-    assertTrue("'" + processFileName + "' found", contains(scanResult, processFileName));
-    assertFalse("'bpmn' folder in resource path not found", contains(scanResult, "bpmn"));
+    assertTrue("'" + processFileName + "'not found", contains(scanResult, processFileName));
+    assertFalse("'bpmn' folder in resource path found", contains(scanResult, "bpmn"));
   }
 
-  private boolean contains(Map<String, byte[]> scanResult, String suffix) {
+  @Test
+  public void testScanProcessArchivePathForCmmnResources() throws MalformedURLException {
+
+    // given: scanning the relative test resource root
+    URLClassLoader classLoader = new URLClassLoader(new URL[]{new URL("file:")});
+    String processRootPath = "classpath:org/camunda/bpm/container/impl/jmx/deployment/case/";
+    Map<String, byte[]> scanResult = ProcessApplicationScanningUtil.findResources(classLoader, processRootPath, null);
+
+    // expect: finds only the CMMN process file and not treats the 'cmmn' folder
+    assertEquals(1, scanResult.size());
+    String processFileName = "VfsProcessScannerTest.cmmn";
+    assertTrue("'" + processFileName + "' not found", contains(scanResult, processFileName));
+    assertFalse("'cmmn' in resource path found", contains(scanResult, "cmmn"));
+  }
+
+  private boolean contains(Map<String, byte[]> scanResult, String prefix) {
     for (String string : scanResult.keySet()) {
-      if (string.endsWith(suffix)) {
+      if (string.startsWith(prefix)) {
         return true;
       }
     }

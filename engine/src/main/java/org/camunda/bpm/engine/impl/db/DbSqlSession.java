@@ -53,6 +53,7 @@ import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.upgrade.DbUpgradeStep;
 import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
@@ -107,13 +108,32 @@ public class DbSqlSession implements Session {
 
   // insert ///////////////////////////////////////////////////////////////////
 
-  public void insert(PersistentObject persistentObject) {
+  /**
+   * Inserts a object at the given index in the insert objects list. If the
+   * index is -1 it will inserted at the end of the list.
+   *
+   * @param persistentObject  the object to insert
+   * @param index  the index at which the object should be inserted or -1 for the end of the list
+   */
+  public void insertAt(PersistentObject persistentObject, int index) {
     if (persistentObject.getId()==null) {
       String id = dbSqlSessionFactory.getIdGenerator().getNextId();
       persistentObject.setId(id);
     }
-    insertedObjects.add(persistentObject);
+    if (index == -1) {
+      index = insertedObjects.size();
+    }
+    insertedObjects.add(index, persistentObject);
     cachePut(persistentObject, false);
+  }
+
+  public void insert(PersistentObject persistentObject) {
+    insertAt(persistentObject, -1);
+  }
+
+  public void insertBefore(PersistentObject objectToInsert, PersistentObject referenceObject) {
+    int index = insertedObjects.indexOf(referenceObject);
+    insertAt(objectToInsert, index);
   }
 
   // update ///////////////////////////////////////////////////////////////////
@@ -752,6 +772,11 @@ public class DbSqlSession implements Session {
     return ClassNameUtil.getClassNameWithoutPackage(persistentObject)+"["+persistentObject.getId()+"]";
   }
 
+  public void lock(String statement) {
+    String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
+    sqlSession.update(mappedStatement);
+  }
+
   // schema operations ////////////////////////////////////////////////////////
 
 
@@ -771,6 +796,9 @@ public class DbSqlSession implements Session {
       }
       if (dbSqlSessionFactory.isDbIdentityUsed() && !isIdentityTablePresent()) {
         errorMessage = addMissingComponent(errorMessage, "identity");
+      }
+      if (dbSqlSessionFactory.isCmmnEnabled() && !isCaseDefinitionTablePresent()) {
+        errorMessage = addMissingComponent(errorMessage, "case.engine");
       }
 
       if (errorMessage!=null) {
@@ -814,6 +842,13 @@ public class DbSqlSession implements Session {
     }
   }
 
+  public void checkDeploymentLockExists() {
+    PropertyEntity deploymentLockProperty = selectById(PropertyEntity.class, "deployment.lock");
+    if (deploymentLockProperty == null) {
+      log.warning("No deployment lock property found in database.");
+    }
+  }
+
   protected String addMissingComponent(String missingComponents, String component) {
     if (missingComponents==null) {
       return "Tables missing for component(s) "+component;
@@ -852,6 +887,10 @@ public class DbSqlSession implements Session {
     if (processEngineConfiguration.isDbIdentityUsed()) {
       dbSchemaCreateIdentity();
     }
+
+    if (processEngineConfiguration.isCmmnEnabled()) {
+      dbSchemaCreateCmmn();
+    }
   }
 
   protected void dbSchemaCreateIdentity() {
@@ -866,8 +905,17 @@ public class DbSqlSession implements Session {
     executeMandatorySchemaResource("create", "engine");
   }
 
+  protected void dbSchemaCreateCmmn() {
+    executeMandatorySchemaResource("create", "case.engine");
+  }
+
   public void dbSchemaDrop() {
+    if (dbSqlSessionFactory.isCmmnEnabled()) {
+      executeMandatorySchemaResource("drop", "case.engine");
+    }
+
     executeMandatorySchemaResource("drop", "engine");
+
     if (dbSqlSessionFactory.isDbHistoryUsed()) {
       executeMandatorySchemaResource("drop", "history");
     }
@@ -882,6 +930,9 @@ public class DbSqlSession implements Session {
     }
     if (isIdentityTablePresent() && dbSqlSessionFactory.isDbIdentityUsed()) {
       executeMandatorySchemaResource("drop", "identity");
+    }
+    if (isCaseDefinitionTablePresent() && dbSqlSessionFactory.isCmmnEnabled()) {
+      executeMandatorySchemaResource("drop", "case.engine");
     }
   }
 
@@ -940,6 +991,14 @@ public class DbSqlSession implements Session {
       dbSchemaCreateIdentity();
     }
 
+    if (isCaseDefinitionTablePresent()) {
+      if (isUpgradeNeeded) {
+        dbSchemaUpgrade("case.engine", dbVersion);
+      }
+    } else if (dbSqlSessionFactory.isCmmnEnabled()) {
+      dbSchemaCreateCmmn();
+    }
+
     return feedback;
   }
 
@@ -951,6 +1010,10 @@ public class DbSqlSession implements Session {
   }
   public boolean isIdentityTablePresent(){
     return isTablePresent("ACT_ID_USER");
+  }
+
+  public boolean isCaseDefinitionTablePresent() {
+    return isTablePresent("ACT_RE_CASE_DEF");
   }
 
   public boolean isTablePresent(String tableName) {
@@ -1172,6 +1235,7 @@ public class DbSqlSession implements Session {
     }
 
     checkHistoryLevel();
+    checkDeploymentLockExists();
   }
 
   public void performSchemaOperationsProcessEngineClose() {
@@ -1188,6 +1252,9 @@ public class DbSqlSession implements Session {
   }
   public ProcessDefinitionQueryImpl createProcessDefinitionQuery() {
     return new ProcessDefinitionQueryImpl();
+  }
+  public CaseDefinitionQueryImpl createCaseDefinitionQuery() {
+    return new CaseDefinitionQueryImpl();
   }
   public ProcessInstanceQueryImpl createProcessInstanceQuery() {
     return new ProcessInstanceQueryImpl();
@@ -1232,5 +1299,8 @@ public class DbSqlSession implements Session {
     return dbSqlSessionFactory;
   }
 
+  public boolean isInsertedObject(PersistentObject persistentObject) {
+    return insertedObjects.contains(persistentObject);
+  }
 
 }

@@ -5,7 +5,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../../parent</relativePath>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>7.2.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.camunda.bpm.distro</groupId>
@@ -13,7 +13,7 @@
   <packaging>jar</packaging>
 
   <name>camunda BPM - SQL scripts</name>
-  
+
   <build>
   <resources>
   	<resource>
@@ -38,7 +38,7 @@
   		</includes>
   	</resource>
   </resources>
-  
+
   	<plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -78,35 +78,35 @@
             </goals>
             <configuration>
               <target>
-              
+
               	<!-- create -->
-                
+
                 <mkdir dir="target/sql/create" />
-                
+
                 <concat destfile="target/sql/create/db2_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.db2.create.engine.sql activiti.db2.create.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.db2.create.case.engine.sql activiti.db2.create.engine.sql activiti.db2.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/h2_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.h2.create.engine.sql activiti.h2.create.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.h2.create.case.engine.sql activiti.h2.create.engine.sql activiti.h2.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/mssql_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mssql.create.engine.sql activiti.mssql.create.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mssql.create.case.engine.sql activiti.mssql.create.engine.sql activiti.mssql.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/mysql_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mysql.create.engine.sql activiti.mysql.create.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mysql.create.case.engine.sql activiti.mysql.create.engine.sql activiti.mysql.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/oracle_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.oracle.create.engine.sql activiti.oracle.create.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.oracle.create.case.engine.sql activiti.oracle.create.engine.sql activiti.oracle.create.history.sql" />
                 </concat>
-                
+
                 <concat destfile="target/sql/create/postgres_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.postgres.create.engine.sql activiti.postgres.create.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.postgres.create.case.engine.sql activiti.postgres.create.engine.sql activiti.postgres.create.history.sql" />
                 </concat>
-                
+
                 <copy todir="target/sql/create" flatten="false">
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" />
                   <mapper>
@@ -115,35 +115,35 @@
                     </chainedmapper>
                   </mapper>
                 </copy>
-                
+
                 <!-- drop -->
-                
+
                 <mkdir dir="target/sql/drop" />
-                
+
                 <concat destfile="target/sql/drop/db2_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.db2.drop.engine.sql activiti.db2.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.db2.drop.case.engine.sql activiti.db2.drop.engine.sql activiti.db2.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/h2_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.h2.drop.engine.sql activiti.h2.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.h2.drop.case.engine.sql activiti.h2.drop.engine.sql activiti.h2.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/mssql_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mssql.drop.engine.sql activiti.mssql.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mssql.drop.case.engine.sql activiti.mssql.drop.engine.sql activiti.mssql.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/mysql_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mysql.drop.engine.sql activiti.mysql.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mysql.drop.case.engine.sql activiti.mysql.drop.engine.sql activiti.mysql.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/oracle_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.oracle.drop.engine.sql activiti.oracle.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.oracle.drop.case.engine.sql activiti.oracle.drop.engine.sql activiti.oracle.drop.history.sql" />
                 </concat>
-                
+
                 <concat destfile="target/sql/drop/postgres_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.postgres.drop.engine.sql activiti.postgres.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.postgres.drop.case.engine.sql activiti.postgres.drop.engine.sql activiti.postgres.drop.history.sql" />
                 </concat>
-                
+
                 <copy todir="target/sql/drop" flatten="false">
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" />
                   <mapper>
@@ -152,7 +152,7 @@
                     </chainedmapper>
                   </mapper>
                 </copy>
-                
+
                 <copy todir="target/sql/upgrade">
                   <fileset dir="upgrade">
                   	<include name="*.sql" />
@@ -164,7 +164,7 @@
           </execution>
         </executions>
       </plugin>
-    </plugins>  
+    </plugins>
   </build>
 
 

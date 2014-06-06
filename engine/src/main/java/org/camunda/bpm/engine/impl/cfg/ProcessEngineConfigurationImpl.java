@@ -45,6 +45,7 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -77,6 +78,14 @@ import org.camunda.bpm.engine.impl.calendar.MapBusinessCalendarManager;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.camunda.bpm.engine.impl.cmmn.CaseServiceImpl;
+import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
+import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistry;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformFactory;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
+import org.camunda.bpm.engine.impl.cmmn.transformer.DefaultCmmnTranformFactory;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.db.IbatisVariableTypeHandler;
@@ -135,6 +144,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHan
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.mail.MailScanner;
@@ -150,6 +160,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
@@ -165,6 +176,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
@@ -191,6 +203,7 @@ import org.camunda.bpm.engine.impl.variable.ShortType;
 import org.camunda.bpm.engine.impl.variable.StringType;
 import org.camunda.bpm.engine.impl.variable.VariableType;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 
 
 /**
@@ -222,6 +235,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected FormService formService = new FormServiceImpl();
   protected ManagementService managementService = new ManagementServiceImpl();
   protected AuthorizationService authorizationService = new AuthorizationServiceImpl();
+  protected CaseService caseService = new CaseServiceImpl();
 
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
 
@@ -304,6 +318,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<String> customScriptingEngineClasses;
   protected ScriptingEngines scriptingEngines;
   protected List<ResolverFactory> resolverFactories;
+  protected boolean autoStoreScriptVariables = false;
+  protected boolean enableScriptCompilation = true;
+  protected boolean cmmnEnabled = true;
 
   protected BusinessCalendarManager businessCalendarManager;
 
@@ -312,6 +329,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected CommandContextFactory commandContextFactory;
   protected TransactionContextFactory transactionContextFactory;
   protected BpmnParseFactory bpmnParseFactory;
+
+  // cmmn
+  protected CmmnTransformFactory cmmnTransformFactory;
+  protected DefaultCmmnElementHandlerRegistry cmmnElementHandlerRegistry;
 
   protected int historyLevel;
 
@@ -364,11 +385,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected HistoryEventHandler historyEventHandler;
 
+  protected boolean isExecutionTreePrefetchEnabled = true;
+
+  /** If true the process engine will attempt to acquire an exclusive lock before
+   * creating a deployment.
+   */
+  protected boolean isDeploymentLockUsed = true;
+
+  /**
+   * The process engine created by this configuration.
+   */
+  protected ProcessEngineImpl processEngine;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   public ProcessEngine buildProcessEngine() {
     init();
-    ProcessEngineImpl processEngine = new ProcessEngineImpl(this);
+    processEngine = new ProcessEngineImpl(this);
     invokePostProcessEngineBuild(processEngine);
     return processEngine;
   }
@@ -551,6 +584,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initService(formService);
     initService(managementService);
     initService(authorizationService);
+    initService(caseService);
   }
 
   protected void initService(Object service) {
@@ -712,6 +746,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           properties.put("falseConstant", DbSqlSessionFactory.databaseSpecificFalseConstant.get(databaseType));
 
           properties.put("dbSpecificDummyTable" , DbSqlSessionFactory.databaseSpecificDummyTable.get(databaseType));
+
+          Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
+          for (Entry<String, String> entry : constants.entrySet()) {
+            properties.put(entry.getKey(), entry.getValue());
+          }
+
         }
         XMLConfigBuilder parser = new XMLConfigBuilder(reader,"", properties);
         Configuration configuration = parser.getConfiguration();
@@ -751,6 +791,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
       dbSqlSessionFactory.setDbIdentityUsed(isDbIdentityUsed);
       dbSqlSessionFactory.setDbHistoryUsed(isDbHistoryUsed);
+      dbSqlSessionFactory.setCmmnEnabled(cmmnEnabled);
       dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
       dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
       addSessionFactory(dbSqlSessionFactory);
@@ -763,8 +804,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(HistoricStatisticsManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricDetailManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricProcessInstanceManager.class));
-      addSessionFactory(new GenericManagerFactory(HistoricVariableInstanceManager.class));
+      addSessionFactory(new GenericManagerFactory(UserOperationLogManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricTaskInstanceManager.class));
+      addSessionFactory(new GenericManagerFactory(HistoricVariableInstanceManager.class));
+      addSessionFactory(new GenericManagerFactory(HistoricIncidentManager.class));
       addSessionFactory(new GenericManagerFactory(IdentityInfoManager.class));
       addSessionFactory(new GenericManagerFactory(IdentityLinkManager.class));
       addSessionFactory(new GenericManagerFactory(JobManager.class));
@@ -780,6 +823,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(StatisticsManager.class));
       addSessionFactory(new GenericManagerFactory(IncidentManager.class));
       addSessionFactory(new GenericManagerFactory(AuthorizationManager.class));
+
+      addSessionFactory(new GenericManagerFactory(CaseDefinitionManager.class));
+      addSessionFactory(new GenericManagerFactory(CaseExecutionManager.class));
 
       sessionFactories.put(ReadOnlyIdentityProvider.class, identityProviderSessionFactory);
 
@@ -832,6 +878,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Collection< ? extends Deployer> getDefaultDeployers() {
     List<Deployer> defaultDeployers = new ArrayList<Deployer>();
 
+    BpmnDeployer bpmnDeployer = getBpmnDeployer();
+    defaultDeployers.add(bpmnDeployer);
+
+    if (isCmmnEnabled()) {
+      CmmnDeployer cmmnDeployer = getCmmnDeployer();
+      defaultDeployers.add(cmmnDeployer);
+    }
+
+    return defaultDeployers;
+  }
+
+  protected BpmnDeployer getBpmnDeployer() {
     BpmnDeployer bpmnDeployer = new BpmnDeployer();
     bpmnDeployer.setExpressionManager(expressionManager);
     bpmnDeployer.setIdGenerator(idGenerator);
@@ -852,16 +910,37 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     bpmnDeployer.setBpmnParser(bpmnParser);
 
-    defaultDeployers.add(bpmnDeployer);
-    return defaultDeployers;
+    return bpmnDeployer;
   }
 
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
-        if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
     }
     return defaultListeners;
+  }
+
+  protected CmmnDeployer getCmmnDeployer() {
+    CmmnDeployer cmmnDeployer = new CmmnDeployer();
+
+    cmmnDeployer.setIdGenerator(idGenerator);
+
+    if (cmmnTransformFactory == null) {
+      cmmnTransformFactory = new DefaultCmmnTranformFactory();
+    }
+
+    if (cmmnElementHandlerRegistry == null) {
+      cmmnElementHandlerRegistry = new DefaultCmmnElementHandlerRegistry();
+    }
+
+    CmmnTransformer cmmnTransformer = new CmmnTransformer(expressionManager, cmmnElementHandlerRegistry, cmmnTransformFactory);
+
+    // TODO: pre- and postParseListener
+
+    cmmnDeployer.setTransformer(cmmnTransformer);
+
+    return cmmnDeployer;
   }
 
   // job executor /////////////////////////////////////////////////////////////
@@ -880,6 +959,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     TimerStartEventJobHandler timerStartEvent = new TimerStartEventJobHandler();
     jobHandlers.put(timerStartEvent.getType(), timerStartEvent);
+
+    TimerStartEventSubprocessJobHandler timerStartEventSubprocess = new TimerStartEventSubprocessJobHandler();
+    jobHandlers.put(timerStartEventSubprocess.getType(), timerStartEventSubprocess);
 
     AsyncContinuationJobHandler asyncContinuationJobHandler = new AsyncContinuationJobHandler();
     jobHandlers.put(asyncContinuationJobHandler.getType(), asyncContinuationJobHandler);
@@ -1356,6 +1438,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setManagementService(ManagementService managementService) {
     this.managementService = managementService;
     return this;
+  }
+
+  public CaseService getCaseService() {
+    return caseService;
+  }
+
+  public void setCaseService(CaseService caseService) {
+    this.caseService = caseService;
   }
 
   public Map<Class< ? >, SessionFactory> getSessionFactories() {
@@ -2076,4 +2166,69 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return formValidators;
   }
 
+  public boolean isExecutionTreePrefetchEnabled() {
+    return isExecutionTreePrefetchEnabled;
+  }
+
+  public void setExecutionTreePrefetchEnabled(boolean isExecutionTreePrefetchingEnabled) {
+    this.isExecutionTreePrefetchEnabled = isExecutionTreePrefetchingEnabled;
+  }
+
+  public ProcessEngineImpl getProcessEngine() {
+    return processEngine;
+  }
+
+  /**
+   * If set to true, the process engine will save all script variables (created from Java Script, Groovy ...)
+   * as process variables.
+   */
+  public void setAutoStoreScriptVariables(boolean autoStoreScriptVariables) {
+    this.autoStoreScriptVariables = autoStoreScriptVariables;
+  }
+
+  /**
+   * @return true if the process engine should save all script variables (created from Java Script, Groovy ...)
+   * as process variables.
+   */
+  public boolean isAutoStoreScriptVariables() {
+    return autoStoreScriptVariables;
+  }
+
+  /**
+   * If set to true, the process engine will attempt to pre-compile script sources at runtime
+   * to optimize script task execution performance.
+   */
+  public void setEnableScriptCompilation(boolean enableScriptCompilation) {
+    this.enableScriptCompilation = enableScriptCompilation;
+  }
+
+  /**
+   * @return true if compilation of script sources ins enabled. False otherwise.
+   */
+  public boolean isEnableScriptCompilation() {
+    return enableScriptCompilation;
+  }
+
+  /**
+   * @return true if the process engine acquires an exclusive lock when creating a deployment.
+   */
+  public boolean isDeploymentLockUsed() {
+    return isDeploymentLockUsed;
+  }
+
+  /**
+   * If set to true, the process engine will acquire an exclusive lock when creating a deployment.
+   * This ensures that {@link DeploymentBuilder#enableDuplicateFiltering()} works correctly in a clustered environment.
+   */
+  public void setDeploymentLockUsed(boolean isDeploymentLockUsed) {
+    this.isDeploymentLockUsed = isDeploymentLockUsed;
+  }
+
+  public boolean isCmmnEnabled() {
+    return cmmnEnabled;
+  }
+
+  public void setCmmnEnabled(boolean cmmnEnabled) {
+    this.cmmnEnabled = cmmnEnabled;
+  }
 }

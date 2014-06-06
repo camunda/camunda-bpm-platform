@@ -21,6 +21,7 @@ import javax.ws.rs.core.Application;
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
+import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 
@@ -38,6 +39,7 @@ public class CockpitApplication extends Application {
     classes.add(JacksonConfigurator.class);
     classes.add(JacksonJsonProvider.class);
     classes.add(ExceptionHandler.class);
+    classes.add(RestExceptionHandler.class);
 
     addPluginResourceClasses(classes);
 

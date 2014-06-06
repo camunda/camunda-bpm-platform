@@ -12,22 +12,13 @@
  */
 package org.camunda.bpm.engine;
 
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.*;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.ActivityInstance;
-import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.ExecutionQuery;
-import org.camunda.bpm.engine.runtime.IncidentQuery;
-import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
-import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 
 
 /** Service which provides access to {@link Deployment}s,
@@ -252,7 +243,7 @@ public interface RuntimeService {
   /** Delete an existing runtime process instance.
    * @param processInstanceId id of process instance to delete, cannot be null.
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
-   * @throws ProcessEngineException when no process instance is found with the given id.
+   * @throws BadUserRequestException when no process instance is found with the given id or id is null.
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason);
 
@@ -315,7 +306,8 @@ public interface RuntimeService {
    * if the process instance contains multiple executions.
    *
    * @param executionId id of process instance or execution to signal, cannot be null.
-   * @throws ProcessEngineException when no execution is found for the given executionId.
+   * @throws BadUserRequestException when no execution is found for the given executionId or id is null.
+   * @throws SuspendedEntityInteractionException when the execution is suspended.
    */
   void signal(String executionId);
 
@@ -325,8 +317,22 @@ public interface RuntimeService {
    * if the process instance contains multiple executions.
    *
    * @param executionId id of process instance or execution to signal, cannot be null.
-   * @param processVariables a map of process variables
+   * @param signalName name of the signal (can be null)
+   * @param signalData additional data of the signal (can be null)
+   * @param processVariables a map of process variables (can be null)
    * @throws ProcessEngineException when no execution is found for the given executionId.
+   */
+  void signal(String executionId, String signalName, Object signalData, Map<String, Object> processVariables);
+
+ /** Sends an external trigger to an activity instance that is waiting inside the given execution.
+   *
+   * Note that you need to provide the exact execution that is waiting for the signal
+   * if the process instance contains multiple executions.
+   *
+   * @param executionId id of process instance or execution to signal, cannot be null.
+   * @param processVariables a map of process variables
+   * @throws BadUserRequestException when no execution is found for the given executionId or id is null.
+   * @throws SuspendedEntityInteractionException when the execution is suspended.
    */
   void signal(String executionId, Map<String, Object> processVariables);
 
@@ -701,6 +707,16 @@ public interface RuntimeService {
   void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables);
 
   /**
+   * Define a complex message correlation using a fluent builder.
+   *
+   * @param messageName the name of the message. Corresponds to the 'name' element
+   * of the message defined in BPMN 2.0 Xml.
+   *
+   * @return the fluent builder for defining the message correlation.
+   */
+  MessageCorrelationBuilder createMessageCorrelation(String messageName);
+
+  /**
    * Correlates a message to either an execution that is waiting for this message or a process definition
    * that can be started by this message.
    *
@@ -776,6 +792,8 @@ public interface RuntimeService {
    *          the name of the message event
    * @param businessKey
    *          the business key of process instances to correlate against
+   * @param processVariables
+   *          a map of variables added to the execution or newly created process instance
    * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
    * @throws ProcessEngineException if messageName is null
    */

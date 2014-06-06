@@ -12,45 +12,23 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import java.sql.Connection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.impl.cmd.ActivateJobCmd;
-import org.camunda.bpm.engine.impl.cmd.ActivateJobDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteJobCmd;
-import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
-import org.camunda.bpm.engine.impl.cmd.GetJobExceptionStacktraceCmd;
-import org.camunda.bpm.engine.impl.cmd.GetProcessApplicationForDeploymentCmd;
-import org.camunda.bpm.engine.impl.cmd.GetPropertiesCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTableCountCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTableMetaDataCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTableNameCmd;
-import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
-import org.camunda.bpm.engine.impl.cmd.RegisterProcessApplicationCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
-import org.camunda.bpm.engine.impl.cmd.SuspendJobCmd;
-import org.camunda.bpm.engine.impl.cmd.SuspendJobDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.UnregisterDeploymentCmd;
-import org.camunda.bpm.engine.impl.cmd.UnregisterProcessApplicationCmd;
+import org.camunda.bpm.engine.impl.cmd.*;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
-import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
-import org.camunda.bpm.engine.management.JobDefinitionQuery;
-import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
-import org.camunda.bpm.engine.management.TableMetaData;
-import org.camunda.bpm.engine.management.TablePageQuery;
+import org.camunda.bpm.engine.management.*;
 import org.camunda.bpm.engine.runtime.JobQuery;
+
+import java.sql.Connection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -98,7 +76,11 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   public void setJobRetries(String jobId, int retries) {
-    commandExecutor.execute(new SetJobRetriesCmd(jobId, retries));
+    commandExecutor.execute(new SetJobRetriesCmd(jobId, null, retries));
+  }
+
+  public void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
+    commandExecutor.execute(new SetJobRetriesCmd(null, jobDefinitionId, retries));
   }
 
   public void setJobDuedate(String jobId, Date newDuedate) {
@@ -123,6 +105,14 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public Map<String, String> getProperties() {
     return commandExecutor.execute(new GetPropertiesCmd());
+  }
+
+  public void setProperty(String name, String value) {
+    commandExecutor.execute(new SetPropertyCmd(name, value));
+  }
+
+  public void deleteProperty(String name) {
+    commandExecutor.execute(new DeletePropertyCmd(name));
   }
 
   public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
@@ -276,6 +266,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void suspendJobByProcessDefinitionKey(String processDefinitionKey) {
     commandExecutor.execute(new SuspendJobCmd(null, null, null, null, processDefinitionKey));
+  }
+
+  public int getHistoryLevel() {
+    return commandExecutor.execute(new GetHistoryLevelCmd());
   }
 
 }

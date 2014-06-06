@@ -12,11 +12,13 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.event;
 
-import static org.junit.Assert.assertEquals;
-
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class EventNotificationTest extends CdiProcessEngineTestCase {
 
@@ -30,8 +32,12 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     assertEquals(0, listenerBean.getEventsReceived().size());
     runtimeService.startProcessInstanceByKey("process1");
 
+    // complete user task
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
     // assert that now the bean has received 11 events
-    assertEquals(11, listenerBean.getEventsReceived().size());
+    assertEquals(16, listenerBean.getEventsReceived().size());
   }
 
   @Test
@@ -59,7 +65,7 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     
     assertEquals(0, listenerBean.getEndActivityService1());
     assertEquals(0, listenerBean.getStartActivityService1());
-    assertEquals(0, listenerBean.getTakeTransitiont1());
+    assertEquals(0, listenerBean.getTakeTransition1());
 
     // start the process
     runtimeService.startProcessInstanceByKey("process1");
@@ -67,8 +73,44 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     // assert
     assertEquals(1, listenerBean.getEndActivityService1());
     assertEquals(1, listenerBean.getStartActivityService1());
-    assertEquals(1, listenerBean.getTakeTransitiont1());
+    assertEquals(1, listenerBean.getTakeTransition1());
   }
 
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/cdi/test/impl/event/EventNotificationTest.process1.bpmn20.xml"})
+  public void testSelectEventsPerTask() {
+    TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
+    listenerBean.reset();
+
+    assertEquals(0, listenerBean.getCreateTaskUser1());
+    assertEquals(0, listenerBean.getAssignTaskUser1());
+    assertEquals(0, listenerBean.getCompleteTaskUser1());
+    assertEquals(0, listenerBean.getDeleteTaskUser1());
+
+    // assert that the bean has received 0 events
+    assertEquals(0, listenerBean.getEventsReceived().size());
+    runtimeService.startProcessInstanceByKey("process1");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setAssignee(task.getId(), "demo");
+
+    taskService.complete(task.getId());
+
+    assertEquals(1, listenerBean.getCreateTaskUser1());
+    assertEquals(1, listenerBean.getAssignTaskUser1());
+    assertEquals(1, listenerBean.getCompleteTaskUser1());
+    assertEquals(0, listenerBean.getDeleteTaskUser1());
+
+    listenerBean.reset();
+    assertEquals(0, listenerBean.getDeleteTaskUser1());
+
+    // assert that the bean has received 0 events
+    assertEquals(0, listenerBean.getEventsReceived().size());
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process1");
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+
+    assertEquals(1, listenerBean.getDeleteTaskUser1());
+  }
 
 }

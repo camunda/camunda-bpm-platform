@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,23 +27,34 @@ import org.camunda.bpm.engine.impl.variable.VariableType;
  * @author Tom Baeyens
  */
 public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariableUpdateEventEntity implements ValueFields, HistoricVariableUpdate {
-  
+
   private static final long serialVersionUID = 1L;
-  
+
   protected VariableType variableType;
   protected ByteArrayEntity byteArrayValue;
 
   protected Object cachedValue;
-  
+
+  protected String errorMessage;
+
   public Object getValue() {
-    if (!variableType.isCachable() || cachedValue==null) {
-      cachedValue = variableType.getValue(this);
+    if (errorMessage == null && (!variableType.isCachable() || cachedValue==null)) {
+      try {
+        cachedValue = variableType.getValue(this);
+
+      } catch(RuntimeException e) {
+        // catch error message
+        errorMessage = e.getMessage();
+
+        //re-throw the exception
+        throw e;
+      }
     }
     return cachedValue;
   }
 
   public void delete() {
-    
+
     DbSqlSession dbSqlSession = Context
         .getCommandContext()
         .getDbSqlSession();
@@ -51,7 +62,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
     dbSqlSession.delete(this);
 
     if (byteArrayId != null) {
-      // the next apparently useless line is probably to ensure consistency in the DbSqlSession 
+      // the next apparently useless line is probably to ensure consistency in the DbSqlSession
       // cache, but should be checked and docced here (or removed if it turns out to be unnecessary)
       // @see also HistoricVariableInstanceEntity
       getByteArrayValue();
@@ -61,31 +72,38 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
         .deleteByteArrayById(byteArrayId);
     }
   }
-  
+
   public String getVariableTypeName() {
     return (variableType!=null ? variableType.getTypeName() : null);
   }
 
+  public String getErrorMessage() {
+    return errorMessage;
+  }
+
   // byte array value /////////////////////////////////////////////////////////
-  
+
   // i couldn't find a easy readable way to extract the common byte array value logic
-  // into a common class.  therefor it's duplicated in VariableInstanceEntity, 
-  // HistoricVariableInstance and HistoricDetailVariableInstanceUpdateEntity 
-  
+  // into a common class.  therefor it's duplicated in VariableInstanceEntity,
+  // HistoricVariableInstance and HistoricDetailVariableInstanceUpdateEntity
+
   public String getByteArrayValueId() {
     return byteArrayId;
   }
 
   public ByteArrayEntity getByteArrayValue() {
     if ((byteArrayValue == null) && (byteArrayId != null)) {
-      byteArrayValue = Context
-        .getCommandContext()
-        .getDbSqlSession()
-        .selectById(ByteArrayEntity.class, byteArrayId);
+      // no lazy fetching outside of command context
+      if(Context.getCommandContext() != null) {
+        byteArrayValue = Context
+          .getCommandContext()
+          .getDbSqlSession()
+          .selectById(ByteArrayEntity.class, byteArrayId);
+      }
     }
     return byteArrayValue;
   }
-  
+
   public void setByteArrayValue(byte[] bytes) {
     ByteArrayEntity byteArrayValue = null;
     if (this.byteArrayId!=null) {
@@ -112,7 +130,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
 
   protected void deleteByteArrayValue() {
     if (byteArrayId != null) {
-      // the next apparently useless line is probably to ensure consistency in the DbSqlSession 
+      // the next apparently useless line is probably to ensure consistency in the DbSqlSession
       // cache, but should be checked and docced here (or removed if it turns out to be unnecessary)
       getByteArrayValue();
       Context
@@ -121,13 +139,13 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
         .deleteByteArrayById(this.byteArrayId);
     }
   }
-  
+
   public String getName() {
     return getVariableName();
   }
-  
+
   // getters and setters //////////////////////////////////////////////////////
-  
+
   public Date getTime() {
     return timestamp;
   }
@@ -139,11 +157,11 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
   public Object getCachedValue() {
     return cachedValue;
   }
-  
+
   public void setCachedValue(Object cachedValue) {
     this.cachedValue = cachedValue;
   }
-  
+
   public void setVariableType(VariableType variableType) {
     this.variableType = variableType;
   }

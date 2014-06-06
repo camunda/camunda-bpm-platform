@@ -1,7 +1,9 @@
 ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, require) {
 
-  var Controller = [ '$scope', '$rootScope', '$dialog', 'search',
-      function ($scope, $rootScope, $dialog, search) {
+  var Controller = [
+    '$scope',
+    'Views',
+  function ($scope, Views) {
 
     var processData = $scope.processData.newChild($scope),
         processDefinition = null;
@@ -37,38 +39,14 @@ ngDefine('cockpit.plugin.jobDefinition.views', ['require'], function(module, req
 
     };
 
-    $scope.openSuspensionStateDialog = function (jobDefinition) {
-      var dialog = $dialog.dialog({
-        resolve: {
-          jobDefinition: function() { return jobDefinition; }
-        },
-        controller: 'JobDefinitionSuspensionStateController',
-        templateUrl: require.toUrl('./job-definition-suspension-state-dialog.html')
-      });
+    $scope.jobDefinitionVars = { read: [ 'jobDefinition', 'processData', 'filter' ] };
+    $scope.jobDefinitionActions = Views.getProviders({ component: 'cockpit.jobDefinition.action' });
 
-      dialog.open().then(function(result) {
-        // dialog closed. YEA!
-        if (result.status === 'SUCCESS') {
-          if (result.executeImmediately) {
-            jobDefinition.suspended = result.suspended;
-            $rootScope.$broadcast('$jobDefinition.suspensionState.changed', $scope.jobDefinition);
-          }
-
-          $scope.processData.set('filter', angular.extend({}, $scope.filter));
-        }
-      });
-
-    };
-
-    $scope.selectActivity = function(activityId, event) {
-      event.preventDefault();
-      $scope.processData.set('filter', angular.extend({}, $scope.filter, { activityIds: [activityId] }));
-    };
   }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.live.tab', {
+    ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
       id: 'job-definition-table',
       label: 'Job Definitions',
       url: 'plugin://jobDefinition/static/app/views/processDefinition/job-definition-table.html',

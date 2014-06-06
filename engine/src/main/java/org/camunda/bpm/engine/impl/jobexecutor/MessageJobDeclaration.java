@@ -32,7 +32,6 @@ public class MessageJobDeclaration extends JobDeclaration<MessageEntity> {
   protected MessageEntity newJobInstance(ExecutionEntity execution) {
     MessageEntity message = new MessageEntity();
     message.setExecution(execution);
-    message.setExclusive(execution.getActivity().isExclusive());
     message.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
     return message;
   }

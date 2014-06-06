@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,11 +14,14 @@ package org.camunda.bpm.engine.impl.delegate;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ExecutionContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
  * Class handling invocations of {@link TaskListener TaskListeners}
- * 
+ *
  * @author Daniel Meyer
  */
 public class TaskListenerInvocation extends DelegateInvocation {
@@ -29,18 +32,29 @@ public class TaskListenerInvocation extends DelegateInvocation {
   public TaskListenerInvocation(TaskListener executionListenerInstance, DelegateTask delegateTask) {
     this(executionListenerInstance, delegateTask, null);
   }
-  
-  public TaskListenerInvocation(TaskListener executionListenerInstance, DelegateTask delegateTask, 
-      InterpretableExecution contextExecution) {
+
+  public TaskListenerInvocation(TaskListener executionListenerInstance, DelegateTask delegateTask,
+      ActivityExecution contextExecution) {
     this.executionListenerInstance = executionListenerInstance;
     this.delegateTask = delegateTask;
     this.contextExecution = contextExecution;
   }
 
   protected void invoke() throws Exception {
-    executionListenerInstance.notify(delegateTask);
+    ExecutionContext executionContext = Context.getExecutionContext();
+    try {
+      if (executionContext == null) {
+        Context.setExecutionContext((ExecutionEntity) contextExecution);
+      }
+      executionListenerInstance.notify(delegateTask);
+    }
+    finally {
+      if (executionContext == null) {
+        Context.removeExecutionContext();
+      }
+    }
   }
-  
+
   public Object getTarget() {
     return executionListenerInstance;
   }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.persistence.deploy;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +22,17 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.cmmn.Cmmn;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 
 
 /**
@@ -32,27 +40,34 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
  * @author Falko Menge
  */
 public class DeploymentCache {
-  
+
   private Logger LOGGER = Logger.getLogger(DeploymentCache.class.getName());
 
-  protected Map<String, ProcessDefinitionEntity> processDefinitionCache = new HashMap<String, ProcessDefinitionEntity>(); 
-  protected Map<String, Object> knowledgeBaseCache = new HashMap<String, Object>(); 
+  protected Map<String, ProcessDefinitionEntity> processDefinitionCache = new HashMap<String, ProcessDefinitionEntity>();
+  protected Map<String, CaseDefinitionEntity> caseDefinitionCache = new HashMap<String, CaseDefinitionEntity>();
+  protected Map<String, BpmnModelInstance> bpmnModelInstanceCache = new HashMap<String, BpmnModelInstance>();
+  protected Map<String, CmmnModelInstance> cmmnModelInstanceCache = new HashMap<String, CmmnModelInstance>();
   protected List<Deployer> deployers;
-  
+
   public void deploy(DeploymentEntity deployment) {
     for (Deployer deployer: deployers) {
       deployer.deploy(deployment);
     }
   }
 
+  // PROCESS DEFINITION ////////////////////////////////////////////////////////////////////////////////
+
   public ProcessDefinitionEntity findDeployedProcessDefinitionById(String processDefinitionId) {
     if (processDefinitionId == null) {
       throw new ProcessEngineException("Invalid process definition id : null");
     }
-    ProcessDefinitionEntity processDefinition = Context
-      .getCommandContext()
-      .getProcessDefinitionManager()
-      .findLatestProcessDefinitionById(processDefinitionId);
+    CommandContext commandContext = Context.getCommandContext();
+    ProcessDefinitionEntity processDefinition = commandContext.getDbSqlSession().findInCache(ProcessDefinitionEntity.class, processDefinitionId);
+    if(processDefinition == null) {
+      processDefinition = commandContext
+        .getProcessDefinitionManager()
+        .findLatestProcessDefinitionById(processDefinitionId);
+    }
     if(processDefinition == null) {
       throw new ProcessEngineException("no deployed process definition found with id '" + processDefinitionId + "'");
     }
@@ -83,7 +98,7 @@ public class DeploymentCache {
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
   }
-  
+
   public ProcessDefinitionEntity findDeployedProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey) {
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) Context
       .getCommandContext()
@@ -94,7 +109,7 @@ public class DeploymentCache {
     }
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
-  }  
+  }
 
   public ProcessDefinitionEntity resolveProcessDefinition(ProcessDefinitionEntity processDefinition) {
     String processDefinitionId = processDefinition.getId();
@@ -108,7 +123,7 @@ public class DeploymentCache {
       deployment.setNew(false);
       deploy(deployment);
       cachedProcessDefinition = processDefinitionCache.get(processDefinitionId);
-      
+
       if (cachedProcessDefinition==null) {
         throw new ProcessEngineException("deployment '"+deploymentId+"' didn't put process definition '"+processDefinitionId+"' in the cache");
       }
@@ -119,6 +134,30 @@ public class DeploymentCache {
     return cachedProcessDefinition;
   }
 
+  public BpmnModelInstance findBpmnModelInstanceForProcessDefinition(String processDefinitionId) {
+    BpmnModelInstance bpmnModelInstance = bpmnModelInstanceCache.get(processDefinitionId);
+    if(bpmnModelInstance == null) {
+
+      ProcessDefinitionEntity processDefinition = findDeployedProcessDefinitionById(processDefinitionId);
+      String deploymentId = processDefinition.getDeploymentId();
+      String resourceName = processDefinition.getResourceName();
+
+      InputStream bpmnResourceInputStream = new GetDeploymentResourceCmd(deploymentId, resourceName)
+        .execute(Context.getCommandContext());
+
+      try {
+        bpmnModelInstance = Bpmn.readModelFromStream(bpmnResourceInputStream);
+      }catch(Exception e) {
+        throw new ProcessEngineException("Could not load Bpmn Model for process definition "+processDefinitionId, e);
+      }
+
+      // put model instance into cache.
+      bpmnModelInstanceCache.put(processDefinitionId, bpmnModelInstance);
+
+    }
+    return bpmnModelInstance;
+  }
+
   public void addProcessDefinition(ProcessDefinitionEntity processDefinition) {
     processDefinitionCache.put(processDefinition.getId(), processDefinition);
   }
@@ -127,43 +166,183 @@ public class DeploymentCache {
     processDefinitionCache.remove(processDefinitionId);
   }
 
-  public void addKnowledgeBase(String knowledgeBaseId, Object knowledgeBase) {
-    knowledgeBaseCache.put(knowledgeBaseId, knowledgeBase);
-  }
-
-  public void removeKnowledgeBase(String knowledgeBaseId) {
-    knowledgeBaseCache.remove(knowledgeBaseId);
-  }
-  
   public void discardProcessDefinitionCache() {
     processDefinitionCache.clear();
   }
 
-  public void discardKnowledgeBaseCache() {
-    knowledgeBaseCache.clear();
+  // CASE DEFINITION ////////////////////////////////////////////////////////////////////////////////
+
+  public CaseDefinitionEntity findDeployedCaseDefinitionById(String caseDefinitionId) {
+    if (caseDefinitionId == null) {
+      throw new ProcessEngineException("Invalid case definition id: null");
+    }
+
+    CommandContext commandContext = Context.getCommandContext();
+
+    // try to load case definition from cache
+    CaseDefinitionEntity caseDefinition = commandContext
+        .getDbSqlSession()
+        .findInCache(CaseDefinitionEntity.class, caseDefinitionId);
+
+    if(caseDefinition == null) {
+
+      // if not found, then load the case definition
+      // from db
+      caseDefinition = commandContext
+        .getCaseDefinitionManager()
+        .findCaseDefinitionById(caseDefinitionId);
+
+    }
+
+    if(caseDefinition == null) {
+      throw new ProcessEngineException("no deployed case definition found with id '" + caseDefinitionId + "'");
+    }
+
+    caseDefinition = resolveCaseDefinition(caseDefinition);
+
+    return caseDefinition;
   }
+
+  public CaseDefinitionEntity findDeployedLatestCaseDefinitionByKey(String caseDefinitionKey) {
+    if (caseDefinitionKey == null) {
+      throw new ProcessEngineException("Invalid case definition key: null");
+    }
+
+    // load case definition by key from db
+    CaseDefinitionEntity caseDefinition = Context
+      .getCommandContext()
+      .getCaseDefinitionManager()
+      .findLatestCaseDefinitionByKey(caseDefinitionKey);
+
+    if (caseDefinition==null) {
+      throw new ProcessEngineException("no case definition deployed with key '"+caseDefinitionKey+"'");
+    }
+
+    caseDefinition = resolveCaseDefinition(caseDefinition);
+
+    return caseDefinition;
+  }
+
+  public CaseDefinitionEntity findDeployedCaseDefinitionByKeyAndVersion(String caseDefinitionKey, Integer caseDefinitionVersion) {
+
+    CaseDefinitionEntity caseDefinition = (CaseDefinitionEntity) Context
+      .getCommandContext()
+      .getCaseDefinitionManager()
+      .findCaseDefinitionByKeyAndVersion(caseDefinitionKey, caseDefinitionVersion);
+
+    if (caseDefinition==null) {
+      throw new ProcessEngineException("no case definition deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'");
+    }
+    caseDefinition = resolveCaseDefinition(caseDefinition);
+
+    return caseDefinition;
+  }
+
+  public CaseDefinitionEntity findDeployedCaseDefinitionByDeploymentAndKey(String deploymentId, String caseDefinitionKey) {
+    CaseDefinitionEntity caseDefinition = (CaseDefinitionEntity) Context
+      .getCommandContext()
+      .getCaseDefinitionManager()
+      .findCaseDefinitionByDeploymentAndKey(deploymentId, caseDefinitionKey);
+
+    if (caseDefinition==null) {
+      throw new ProcessEngineException("no case definition deployed with key = '" + caseDefinitionKey + "' in deployment = '" + deploymentId + "'");
+    }
+    caseDefinition = resolveCaseDefinition(caseDefinition);
+
+    return caseDefinition;
+  }
+
+  public CaseDefinitionEntity resolveCaseDefinition(CaseDefinitionEntity caseDefinition) {
+    String caseDefinitionId = caseDefinition.getId();
+    String deploymentId = caseDefinition.getDeploymentId();
+
+    CaseDefinitionEntity cachedCaseDefinition = caseDefinitionCache.get(caseDefinitionId);
+
+    if (cachedCaseDefinition==null) {
+      DeploymentEntity deployment = Context
+        .getCommandContext()
+        .getDeploymentManager()
+        .findDeploymentById(deploymentId);
+
+      deployment.setNew(false);
+      deploy(deployment);
+
+      cachedCaseDefinition = caseDefinitionCache.get(caseDefinitionId);
+
+      if (cachedCaseDefinition==null) {
+        throw new ProcessEngineException("deployment '"+deploymentId+"' didn't put case definition '"+caseDefinitionId+"' in the cache");
+      }
+
+    }
+    return cachedCaseDefinition;
+  }
+
+  public CmmnModelInstance findCmmnModelInstanceForCaseDefinition(String caseDefinitionId) {
+    CmmnModelInstance cmmnModelInstance = cmmnModelInstanceCache.get(caseDefinitionId);
+    if(cmmnModelInstance == null) {
+
+      CaseDefinitionEntity caseDefinition = findDeployedCaseDefinitionById(caseDefinitionId);
+      String deploymentId = caseDefinition.getDeploymentId();
+      String resourceName = caseDefinition.getResourceName();
+
+      InputStream cmmnResourceInputStream = new GetDeploymentResourceCmd(deploymentId, resourceName)
+        .execute(Context.getCommandContext());
+
+      try {
+        cmmnModelInstance = Cmmn.readModelFromStream(cmmnResourceInputStream);
+      }catch(Exception e) {
+        throw new ProcessEngineException("Could not load Cmmn Model for case definition " + caseDefinitionId, e);
+      }
+
+      // put model instance into cache.
+      cmmnModelInstanceCache.put(caseDefinitionId, cmmnModelInstance);
+
+    }
+    return cmmnModelInstance;
+  }
+
+  public void addCaseDefinition(CaseDefinitionEntity caseDefinition) {
+    caseDefinitionCache.put(caseDefinition.getId(), caseDefinition);
+  }
+
+  public void removeCaseDefinition(String caseDefinitionId) {
+    caseDefinitionCache.remove(caseDefinitionId);
+  }
+
+  public void discardCaseDefinitionCache() {
+    caseDefinitionCache.clear();
+  }
+
   // getters and setters //////////////////////////////////////////////////////
+
+  public Map<String, BpmnModelInstance> getBpmnModelInstanceCache() {
+    return bpmnModelInstanceCache;
+  }
+
+  public Map<String, CmmnModelInstance> getCmmnModelInstanceCache() {
+    return cmmnModelInstanceCache;
+  }
 
   public Map<String, ProcessDefinitionEntity> getProcessDefinitionCache() {
     return processDefinitionCache;
   }
-  
+
   public void setProcessDefinitionCache(Map<String, ProcessDefinitionEntity> processDefinitionCache) {
     this.processDefinitionCache = processDefinitionCache;
   }
-  
-  public Map<String, Object> getKnowledgeBaseCache() {
-    return knowledgeBaseCache;
+
+  public Map<String, CaseDefinitionEntity> getCaseDefinitionCache() {
+    return caseDefinitionCache;
   }
-  
-  public void setKnowledgeBaseCache(Map<String, Object> knowledgeBaseCache) {
-    this.knowledgeBaseCache = knowledgeBaseCache;
+
+  public void setCaseDefinitionCache(Map<String, CaseDefinitionEntity> caseDefinitionCache) {
+    this.caseDefinitionCache = caseDefinitionCache;
   }
-  
+
   public List<Deployer> getDeployers() {
     return deployers;
   }
-  
+
   public void setDeployers(List<Deployer> deployers) {
     this.deployers = deployers;
   }
@@ -176,13 +355,12 @@ public class DeploymentCache {
     for (ProcessDefinition processDefinition : allDefinitionsForDeployment) {
       try {
         removeProcessDefinition(processDefinition.getId());
-        
+
       } catch(Exception e) {
         LOGGER.log(Level.WARNING, "Could not remove process definition with id '"+processDefinition.getId()+"' from the cache.", e);
-        
+
       }
     }
-      
-    
+
   }
 }

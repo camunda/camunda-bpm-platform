@@ -10,7 +10,7 @@
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
-  <version>7.1.0-SNAPSHOT</version>
+  <version>7.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Root Pom</name>
 
@@ -45,8 +45,7 @@
         
         <module>engine</module>
         <module>engine-cdi</module>
-        <module>engine-osgi</module>
-        <module>engine-spring</module>          
+        <module>engine-spring</module>
         <module>engine-rest</module>
 
         <module>examples/invoice</module>
@@ -87,7 +86,6 @@
       <modules>
         <module>engine</module>
         <module>engine-cdi</module>
-        <module>engine-osgi</module>
         <module>engine-spring</module>          
         <module>engine-rest</module>
   
@@ -111,12 +109,15 @@
       <modules>
         <module>engine</module>
         <module>engine-cdi</module>
-        <!--<module>engine-osgi</module>-->
         <module>engine-spring</module>
         <module>engine-rest</module>
 
+        <module>javaee/ejb-client</module>
+
         <module>identity/identity-ldap</module>
-  
+
+        <module>webapps/camunda-webapp</module>
+
         <module>parent</module>
         <module>bom</module>
       </modules>

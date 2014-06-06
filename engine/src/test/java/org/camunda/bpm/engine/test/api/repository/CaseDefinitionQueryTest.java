@@ -1,0 +1,471 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.camunda.bpm.engine.test.api.repository;
+
+import java.util.List;
+
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
+
+/**
+ * @author Roman Smirnov
+ *
+ */
+public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
+
+  private String deploymentOneId;
+  private String deploymentTwoId;
+  private String resourceOne = "org/camunda/bpm/engine/test/repository/one.cmmn";
+  private String resourceTwo = "org/camunda/bpm/engine/test/repository/two.cmmn";
+
+  @Override
+  protected void setUp() throws Exception {
+    deploymentOneId = repositoryService
+      .createDeployment()
+      .name("firstDeployment")
+      .addClasspathResource(resourceOne)
+      .addClasspathResource(resourceTwo)
+      .deploy()
+      .getId();
+
+    deploymentTwoId = repositoryService
+      .createDeployment()
+      .name("secondDeployment")
+      .addClasspathResource(resourceOne)
+      .deploy()
+      .getId();
+
+    super.setUp();
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    super.tearDown();
+    repositoryService.deleteDeployment(deploymentOneId, true);
+    repositoryService.deleteDeployment(deploymentTwoId, true);
+  }
+
+  private void verifyQueryResults(CaseDefinitionQuery query, int countExpected) {
+    assertEquals(countExpected, query.list().size());
+    assertEquals(countExpected, query.count());
+
+    if (countExpected == 1) {
+      assertNotNull(query.singleResult());
+    } else if (countExpected > 1){
+      verifySingleResultFails(query);
+    } else if (countExpected == 0) {
+      assertNull(query.singleResult());
+    }
+  }
+
+  private void verifySingleResultFails(CaseDefinitionQuery query) {
+    try {
+      query.singleResult();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testCaseDefinitionProperties() {
+    List<CaseDefinition> caseDefinitions = repositoryService
+      .createCaseDefinitionQuery()
+      .orderByCaseDefinitionName().asc()
+      .orderByCaseDefinitionVersion().asc()
+      .orderByCaseDefinitionCategory()
+      .asc()
+      .list();
+
+    CaseDefinition caseDefinition = caseDefinitions.get(0);
+    assertEquals("one", caseDefinition.getKey());
+    assertEquals("One", caseDefinition.getName());
+    assertTrue(caseDefinition.getId().startsWith("one:1"));
+    assertEquals("Examples", caseDefinition.getCategory());
+    assertEquals(1, caseDefinition.getVersion());
+    assertEquals("org/camunda/bpm/engine/test/repository/one.cmmn", caseDefinition.getResourceName());
+    assertEquals(deploymentOneId, caseDefinition.getDeploymentId());
+
+    caseDefinition = caseDefinitions.get(1);
+    assertEquals("one", caseDefinition.getKey());
+    assertEquals("One", caseDefinition.getName());
+    assertTrue(caseDefinition.getId().startsWith("one:2"));
+    assertEquals("Examples", caseDefinition.getCategory());
+    assertEquals(2, caseDefinition.getVersion());
+    assertEquals("org/camunda/bpm/engine/test/repository/one.cmmn", caseDefinition.getResourceName());
+    assertEquals(deploymentTwoId, caseDefinition.getDeploymentId());
+
+    caseDefinition = caseDefinitions.get(2);
+    assertEquals("two", caseDefinition.getKey());
+    assertEquals("Two", caseDefinition.getName());
+    assertTrue(caseDefinition.getId().startsWith("two:1"));
+    assertEquals("Examples2", caseDefinition.getCategory());
+    assertEquals(1, caseDefinition.getVersion());
+    assertEquals("org/camunda/bpm/engine/test/repository/two.cmmn", caseDefinition.getResourceName());
+    assertEquals(deploymentOneId, caseDefinition.getDeploymentId());
+  }
+
+  public void testQueryByDeploymentId() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .deploymentId(deploymentOneId);
+
+    verifyQueryResults(query, 2);
+  }
+
+  public void testQueryByInvalidDeploymentId() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+   query
+     .deploymentId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.deploymentId(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByName() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionName("Two");
+
+    verifyQueryResults(query, 1);
+
+    query
+      .caseDefinitionName("One");
+
+    verifyQueryResults(query, 2);
+  }
+
+  public void testQueryByInvalidName() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionName("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseDefinitionName(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByNameLike() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionNameLike("%w%");
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidNameLike() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionNameLike("%invalid%");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseDefinitionNameLike(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByKey() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    // case one
+    query
+      .caseDefinitionKey("one");
+
+    verifyQueryResults(query, 2);
+
+    // case two
+    query
+      .caseDefinitionKey("two");
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidKey() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionKey("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseDefinitionKey(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByKeyLike() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionKeyLike("%o%");
+
+    verifyQueryResults(query, 3);
+  }
+
+  public void testQueryByInvalidKeyLike() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionKeyLike("%invalid%");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseDefinitionKeyLike(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByCategory() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionCategory("Examples");
+
+    verifyQueryResults(query, 2);
+  }
+
+  public void testQueryByInvalidCategory() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionCategory("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseDefinitionCategory(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByCategoryLike() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionCategoryLike("%Example%");
+
+    verifyQueryResults(query, 3);
+
+    query
+      .caseDefinitionCategoryLike("%amples2");
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidCategoryLike() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionCategoryLike("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseDefinitionCategoryLike(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByVersion() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionVersion(2);
+
+    verifyQueryResults(query, 1);
+
+    query
+      .caseDefinitionVersion(1);
+
+    verifyQueryResults(query, 2);
+  }
+
+  public void testQueryByInvalidVersion() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .caseDefinitionVersion(3);
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseDefinitionVersion(-1);
+      fail();
+    } catch (ProcessEngineException e) {}
+
+    try {
+      query.caseDefinitionVersion(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByLatest() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .latestVersion();
+
+    verifyQueryResults(query, 2);
+
+    query
+      .caseDefinitionKey("one")
+      .latestVersion();
+
+    verifyQueryResults(query, 1);
+
+    query
+      .caseDefinitionKey("two").latestVersion();
+    verifyQueryResults(query, 1);
+  }
+
+  public void testInvalidUsageOfLatest() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    try {
+      query
+        .caseDefinitionId("test")
+        .latestVersion()
+        .list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+    try {
+      query
+        .caseDefinitionName("test")
+        .latestVersion()
+        .list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+    try {
+      query
+        .caseDefinitionNameLike("test")
+        .latestVersion()
+        .list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+    try {
+      query
+        .caseDefinitionVersion(1)
+        .latestVersion()
+        .list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+    try {
+      query
+        .deploymentId("test")
+        .latestVersion()
+        .list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testQuerySorting() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    // asc
+    query
+      .orderByCaseDefinitionId()
+      .asc();
+    verifyQueryResults(query, 3);
+
+    query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .orderByDeploymentId()
+      .asc();
+    verifyQueryResults(query, 3);
+
+    query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .orderByCaseDefinitionKey()
+      .asc();
+    verifyQueryResults(query, 3);
+
+    query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .orderByCaseDefinitionVersion()
+      .asc();
+    verifyQueryResults(query, 3);
+
+    // desc
+
+    query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .orderByCaseDefinitionId()
+      .desc();
+    verifyQueryResults(query, 3);
+
+    query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .orderByDeploymentId()
+      .desc();
+    verifyQueryResults(query, 3);
+
+    query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .orderByCaseDefinitionKey()
+      .desc();
+    verifyQueryResults(query, 3);
+
+    query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .orderByCaseDefinitionVersion()
+      .desc();
+    verifyQueryResults(query, 3);
+
+    query = repositoryService.createCaseDefinitionQuery();
+
+    // Typical use case
+    query
+      .orderByCaseDefinitionKey()
+      .asc()
+      .orderByCaseDefinitionVersion()
+      .desc();
+
+    List<CaseDefinition> caseDefinitions = query.list();
+    assertEquals(3, caseDefinitions.size());
+
+    assertEquals("one", caseDefinitions.get(0).getKey());
+    assertEquals(2, caseDefinitions.get(0).getVersion());
+    assertEquals("one", caseDefinitions.get(1).getKey());
+    assertEquals(1, caseDefinitions.get(1).getVersion());
+    assertEquals("two", caseDefinitions.get(2).getKey());
+    assertEquals(1, caseDefinitions.get(2).getVersion());
+  }
+
+}

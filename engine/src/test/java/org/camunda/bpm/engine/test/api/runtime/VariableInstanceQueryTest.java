@@ -22,12 +22,15 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
+import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
 import org.junit.Test;
 
 /**
@@ -60,6 +63,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(2, query.count());
 
     for (VariableInstance var : result) {
+      assertNotNull(var.getId());
       if (var.getName().equals("intVar")) {
         assertEquals("intVar", var.getName());
         assertEquals(123, var.getValue());
@@ -71,6 +75,30 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
       }
 
     }
+  }
+
+  @Test
+  public void testQueryByVariableId() {
+    // given
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("var1", "test");
+    variables.put("var2", "test");
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+    taskService.setVariablesLocal(task.getId(), variables);
+    VariableInstance result = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(result);
+
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableId(result.getId());
+
+    // then
+    assertNotNull(query);
+    VariableInstance resultById = query.singleResult();
+    assertEquals(result.getId(), resultById.getId());
+
+    // delete task
+    taskService.deleteTask(task.getId(), true);
   }
 
   @Test
@@ -2147,6 +2175,268 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     taskService.complete(task.getId());
 
+  }
+
+  @Test
+  public void testDisableBinaryFetching() {
+    byte[] binaryContent = "some binary content".getBytes();
+
+    // given
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("binaryVariable", binaryContent);
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+    taskService.setVariablesLocal(task.getId(), variables);
+
+    // when binary fetching is enabled (default)
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // then value is fetched
+    VariableInstance result = query.singleResult();
+    assertNotNull(result.getValue());
+
+    // when binary fetching is disabled
+    query = runtimeService.createVariableInstanceQuery().disableBinaryFetching();
+
+    // then value is not fetched
+    result = query.singleResult();
+    assertNull(result.getValue());
+
+    // delete task
+    taskService.deleteTask(task.getId(), true);
+  }
+
+  @Test
+  public void testSerializableErrorMessage() {
+
+    // given
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("customSerializable", new CustomSerializable());
+    variables.put("failingSerializable", new FailingSerializable());
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+    taskService.setVariablesLocal(task.getId(), variables);
+
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // then
+    List<VariableInstance> results = query.list();
+
+    // both variables are fetched
+    assertEquals(2, results.size());
+
+    for (VariableInstance variableInstance : results) {
+      if(variableInstance.getName().equals("customSerializable")) {
+        assertNotNull(variableInstance.getValue());
+        assertTrue(variableInstance.getValue() instanceof CustomSerializable);
+      }
+      if(variableInstance.getName().equals("failingSerializable")) {
+        // no value was fetched
+        assertNull(variableInstance.getValue());
+        // error message is present
+        assertNotNull(variableInstance.getErrorMessage());
+      }
+    }
+
+    // delete task
+    taskService.deleteTask(task.getId(), true);
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseExecutionId() {
+    CaseInstance instance = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      .caseExecutionIdIn(instance.getId());
+
+    VariableInstance result = query.singleResult();
+
+    assertNotNull(result);
+
+    assertEquals("aVariableName", result.getName());
+    assertEquals("abc", result.getValue());
+    assertEquals(instance.getId(), result.getCaseExecutionId());
+    assertEquals(instance.getId(), result.getCaseInstanceId());
+
+    assertNull(result.getExecutionId());
+    assertNull(result.getProcessInstanceId());
+
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseExecutionIds() {
+    CaseInstance instance1 = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    CaseInstance instance2 = caseService
+        .createCaseInstanceByKey("oneTaskCase")
+        .setVariable("anotherVariableName", "xyz")
+        .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      .caseExecutionIdIn(instance1.getId(), instance2.getId())
+      .orderByVariableName()
+      .asc();
+
+    List<VariableInstance> result = query.list();
+
+    assertEquals(2, result.size());
+
+    for (VariableInstance variableInstance : result) {
+      if (variableInstance.getName().equals("aVariableName")) {
+        assertEquals("aVariableName", variableInstance.getName());
+        assertEquals("abc", variableInstance.getValue());
+      } else if (variableInstance.getName().equals("anotherVariableName")) {
+        assertEquals("anotherVariableName", variableInstance.getName());
+        assertEquals("xyz", variableInstance.getValue());
+      } else {
+        fail("Unexpected variable: " + variableInstance.getName());
+      }
+
+    }
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceId() {
+    CaseInstance instance = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      .caseInstanceIdIn(instance.getId());
+
+    VariableInstance result = query.singleResult();
+
+    assertNotNull(result);
+
+    assertEquals("aVariableName", result.getName());
+    assertEquals("abc", result.getValue());
+    assertEquals(instance.getId(), result.getCaseExecutionId());
+    assertEquals(instance.getId(), result.getCaseInstanceId());
+
+    assertNull(result.getExecutionId());
+    assertNull(result.getProcessInstanceId());
+
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceIds() {
+    CaseInstance instance1 = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    CaseInstance instance2 = caseService
+        .createCaseInstanceByKey("oneTaskCase")
+        .setVariable("anotherVariableName", "xyz")
+        .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      .caseInstanceIdIn(instance1.getId(), instance2.getId())
+      .orderByVariableName()
+      .asc();
+
+    List<VariableInstance> result = query.list();
+
+    assertEquals(2, result.size());
+
+    for (VariableInstance variableInstance : result) {
+      if (variableInstance.getName().equals("aVariableName")) {
+        assertEquals("aVariableName", variableInstance.getName());
+        assertEquals("abc", variableInstance.getValue());
+      } else if (variableInstance.getName().equals("anotherVariableName")) {
+        assertEquals("anotherVariableName", variableInstance.getName());
+        assertEquals("xyz", variableInstance.getValue());
+      } else {
+        fail("Unexpected variable: " + variableInstance.getName());
+      }
+
+    }
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseActivityInstanceId() {
+    CaseInstance instance = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      .activityInstanceIdIn(instance.getId());
+
+    VariableInstance result = query.singleResult();
+
+    assertNotNull(result);
+
+    assertEquals("aVariableName", result.getName());
+    assertEquals("abc", result.getValue());
+    assertEquals(instance.getId(), result.getCaseExecutionId());
+    assertEquals(instance.getId(), result.getCaseInstanceId());
+
+    assertNull(result.getExecutionId());
+    assertNull(result.getProcessInstanceId());
+
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseActivityInstanceIds() {
+    CaseInstance instance1 = caseService
+      .createCaseInstanceByKey("oneTaskCase")
+      .setVariable("aVariableName", "abc")
+      .create();
+
+    CaseInstance instance2 = caseService
+        .createCaseInstanceByKey("oneTaskCase")
+        .setVariable("anotherVariableName", "xyz")
+        .create();
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    query
+      // activityInstanceId == caseExecutionId
+      .activityInstanceIdIn(instance1.getId(), instance2.getId())
+      .orderByVariableName()
+      .asc();
+
+    List<VariableInstance> result = query.list();
+
+    assertEquals(2, result.size());
+
+    for (VariableInstance variableInstance : result) {
+      if (variableInstance.getName().equals("aVariableName")) {
+        assertEquals("aVariableName", variableInstance.getName());
+        assertEquals("abc", variableInstance.getValue());
+      } else if (variableInstance.getName().equals("anotherVariableName")) {
+        assertEquals("anotherVariableName", variableInstance.getName());
+        assertEquals("xyz", variableInstance.getValue());
+      } else {
+        fail("Unexpected variable: " + variableInstance.getName());
+      }
+
+    }
   }
 
 }

@@ -1,14 +1,14 @@
-'use strict';
+/* global ngDefine: false */
+ngDefine('cockpit.directives', function(module) {
+  'use strict';
 
-ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
-  
   var Directive = function () {
     return {
       restrict: 'A',
       require: 'ngModel',
       link: function (scope, element, attrs, model) {
 
-        var pattern = attrs['integer'] ? /^-?[\d]+$/ : /^(0|(-?(((0|[1-9]\d*)\.\d+)|([1-9]\d*))))([eE][-+]?[0-9]+)?$/;     
+        var pattern = attrs.integer ? /^-?[\d]+$/ : /^(0|(-?(((0|[1-9]\d*)\.\d+)|([1-9]\d*))))([eE][-+]?[0-9]+)?$/;
 
         var numberParser = function(value) {
 
@@ -26,7 +26,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           // then ignore it!
           if (value === undefined || value === null) {
             return;
-          }          
+          }
 
           // test the pattern
           var isValid = pattern.test(value);
@@ -37,7 +37,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
             // value as a number
             return parseFloat(value, 10);
           } else {
-            // if the value is invalid, then 
+            // if the value is invalid, then
             // set $pristine to false and set $dirty to true,
             // that means the user has interacted with the controller.
             model.$pristine = false;
@@ -49,7 +49,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
             return value;
           }
         };
-        
+
         model.$formatters.push(numberFormatter);
       }
     };
@@ -57,5 +57,5 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
 
   module
     .directive('numeric', Directive);
-  
+
 });

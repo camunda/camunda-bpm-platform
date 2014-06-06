@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.runtime.ExecutionQuery;
  * @author Frederik Heremans
  * @author Daniel Meyer
  */
-public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery, Execution> 
+public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery, Execution>
   implements ExecutionQuery {
 
   private static final long serialVersionUID = 1L;
@@ -39,19 +39,23 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   protected String processInstanceId;
   protected List<EventSubscriptionQueryValue> eventSubscriptions;
   protected SuspensionState suspensionState;
-  
+  protected String incidentType;
+  protected String incidentId;
+  protected String incidentMessage;
+  protected String incidentMessageLike;
+
   // Not used by end-users, but needed for dynamic ibatis query
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
   private String businessKey;
-  
+
   public ExecutionQueryImpl() {
   }
-  
+
   public ExecutionQueryImpl(CommandContext commandContext) {
     super(commandContext);
   }
-  
+
   public ExecutionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
@@ -75,7 +79,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
-  
+
   public ExecutionQueryImpl processInstanceId(String processInstanceId) {
     if (processInstanceId == null) {
       throw new ProcessEngineException("Process instance id is null");
@@ -83,7 +87,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     this.processInstanceId = processInstanceId;
     return this;
   }
-  
+
   public ExecutionQuery processInstanceBusinessKey(String businessKey) {
     if (businessKey == null) {
       throw new ProcessEngineException("Business key is null");
@@ -91,7 +95,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     this.businessKey = businessKey;
     return this;
   }
-  
+
   public ExecutionQueryImpl executionId(String executionId) {
     if (executionId == null) {
       throw new ProcessEngineException("Execution id is null");
@@ -99,24 +103,24 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     this.executionId = executionId;
     return this;
   }
-  
+
   public ExecutionQueryImpl activityId(String activityId) {
     this.activityId = activityId;
     return this;
   }
-  
-  public ExecutionQuery signalEventSubscription(String signalName) {    
+
+  public ExecutionQuery signalEventSubscription(String signalName) {
     return eventSubscription("signal", signalName);
   }
-  
-  public ExecutionQuery signalEventSubscriptionName(String signalName) {    
+
+  public ExecutionQuery signalEventSubscriptionName(String signalName) {
     return eventSubscription("signal", signalName);
-  }  
-  
-  public ExecutionQuery messageEventSubscriptionName(String messageName) {    
+  }
+
+  public ExecutionQuery messageEventSubscriptionName(String messageName) {
     return eventSubscription("message", messageName);
-  } 
-  
+  }
+
   public ExecutionQuery eventSubscription(String eventType, String eventName) {
     if(eventName == null) {
       throw new ProcessEngineException("event name is null");
@@ -140,7 +144,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     this.suspensionState = SuspensionState.ACTIVE;
     return this;
   }
-  
+
   public ExecutionQuery processVariableValueEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.EQUALS, false);
     return this;
@@ -150,26 +154,50 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false);
     return this;
   }
-  
+
+  public ExecutionQuery incidentType(String incidentType) {
+    assertParamNotNull("incident type", incidentType);
+    this.incidentType = incidentType;
+    return this;
+  }
+
+  public ExecutionQuery incidentId(String incidentId) {
+    assertParamNotNull("incident id", incidentId);
+    this.incidentId = incidentId;
+    return this;
+  }
+
+  public ExecutionQuery incidentMessage(String incidentMessage) {
+    assertParamNotNull("incident message", incidentMessage);
+    this.incidentMessage = incidentMessage;
+    return this;
+  }
+
+  public ExecutionQuery incidentMessageLike(String incidentMessageLike) {
+    assertParamNotNull("incident messageLike", incidentMessageLike);
+    this.incidentMessageLike = incidentMessageLike;
+    return this;
+  }
+
   //ordering ////////////////////////////////////////////////////
-  
+
   public ExecutionQueryImpl orderByProcessInstanceId() {
     this.orderProperty = ExecutionQueryProperty.PROCESS_INSTANCE_ID;
     return this;
   }
-  
+
   public ExecutionQueryImpl orderByProcessDefinitionId() {
     this.orderProperty = ExecutionQueryProperty.PROCESS_DEFINITION_ID;
     return this;
   }
-  
+
   public ExecutionQueryImpl orderByProcessDefinitionKey() {
     this.orderProperty = ExecutionQueryProperty.PROCESS_DEFINITION_KEY;
     return this;
   }
-  
+
   //results ////////////////////////////////////////////////////
-  
+
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -186,7 +214,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
       .getExecutionManager()
       .findExecutionsByQueryCriteria(this, page);
   }
-  
+
   //getters ////////////////////////////////////////////////////
 
   public boolean getOnlyProcessInstances() {
@@ -218,20 +246,36 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   }
   public String getSubProcessInstanceId() {
     return subProcessInstanceId;
-  }  
+  }
   public SuspensionState getSuspensionState() {
     return suspensionState;
-  }  
+  }
   public void setSuspensionState(SuspensionState suspensionState) {
     this.suspensionState = suspensionState;
-  }  
-  
+  }
+
   public List<EventSubscriptionQueryValue> getEventSubscriptions() {
     return eventSubscriptions;
   }
-  
+
   public void setEventSubscriptions(List<EventSubscriptionQueryValue> eventSubscriptions) {
     this.eventSubscriptions = eventSubscriptions;
   }
-  
+
+  public String getIncidentId() {
+    return incidentId;
+  }
+
+  public String getIncidentType() {
+    return incidentType;
+  }
+
+  public String getIncidentMessage() {
+    return incidentMessage;
+  }
+
+  public String getIncidentMessageLike() {
+    return incidentMessageLike;
+  }
+
 }

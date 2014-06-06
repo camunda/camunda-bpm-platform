@@ -1,7 +1,6 @@
-ngDefine(
-  'cockpit.directives', [
-  'jquery', 'angular'
-], function(module, $, angular) {
+/* global ngDefine: false */
+ngDefine('cockpit.directives', ['jquery'], function(module, $) {
+  'use strict';
 
   module.directive('ctnCollapsableParent', function() {
 
@@ -114,7 +113,7 @@ ngDefine(
 
             if (direction === 'left' || direction === 'top') {
               resizeHandle
-                .css(resizeHandleAttachAttr, collapsableSize)
+                .css(resizeHandleAttachAttr, collapsableSize);
             } else {
               resizeHandle
                 .css(resizeHandleAttachAttr, collapsablePosition[resizeHandleAttachAttr]);
@@ -123,7 +122,7 @@ ngDefine(
 
           $(resizeHandle)
             .draggable({ axis: changeAxis, containment: 'parent'})
-            .on('drag', function(e, ui) {
+            .on('drag', function() {
               var position = resizeHandle.position();
               var pos = position[direction];
 

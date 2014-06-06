@@ -9,12 +9,14 @@
 
 		<serviceTask id="service1" activiti:expression="#{true}" />
 		<serviceTask id="service2" activiti:expression="#{true}" />
+    <userTask id="user1" />
 
 		<endEvent id="endEvent" />
 
 		<sequenceFlow id="t1" targetRef="service1" sourceRef="startEvent" />
 		<sequenceFlow id="t2" targetRef="service2" sourceRef="service1" />
-		<sequenceFlow id="t3" targetRef="endEvent" sourceRef="service2" />
+    <sequenceFlow id="t3" targetRef="user1" sourceRef="service2" />
+		<sequenceFlow id="t4" targetRef="endEvent" sourceRef="user1" />
 
 	</process>
 </definitions>

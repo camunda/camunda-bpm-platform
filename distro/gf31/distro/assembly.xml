@@ -49,6 +49,13 @@
 
     <dependencySet>
       <includes>
+        <include>org.camunda.bpm.distro:camunda-h2-webapp:war:*</include>
+      </includes>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
         <include>org.camunda.bpm.cycle:camunda-cycle-glassfish:war:*</include>
       </includes>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>

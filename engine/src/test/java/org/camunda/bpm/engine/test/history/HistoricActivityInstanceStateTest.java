@@ -279,6 +279,26 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  public void testEventSubprocessMessageCancel() {
+    startProcess();
+
+    runtimeService.correlateMessage("message");
+
+    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
+
+    List<HistoricActivityInstance> allInstances = getAllActivityInstances();
+
+    assertIsCanceledActivityInstances(allInstances, "userTask", 1);
+    assertNonCompletingActivityInstance(allInstances, "userTask");
+
+    assertNonCanceledActivityInstance(allInstances, "eventSubprocessStart");
+    assertNonCompletingActivityInstance(allInstances, "eventSubprocessStart");
+
+    assertNonCanceledActivityInstance(allInstances, "eventSubprocessEnd");
+    assertIsCompletingActivityInstances(allInstances, "eventSubprocessEnd", 1);
+  }
+
+  @Deployment
   public void testEventSubprocessSignalCancel() {
     ProcessInstance processInstance = startProcess();
 

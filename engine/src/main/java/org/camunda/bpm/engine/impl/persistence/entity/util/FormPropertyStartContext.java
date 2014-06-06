@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoryAwareStartContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  * @author Daniel Meyer
@@ -45,7 +45,7 @@ public class FormPropertyStartContext extends HistoryAwareStartContext {
     this.formProperties = properties;
   }
 
-  public void initialStarted(InterpretableExecution execution) {
+  public void initialStarted(PvmExecutionImpl execution) {
 
     final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     int historyLevel = processEngineConfiguration.getHistoryLevel();

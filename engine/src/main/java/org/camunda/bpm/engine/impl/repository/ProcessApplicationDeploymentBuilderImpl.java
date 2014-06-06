@@ -20,6 +20,7 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * @author Daniel Meyer
@@ -67,6 +68,11 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   @Override
   public ProcessApplicationDeploymentBuilderImpl addString(String resourceName, String text) {
     return (ProcessApplicationDeploymentBuilderImpl) super.addString(resourceName, text);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl addModelInstance(String resourceName, BpmnModelInstance modelInstance) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addModelInstance(resourceName, modelInstance);
   }
 
   @Override

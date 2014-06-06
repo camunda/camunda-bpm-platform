@@ -14,20 +14,12 @@ package org.camunda.bpm.cockpit.test.plugin;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-import org.camunda.bpm.cockpit.Cockpit;
-import org.camunda.bpm.cockpit.db.QueryParameters;
-import org.camunda.bpm.cockpit.db.QueryService;
-
-import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
+import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.test.util.AbstractCockpitCoreTest;
-import org.camunda.bpm.cockpit.test.util.DeploymentHelper;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.runtime.Execution;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;

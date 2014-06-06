@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.camunda.bpm.glassfish</groupId>
     <artifactId>camunda-glassfish</artifactId>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>7.2.0-SNAPSHOT</version>
   </parent>
 
   <name>camunda BPM - Glassfish 3.1.x Assembly</name>
@@ -128,11 +128,17 @@
     </dependency>
 
     <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+    </dependency>
+
+    <dependency>
     	<groupId>org.camunda.bpm.javaee</groupId>
     	<artifactId>camunda-jobexecutor-rar</artifactId>
     	<version>${project.version}</version>
     	<type>rar</type>
     </dependency>
+
   </dependencies>
 
   <build>

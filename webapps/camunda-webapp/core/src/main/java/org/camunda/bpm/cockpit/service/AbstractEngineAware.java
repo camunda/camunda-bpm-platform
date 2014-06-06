@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.ProcessEngine;
  *
  * @author nico.rehwaldt
  */
+@Deprecated
 public class AbstractEngineAware {
 
   private final String engineName;

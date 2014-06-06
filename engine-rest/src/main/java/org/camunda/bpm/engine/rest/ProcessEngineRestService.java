@@ -64,10 +64,26 @@ public interface ProcessEngineRestService {
   @Path("/{name}" + AuthorizationRestService.PATH)
   AuthorizationRestService getAuthorizationRestService(@PathParam("name") String engineName);
 
+  @Path("/{name}" + IncidentRestService.PATH)
+  IncidentRestService getIncidentService(@PathParam("name") String engineName);
+
+  @Path("/{name}" + DeploymentRestService.PATH)
+  DeploymentRestService getDeploymentRestService(@PathParam("name") String engineName);
+
   @Path("/{name}" + HistoryRestService.PATH)
   HistoryRestService getHistoryRestService(@PathParam("name") String engineName);
+
+  @Path("/{name}" + CaseDefinitionRestService.PATH)
+  CaseDefinitionRestService getCaseDefinitionRestService(@PathParam("name") String engineName);
+
+  @Path("/{name}" + CaseInstanceRestService.PATH)
+  CaseInstanceRestService getCaseInstanceRestService(@PathParam("name") String engineName);
+
+  @Path("/{name}" + CaseExecutionRestService.PATH)
+  CaseExecutionRestService getCaseExecutionRestService(@PathParam("name") String engineName);
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   List<ProcessEngineDto> getProcessEngineNames();
+
 }

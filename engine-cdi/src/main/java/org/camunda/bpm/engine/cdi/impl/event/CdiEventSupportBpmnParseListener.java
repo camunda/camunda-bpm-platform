@@ -12,19 +12,22 @@
  */
 package org.camunda.bpm.engine.cdi.impl.event;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
+import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 
+import java.util.List;
+
 /**
- * {@link BpmnParseListener} registering the {@link CdiExecutionListener} for
+ * {@link BpmnParseListener} registering the {@link CdiEventListener} for
  * distributing execution events using the cdi event infrastructure
  *
  * @author Daniel Meyer
@@ -32,11 +35,27 @@ import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
 
   protected void addEndEventListener(ActivityImpl activity) {
-    activity.addExecutionListener(ExecutionListener.EVENTNAME_END, new CdiExecutionListener());
+    activity.addExecutionListener(ExecutionListener.EVENTNAME_END, new CdiEventListener());
   }
 
   protected void addStartEventListener(ActivityImpl activity) {
-    activity.addExecutionListener(ExecutionListener.EVENTNAME_START, new CdiExecutionListener());
+    activity.addExecutionListener(ExecutionListener.EVENTNAME_START, new CdiEventListener());
+  }
+
+  protected void addTaskCreateListeners(TaskDefinition taskDefinition) {
+    taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, new CdiEventListener());
+  }
+
+  protected void addTaskAssignmentListeners(TaskDefinition taskDefinition) {
+    taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, new CdiEventListener());
+  }
+
+  protected void addTaskCompleteListeners(TaskDefinition taskDefinition) {
+    taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, new CdiEventListener());
+  }
+
+  protected void addTaskDeleteListeners(TaskDefinition taskDefinition) {
+    taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, new CdiEventListener());
   }
 
   @Override
@@ -101,6 +120,12 @@ public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
   public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
     addStartEventListener(activity);
     addEndEventListener(activity);
+    UserTaskActivityBehavior activityBehavior = (UserTaskActivityBehavior) activity.getActivityBehavior();
+    TaskDefinition taskDefinition = activityBehavior.getTaskDefinition();
+    addTaskCreateListeners(taskDefinition);
+    addTaskAssignmentListeners(taskDefinition);
+    addTaskCompleteListeners(taskDefinition);
+    addTaskDeleteListeners(taskDefinition);
   }
 
   @Override
@@ -139,7 +164,7 @@ public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
 
   @Override
   public void parseSequenceFlow(Element sequenceFlowElement, ScopeImpl scopeElement, TransitionImpl transition) {
-    transition.addExecutionListener(new CdiExecutionListener());
+    transition.addExecutionListener(new CdiEventListener());
   }
 
   @Override

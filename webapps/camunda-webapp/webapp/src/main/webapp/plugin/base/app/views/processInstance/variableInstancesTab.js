@@ -1,6 +1,10 @@
-ngDefine('cockpit.plugin.base.views', function(module) {
+/* global ngDefine: false, angular: false */
+ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
+  'use strict';
 
-   function VariableInstancesController ($scope, $http, search, Uri, LocalExecutionVariableResource, Notifications) {
+  module.controller('VariableInstancesController', [
+          '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', '$modal',
+  function($scope,   $http,   search,   Uri,   LocalExecutionVariableResource,   Notifications,   $modal) {
 
     // input: processInstance, processData
 
@@ -18,8 +22,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
                           'Double',
                           'Date'
                         ];
-
-    var sequencer = 0;
 
     var DEFAULT_PAGES = { size: 50, total: 0, current: 1 };
 
@@ -71,7 +73,8 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
       // get the 'count' of variables
       $http.post(Uri.appUri('engine://engine/:engine/variable-instance/count'), params).success(function(data) {
-        pages.total = Math.ceil(data.count / pages.size);
+        // pages.total = Math.ceil(data.count / pages.size);
+        pages.total = data.count;
       });
 
       variableInstanceIdexceptionMessageMap = {};
@@ -83,21 +86,11 @@ ngDefine('cockpit.plugin.base.views', function(module) {
           var instance = instanceIdToInstanceMap[currentVariable.activityInstanceId];
           currentVariable.instance = instance;
 
-          // set an internal id
-          currentVariable.id = getNextId();
-
           // creates initially a copy of the current variable instance
           variableCopies[currentVariable.id] = angular.copy(currentVariable);
         });
         $scope.variables = data;
       });
-    };
-
-    /**
-     * Returns the next id.
-     */
-    function getNextId () {
-      return sequencer++;
     }
 
     $scope.editVariable = function (variable) {
@@ -118,7 +111,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
     var isValid = $scope.isValid = function (form) {
       return !form.$invalid;
-    }
+    };
 
     $scope.submit = function (variable, form) {
       if (!isValid(form)) {
@@ -138,9 +131,9 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       var newVariable = { value: newValue, type: newType };
       modifiedVariable[variable.name] = newVariable;
 
-      LocalExecutionVariableResource.updateVariables({ executionId: variable.executionId }, { modifications : modifiedVariable }).$then(
+      LocalExecutionVariableResource.updateVariables({ executionId: variable.executionId }, { modifications : modifiedVariable }).$promise.then(
         // success
-        function(response) {
+        function() {
           Notifications.addMessage({ status: 'Variable', message: 'The variable \'' + variable.name + '\' has been changed successfully.', duration: 5000 });
           angular.extend(variable, newVariable);
           $scope.closeInPlaceEditing(variable);
@@ -201,28 +194,62 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       return variable.type === 'null' || variable.type === 'Null';
     };
 
+    var isBinary = $scope.isBinary = function (variable) {
+      return variable.type === 'binary' || variable.type === 'Binary';
+    };
+
     var isSerializable = $scope.isSerializable = function (variable) {
-      return !isInteger(variable) &&
-          !isShort(variable) &&
-          !isLong(variable) &&
-          !isDouble(variable) &&
-          !isFloat(variable) &&
-          !isString(variable) &&
-          !isDate(variable) &&
-          !isBoolean(variable) &&
-          !isNull(variable);
+      return variable.type === 'serializable' || variable.type === 'Serializable';
+    };
+
+    var isPrimitive = $scope.isPrimitive = function (variable) {
+      return isInteger(variable) ||
+        isShort(variable) ||
+        isLong(variable) ||
+        isDouble(variable) ||
+        isFloat(variable) ||
+        isString(variable) ||
+        isDate(variable) ||
+        isBoolean(variable) ||
+        isNull(variable);
+    };
+
+    $scope.isEditable = function (param) {
+      return !isSerializable(param) && !isBinary(param);
     };
 
     $scope.isDateValueValid = function (param) {
-      console.log(param);
+      // console.log(param);
     };
-  }
 
-  module.controller('VariableInstancesController', [ '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', VariableInstancesController ]);
+    $scope.getBinaryVariableDownloadLink = function (variable) {
+      return Uri.appUri('engine://engine/:engine/variable-instance/'+variable.id+'/data');
+    };
+
+    $scope.openUploadDialog = function (variableInstance) {
+      $modal.open({
+        resolve: {
+          variableInstance: function() { return variableInstance; }
+        },
+        controller: 'VariableInstanceUpluadController',
+        templateUrl: require.toUrl('./variable-instance-upload-dialog.html')
+      });
+    };
+
+    $scope.openInspectDialog = function (variableInstance) {
+      $modal.open({
+        resolve: {
+          variableInstance: function() { return variableInstance; }
+        },
+        controller: 'VariableInstanceInspectController',
+        templateUrl: require.toUrl('./variable-instance-inspect-dialog.html')
+      });
+    };
+  }]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.live.tab', {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
       id: 'variables-tab',
       label: 'Variables',
       url: 'plugin://base/static/app/views/processInstance/variable-instances-tab.html',

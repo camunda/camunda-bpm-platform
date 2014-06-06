@@ -3,12 +3,20 @@
 
   <div class="ctn-header">
     <h1>
-      <i class="icon-type icon-inbox"></i>
+      <!--
+      <i class="icon-type icon-inbox"
+                  tooltip="Process definition"></i>
+      -->
+      <span class="process-name-prefix">
+        <span>Process</span>
+        <span>definition</span>
+      </span>
       {{ processDefinition.name || processDefinition.key }}
 
       <span class="badge badge-warning badge-suspended"
             ng-show="processDefinition.suspended"
-            title="Currently suspended">
+            tooltip="Currently suspended"
+            tooltip-placement="top">
         <i class="icon-suspended white"></i>
       </span>
     </h1>
@@ -33,8 +41,9 @@
       <div class="filters" ng-controller="ProcessDefinitionFilterController">
         <h5>
           Filter
-          <div class="btn-group btn-control">
-            <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown">
+          <div class="btn-group btn-control dropdown">
+            <button class="btn btn-mini dropdown-toggle"
+                    data-toggle="dropdown">
               <i class="icon-plus"></i>
             </button>
 
@@ -49,6 +58,11 @@
                   by business key
                 </a>
               </li>
+              <li ng-hide="filterData.start.length">
+                <a href ng-click="addStartDateFilter()">
+                  by start date
+                </a>
+              </li>
             </ul>
           </div>
         </h5>
@@ -56,13 +70,14 @@
         <form name="filterForm" novalidate ng-submit="filterChanged()">
           <ul class="unstyled">
 
-            <li class="filter">
+            <li class="version-filter filter">
               <span class="name">
                 Version
               </span>
 
-              <div class="btn-group">
-                <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown">
+              <div class="btn-group dropdown">
+                <button class="btn btn-mini dropdown-toggle"
+                        data-toggle="dropdown">
                   {{ processDefinition.version }} <span class="caret"></span>
                 </button>
 
@@ -76,7 +91,7 @@
               </div>
             </li>
 
-            <li class="filter" ng-if="filterData.parent">
+            <li class="parent-filter filter" ng-if="filterData.parent">
               <div class="name">
                 Parent
               </div>
@@ -94,7 +109,7 @@
               </div>
             </li>
 
-            <li class="filter" ng-if="filterData.businessKey">
+            <li class="business-key-filter filter" ng-if="filterData.businessKey">
               <div class="name">
                 Business Key
               </div>
@@ -115,7 +130,60 @@
               </div>
             </li>
 
-            <li class="filter" ng-if="filterData.variables.length">
+            <li class="date-filter filter" ng-if="filterData.start.length">
+              <div class="name">
+                Start Date
+              </div>
+
+              <div class="search search-date" ng-repeat="date in filterData.start">
+
+                <select ng-model="date.type"
+                        ng-options="item as item for item in dateTypeItems"
+                        required
+                        cam-dynamic-name="startDateFilterType{{$index}}"
+                        ng-change="dateFilterTypeChanged(filterForm['startDateFilterType0'], filterForm['startDateFilterType1'])">
+                </select>
+
+                <div class="removable-input">
+                  <input type="text"
+                         date
+                         required
+                         ng-change="filterChanged()"
+                         ng-model="date.value"
+                         cam-dynamic-name="startDateFilterValue{{$index}}" />
+
+                  <button class="btn btn-link btn-mini btn-control remove-date-filter"
+                          ng-click="removeStartDateFilter(date)">
+                    <i class="icon-remove"></i>
+                  </button>
+                </div>
+
+                <div class="note note-error note-small" ng-if="filterForm['startDateFilterValue' + $index].$invalid">
+                  <div ng-show="filterForm['startDateFilterValue' + $index].$error.required">
+                    Field is required.
+                  </div>
+
+                  <div ng-show="filterForm['startDateFilterValue' + $index].$error.date && !filterForm['startDateFilterValue' + $index].$error.required">
+                    Syntax for a date is <code>yyyy-MM-ddTHH:mm:ss</code>.
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="note note-error note-small" ng-if="filterForm['startDateFilterType0'].$invalid && filterForm['startDateFilterType1'].$invalid">
+                <div ng-show="filterForm['startDateFilterType0'].$error.dateTypeEqual && filterForm['startDateFilterType1'].$error.dateTypeEqual">
+                  Only the combination <code>after/before</code> is allowed.
+                </div>
+              </div>
+
+              <button class="btn btn-mini pull-right"
+                      ng-click="addStartDateFilter()"
+                      ng-disabled="filterData.start.length === 2">
+                <i class="icon-plus"></i>
+              </button>
+            </li>
+
+            <li class="variable-filter filter" ng-if="filterData.variables.length">
               <div class="name">
                 Variables <a href ng-click="toggleVariableFilterHelp()" title="Get help on variable filters"><i class="icon-question-sign"></i></a>
               </div>
@@ -129,7 +197,7 @@
 
                 <input type="text"
                        required
-                       name="variableFilter{{$index}}"
+                       cam-dynamic-name="variableFilter{{$index}}"
                        placeholder="Filter Variable"
                        ng-model="variable.value"
                        ng-change="filterChanged()"
@@ -139,7 +207,7 @@
                   <div ng-show="filterForm['variableFilter' + $index].$error.required">
                     Field is required.
                   </div>
-                  <div ng-show="filterForm['variableFilter' + $index].$error.processVariableFilter">
+                  <div ng-show="filterForm['variableFilter' + $index].$error.processVariableFilter && !filterForm['variableFilter' + $index].$error.required">
                     Syntax for variable filters is <code>variableName OPERATOR value</code>.
                     <a href ng-show="!showVariableFilterHelp" ng-click="toggleVariableFilterHelp()">
                       Learn more.
@@ -147,6 +215,11 @@
                   </div>
                 </div>
               </div>
+
+              <button class="btn btn-mini pull-right"
+                      ng-click="addVariableFilter()">
+                <i class="icon-plus"></i>
+              </button>
 
               <div class="note" ng-show="showVariableFilterHelp">
                 <div class="name">
@@ -168,7 +241,7 @@
               </div>
             </li>
 
-            <li class="filter" ng-if="filterData.activities.length">
+            <li class="activity-filter filter" ng-if="filterData.activities.length">
               <div class="name">
                 Activity
               </div>
@@ -211,7 +284,11 @@
 
       <!-- content top pane -->
       <div class="ctn-row ctn-content-top">
-        <div process-diagram="processDiagram" on-element-click="handleBpmnElementSelection(id, $event)" selection="filter" process-data="processData" provider-component="cockpit.processDefinition.diagram.overlay"></div>
+        <div process-diagram="processDiagram"
+             on-element-click="handleBpmnElementSelection(id, $event)"
+             selection="filter"
+             process-data="processData"
+             provider-component="cockpit.processDefinition.diagram.overlay"></div>
       </div>
 
       <!-- content bottom pane -->

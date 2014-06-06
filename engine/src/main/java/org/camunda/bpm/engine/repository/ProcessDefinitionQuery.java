@@ -104,6 +104,26 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    */
   ProcessDefinitionQuery active();
 
+  /**
+   * Only selects process definitions with the given incident type.
+   */
+  ProcessDefinitionQuery incidentType(String incidentType);
+
+  /**
+   * Only selects process definitions with the given incident id.
+   */
+  ProcessDefinitionQuery incidentId(String incidentId);
+
+  /**
+   * Only selects process definitions with the given incident message.
+   */
+  ProcessDefinitionQuery incidentMessage(String incidentMessage);
+
+  /**
+   * Only selects process definitions with an incident message like the given.
+   */
+  ProcessDefinitionQuery incidentMessageLike(String incidentMessageLike);
+
   // Support for event subscriptions /////////////////////////////////////
 
   /**

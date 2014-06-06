@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity">
+
+  <!-- CASEDEFINITION INSERT -->
+
+  <insert id="insertCaseDefinition" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity">
+    insert into ${prefix}ACT_RE_CASE_DEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, REV_)
+    values (#{id, jdbcType=VARCHAR},
+            #{category, jdbcType=VARCHAR},
+            #{name, jdbcType=VARCHAR},
+            #{key, jdbcType=VARCHAR}, 
+            #{version, jdbcType=INTEGER},
+            #{deploymentId, jdbcType=VARCHAR},
+            #{resourceName, jdbcType=VARCHAR},
+            1
+           )
+  </insert>
+
+  <!-- CASEDEFINITION UPDATE -->
+
+  <update id="updateCaseDefinition" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity">
+    update ${prefix}ACT_RE_CASE_DEF set
+      REV_ = #{revisionNext, jdbcType=INTEGER}
+    where ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <!-- CASEDEFINITION DELETE -->
+
+  <delete id="deleteCaseDefinitionsByDeploymentId" parameterType="string">
+    delete from ${prefix}ACT_RE_CASE_DEF where DEPLOYMENT_ID_ = #{deploymentId} 
+  </delete>
+
+  <!-- CASEDEFINITION RESULTMAP -->
+
+  <resultMap id="caseDefinitionResultMap" type="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" />
+    <result property="category" column="CATEGORY_" />
+    <result property="name" column="NAME_" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <result property="version" column="VERSION_" jdbcType="INTEGER"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!-- CASEDEFINITION SELECT -->
+
+  <select id="selectCaseDefinitionById" parameterType="string" resultMap="caseDefinitionResultMap">
+    select * from ${prefix}ACT_RE_CASE_DEF where ID_ = #{caseDefinitionId}
+  </select>
+
+  <select id="selectCaseDefinitionByDeploymentAndKey" parameterType="map" resultMap="caseDefinitionResultMap">
+    select * 
+    from ${prefix}ACT_RE_CASE_DEF 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{caseDefinitionKey}
+  </select>
+
+  <select id="selectLatestCaseDefinitionByKey" parameterType="string" resultMap="caseDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_CASE_DEF 
+    where KEY_ = #{caseDefinitionKey} and
+          VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_CASE_DEF where KEY_ = #{caseDefinitionKey})
+  </select>
+
+  <select id="selectCaseDefinitionByKeyAndVersion" parameterType="map" resultMap="caseDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_CASE_DEF 
+    where KEY_ = #{caseDefinitionKey}
+      and VERSION_ = #{caseDefinitionVersion}
+  </select>
+
+  <select id="selectCaseDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectCaseDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
+  </select>
+
+  <!-- mysql specific sql -->
+  <select id="selectCaseDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
+    ${limitBefore}
+    select distinct RES.* ${limitBetween}
+    <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <!-- mysql specific sql -->
+  <select id="selectCaseDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultType="long">
+    select distinct count(RES.ID_)
+    <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectCaseDefinitionsByQueryCriteriaSql">
+    from ${prefix}ACT_RE_CASE_DEF RES
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categoryLike != null">
+        and RES.CATEGORY_ like #{categoryLike}
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}
+      </if>
+      <if test="key != null">
+        and RES.KEY_ = #{key}
+      </if>
+      <if test="keyLike != null">
+        and RES.KEY_ like #{keyLike}
+      </if>
+      <if test="resourceName != null">
+        and RES.RESOURCE_NAME_ = #{resourceName}
+      </if>
+      <if test="resourceNameLike != null">
+        and RES.RESOURCE_NAME_ like #{resourceNameLike}
+      </if>
+      <if test="version != null">
+        and RES.VERSION_ = #{version}
+      </if>
+      <if test="deploymentId != null">
+        and RES.DEPLOYMENT_ID_ = #{deploymentId}
+      </if>
+      <if test="latest">
+        and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_CASE_DEF where KEY_ = RES.KEY_)
+      </if>
+    </where>
+  </sql>
+
+</mapper>

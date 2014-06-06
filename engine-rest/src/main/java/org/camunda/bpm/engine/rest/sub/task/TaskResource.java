@@ -12,21 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.sub.task;
 
-import java.util.List;
+import org.camunda.bpm.engine.rest.dto.task.*;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-
-import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
-import org.camunda.bpm.engine.rest.dto.task.FormDto;
-import org.camunda.bpm.engine.rest.dto.task.IdentityLinkDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
+import java.util.List;
 
 public interface TaskResource {
 
@@ -92,4 +83,16 @@ public interface TaskResource {
   @Path("/identity-links/delete")
   @Consumes(MediaType.APPLICATION_JSON)
   void deleteIdentityLink(IdentityLinkDto identityLink);
+
+  @Path("/comment")
+  TaskCommentResource getTaskCommentResource();
+
+  @Path("/attachment")
+  TaskAttachmentResource getAttachmentResource();
+
+  @Path("/localVariables")
+  VariableResource getLocalVariables();
+
 }
+
+

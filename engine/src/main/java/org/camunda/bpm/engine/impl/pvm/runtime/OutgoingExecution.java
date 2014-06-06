@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.impl.pvm.runtime;
 
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.impl.pvm.PvmTransition;
+import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 
 /**
  *
@@ -26,11 +26,11 @@ public class OutgoingExecution {
 
   private static Logger log = Logger.getLogger(OutgoingExecution.class.getName());
 
-  protected InterpretableExecution outgoingExecution;
-  protected PvmTransition outgoingTransition;
+  protected PvmExecutionImpl outgoingExecution;
+  protected TransitionImpl outgoingTransition;
   protected boolean isNew;
 
-  public OutgoingExecution(InterpretableExecution outgoingExecution, PvmTransition outgoingTransition, boolean isNew) {
+  public OutgoingExecution(PvmExecutionImpl outgoingExecution, TransitionImpl outgoingTransition, boolean isNew) {
     this.outgoingExecution = outgoingExecution;
     this.outgoingTransition = outgoingTransition;
     this.isNew = isNew;

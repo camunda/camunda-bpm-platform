@@ -14,31 +14,31 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testAsyncStartEvent() {
     runtimeService.startProcessInstanceByKey("asyncStartEvent");
-    
+
     Task task = taskService.createTaskQuery().singleResult();
     Assert.assertNull("The user task should not have been reached yet", task);
-    
+
     Assert.assertEquals(1, runtimeService.createExecutionQuery().activityId("startEvent").count());
-    
-    waitForJobExecutorToProcessAllJobs(6000L);
+
+    executeAvailableJobs();
     task = taskService.createTaskQuery().singleResult();
-    
+
     Assert.assertEquals(0, runtimeService.createExecutionQuery().activityId("startEvent").count());
-    
+
     Assert.assertNotNull("The user task should have been reached", task);
   }
-  
+
   @Deployment
   public void testAsyncStartEventListeners() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncStartEvent");
-    
+
     Assert.assertNull(runtimeService.getVariable(instance.getId(), "listener"));
-    
-    waitForJobExecutorToProcessAllJobs(6000L);
-    
+
+    executeAvailableJobs();
+
     Assert.assertNotNull(runtimeService.getVariable(instance.getId(), "listener"));
   }
-  
+
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncStartEvent.bpmn20.xml")
   public void testAsyncStartEventHistory() {
     if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {

@@ -73,6 +73,8 @@
       ) INCIDENT
     on
       INSTANCE.ID_ = INCIDENT.PROC_INST_ID_
+    order by
+      ${outerOrderBy}
   </select>
 
   <sql id="selectProcessInstances">
@@ -95,6 +97,16 @@
       <!-- businessKey -->
       <if test="businessKey != null">
       and RES.BUSINESS_KEY_ = #{businessKey}
+      </if>
+
+      <!-- startedBefore -->
+      <if test="historyEnabled &amp;&amp; startedBefore != null">
+        and HISTORY.START_TIME_ &lt;= #{startedBefore}
+      </if>
+
+      <!-- startedAfter -->
+      <if test="historyEnabled &amp;&amp; startedAfter != null">
+        and HISTORY.START_TIME_ &gt;= #{startedAfter}
       </if>
 
       <!-- activityIds -->

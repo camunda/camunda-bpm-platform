@@ -42,10 +42,12 @@
       <includes>
         <include>org.camunda.bpm:camunda-engine:jar:*</include>
         <include>org.camunda.bpm.identity:camunda-identity-ldap:jar:*</include>
+        <include>org.camunda.bpm.model:*:jar:*</include>
         <include>org.mybatis:mybatis:jar:*</include>
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
-      </includes>     
+        <include>org.codehaus.groovy:groovy-all:jar:*</include>
+      </includes>
     </dependencySet>
     <dependencySet>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/camunda-bpm-platform</outputDirectory>
@@ -80,10 +82,12 @@
       <includes>
         <include>org.camunda.bpm:camunda-engine:jar:*</include>
         <include>org.camunda.bpm.identity:camunda-identity-ldap:jar:*</include>
+        <include>org.camunda.bpm.model:*:jar:*</include>
         <include>org.mybatis:mybatis:jar:*</include>
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
-      </includes>     
+        <include>org.codehaus.groovy:groovy-all:jar:*</include>
+      </includes>
     </dependencySet>
     <dependencySet>
       <outputDirectory>server/glassfish3/glassfish/lib</outputDirectory>

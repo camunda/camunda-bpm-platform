@@ -144,7 +144,7 @@
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
       <if test="processDefinitionKey != null">
-        and RES.PROC_DEF_ID_ like #{processDefinitionIdLike}
+        and DEF.KEY_ = #{processDefinitionKey}
       </if>
       <if test="processDefinitionName != null">
         and DEF.NAME_ = #{processDefinitionName}

@@ -378,7 +378,7 @@ public class BusinessProcess implements Serializable {
   public void stopTask() {
     assertCommandContextNotActive();
     assertTaskAssociated();
-    associationManager.setTask(null);
+    associationManager.disAssociate();
   }
 
   /**

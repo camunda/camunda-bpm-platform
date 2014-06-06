@@ -35,7 +35,7 @@ define(['angular'], function(angular) {
         credentials : { password : $scope.credentials.password }
       };
 
-      InitialUserResource.create(user).$then(
+      InitialUserResource.create(user).$promise.then(
         function() {
           $scope.created = true;
         },
@@ -49,7 +49,7 @@ define(['angular'], function(angular) {
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/setup', {
-      templateUrl: 'pages/setup.html',
+      templateUrl: require.toUrl('./app/admin/pages/setup.html'),
       controller: Controller
     });
   }];

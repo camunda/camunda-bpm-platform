@@ -17,7 +17,7 @@ public class TestJobSuspensionStateUpgrade extends AbstractDbUpgradeTestCase {
     Assert.assertEquals(0, managementService.createJobQuery().processDefinitionKey(key).active().count());
     Assert.assertEquals(1, managementService.createJobQuery().processDefinitionKey(key).suspended().count());
 
-    // if I activate the process instnace
+    // if I activate the process instance
     runtimeService.activateProcessInstanceById(runtimeService.createProcessInstanceQuery().processDefinitionKey(key).singleResult().getId());
 
     // then the job is active as well

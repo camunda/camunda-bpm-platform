@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Stack;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ProcessElementImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 
@@ -35,14 +35,14 @@ public class ProcessDefinitionBuilder {
 
   protected ProcessDefinitionImpl processDefinition;
   protected Stack<ScopeImpl> scopeStack = new Stack<ScopeImpl>();
-  protected ProcessElementImpl processElement = processDefinition;
+  protected CoreModelElement processElement = processDefinition;
   protected TransitionImpl transition;
   protected List<Object[]> unresolvedTransitions = new ArrayList<Object[]>();
-  
+
   public ProcessDefinitionBuilder() {
     this(null);
   }
-  
+
   public ProcessDefinitionBuilder(String processDefinitionId) {
     processDefinition = new ProcessDefinitionImpl(processDefinitionId);
     scopeStack.push(processDefinition);
@@ -52,21 +52,21 @@ public class ProcessDefinitionBuilder {
     ActivityImpl activity = scopeStack.peek().createActivity(id);
     scopeStack.push(activity);
     processElement = activity;
-    
+
     transition = null;
-    
+
     return this;
   }
-  
+
   public ProcessDefinitionBuilder endActivity() {
     scopeStack.pop();
     processElement = scopeStack.peek();
 
     transition = null;
-    
+
     return this;
   }
-  
+
   public ProcessDefinitionBuilder initial() {
     processDefinition.setInitial(getActivity());
     return this;
@@ -75,7 +75,7 @@ public class ProcessDefinitionBuilder {
   public ProcessDefinitionBuilder startTransition(String destinationActivityId) {
     return startTransition(destinationActivityId, null);
   }
-  
+
   public ProcessDefinitionBuilder startTransition(String destinationActivityId, String transitionId) {
     if (destinationActivityId==null) {
       throw new PvmException("destinationActivityId is null");
@@ -86,7 +86,7 @@ public class ProcessDefinitionBuilder {
     processElement = transition;
     return this;
   }
-  
+
   public ProcessDefinitionBuilder endTransition() {
     processElement = scopeStack.peek();
     transition = null;
@@ -96,7 +96,7 @@ public class ProcessDefinitionBuilder {
   public ProcessDefinitionBuilder transition(String destinationActivityId) {
     return transition(destinationActivityId, null);
   }
-  
+
   public ProcessDefinitionBuilder transition(String destinationActivityId, String transitionId) {
     startTransition(destinationActivityId, transitionId);
     endTransition();
@@ -107,7 +107,7 @@ public class ProcessDefinitionBuilder {
     getActivity().setActivityBehavior(activityBehaviour);
     return this;
   }
-  
+
   public ProcessDefinitionBuilder property(String name, Object value) {
     processElement.setProperty(name, value);
     return this;
@@ -125,9 +125,9 @@ public class ProcessDefinitionBuilder {
     }
     return processDefinition;
   }
-  
+
   protected ActivityImpl getActivity() {
-    return (ActivityImpl) scopeStack.peek(); 
+    return (ActivityImpl) scopeStack.peek();
   }
 
   public ProcessDefinitionBuilder scope() {
@@ -143,7 +143,7 @@ public class ProcessDefinitionBuilder {
     }
     return this;
   }
-  
+
   public ProcessDefinitionBuilder executionListener(String eventName, ExecutionListener executionListener) {
     if (transition==null) {
       scopeStack.peek().addExecutionListener(eventName, executionListener);

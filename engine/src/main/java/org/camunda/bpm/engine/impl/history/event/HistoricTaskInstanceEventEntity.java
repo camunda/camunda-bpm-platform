@@ -32,6 +32,7 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
   protected String parentTaskId;
   protected String deleteReason;
   protected String taskDefinitionKey;
+  protected String activityInstanceId;
 
   // getters and setters //////////////////////////////////////////////////////
 
@@ -123,6 +124,14 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
     this.taskDefinitionKey = taskDefinitionKey;
   }
 
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+
+  public void setActivityInstanceId(String activityInstanceId) {
+    this.activityInstanceId = activityInstanceId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -145,6 +154,7 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
            + ", executionId=" + executionId
            + ", processDefinitionId=" + processDefinitionId
            + ", processInstanceId=" + processInstanceId
+           + ", activityInstanceId=" + activityInstanceId
            + "]";
   }
 }

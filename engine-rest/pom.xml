@@ -8,7 +8,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>7.2.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -26,6 +26,11 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
     </dependency>
 
     <dependency>
@@ -63,12 +68,12 @@
 
     <!-- jersey -->
     <dependency>
-		  <groupId>com.sun.jersey</groupId>
-		  <artifactId>jersey-grizzly2</artifactId>
-		  <version>1.17.1</version>
-		  <scope>test</scope>
-		</dependency>
-  
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-grizzly2</artifactId>
+      <version>1.17.1</version>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -147,8 +152,22 @@
       <artifactId>rest-assured</artifactId>
       <version>1.8.1</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
-    
+
+    <!-- version must be the same as used by restassured -->
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>2.1.2</version>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
@@ -170,16 +189,15 @@
       <scope>test</scope>
     </dependency>
 
-		<dependency>
-		  <groupId>org.springframework</groupId>
-		  <artifactId>spring-mock</artifactId>
-		  <version>2.0.8</version>
-		  <scope>test</scope>
-		</dependency>
-    
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-mock</artifactId>
+      <version>2.0.8</version>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
-  
+
   <build>
     <testResources>
       <testResource>
@@ -204,10 +222,10 @@
             </goals>
             <phase>package</phase>
             <configuration>
-              <classifier>classes</classifier>                       
+              <classifier>classes</classifier>
               <excludes>
-                <exclude>org/camunda/bpm/engine/rest/impl/application/**</exclude>
-              </excludes>              
+                <exclude>org/camunda/bpm/engine/rest/impl/application/DefaultApplication.class</exclude>
+              </excludes>
             </configuration>
           </execution>
           <execution>
@@ -217,11 +235,11 @@
               <goal>test-jar</goal>
             </goals>
             <configuration>
-              <forceCreate>true</forceCreate>
+              <forceCreation>true</forceCreation>
             </configuration>
           </execution>
         </executions>
-      </plugin>     
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
@@ -237,7 +255,7 @@
               <Dependencies>org.camunda.bpm.camunda-engine</Dependencies>
             </manifestEntries>
           </archive>
-        </configuration>        
+        </configuration>
       </plugin>
 
       <plugin>
@@ -321,7 +339,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <profile>
       <id>embedded-rest</id>
       <activation>
@@ -338,7 +356,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
-                <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
+                <org.apache.maven.user-settings>../settings/maven/nexus-settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
               <excludes>
                 <exclude>**/Abstract*</exclude>
@@ -438,7 +456,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <profile>
       <id>was-compatibility</id>
       <properties>
@@ -452,7 +470,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
-                <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
+                <org.apache.maven.user-settings>../settings/maven/nexus-settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
               <excludes>
                 <exclude>**/Abstract*</exclude>

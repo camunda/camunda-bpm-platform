@@ -7,13 +7,13 @@
   <!-- INCIDENT DELETE -->
 
   <delete id="deleteIncident" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
-    delete from ${prefix}ACT_RU_INCIDENT where ID_ = #{id}
+    delete from ${prefix}ACT_RU_INCIDENT where ID_ = #{id} and REV_ = #{revision}
   </delete>
 
   <!-- INCIDENT INSERT -->
 
   <insert id="insertIncident" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
-    insert into ${prefix}ACT_RU_INCIDENT (ID_, INCIDENT_TIMESTAMP_, INCIDENT_MSG_, INCIDENT_TYPE_, EXECUTION_ID_, ACTIVITY_ID_, PROC_INST_ID_, PROC_DEF_ID_, CAUSE_INCIDENT_ID_, ROOT_CAUSE_INCIDENT_ID_, CONFIGURATION_)
+    insert into ${prefix}ACT_RU_INCIDENT (ID_, INCIDENT_TIMESTAMP_, INCIDENT_MSG_, INCIDENT_TYPE_, EXECUTION_ID_, ACTIVITY_ID_, PROC_INST_ID_, PROC_DEF_ID_, CAUSE_INCIDENT_ID_, ROOT_CAUSE_INCIDENT_ID_, CONFIGURATION_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{incidentTimestamp, jdbcType=TIMESTAMP},
@@ -25,7 +25,8 @@
       #{processDefinitionId ,jdbcType=VARCHAR},
       #{causeIncidentId ,jdbcType=VARCHAR},
       #{rootCauseIncidentId ,jdbcType=VARCHAR},
-      #{configuration, jdbcType=VARCHAR}
+      #{configuration, jdbcType=VARCHAR},
+      1
     )
   </insert>
 
@@ -43,6 +44,7 @@
     <result property="causeIncidentId" column="CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentId" column="ROOT_CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
   </resultMap>
   
   <!-- INCIDENT SELECT -->  
@@ -53,12 +55,15 @@
     where I.EXECUTION_ID_ = #{parameter}
   </select>
 
-  <select id="selectIncidentsByConfiguration" parameterType="string" resultMap="incidentResultMap">
+  <select id="selectIncidentsByConfiguration" resultMap="incidentResultMap">
     select *
     from ${prefix}ACT_RU_INCIDENT I
-    where I.CONFIGURATION_ = #{parameter}
-  </select>  
-  
+    where I.CONFIGURATION_ = #{parameter.configuration, jdbcType=VARCHAR}
+    <if test="parameter.incidentType != null">
+      and INCIDENT_TYPE_ = #{parameter.incidentType, jdbcType=VARCHAR}
+    </if>
+  </select>
+
   <select id="selectIncidentByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.IncidentQueryImpl" resultMap="incidentResultMap">
     ${limitBefore}
     select RES.* ${limitBetween}
@@ -107,5 +112,17 @@
       </if>
     </where>
   </sql>
-  
+
+  <update id="updateIncident" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
+    update ${prefix}ACT_RU_INCIDENT
+    <set>
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+    </set>
+    <where>
+      ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+    </where>
+  </update>
+
 </mapper>

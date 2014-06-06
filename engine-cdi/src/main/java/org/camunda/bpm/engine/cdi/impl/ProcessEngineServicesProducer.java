@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,25 +18,39 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
 import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 
 /**
  * Makes the managed process engine and the provided services available for injection
- * 
+ *
  * @author Daniel Meyer
  * @author Falko Menge
  */
 public class ProcessEngineServicesProducer {
-  
-  @Produces @Named @ApplicationScoped public ProcessEngine processEngine() { return getProcessEngineService().getDefaultProcessEngine(); }
+
+  @Produces
+  @Named
+  @ApplicationScoped
+  public ProcessEngine processEngine() {
+
+    ProcessEngine processEngine =  BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
+    if(processEngine != null) {
+      return processEngine;
+
+    } else {
+      return ProcessEngines.getDefaultProcessEngine(false);
+
+    }
+
+  }
 
   @Produces @Named @ApplicationScoped public RuntimeService runtimeService() { return processEngine().getRuntimeService(); }
 
@@ -51,9 +65,5 @@ public class ProcessEngineServicesProducer {
   @Produces @Named @ApplicationScoped public IdentityService identityService() { return processEngine().getIdentityService(); }
 
   @Produces @Named @ApplicationScoped public ManagementService managementService() { return processEngine().getManagementService(); }
-  
-  private ProcessEngineService getProcessEngineService() {
-    return BpmPlatform.getProcessEngineService();
-  }
 
 }

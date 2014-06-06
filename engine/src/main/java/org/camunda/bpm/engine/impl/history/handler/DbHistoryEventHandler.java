@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.history.handler;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
@@ -40,13 +42,19 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
   }
 
+  public void handleEvents(List<HistoryEvent> historyEvents) {
+    for (HistoryEvent historyEvent : historyEvents) {
+      handleEvent(historyEvent);
+    }
+  }
+
   /** general history event insert behavior */
   protected void insertOrUpdate(HistoryEvent historyEvent) {
 
     final DbSqlSession dbSqlSession = getDbSqlSession();
 
     String eventType = historyEvent.getEventType();
-    if(isInitialEvent(eventType)) {
+    if(eventType == null || isInitialEvent(eventType)) {
       dbSqlSession.insert(historyEvent);
     } else {
       if(dbSqlSession.findInCache(historyEvent.getClass(), historyEvent.getId()) == null) {
@@ -118,7 +126,8 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
   protected boolean isInitialEvent(String eventType) {
     return HistoryEvent.ACTIVITY_EVENT_TYPE_START.equals(eventType)
         || HistoryEvent.TASK_EVENT_TYPE_CREATE.equals(eventType)
-        || HistoryEvent.FORM_PROPERTY_UPDATE.equals(eventType);
+        || HistoryEvent.FORM_PROPERTY_UPDATE.equals(eventType)
+        || HistoryEvent.INCIDENT_CREATE.equals(eventType);
   }
 
   protected DbSqlSession getDbSqlSession() {

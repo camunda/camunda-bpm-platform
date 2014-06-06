@@ -7,14 +7,15 @@
   <!-- INSERT IDENTITY LINK -->
   
   <insert id="insertIdentityLink" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity">
-    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_DEF_ID_)
+    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_DEF_ID_, REV_)
     values (#{id, jdbcType=VARCHAR},
-            1,
             #{type, jdbcType=VARCHAR},
             #{userId, jdbcType=VARCHAR},
             #{groupId, jdbcType=VARCHAR},
             #{taskId, jdbcType=VARCHAR},
-            #{processDefId, jdbcType=VARCHAR})
+            #{processDefId, jdbcType=VARCHAR},
+            1
+           )
             
   </insert>
   

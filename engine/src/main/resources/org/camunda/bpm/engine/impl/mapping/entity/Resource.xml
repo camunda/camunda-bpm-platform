@@ -7,8 +7,8 @@
   <!-- RESOURCE INSERT -->
 
   <insert id="insertResource" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity">
-    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_, GENERATED_)
-    values (#{id, jdbcType=VARCHAR}, 1, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=BLOB}, #{deploymentId, jdbcType=VARCHAR}, #{generated, jdbcType=BOOLEAN})  
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, GENERATED_, REV_)
+    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=BLOB}, #{deploymentId, jdbcType=VARCHAR}, #{generated, jdbcType=BOOLEAN}, 1)  
   </insert>
   
   <!-- RESOURCE UPDATE -->
@@ -25,6 +25,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="bytes" column="BYTES_" jdbcType="BLOB"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="generated" column="GENERATED_" jdbcType="BOOLEAN"/>
   </resultMap>
   
@@ -40,6 +41,12 @@
           AND NAME_ = #{resourceName}
   </select>
 
+  <select id="selectResourceByDeploymentIdAndResourceId" parameterType="map" resultMap="resourceResultMap">
+    select * from ${prefix}ACT_GE_BYTEARRAY 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+          AND ID_ = #{resourceId}
+  </select>
+
   <select id="selectResourcesByDeploymentId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap">
     select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>  
@@ -49,6 +56,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="bytes" column="BYTES_" jdbcType="BINARY"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="generated" column="GENERATED_" jdbcType="BOOLEAN"/>
   </resultMap>
     
@@ -57,6 +65,13 @@
     select * from ${prefix}ACT_GE_BYTEARRAY 
     where DEPLOYMENT_ID_ = #{deploymentId}
           AND NAME_ = #{resourceName}
+  </select>
+
+  <!-- postgresql specific -->
+  <select id="selectResourceByDeploymentIdAndResourceId_postgres" parameterType="map" resultMap="resourceResultMap_postgres">
+    select * from ${prefix}ACT_GE_BYTEARRAY 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+          AND ID_ = #{resourceId}
   </select>
   
   <!-- postgresql specific -->

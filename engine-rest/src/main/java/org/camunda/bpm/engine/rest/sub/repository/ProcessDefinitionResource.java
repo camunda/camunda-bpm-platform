@@ -23,6 +23,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
@@ -43,6 +44,10 @@ public interface ProcessDefinitionResource {
   @Path("/xml")
   @Produces(MediaType.APPLICATION_JSON)
   ProcessDefinitionDiagramDto getProcessDefinitionBpmn20Xml();
+
+  @GET
+  @Path("/diagram")
+  Response getProcessDefinitionDiagram();
 
   @POST
   @Path("/start")

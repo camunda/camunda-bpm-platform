@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 @ConversationScoped
-@Named("camunda.taskForm")
+@Named("camundaTaskForm")
 public class TaskForm implements Serializable {
 
   private static Logger log = Logger.getLogger(TaskForm.class.getName());
@@ -55,7 +55,7 @@ public class TaskForm implements Serializable {
         return;
       }
       // return it anyway but log an info message
-      log.log(Level.INFO, "Called startTask method without proper parameter (taskId='"+taskId+"'; callbackUrl='"+callbackUrl+"') even if it seems we are not called by an AJAX Postback. Are you using the camunda.taskForm bean correctly?");
+      log.log(Level.INFO, "Called startTask method without proper parameter (taskId='"+taskId+"'; callbackUrl='"+callbackUrl+"') even if it seems we are not called by an AJAX Postback. Are you using the camundaTaskForm bean correctly?");
       return;
     }
     // Note that we always run in a conversation
@@ -81,7 +81,7 @@ public class TaskForm implements Serializable {
         return;
       }
       // return it anyway but log an info message
-      log.log(Level.INFO, "Called startTask method without proper parameter (taskId='"+taskId+"'; callbackUrl='"+callbackUrl+"') even if it seems we are not called by an AJAX Postback. Are you using the camunda.taskForm bean correctly?");
+      log.log(Level.INFO, "Called startTask method without proper parameter (taskId='"+taskId+"'; callbackUrl='"+callbackUrl+"') even if it seems we are not called by an AJAX Postback. Are you using the camundaTaskForm bean correctly?");
       return;
     }
     // Note that we always run in a conversation

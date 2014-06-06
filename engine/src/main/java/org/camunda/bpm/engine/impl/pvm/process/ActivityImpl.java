@@ -13,16 +13,15 @@
 
 package org.camunda.bpm.engine.impl.pvm.process;
 
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.impl.pvm.PvmTransition;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
-import org.camunda.bpm.engine.impl.pvm.PvmScope;
-import org.camunda.bpm.engine.impl.pvm.PvmTransition;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 
 
 /**
@@ -32,18 +31,26 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds {
 
   private static final long serialVersionUID = 1L;
+
   protected List<TransitionImpl> outgoingTransitions = new ArrayList<TransitionImpl>();
   protected Map<String, TransitionImpl> namedOutgoingTransitions = new HashMap<String, TransitionImpl>();
   protected List<TransitionImpl> incomingTransitions = new ArrayList<TransitionImpl>();
-  protected ActivityBehavior activityBehavior;
-  protected ScopeImpl parent;
-  protected boolean isScope;
-  protected boolean isAsync;
-  protected boolean isExclusive;
-  protected boolean isCancelScope = false;
-  protected boolean isConcurrent = false;
-  protected PvmScope scope;
 
+  protected ActivityBehavior activityBehavior;
+
+  protected ScopeImpl parent;
+
+  protected boolean isScope;
+
+  protected boolean isAsync;
+
+  protected boolean isCancelScope = false;
+
+  protected boolean isConcurrent = false;
+
+  protected ScopeImpl scope;
+
+  protected ScopeImpl flowScope;
 
   // Graphical information
   protected int x = -1;
@@ -100,7 +107,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     this.parent = parent;
   }
 
-  public void setScope(PvmScope scope) {
+  public void setScope(ScopeImpl scope) {
     this.scope = scope;
   }
 
@@ -127,7 +134,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     return parent;
   }
 
-  public PvmScope getScope() {
+  public ScopeImpl getScope() {
     if(scope == null) {
       return parent;
     } else {
@@ -188,15 +195,6 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     this.isAsync = isAsync;
   }
 
-  public boolean isExclusive() {
-    return isExclusive;
-  }
-
-  @Deprecated
-  public void setExclusive(boolean isExclusive) {
-    this.isExclusive = isExclusive;
-  }
-
   public String getActivityId() {
     return super.getId();
   }
@@ -219,6 +217,24 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   public void setConcurrent(boolean isConcurrent) {
     this.isConcurrent = isConcurrent;
+  }
+
+  /**
+   * @return the scope which should be used for traversing
+   * transitions which originate in this activity.
+   */
+  public ScopeImpl getFlowScope() {
+    if(flowScope == null) {
+      return getScope();
+
+    } else {
+
+      return flowScope;
+    }
+  }
+
+  public void setFlowScope(ScopeImpl flowScope) {
+    this.flowScope = flowScope;
   }
 
 }

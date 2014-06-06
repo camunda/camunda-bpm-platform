@@ -12,12 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.history.producer;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableScopeImpl;
+import org.camunda.bpm.engine.runtime.Incident;
 
 /**
  * <p>The producer for history events. The history event producer is
@@ -104,6 +108,17 @@ public interface HistoryEventProducer {
    */
   public HistoryEvent createTaskInstanceCompleteEvt(DelegateTask task, String deleteReason);
 
+  // User Operation Logs ///////////////////////////////
+
+  /**
+   * Creates the history event fired whenever an operation has been performed by a user. This is
+   * used for logging actions such as creating a new Task, completing a task, canceling a
+   * a process instance, ...
+   *
+   * @param context the {@link UserOperationLogContext} providing the needed informations
+   * @return a {@link List} of {@link HistoryEvent}s
+   */
+  public List<HistoryEvent> createUserOperationLogEvents(UserOperationLogContext context);
 
   // HistoricVariableUpdateEventEntity //////////////////////
 
@@ -114,7 +129,7 @@ public interface HistoryEventProducer {
    * @param the scope to which the variable is linked
    * @return the history event
    */
-  public HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl);
+  public HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
 
   /**
    * Creates the history event fired when a variable is <strong>updated</strong>.
@@ -123,7 +138,7 @@ public interface HistoryEventProducer {
    * @param the scope to which the variable is linked
    * @return the history event
    */
-  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl);
+  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
 
   /**
    * Creates the history event fired when a variable is <strong>deleted</strong>.
@@ -132,7 +147,7 @@ public interface HistoryEventProducer {
    * @param variableScopeImpl
    * @return the history event
    */
-  public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl);
+  public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
 
   // Form properties //////////////////////////////////////////
 
@@ -146,4 +161,13 @@ public interface HistoryEventProducer {
    * @return the history event
    */
   public HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, Object propertyValue, String taskId);
+
+  // Incidents //////////////////////////////////////////
+
+  public HistoryEvent createHistoricIncidentCreateEvt(Incident incident);
+
+  public HistoryEvent createHistoricIncidentResolveEvt(Incident incident);
+
+  public HistoryEvent createHistoricIncidentDeleteEvt(Incident incident);
+
 }

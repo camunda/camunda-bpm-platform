@@ -14,6 +14,9 @@ values ('schema.history', 'create(fox)', 1);
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
 
+insert into ACT_GE_PROPERTY
+values ('deployment.lock', '0', 1);
+
 create table ACT_GE_BYTEARRAY (
     ID_ nvarchar(64),
     REV_ int,
@@ -52,7 +55,7 @@ create table ACT_RU_EXECUTION (
 
 create table ACT_RU_JOB (
     ID_ nvarchar(64) NOT NULL,
-	REV_ int,
+    REV_ int,
     TYPE_ nvarchar(255) NOT NULL,
     LOCK_EXP_TIME_ datetime2,
     LOCK_OWNER_ nvarchar(255),
@@ -140,12 +143,15 @@ create table ACT_RU_VARIABLE (
     NAME_ nvarchar(255) not null,
     EXECUTION_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
+    CASE_EXECUTION_ID_ nvarchar(64),
+    CASE_INST_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
     BYTEARRAY_ID_ nvarchar(64),
     DOUBLE_ double precision,
     LONG_ numeric(19,0),
     TEXT_ nvarchar(4000),
     TEXT2_ nvarchar(4000),
+    VAR_SCOPE_ nvarchar(64) not null,
     primary key (ID_)
 );
 
@@ -164,6 +170,7 @@ create table ACT_RU_EVENT_SUBSCR (
 
 create table ACT_RU_INCIDENT (
   ID_ nvarchar(64) not null,
+  REV_ int not null,
   INCIDENT_TIMESTAMP_ datetime2 not null,
   INCIDENT_MSG_ nvarchar(4000),
   INCIDENT_TYPE_ nvarchar(255) not null,
@@ -199,6 +206,7 @@ create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT(CONFIGURATION_);
 create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION (TYPE_,USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where USER_ID_ is not null;
 create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION (TYPE_,GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where GROUP_ID_ is not null;
+create unique index ACT_UNIQ_VARIABLE on ACT_RU_VARIABLE(VAR_SCOPE_, NAME_);
 
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL 
@@ -263,7 +271,7 @@ alter table ACT_RU_VARIABLE
     add constraint ACT_FK_VAR_BYTEARRAY 
     foreign key (BYTEARRAY_ID_) 
     references ACT_GE_BYTEARRAY (ID_);
-	
+
 alter table ACT_RU_JOB 
     add constraint ACT_FK_JOB_EXCEPTION 
     foreign key (EXCEPTION_STACK_ID_) 
@@ -298,3 +306,23 @@ alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_RCAUSE 
     foreign key (ROOT_CAUSE_INCIDENT_ID_) 
     references ACT_RU_INCIDENT (ID_);
+
+-- indexes for concurrency problems - https://app.camunda.com/jira/browse/CAM-1646 --
+create index ACT_IDX_EXECUTION_PROC on ACT_RU_EXECUTION(PROC_DEF_ID_);
+create index ACT_IDX_EXECUTION_PARENT on ACT_RU_EXECUTION(PARENT_ID_);
+create index ACT_IDX_EXECUTION_SUPER on ACT_RU_EXECUTION(SUPER_EXEC_);
+create index ACT_IDX_EVENT_SUBSCR_EXEC on ACT_RU_EVENT_SUBSCR(EXECUTION_ID_);
+create index ACT_IDX_BA_DEPLOYMENT on ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
+create index ACT_IDX_IDENT_LNK_TASK on ACT_RU_IDENTITYLINK(TASK_ID_);
+create index ACT_IDX_INCIDENT_EXEC on ACT_RU_INCIDENT(EXECUTION_ID_);
+create index ACT_IDX_INCIDENT_PROCINST on ACT_RU_INCIDENT(PROC_INST_ID_);
+create index ACT_IDX_INCIDENT_PROC_DEF_ID on ACT_RU_INCIDENT(PROC_DEF_ID_);
+create index ACT_IDX_INCIDENT_CAUSE on ACT_RU_INCIDENT(CAUSE_INCIDENT_ID_);
+create index ACT_IDX_INCIDENT_ROOT_CAUSE on ACT_RU_INCIDENT(ROOT_CAUSE_INCIDENT_ID_);
+create index ACT_IDX_JOB_EXCEPTION_STACK on ACT_RU_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_VARIABLE_BA on ACT_RU_VARIABLE(BYTEARRAY_ID_);
+create index ACT_IDX_VARIABLE_EXEC on ACT_RU_VARIABLE(EXECUTION_ID_);
+create index ACT_IDX_VARIABLE_PROCINST on ACT_RU_VARIABLE(PROC_INST_ID_);
+create index ACT_IDX_TASK_EXEC on ACT_RU_TASK(EXECUTION_ID_);
+create index ACT_IDX_TASK_PROCINST on ACT_RU_TASK(PROC_INST_ID_);
+create index ACT_IDX_TASK_PROC_DEF_ID on ACT_RU_TASK(PROC_DEF_ID_);

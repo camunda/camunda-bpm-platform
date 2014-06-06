@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.application.impl.event;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
@@ -25,6 +23,8 @@ import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
+
+import java.util.List;
 
 /**
  *
@@ -58,6 +58,10 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
 
   protected void addTaskCompleteListeners(TaskDefinition taskDefinition) {
     taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, TASK_LISTENER);
+  }
+
+  protected void addTaskDeleteListeners(TaskDefinition taskDefinition) {
+    taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, TASK_LISTENER);
   }
 
   // BpmnParseListener implementation /////////////////////////////////////////////////////////
@@ -129,6 +133,7 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
     addTaskCreateListeners(taskDefinition);
     addTaskAssignmentListeners(taskDefinition);
     addTaskCompleteListeners(taskDefinition);
+    addTaskDeleteListeners(taskDefinition);
   }
 
   @Override
@@ -139,14 +144,12 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
 
   @Override
   public void parseBoundaryTimerEventDefinition(Element timerEventDefinition, boolean interrupting, ActivityImpl timerActivity) {
-    addStartEventListener(timerActivity);
-    addEndEventListener(timerActivity);
+    // start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override
   public void parseBoundaryErrorEventDefinition(Element errorEventDefinition, boolean interrupting, ActivityImpl activity, ActivityImpl nestedErrorEventActivity) {
-    addStartEventListener(activity);
-    addEndEventListener(activity);
+    // start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override
@@ -204,8 +207,7 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
 
   @Override
   public void parseBoundarySignalEventDefinition(Element signalEventDefinition, boolean interrupting, ActivityImpl signalActivity) {
-    addStartEventListener(signalActivity);
-    addEndEventListener(signalActivity);
+    // start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override

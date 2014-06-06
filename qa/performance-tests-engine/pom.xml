@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>7.2.0-SNAPSHOT</version>
   </parent>
   
   <properties>
@@ -230,7 +230,7 @@
       <id>postgres</id>
       <dependencies>
         <dependency>
-          <groupId>postgresql</groupId>
+          <groupId>org.postgresql</groupId>
           <artifactId>postgresql</artifactId>
         </dependency>
       </dependencies>

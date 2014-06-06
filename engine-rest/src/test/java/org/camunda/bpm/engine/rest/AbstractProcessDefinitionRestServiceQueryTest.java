@@ -78,12 +78,12 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
-  
+
   @Test
   public void testInvalidSortingOptions() {
-    executeAndVerifyFailingSorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST, 
+    executeAndVerifyFailingSorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST,
         InvalidRequestException.class.getSimpleName(), "Cannot set query parameter 'sortBy' to value 'anInvalidSortByOption'");
-    executeAndVerifyFailingSorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST, 
+    executeAndVerifyFailingSorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST,
         InvalidRequestException.class.getSimpleName(), "Cannot set query parameter 'sortOrder' to value 'anInvalidSortOrderOption'");
   }
 
@@ -92,7 +92,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
       .then().expect().statusCode(expectedStatus.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
-  
+
   protected void executeAndVerifyFailingSorting(String sortBy, String sortOrder, Status expectedStatus, String expectedErrorType, String expectedErrorMessage) {
     given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
       .then().expect().statusCode(expectedStatus.getStatusCode()).contentType(ContentType.JSON)
@@ -100,7 +100,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
       .body("message", equalTo(expectedErrorMessage))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
-  
+
   @Test
   public void testSortByParameterOnly() {
     given().queryParam("sortBy", "category")
@@ -109,7 +109,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
       .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
-  
+
   @Test
   public void testSortOrderParameterOnly() {
     given().queryParam("sortOrder", "asc")
@@ -122,21 +122,21 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
   @Test
   public void testProcessDefinitionRetrieval() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
-    
+
     String queryKey = "Key";
     Response response = given().queryParam("keyLike", queryKey)
         .then().expect().statusCode(Status.OK.getStatusCode())
         .when().get(PROCESS_DEFINITION_QUERY_URL);
-    
+
     // assert query invocation
     inOrder.verify(mockedQuery).processDefinitionKeyLike(queryKey);
     inOrder.verify(mockedQuery).list();
-    
+
     String content = response.asString();
     List<String> definitions = from(content).getList("");
     Assert.assertEquals("There should be one process definition returned.", 1, definitions.size());
     Assert.assertNotNull("There should be one process definition returned", definitions.get(0));
-    
+
     String returnedDefinitionKey = from(content).getString("[0].key");
     String returnedDefinitionId = from(content).getString("[0].id");
     String returnedCategory = from(content).getString("[0].category");
@@ -147,7 +147,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     String returnedDeploymentId  = from(content).getString("[0].deploymentId");
     String returnedDiagramResourceName = from(content).getString("[0].diagram");
     Boolean returnedIsSuspended = from(content).getBoolean("[0].suspended");
-  
+
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY, returnedCategory);
@@ -165,25 +165,25 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     setUpMockDefinitionQuery(createIncompleteMockDefinitions());
     Response response = expect().statusCode(Status.OK.getStatusCode())
         .when().get(PROCESS_DEFINITION_QUERY_URL);
-    
+
     String content = response.asString();
     String returnedResourceName = from(content).getString("[0].resource");
-    Assert.assertNull("Should be null, as it is also null in the original process definition on the server.", 
+    Assert.assertNull("Should be null, as it is also null in the original process definition on the server.",
         returnedResourceName);
   }
 
   private List<ProcessDefinition> createIncompleteMockDefinitions() {
     List<ProcessDefinition> mocks = new ArrayList<ProcessDefinition>();
-    
+
     MockDefinitionBuilder builder = new MockDefinitionBuilder();
-    ProcessDefinition mockDefinition = 
+    ProcessDefinition mockDefinition =
         builder.id(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
           .category(MockProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY)
           .name(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME)
           .key(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
           .suspended(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED)
           .version(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION).build();
-    
+
     mocks.add(mockDefinition);
     return mocks;
   }
@@ -191,7 +191,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
   @Test
   public void testNoParametersQuery() {
     expect().statusCode(Status.OK.getStatusCode()).when().get(PROCESS_DEFINITION_QUERY_URL);
-    
+
     verify(mockedQuery).list();
     verifyNoMoreInteractions(mockedQuery);
   }
@@ -199,11 +199,11 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
   @Test
   public void testAdditionalParameters() {
     Map<String, String> queryParameters = getCompleteQueryParameters();
-    
+
     given().queryParams(queryParameters)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
-    
+
     // assert query invocation
     verify(mockedQuery).processDefinitionCategory(queryParameters.get("category"));
     verify(mockedQuery).processDefinitionCategoryLike(queryParameters.get("categoryLike"));
@@ -219,12 +219,16 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     verify(mockedQuery).startableByUser(queryParameters.get("startableBy"));
     verify(mockedQuery).active();
     verify(mockedQuery).suspended();
+    verify(mockedQuery).incidentId(queryParameters.get("incidentId"));
+    verify(mockedQuery).incidentType(queryParameters.get("incidentType"));
+    verify(mockedQuery).incidentMessage(queryParameters.get("incidentMessage"));
+    verify(mockedQuery).incidentMessageLike(queryParameters.get("incidentMessageLike"));
     verify(mockedQuery).list();
   }
 
   private Map<String, String> getCompleteQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
-    
+
     parameters.put("category", "cat");
     parameters.put("categoryLike", "catlike");
     parameters.put("name", "name");
@@ -239,7 +243,11 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     parameters.put("startableBy", "kermit");
     parameters.put("suspended", "true");
     parameters.put("active", "true");
-    
+    parameters.put("incidentId", "incId");
+    parameters.put("incidentType", "incType");
+    parameters.put("incidentMessage", "incMessage");
+    parameters.put("incidentMessageLike", "incMessageLike");
+
     return parameters;
   }
 
@@ -249,27 +257,27 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     executeAndVerifySuccessfulSorting("category", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionCategory();
     inOrder.verify(mockedQuery).asc();
-    
+
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("key", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
     inOrder.verify(mockedQuery).desc();
-    
+
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("id", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionId();
     inOrder.verify(mockedQuery).asc();
-    
+
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("version", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionVersion();
     inOrder.verify(mockedQuery).desc();
-    
+
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("name", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionName();
     inOrder.verify(mockedQuery).asc();
-    
+
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("deploymentId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDeploymentId();
@@ -283,7 +291,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
-    
+
     verify(mockedQuery).listPage(firstResult, maxResults);
   }
 
@@ -296,7 +304,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     given().queryParam("maxResults", maxResults)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
-    
+
     verify(mockedQuery).listPage(0, maxResults);
   }
 
@@ -309,7 +317,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     given().queryParam("firstResult", firstResult)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
-    
+
     verify(mockedQuery).listPage(firstResult, Integer.MAX_VALUE);
   }
 
@@ -318,7 +326,8 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     expect().statusCode(Status.OK.getStatusCode())
       .body("count", equalTo(1))
       .when().get(PROCESS_DEFINITION_COUNT_QUERY_URL);
-    
+
     verify(mockedQuery).count();
   }
+
 }

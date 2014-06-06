@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.camunda.bpm.webapp</groupId>
     <artifactId>camunda-webapp-root</artifactId>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>7.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-webapp</artifactId>
@@ -30,6 +30,15 @@
     <dependency>
       <groupId>org.camunda.bpm.webapp</groupId>
       <artifactId>camunda-webapp-core</artifactId>
+    </dependency>
+
+    <!-- the tasklist UI -->
+    <dependency>
+      <groupId>org.camunda.bpm.webapp</groupId>
+      <artifactId>camunda-tasklist-ui</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <scope>provided</scope>
     </dependency>
 
     <!-- jee spec -->
@@ -229,6 +238,30 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.camunda.bpm.webapp</groupId>
+                  <artifactId>camunda-tasklist-ui</artifactId>
+                  <type>zip</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/webapp/app/tasklist</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+           </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -325,6 +358,18 @@
         <dependency>
           <groupId>com.fasterxml.uuid</groupId>
           <artifactId>java-uuid-generator</artifactId>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-jdbc</artifactId>
+          <version>7.0.33</version>
+        </dependency>
+    
+        <dependency>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-juli</artifactId>
+          <version>7.0.33</version>
         </dependency>
       </dependencies>
       <build>
@@ -551,7 +596,24 @@
       </activation>
       <dependencies>
         <dependency>
-          <groupId>postgresql</groupId>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>test</scope>
+        </dependency>
+       </dependencies>
+    </profile>
+
+    <profile>
+      <id>postgresql93</id>
+        <activation>
+        <property>
+          <name>database</name>
+          <value>postgresql93</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.postgresql</groupId>
           <artifactId>postgresql</artifactId>
           <scope>test</scope>
         </dependency>

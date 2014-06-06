@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.cmd.SuspendJobDefinitionCmd;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -81,6 +82,39 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
     // then the new job executor will not acquire the job:
     acquiredJobs = acquireJobs();
     assertEquals(1, acquiredJobs.size());
+
+  }
+
+  @Deployment
+  public void testExclusiveJobs() {
+
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+      .activityIdIn("task2")
+      .singleResult();
+
+    // given that the second task is suspended
+    managementService.suspendJobDefinitionById(jobDefinition.getId());
+
+    // if I start a process instance
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    waitForJobExecutorToProcessAllJobs(6000);
+
+    // then the second task is not executed
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    // there is a suspended job instance
+    Job job = managementService.createJobQuery()
+      .singleResult();
+    assertEquals(job.getJobDefinitionId(), jobDefinition.getId());
+    assertTrue(job.isSuspended());
+
+    // if I unsuspend the job definition, the job is executed:
+    managementService.activateJobDefinitionById(jobDefinition.getId(), true);
+
+    waitForJobExecutorToProcessAllJobs(5000);
+
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
   }
 
 
@@ -187,7 +221,7 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
     // there should be one suspended job
     assertEquals(1, managementService.createJobQuery().suspended().count());
     assertEquals(0, managementService.createJobQuery().active().count());
-    
+
     assertEquals(1, runtimeService.createProcessInstanceQuery().active().count());
 
   }

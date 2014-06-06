@@ -37,7 +37,7 @@
   
   <insert id="insertHistoricVariableUpdateEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity">
   
-    insert into ${prefix}ACT_HI_DETAIL (ID_, TYPE_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, TIME_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
+    insert into ${prefix}ACT_HI_DETAIL (ID_, TYPE_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, TASK_ID_, NAME_, REV_, VAR_INST_ID_, VAR_TYPE_, TIME_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
     values (
       #{id, jdbcType=VARCHAR},
       'VariableUpdate',
@@ -47,6 +47,7 @@
       #{taskId, jdbcType=VARCHAR},      
       #{variableName, jdbcType=VARCHAR},
       #{revision, jdbcType=VARCHAR},
+      #{variableInstanceId, jdbcType=VARCHAR},
       #{variableTypeName, jdbcType=VARCHAR},      
       #{timestamp, jdbcType=TIMESTAMP},     
       #{byteArrayId, jdbcType=VARCHAR},
@@ -161,13 +162,16 @@
   </select>
   
   <select id="selectHistoricDetailCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultType="long">
-    select count(RES.*)
+    select count(*)
     <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
   </select>
   
   <sql id="selectHistoricDetailsByQueryCriteriaSql">
     from ${prefix}ACT_HI_DETAIL RES
     <where>
+      <if test="detailId != null">
+        RES.ID_ = #{detailId}
+      </if>
       <if test="processInstanceId != null">
         RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
@@ -179,6 +183,9 @@
       </if>
       <if test="activityInstanceId != null">
         and RES.ACT_INST_ID_ = #{activityInstanceId}
+      </if>
+      <if test="variableInstanceId != null">
+        and RES.VAR_INST_ID_ = #{variableInstanceId}
       </if>
       <choose>
         <when test="taskId != null">

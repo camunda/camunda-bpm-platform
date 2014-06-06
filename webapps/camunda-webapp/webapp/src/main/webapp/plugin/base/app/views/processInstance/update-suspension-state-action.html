@@ -1,15 +1,13 @@
 <!-- # CE - src/main/webapp/plugin/base/app/views/processInstance/update-suspension-state-action.html -->
 <a class="btn btn-toolbar btn-suspend-action" href ng-click="openDialog()"
-   help
-   help-text="Suspend Process Instance"
-   help-placement="'left'"
+   tooltip="Suspend Process Instance"
+   tooltip-placement="left"
    ng-show="!processInstance.suspended">
   <i class="icon-suspended"></i>
 </a>
 <a class="btn btn-toolbar" href ng-click="openDialog()"
-   help
-   help-text="Activate Process Instance"
-   help-placement="'left'"
+   tooltip="Activate Process Instance"
+   tooltip-placement="left"
    ng-hide="!processInstance.suspended">
   <i class="icon-play"></i>
 </a>

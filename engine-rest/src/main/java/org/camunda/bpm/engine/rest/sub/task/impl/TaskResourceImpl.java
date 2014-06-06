@@ -12,39 +12,39 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormData;
-import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
-import org.camunda.bpm.engine.rest.dto.task.FormDto;
-import org.camunda.bpm.engine.rest.dto.task.IdentityLinkDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
+import org.camunda.bpm.engine.rest.dto.task.*;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
+import org.camunda.bpm.engine.rest.sub.task.TaskAttachmentResource;
+import org.camunda.bpm.engine.rest.sub.task.TaskCommentResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
 
+import javax.ws.rs.core.Response.Status;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class TaskResourceImpl implements TaskResource {
 
   private ProcessEngine engine;
   private String taskId;
+  private String rootResourcePath;
 
-  public TaskResourceImpl(ProcessEngine engine, String taskId) {
+  public TaskResourceImpl(ProcessEngine engine, String taskId, String rootResourcePath) {
     this.engine = engine;
     this.taskId = taskId;
+    this.rootResourcePath = rootResourcePath;
   }
 
   @Override
@@ -240,6 +240,20 @@ public class TaskResourceImpl implements TaskResource {
       taskService.deleteGroupIdentityLink(taskId, identityLink.getGroupId(), identityLink.getType());
     }
 
+  }
+
+  public TaskCommentResource getTaskCommentResource() {
+    return new TaskCommentResourceImpl(engine, taskId, rootResourcePath);
+  }
+
+  @Override
+  public TaskAttachmentResource getAttachmentResource() {
+    return new TaskAttachmentResourceImpl(engine, taskId, rootResourcePath);
+  }
+
+  @Override
+  public VariableResource getLocalVariables() {
+    return new LocalTaskVariablesResource(engine, taskId);
   }
 
 }

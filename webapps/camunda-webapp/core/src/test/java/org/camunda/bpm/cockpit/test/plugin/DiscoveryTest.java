@@ -18,8 +18,8 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.resources.SimpleRootResource;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimpleCockpitPlugin;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.resources.SimpleCockpitRootResource;
 import org.camunda.bpm.cockpit.test.sample.web.CockpitTestApplication;
 import org.camunda.bpm.cockpit.test.util.AbstractCockpitCoreTest;
 import org.camunda.bpm.cockpit.test.util.DeploymentHelper;
@@ -41,7 +41,7 @@ public class DiscoveryTest extends AbstractCockpitCoreTest {
   @Deployment
   public static Archive<?> createDeployment() {
     WebArchive archive = createBaseDeployment()
-          .addAsLibraries(DeploymentHelper.getTestPluginJar());
+          .addAsLibraries(DeploymentHelper.getCockpitTestPluginJar());
 
     return archive;
   }
@@ -51,7 +51,7 @@ public class DiscoveryTest extends AbstractCockpitCoreTest {
     @Override
     public boolean matches(List<?> value) {
       for (Object o: value) {
-        if (o instanceof SimplePlugin) {
+        if (o instanceof SimpleCockpitPlugin) {
           return true;
         }
       }
@@ -83,6 +83,6 @@ public class DiscoveryTest extends AbstractCockpitCoreTest {
     CockpitTestApplication application = new CockpitTestApplication();
 
     // then
-    assertThat(application.getClasses()).contains(SimpleRootResource.class);
+    assertThat(application.getClasses()).contains(SimpleCockpitRootResource.class);
   }
 }

@@ -19,7 +19,7 @@ package org.camunda.bpm.engine;
  * 
  * @author Thorben Lindhauer
  */
-public class SuspendedEntityInteractionException extends ProcessEngineException {
+public class SuspendedEntityInteractionException extends BadUserRequestException {
 
   private static final long serialVersionUID = 1L;
 

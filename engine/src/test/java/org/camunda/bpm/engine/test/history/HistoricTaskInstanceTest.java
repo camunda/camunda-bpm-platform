@@ -19,6 +19,7 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -62,6 +63,9 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(taskDefinitionKey, historicTaskInstance.getTaskDefinitionKey());
     assertNull(historicTaskInstance.getEndTime());
     assertNull(historicTaskInstance.getDurationInMillis());
+
+    // the activity instance id is set
+    assertEquals(((TaskEntity)runtimeTask).getExecution().getActivityInstanceId(), historicTaskInstance.getActivityInstanceId());
 
     runtimeService.setVariable(processInstanceId, "deadline", "yesterday");
 
@@ -244,7 +248,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     historyService.deleteHistoricTaskInstance(hti.getId());
   }
 
-  public void testHistoricTaskInstanceName() {
+  public void testHistoricTaskInstancePriority() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
 
@@ -252,7 +256,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
     assertEquals(Task.PRIORITY_NORMAL, hti.getPriority());
 
-    // set owner to jonny:
+    // set priority to maximum value:
     taskService.setPriority(task.getId(), Task.PRIORITY_MAXIMUM);
 
     // should be reflected in history
@@ -381,5 +385,70 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(followUpDate, historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult().getFollowUpDate());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpDate(followUpDate).count());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  public void testHistoricTaskInstanceQueryByActivityInstanceId() throws Exception {
+    runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
+
+    String activityInstanceId = historyService.createHistoricActivityInstanceQuery()
+        .activityId("task")
+        .singleResult()
+        .getId();
+
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
+        .activityInstanceIdIn(activityInstanceId);
+
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  public void testHistoricTaskInstanceQueryByActivityInstanceIds() throws Exception {
+    ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
+    ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
+
+    String activityInstanceId1 = historyService.createHistoricActivityInstanceQuery()
+        .processInstanceId(pi1.getId())
+        .activityId("task")
+        .singleResult()
+        .getId();
+
+    String activityInstanceId2 = historyService.createHistoricActivityInstanceQuery()
+        .processInstanceId(pi2.getId())
+        .activityId("task")
+        .singleResult()
+        .getId();
+
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
+        .activityInstanceIdIn(activityInstanceId1, activityInstanceId2);
+
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  public void testHistoricTaskInstanceQueryByInvalidActivityInstanceId() {
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.activityInstanceIdIn("invalid");
+    assertEquals(0, query.count());
+
+    try {
+      query.activityInstanceIdIn(null);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (ProcessEngineException e) {}
+
+    try {
+      query.activityInstanceIdIn((String)null);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (ProcessEngineException e) {}
+
+    try {
+      String[] values = { "a", null, "b" };
+      query.activityInstanceIdIn(values);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (ProcessEngineException e) {}
+
   }
 }

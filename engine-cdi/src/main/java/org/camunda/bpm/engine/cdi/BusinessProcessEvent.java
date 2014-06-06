@@ -12,11 +12,12 @@
  */
 package org.camunda.bpm.engine.cdi;
 
-import java.util.Date;
-
+import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+
+import java.util.Date;
 
 /**
  * Signifies an event that is happening / has happened during the execution of a
@@ -28,7 +29,7 @@ public interface BusinessProcessEvent {
 
   /**
    * @return the process definition in which the event is happening / has
-   *         happened
+   *         happened or null the event was not related to a process definition
    */
   public ProcessDefinition getProcessDefinition();
 
@@ -65,4 +66,18 @@ public interface BusinessProcessEvent {
    */
   public Date getTimeStamp();
 
+  /**
+   * @return the delegate task if this is a task event.
+   */
+  public DelegateTask getTask();
+
+  /**
+   * @return the task id of the current task or null if this is not a task event.
+   */
+  public String getTaskId();
+
+  /**
+   * @return the id of the task in the process definition (BPMN XML) or null if this is not a task event.
+   */
+  public String getTaskDefinitionKey();
 }

@@ -16,7 +16,9 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -28,6 +30,7 @@ import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
@@ -40,6 +43,8 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Frederik Heremans
  */
 public abstract class JobEntity implements Serializable, Job, PersistentObject, HasRevision {
+
+  private final static Logger LOG = Logger.getLogger(JobEntity.class.getName());
 
   public static final boolean DEFAULT_EXCLUSIVE = true;
   public static final int DEFAULT_RETRIES = 3;
@@ -84,6 +89,9 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     ExecutionEntity execution = null;
     if (executionId != null) {
       execution = commandContext.getExecutionManager().findExecutionById(executionId);
+      if(execution == null) {
+        throw new ProcessEngineException("Cannot find execution with id '"+executionId+"' referenced from job '"+ this +"'.");
+      }
     }
 
     Map<String, JobHandler> jobHandlers = Context.getProcessEngineConfiguration().getJobHandlers();
@@ -110,9 +118,13 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
   }
 
   public void delete() {
+    delete(false);
+  }
+
+  public void delete(boolean incidentResolved) {
     DbSqlSession dbSqlSession = Context
-      .getCommandContext()
-      .getDbSqlSession();
+        .getCommandContext()
+        .getDbSqlSession();
 
     dbSqlSession.delete(this);
 
@@ -129,10 +141,7 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
       execution.removeJob(this);
     }
 
-    // if a job with retries == 0 is deleted this means that the corresponding incident is resolved.
-    if (retries == 0) {
-      removeFailedJobIncident();
-    }
+    removeFailedJobIncident(incidentResolved);
   }
 
   public Object getPersistentState() {
@@ -175,9 +184,15 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
   }
 
   public void setRetries(int retries) {
+    // Assuming: if the number of retries will
+    // be changed from 0 to x (x >= 1), means
+    // that the corresponding incident is resolved.
     if (this.retries == 0 && retries > 0) {
-      removeFailedJobIncident();
+      removeFailedJobIncident(true);
     }
+
+    // If the retries will be set to 0, an
+    // incident has to be created.
     if(retries == 0) {
       createFailedJobIncident();
     }
@@ -194,25 +209,45 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
 
     if (processEngineConfiguration
         .isCreateIncidentOnFailedJobEnabled()) {
+
+      String incidentHandlerType = FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE;
+
       // make sure job has an ID set:
       if(id == null) {
         id = processEngineConfiguration
             .getIdGenerator()
             .getNextId();
+
+      } else {
+        // check whether there exists already an incident
+        // for this job
+        List<Incident> failedJobIncidents = Context
+            .getCommandContext()
+            .getIncidentManager()
+            .findIncidentByConfigurationAndIncidentType(id, incidentHandlerType);
+
+        if (!failedJobIncidents.isEmpty()) {
+          return;
+        }
+
       }
       processEngineConfiguration
-        .getIncidentHandler(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE)
-        .handleIncident(null, null, executionId, id, exceptionMessage);
+        .getIncidentHandler(incidentHandlerType)
+        .handleIncident(getProcessDefinitionId(), null, executionId, id, exceptionMessage);
 
     }
   }
 
-  protected void removeFailedJobIncident() {
+  protected void removeFailedJobIncident(boolean incidentResolved) {
     IncidentHandler handler = Context
         .getProcessEngineConfiguration()
         .getIncidentHandler(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE);
 
-    handler.resolveIncident(null, null, executionId, id);
+    if (incidentResolved) {
+      handler.resolveIncident(getProcessDefinitionId(), null, executionId, id);
+    } else {
+      handler.deleteIncident(getProcessDefinitionId(), null, executionId, id);
+    }
   }
 
   public String getExceptionStacktrace() {

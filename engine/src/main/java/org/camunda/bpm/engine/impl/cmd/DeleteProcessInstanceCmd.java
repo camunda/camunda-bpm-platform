@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+
+import java.io.Serializable;
 
 
 /**
@@ -35,7 +35,7 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) { 
     if(processInstanceId == null) {
-      throw new ProcessEngineException("processInstanceId is null");
+      throw new BadUserRequestException("processInstanceId is null");
     }
     
     commandContext

@@ -1,5 +1,7 @@
+/* global ngDefine: false */
 ngDefine('cockpit.services', function(module) {
-  
+  'use strict';
+
   var SearchFactory = [ '$location', '$rootScope', function($location, $rootScope) {
 
     var silent = false;
@@ -30,7 +32,7 @@ ngDefine('cockpit.services', function(module) {
       });
 
       var newPath = $location.absUrl();
-      
+
       if (newPath != oldPath) {
         silent = true;
       }

@@ -1,13 +1,13 @@
-'use strict';
+/* global ngDefine: false */
+ngDefine('cockpit.directives', [ 'angular' ], function(module) {
+  'use strict';
 
-ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
-  
-  var Directive = function () {
+  module.directive('date', function () {
     return {
       restrict: 'A',
       require: 'ngModel',
       link: function (scope, element, attrs, model) {
-      
+
         var pattern = /^(\d{2}|\d{4})(?:\-)([0]{1}\d{1}|[1]{1}[0-2]{1})(?:\-)([0-2]{1}\d{1}|[3]{1}[0-1]{1})T(?:\s)?([0-1]{1}\d{1}|[2]{1}[0-3]{1}):([0-5]{1}\d{1}):([0-5]{1}\d{1})?$/;
 
         var dateParser = function(value) {
@@ -33,7 +33,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           model.$setValidity('date', isValid);
 
           if (!isValid) {
-            // if the value is invalid, then 
+            // if the value is invalid, then
             // set $pristine to false and set $dirty to true,
             // that means the user has interacted with the controller.
             model.$pristine = false;
@@ -45,12 +45,9 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
 
           return value;
         };
-        
+
         model.$formatters.push(dateFormatter);
       }
     };
-  };
-
-  module
-    .directive('date', Directive);  
+  });
 });

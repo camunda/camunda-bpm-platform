@@ -1,10 +1,10 @@
-'use strict';
-
+/* global define: false */
 define(['angular'], function(angular) {
+  'use strict';
 
   var module = angular.module('cockpit.pages');
 
-  var Controller = ['$scope', '$rootScope', 'Views', 'Data', 'dataDepend', function ($scope, $rootScope, Views, Data, dataDepend) {
+  var Controller = ['$scope', '$rootScope', 'Views', 'Data', 'dataDepend', 'page', function ($scope, $rootScope, Views, Data, dataDepend, page) {
 
     var processData = $scope.processData = dataDepend.create($scope);
 
@@ -14,18 +14,17 @@ define(['angular'], function(angular) {
     Data.instantiateProviders('cockpit.dashboard.data', {$scope: $scope, processData : processData});
 
     // reset breadcrumbs
-    $rootScope.clearBreadcrumbs();
+    page.breadcrumbsClear();
 
-    // set the page title
-    $rootScope.pageTitle = [
+    page.titleSet([
       'camunda Cockpit',
       'Dashboard'
-    ].join(' | ');
+    ].join(' | '));
   }];
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/dashboard', {
-      templateUrl: 'pages/dashboard.html',
+      templateUrl: require.toUrl('./app/cockpit/pages/dashboard.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser

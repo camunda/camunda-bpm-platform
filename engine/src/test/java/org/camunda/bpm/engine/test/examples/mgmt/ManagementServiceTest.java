@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.test.examples.mgmt;
 
-import java.util.Arrays;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.TableMetaData;
+
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Test case for the various operations of the {@link ManagementService}
@@ -31,7 +31,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     Map<String, Long> tableCount = managementService.getTableCount();
     
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
-    assertEquals(new Long(4), tableCount.get(tablePrefix+"ACT_GE_PROPERTY"));
+    assertEquals(new Long(5), tableCount.get(tablePrefix+"ACT_GE_PROPERTY"));
     assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_GE_BYTEARRAY"));
     assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RE_DEPLOYMENT"));
     assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RU_EXECUTION"));

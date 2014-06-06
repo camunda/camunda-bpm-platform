@@ -1,16 +1,14 @@
-/**
- * bootstrap script of the admin application
- */
-
 (function(document, window, require) {
+  'use strict';
 
-  var baseUrl = '../../../';
+  var baseUrl = document.getElementsByTagName('base')[0].getAttribute('app-root') +'/';
   var APP_NAME = 'admin';
   var pluginPackages = window.PLUGIN_PACKAGES || [];
 
-  require([baseUrl +'require-conf'], function(rjsConf) {
+  require([baseUrl +'require-conf.js'], function(rjsConf) {
     require({
       baseUrl:    baseUrl,
+      urlArgs:    rjsConf.urlArgs,
       paths:      rjsConf.paths,
       shim:       rjsConf.shim,
       packages:   rjsConf.packages.concat(pluginPackages)
@@ -22,8 +20,8 @@
       'angular-sanitize',
       'angular-ui',
       'ngDefine',
-      'bootstrap',
-      'jquery-ui'
+      // 'bootstrap',
+      'jquery-ui/ui/jquery.ui.draggable'
     ], function(angular) {
       require([
         APP_NAME,

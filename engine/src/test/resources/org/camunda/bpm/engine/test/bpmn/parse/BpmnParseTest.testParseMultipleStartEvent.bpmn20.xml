@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <message id="newMessage" name="new" />
+
+  <process id="multipleStartEvent" isExecutable="true">
+  
+  <startEvent id="theStart">
+    <timerEventDefinition>
+      <timeDuration>PT1M</timeDuration>
+    </timerEventDefinition>
+    <messageEventDefinition messageRef="newMessage" />
+  </startEvent>
+  
+  <sequenceFlow id="flow_1" sourceRef="theStart" targetRef="subProcess" />
+  
+   <subProcess id="subProcess">
+    <startEvent id="startSubProcess">
+      <timerEventDefinition>
+        <timeDuration>PT1M</timeDuration>
+      </timerEventDefinition>
+      <messageEventDefinition messageRef="newMessage" />
+    </startEvent>
+    <sequenceFlow id="flow_4" sourceRef="startSubProcess" targetRef="mySubProcessUserTask" />
+    <userTask id="mySubProcessUserTask" />
+    <sequenceFlow id="flow_5" sourceRef="mySubProcessUserTask" targetRef="endSubProcess" />
+    <endEvent id="endSubProcess" />
+   </subProcess>
+  
+  <sequenceFlow id="flow_2" sourceRef="subProcess" targetRef="myUserTask" />
+  
+  <userTask id="myUserTask" />
+  
+  <sequenceFlow id="flow_3" sourceRef="myUserTask" targetRef="theEnd" />
+  
+  <endEvent id="theEnd" />
+  
+   <subProcess id="eventSubProcess" triggeredByEvent="true">
+    <startEvent id="startEventSubProcess">
+      <timerEventDefinition>
+        <timeDuration>PT1M</timeDuration>
+      </timerEventDefinition>
+      <messageEventDefinition messageRef="newMessage" />
+    </startEvent>
+    
+    <sequenceFlow id="flow_6" sourceRef="startEventSubProcess" targetRef="myEventSubProcessUserTask" />
+    
+    <userTask id="myEventSubProcessUserTask" />
+    
+    <sequenceFlow id="flow_7" sourceRef="myEventSubProcessUserTask" targetRef="endEventSubProcess" />
+    
+    <endEvent id="endEventSubProcess" />
+   </subProcess>
+
+  </process>
+
+</definitions>

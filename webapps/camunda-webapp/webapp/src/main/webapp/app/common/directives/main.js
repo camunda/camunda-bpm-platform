@@ -1,14 +1,22 @@
-ngDefine('camunda.common.directives', [
-  'module:camunda.common.directives.notificationsPanel:./notificationsPanel',
+/* global define: false, angular: false */
+define([
   './email',
-  './help',
-  './requestAware',
   './engineSelect',
-  './paginator',
-  'module:camunda.common.directives.ifLoggedIn:./ifLoggedIn',
-  'module:camunda.common.directives.showIfAuthorized:./showIfAuthorized',  
+  //'./help',
+  './inPlaceTextField',
+  // './paginator',
   './password',
-  'module:camunda.common.directives.modal:./modal'
-], function(module) {
-
+  './requestAware',
+  './ifLoggedIn',
+  './bootstrap',
+  './notificationsPanel',
+  './showIfAuthorized'
+], function() {
+  'use strict';
+  angular.module('camunda.common.directives', [
+    'camunda.common.directives.ifLoggedIn',
+    'camunda.common.directives.bootstrap',
+    'camunda.common.directives.notificationsPanel',
+    'camunda.common.directives.showIfAuthorized'
+  ]);
 });

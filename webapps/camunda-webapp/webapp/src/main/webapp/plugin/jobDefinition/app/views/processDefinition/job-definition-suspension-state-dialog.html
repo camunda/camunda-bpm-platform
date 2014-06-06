@@ -1,3 +1,4 @@
+<!-- # CE - src/main/webapp/plugin/jobDefintion/app/views/processDefinition/job-definition-suspension-state-dialog.html -->
 <div class="modal-header">
   <h3 ng-show="jobDefinition.suspended">Activate Job Definition</h3>
   <h3 ng-hide="jobDefinition.suspended">Suspend Job Definition</h3>
@@ -24,21 +25,19 @@
           <label class="control-label" for="includeJobsValue">Include Existing Jobs
             <!-- activation -->
             <span class="btn btn-small btn-link btn-control btn-control-link"
-                  help
-                  help-text="Including jobs means that all existing jobs of this job definition will be activated too, if the value is set to true."
-                  help-placement="'right'"
+                  tooltip="Including jobs means that all existing jobs of this job definition will be activated too, if the value is set to true."
+                  tooltip-placement="right"
                   ng-show="processDefinition.suspended">
               <i class="icon-question-sign"></i>
             </span>
 
             <!-- suspension -->
             <span class="btn btn-small btn-link btn-control btn-control-link"
-                  help
-                  help-text="Including jobs means that all existing jobs of this job definition will be suspended too, if the value is set to true."
-                  help-placement="'right'"
-                  ng-hide="processDefinition.suspended">   
+                  tooltip="Including jobs means that all existing jobs of this job definition will be suspended too, if the value is set to true."
+                  tooltip-placement="right"
+                  ng-hide="processDefinition.suspended">
               <i class="icon-question-sign"></i>
-            </span>  
+            </span>
           </label>
           <div class="controls">
             <input id="includeJobsValueId" name="includeJobsValue" type="checkbox" ng-model="includeJobs">
@@ -48,19 +47,17 @@
         <div class="control-group">
           <label class="control-label" for="executeImmediately">Execute
             <span class="btn btn-small btn-link btn-control btn-control-link"
-                  help
-                  help-text="Decide whether the activation of this job definition should be executed immediately or delayed. If the activation should happen delayed then an execution date must be provided on which the activation will be scheduled."
-                  help-placement="'right'"
+                  tooltip="Decide whether the activation of this job definition should be executed immediately or delayed. If the activation should happen delayed then an execution date must be provided on which the activation will be scheduled."
+                  tooltip-placement="right"
                   ng-show="processDefinition.suspended">
               <i class="icon-question-sign"></i>
             </span>
             <span class="btn btn-small btn-link btn-control btn-control-link"
-                  help
-                  help-text="Decide whether the suspension of this job definition should be executed immediately or delayed. If the suspension should happen delayed then an execution date must be provided on which the suspension will be scheduled."
-                  help-placement="'right'"
-                  ng-hide="processDefinition.suspended">   
+                  tooltip="Decide whether the suspension of this job definition should be executed immediately or delayed. If the suspension should happen delayed then an execution date must be provided on which the suspension will be scheduled."
+                  tooltip-placement="right"
+                  ng-hide="processDefinition.suspended">
               <i class="icon-question-sign"></i>
-            </span> 
+            </span>
           </label>
           <div class="controls">
             <label class="radio">
@@ -109,7 +106,7 @@
     </p>
     <p ng-show="!jobDefinition.suspended && !executeImmediately">
       The suspension of the Job Definition has been scheduled to {{ executionDate }} successfully.
-    </p>    
+    </p>
   </div>
 
   <div ng-show="status === 'FAIL'">
@@ -124,7 +121,7 @@
     </p>
     <p ng-show="!jobDefinition.suspended && !executeImmediately">
       The suspension of the Job Definition could not be scheduled to {{ executionDate }} successfully.
-    </p> 
+    </p>
   </div>
 
 </div>
@@ -144,3 +141,4 @@
   <button class="btn btn-primary" ng-click="close(status)"
           ng-show="status === 'SUCCESS' || status === 'FAIL'">OK</button>
 </div>
+<!-- / CE - src/main/webapp/plugin/jobDefintion/app/views/processDefinition/job-definition-suspension-state-dialog.html -->

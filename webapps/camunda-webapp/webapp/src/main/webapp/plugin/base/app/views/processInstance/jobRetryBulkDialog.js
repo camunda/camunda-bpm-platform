@@ -1,7 +1,9 @@
-ngDefine('cockpit.plugin.base.views', function(module, $) {
-
-  var JobRetriesController = [ '$scope', '$q', 'Notifications', 'JobResource', 'dialog', 'processData', 'processInstance',
-                      function ($scope, $q, Notifications, JobResource, dialog, processData, processInstance) {
+/* global ngDefine: false, angular: false */
+ngDefine('cockpit.plugin.base.views', function(module) {
+  'use strict';
+  module.controller('JobRetriesController', [
+           '$scope', '$q', 'Notifications', 'JobResource', '$modalInstance', 'processData', 'processInstance',
+  function ($scope,   $q,   Notifications,   JobResource,   $modalInstance,   processData,   processInstance) {
 
     var jobRetriesData = processData.newChild($scope);
 
@@ -17,7 +19,7 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
     $scope.allJobsSelected = false;
 
     var FINISHED = 'finished',
-        PERFORM = 'performing'
+        PERFORM = 'performing',
         SUCCESS = 'successful',
         FAILED = 'failed';
 
@@ -26,7 +28,7 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
     });
 
     $scope.$on('$routeChangeStart', function () {
-      dialog.close($scope.status);
+      $modalInstance.close($scope.status);
     });
 
     $scope.$watch('jobPages.current', function(newValue, oldValue) {
@@ -50,8 +52,16 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
       var count = jobPages.size;
       var firstResult = (page - 1) * count;
 
-      JobResource.query({'firstResult': firstResult, 'maxResults': count},{'processInstanceId': processInstance.id, 'withException': true, 'noRetriesLeft': true}).$then(function (response) {
-        for (var i = 0, job; !!(job = response.data[i]); i++) {
+      JobResource.query({
+        firstResult: firstResult,
+        maxResults: count
+      },{
+        processInstanceId: processInstance.id,
+        withException: true,
+        noRetriesLeft: true
+      }).$promise.then(function (response) {
+        // for (var i = 0, job; !!(job = response.data[i]); i++) {
+        for (var i = 0, job; !!(job = response[i]); i++) {
           jobIdToFailedJobMap[job.id] = job;
           var instance = executionIdToInstanceMap[job.executionId];
           job.instance = instance;
@@ -59,11 +69,17 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
           var index = selectedFailedJobIds.indexOf(job.id);
           job.selected = index !== -1;
         }
-        $scope.failedJobs = response.data;
+        // $scope.failedJobs = response.data;
+        $scope.failedJobs = response;
       });
 
-      JobResource.count({'processInstanceId': processInstance.id, 'withException': true}).$then(function(data) {
-        jobPages.total = (Math.ceil(data.data.count / jobPages.size));
+      JobResource.count({
+        processInstanceId: processInstance.id,
+        withException: true
+      }).$promise.then(function(data) {
+        // jobPages.total = (Math.ceil(data.data.count / jobPages.size));
+        // jobPages.total = (Math.ceil(data.count / jobPages.size));
+        jobPages.total = data.count;
       });
     }
 
@@ -80,7 +96,7 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
       var count = summarizePages.size;
       var firstResult = (page - 1) * count;
 
-      showJobsRetried = $scope.showJobsRetried = [];
+      var showJobsRetried = $scope.showJobsRetried = [];
 
       for (var i = 0; i < count; i++) {
         var jobId = selectedFailedJobIds[i + firstResult];
@@ -92,7 +108,7 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
     }
 
     $scope.selectAllJobs = function (allJobsSelected) {
-      var selected = allJobsSelected;
+      // var selected = allJobsSelected;
       angular.forEach($scope.failedJobs, function (job) {
         job.selected = allJobsSelected;
         selectFailedJob(job);
@@ -126,9 +142,17 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
 
       doRetry(selectedFailedJobIds).then(function () {
         if (!finishedWithFailures) {
-          Notifications.addMessage({ 'status': 'Finished', 'message': 'Incrementing the number of retries finished.', 'exclusive': true });
+          Notifications.addMessage({
+            status: 'Finished',
+            message: 'Incrementing the number of retries finished.',
+            exclusive: true
+          });
         } else {
-          Notifications.addError({ 'status': 'Finished', 'message': 'Incrementing the number of retries finished with failures.', 'exclusive': true });
+          Notifications.addError({
+            status: 'Finished',
+            message: 'Incrementing the number of retries finished with failures.',
+            exclusive: true
+          });
         }
 
         $scope.status = FINISHED;
@@ -142,7 +166,11 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
 
       function retryJob(job) {
         job.status = PERFORM;
-        JobResource.setRetries({'id': job.id}, {'retries': 1}, function (response) {
+        JobResource.setRetries({
+          id: job.id
+        }, {
+          retries: 1
+        }, function () {
           job.status = SUCCESS;
 
           // we want to show a summarize, when all requests
@@ -178,10 +206,7 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
 
 
     $scope.close = function (status) {
-      dialog.close(status);
+      $modalInstance.close(status);
     };
-  }];
-
-  module.controller('JobRetriesController', JobRetriesController);
-
+  }]);
 });

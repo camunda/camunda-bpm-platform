@@ -1,7 +1,9 @@
-ngDefine('cockpit.plugin.base.views', function(module, $) {
-
-  var AddVariableController = [ '$scope', '$http', 'Uri', 'Notifications', 'dialog', 'processInstance', 'processData',
-                        function($scope, $http, Uri, Notifications, dialog, processInstance, processData) {
+/* global ngDefine: false, angular: false */
+ngDefine('cockpit.plugin.base.views', function(module) {
+  'use strict';
+  module.controller('AddVariableController', [
+          '$scope', '$http', 'Uri', 'Notifications', '$modalInstance', 'processInstance',
+  function($scope,   $http,   Uri,   Notifications,   $modalInstance,   processInstance) {
 
     $scope.variableTypes = [
       'String',
@@ -24,15 +26,20 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
         FAIL = 'FAIL';
 
     $scope.$on('$routeChangeStart', function () {
-      dialog.close($scope.status);
+      $modalInstance.close($scope.status);
     });
 
     $scope.close = function () {
-      dialog.close($scope.status);
+      $modalInstance.close($scope.status);
     };
 
     var isValid = $scope.isValid = function() {
-      return $scope.addVariableForm.$valid;
+      // that's a pity... I do not get why,
+      // but getting the form scope is.. kind of random
+      // m2c: it has to do with the `click event`
+      // Hate the game, not the player
+      var formScope = angular.element('[name="addVariableForm"]').scope();
+      return (formScope && formScope.addVariableForm) ? formScope.addVariableForm.$valid : false;
     };
 
     $scope.save = function () {
@@ -47,19 +54,25 @@ ngDefine('cockpit.plugin.base.views', function(module, $) {
 
       delete data.name;
 
-      $http.put(Uri.appUri('engine://engine/:engine/process-instance/' + processInstance.id + '/variables/' + name), data).success(function (data) {
+      $http
+      .put(Uri.appUri('engine://engine/:engine/process-instance/' + processInstance.id + '/variables/' + name), data)
+      .success(function () {
         $scope.status = SUCCESS;
 
-        Notifications.addMessage({'status': 'Finished', 'message': 'Added the variable', 'exclusive': true });
-
+        Notifications.addMessage({
+          status: 'Finished',
+          message: 'Added the variable',
+          exclusive: true
+        });
       }).error(function (data) {
         $scope.status = FAIL;
 
-        Notifications.addError({'status': 'Finished', 'message': 'Could not add the new variable: ' + data.message, 'exclusive': true });
+        Notifications.addError({
+          status: 'Finished',
+          message: 'Could not add the new variable: ' + data.message,
+          exclusive: true
+        });
       });
     };
-  }];
-
-  module.controller('AddVariableController', AddVariableController);
-
+  }]);
 });

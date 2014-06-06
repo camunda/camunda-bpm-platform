@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,10 +31,15 @@ public class VariableInstanceManager extends AbstractManager {
   public List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
     return getDbSqlSession().selectList("selectVariablesByTaskId", taskId);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId) {
     return getDbSqlSession().selectList("selectVariablesByExecutionId", executionId);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<VariableInstanceEntity> findVariableInstancesByCaseExecutionId(String caseExecutionId) {
+    return getDbSqlSession().selectList("selectVariablesByCaseExecutionId", caseExecutionId);
   }
 
   public void deleteVariableInstanceByTask(TaskEntity task) {
@@ -45,14 +50,14 @@ public class VariableInstanceManager extends AbstractManager {
       }
     }
   }
-  
+
   public long findVariableInstanceCountByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
     return (Long) getDbSqlSession().selectOne("selectVariableInstanceCountByQueryCriteria", variableInstanceQuery);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<VariableInstance> findVariableInstanceByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery, Page page) {
     return getDbSqlSession().selectList("selectVariableInstanceByQueryCriteria", variableInstanceQuery, page);
   }
-  
+
 }

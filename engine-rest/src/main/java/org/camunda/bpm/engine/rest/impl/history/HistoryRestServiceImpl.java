@@ -12,18 +12,15 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.UriInfo;
-
-import org.camunda.bpm.engine.rest.dto.history.HistoricActivityStatisticsDto;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricActivityStatisticsRestService;
+import org.camunda.bpm.engine.rest.history.HistoricDetailRestService;
+import org.camunda.bpm.engine.rest.history.HistoricIncidentRestService;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
+import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricVariableInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoryRestService;
+import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
 
 public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware implements HistoryRestService {
@@ -54,6 +51,26 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
   @Override
   public HistoricActivityStatisticsRestService getActivityStatisticsService() {
     return new HistoricActivityStatisticsRestServiceImpl(getProcessEngine());
+  }
+
+  @Override
+  public UserOperationLogRestService getUserOperationLogRestService() {
+    return new UserOperationLogRestServiceImpl(getProcessEngine());
+  }
+
+  @Override
+  public HistoricDetailRestService getDetailService() {
+    return new HistoricDetailRestServiceImpl(getProcessEngine());
+  }
+
+  @Override
+  public HistoricTaskInstanceRestService getTaskInstanceService() {
+    return new HistoricTaskInstanceRestServiceImpl(getProcessEngine());
+  }
+
+  @Override
+  public HistoricIncidentRestService getIncidentService() {
+    return new HistoricIncidentRestServiceImpl(getProcessEngine());
   }
 
 }

@@ -128,6 +128,9 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
     Element extensionElements = element.element(EXTENSION_ELEMENTS);
     if (extensionElements != null) {
       Element failedJobRetryTimeCycleElement = extensionElements.elementNS(FOX_ENGINE_NS, FAILED_JOB_RETRY_TIME_CYCLE);
+      if (failedJobRetryTimeCycleElement == null) { // try to get it from the activiti namespace
+        failedJobRetryTimeCycleElement = extensionElements.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, FAILED_JOB_RETRY_TIME_CYCLE);
+      }
       if (failedJobRetryTimeCycleElement != null) {
         String failedJobRetryTimeCycleValue = failedJobRetryTimeCycleElement.getText();
         activity.setProperty(FOX_FAILED_JOB_CONFIGURATION, failedJobRetryTimeCycleValue);

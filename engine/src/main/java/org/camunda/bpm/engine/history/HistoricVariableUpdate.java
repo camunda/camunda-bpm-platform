@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,11 +13,9 @@
 
 package org.camunda.bpm.engine.history;
 
-
-
-/** Update of a process variable.  This is only available if history 
+/** Update of a process variable.  This is only available if history
  * level is configured to FULL.
- * 
+ *
  * @author Tom Baeyens
  */
 public interface HistoricVariableUpdate extends HistoricDetail {
@@ -26,4 +24,10 @@ public interface HistoricVariableUpdate extends HistoricDetail {
   String getVariableTypeName();
   Object getValue();
   int getRevision();
+
+  /**
+   * If the variable value could not be loaded, this returns the error message.
+   * @return an error message indicating why the variable value could not be loaded.
+   */
+  String getErrorMessage();
 }

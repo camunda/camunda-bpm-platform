@@ -1,4 +1,6 @@
+/* global ngDefine: false */
 ngDefine('cockpit.filters.shorten', function(module) {
+  'use strict';
 
   var ShortenFilter = function() {
     return function(input, length) {

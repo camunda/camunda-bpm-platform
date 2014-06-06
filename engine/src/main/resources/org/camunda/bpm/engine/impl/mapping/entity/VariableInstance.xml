@@ -5,32 +5,36 @@
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
 
   <!-- VARIABLE INSTANCE INSERT -->
-  
+
   <insert id="insertVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
-    insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
+    insert into ${prefix}ACT_RU_VARIABLE (ID_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, CASE_INST_ID_, CASE_EXECUTION_ID_, TASK_ID_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, VAR_SCOPE_, REV_) 
     values (
       #{id, jdbcType=VARCHAR},
-      1,
       #{type, jdbcType=VARCHAR },
       #{name, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
+      #{caseInstanceId, jdbcType=VARCHAR},
+      #{caseExecutionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
       #{byteArrayValueId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
       #{textValue, jdbcType=VARCHAR},
-      #{textValue2, jdbcType=VARCHAR}
+      #{textValue2, jdbcType=VARCHAR},
+      #{variableScope, jdbcType=VARCHAR},
+      1
     )
   </insert>
-  
+
   <!-- VARIABLE INSTANCE UPDATE -->
-  
+
   <update id="updateVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
     update ${prefix}ACT_RU_VARIABLE
     set 
       REV_ = #{revisionNext, jdbcType=INTEGER},
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      TYPE_ = #{type, jdbcType=VARCHAR },
 	    BYTEARRAY_ID_ = #{byteArrayValueId, jdbcType=VARCHAR},
 	    DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
 	    LONG_ = #{longValue, jdbcType=BIGINT},
@@ -45,7 +49,7 @@
   <delete id="deleteVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
     delete from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision}
   </delete>
-  
+
   <!-- VARIABLE INSTANCE RESULTMAP -->
 
 	<resultMap id="variableInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
@@ -55,6 +59,8 @@
       <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
       <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
       <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+      <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+      <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
       <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
       <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
@@ -79,11 +85,17 @@
 		  and TASK_ID_ is null
   </select>
 
+  <select id="selectVariablesByCaseExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
+    select * from ${prefix}ACT_RU_VARIABLE 
+    where CASE_EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
+      and TASK_ID_ is null
+  </select>
+
   <select id="selectVariablesByTaskId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
     select * from ${prefix}ACT_RU_VARIABLE where
     TASK_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
-  
+
   <select id="selectVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.VariableInstanceQueryImpl" resultMap="variableInstanceResultMap">
     ${limitBefore}
     select RES.* ${limitBetween}
@@ -96,51 +108,67 @@
     select count(distinct RES.ID_)
     <include refid="selectVariableInstanceByQueryCriteriaSql"/>
   </select>
-  
+
   <sql id="actInstIdColumn">
   case
-	  when RES.TASK_ID_ is not null 
-	  then EXECUTION.ACT_INST_ID_ 
-	
-	  when 
-	    EXECUTION.IS_SCOPE_ = ${trueConstant} 
-	    and ((EXECUTION.IS_ACTIVE_ = ${trueConstant}) or (EXECUTION.IS_ACTIVE_ = ${falseConstant} and EXECUTION.ACT_ID_ is null)) 
-	    and EXECUTION.PARENT_ID_ is null 
+	  when
+      RES.TASK_ID_ is not null
+      and RES.EXECUTION_ID_ is not null
+	  then EXECUTION.ACT_INST_ID_
+
+    when
+      RES.CASE_EXECUTION_ID_ is not null
+    then CASE_EXECUTION.ID_
+
+	  when
+	    EXECUTION.IS_SCOPE_ = ${trueConstant}
+	    and ((EXECUTION.IS_ACTIVE_ = ${trueConstant}) or (EXECUTION.IS_ACTIVE_ = ${falseConstant} and EXECUTION.ACT_ID_ is null))
+	    and EXECUTION.PARENT_ID_ is null
 	  then EXECUTION.ID_
-	  
-	  when 
-	    EXECUTION.IS_SCOPE_ = ${trueConstant} 
-	    and ((EXECUTION.IS_ACTIVE_ = ${trueConstant}) or (EXECUTION.IS_ACTIVE_ = ${falseConstant} and EXECUTION.ACT_ID_ is null)) 
+
+	  when
+	    EXECUTION.IS_SCOPE_ = ${trueConstant}
+	    and ((EXECUTION.IS_ACTIVE_ = ${trueConstant}) or (EXECUTION.IS_ACTIVE_ = ${falseConstant} and EXECUTION.ACT_ID_ is null))
 	    and EXECUTION.PARENT_ID_ is not null
 	  then PARENT_EXECUTION.ACT_INST_ID_
-	  
-	  else EXECUTION.ACT_INST_ID_ 
+
+	  else EXECUTION.ACT_INST_ID_
 	end
   </sql>
-  
+
   <sql id="selectVariableInstanceByQueryCriteriaSql">
     from (
           select 
             RES.*, 
             (<include refid="actInstIdColumn"/>) ACT_INST_ID_
-            
-          from ${prefix}ACT_RU_VARIABLE RES 
+
+          from ${prefix}ACT_RU_VARIABLE RES
+
           left join ${prefix}ACT_RU_EXECUTION EXECUTION
           on RES.EXECUTION_ID_ = EXECUTION.ID_
+
           left join ${prefix}ACT_RU_EXECUTION PARENT_EXECUTION
           on EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
-          
+
+          left join ${prefix}ACT_RU_CASE_EXECUTION CASE_EXECUTION
+          on RES.CASE_EXECUTION_ID_ = CASE_EXECUTION.ID_
+
           <where>
+            <!-- variableId -->
+            <if test="variableId != null">
+              RES.ID_ = #{variableId}
+            </if>
+
             <!-- variableName -->
             <if test="variableName != null">
               RES.NAME_ = #{variableName}
             </if>
-            
+
             <!-- variableNameLike -->
             <if test="variableNameLike != null">
               and RES.NAME_ like #{variableNameLike}
             </if>
-            
+
             <!-- executionIds -->
             <if test="executionIds != null &amp;&amp; executionIds.length > 0">
               and RES.EXECUTION_ID_ in
@@ -149,7 +177,7 @@
                 #{item}
               </foreach>
             </if>
-            
+
             <!-- processInstanceIds -->
             <if test="processInstanceIds != null &amp;&amp; processInstanceIds.length > 0">
               and RES.PROC_INST_ID_ in
@@ -158,7 +186,25 @@
                 #{item}
               </foreach>
             </if>
-            
+
+            <!-- caseExecutionIds -->
+            <if test="caseExecutionIds != null &amp;&amp; caseExecutionIds.length > 0">
+              and RES.CASE_EXECUTION_ID_ in
+              <foreach item="item" index="index" collection="caseExecutionIds"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+
+            <!-- caseInstanceIds -->
+            <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.length > 0">
+              and RES.CASE_INST_ID_ in
+              <foreach item="item" index="index" collection="caseInstanceIds"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+
             <!-- taskIds -->
             <if test="taskIds != null &amp;&amp; taskIds.length > 0">
               and RES.TASK_ID_ in
@@ -167,7 +213,7 @@
                 #{item}
               </foreach>
             </if>
-            
+
             <!-- activityInstanceIds -->
             <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
               and <include refid="actInstIdColumn"/> in
@@ -176,7 +222,7 @@
                 #{item}
               </foreach>
             </if>
-            
+
             <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance & Execution, the same query object is used there! -->
             <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
               and RES.NAME_= #{queryVariableValue.name}
@@ -222,14 +268,11 @@
               </choose>
               </if>
             </foreach>
-            
-            <!-- Add this hook to prevent loading of byte arrays -->
-            and RES.TYPE_ != 'bytes'
-            
+
           </where>
     ) RES
   </sql>
-  
+
   <sql id="executionVariableOperator">
     <choose>
       <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
@@ -240,20 +283,20 @@
       <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
    </choose>
   </sql>
-  
+
   <!-- BYTE ARRAY INSERT -->
 
   <insert id="insertByteArray" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
-    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_)
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, REV_)
     values (
       #{id, jdbcType=VARCHAR},
-      1, 
       #{name, jdbcType=VARCHAR}, 
       #{bytes, jdbcType=BLOB}, 
-      #{deploymentId, jdbcType=VARCHAR}
+      #{deploymentId, jdbcType=VARCHAR},
+      1 
     )  
   </insert>
-  
+
   <!-- BYTE ARRAY UPDATE -->
 
   <update id="updateByteArray" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
@@ -264,69 +307,69 @@
     where ID_ = #{id}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
-  
+
   <!-- BYTE ARRAY DELETE -->
 
   <select id="selectBytesOfByteArray" parameterType="string" resultType="hashmap">
     select BYTES_ from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id} and REV_ = #{revision}
   </select>
-  
+
   <delete id="deleteByteArraysForDeployment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
     delete from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{id} and REV_ = #{revision}
   </delete>
-  
+
   <delete id="deleteByteArray" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
     delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id} and REV_ = #{revision}
   </delete>
-  
+
   <delete id="deleteByteArrayNoRevisionCheck" parameterType="string">
     delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id}
   </delete>
 
   <!-- BYTE ARRAY RESULTMAP -->
-  
+
   <resultMap id="byteArrayResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
-    <result property="bytes" column="BYTES_" jdbcType="BLOB"/>  
+    <result property="bytes" column="BYTES_" jdbcType="BLOB"/>
   </resultMap>
 
   <!-- BYTE ARRAY SELECT -->
-  
+
   <select id="selectByteArray" parameterType="string" resultMap="byteArrayResultMap">
    select * from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id}
   </select>
-  
+
 <!-- Postgresql specific configuration -->
   <resultMap id="byteArrayResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
-    <result property="bytes" column="BYTES_" jdbcType="BINARY"/>  
+    <result property="bytes" column="BYTES_" jdbcType="BINARY"/>
   </resultMap>
-  
+
   <select id="selectByteArray_postgres" parameterType="string" resultMap="byteArrayResultMap_postgres">
    select * from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id}
   </select>
 
 	<update id="updateByteArray_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
-    update ${prefix}ACT_GE_BYTEARRAY 
+    update ${prefix}ACT_GE_BYTEARRAY
     set
       REV_ = #{revisionNext, jdbcType=INTEGER},
       BYTES_ = #{bytes, jdbcType=BINARY}
     where ID_ = #{id}
       and REV_ = #{revision, jdbcType=INTEGER}
-  </update>  
-  
+  </update>
+
     <insert id="insertByteArray_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
-    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_)
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, REV_)
     values (
       #{id, jdbcType=VARCHAR},
-      1, 
-      #{name, jdbcType=VARCHAR}, 
-      #{bytes, jdbcType=BINARY}, 
-      #{deploymentId, jdbcType=VARCHAR}
-    )  
+      #{name, jdbcType=VARCHAR},
+      #{bytes, jdbcType=BINARY},
+      #{deploymentId, jdbcType=VARCHAR},
+      1
+    )
   </insert>
 </mapper>

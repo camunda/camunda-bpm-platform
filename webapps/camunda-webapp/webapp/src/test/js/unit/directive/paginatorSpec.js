@@ -1,4 +1,12 @@
-define([ 'angular', 'jquery', 'camunda-common/directives/main', 'camunda-common/extensions/main' ], function(angular, $) {
+/* global define: false, describe: false, xdescribe: false, beforeEach: false, afterEach: false, module: false, inject: false, xit: false, it: false, expect: false */
+/* jshint unused: false */
+define([
+  'angular',
+  'jquery',
+  'camunda-common/directives/main',
+  'camunda-common/extensions/main'
+], function(angular, $) {
+  'use strict';
 
   /**
    * @see http://docs.angularjs.org/guide/dev_guide.unit-testing
@@ -6,7 +14,7 @@ define([ 'angular', 'jquery', 'camunda-common/directives/main', 'camunda-common/
    */
   return describe('directives', function() {
 
-    describe('paginator directive', function() {
+    xdescribe('paginator directive', function() {
       var element;
 
       function createElement(content) {
@@ -15,6 +23,7 @@ define([ 'angular', 'jquery', 'camunda-common/directives/main', 'camunda-common/
 
       afterEach(function() {
         $(document.body).html('');
+        /* global dealoc: false */
         dealoc(element);
       });
 
@@ -36,7 +45,7 @@ define([ 'angular', 'jquery', 'camunda-common/directives/main', 'camunda-common/
         $rootScope.$digest();
 
         var text = element.text();
-        text = text.replace(/\s+/gm, " ");
+        text = text.replace(/\s+/gm, ' ');
 
         expect(text).toEqual(' « 1 2 3 4 5 6 7 8 9 10 » ');
       }));
@@ -52,7 +61,7 @@ define([ 'angular', 'jquery', 'camunda-common/directives/main', 'camunda-common/
         $rootScope.$digest();
 
         var text = element.text();
-        text = text.replace(/\s+/gm, " ");
+        text = text.replace(/\s+/gm, ' ');
 
         expect(text).toEqual(' « 1 2 3 4 … 12 » ');
       }));
@@ -68,11 +77,11 @@ define([ 'angular', 'jquery', 'camunda-common/directives/main', 'camunda-common/
         $rootScope.$digest();
 
         var text = element.text();
-        text = text.replace(/\s+/gm, " ");
+        text = text.replace(/\s+/gm, ' ');
 
         expect(text).toEqual(' « 1 … 10 11 12 » ');
       }));
-      
+
       it('creates compact pagination > 10 elements (3)', inject(function($rootScope, $compile) {
 
           $rootScope.totalPages = 12;
@@ -84,11 +93,11 @@ define([ 'angular', 'jquery', 'camunda-common/directives/main', 'camunda-common/
           $rootScope.$digest();
 
           var text = element.text();
-          text = text.replace(/\s+/gm, " ");
+          text = text.replace(/\s+/gm, ' ');
 
           expect(text).toEqual(' « 1 … 5 6 7 … 12 » ');
       }));
-      
+
     });
   });
 });

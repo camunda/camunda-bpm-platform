@@ -12,12 +12,14 @@
  */
 package org.camunda.bpm.engine.cdi.impl.event;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
 import org.camunda.bpm.engine.cdi.BusinessProcessEventType;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+
+import java.util.Date;
 
 /**
  * 
@@ -30,6 +32,7 @@ public class CdiBusinessProcessEvent implements BusinessProcessEvent {
   protected final String transitionName;
   protected final String processInstanceId;
   protected final String executionId;
+  protected final DelegateTask delegateTask;
   protected final BusinessProcessEventType type;
   protected final Date timeStamp;
 
@@ -46,8 +49,20 @@ public class CdiBusinessProcessEvent implements BusinessProcessEvent {
       this.type = type;
       this.timeStamp = timeStamp;
       this.processDefinition = processDefinition;
+      this.delegateTask = null;
   }
-  
+
+  public CdiBusinessProcessEvent(DelegateTask task, ProcessDefinitionEntity processDefinition, BusinessProcessEventType type, Date timeStamp) {
+    this.activityId = null;
+    this.transitionName = null;
+    this.processInstanceId = task.getProcessInstanceId();
+    this.executionId = task.getExecutionId();
+    this.type = type;
+    this.timeStamp = timeStamp;
+    this.processDefinition = processDefinition;
+    this.delegateTask = task;
+  }
+
   @Override
   public ProcessDefinition getProcessDefinition() {
     return processDefinition;
@@ -81,6 +96,18 @@ public class CdiBusinessProcessEvent implements BusinessProcessEvent {
   @Override
   public Date getTimeStamp() {
     return timeStamp;
+  }
+
+  public DelegateTask getTask() {
+    return delegateTask;
+  }
+
+  public String getTaskId() {
+    return delegateTask.getId();
+  }
+
+  public String getTaskDefinitionKey() {
+    return delegateTask.getTaskDefinitionKey();
   }
 
   @Override

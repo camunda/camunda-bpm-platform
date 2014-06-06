@@ -1,18 +1,33 @@
-ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
+/* global ngDefine: false */
+ngDefine('cockpit.directives', [
+  'cockpit/util/routeUtil'
+  ], function(module) {
   'use strict';
 
-  module.directive('viewPills', [ '$location', 'Views', function($location, Views) {
-    
-    var ViewPillsController = [ '$scope', 'Views', '$location', function($scope, Views, $location) {
+  var routeUtil = require('cockpit/util/routeUtil');
+
+  module.directive('viewPills', [
+  function() {
+    var ViewPillsController = [
+      '$scope',
+      'Views',
+      '$location',
+    function($scope, Views, $location) {
       var providers = Views.getProviders({ component: $scope.id });
       $scope.providers = providers;
 
-      $scope.isActive = function(provider) {
+      var isActive = $scope.isActive = function(provider) {
         return $location.path().indexOf('/' + provider.id) != -1;
       };
 
       $scope.getUrl = function(provider) {
-        return '#' + $location.path().replace(/[^\/]*$/, provider.id);
+        var replacement = provider.id,
+            currentPath = $location.path(),
+            currentSearch = $location.search(),
+            keepSearchParams = !isActive(provider) ? provider.keepSearchParams : true;
+
+        return '#' + routeUtil.replaceLastPathFragment(replacement, currentPath, currentSearch, keepSearchParams);
+
       };
     }];
 
@@ -21,10 +36,12 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
       scope: {
         id: '@'
       },
-      template: 
-'<ul class="nav nav-pills">' +
-'  <li ng-repeat="provider in providers" ng-class="{ active: isActive(provider) }"><a ng-href="{{ getUrl(provider) }}">{{ provider.label }}</a></li>' +
-'</ul>',
+      template:
+        '<ul class="nav nav-pills">' +
+        '  <li ng-repeat="provider in providers" ng-class="{ active: isActive(provider) }" class="{{ provider.id }}">' +
+        '    <a ng-href="{{ getUrl(provider) }}">{{ provider.label }}</a>' +
+        '  </li>' +
+        '</ul>',
       replace: true,
       controller: ViewPillsController
     };

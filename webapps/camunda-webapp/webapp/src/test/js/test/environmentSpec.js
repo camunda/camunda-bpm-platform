@@ -1,6 +1,6 @@
+/* global karma: false, describe: false, it: false, expect: false, require: false */
 describe('The testing environment', function() {
   'use strict';
-  /* global karma: true */
 
   it('inititalizes', function() {
     expect(window.__karma__).toBeDefined();
@@ -8,10 +8,6 @@ describe('The testing environment', function() {
   });
 
   describe('The basic setup', function() {
-    xit('uses a configuration module', function() {
-      expect(require.defined('require-conf')).toBe(true);
-    });
-
     it('contains jQuery', function() {
       expect(require.defined('jquery')).toBe(true);
     });

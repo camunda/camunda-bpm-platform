@@ -13,12 +13,16 @@
 
 package org.camunda.bpm.engine.test.api.repository;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
@@ -26,6 +30,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
+ * @author Roman Smirnov
  */
 public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
@@ -109,6 +114,16 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("deploymentId is null", ae.getMessage());
+    }
+  }
+
+  public void testFindDeploymentResourcesNullDeploymentId() {
+    try {
+      repositoryService.getDeploymentResources(null);
+      fail("ProcessEngineException expected");
+    }
+    catch (ProcessEngineException e) {
+      assertTextPresent("deploymentId is null", e.getMessage());
     }
   }
 
@@ -244,6 +259,68 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("resourceName is null", ae.getMessage());
+    }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/repository/one.cmmn" })
+  public void testGetCaseDefinition() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    CaseDefinition caseDefinition = query.singleResult();
+    String caseDefinitionId = caseDefinition.getId();
+
+    CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinitionId);
+
+    assertNotNull(definition);
+    assertEquals(caseDefinitionId, definition.getId());
+  }
+
+  public void testGetCaseDefinitionByInvalidId() {
+    try {
+      repositoryService.getCaseDefinition("invalid");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("no deployed case definition found with id 'invalid'", e.getMessage());
+    }
+
+    try {
+      repositoryService.getCaseDefinition(null);
+      fail();
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Invalid case definition id: null", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/repository/one.cmmn" })
+  public void testGetCaseModel() throws Exception {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    CaseDefinition caseDefinition = query.singleResult();
+    String caseDefinitionId = caseDefinition.getId();
+
+    InputStream caseModel = repositoryService.getCaseModel(caseDefinitionId);
+
+    assertNotNull(caseModel);
+
+    byte[] readInputStream = IoUtil.readInputStream(caseModel, "caseModel");
+    String model = new String(readInputStream, "UTF-8");
+
+    assertTrue(model.contains("<case id=\"one\" name=\"One\">"));
+
+    IoUtil.closeSilently(caseModel);
+  }
+
+  public void testGetCaseModelByInvalidId() throws Exception {
+    try {
+      repositoryService.getCaseModel("invalid");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("no deployed case definition found with id 'invalid'", e.getMessage());
+    }
+
+    try {
+      repositoryService.getCaseModel(null);
+      fail();
+    } catch (ProcessEngineException e) {
+      assertTextPresent("The case definition id is mandatory, but 'null' has been provided.", e.getMessage());
     }
   }
 

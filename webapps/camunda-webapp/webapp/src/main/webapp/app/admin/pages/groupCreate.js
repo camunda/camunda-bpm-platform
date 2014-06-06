@@ -15,7 +15,7 @@ define(['angular'], function(angular) {
 
     $scope.createGroup = function() {
       var group = $scope.group;
-      GroupResource.createGroup(group).$then(
+      GroupResource.createGroup(group).$promise.then(
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Successfully created new group "+group.id});
           $location.path("/groups");
@@ -30,7 +30,7 @@ define(['angular'], function(angular) {
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/group-create', {
-      templateUrl: 'pages/groupCreate.html',
+      templateUrl: require.toUrl('./app/admin/pages/groupCreate.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,

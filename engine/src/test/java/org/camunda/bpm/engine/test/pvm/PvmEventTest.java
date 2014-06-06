@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.pvm.activities.EmbeddedSubProcess;
@@ -354,8 +354,8 @@ public class PvmEventTest extends PvmTestCase {
 
     ExecutionImpl execution = (ExecutionImpl) processInstance;
     FoxDeleteProcessInstanceCmd cmd = new FoxDeleteProcessInstanceCmd(null, null);
-    List<InterpretableExecution> collectExecutionToDelete = cmd.collectExecutionToDelete(execution);
-    for (InterpretableExecution interpretableExecution : collectExecutionToDelete) {
+    List<PvmExecutionImpl> collectExecutionToDelete = cmd.collectExecutionToDelete(execution);
+    for (PvmExecutionImpl interpretableExecution : collectExecutionToDelete) {
       interpretableExecution.deleteCascade2("");
     }
 

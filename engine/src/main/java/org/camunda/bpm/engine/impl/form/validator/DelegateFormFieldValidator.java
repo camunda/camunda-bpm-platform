@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
@@ -56,7 +56,7 @@ public class DelegateFormFieldValidator implements FormFieldValidator {
         public Boolean call() throws Exception {
           return doValidate(submittedValue, validatorContext);
         }
-      }, ProcessApplicationContextUtil.getTargetProcessApplication((InterpretableExecution) execution));
+      }, ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution));
 
     } else {
       return doValidate(submittedValue, validatorContext);
@@ -69,7 +69,7 @@ public class DelegateFormFieldValidator implements FormFieldValidator {
     if(execution == null) {
       return false;
     } else {
-      ProcessApplicationReference targetPa = ProcessApplicationContextUtil.getTargetProcessApplication((InterpretableExecution) execution);
+      ProcessApplicationReference targetPa = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
       return targetPa != null && !targetPa.equals(Context.getCurrentProcessApplication());
     }
   }

@@ -12,13 +12,17 @@
  */
 package org.camunda.bpm.cockpit.plugin.test;
 
+import java.util.List;
+
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.cockpit.db.QueryService;
-import org.camunda.bpm.cockpit.impl.DefaultRuntimeDelegate;
+import org.camunda.bpm.cockpit.impl.DefaultCockpitRuntimeDelegate;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.util.LogUtil;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -77,7 +81,24 @@ public abstract class AbstractCockpitPluginTest {
     return Cockpit.getQueryService("default");
   }
 
-  private static class TestCockpitRuntimeDelegate extends DefaultRuntimeDelegate {
+  public void executeAvailableJobs() {
+    ManagementService managementService = getProcessEngine().getManagementService();
+    List<Job> jobs = managementService.createJobQuery().withRetriesLeft().list();
+
+    if (jobs.isEmpty()) {
+      return;
+    }
+
+    for (Job job : jobs) {
+      try {
+        managementService.executeJob(job.getId());
+      } catch (Exception e) {};
+    }
+
+    executeAvailableJobs();
+  }
+
+  private static class TestCockpitRuntimeDelegate extends DefaultCockpitRuntimeDelegate {
 
     public ProcessEngine ENGINE;
 

@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Intercepts {@link OptimisticLockingException} and tries to run the
@@ -50,7 +50,9 @@ public class RetryInterceptor extends CommandInterceptor {
         return next.execute(command);
 
       } catch (OptimisticLockingException e) {
-        log.log(Level.INFO, "Caught optimistic locking exception: "+e);
+        if (log.isLoggable(Level.FINE)) {
+          log.log(Level.FINE, "Caught optimistic locking exception: " + e);
+        }
       }
             
       failedAttempts ++;      

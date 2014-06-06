@@ -1,6 +1,62 @@
+/* global ngDefine: false, angular: false, require: false */
 ngDefine('cockpit.plugin.base.views', function(module) {
+  'use strict';
+  /**
+   * @name userTaskTable
+   * @memberof cam.cockpit.plugin.base.views
+   * @description ---
+   * @example
+      TODO
+   */
 
-  function UserTaskController ($scope, search, TaskResource, Notifications) {
+  /**
+   * Map an array with a callback - similar to {@link http://underscorejs.org/#map|_.map()}
+   *
+   * @param {array} array   - the array on which iteration has to be performed
+   * @param {function} cb   - the function returning the new value for each array value
+   * @returns {array}       - a new array with the values produced
+   */
+  function map(array, cb) {
+    var newArray = [];
+    angular.forEach(array, function(val, key) {
+      newArray[key] = cb(val, key);
+    });
+    return newArray;
+  }
+
+  /**
+   * Removes "empty" values of an array - {@link http://underscorejs.org/#compact|_.compact()}
+   *
+   * @param {array} array   - the original array
+   * @returns {array}       - a new array with the values produced
+   */
+  function compact(array) {
+    var newArray = [];
+    angular.forEach(array, function(val) {
+      if (!!val) {
+        newArray.push(val);
+      }
+    });
+    return newArray;
+  }
+
+  /**
+   * Ensure a function
+   *
+   * @param {?function} func - the original function
+   * @returns {function}     - a function
+   */
+  function ensureCallback(func) {
+    return angular.isFunction(func) ? func : angular.noop;
+  }
+
+
+
+
+
+  module.controller('UserTaskController', [
+          '$scope', 'search', 'TaskResource', 'Notifications', '$modal',
+  function($scope,   search,   TaskResource,   Notifications,   $modal) {
 
     // input: processInstance, processData
 
@@ -61,95 +117,189 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       taskIdIdToExceptionMessageMap = {};
       taskCopies = {};
 
-      TaskResource.count(params).$then(function (response) {
-        pages.total = Math.ceil(response.data.count / pages.size);
+      TaskResource.count(params).$promise.then(function (response) {
+        // pages.total = Math.ceil(response.data.count / pages.size);
+        // pages.total = Math.ceil(response.count / pages.size);
+        pages.total = response.count;
       });
 
-      TaskResource.query(pagingParams, params).$then(function (response) {
-        for (var i = 0, task; !!(task = response.resource[i]); i++) {
+      TaskResource.query(pagingParams, params).$promise.then(function (response) {
+        // for (var i = 0, task; !!(task = response.resource[i]); i++) {
+        for (var i = 0, task; !!(task = response[i]); i++) {
           task.instance = executionIdToInstanceMap[task.executionId];
           taskCopies[task.id] = angular.copy(task);
         }
 
-        $scope.userTasks = response.resource;
+        // $scope.userTasks = response.resource;
+        $scope.userTasks = response;
       });
 
     }
 
     $scope.getHref = function (userTask) {
-      return '#/process-instance/' + processInstance.id + '?activityInstanceIds=' + userTask.instance.id;
+      return '#/process-instance/' + processInstance.id + '?detailsTab=user-tasks-tab&activityInstanceIds=' + userTask.instance.id;
     };
 
-    $scope.editAssignee = function (userTask) {
-      userTask.inEditMode = true;
-    };
+    $scope.submitAssigneeChange = function(editForm, cb) {
+      cb = ensureCallback(cb);
 
-    $scope.closeInPlaceEditing = function (userTask) {
-      delete userTask.inEditMode;
-
-      // clear the exception for the passed user task
-      taskIdIdToExceptionMessageMap[userTask.id] = null;
-
-      // reset the values of the copy
+      var userTask = editForm.context;
       var copy = taskCopies[userTask.id];
-      angular.extend(copy, userTask);
+      var defaultParams = {id: userTask.id};
+      var params = {userId : editForm.value};
 
-    };
-
-    $scope.getCopy = function (userTaskId) {
-      return taskCopies[userTaskId];
-    };
-
-    var isValid = $scope.isValid = function (editAssigneeFrom) {
-      if (editAssigneeFrom.$invalid) {
-        return false;
-      }
-
-      return true;
-    };
-
-    $scope.submit = function (editAssigneeFrom, userTask) {
-      if (!isValid(editAssigneeFrom)) {
-        return;
-      }
-
-      var copy = taskCopies[userTask.id],
-          defaultParams = {id: userTask.id},
-          params = {userId : copy.assignee};
-
-      // If the value did not change then there is nothing to do!
-      if (userTask.assignee === copy.assignee) {
-        $scope.closeInPlaceEditing(userTask);
-        return;
-      }
-
-      TaskResource.setAssignee(defaultParams, params).$then(
-
+      TaskResource.setAssignee(defaultParams, params).$promise.then(
         // success
         function (response) {
-          Notifications.addMessage({ status: 'Assignee', message: 'The assignee of the user task \'' + userTask.instance.name + '\' has been set to \'' + copy.assignee + '\' successfully.', duration: 5000 });
-          angular.extend(userTask, copy);
-          $scope.closeInPlaceEditing(userTask);
+          // copy.assignee = userTask.assignee = response.resource.userId;
+          copy.assignee = userTask.assignee = response.userId;
+
+          Notifications.addMessage({
+            status: 'Assignee',
+            message: 'The assignee of the user task \'' +
+                     userTask.instance.name +
+                     '\' has been set to \'' +
+                     copy.assignee + '\' successfully.',
+            duration: 5000
+          });
+
+          cb();
         },
 
         // error
         function (error) {
-          Notifications.addError({ status: 'Assignee', message: 'The assignee of the user task \'' + userTask.instance.name + '\' could not be set to \'' + copy.assignee + '\' successfully.', exclusive: true, duration: 5000 });
+          var err = {
+            status: 'Assignee',
+            message: 'The assignee of the user task \'' +
+                     userTask.instance.name +
+                     '\' could not be set to \'' + copy.assignee +
+                     '\' successfully.',
+            exclusive: true,
+            duration: 5000
+          };
+
+          Notifications.addError(err);
           taskIdIdToExceptionMessageMap[userTask.id] = error.data;
+          cb(err);
         }
       );
     };
 
+
+    $scope.openDialog = function(userTask, groups) {
+      $modal.open({
+        resolve: {
+          userTask: function() { return userTask; },
+          groups: function() { return groups; }
+        },
+        controller: 'UserTaskGroupController',
+        templateUrl: require.toUrl('./plugin/base/app/views/processInstance/identity-links-modal.html')
+      });
+    };
+
+    $scope.changeGroups = function() {
+      var userTask = this.userTask;
+
+      // 1. load the identityLinks
+      TaskResource.getIdentityLinks({id: userTask.id}, {}).$promise.then(function(response) {
+        // 2. filter the response.data to exclude links who have no groupId or have type 'assignee' or 'owner'
+        // var groups = compact(map(response.data, function(item) {
+        var groups = compact(map(response, function(item) {
+          var ok = item.groupId && item.type !== 'assignee' && item.type !== 'owner';
+          return ok ? item : null;
+        }));
+
+        // 3. open a dialog
+        $scope.openDialog(userTask, groups);
+      });
+    };
+
+
     $scope.getExceptionForUserTask = function (userTask) {
       return taskIdIdToExceptionMessageMap[userTask.id];
     };
-  }
+  }]);
 
-  module.controller('UserTaskController', [ '$scope', 'search', 'TaskResource', 'Notifications', UserTaskController ]);
+  module.controller('UserTaskGroupController', [
+          '$modalInstance', 'TaskResource', '$scope', 'Notifications', 'userTask', 'groups',
+  function($modalInstance,   TaskResource,   $scope,   Notifications,   userTask,   groups) {
+    $scope.groups = groups;
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+    $scope.title = 'Manage groups';
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.live.tab', {
+    $scope.labelKey = 'groupId';
+
+    $scope.buttons = [
+      {
+        cssClass: 'btn',
+        label: 'Close'
+      }
+    ];
+
+    $scope.removeItem = function() {
+      var delta = this.delta;
+      TaskResource.deleteIdentityLink({
+        id: userTask.id
+      }, angular.toJson(this.group)).$promise.then(function() {
+        // deleting an entry is not enough, we need to "rebuild" the groups array
+        // delete $scope.groups[delta];
+        $scope.groups = compact(map($scope.groups, function(g, d) {
+          return delta !== d ? g : false;
+        }));
+      }, function(error) {
+        Notifications.addError({
+          status: 'Assignee',
+          message: error.message,
+          exclusive: true,
+          duration: 5000
+        });
+      });
+    };
+
+    $scope.invalid = function() {
+      var editForm = this.editForm;
+      if (editForm.$invalid) {
+        return true;
+      }
+
+      var exists;
+      var newItem = editForm.newItem.$modelValue;
+      angular.forEach($scope.groups, function(group) {
+        exists = (exists || (group.groupId === newItem));
+      });
+
+      return exists;
+    };
+
+    $scope.addItem = function() {
+      var editForm = this;
+
+
+      var newGroup = {
+        type: 'candidate',
+        groupId: editForm.newItem
+      };
+
+      TaskResource.addIdentityLink({
+        id: userTask.id
+      }, newGroup).$promise.then(function() {
+        $scope.groups.push(newGroup);
+        editForm.newItem = '';
+      }, function(error) {
+        Notifications.addError({
+          status: 'Assignee',
+          message: error.message,
+          exclusive: true,
+          duration: 5000
+        });
+      });
+    };
+
+    $scope.close = $modalInstance.close;
+  }]);
+
+  var Configuration = function(ViewsProvider) {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
       id: 'user-tasks-tab',
       label: 'User Tasks',
       url: 'plugin://base/static/app/views/processInstance/user-tasks-table.html',

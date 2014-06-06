@@ -12,138 +12,20 @@
  */
 package org.camunda.bpm.cockpit.plugin.resource;
 
-import java.io.InputStream;
-
-import javax.servlet.ServletContext;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
-import org.camunda.bpm.cockpit.Cockpit;
-import org.camunda.bpm.cockpit.plugin.PluginRegistry;
-import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-
 /**
- * A resource class that provides a plugins restful API.
  *
- * <p>
+ * Deprecated: use {@link AbstractCockpitPluginRootResource}
  *
- * Subclasses of this class may provide subresources using annotated getters
- * in order to be multi-engine aware.
- *
- * <p>
- *
- * Subresources must properly initialize the subresources via
- * {@link AbstractPluginRootResource#subResource(AbstractPluginResource, String) }.
- *
- * <pre>
- * @Path("myplugin")
- * public class MyPluginRootResource extends AbstractPluginRootResource {
- *
- *   @Path("{engine}/my-resource")
- *   public FooResource getFooResource(@PathParam("engine") String engine) {
- *     return subResource(new FooResource(engine), engine);
- *   }
- * }
- * </pre>
+ * @see AbstractCockpitPluginRootResource
  *
  * @author nico.rehwaldt
+ *
  */
-public class AbstractPluginRootResource {
-
-  @Context
-  private ServletContext servletContext;
-
-  private final String pluginName;
+@Deprecated
+public class AbstractPluginRootResource extends AbstractCockpitPluginRootResource {
 
   public AbstractPluginRootResource(String pluginName) {
-    this.pluginName = pluginName;
+    super(pluginName);
   }
 
-  /**
-   *
-   * @param <T>
-   * @param subResource
-   * @param engineName
-   * @return
-   */
-  protected <T extends AbstractPluginResource> T subResource(T subResource, String engineName) {
-    return subResource;
-  }
-
-  /**
-   * Provides a plugins asset files via <code>$PLUGIN_ROOT_PATH/static</code>.
-   *
-   * @param file
-   * @return
-   */
-  @GET
-  @Path("/static/{file:.*}")
-  public Response getAsset(@PathParam("file") String file) {
-
-    CockpitPlugin plugin = getPluginRegistry().getPlugin(pluginName);
-
-    if (plugin != null) {
-      InputStream assetStream = getPluginAssetAsStream(plugin, file);
-      if (assetStream != null) {
-        String contentType = getContentType(file);
-        return Response.ok(assetStream, contentType).build();
-      }
-    }
-
-    // no asset found
-    throw new WebApplicationException(Status.NOT_FOUND);
-  }
-
-  protected String getContentType(String file) {
-    if (file.endsWith(".js")) {
-      return "text/javascript";
-    } else
-    if (file.endsWith(".html")) {
-      return "text/html";
-    } else {
-      return "text/plain";
-    }
-  }
-
-  /**
-   * Returns an input stream for a given resource
-   *
-   * @param resourceName
-   * @return
-   */
-  private InputStream getPluginAssetAsStream(CockpitPlugin plugin, String fileName) {
-
-    String assetDirectory = plugin.getAssetDirectory();
-
-    if (assetDirectory == null) {
-      return null;
-    }
-
-    InputStream result = getWebResourceAsStream(assetDirectory, fileName);
-
-    if (result == null) {
-      result = getClasspathResourceAsStream(plugin, assetDirectory, fileName);
-    }
-    return result;
-  }
-
-  private InputStream getWebResourceAsStream(String assetDirectory, String fileName) {
-    String resourceName = String.format("/%s/%s", assetDirectory, fileName);
-
-    return servletContext.getResourceAsStream(resourceName);
-  }
-
-  private InputStream getClasspathResourceAsStream(CockpitPlugin plugin, String assetDirectory, String fileName) {
-    String resourceName = String.format("%s/%s", assetDirectory, fileName);
-    return plugin.getClass().getClassLoader().getResourceAsStream(resourceName);
-  }
-
-  private PluginRegistry getPluginRegistry() {
-    return Cockpit.getRuntimeDelegate().getPluginRegistry();
-  }
 }

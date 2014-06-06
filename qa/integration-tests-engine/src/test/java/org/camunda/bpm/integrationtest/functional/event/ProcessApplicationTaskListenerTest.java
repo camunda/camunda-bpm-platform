@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.integrationtest.functional.event;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -30,6 +27,9 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Daniel Meyer
@@ -72,7 +72,7 @@ public class ProcessApplicationTaskListenerTest extends AbstractFoxPlatformInteg
     Assert.assertFalse(assignmentEventFired);
     Assert.assertFalse(completeEventFired);
 
-    Task task = taskService.createTaskQuery().singleResult();
+    Task task = taskService.createTaskQuery().processDefinitionKey("testProcess").singleResult();
     taskService.claim(task.getId(), "jonny");
 
     createEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_CREATE);

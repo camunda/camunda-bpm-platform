@@ -4,7 +4,7 @@ define(['angular'], function(angular) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', '$routeParams', 'GroupResource', 'AuthorizationResource', 'Notifications', '$location', '$window', 
+  var Controller = ['$scope', '$routeParams', 'GroupResource', 'AuthorizationResource', 'Notifications', '$location', '$window',
     function ($scope, $routeParams, GroupResource, AuthorizationResource, Notifications, $location, $window) {
 
     $scope.group = null;
@@ -17,7 +17,7 @@ define(['angular'], function(angular) {
 
     /** form must be valid & user must have made some changes */
     var canSubmit = $scope.canSubmit = function(form, modelObject) {
-      return form.$valid 
+      return form.$valid
         && !form.$pristine
         && (modelObject == null || !angular.equals($scope[modelObject], $scope[modelObject+'Copy']));
     };
@@ -25,22 +25,26 @@ define(['angular'], function(angular) {
     // update group form /////////////////////////////
 
     var loadGroup = $scope.loadGroup = function() {
-      GroupResource.get({groupId : $routeParams.groupId}).$then(function(response) {
-        $scope.group = response.data;
-        $scope.groupName = (!!response.data.name ? response.data.name : response.data.id);
-        $scope.groupCopy = angular.copy(response.data);
+      GroupResource.get({groupId : $routeParams.groupId}).$promise.then(function(response) {
+        // $scope.group = response.data;
+        // $scope.groupName = (!!response.data.name ? response.data.name : response.data.id);
+        // $scope.groupCopy = angular.copy(response.data);
+        $scope.group = response;
+        $scope.groupName = (!!response.name ? response.name : response.id);
+        $scope.groupCopy = angular.copy(response);
       });
     }
 
-    GroupResource.OPTIONS({groupId : $routeParams.groupId}).$then(function(response) {
-      angular.forEach(response.data.links, function(link){
+    GroupResource.OPTIONS({groupId : $routeParams.groupId}).$promise.then(function(response) {
+      // angular.forEach(response.data.links, function(link){
+      angular.forEach(response.links, function(link){
         $scope.availableOperations[link.rel] = true;
-      });    
+      });
     });
 
-    $scope.updateGroup = function() {      
+    $scope.updateGroup = function() {
 
-      GroupResource.update($scope.group).$then(
+      GroupResource.update($scope.group).$promise.then(
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Group successfully updated."});
           loadGroup();
@@ -63,7 +67,7 @@ define(['angular'], function(angular) {
         return;
       }
 
-      GroupResource.delete({'groupId':$scope.group.id}).$then(
+      GroupResource.delete({'groupId':$scope.group.id}).$promise.then(
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Group "+$scope.group.id+" successfully deleted."});
           $location.path("/groups");
@@ -72,18 +76,18 @@ define(['angular'], function(angular) {
     }
 
     // page controls ////////////////////////////////////
-    
+
     $scope.show = function(fragment) {
       return fragment == $location.search().tab;
     };
 
     $scope.activeClass = function(link) {
-      var path = $location.absUrl();      
+      var path = $location.absUrl();
       return path.indexOf(link) != -1 ? "active" : "";
     };
 
     // initialization ///////////////////////////////////
-    
+
     loadGroup();
 
     if(!$location.search().tab) {
@@ -95,7 +99,7 @@ define(['angular'], function(angular) {
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/groups/:groupId', {
-      templateUrl: 'pages/groupEdit.html',
+      templateUrl: require.toUrl('./app/admin/pages/groupEdit.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,

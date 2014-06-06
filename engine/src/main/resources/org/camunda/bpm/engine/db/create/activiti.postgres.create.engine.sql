@@ -14,6 +14,9 @@ values ('schema.history', 'create(fox)', 1);
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
 
+insert into ACT_GE_PROPERTY
+values ('deployment.lock', '0', 1);
+
 create table ACT_GE_BYTEARRAY (
     ID_ varchar(64),
     REV_ integer,
@@ -139,13 +142,16 @@ create table ACT_RU_VARIABLE (
     TYPE_ varchar(255) not null,
     NAME_ varchar(255) not null,
     EXECUTION_ID_ varchar(64),
-	  PROC_INST_ID_ varchar(64),
+    PROC_INST_ID_ varchar(64),
+    CASE_EXECUTION_ID_ varchar(64),
+    CASE_INST_ID_ varchar(64),
     TASK_ID_ varchar(64),
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double precision,
     LONG_ bigint,
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
+    VAR_SCOPE_ varchar(64),
     primary key (ID_)
 );
 
@@ -164,6 +170,7 @@ create table ACT_RU_EVENT_SUBSCR (
 
 create table ACT_RU_INCIDENT (
   ID_ varchar(64) not null,
+  REV_ integer not null,
   INCIDENT_TIMESTAMP_ timestamp not null,
   INCIDENT_MSG_ varchar(4000),
   INCIDENT_TYPE_ varchar(255) not null,
@@ -324,4 +331,7 @@ alter table ACT_RU_AUTHORIZATION
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_GROUP
     unique (TYPE_,GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
-    
+
+alter table ACT_RU_VARIABLE
+    add constraint ACT_UNIQ_VARIABLE
+    unique (VAR_SCOPE_, NAME_);

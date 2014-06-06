@@ -13,10 +13,6 @@
 
 package org.camunda.bpm.engine.test.bpmn.deployment;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -32,7 +28,12 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 
 /**
@@ -50,7 +51,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     assertEquals(1, deploymentResources.size());
     String bpmnResourceName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
     assertEquals(bpmnResourceName, deploymentResources.get(0));
-    
+
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     assertEquals(bpmnResourceName, processDefinition.getResourceName());
     assertNull(processDefinition.getDiagramResourceName());
@@ -199,7 +200,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     assertEquals("org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testMultipleDiagramResourcesProvided.b.jpg", processB.getDiagramResourceName());
     assertEquals("org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testMultipleDiagramResourcesProvided.c.jpg", processC.getDiagramResourceName());
   }
-  
+
   @Deployment
   public void testProcessDefinitionDescription() {
     String id = repositoryService.createProcessDefinitionQuery().singleResult().getId();
@@ -247,6 +248,17 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     
     // clean db
     engine.getRepositoryService().deleteDeployment(deploymentId);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml"})
+  public void testDeploymentIdOfResource() {
+    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
+
+    List<Resource> resources = repositoryService.getDeploymentResources(deploymentId);
+    assertEquals(1, resources.size());
+
+    Resource resource = resources.get(0);
+    assertEquals(deploymentId, resource.getDeploymentId());
   }
   
 }

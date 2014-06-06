@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,8 +24,8 @@ import java.util.logging.Level;
 
 import junit.framework.AssertionFailedError;
 
-import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -60,13 +60,13 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 //    LogFactory.useJdkLogging();
     // with an upgrade of mybatis, this might have to become org.mybatis.generator.logging.LogFactory.forceJavaLogging();
   }
-  
+
   private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
     "ACT_GE_PROPERTY"
   );
 
-  protected ProcessEngine processEngine; 
-  
+  protected ProcessEngine processEngine;
+
   protected ThreadLogMode threadRenderingMode = DEFAULT_THREAD_LOG_MODE;
   protected String deploymentId;
   protected Throwable exception;
@@ -80,26 +80,27 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   protected IdentityService identityService;
   protected ManagementService managementService;
   protected AuthorizationService authorizationService;
-  
+  protected CaseService caseService;
+
   protected abstract void initializeProcessEngine();
-  
+
   // Default: do nothing
   protected void closeDownProcessEngine() {
   }
-  
+
   @Override
   public void runBare() throws Throwable {
     initializeProcessEngine();
     if (repositoryService==null) {
       initializeServices();
     }
-    
+
     log.severe(EMPTY_LINE);
 
     try {
-      
+
       deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
-      
+
       super.runBare();
 
     }  catch (AssertionFailedError e) {
@@ -107,31 +108,31 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       log.log(Level.SEVERE, "ASSERTION FAILED: "+e, e);
       exception = e;
       throw e;
-      
+
     } catch (Throwable e) {
       log.severe(EMPTY_LINE);
       log.log(Level.SEVERE, "EXCEPTION: "+e, e);
       exception = e;
       throw e;
-      
+
     } finally {
       TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
       identityService.setAuthenticatedUserId(null);
       assertAndEnsureCleanDb();
       ClockUtil.reset();
-      
+
       // Can't do this in the teardown, as the teardown will be called as part of the super.runBare
       closeDownProcessEngine();
     }
   }
 
   /** Each test is assumed to clean up all DB content it entered.
-   * After a test method executed, this method scans all tables to see if the DB is completely clean. 
+   * After a test method executed, this method scans all tables to see if the DB is completely clean.
    * It throws AssertionFailed in case the DB is not clean.
    * If the DB is not clean, it is cleaned by performing a create a drop. */
   protected void assertAndEnsureCleanDb() throws Throwable {
     log.fine("verifying that db is clean after test");
-    
+
     Map<String, Long> tableCounts = managementService.getTableCount();
     StringBuilder outputMessage = new StringBuilder();
     for (String tableName : tableCounts.keySet()) {
@@ -147,9 +148,9 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       outputMessage.insert(0, "DB NOT CLEAN: \n");
       log.severe(EMPTY_LINE);
       log.severe(outputMessage.toString());
-      
+
       log.info("dropping and recreating db");
-      
+
       CommandExecutor commandExecutor = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration().getCommandExecutorTxRequired();
       commandExecutor.execute(new Command<Object>() {
         public Object execute(CommandContext commandContext) {
@@ -181,17 +182,18 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     identityService = processEngine.getIdentityService();
     managementService = processEngine.getManagementService();
     authorizationService = processEngine.getAuthorizationService();
+    caseService = processEngine.getCaseService();
   }
-  
+
   public void assertProcessEnded(final String processInstanceId) {
     ProcessInstance processInstance = processEngine
       .getRuntimeService()
       .createProcessInstanceQuery()
       .processInstanceId(processInstanceId)
       .singleResult();
-    
+
     if (processInstance!=null) {
-      throw new AssertionFailedError("Expected finished process instance '"+processInstanceId+"' but it was still in the db"); 
+      throw new AssertionFailedError("Expected finished process instance '"+processInstanceId+"' but it was still in the db");
     }
   }
 
@@ -199,7 +201,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
     waitForJobExecutorToProcessAllJobs(maxMillisToWait);
   }
-  
+
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
@@ -209,7 +211,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     if(maxMillisToWait < jobExecutorWaitTime) {
       maxMillisToWait = jobExecutorWaitTime;
     }
-    
+
     try {
       Timer timer = new Timer();
       InteruptTask task = new InteruptTask(Thread.currentThread());
@@ -242,12 +244,12 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   public void waitForJobExecutorOnCondition(long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
     waitForJobExecutorOnCondition(maxMillisToWait, condition);
   }
-  
+
   public void waitForJobExecutorOnCondition(long maxMillisToWait, Callable<Boolean> condition) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
     long intervalMillis = 500;
-    
+
     if(maxMillisToWait < (jobExecutor.getWaitTimeInMillis()*2)) {
       maxMillisToWait = (jobExecutor.getWaitTimeInMillis()*2);
     }
@@ -277,16 +279,32 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
   }
 
+  public void executeAvailableJobs() {
+    List<Job> jobs = managementService.createJobQuery().withRetriesLeft().list();
+
+    if (jobs.isEmpty()) {
+      return;
+    }
+
+    for (Job job : jobs) {
+      try {
+        managementService.executeJob(job.getId());
+      } catch (Exception e) {};
+    }
+
+    executeAvailableJobs();
+  }
+
   public boolean areJobsAvailable() {
     List<Job> list = managementService.createJobQuery().list();
     for (Job job : list) {
-      if (job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
+      if (!job.isSuspended() && job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
         return true;
       }
     }
     return false;
   }
-  
+
   private static class InteruptTask extends TimerTask {
     protected boolean timeLimitExceeded = false;
     protected Thread thread;
@@ -301,7 +319,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       thread.interrupt();
     }
   }
-  
+
   protected List<ActivityInstance> getInstancesForActivitiyId(ActivityInstance activityInstance, String activityId) {
     List<ActivityInstance> result = new ArrayList<ActivityInstance>();
     if(activityInstance.getActivityId().equals(activityId)) {
@@ -312,18 +330,18 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
     return result;
   }
-  
+
   protected void runAsUser(String userId, List<String> groupIds, Runnable r) {
     try {
       identityService.setAuthenticatedUserId(userId);
       processEngineConfiguration.setAuthorizationEnabled(true);
-      
+
       r.run();
-      
+
     } finally {
       identityService.setAuthenticatedUserId(null);
-      processEngineConfiguration.setAuthorizationEnabled(false);      
+      processEngineConfiguration.setAuthorizationEnabled(false);
     }
   }
-  
+
 }

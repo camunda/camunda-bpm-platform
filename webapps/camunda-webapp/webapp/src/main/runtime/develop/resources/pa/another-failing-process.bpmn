@@ -53,7 +53,7 @@
       <bpmndi:BPMNShape id="_BPMNShape_IntermediateCatchEvent_3" bpmnElement="IntermediateCatchEvent_1">
         <dc:Bounds height="36.0" width="36.0" x="492.0" y="253.0"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds height="0.0" width="0.0" x="510.0" y="294.0"/>
+          <dc:Bounds height="0.0" width="100.0" x="510.0" y="294.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_IntermediateCatchEvent_3" targetElement="_BPMNShape_EndEvent_21">

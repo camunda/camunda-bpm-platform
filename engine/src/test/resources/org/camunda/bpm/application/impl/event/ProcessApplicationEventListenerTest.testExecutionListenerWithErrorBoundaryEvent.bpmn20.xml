@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <error id="Error_1" errorCode="error" name="error"/>
+
+  <process id="executionListener">
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="serviceTask" />
+
+    <serviceTask id="serviceTask" activiti:class="org.camunda.bpm.application.impl.event.AsyncThrowErrorService" />
+    <sequenceFlow sourceRef="serviceTask" targetRef="theEnd" />
+
+    <boundaryEvent id="errorBoundary" attachedToRef="serviceTask">
+      <errorEventDefinition id="errorEventDefinition" errorRef="Error_1"/>
+    </boundaryEvent>
+    <sequenceFlow sourceRef="errorBoundary" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>

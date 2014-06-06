@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,28 +19,24 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.pvm.delegate.ExecutionListenerExecution;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
 /**
  * @author Tom Baeyens
  */
 public class EventCollector implements ExecutionListener {
-  
+
   private static Logger log = Logger.getLogger(EventCollector.class.getName());
-  
-  public List<String> events = new ArrayList<String>(); 
+
+  public List<String> events = new ArrayList<String>();
 
   public void notify(DelegateExecution execution) throws Exception {
-    notify((ExecutionListenerExecution)execution);
+    PvmExecutionImpl executionImpl = (PvmExecutionImpl) execution;
+    log.fine("collecting event: "+execution.getEventName()+" on "+executionImpl.getEventSource());
+    events.add(execution.getEventName()+" on "+executionImpl.getEventSource());
   }
-  
-  public void notify(ExecutionListenerExecution execution) {
-    
-    log.fine("collecting event: "+execution.getEventName()+" on "+execution.getEventSource());
-    events.add(execution.getEventName()+" on "+execution.getEventSource());
-  }
-  
+
   public String toString() {
     StringBuilder text = new StringBuilder();
     for (String event: events) {

@@ -19,15 +19,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
+import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
 public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefinition {
 
@@ -59,18 +62,18 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
       throw new ProcessEngineException("Cannot start process instance, initial activity where the process instance should start is null.");
     }
 
-    InterpretableExecution processInstance = newProcessInstance(initial);
+    PvmExecutionImpl processInstance = newProcessInstance(initial);
     processInstance.setProcessDefinition(this);
     processInstance.setProcessInstance(processInstance);
     processInstance.initialize();
 
-    InterpretableExecution scopeInstance = processInstance;
+    PvmExecutionImpl scopeInstance = processInstance;
 
     List<ActivityImpl> initialActivityStack = getInitialActivityStack(initial);
 
     for (ActivityImpl initialActivity: initialActivityStack) {
       if (initialActivity.isScope()) {
-        scopeInstance = (InterpretableExecution) scopeInstance.createExecution();
+        scopeInstance = scopeInstance.createExecution();
         scopeInstance.setActivity(initialActivity);
         if (initialActivity.isScope()) {
           scopeInstance.initialize();
@@ -101,7 +104,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     return initialActivityStack;
   }
 
-  protected InterpretableExecution newProcessInstance(ActivityImpl startActivity) {
+  protected PvmExecutionImpl newProcessInstance(ActivityImpl startActivity) {
     return new ExecutionImpl(startActivity);
   }
 
@@ -130,6 +133,11 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     return null;
   }
 
+  public CoreActivityBehavior<? extends BaseDelegateExecution> getActivityBehavior() {
+    // unsupported in PVM
+    return null;
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
   public ActivityImpl getInitial() {
@@ -144,15 +152,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     return "ProcessDefinition("+id+")";
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getDescription() {
+   public String getDescription() {
     return (String) getProperty("documentation");
   }
 

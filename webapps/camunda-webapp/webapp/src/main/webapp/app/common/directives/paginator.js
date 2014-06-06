@@ -1,4 +1,7 @@
-ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, angular, $) {
+/* global ngDefine: false */
+ngDefine('camunda.common.directives', [], function(module) {
+  'use strict';
+  console.info('paginator directive loaded');
 
   var paginatorTmpl =
     '<div class="pagination pagination-centered">' +
@@ -10,7 +13,7 @@ ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, 
     '  </ul>' +
     '</div>';
 
-  var PaginatorDirective = function () {
+  module.directive('paginator', function () {
     return {
       restrict: 'EAC',
       template: paginatorTmpl,
@@ -19,8 +22,8 @@ ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, 
         totalPages: '=',
         currentPage: '='
       },
-      link: function(scope, element, attrs) {
-
+      link: function(scope /*, element, attrs*/) {
+        console.warn('DEPRECATE paginator directive found', arguments[1]);
         /* constants */
 
         var LABEL = {
@@ -49,11 +52,12 @@ ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, 
             return;
           }
 
+          var i;
           if (totalPages > 10) {
 
             // more than 10 pages, show
             //   1 ... 4 [5] 6 ... n
-            for (var i = currentPage - 1; i < currentPage + 2; i++) {
+            for (i = currentPage - 1; i < currentPage + 2; i++) {
               if (i > 0 && i <= totalPages) {
                 pages.push({ number: i, text: i, current: (currentPage === i) });
               }
@@ -78,7 +82,7 @@ ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, 
 
             // less/eq 10 pages, show
             //   1 2 3 4 5 6
-            for (var i = 1; i <= totalPages; i++) {
+            for (i = 1; i <= totalPages; i++) {
               pages.push({ number: i, text: i, current: (currentPage === i) });
             }
           }
@@ -94,7 +98,5 @@ ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, 
         };
       }
     };
-  };
-
-  module.directive('paginator', PaginatorDirective);
+  });
 });

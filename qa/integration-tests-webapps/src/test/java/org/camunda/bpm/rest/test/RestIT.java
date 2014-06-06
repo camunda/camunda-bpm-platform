@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Assert;
-
 import org.camunda.bpm.AbstractWebappIntegrationTest;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -17,7 +16,11 @@ import com.sun.jersey.api.client.WebResource;
 
 public class RestIT extends AbstractWebappIntegrationTest {
 
-  private static final String PROCESS_DEFINITION_PATH = "engine/default/process-definition";
+  private static final String ENGINE_DEFAULT_PATH = "engine/default";
+
+  private static final String PROCESS_DEFINITION_PATH = ENGINE_DEFAULT_PATH + "/process-definition";
+
+  private static final String TASK_PATH = ENGINE_DEFAULT_PATH + "/task";
 
   private final static Logger log = Logger.getLogger(RestIT.class.getName());
 
@@ -27,9 +30,9 @@ public class RestIT extends AbstractWebappIntegrationTest {
 
   @Test
   public void testScenario() throws JSONException {
-    
-    // FIXME: cannot do this on JBoss AS7, see https://app.camunda.com/jira/browse/CAM-787    
-    
+
+    // FIXME: cannot do this on JBoss AS7, see https://app.camunda.com/jira/browse/CAM-787
+
     // get list of process engines
     // log.info("Checking " + APP_BASE_PATH + ENGINES_PATH);
     // WebResource resource = client.resource(APP_BASE_PATH + ENGINES_PATH);
@@ -64,6 +67,26 @@ public class RestIT extends AbstractWebappIntegrationTest {
     Assert.assertTrue(definitionJson.isNull("description"));
     Assert.assertTrue(definitionJson.getString("resource").contains("invoice.bpmn"));
     Assert.assertFalse(definitionJson.getBoolean("suspended"));
+
+    response.close();
+
+
+
+  }
+
+  @Test
+  public void assertJodaTimePresent() {
+    log.info("Checking " + APP_BASE_PATH + TASK_PATH);
+
+    WebResource resource = client.resource(APP_BASE_PATH + TASK_PATH);
+    resource.queryParam("dueAfter", "2000-01-01T00-00-00");
+    ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+
+    Assert.assertEquals(200, response.getStatus());
+
+    JSONArray definitionsJson = response.getEntity(JSONArray.class);
+    // no tasks are found
+    Assert.assertEquals(1, definitionsJson.length());
 
     response.close();
   }

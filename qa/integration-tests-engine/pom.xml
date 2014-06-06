@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>7.2.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -109,6 +109,7 @@
         <directory>src/test/resources</directory>
         <filtering>true</filtering>
         <includes>
+          <include>**/*.cmmn</include>
           <include>**/*.xml</include>
           <include>**/*.properties</include>
           <include>**/*.png</include>
@@ -129,7 +130,7 @@
               <goal>test-jar</goal>
             </goals>
             <configuration>
-              <forceCreate>true</forceCreate>
+              <forceCreation>true</forceCreation>
             </configuration>
           </execution>
         </executions>
@@ -221,8 +222,8 @@
         </plugins>
       </build>
     </profile>
-    
-    
+
+
     <profile>
       <id>jboss-domain</id>
       <dependencies>
@@ -464,7 +465,7 @@
                 <version>${version.mssql}</version>
               </dependency>
               <dependency>
-                <groupId>postgresql</groupId>
+                <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${version.postgre}</version>
               </dependency>
@@ -604,7 +605,7 @@
                 <version>${version.mssql}</version>
               </dependency>
               <dependency>
-                <groupId>postgresql</groupId>
+                <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${version.postgre}</version>
               </dependency>
@@ -739,6 +740,8 @@
                 <exclude>**/TestDeploymentWithDroolsTaskFails.java</exclude>
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
 
+                <exclude>**/TestWarDeploymentWithProcessEnginePlugin.java</exclude>
+
                 <exclude>**/*_JBOSS.java</exclude>
                 <exclude>**/EjbPALifecycleCallbacksTest.java</exclude>
               </excludes>
@@ -870,7 +873,7 @@
           <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>postgresql</groupId>
+          <groupId>org.postgresql</groupId>
           <artifactId>postgresql</artifactId>
           <scope>test</scope>
         </dependency>
@@ -936,7 +939,7 @@
                 <version>${version.mssql}</version>
               </dependency>
               <dependency>
-                <groupId>postgresql</groupId>
+                <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${version.postgre}</version>
               </dependency>

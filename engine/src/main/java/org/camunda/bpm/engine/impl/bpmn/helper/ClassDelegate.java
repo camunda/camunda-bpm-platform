@@ -34,10 +34,10 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.delegate.ExecutionListenerInvocation;
 import org.camunda.bpm.engine.impl.delegate.TaskListenerInvocation;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 
@@ -119,7 +119,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
   // Signallable activity behavior
   public void signal(final ActivityExecution execution, final String signalName, final Object signalData) throws Exception {
 
-    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication((InterpretableExecution) execution);
+    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
 
     if(!ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
       ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution);
