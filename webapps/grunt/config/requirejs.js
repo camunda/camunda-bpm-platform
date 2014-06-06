@@ -6,16 +6,22 @@ module.exports = function(config) {
 
   config = config || {};
 
+  var rjsConfPath = path.resolve('./client/scripts/rjsconf');
+  var rjsConf = require(rjsConfPath);
+
   var deps = [
+    'camunda-tasklist-ui/rjsconf',
     './../node_modules/requirejs/require',
+    'jquery',
     'angular',
     'moment',
     'angular-bootstrap',
+    'angular-route',
+    'angular-animate',
     'angular-moment'
   ];
 
-  var rjsConfPath = path.resolve('./client/scripts/rjsconf');
-  var rjsConf = require(rjsConfPath);
+  var mockDeps = _.uniq(deps.concat(rjsConf.shim['camunda-tasklist-ui/mocks'], ['camunda-tasklist-ui/mocks']));
 
   _.extend(rjsConf.paths, {
     rjsconf: 'scripts/rjsconf'
@@ -68,8 +74,7 @@ module.exports = function(config) {
         out: 'dist/scripts/deps.js',
         // include: deps
         include: deps.concat([
-          'camunda-tasklist-ui/rjsconf',
-          'angular-route'
+          'camunda-tasklist-ui/rjsconf'
         ])
       }
     },
@@ -81,11 +86,7 @@ module.exports = function(config) {
         // name: 'scripts/index',
         name: '<%= pkg.name %>/mocks',
         out: 'dist/scripts/deps-n-mocks.js',
-        exclude: [],
-        include: deps.concat([
-          'camunda-tasklist-ui/rjsconf',
-          'angular-route'
-        ], rjsConf.shim['camunda-tasklist-ui/mocks'], ['camunda-tasklist-ui/mocks'])
+        include: mockDeps
       }
     },
 
@@ -98,14 +99,20 @@ module.exports = function(config) {
         out: 'dist/scripts/<%= pkg.name %>.js',
         // exclude: deps,
         exclude: deps.concat([
-          'camunda-tasklist-ui/rjsconf',
-          // 'camunda-tasklist-ui/mocks',
-          'angular-route'
+          'camunda-tasklist-ui/rjsconf'
         ]),
         include: rjsConf.shim['camunda-tasklist-ui']
       }
     }
   };
+
+  if (process.env.RJS_OPTIMIZATION) {
+    rConf.options.optimize = process.env.RJS_OPTIMIZATION;
+    if (process.env.RJS_OPTIMIZATION === 'none') {
+      rConf.options.generateSourceMaps = false;
+    }
+  }
+
 
   return rConf;
 };

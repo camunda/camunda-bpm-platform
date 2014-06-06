@@ -57,6 +57,7 @@ define(function() {
 
       'camunda-tasklist-ui':        [
                                       'angular-route',
+                                      'angular-animate',
 
 
                                       'camunda-tasklist-ui/utils',

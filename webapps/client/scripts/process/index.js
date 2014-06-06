@@ -15,8 +15,8 @@ define([
 
 
   processModule.controller('processStartModalFormCtrl', [
-          '$scope', 'camLegacyProcessData',
-  function($scope,   camLegacyProcessData) {
+          '$scope', '$q', 'camLegacyProcessData',
+  function($scope,   $q,   camLegacyProcessData) {
     var emptyVariable = {
       name:   '',
       value:  '',
@@ -45,6 +45,10 @@ define([
       cb(result);
     }
 
+    function loadError(err) {
+      $scope.loadingProcesses = false;
+    }
+
     $scope.processes = [];
 
     $scope.totalProcesses = 0;
@@ -55,17 +59,32 @@ define([
 
     $scope.loadingProcesses = false;
 
-    function loadError(err) {
-      console.warn('loading error', err.stack ? err.stack : err);
-      $scope.loadingProcesses = false;
-    }
+    $scope.selected = function($item, $model, $label) {
+      $scope.startingProcess = $item;
+    };
 
     $scope.getProcess = function(val) {
-      $scope.loadingProcesses = true;
-      camLegacyProcessData.list().then(function(res){
-        $scope.loadingProcesses = false;
-        $scope.processes = res;
-      }, loadError);
+      if (val.length > 2) {
+        $scope.loadingProcesses = true;
+
+        return camLegacyProcessData.list({
+          nameLike: '%'+ val +'%'
+        }).then(function(res){
+          $scope.loadingProcesses = false;
+          $scope.processes = res;
+
+          // return $scope.processes;
+          return $scope.processes;
+        }, loadError);
+      }
+      else {
+        var deferred = $q.defer();
+
+        $scope.processes = $scope.processes || [];
+        deferred.resolve($scope.processes);
+
+        return deferred.promise;
+      }
     };
 
 
@@ -100,6 +119,7 @@ define([
       $scope.startingProcess = null;
     };
 
+
     $scope.loadProcesses = function() {
       $scope.loadingProcesses = true;
       var where = {};
@@ -116,7 +136,12 @@ define([
     };
     $scope.loadProcesses();
 
+
     $scope.submitForm = function(htmlForm) {
+      if (!$scope.startingProcess || !$scope.startingProcess.key) {
+        return false;
+      }
+
       var vars = {};
 
       angular.forEach($scope.variables, function(val) {
@@ -137,13 +162,17 @@ define([
 
 
   processModule.controller('processStartCtrl', [
-          '$modal', '$scope', '$rootScope',
-  function($modal,   $scope,   $rootScope) {
-    $modal.open({
+          '$modal', '$scope', '$location', '$rootScope',
+  function($modal,   $scope,   $location,   $rootScope) {
+    var instance = $modal.open({
       size: 'lg',
       scope: $scope,
       template: require('text!camunda-tasklist-ui/process/start.html')
     });
+
+    function goHome() { $location.path('/'); }
+
+    instance.result.then(goHome, goHome);
   }]);
 
   return processModule;

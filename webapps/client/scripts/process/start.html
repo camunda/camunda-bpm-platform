@@ -14,10 +14,14 @@
         <div class="input-group has-feedback"
              ng-if="!startingProcess">
           <input type="text"
-                 ng-model="searchModel"
+                 ng-model="searchProcess"
                  placeholder="Process name"
-                 typeahead="process for process in getProcess($viewValue)"
+                 tooltip="Search by process name, case sensitive."
+                 tooltip-placement="left"
+                 typeahead="process.name for process in getProcess($viewValue)"
                  typeahead-loading="loadingProcesses"
+                 typeahead-wait-ms="100"
+                 typeahead-on-select="selected($item, $model, $label)"
                  class="form-control">
           <span class="input-group-addon">
             <i ng-show="loadingProcesses"
