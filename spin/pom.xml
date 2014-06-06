@@ -18,6 +18,7 @@
 
   <modules>
     <module>core</module>
+    <module>dist</module>
   </modules>
 
   <dependencyManagement>
