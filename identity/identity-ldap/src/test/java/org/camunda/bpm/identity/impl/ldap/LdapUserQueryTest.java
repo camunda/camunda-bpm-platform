@@ -24,7 +24,7 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
 
   public void testQueryNoFilter() {
     List<User> result = identityService.createUserQuery().list();
-    assertEquals(6, result.size());
+    assertEquals(7, result.size());
   }
 
   public void testFilterByUserId() {

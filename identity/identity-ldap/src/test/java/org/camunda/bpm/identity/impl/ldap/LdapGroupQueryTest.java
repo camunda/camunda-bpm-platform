@@ -76,6 +76,11 @@ public class LdapGroupQueryTest extends LdapIdentityProviderTest {
     assertEquals(0, list.size());
   }
 
+  public void testFilterByGroupMemberSpecialCharacter() {
+    List<Group> list = identityService.createGroupQuery().groupMember("david(IT)").list();
+    assertEquals(1, list.size());
+  }
+
   public void testFilterByGroupMemberPosix() {
 
     // by default the configuration does not use posix groups
