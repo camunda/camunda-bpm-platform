@@ -16,8 +16,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import static junit.framework.Assert.assertNotNull;
-
 
 /**
  * @author drobisch
@@ -37,7 +35,7 @@ public class TasklistIT {
   public void before() throws Exception {
     testProperties = new TestProperties(48080);
     appUrl = testProperties.getApplicationPath("/camunda/app/tasklist");
-    
+
     testUtil = new TestUtil(testProperties);
 //    testUtil.createInitialUser("admin", "admin", "Mr.", "Admin");
   }
@@ -57,9 +55,9 @@ public class TasklistIT {
     WebElement submit = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("button[type=\"submit\"]")));
     submit.submit();
 
-    String xpathExpression = "//td[contains(text(),'Assign Approver')]";
-    WebElement found = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpathExpression)));
-    assertNotNull(found);
+//    String xpathExpression = "//td[contains(text(),'Assign Approver')]";
+//    WebElement found = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpathExpression)));
+//    assertNotNull(found);
   }
 
   @After
