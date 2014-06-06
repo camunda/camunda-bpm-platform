@@ -45,10 +45,13 @@ define([
     };
 
     if (options.data) {
-      reqParams.data = JSON.stringify(options.data);
+      if (reqParams.type.toUpperCase() !== 'GET') {
+        reqParams.data = JSON.stringify(options.data);
+      }
+      else {
+        reqParams.data = options.data;
+      }
     }
-
-    // console.info('request parameters', reqParams);
 
     deferred.notify('request:start');
 
@@ -69,6 +72,7 @@ define([
   CamLegacyProcessData.prototype.list = function(where) {
     where = where || {};
     return this.query({
+      data: where,
       path: '/process-definition'
     });
   };
