@@ -492,6 +492,7 @@
                   <srcFiles>
                     <!-- create the DB -->
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.engine.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.case.engine.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.identity.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.history.sql</srcFile>
                   </srcFiles>
@@ -632,6 +633,7 @@
                   <srcFiles>
                     <!-- create the DB -->
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.engine.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.case.engine.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.identity.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.history.sql</srcFile>
                   </srcFiles>
