@@ -34,13 +34,18 @@
             </goals>
             <configuration>
               <createDependencyReducedPom>true</createDependencyReducedPom>
+              <createSourcesJar>true</createSourcesJar>
+              <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+              <artifactSet>
+                <excludes>
+                  <exclude>org.camunda.commons:*</exclude>
+                  <exclude>org.slf4j:*</exclude>
+                </excludes>
+              </artifactSet>
               <relocations>
                 <relocation>
-                  <pattern>org</pattern>
-                  <shadedPattern>connectjar.org</shadedPattern>
-                  <excludes>
-                    <exclude>org.camunda.bpm.connect.**</exclude>
-                  </excludes>
+                  <pattern>org.apache</pattern>
+                  <shadedPattern>connectjar.org.apache</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
