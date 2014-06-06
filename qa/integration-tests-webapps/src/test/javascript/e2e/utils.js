@@ -163,3 +163,17 @@ utils.login = function(username, password, valid) {
 };
 
 
+/**
+ Navbar
+ @memberof cam.test.e2e.utils
+
+ @param {string} appName   - Admin Tasklist Cockpit
+ */
+utils.switchWebapp = function(appName) {
+  element(by.css('.navbar [sem-show-apps]')).click();
+  element(by.css('.navbar [sem-jump-to-'+ appName + ']')).click();
+};
+
+
+
+

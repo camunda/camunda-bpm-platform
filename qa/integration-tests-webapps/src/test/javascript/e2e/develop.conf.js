@@ -40,7 +40,7 @@ exports.config = {
     //
     // Spec patterns are relative to the location of the spec file. They may
     // include glob patterns.
-    specs: ['cockpit/*Spec.js'],
+    specs: ['admin/*Spec.js'],
 
     // A base URL for your application under test. Calls to protractor.get()
     // with relative paths will be prepended with this.

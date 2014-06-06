@@ -10,8 +10,7 @@
 6. Enter the path of the protractor configuration file as `Application Parameter`. For development purpose choose the `develop.conf.js` file.
 
 The `develop.conf.js` configuration file is only for development purpose and has to be adjusted according to the desired webapp:
- 
+
 ```
 specs: ['WEBAPP/*Spec.js'],
 ```
-
