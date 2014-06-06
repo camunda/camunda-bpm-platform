@@ -13,11 +13,14 @@
 
 package org.camunda.bpm.engine.impl.runtime;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Thorben Lindhauer
  * @author Daniel Meyer
+ * @author Michael Scholz
  */
 public interface CorrelationHandler {
 
@@ -31,5 +34,16 @@ public interface CorrelationHandler {
    * @return
    */
   public MessageCorrelationResult correlateMessage(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
+
+  /**
+   * Correlate all given messages and return a {@link List} of {@link MessageCorrelationResult}s that matches them.
+   * Return any empty {@link List} if no message could not be correlated.
+   *
+   * @param commandContext
+   * @param messageName
+   * @param correlationSet any of its members may be <code>null</code>
+   * @return
+   */
+  public List<MessageCorrelationResult> correlateMessages(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
 
 }
