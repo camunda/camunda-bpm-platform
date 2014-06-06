@@ -93,11 +93,14 @@ public class LdapTestEnvironment {
     
     createGroup("office-home");
     String dnRuecker = createUser("ruecker", "office-home", "Bernd", "Ruecker", "ruecker@camunda.org");
-
+    // Doesn't work using backslashes, end up with two uid attributes
+    // See https://issues.apache.org/jira/browse/DIRSERVER-1442
+    String dnDavid = createUser("david(IT)", "office-home", "David", "Howe\\IT\\", "david@camunda.org");
+    
     createRole("management", dnRuecker, dnRobert, dnDaniel);
     createRole("development", dnRoman, dnDaniel, dnOscar);
     createRole("consulting", dnRuecker);
-    createRole("sales", dnRuecker, dnMonster);
+    createRole("sales", dnRuecker, dnMonster, dnDavid);
   }
 
   protected String createUser(String user, String group, String firstname, String lastname, String email) throws Exception {
