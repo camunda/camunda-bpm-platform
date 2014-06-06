@@ -22,7 +22,7 @@ ALTER TABLE ACT_RU_VARIABLE
   ADD CASE_EXECUTION_ID_ nvarchar(64);
   
 ALTER TABLE ACT_RU_VARIABLE
-  ADD CASE_DEF_ID_ nvarchar(64);
+  ADD CASE_INST_ID_ nvarchar(64);
 
 -- create case definition table --
 create table ACT_RE_CASE_DEF (

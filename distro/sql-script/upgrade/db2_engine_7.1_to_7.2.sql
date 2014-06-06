@@ -25,7 +25,7 @@ ALTER TABLE ACT_RU_VARIABLE
   ADD CASE_EXECUTION_ID_ varchar(64);
 
 ALTER TABLE ACT_RU_VARIABLE
-  ADD CASE_DEF_ID_ varchar(64);
+  ADD CASE_INST_ID_ varchar(64);
 
 -- create case definition table --
 
