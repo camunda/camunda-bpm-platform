@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-release-parent</artifactId>
-    <version>1</version>
+    <version>2</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
@@ -19,6 +19,7 @@
   <modules>
     <module>core</module>
     <module>soap-httpclient</module>
+    <module>dist</module>
   </modules>
 
   <dependencyManagement>
@@ -30,12 +31,6 @@
         <version>1.0.0</version>
         <scope>import</scope>
         <type>pom</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.spin</groupId>
-        <artifactId>camunda-spin-core</artifactId>
-        <version>1.0.0</version>
       </dependency>
 
       <dependency>
