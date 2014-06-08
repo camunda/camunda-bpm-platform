@@ -102,8 +102,6 @@ Bpmn.writeModelToFile(file, modelInstance);
 
 == Planned features
 
-* complete read, edit and write support for BPMN 2.0 models
-* JSON import and export
 * extended validation support like integrity checks for broken references
 
 
