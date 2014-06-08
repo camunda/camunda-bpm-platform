@@ -37,6 +37,10 @@
           <groupId>joda-time</groupId>
           <artifactId>joda-time</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -85,18 +89,31 @@
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                      <regexpmapper from="^(.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
+                      <regexpmapper from="^(org.camunda.bpm.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
                     </chainedmapper>
                   </mapper>
                 </copy>
 
                 <copy todir="target/modules" flatten="false">
-                  <fileset dir="src/main/modules" />               
+                  <fileset dir="src/main/modules" />
                 </copy>
-                
+
                 <replace dir="target/modules" token="@project.version@" value="${project.version}">
                   <include name="**/module.xml" />
-                </replace>                
+                </replace>
+
+                <replace dir="target/modules" token="@version.camunda.commons@" value="${version.camunda.commons}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.camunda.spin@" value="${version.camunda.spin}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.camunda.connect@" value="${version.camunda.connect}">
+                  <include name="**/module.xml" />
+                </replace>
+
               </target>
             </configuration>
           </execution>

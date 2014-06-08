@@ -34,7 +34,8 @@ import org.jboss.msc.service.ServiceName;
  * <p>This Processor creates implicit module dependencies for process applications</p>
  *
  * <p>Concretely speaking, this processor adds a module dependency from the process
- * application module (deployment unit) to the process engine module.</p>
+ * application module (deployment unit) to the process engine module (and other camunda libraries
+ * which are useful for process apps).</p>
  *
  * @author Daniel Meyer
  *
@@ -47,6 +48,8 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
   public static ModuleIdentifier MODULE_IDENTIFYER_XML_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-xml-model");
   public static ModuleIdentifier MODULE_IDENTIFYER_BPMN_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-bpmn-model");
   public static ModuleIdentifier MODULE_IDENTIFYER_CMMN_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-cmmn-model");
+  public static ModuleIdentifier MODULE_IDENTIFYER_SPIN = ModuleIdentifier.create("org.camunda.spin.camunda-spin-all");
+  public static ModuleIdentifier MODULE_IDENTIFYER_CONNECT = ModuleIdentifier.create("org.camunda.connect.camunda-connect-all");
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
@@ -92,6 +95,8 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_XML_MODEL);
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_BPMN_MODEL);
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_CMMN_MODEL);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_SPIN);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_CONNECT);
   }
 
   private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, ModuleIdentifier dependency) {

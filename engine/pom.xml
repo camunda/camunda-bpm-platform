@@ -13,6 +13,29 @@
   </parent>
 
   <dependencies>
+
+    <!-- camunda dependencies -->
+
+    <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-bpmn-model</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-cmmn-model</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-all</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-all</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-email</artifactId>
@@ -119,16 +142,6 @@
       <artifactId>jboss-vfs</artifactId>
       <version>3.1.0.Final</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.model</groupId>
-      <artifactId>camunda-bpmn-model</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.model</groupId>
-      <artifactId>camunda-cmmn-model</artifactId>
     </dependency>
 
     <dependency>
