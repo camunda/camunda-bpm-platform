@@ -10,11 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.scripting;
+package org.camunda.bpm.engine.impl.scripting.engine;
 
+import java.io.Reader;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,16 +44,6 @@ import org.camunda.bpm.engine.delegate.VariableScope;
  *
  * <p><strong>Custom Bindings:</strong> this class supports custom {@link Bindings}
  * implementations through the {@link #scriptBindingsFactory}. See {@link ScriptBindingsFactory}.</p>
- *
- * <p><strong>Script Evaluation:</strong> Two evaluation modes are supported:
- * <ul>
- * <li>Dynamic evaluation through the {@link #evaluate(String, String, VariableScope)} method. In this
- * case the script is passed in as source code and evaluated using the {@link ScriptEngine#eval(String)}
- * method.</li>
- * <li>Evaluation of pre-compiled {@link CompiledScript} instances through
- * {@link #evaluate(CompiledScript, String, VariableScope)}. The {@link CompiledScript} instances
- * can be obtained through {@link #compile(String, String)}.</li>
- * </ul>
  * </p>
  *
  * @author Tom Baeyens
@@ -101,75 +94,26 @@ public class ScriptingEngines {
   }
 
   /**
-   * <p>Evaluates a script provided as source code. Returns the return value of the script evaluation.
-   * In case the script does not return a value, 'null' is returned.</p>
-   *
-   * @param script the script provided as source code.
-   * @param language the script language.
-   * @param variableScope the variable scope in which the evaluation should be performed.
-   * @return the result of the script evaluation or 'null' in case the script does not return a value.
-   * @throws ProcessEngineException if no implementation for the script language can be found or
-   *         if the script evaluation fails.
-   */
-  public Object evaluate(String script, String language, VariableScope variableScope) {
-    ScriptEngine scriptEngine = getScriptEngineForLanguage(language);
-    Bindings bindings = createBindings(variableScope, scriptEngine.createBindings());
-
-    try {
-      LOG.log(Level.FINE, "Evaluationg un-compiled script using {0} script engine ", language);
-      return scriptEngine.eval(script, bindings);
-
-    } catch (ScriptException e) {
-      throw new ProcessEngineException("problem evaluating script: " + e.getMessage(), e);
-    }
-  }
-
-  /**
-   * <p>Evaluates a pre-compiled script (scripts can be compiled usig the {@link #compile(String, String)}
-   * method. Returns the return value of the script evaluation. In case the script does not return a value,
-   * 'null' is returned.</p>
-   *
-   * @param script the precompiled script code
-   * @param language the script language
-   * @param variableScope the variable scope in which the evaluation should be performed
-   * @return the result of the script evaluation or 'null' in case the script does not return a value
-   * @throws ProcessEngineException if no implementation for the script language can be found or
-   *         if the script evaluation fails.
-   */
-  public Object evaluate(CompiledScript script, String language, VariableScope variableScope) {
-    ScriptEngine scriptEngine = getScriptEngineForLanguage(language);
-    Bindings bindings = createBindings(variableScope, scriptEngine.createBindings());
-
-    try {
-      LOG.log(Level.FINE, "Evaluationg compiled script using {0} script engine ", language);
-      return script.eval(bindings);
-
-    } catch (ScriptException e) {
-      throw new ProcessEngineException("problem evaluating script: " + e.getMessage(), e);
-    }
-  }
-
-  /**
    * <p>Used to compile a script provided as String into an engine-specific {@link CompiledScript}.</p>
    *
    * <p><strong>Note on caching of compiled scripts:</strong> only cache the returned script if
    * {@link #enableScriptEngineCaching} is set to 'true'. Depending on the implementation, the compiled
    * script will keep references to the script engine which created it.</p>
    *
-   * @param script source code of the script to compile
+   * @param reader a reader for the source of the script
    * @param language the script language in which the script is written
    * @return a {@link CompiledScript} or null if script engine can be found but does not support compilation.
    * @throws ProcessEngineException if no {@link ScriptEngine} can be resolved for the provided language or
    *         if the script cannot be compiled (sytax error ...).
    */
-  public CompiledScript compile(String script, String language) {
+  public CompiledScript compile(Reader reader, String language) {
     ScriptEngine scriptEngine = getScriptEngineForLanguage(language);
 
     if(scriptEngine instanceof Compilable) {
       Compilable compilingEngine = (Compilable) scriptEngine;
 
       try {
-        CompiledScript compiledScript = compilingEngine.compile(script);
+        CompiledScript compiledScript = compilingEngine.compile(reader);
 
         LOG.log(Level.FINE, "Compiled script using {0} script engine ", language);
 
@@ -217,6 +161,15 @@ public class ScriptingEngines {
 
     return scriptEngine;
 
+  }
+
+  public Set<String> getAllSupportedLanguages() {
+    Set<String> languages = new HashSet<String>();
+    List<ScriptEngineFactory> engineFactories = scriptEngineManager.getEngineFactories();
+    for (ScriptEngineFactory scriptEngineFactory : engineFactories) {
+      languages.add(scriptEngineFactory.getLanguageName());
+    }
+    return languages;
   }
 
   /**
@@ -274,13 +227,14 @@ public class ScriptingEngines {
   /** override to build a spring aware ScriptingEngines
    * @param engineBindings
    * @param scriptEngine */
-  protected Bindings createBindings(VariableScope variableScope, Bindings engineBindings) {
-    return scriptBindingsFactory.createBindings(variableScope, engineBindings);
+  public Bindings createBindings(ScriptEngine scriptEngine, VariableScope variableScope) {
+    return scriptBindingsFactory.createBindings(variableScope, scriptEngine.createBindings());
   }
 
   public ScriptBindingsFactory getScriptBindingsFactory() {
     return scriptBindingsFactory;
   }
+
   public void setScriptBindingsFactory(ScriptBindingsFactory scriptBindingsFactory) {
     this.scriptBindingsFactory = scriptBindingsFactory;
   }

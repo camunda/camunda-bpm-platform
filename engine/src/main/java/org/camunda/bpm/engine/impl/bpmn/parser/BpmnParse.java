@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionExecutionList
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionTaskListener;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
@@ -38,7 +39,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.*;
-import org.camunda.bpm.engine.impl.scripting.ScriptingEngines;
+import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.util.xml.Element;
@@ -47,6 +49,7 @@ import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URL;
 import java.text.StringCharacterIterator;
 import java.util.*;
@@ -1446,7 +1449,7 @@ public class BpmnParse extends Parse {
 
     parseAsynchronousContinuation(scriptTaskElement, activity);
 
-    activity.setActivityBehavior(new ScriptTaskActivityBehavior(script, language, resultVariableName));
+    activity.setActivityBehavior(new ScriptTaskActivityBehavior(parseScript(script, language), resultVariableName));
 
     parseExecutionListenersOnScope(scriptTaskElement, activity);
 
@@ -1456,6 +1459,19 @@ public class BpmnParse extends Parse {
     return activity;
   }
 
+
+  /**
+   * Parses a script text into an {@link ExecutableScript}.
+   * @param script the script source
+   * @param language the language in which the script is written
+   * @return the executable script
+   */
+  protected ExecutableScript parseScript(String script, String language) {
+    ExecutableScript executableScript = Context.getProcessEngineConfiguration()
+      .getScriptFactory()
+      .crateScript(new StringReader(script), language);
+    return executableScript;
+  }
 
   /**
    * Parses a serviceTask declaration.

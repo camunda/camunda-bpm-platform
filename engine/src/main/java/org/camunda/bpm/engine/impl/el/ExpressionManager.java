@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.Expression;
@@ -23,6 +25,7 @@ import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ExpressionFactory;
+import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
 import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
@@ -49,9 +52,10 @@ import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
 public class ExpressionManager {
 
 
+  protected List<FunctionMapper> functionMappers = new ArrayList<FunctionMapper>();
   protected ExpressionFactory expressionFactory;
   // Default implementation (does nothing)
-  protected ELContext parsingElContext = new ParsingElContext();
+  protected ELContext parsingElContext = new ProcessEngineElContext(functionMappers);
   protected Map<Object, Object> beans;
 
 
@@ -60,7 +64,7 @@ public class ExpressionManager {
   }
 
   public ExpressionManager(Map<Object, Object> beans) {
-    // Use the ExpressionFactoryImpl in activiti build in version of juel, with parametrised method expressions enabled
+    // Use the ExpressionFactoryImpl built-in version of juel, with parametrised method expressions enabled
     expressionFactory = new ExpressionFactoryImpl();
     this.beans = beans;
   }
@@ -93,9 +97,9 @@ public class ExpressionManager {
     return elContext;
   }
 
-  protected ActivitiElContext createElContext(VariableScope variableScope) {
+  protected ProcessEngineElContext createElContext(VariableScope variableScope) {
     ELResolver elResolver = createElResolver(variableScope);
-    return new ActivitiElContext(elResolver);
+    return new ProcessEngineElContext(functionMappers, elResolver);
   }
 
   protected ELResolver createElResolver(VariableScope variableScope) {
@@ -103,7 +107,7 @@ public class ExpressionManager {
     elResolver.add(new VariableScopeElResolver(variableScope));
 
     if(beans != null) {
-      // ACT-1102: Also expose all beans in configuration when using standalone activiti, not
+      // ACT-1102: Also expose all beans in configuration when using standalone engine, not
       // in spring-context
       elResolver.add(new ReadOnlyMapELResolver(beans));
     }
@@ -115,5 +119,12 @@ public class ExpressionManager {
     elResolver.add(new MapELResolver());
     elResolver.add(new BeanELResolver());
     return elResolver;
+  }
+
+  /**
+   * @param elFunctionMapper
+   */
+  public void addFunctionMapper(FunctionMapper elFunctionMapper) {
+    this.functionMappers.add(elFunctionMapper);
   }
 }

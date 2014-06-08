@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.impl.scripting;
+package org.camunda.bpm.engine.impl.scripting.engine;
 
 import java.io.IOException;
 import java.io.Reader;

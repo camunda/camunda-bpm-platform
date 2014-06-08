@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.impl.scripting;
+package org.camunda.bpm.engine.impl.scripting.engine;
 
 import java.util.ArrayList;
 import java.util.Arrays;

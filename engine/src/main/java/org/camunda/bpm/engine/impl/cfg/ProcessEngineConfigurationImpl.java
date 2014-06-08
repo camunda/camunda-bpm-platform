@@ -180,11 +180,15 @@ import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
-import org.camunda.bpm.engine.impl.scripting.BeansResolverFactory;
-import org.camunda.bpm.engine.impl.scripting.ResolverFactory;
-import org.camunda.bpm.engine.impl.scripting.ScriptBindingsFactory;
-import org.camunda.bpm.engine.impl.scripting.ScriptingEngines;
-import org.camunda.bpm.engine.impl.scripting.VariableScopeResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
+import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
+import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
+import org.camunda.bpm.engine.impl.spin.ProcessEngineSpinSupport;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.variable.BooleanType;
@@ -318,6 +322,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<String> customScriptingEngineClasses;
   protected ScriptingEngines scriptingEngines;
   protected List<ResolverFactory> resolverFactories;
+  protected ScriptingEnvironment scriptingEnvironment;
+  protected List<ScriptEnvResolver> scriptEnvResolvers;
+  protected ScriptFactory scriptFactory;
   protected boolean autoStoreScriptVariables = false;
   protected boolean enableScriptCompilation = true;
   protected boolean cmmnEnabled = true;
@@ -419,7 +426,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initFormEngines();
     initFormTypes();
     initFormFieldValidators();
-    initScriptingEngines();
+    initScripting();
     initBusinessCalendarManager();
     initCommandContextFactory();
     initTransactionContextFactory();
@@ -444,6 +451,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initPasswordDigest();
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
+    initSpin();
     invokePostInit();
   }
 
@@ -1148,7 +1156,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   }
 
-  protected void initScriptingEngines() {
+  protected void initScripting() {
     if (resolverFactories==null) {
       resolverFactories = new ArrayList<ResolverFactory>();
       resolverFactories.add(new VariableScopeResolverFactory());
@@ -1156,6 +1164,29 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     if (scriptingEngines==null) {
       scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories));
+    }
+    if(scriptFactory == null) {
+      scriptFactory = new ScriptFactory(scriptingEngines);
+    }
+    if(scriptEnvResolvers == null) {
+      scriptEnvResolvers = new ArrayList<ScriptEnvResolver>();
+    }
+    if(scriptingEnvironment == null) {
+      scriptingEnvironment = new ScriptingEnvironment(scriptFactory, scriptEnvResolvers);
+    }
+  }
+
+  protected void initSpin() {
+    if(ProcessEngineSpinSupport.isSpinAvailable()) {
+      log.info("Spin available: camunda Spin is found on the classpath. Spin support is available in Expression Language and Scripts.");
+      // add spin script env resolver
+      scriptEnvResolvers.add(ProcessEngineSpinSupport.getScriptEnvResolver());
+      // add spin el function mapper
+      expressionManager.addFunctionMapper(ProcessEngineSpinSupport.getElFunctionMapper());
+
+    } else {
+      log.info("Spin unavailable: camunda Spin is not found on the classpath.");
+
     }
   }
 
@@ -2230,5 +2261,29 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setCmmnEnabled(boolean cmmnEnabled) {
     this.cmmnEnabled = cmmnEnabled;
+  }
+
+  public ScriptFactory getScriptFactory() {
+    return scriptFactory;
+  }
+
+  public ScriptingEnvironment getScriptingEnvironment() {
+    return scriptingEnvironment;
+  }
+
+  public void setScriptFactory(ScriptFactory scriptFactory) {
+    this.scriptFactory = scriptFactory;
+  }
+
+  public void setScriptingEnvironment(ScriptingEnvironment scriptingEnvironment) {
+    this.scriptingEnvironment = scriptingEnvironment;
+  }
+
+  public List<ScriptEnvResolver> getEnvScriptResolvers() {
+    return scriptEnvResolvers;
+  }
+
+  public void setEnvScriptResolvers(List<ScriptEnvResolver> scriptEnvResolvers) {
+    this.scriptEnvResolvers = scriptEnvResolvers;
   }
 }

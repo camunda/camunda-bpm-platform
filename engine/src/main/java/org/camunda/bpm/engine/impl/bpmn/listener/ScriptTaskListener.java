@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,11 +13,16 @@
 
 package org.camunda.bpm.engine.impl.bpmn.listener;
 
+import java.io.StringReader;
+
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.Expression;
-import org.camunda.bpm.engine.impl.scripting.ScriptingEngines;
+import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
+import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
+import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 
 public class ScriptTaskListener implements TaskListener {
 	private Expression script;
@@ -35,9 +40,12 @@ public class ScriptTaskListener implements TaskListener {
 			throw new IllegalArgumentException("The field 'language' should be set on the TaskListener");
 		}
 
-		ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
+		ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ScriptingEnvironment scriptEnv = processEngineConfiguration.getScriptingEnvironment();
+    ScriptFactory scriptFactory = processEngineConfiguration.getScriptFactory();
+    ExecutableScript executableScript = scriptFactory.crateScript(new StringReader(script.getExpressionText()), language.getExpressionText());
 
-		Object result = scriptingEngines.evaluate(script.getExpressionText(), language.getExpressionText(), delegateTask);
+    Object result = scriptEnv.execute(executableScript, delegateTask);
 
 		if (resultVariable != null) {
 			delegateTask.setVariable(resultVariable.getExpressionText(), result);

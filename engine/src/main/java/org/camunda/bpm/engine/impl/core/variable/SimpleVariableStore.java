@@ -23,7 +23,7 @@ import java.util.Set;
  * @author Sebastian Menski
  *
  */
-public class SimpleVariableStrore implements CoreVariableStore {
+public class SimpleVariableStore implements CoreVariableStore {
 
   public static class SimpleVariableInstance implements CoreVariableInstance {
 
@@ -48,7 +48,7 @@ public class SimpleVariableStrore implements CoreVariableStore {
     }
   }
 
-  protected Map<String, SimpleVariableInstance> variables = new HashMap<String, SimpleVariableStrore.SimpleVariableInstance>();
+  protected Map<String, SimpleVariableInstance> variables = new HashMap<String, SimpleVariableStore.SimpleVariableInstance>();
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public Collection<CoreVariableInstance> getVariableInstancesValues() {
