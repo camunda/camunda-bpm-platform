@@ -40,7 +40,7 @@ public class VfsProcessApplicationScannerTest {
     assertEquals(1, scanResult.size());
     String processFileName = "VfsProcessScannerTest.bpmn20.xml";
     assertTrue("'" + processFileName + "'not found", contains(scanResult, processFileName));
-    assertFalse("'bpmn' folder in resource path found", contains(scanResult, "bpmn"));
+    assertFalse("'bpmn' folder in resource path found", contains(scanResult, "processResource.txt"));
   }
 
   @Test
@@ -55,12 +55,12 @@ public class VfsProcessApplicationScannerTest {
     assertEquals(1, scanResult.size());
     String processFileName = "VfsProcessScannerTest.cmmn";
     assertTrue("'" + processFileName + "' not found", contains(scanResult, processFileName));
-    assertFalse("'cmmn' in resource path found", contains(scanResult, "cmmn"));
+    assertFalse("'cmmn' in resource path found", contains(scanResult, "caseResource.txt"));
   }
 
-  private boolean contains(Map<String, byte[]> scanResult, String prefix) {
+  private boolean contains(Map<String, byte[]> scanResult, String suffix) {
     for (String string : scanResult.keySet()) {
-      if (string.startsWith(prefix)) {
+      if (string.endsWith(suffix)) {
         return true;
       }
     }
