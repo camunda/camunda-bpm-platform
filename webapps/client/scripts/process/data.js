@@ -71,6 +71,7 @@ define([
 
   CamLegacyProcessData.prototype.list = function(where) {
     where = where || {};
+    where.latest = where.latest || 'true';
     return this.query({
       data: where,
       path: '/process-definition'
@@ -79,6 +80,7 @@ define([
 
   CamLegacyProcessData.prototype.count = function(where) {
     where = where || {};
+    where.latest = where.latest || 'true';
     return this.query({
       path: '/process-definition/count'
     });
