@@ -75,4 +75,5 @@ public class SpinTestLogger extends SpinLogger {
   public SpinRuntimeException unableToUnwrapRhinoJsWrappedException(String message) {
     return new SpinScriptException(exceptionMessage("008", "Unable to unwrap rhinojs wrapped exception with message '{}'", message));
   }
+
 }

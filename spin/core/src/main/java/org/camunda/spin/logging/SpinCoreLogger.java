@@ -14,6 +14,7 @@ package org.camunda.spin.logging;
 
 import org.camunda.spin.SpinFileNotFoundException;
 import org.camunda.spin.SpinRuntimeException;
+import org.camunda.spin.SpinScriptException;
 import org.camunda.spin.spi.SpinDataFormatException;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
@@ -70,6 +71,10 @@ public class SpinCoreLogger extends SpinLogger {
 
   public IllegalArgumentException unsupportedParameterType(String parameterName, Object param, Class<?> expectedType) {
     return new IllegalArgumentException(exceptionMessage("009", "Unsupported parameter '{}' of type '{}'. Expected type '{}'.", parameterName, param.getClass(), expectedType.getName()));
+  }
+
+  public SpinScriptException noScriptEnvFoundForLanguage(String scriptLanguage, String path) {
+    return new SpinScriptException(exceptionMessage("010", "No script script env found for script language '{}' at path '{}'", scriptLanguage, path));
   }
 
 }

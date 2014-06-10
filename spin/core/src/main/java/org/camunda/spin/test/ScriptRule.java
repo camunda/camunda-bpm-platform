@@ -16,6 +16,7 @@ package org.camunda.spin.test;
 import org.camunda.spin.SpinScriptException;
 import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.logging.SpinLogger;
+import org.camunda.spin.scripting.SpinScriptEnv;
 import org.junit.ClassRule;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -24,6 +25,7 @@ import org.junit.runners.model.Statement;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -35,45 +37,11 @@ import java.util.Map;
  * is used to obtain a {@link ScriptEngine}.
  *
  * @author Sebastian Menski
+ * @author Daniel Meyer
  */
 public class ScriptRule implements TestRule {
 
   private final static SpinTestLogger LOG = SpinLogger.TEST_LOGGER;
-
-  /**
-   * Mapping of known {@link ScriptEngine} language names and
-   * file extensions of corresponding script files.
-   */
-  public static final Map<String,String> extensions = new HashMap<String, String>();
-  static {
-    extensions.put("python", "py");
-    extensions.put("ECMAScript", "js");
-    extensions.put("Groovy", "groovy");
-    extensions.put("ruby", "rb");
-  }
-
-  private static final Map<String, String> testEnvironment = new HashMap<String, String>();
-  static {
-    testEnvironment.put("python",
-        "import org.camunda.spin.Spin.S as S\n"
-      + "import org.camunda.spin.Spin.XML as XML"
-    );
-
-    testEnvironment.put("ECMAScript",
-        "var S = org.camunda.spin.Spin.S;\n"
-      + "var XML = org.camunda.spin.Spin.XML;\n"
-    );
-
-    testEnvironment.put("Groovy",
-        "S = org.camunda.spin.Spin.&S\n"
-      + "XML = org.camunda.spin.Spin.&XML"
-    );
-
-    testEnvironment.put("ruby",
-        "def S(*args)\norg.camunda.spin.Spin.S(*args)\nend\n"
-      + "def XML(*args)\norg.camunda.spin.Spin.XML(*args)\nend"
-    );
-  }
 
   private String script;
   private String scriptPath;
@@ -221,7 +189,7 @@ public class ScriptRule implements TestRule {
   private void executeScript() {
     if (scriptEngine != null) {
       try {
-        String environment = testEnvironment.get(scriptEngine.getFactory().getLanguageName());
+        String environment = SpinScriptEnv.get(scriptEngine.getFactory().getLanguageName());
 
         SimpleBindings bindings = new SimpleBindings(variables);
         LOG.executeScriptWithScriptEngine(scriptPath, scriptEngine.getFactory().getEngineName());
@@ -314,7 +282,7 @@ public class ScriptRule implements TestRule {
    */
   private String getScriptExtension() {
     String languageName = scriptEngine.getFactory().getLanguageName();
-    String extension = extensions.get(languageName);
+    String extension = SpinScriptEnv.getExtension(languageName);
     if (extension == null) {
       LOG.noScriptExtensionFoundForScriptLanguage(languageName);
       return "";
