@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.integrationtest.functional.connect;
 
-import java.io.ByteArrayInputStream;
-
 import org.camunda.bpm.connect.interceptor.ConnectorInvocation;
 import org.camunda.bpm.connect.interceptor.RequestInterceptor;
 import org.camunda.bpm.connect.soap.httpclient.SoapHttpConnector;
@@ -55,7 +53,7 @@ public class PaConnectSupportTest extends AbstractFoxPlatformIntegrationTest {
     soapHttpConnector.createRequest()
       .endpointUrl("http://foo")
       .soapAction("bar")
-      .soapEnvelope(new ByteArrayInputStream("foo".getBytes()))
+      .soapEnvelope("foo")
       .execute();
   }
 
