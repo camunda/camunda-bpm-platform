@@ -12,16 +12,15 @@
  */
 package org.camunda.spin.scripting;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.script.ScriptEngine;
-
+import org.camunda.spin.SpinScriptException;
 import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.logging.SpinLogger;
-import org.camunda.spin.test.ScriptRule;
+
+import javax.script.ScriptEngine;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Spin provides a set of environment scripts for known scripting languages.
@@ -86,7 +85,7 @@ public class SpinScriptEnv {
 
   protected static String loadScriptEnv(String language, String extension) {
     String scriptEnvPath = String.format(ENV_PATH_TEMPLATE, language, extension);
-    InputStream envResource = ScriptRule.class.getClassLoader().getResourceAsStream(scriptEnvPath);
+    InputStream envResource = SpinScriptException.class.getClassLoader().getResourceAsStream(scriptEnvPath);
 
     if(envResource == null) {
       throw LOG.noScriptEnvFoundForLanguage(language, scriptEnvPath);
