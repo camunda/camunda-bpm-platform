@@ -36,7 +36,7 @@ public class SoapHttpResponse extends AbstractConnectorResponse {
     this.httpResponse = httpResponse;
   }
 
-  public int getStatusCode() {
+  public Integer getStatusCode() {
     return getResponseParameter(PARAM_NAME_STATUS_CODE);
   }
 
