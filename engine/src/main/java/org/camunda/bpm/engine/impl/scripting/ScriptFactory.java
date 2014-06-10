@@ -12,11 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.scripting;
 
-import java.io.Reader;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 
 import javax.script.CompiledScript;
-
-import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
+import java.io.Reader;
 
 /**
  * <p>A script factory is responsible for creating a {@link ExecutableScript}
@@ -35,7 +34,7 @@ public class ScriptFactory {
     this.scriptingEngines = scriptingEngines;
   }
 
-  public ExecutableScript crateScript(Reader src, String language) {
+  public ExecutableScript createScript(Reader src, String language) {
 
     CompiledScript compiledScript = scriptingEngines.compile(src, language);
     if(compiledScript != null) {

@@ -12,13 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.execution;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.CmmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
@@ -27,6 +20,13 @@ import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStore;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Roman Smirnov
@@ -50,7 +50,7 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   // variables ////////////////////////////////////////////////////////////////
 
-  protected SimpleVariableStore variableStrore = new SimpleVariableStore();
+  protected SimpleVariableStore variableStore = new SimpleVariableStore();
 
   public CaseExecutionImpl() {
   }
@@ -142,7 +142,7 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   // variables //////////////////////////////////////////////////////////////
 
   protected CoreVariableStore getVariableStore() {
-    return variableStrore;
+    return variableStore;
   }
 
   // toString /////////////////////////////////////////////////////////////////

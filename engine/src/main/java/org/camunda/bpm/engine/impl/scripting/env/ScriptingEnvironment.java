@@ -12,19 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.scripting.env;
 
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
+import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
+
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-
-import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
-import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
-import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 
 /**
  * <p>The scripting environment contains scripts that provide an environment to
@@ -119,7 +118,7 @@ public class ScriptingEnvironment {
       Reader[] resolvedScripts = resolver.resolve(language);
       if(resolvedScripts != null) {
         for (Reader resolvedScript : resolvedScripts) {
-          scripts.add(scriptFactory.crateScript(resolvedScript, language));
+          scripts.add(scriptFactory.createScript(resolvedScript, language));
         }
       }
     }

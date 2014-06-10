@@ -109,7 +109,7 @@ public class ScriptingEngines {
   public CompiledScript compile(Reader reader, String language) {
     ScriptEngine scriptEngine = getScriptEngineForLanguage(language);
 
-    if(scriptEngine instanceof Compilable) {
+    if(scriptEngine instanceof Compilable && !scriptEngine.getFactory().getLanguageName().equalsIgnoreCase("ecmascript")) {
       Compilable compilingEngine = (Compilable) scriptEngine;
 
       try {

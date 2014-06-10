@@ -61,7 +61,7 @@ public class JuelFormEngine implements FormEngine {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     ScriptingEnvironment scriptingEnvironment = processEngineConfiguration.getScriptingEnvironment();
     ScriptFactory scriptFactory = processEngineConfiguration.getScriptFactory();
-    ExecutableScript script = scriptFactory.crateScript(new StringReader(scriptSrc), ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE);
+    ExecutableScript script = scriptFactory.createScript(new StringReader(scriptSrc), ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE);
     return scriptingEnvironment.execute(script, scope);
   }
 
