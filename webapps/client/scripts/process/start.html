@@ -18,7 +18,7 @@
                  placeholder="Process name"
                  tooltip="Search by process name, case sensitive."
                  tooltip-placement="left"
-                 typeahead="process.name for process in getProcess($viewValue)"
+                 typeahead="process.name for process in searchProcess($viewValue)"
                  typeahead-loading="loadingProcesses"
                  typeahead-wait-ms="100"
                  typeahead-on-select="selected($item, $model, $label)"
@@ -132,16 +132,20 @@
   </div>
 
   <div class="modal-footer">
+    <!--
     <div ng-if="!startingProcess">
       <pagination boundary-links="true"
+                  items-per-page="itemsPerPage"
                   total-items="totalProcesses"
                   ng-model="currentPage"
+                  ng-change="pageChanged()"
                   class="pagination-sm"
                   previous-text="&lsaquo;"
                   next-text="&rsaquo;"
                   first-text="&laquo;"
                   last-text="&raquo;"></pagination>
     </div>
+    -->
 
     <div ng-if="startingProcess">
       <button class="btn btn-xs btn-link"

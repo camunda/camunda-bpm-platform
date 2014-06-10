@@ -49,9 +49,14 @@ define([
       $scope.loadingProcesses = false;
     }
 
-    $scope.processes = [];
+    // used by the pagination directive
+    $scope.currentPage = 1;
+
+    $scope.itemsPerPage = 25;
 
     $scope.totalProcesses = 0;
+
+    $scope.processes = [];
 
     $scope.variables = [];
 
@@ -59,11 +64,28 @@ define([
 
     $scope.loadingProcesses = false;
 
+
+    // $scope.setPage = function (pageNo) {
+    //   $scope.currentPage = pageNo;
+    // };
+
+    // $scope.$watch('currentPage', function() {
+    //   console.info('Changed currentPage', $scope.currentPage);
+    // });
+
+    // $scope.pageChanged = function() {
+    //   console.log('Page changed to: ' + $scope.currentPage, $scope.$id, this.$id);
+    //   // $scope.currentPage = this.currentPage;
+    //   $scope.setPage(this.currentPage);
+    // };
+
+
     $scope.selected = function($item, $model, $label) {
       $scope.startingProcess = $item;
     };
 
-    $scope.getProcess = function(val) {
+
+    $scope.searchProcess = function(val) {
       if (val.length > 2) {
         $scope.loadingProcesses = true;
 
@@ -73,7 +95,6 @@ define([
           $scope.loadingProcesses = false;
           $scope.processes = res;
 
-          // return $scope.processes;
           return $scope.processes;
         }, loadError);
       }
@@ -85,6 +106,43 @@ define([
 
         return deferred.promise;
       }
+    };
+
+
+    $scope.showList = function() {
+      $scope.startingProcess = null;
+    };
+
+
+    $scope.loadProcesses = function() {
+      $scope.loadingProcesses = true;
+      var where = {};
+      // startableBy?
+
+      camLegacyProcessData.count(where)
+      .then(function(result) {
+        $scope.totalProcesses = result.count;
+
+        where.maxResults = where.maxResults || $scope.itemsPerPage;
+
+        camLegacyProcessData.list(where)
+        .then(function(processes) {
+          $scope.loadingProcesses = false;
+
+          $scope.processes = processes;
+
+          console.info('processes loaded', $scope);
+        }, loadError);
+      }, loadError);
+    };
+    $scope.loadProcesses();
+
+
+    $scope.getStartForm = function(startingProcess) {
+      $scope.startingProcess = startingProcess;
+      $scope.variables = [];
+      $scope.addVariable();
+      // camLegacyProcessData.getForm(startingProcess.key).then(function() {});
     };
 
 
@@ -105,36 +163,6 @@ define([
 
       $scope.variables = vars;
     };
-
-
-    $scope.getStartForm = function(startingProcess) {
-      $scope.startingProcess = startingProcess;
-      $scope.variables = [];
-      $scope.addVariable();
-      // camLegacyProcessData.getForm(startingProcess.key).then(function() {});
-    };
-
-
-    $scope.showList = function() {
-      $scope.startingProcess = null;
-    };
-
-
-    $scope.loadProcesses = function() {
-      $scope.loadingProcesses = true;
-      var where = {};
-
-      camLegacyProcessData.count(where).then(function(result) {
-        $scope.totalProcesses = result.count;
-
-        camLegacyProcessData.list(where).then(function(processes) {
-          $scope.loadingProcesses = false;
-
-          $scope.processes = processes;
-        }, loadError);
-      }, loadError);
-    };
-    $scope.loadProcesses();
 
 
     $scope.submitForm = function(htmlForm) {
@@ -166,7 +194,7 @@ define([
   function($modal,   $scope,   $location,   $rootScope) {
     var instance = $modal.open({
       size: 'lg',
-      scope: $scope,
+      // scope: $scope,
       template: require('text!camunda-tasklist-ui/process/start.html')
     });
 
