@@ -44,6 +44,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
+import org.camunda.bpm.connect.soap.httpclient.SoapHttpConnector;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FormService;
@@ -86,6 +87,7 @@ import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistr
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformFactory;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
 import org.camunda.bpm.engine.impl.cmmn.transformer.DefaultCmmnTranformFactory;
+import org.camunda.bpm.engine.impl.connector.Connectors;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.db.IbatisVariableTypeHandler;
@@ -399,6 +401,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected boolean isDeploymentLockUsed = true;
 
+  protected Connectors connectors;
+
   /**
    * The process engine created by this configuration.
    */
@@ -452,6 +456,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
     initSpin();
+    initConnectors();
     invokePostInit();
   }
 
@@ -1187,6 +1192,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     } else {
       log.info("Spin unavailable: camunda Spin is not found on the classpath.");
 
+    }
+  }
+
+  protected void initConnectors() {
+    if(connectors == null) {
+      connectors = new Connectors();
+
+      // register default connectors
+      connectors.addConnector(SoapHttpConnector.ID, SoapHttpConnector.class);
     }
   }
 
@@ -2285,5 +2299,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setEnvScriptResolvers(List<ScriptEnvResolver> scriptEnvResolvers) {
     this.scriptEnvResolvers = scriptEnvResolvers;
+  }
+
+  public Connectors getConnectors() {
+    return connectors;
+  }
+
+  public void setConnectors(Connectors connectors) {
+    this.connectors = connectors;
   }
 }
