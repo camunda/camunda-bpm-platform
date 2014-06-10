@@ -8,7 +8,20 @@
     <!-- / page-navigation -->
 
 
-
+<!--     <div class="splash-screen">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title">Upcoming camunda Tasklist</h3>
+        </div>
+        <div class="panel-body">
+          <p>
+            This is the draft of <a target="_blank" href="https://github.com/camunda/camunda-tasklist-ui">upcoming re-designed tasklist</a> for the <a target="_blank" href="https://github.com/camunda/camunda-tasklist-ui">camunda BPM platform</a>.<br/>
+            For now, you can start a process (by clicking on the <i class="glyphicon glyphicon-list-alt"></i> icon in the header).<br/>
+          </p>
+        </div>
+      </div>
+    </div>
+ -->
 
     <div class="container-fluid">
       <div class="row controls">
@@ -23,10 +36,13 @@
         <div class="cols col-sm-4 current-pile">
           <div class="inner">
             <div class="row">
+              <div class="col-xs-12">
+              <!--
               <div class="col-xs-6">
                 <h5>&nbsp;</h5>
               </div>
               <div class="col-xs-6 dropdown sorting">
+              -->
                 <a data-toggle="dropdown" href="#">Sort by <span class="sort-by">Due date</span></a>
                 <a href="#" class="sort-direction glyphicon glyphicon-chevron-up"></a>
                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
@@ -70,7 +86,22 @@
         </div>
 
         <div class="cols col-sm-4 task-list">
-          <div cam-tasklist-pile-tasks></div>
+          <!-- <div cam-tasklist-pile-tasks></div> -->
+          <div class="inner">
+
+            <div class="panel panel-default splash-screen">
+              <div class="panel-heading">
+                <h3 class="panel-title">Upcoming camunda Tasklist</h3>
+              </div>
+              <div class="panel-body">
+                <p>
+                  This is the draft of <a target="_blank" href="https://github.com/camunda/camunda-tasklist-ui">upcoming re-designed tasklist</a> for the <a target="_blank" href="https://github.com/camunda/camunda-tasklist-ui">camunda BPM platform</a>.<br/>
+                  For now, you can start a process (by clicking on the <i class="glyphicon glyphicon-list-alt"></i> icon in the header).<br/>
+                </p>
+              </div>
+            </div>
+
+          </div>
         </div>
 
         <div class="cols col-sm-6 current-task">
