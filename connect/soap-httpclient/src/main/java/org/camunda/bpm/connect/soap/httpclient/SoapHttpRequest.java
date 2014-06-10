@@ -14,7 +14,6 @@ package org.camunda.bpm.connect.soap.httpclient;
 
 import org.camunda.bpm.connect.impl.AbstractConnectorRequest;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,8 +40,8 @@ public class SoapHttpRequest extends AbstractConnectorRequest<SoapHttpResponse> 
     return this;
   }
 
-  public SoapHttpRequest soapEnvelope(InputStream messageStream) {
-    setRequestParameter(PARAM_NAME_SOAP_ENVELOPE, messageStream);
+  public SoapHttpRequest soapEnvelope(String envelope) {
+    setRequestParameter(PARAM_NAME_SOAP_ENVELOPE, envelope);
     return this;
   }
 
@@ -75,7 +74,7 @@ public class SoapHttpRequest extends AbstractConnectorRequest<SoapHttpResponse> 
     return getRequestParameter(PARAM_NAME_ENDPOINT_URL);
   }
 
-  public InputStream getSoapEnvelope() {
+  public String getSoapEnvelope() {
     return getRequestParameter(PARAM_NAME_SOAP_ENVELOPE);
   }
 }

@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.connect.soap.httpclient;
 
+import org.camunda.bpm.connect.ConnectorException;
+
 /**
  * @author Sebastian Menski
  */
@@ -20,6 +22,14 @@ public class SoapHttpConnectorLogger extends SoapHttpLogger {
 
   public void setHeader(String field, String value) {
     logDebug("001", "Set header field '{}' to '{}'", field, value);
+  }
+
+  public ConnectorException unableToReadResponse(Exception cause) {
+    return new ConnectorException(exceptionMessage("001", "Unable to read connectorResponse: {}", cause.getMessage()), cause);
+  }
+
+  public ConnectorException invalidRequestParameter(String paramName, String value) {
+    return new ConnectorException(exceptionMessage("002", "Invalid value for request parameter '{}': '{}'", paramName, value));
   }
 
 }

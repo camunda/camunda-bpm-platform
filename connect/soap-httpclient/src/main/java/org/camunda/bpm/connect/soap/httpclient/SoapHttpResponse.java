@@ -12,21 +12,23 @@
  */
 package org.camunda.bpm.connect.soap.httpclient;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.camunda.bpm.connect.impl.AbstractCloseableConnectorResponse;
+import org.camunda.bpm.connect.impl.AbstractConnectorResponse;
+import org.camunda.commons.utils.IoUtil;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class SoapHttpResponse extends AbstractCloseableConnectorResponse {
+public class SoapHttpResponse extends AbstractConnectorResponse {
+
+  private final SoapHttpConnectorLogger LOG = SoapHttpLogger.SOAP_CONNECTOR_LOGGER;
 
   public static final String PARAM_NAME_STATUS_CODE = "statusCode";
+  public static final String PARAM_NAME_RESPONSE = "response";
 
   protected CloseableHttpResponse httpResponse;
 
@@ -34,31 +36,26 @@ public class SoapHttpResponse extends AbstractCloseableConnectorResponse {
     this.httpResponse = httpResponse;
   }
 
-  public boolean isSuccessful() {
-    // TODO: do other status codes also indicate success in SOAP?
-    return getStatusCode() == 200;
-  }
-
   public int getStatusCode() {
-    return httpResponse.getStatusLine().getStatusCode();
+    return getResponseParameter(PARAM_NAME_STATUS_CODE);
   }
 
-  public InputStream getInputStream() {
-    try {
-      return httpResponse.getEntity().getContent();
-    } catch (IllegalStateException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+  public String getResponse() {
+    return getResponseParameter(PARAM_NAME_RESPONSE);
   }
 
   protected void collectResponseParameters(Map<String, Object> responseParameters) {
-    responseParameters.put(PARAM_NAME_STATUS_CODE, getStatusCode());
-  }
+    try {
+      responseParameters.put(PARAM_NAME_STATUS_CODE, httpResponse.getStatusLine().getStatusCode());
+      responseParameters.put(PARAM_NAME_RESPONSE, IoUtil.inputStreamAsString(httpResponse.getEntity().getContent()));
 
-  protected Closeable getClosable() {
-    return httpResponse;
+    } catch (IllegalStateException e) {
+      throw LOG.unableToReadResponse(e);
+    } catch (IOException e) {
+      throw LOG.unableToReadResponse(e);
+    } finally {
+      IoUtil.closeSilently(httpResponse);
+    }
   }
 
 }

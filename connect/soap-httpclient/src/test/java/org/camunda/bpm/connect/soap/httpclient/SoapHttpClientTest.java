@@ -13,6 +13,7 @@
 package org.camunda.bpm.connect.soap.httpclient;
 
 import org.apache.http.client.methods.HttpPost;
+import org.camunda.bpm.connect.ConnectorException;
 import org.camunda.commons.utils.IoUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class SoapHttpClientTest {
       .contentType("application/xml")
       .endpointUrl("http://camunda.org/soap")
       .soapAction("action")
-      .soapEnvelope(IoUtil.stringAsInputStream("test"));
+      .soapEnvelope("test");
   }
 
   @Test
@@ -54,9 +55,20 @@ public class SoapHttpClientTest {
     assertThat(content).isEqualTo("test");
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ConnectorException.class)
   public void shouldFailIfNoEnvelopeIsSet() {
     request.soapEnvelope(null);
+    connector.createHttpPost(request);
+  }
+
+  @Test(expected = ConnectorException.class)
+  public void shouldFailIfNoEndpointUrlIsSet() {
+    request.endpointUrl(null);
+    connector.createHttpPost(request);
+  }
+
+  public void shouldNotFailIfNoHeadersAreSet() {
+    request.setRequestParameter(SoapHttpRequest.PARAM_NAME_HEADERS, null);
     connector.createHttpPost(request);
   }
 

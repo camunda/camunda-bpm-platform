@@ -19,6 +19,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.camunda.bpm.connect.impl.AbstractConnector;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -79,14 +82,30 @@ public class SoapHttpConnector extends AbstractConnector<SoapHttpRequest, SoapHt
    * @return the HttpPost object
    */
   protected HttpPost createHttpPost(SoapHttpRequest soapHttpRequest) {
+
+    // handle endpoint
+    String endpointUrl = soapHttpRequest.getEndpointUrl();
+    if(endpointUrl == null || endpointUrl.isEmpty()) {
+      throw LOG.invalidRequestParameter(SoapHttpRequest.PARAM_NAME_ENDPOINT_URL, "param must be set");
+    }
     HttpPost httpPost = new HttpPost(soapHttpRequest.getEndpointUrl());
 
-    for (Entry<String, String> entry : soapHttpRequest.getHeaders().entrySet()) {
-      httpPost.setHeader(entry.getKey(), entry.getValue());
-      LOG.setHeader(entry.getKey(), entry.getValue());
+    // handle headers
+    Map<String, String> headers = soapHttpRequest.getHeaders();
+    if(headers != null) {
+      for (Entry<String, String> entry : headers.entrySet()) {
+        httpPost.setHeader(entry.getKey(), entry.getValue());
+        LOG.setHeader(entry.getKey(), entry.getValue());
+      }
     }
 
-    httpPost.setEntity(new InputStreamEntity(soapHttpRequest.getSoapEnvelope()));
+    // handle payload
+    String soapEnvelope = soapHttpRequest.getSoapEnvelope();
+    if(soapEnvelope == null || soapEnvelope.isEmpty()) {
+      throw LOG.invalidRequestParameter(SoapHttpRequest.PARAM_NAME_SOAP_ENVELOPE, "param must be set");
+    }
+    ByteArrayInputStream envelopeStream = new ByteArrayInputStream(soapEnvelope.getBytes(Charset.forName("utf-8")));
+    httpPost.setEntity(new InputStreamEntity(envelopeStream));
 
     return httpPost;
   }
