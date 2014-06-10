@@ -103,23 +103,25 @@ define([
     }
   });
 
+  var pileDetailsExp = /\/tasklist\/piles\/([^\/]+)/;
   $.mockjax({
     method: 'GET',
     contentType: 'application/hal+json',
-
-    url: /\/tasklist\/piles\/([0-9a-z-]+)$/g,
-    data: ['pileId'],
+    url: pileDetailsExp,
+    urlParams: ['pileId'],
     response: function(settings) {
-      console.info('pile details', settings.url.match(/\/tasklist\/piles\/([0-9a-z-]+)$/g));
       var hal = {
         _links: {
           self: {
-            href: settings.url //'/tasklist/piles/'+ settings.pileId
+            href: settings.url
           }
         }
       };
 
-      _.extend(hal, _mockedPiles[settings.pileId]);
+      // _.extend(hal, _mockedPiles[expResult[1]] || {});
+      _.extend(hal, _mockedPiles[settings.pileId] || {});
+
+      hal._embedded = {tasks: {}};
 
       this.responseText = JSON.stringify(hal);
     }
