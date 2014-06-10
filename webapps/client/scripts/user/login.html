@@ -8,27 +8,52 @@
   </div>
 
   <div class="modal-body">
-    <div class="form-group">
-      <!-- <label for="userLoginInputUsername">User name</label> -->
-      <input required
-             ng-model="username"
-             name="username"
-             type="text"
-             class="form-control"
-             id="userLoginInputUsername"
-             placeholder="User name">
+    <div class="row">
+      <div class="col-md-6 col-sm-12">
+
+        <div class="form-group">
+          <!-- <label for="userLoginInputUsername">User name</label> -->
+          <input required
+                 ng-model="username"
+                 name="username"
+                 type="text"
+                 class="form-control"
+                 id="userLoginInputUsername"
+                 placeholder="User name">
+        </div>
+
+        <div class="form-group">
+          <!-- <label for="userLoginInputPassword">Password</label> -->
+          <input required
+                 ng-model="password"
+                 name="password"
+                 type="password"
+                 class="form-control"
+                 id="userLoginInputPassword"
+                 placeholder="Password">
+        </div>
+
+
+      </div>
+      <div class="col-md-6 col-sm-12">
+
+        <div class="panel panel-default splash-screen">
+          <div class="panel-heading">
+            <h3 class="panel-title">Upcoming camunda Tasklist</h3>
+          </div>
+          <div class="panel-body">
+            This is the <strong>draft</strong> of <a target="_blank" href="https://github.com/camunda/camunda-tasklist-ui">upcoming re-designed tasklist</a> for the <a target="_blank" href="https://github.com/camunda/camunda-tasklist-ui">camunda BPM platform</a>.<hr/>
+            For now, you can start a process (by clicking on the <i class="glyphicon glyphicon-list-alt"></i> icon in the header).<br/>
+            If you are looking for a more stable version of the tasklist, please, use the one packaged with the 7.1 version of the camunda BPM platform.
+            <hr/>
+            You can give us some feedback in <a href="https://groups.google.com/forum/#!forum/camunda-bpm-users">the forum</a>.
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <div class="form-group">
-      <!-- <label for="userLoginInputPassword">Password</label> -->
-      <input required
-             ng-model="password"
-             name="password"
-             type="password"
-             class="form-control"
-             id="userLoginInputPassword"
-             placeholder="Password">
-    </div>
+
   </div>
 
   <div class="modal-footer">
