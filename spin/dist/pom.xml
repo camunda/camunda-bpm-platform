@@ -54,6 +54,13 @@
           <includeDependencySources>true</includeDependencySources>
           <includeTransitiveDependencySources>true</includeTransitiveDependencySources>
          <dependencySourceIncludes><include>org.camunda.spin:*</include></dependencySourceIncludes>
+         <additionnalDependencies>
+           <dependency>
+             <groupId>junit</groupId>
+             <artifactId>junit</artifactId>
+             <version>4.11</version>
+           </dependency>
+         </additionnalDependencies>
         </configuration>
       </plugin>
     </plugins>
