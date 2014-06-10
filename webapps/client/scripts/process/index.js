@@ -25,10 +25,13 @@ define([
 
     // http://docs.camunda.org/latest/api-references/rest/#process-definition-start-process-instance-method
     // Valid variable values are Boolean, Number, String and Date values.
+    // NOTE: Actually... forget the docs...
     var variableTypes = {
       'Boolean':  'checkbox',
-      // 'Number':   'number',
-      'Number':   'text',
+      'Integer':  'text',
+      'Double':   'text',
+      'Long':     'text',
+      'Short':    'text',
       'String':   'text',
       'Date':     'datetime'
     };
