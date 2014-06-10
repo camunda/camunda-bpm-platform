@@ -24,6 +24,15 @@ import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.mapping.InputParameter;
+import org.camunda.bpm.engine.impl.core.mapping.IoMapping;
+import org.camunda.bpm.engine.impl.core.mapping.OutputParameter;
+import org.camunda.bpm.engine.impl.core.mapping.value.ConstantValueProvider;
+import org.camunda.bpm.engine.impl.core.mapping.value.ListValueProvider;
+import org.camunda.bpm.engine.impl.core.mapping.value.MapValueProvider;
+import org.camunda.bpm.engine.impl.core.mapping.value.NullValueProvider;
+import org.camunda.bpm.engine.impl.core.mapping.value.ParameterValueProvider;
+import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
@@ -40,6 +49,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.*;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
+import org.camunda.bpm.engine.impl.scripting.ScriptValueProvider;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -925,6 +935,10 @@ public class BpmnParse extends Parse {
     if (activity != null) {
       parseMultiInstanceLoopCharacteristics(activityElement, activity);
     }
+
+    if(activity != null) {
+      parseActivityInputOutput(activityElement, activity);
+    }
   }
 
   public void validateActivities(List<ActivityImpl> activities) {
@@ -1445,6 +1459,9 @@ public class BpmnParse extends Parse {
         // for backwards compatible reasons
         resultVariableName = scriptTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariableName");
       }
+    } else {
+      addError("ScriptTask does not provide script", scriptTaskElement);
+      return activity;
     }
 
     parseAsynchronousContinuation(scriptTaskElement, activity);
@@ -1491,6 +1508,7 @@ public class BpmnParse extends Parse {
     if (resultVariableName == null) {
       resultVariableName = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariableName");
     }
+    Element connectorDefinition = findConnectorDefinition(serviceTaskElement);
 
     parseAsynchronousContinuation(serviceTaskElement, activity);
 
@@ -1502,6 +1520,20 @@ public class BpmnParse extends Parse {
       } else {
         addError("Invalid usage of type attribute on " + elementName + ": '" + type + "'", serviceTaskElement);
       }
+
+    } else if(connectorDefinition != null) {
+      Element connectorIdElement = connectorDefinition.element("connectorId");
+      String connectorId = null;
+      if(connectorIdElement != null)  {
+        connectorId = connectorIdElement.getText().trim();
+      }
+      if(connectorIdElement == null || connectorId.isEmpty()) {
+        addError("No 'id' defined for connector.", serviceTaskElement);
+      }
+
+      // parse mapping. TODO: Make this non-optional?
+      IoMapping ioMapping = parseInputOutput(connectorDefinition);
+      activity.setActivityBehavior(new ServiceTaskConnectorActivityBehavior(connectorId, ioMapping));
 
     } else if (className != null && className.trim().length() > 0) {
       if (resultVariableName != null) {
@@ -1519,7 +1551,7 @@ public class BpmnParse extends Parse {
       activity.setActivityBehavior(new ServiceTaskExpressionActivityBehavior(expressionManager.createExpression(expression), resultVariableName));
 
     } else {
-      addError("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on " + elementName + ".", serviceTaskElement);
+      addError("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' or a nested 'connector' element is mandatory on " + elementName + ".", serviceTaskElement);
     }
 
     parseExecutionListenersOnScope(serviceTaskElement, activity);
@@ -1528,6 +1560,17 @@ public class BpmnParse extends Parse {
       parseListener.parseServiceTask(serviceTaskElement, scope, activity);
     }
     return activity;
+  }
+
+  protected Element findConnectorDefinition(Element serviceTaskElement) {
+    Element extensionElements = serviceTaskElement.element("extensionElements");
+    if(extensionElements != null) {
+      return extensionElements.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "connector");
+
+    } else {
+      return null;
+
+    }
   }
 
   /**
@@ -3151,5 +3194,161 @@ public class BpmnParse extends Parse {
 
   public List<JobDeclaration<?>> getJobDeclarationsByKey(String processDefinitionKey) {
     return jobDeclarations.get(processDefinitionKey);
+  }
+
+  // IoMappings ////////////////////////////////////////////////////////
+
+  protected void parseActivityInputOutput(Element activityElement, ActivityImpl activity) {
+    Element extensionElements = activityElement.element("extensionElements");
+    if(extensionElements != null) {
+      IoMapping inputOutput = parseInputOutput(extensionElements);
+      if(inputOutput != null) {
+        if(!isActivityInputOutputSupported(activityElement.getTagName())) {
+          addError("camunda:inputOutput mapping unsupported for element type '"+activityElement.getTagName()+"'.", activityElement);
+
+        } else {
+          activity.setIoMapping(inputOutput);
+          // turn activity into a scope (->local scope for variables) unless it is an event subprocess
+          if(!activityElement.getTagName().equals("subprocess")
+              && !parseBooleanAttribute(activityElement.attribute(PROPERTYNAME_TRIGGERED_BY_EVENT), false)) {
+            activity.setScope(true);
+          }
+        }
+      }
+    }
+  }
+
+  public static boolean isActivityInputOutputSupported(String tagName) {
+    return tagName.contains("Task") ||
+           tagName.contains("Event") ||
+           tagName.equals("transaction") ||
+           tagName.equals("subProcess");
+  }
+
+  protected IoMapping parseInputOutput(Element element) {
+    Element inputOutputElement = element.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "inputOutput");
+    if(inputOutputElement != null) {
+      IoMapping ioMapping = new IoMapping();
+      parseCamundaInputParameters(inputOutputElement, ioMapping);
+      parseCamundaOutputParameters(inputOutputElement, ioMapping);
+      return ioMapping;
+    }
+    return null;
+  }
+
+  protected void parseCamundaInputParameters(Element inputOutputElement, IoMapping ioMapping) {
+    List<Element> inputParameters = inputOutputElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "inputParameter");
+    for (Element inputParameterElement : inputParameters) {
+      parseInputParameterElement(inputParameterElement, ioMapping);
+    }
+  }
+
+  protected void parseInputParameterElement(Element inputElement, IoMapping ioMapping) {
+    String nameAttribute = inputElement.attribute("name");
+    if(nameAttribute == null || nameAttribute.isEmpty()) {
+      addError("Missing attribute 'name' for inputParameter", inputElement);
+      return;
+    }
+
+    ParameterValueProvider valueProvider = parseNestedParamValueProvider(inputElement);
+
+    // add parameter
+    ioMapping.addInputParameter(new InputParameter(nameAttribute, valueProvider));
+  }
+
+  protected void parseCamundaOutputParameters(Element inputOutputElement, IoMapping ioMapping) {
+    List<Element> outputParameters = inputOutputElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "outputParameter");
+    for (Element inputParameterElement : outputParameters) {
+      parseOutputParameterElement(inputParameterElement, ioMapping);
+    }
+  }
+
+  protected void parseOutputParameterElement(Element outputParameterElement, IoMapping ioMapping) {
+    String nameAttribute = outputParameterElement.attribute("name");
+    if(nameAttribute == null || nameAttribute.isEmpty()) {
+      addError("Missing attribute 'name' for outputParameter", outputParameterElement);
+      return;
+    }
+
+    ParameterValueProvider valueProvider = parseNestedParamValueProvider(outputParameterElement);
+
+    // add parameter
+    ioMapping.addOutputParameter(new OutputParameter(nameAttribute, valueProvider));
+  }
+
+  protected ParameterValueProvider parseNestedParamValueProvider(Element element) {
+    // parse value provider
+    if(element.elements().size() == 0) {
+      return parseParamValueProvider(element);
+
+    } else if(element.elements().size() == 1) {
+      return parseParamValueProvider(element.elements().get(0));
+
+    } else {
+      addError("Output parameter can at most have one child element", element);
+      return null;
+    }
+  }
+
+  protected ParameterValueProvider parseParamValueProvider(Element parameterElement) {
+
+    // LIST
+    if("list".equals(parameterElement.getTagName())) {
+      List<ParameterValueProvider> providerList = new ArrayList<ParameterValueProvider>();
+      for (Element element : parameterElement.elements()) {
+        // parse nested provider
+        providerList.add(parseNestedParamValueProvider(element));
+      }
+      return new ListValueProvider(providerList);
+    }
+
+    // MAP
+    if("map".equals(parameterElement.getTagName())) {
+      TreeMap<String, ParameterValueProvider> providerMap = new TreeMap<String, ParameterValueProvider>();
+      for (Element entryElement : parameterElement.elements("entry")) {
+        // entry must provide key
+        String keyAttribute = entryElement.attribute("key");
+        if(keyAttribute == null || keyAttribute.isEmpty()) {
+          addError("Missing attribute 'key' for 'entry' element", entryElement);
+          break;
+        }
+        // parse nested provider
+        providerMap.put(keyAttribute, parseNestedParamValueProvider(entryElement));
+      }
+      return new MapValueProvider(providerMap);
+    }
+
+    // SCRIPT
+    if("script".equals(parameterElement.getTagName())) {
+      // script must provide 'scriptFormat'
+      String scriptFormatAttribute = parameterElement.attribute("scriptFormat");
+      if(scriptFormatAttribute == null || scriptFormatAttribute.isEmpty()) {
+        addError("Missing attribute 'scriptFormatAttribute' for 'script' element", parameterElement);
+
+      } else {
+        String scriptSource = parameterElement.getText();
+        ExecutableScript executableScript = parseScript(scriptSource, scriptFormatAttribute);
+        return new ScriptValueProvider(executableScript);
+      }
+
+    }
+
+    String textContent = parameterElement.getText().trim();
+    if(!textContent.isEmpty()) {
+      if(textContent.startsWith("${") || textContent.startsWith("#{")) {
+        // EL
+        return new ElValueProvider(expressionManager.createExpression(textContent));
+
+      } else {
+        // CONSTANT (String)
+        return new ConstantValueProvider(textContent);
+
+      }
+
+    } else {
+      // NULL value
+      return new NullValueProvider();
+    }
+
   }
 }

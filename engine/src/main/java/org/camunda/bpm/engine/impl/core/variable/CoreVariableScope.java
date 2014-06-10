@@ -34,7 +34,7 @@ public abstract class CoreVariableScope implements Serializable, VariableScope {
   // TODO: move this?
   protected ELContext cachedElContext;
 
-  protected abstract CoreVariableScope getParentVariableScope();
+  public abstract CoreVariableScope getParentVariableScope();
 
   public Map<String, Object> getVariables() {
     return collectVariables(new HashMap<String, Object>());
@@ -276,6 +276,5 @@ public abstract class CoreVariableScope implements Serializable, VariableScope {
   public void setCachedElContext(ELContext cachedElContext) {
     this.cachedElContext = cachedElContext;
   }
-
 
 }

@@ -305,7 +305,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
     return variableStore;
   }
 
-  protected CoreVariableScope getParentVariableScope() {
+  public CoreVariableScope getParentVariableScope() {
     if (getExecution()!=null) {
       return execution;
     }

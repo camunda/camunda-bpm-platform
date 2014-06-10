@@ -687,7 +687,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   // variables ////////////////////////////////////////////
 
-  protected CoreVariableScope getParentVariableScope() {
+  public CoreVariableScope getParentVariableScope() {
     return getParent();
   }
 

@@ -151,7 +151,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   // variables ////////////////////////////////////////////
 
-  protected CoreVariableScope getParentVariableScope() {
+  public CoreVariableScope getParentVariableScope() {
     return getParent();
   }
 

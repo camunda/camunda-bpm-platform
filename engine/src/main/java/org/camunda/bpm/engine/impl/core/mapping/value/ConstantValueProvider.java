@@ -10,31 +10,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.el.util;
+package org.camunda.bpm.engine.impl.core.mapping.value;
 
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
-import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStore;
 
 /**
- * Simple standalone variable scope which can be used in testcases.
+ * A constant parameter value.
  *
  * @author Daniel Meyer
  *
  */
-public class TestVariableScope extends CoreVariableScope {
+public class ConstantValueProvider implements ParameterValueProvider {
 
-  private static final long serialVersionUID = 1L;
+  protected Object value;
 
-  protected SimpleVariableStore variableStore = new SimpleVariableStore();
-
-  protected CoreVariableStore getVariableStore() {
-    return variableStore;
+  public ConstantValueProvider(Object value) {
+    this.value = value;
   }
 
-  public CoreVariableScope getParentVariableScope() {
-    // flat scope (has no parent)
-    return null;
+  public Object getValue(CoreVariableScope scope) {
+    return value;
+  }
+
+  public void setValue(Object value) {
+    this.value = value;
   }
 
 }
