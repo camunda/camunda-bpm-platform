@@ -12,14 +12,14 @@
  */
 package org.camunda.bpm.engine.test.bpmn.iomapping;
 
-import java.util.List;
-import java.util.TreeMap;
-
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Testcase for camunda input / output in BPMN
@@ -77,6 +77,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @SuppressWarnings("unchecked")
   public void testInputListElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -89,6 +90,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @SuppressWarnings("unchecked")
   public void testInputListMixedValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -101,6 +103,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @SuppressWarnings("unchecked")
   public void testInputMapElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -146,6 +149,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @SuppressWarnings("unchecked")
   public void testInputNested() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
@@ -206,6 +210,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @SuppressWarnings("unchecked")
   public void testOutputListElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -218,6 +223,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @SuppressWarnings("unchecked")
   public void testOutputListMixedValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -230,6 +236,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @SuppressWarnings("unchecked")
   public void testOutputMapElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -273,6 +280,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @SuppressWarnings("unchecked")
   public void testOutputNested() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 

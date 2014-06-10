@@ -3258,8 +3258,8 @@ public class BpmnParse extends Parse {
 
   protected void parseCamundaOutputParameters(Element inputOutputElement, IoMapping ioMapping) {
     List<Element> outputParameters = inputOutputElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "outputParameter");
-    for (Element inputParameterElement : outputParameters) {
-      parseOutputParameterElement(inputParameterElement, ioMapping);
+    for (Element outputParameterElement : outputParameters) {
+      parseOutputParameterElement(outputParameterElement, ioMapping);
     }
   }
 
