@@ -39,7 +39,9 @@
             <li class="divider"></li>
 
 
-            <li ng-repeat="link in links" class="dropdown" ng-class="{dropdown: (link.links && link.links.length)}">
+            <li ng-repeat="link in links"
+                class="dropdown"
+                ng-class="{dropdown: (link.links && link.links.length)}">
               <a ng-if="!link.links || !link.links.length"
                  href="{{ link.href }}">
                 {{ link.title }}
@@ -51,7 +53,8 @@
                  class="dropdown-toggle"
                  data-toggle="dropdown">
                 {{ link.title }}
-                <i ng-if="link.icon" class="glyphicon glyphicon-{{ link.icon }}"></i>
+                <i ng-if="link.icon"
+                   class="glyphicon glyphicon-{{ link.icon }}"></i>
                 <b class="caret"></b>
               </a>
               <ul ng-if="link.links && link.links.length"
@@ -59,7 +62,8 @@
                 <li ng-repeat="link in link.links">
                   <a href="{{ link.href }}">
                     {{ link.title }}
-                    <i ng-if="link.icon" class="glyphicon glyphicon-{{ link.icon }}"></i>
+                    <i ng-if="link.icon"
+                       class="glyphicon glyphicon-{{ link.icon }}"></i>
                   </a>
                 </li>
               </ul>
