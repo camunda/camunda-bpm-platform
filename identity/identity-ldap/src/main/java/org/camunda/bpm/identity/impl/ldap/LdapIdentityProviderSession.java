@@ -402,7 +402,9 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       addFilter(ldapConfiguration.getGroupNameAttribute(), query.getNameLike(), search);
     }
     if(query.getUserId() != null) {
-      addFilter(ldapConfiguration.getGroupMemberAttribute(), getDnForUser(query.getUserId()), search);
+      addFilter(ldapConfiguration.getGroupMemberAttribute(), 
+          escapeLDAPSearchFilter(getDnForUser(query.getUserId())), 
+          search);
     }
     search.write(")");
 
@@ -540,4 +542,31 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       .isAuthorized(permission, resource, resourceId);
   }
 
+  // Based on https://www.owasp.org/index.php/Preventing_LDAP_Injection_in_Java
+  protected final String escapeLDAPSearchFilter(String filter) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < filter.length(); i++) {
+      char curChar = filter.charAt(i);
+        switch (curChar) {
+         case '\\':
+            sb.append("\\5c");
+            break;
+          case '*':
+            sb.append("\\2a");
+            break;
+          case '(':
+            sb.append("\\28");
+            break;
+          case ')':
+            sb.append("\\29");
+            break;
+          case '\u0000': 
+            sb.append("\\00"); 
+            break;
+          default:
+            sb.append(curChar);
+        }
+    }
+    return sb.toString();
+  }
 }
