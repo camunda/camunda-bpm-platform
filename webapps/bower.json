@@ -48,6 +48,7 @@
     "requirejs-text": "2.0.12"
   },
   "resolutions": {
-    "jquery": "2.1.1"
+    "jquery": "2.1.1",
+    "angular": "1.2.16"
   }
 }
