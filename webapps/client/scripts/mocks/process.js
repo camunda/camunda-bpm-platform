@@ -71,7 +71,7 @@ define([
     $.mockjax({
       method: 'POST',
       contentType: 'application/json',
-      url: /\/camunda\/api\/engine\/engine\/default\/process-definition\/key\/([a-z0-9-_]+)\/start/i,
+      url: /\/camunda\/api\/engine\/engine\/default\/process-definition\/key\/([^\/]+)\/start/i,
       urlParams: ['key'],
       // http://docs.camunda.org/latest/api-references/rest/#process-definition-start-process-instance-result
       response: function(settings) {
