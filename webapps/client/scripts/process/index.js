@@ -85,7 +85,7 @@ define([
     };
 
 
-    $scope.searchProcess = function(val) {
+    $scope.getProcess = function(val) {
       if (val.length > 2) {
         $scope.loadingProcesses = true;
 
