@@ -12,18 +12,6 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.naming.InvalidNameException;
-import javax.naming.NamingException;
-
 import org.apache.directory.server.core.DefaultDirectoryService;
 import org.apache.directory.server.core.DirectoryService;
 import org.apache.directory.server.core.entry.ServerEntry;
@@ -35,6 +23,14 @@ import org.apache.directory.server.protocol.shared.transport.TcpTransport;
 import org.apache.directory.server.xdbm.Index;
 import org.apache.directory.shared.ldap.name.LdapDN;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+
+import javax.naming.InvalidNameException;
+import javax.naming.NamingException;
+import java.io.*;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * <p>LDAP test setup using apache directory</p>
@@ -83,28 +79,46 @@ public class LdapTestEnvironment {
     }
 
     createGroup("office-berlin");
-    String dnRoman = createUser("roman", "office-berlin", "Roman", "Smirnov", "roman@camunda.org");
-    String dnRobert = createUser("robert", "office-berlin", "Robert", "Gimbel", "robert@camunda.org");
-    String dnDaniel = createUser("daniel", "office-berlin", "Daniel", "Meyer", "daniel@camunda.org");
+    String dnRoman = createUserUid("roman", "office-berlin", "Roman", "Smirnov", "roman@camunda.org");
+    String dnRobert = createUserUid("robert", "office-berlin", "Robert", "Gimbel", "robert@camunda.org");
+    String dnDaniel = createUserUid("daniel", "office-berlin", "Daniel", "Meyer", "daniel@camunda.org");
 
     createGroup("office-london");
-    String dnOscar = createUser("oscar", "office-london", "Oscar", "The Crouch", "oscar@camunda.org");
-    String dnMonster = createUser("monster", "office-london", "Cookie", "Monster", "monster@camunda.org");
+    String dnOscar = createUserUid("oscar", "office-london", "Oscar", "The Crouch", "oscar@camunda.org");
+    String dnMonster = createUserUid("monster", "office-london", "Cookie", "Monster", "monster@camunda.org");
     
     createGroup("office-home");
-    String dnRuecker = createUser("ruecker", "office-home", "Bernd", "Ruecker", "ruecker@camunda.org");
     // Doesn't work using backslashes, end up with two uid attributes
     // See https://issues.apache.org/jira/browse/DIRSERVER-1442
-    String dnDavid = createUser("david(IT)", "office-home", "David", "Howe\\IT\\", "david@camunda.org");
+    String dnDavid = createUserUid("david(IT)", "office-home", "David", "Howe\\IT\\", "david@camunda.org");
+    
+    String dnRuecker = createUserUid("ruecker", "office-home", "Bernd", "Ruecker", "ruecker@camunda.org");
+
+    createGroup("office-external");
+    String dnFozzie = createUserCN("fozzie", "office-external", "Bear", "Fozzie", "fozzie@camunda.org");
     
     createRole("management", dnRuecker, dnRobert, dnDaniel);
     createRole("development", dnRoman, dnDaniel, dnOscar);
     createRole("consulting", dnRuecker);
     createRole("sales", dnRuecker, dnMonster, dnDavid);
+    createRole("external", dnFozzie);
   }
 
-  protected String createUser(String user, String group, String firstname, String lastname, String email) throws Exception {
+  protected String createUserUid(String user, String group, String firstname, String lastname, String email) throws Exception {
     LdapDN dn = new LdapDN("uid="+user+",ou="+group+",o=camunda,c=org");
+    createUser(user, firstname, lastname, email, dn);
+    return dn.toNormName();
+  }
+
+  protected String createUserCN(String user, String group, String firstname, String lastname, String email) throws Exception {
+    LdapDN dn = new LdapDN("cn="+lastname + "\\," + firstname +",ou="+group+",o=camunda,c=org");
+    createUser(user, firstname, lastname, email, dn);
+    return dn.toNormName();
+  }
+
+  private void createUser(String user, String firstname, String lastname,
+      String email, LdapDN dn) throws Exception, NamingException,
+      UnsupportedEncodingException {
     if (!service.getAdminSession().exists(dn)) {
       ServerEntry entry = service.newEntry(dn);
       entry.add("objectClass", "top", "person", "inetOrgPerson"); //, "extensibleObject"); //make extensible to allow for the "memberOf" field
@@ -116,7 +130,6 @@ public class LdapTestEnvironment {
       service.getAdminSession().add(entry);
       System.out.println("created entry: " + dn.toNormName());
     }
-    return dn.toNormName();
   }
 
   protected void createGroup(String name) throws InvalidNameException, Exception, NamingException {
