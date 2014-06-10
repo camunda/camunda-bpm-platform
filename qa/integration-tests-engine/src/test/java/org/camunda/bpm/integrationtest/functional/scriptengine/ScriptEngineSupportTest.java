@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNotNull;
 public abstract class ScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTest {
 
   public static final String PROCESS_ID = "testProcess";
-  public static final String EXAMPLE_SCRIPT = "execution.setVariable('foo', 'bar')";
+  public static final String EXAMPLE_SCRIPT = "execution.setVariable('foo', S('<bar/>').name())";
 
   public String processInstanceId;
 
