@@ -26,7 +26,7 @@
   <update id="updateCaseExecution" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity">
     update ${prefix}ACT_RU_CASE_EXECUTION set
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      STATE_ = #{state, jdbcType=INTEGER},
+      CURRENT_STATE_ = #{currentState, jdbcType=INTEGER},
       PREV_STATE_ = #{previousState, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
