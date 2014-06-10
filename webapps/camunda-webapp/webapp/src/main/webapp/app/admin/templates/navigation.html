@@ -25,6 +25,7 @@
     <li class="dropdown"
         if-logged-in>
       <a href
+         sem-show-user-actions
          class="dropdown-toggle"
          data-toggle="dropdown">
         <i class="icon-user icon-white"></i> {{ authentication.user.name }}
@@ -32,13 +33,13 @@
 
       <ul class="dropdown-menu">
         <li>
-          <a ng-href="{{ '../../admin/:engine/#/users/' + authentication.user.name + '?tab=profile' | uri }}">
+          <a sem-jump-to-profile ng-href="{{ '../../admin/:engine/#/users/' + authentication.user.name + '?tab=profile' | uri }}">
             My Profile
           </a>
         </li>
         <li class="divider"></li>
         <li>
-          <a href ng-click="logout()">
+          <a href sem-log-out ng-click="logout()">
             Sign out
           </a>
         </li>
@@ -56,10 +57,10 @@
 
       <ul class="dropdown-menu">
         <li ng-show="authentication.canAccess('cockpit')">
-          <a ng-href="{{ '../../cockpit/:engine/' | uri }}">Cockpit</a>
+          <a sem-jump-to-cockpit ng-href="{{ '../../cockpit/:engine/' | uri }}">Cockpit</a>
         </li>
         <li ng-show="authentication.canAccess('tasklist')">
-          <a ng-href="{{ '../../tasklist/:engine/' | uri }}">Tasklist</a>
+          <a sem-jump-to-tasklist ng-href="{{ '../../tasklist/:engine/' | uri }}">Tasklist</a>
         </li>
       </ul>
     </li>
