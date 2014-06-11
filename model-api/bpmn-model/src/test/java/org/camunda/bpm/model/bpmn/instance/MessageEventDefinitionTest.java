@@ -14,20 +14,18 @@
 package org.camunda.bpm.model.bpmn.instance;
 
 import org.camunda.bpm.model.bpmn.impl.instance.OperationRef;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 /**
  * @author Sebastian Menski
  */
-public class MessageEventDefinitionTest extends BpmnModelElementInstanceTest {
-
-  public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(EventDefinition.class, false);
-  }
+public class MessageEventDefinitionTest extends AbstractEventDefinitionTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
@@ -45,4 +43,13 @@ public class MessageEventDefinitionTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "resultVariable")
     );
   }
+
+  @Test
+  public void getEventDefinition() {
+    MessageEventDefinition eventDefinition = eventDefinitionQuery.filterByType(MessageEventDefinition.class).singleResult();
+    assertThat(eventDefinition).isNotNull();
+    assertThat(eventDefinition.getMessage().getId()).isEqualTo("message");
+    assertThat(eventDefinition.getOperation()).isNull();
+  }
+
 }

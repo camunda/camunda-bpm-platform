@@ -64,8 +64,7 @@ public class ModelTest {
     baseInstanceTypes.add(model.getType(ExtensionElements.class));
     baseInstanceTypes.add(model.getType(EventDefinition.class));
     Collection<ModelElementType> allExtendingTypes = ModelUtil.calculateAllExtendingTypes(bpmnModelInstance.getModel(), baseInstanceTypes);
-    assertThat(allExtendingTypes).hasSize(8);
+    assertThat(allExtendingTypes).hasSize(16);
   }
-
 
 }

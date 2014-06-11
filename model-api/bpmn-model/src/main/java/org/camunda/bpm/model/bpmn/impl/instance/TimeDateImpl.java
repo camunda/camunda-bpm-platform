@@ -13,34 +13,38 @@
 
 package org.camunda.bpm.model.bpmn.impl.instance;
 
+import org.camunda.bpm.model.bpmn.instance.Expression;
+import org.camunda.bpm.model.bpmn.instance.TimeDate;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_SOURCE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_TIME_DATE;
 import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
 /**
- * The BPMN source element of the BPMN tRelationship and tLinkEventDefinition type
+ * The BPMN timeDate element of the BPMN tTimerEventDefinition type
  *
  * @author Sebastian Menski
  */
-public class Source extends BpmnModelElementInstanceImpl {
+public class TimeDateImpl extends ExpressionImpl implements TimeDate {
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Source.class, BPMN_ELEMENT_SOURCE)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(TimeDate.class, BPMN_ELEMENT_TIME_DATE)
       .namespaceUri(BPMN20_NS)
-      .instanceProvider(new ModelTypeInstanceProvider<Source>() {
-        public Source newInstance(ModelTypeInstanceContext instanceContext) {
-          return new Source(instanceContext);
+      .extendsType(Expression.class)
+      .instanceProvider(new ModelTypeInstanceProvider<TimeDate>() {
+        public TimeDate newInstance(ModelTypeInstanceContext instanceContext) {
+          return new TimeDateImpl(instanceContext);
         }
       });
 
     typeBuilder.build();
   }
 
-  public Source(ModelTypeInstanceContext instanceContext) {
+  public TimeDateImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
+
 }

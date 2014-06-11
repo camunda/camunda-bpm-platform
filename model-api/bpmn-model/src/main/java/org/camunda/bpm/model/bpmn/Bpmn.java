@@ -234,11 +234,15 @@ public class Bpmn {
     CallableElementImpl.registerType(bpmnModelBuilder);
     CallActivityImpl.registerType(bpmnModelBuilder);
     CallConversationImpl.registerType(bpmnModelBuilder);
+    CancelEventDefinitionImpl.registerType(bpmnModelBuilder);
     CatchEventImpl.registerType(bpmnModelBuilder);
     CategoryValueImpl.registerType(bpmnModelBuilder);
     CategoryValueRef.registerType(bpmnModelBuilder);
     ChildLaneSet.registerType(bpmnModelBuilder);
     CollaborationImpl.registerType(bpmnModelBuilder);
+    CompensateEventDefinitionImpl.registerType(bpmnModelBuilder);
+    ConditionImpl.registerType(bpmnModelBuilder);
+    ConditionalEventDefinitionImpl.registerType(bpmnModelBuilder);
     ConditionExpression.registerType(bpmnModelBuilder);
     ConversationAssociationImpl.registerType(bpmnModelBuilder);
     ConversationImpl.registerType(bpmnModelBuilder);
@@ -264,6 +268,7 @@ public class Bpmn {
     EndEventImpl.registerType(bpmnModelBuilder);
     EndPointImpl.registerType(bpmnModelBuilder);
     EndPointRef.registerType(bpmnModelBuilder);
+    ErrorEventDefinitionImpl.registerType(bpmnModelBuilder);
     ErrorImpl.registerType(bpmnModelBuilder);
     ErrorRef.registerType(bpmnModelBuilder);
     EventDefinitionImpl.registerType(bpmnModelBuilder);
@@ -297,6 +302,7 @@ public class Bpmn {
     ItemDefinitionImpl.registerType(bpmnModelBuilder);
     LaneImpl.registerType(bpmnModelBuilder);
     LaneSetImpl.registerType(bpmnModelBuilder);
+    LinkEventDefinitionImpl.registerType(bpmnModelBuilder);
     LoopCharacteristicsImpl.registerType(bpmnModelBuilder);
     ManualTaskImpl.registerType(bpmnModelBuilder);
     MessageEventDefinitionImpl.registerType(bpmnModelBuilder);
@@ -339,6 +345,8 @@ public class Bpmn {
     SendTaskImpl.registerType(bpmnModelBuilder);
     SequenceFlowImpl.registerType(bpmnModelBuilder);
     ServiceTaskImpl.registerType(bpmnModelBuilder);
+    SignalEventDefinitionImpl.registerType(bpmnModelBuilder);
+    SignalImpl.registerType(bpmnModelBuilder);
     Source.registerType(bpmnModelBuilder);
     SourceRef.registerType(bpmnModelBuilder);
     StartEventImpl.registerType(bpmnModelBuilder);
@@ -349,7 +357,12 @@ public class Bpmn {
     Target.registerType(bpmnModelBuilder);
     TargetRef.registerType(bpmnModelBuilder);
     TaskImpl.registerType(bpmnModelBuilder);
+    TerminateEventDefinitionImpl.registerType(bpmnModelBuilder);
     ThrowEventImpl.registerType(bpmnModelBuilder);
+    TimeCycleImpl.registerType(bpmnModelBuilder);
+    TimeDateImpl.registerType(bpmnModelBuilder);
+    TimeDurationImpl.registerType(bpmnModelBuilder);
+    TimerEventDefinitionImpl.registerType(bpmnModelBuilder);
     To.registerType(bpmnModelBuilder);
     Transformation.registerType(bpmnModelBuilder);
     UserTaskImpl.registerType(bpmnModelBuilder);

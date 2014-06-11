@@ -119,6 +119,15 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_EVENT_DEFINITION = "eventDefinition";
   public static final String BPMN_ELEMENT_EVENT_DEFINITION_REF = "eventDefinitionRef";
   public static final String BPMN_ELEMENT_MESSAGE_EVENT_DEFINITION = "messageEventDefinition";
+  public static final String BPMN_ELEMENT_CANCEL_EVENT_DEFINITION = "cancelEventDefinition";
+  public static final String BPMN_ELEMENT_COMPENSATE_EVENT_DEFINITION = "compensateEventDefinition";
+  public static final String BPMN_ELEMENT_CONDITIONAL_EVENT_DEFINITION = "conditionalEventDefinition";
+  public static final String BPMN_ELEMENT_CONDITION = "condition";
+  public static final String BPMN_ELEMENT_ERROR_EVENT_DEFINITION = "errorEventDefinition";
+  public static final String BPMN_ELEMENT_LINK_EVENT_DEFINITION = "linkEventDefinition";
+  public static final String BPMN_ELEMENT_SIGNAL_EVENT_DEFINITION = "signalEventDefinition";
+  public static final String BPMN_ELEMENT_TERMINATE_EVENT_DEFINITION = "terminateEventDefinition";
+  public static final String BPMN_ELEMENT_TIMER_EVENT_DEFINITION = "timerEventDefinition";
   public static final String BPMN_ELEMENT_SUPPORTED_INTERFACE_REF = "supportedInterfaceRef";
   public static final String BPMN_ELEMENT_CALLABLE_ELEMENT = "callableElement";
   public static final String BPMN_ELEMENT_PARTITION_ELEMENT = "partitionElement";
@@ -176,6 +185,10 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_CONVERSATION_LINK = "conversationLink";
   public static final String BPMN_ELEMENT_COLLABORATION = "collaboration";
   public static final String BPMN_ELEMENT_ASSOCIATION = "association";
+  public static final String BPMN_ELEMENT_SIGNAL = "signal";
+  public static final String BPMN_ELEMENT_TIME_DATE = "timeDate";
+  public static final String BPMN_ELEMENT_TIME_DURATION = "timeDuration";
+  public static final String BPMN_ELEMENT_TIME_CYCLE = "timeCycle";
 
   /** DC */
 
@@ -292,6 +305,10 @@ public final class BpmnModelConstants {
   public static final String BPMN_ATTRIBUTE_INNER_MESSAGE_FLOW_REF = "innerMessageFlowRef";
   public static final String BPMN_ATTRIBUTE_OUTER_MESSAGE_FLOW_REF = "outerMessageFlowRef";
   public static final String BPMN_ATTRIBUTE_ASSOCIATION_DIRECTION = "associationDirection";
+  public static final String BPMN_ATTRIBUTE_WAIT_FOR_COMPLETION = "waitForCompletion";
+  public static final String BPMN_ATTRIBUTE_ACTIVITY_REF = "activityRef";
+  public static final String BPMN_ATTRIBUTE_ERROR_REF = "errorRef";
+  public static final String BPMN_ATTRIBUTE_SIGNAL_REF = "signalRef";
 
   /** DC */
 

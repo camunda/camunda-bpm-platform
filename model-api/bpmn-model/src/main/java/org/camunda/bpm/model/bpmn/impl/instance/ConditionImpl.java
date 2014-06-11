@@ -13,34 +13,37 @@
 
 package org.camunda.bpm.model.bpmn.impl.instance;
 
+import org.camunda.bpm.model.bpmn.instance.Condition;
+import org.camunda.bpm.model.bpmn.instance.Expression;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_SOURCE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_CONDITION;
 import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
 /**
- * The BPMN source element of the BPMN tRelationship and tLinkEventDefinition type
+ * The BPMN condition element of the BPMN tConditionalEventDefinition type
  *
  * @author Sebastian Menski
  */
-public class Source extends BpmnModelElementInstanceImpl {
+public class ConditionImpl extends ExpressionImpl implements Condition {
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Source.class, BPMN_ELEMENT_SOURCE)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Condition.class, BPMN_ELEMENT_CONDITION)
       .namespaceUri(BPMN20_NS)
-      .instanceProvider(new ModelTypeInstanceProvider<Source>() {
-        public Source newInstance(ModelTypeInstanceContext instanceContext) {
-          return new Source(instanceContext);
+      .extendsType(Expression.class)
+      .instanceProvider(new ModelTypeInstanceProvider<Condition>() {
+        public Condition newInstance(ModelTypeInstanceContext instanceContext) {
+          return new ConditionImpl(instanceContext);
         }
       });
 
     typeBuilder.build();
   }
 
-  public Source(ModelTypeInstanceContext instanceContext) {
+  public ConditionImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 }

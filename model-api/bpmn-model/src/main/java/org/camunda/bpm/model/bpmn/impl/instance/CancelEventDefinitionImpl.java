@@ -13,34 +13,38 @@
 
 package org.camunda.bpm.model.bpmn.impl.instance;
 
+import org.camunda.bpm.model.bpmn.instance.CancelEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.EventDefinition;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_SOURCE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_CANCEL_EVENT_DEFINITION;
 import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
 /**
- * The BPMN source element of the BPMN tRelationship and tLinkEventDefinition type
+ * The BPMN cancelEventDefinition element
  *
  * @author Sebastian Menski
  */
-public class Source extends BpmnModelElementInstanceImpl {
+public class CancelEventDefinitionImpl extends EventDefinitionImpl implements CancelEventDefinition {
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Source.class, BPMN_ELEMENT_SOURCE)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CancelEventDefinition.class, BPMN_ELEMENT_CANCEL_EVENT_DEFINITION)
       .namespaceUri(BPMN20_NS)
-      .instanceProvider(new ModelTypeInstanceProvider<Source>() {
-        public Source newInstance(ModelTypeInstanceContext instanceContext) {
-          return new Source(instanceContext);
+      .extendsType(EventDefinition.class)
+      .instanceProvider(new ModelTypeInstanceProvider<CancelEventDefinition>() {
+        public CancelEventDefinition newInstance(ModelTypeInstanceContext instanceContext) {
+          return new CancelEventDefinitionImpl(instanceContext);
         }
       });
 
     typeBuilder.build();
   }
 
-  public Source(ModelTypeInstanceContext instanceContext) {
-    super(instanceContext);
+  public CancelEventDefinitionImpl(ModelTypeInstanceContext context) {
+    super(context);
   }
+
 }
