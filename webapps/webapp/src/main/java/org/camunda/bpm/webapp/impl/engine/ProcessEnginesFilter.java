@@ -82,6 +82,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
       String requestUrl = request.getRequestURL().toString();
       if("tasklist".equals(appName) && requestUrl.contains("default/")) {
           response.sendRedirect(requestUrl.replace("default/", ""));
+          return;
       }
     }
 
