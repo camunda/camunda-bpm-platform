@@ -1,7 +1,7 @@
 (function(root) {
   'use strict';
 
-  var tests = ['/base/dist/scripts/deps.js'];
+  var tests = ['camunda-tasklist-ui-mocks'];
   for (var file in root.__karma__.files) {
     if (root.__karma__.files.hasOwnProperty(file)) {
       if (/Spec\.js$/.test(file)) {
@@ -10,21 +10,15 @@
     }
   }
 
-  requirejs.config({
-    baseUrl: '/base',
+  require(['/base/client/scripts/rjsconf.js'], function(conf) {
+    conf.baseUrl = '/base/client';
 
-    paths: {
-      'camunda-tasklist-ui': '/base/dist/camunda-tasklist-ui',
-      'scripts': '/base/client/scripts',
-      'bower_components': '/base/client/bower_components'
-    }
-  });
+    requirejs.config(conf);
 
-  setTimeout(function() {
     require(tests, function() {
       root.__karma__.start();
     }, function(err) {
       console.error('Something went wrong while loading the tests.', err.stack);
     });
-  }, 200);
+  });
 }(this));

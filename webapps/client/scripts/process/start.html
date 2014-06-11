@@ -1,7 +1,6 @@
 <form role="form"
       name="processStart"
       ng-class="{loading: loadingProcesses}"
-      ng-controller="processStartModalFormCtrl"
       ng-submit="submitForm(processStart)">
 
   <div class="modal-header">
@@ -132,8 +131,10 @@
   </div>
 
   <div class="modal-footer">
-    <!--
     <div ng-if="!startingProcess">
+      <div class="row">
+        <div class="col-xs-8">
+    <!--
       <pagination boundary-links="true"
                   items-per-page="itemsPerPage"
                   total-items="totalProcesses"
@@ -144,13 +145,21 @@
                   next-text="&rsaquo;"
                   first-text="&laquo;"
                   last-text="&raquo;"></pagination>
-    </div>
     -->
+        </div>
+        <div class="col-xs-4">
+          <button class="btn btn-xs btn-link"
+                  type="button"
+                  ng-click="close()">Cancel</button>
+        </div>
+      </div>
+
+    </div>
 
     <div ng-if="startingProcess">
       <button class="btn btn-xs btn-link"
               type="button"
-              ng-click="showList()">back</button>
+              ng-click="showList()">Back</button>
 
       <button class="btn btn-primary"
               type="submit"

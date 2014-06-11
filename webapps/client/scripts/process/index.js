@@ -15,8 +15,8 @@ define([
 
 
   processModule.controller('processStartModalFormCtrl', [
-          '$scope', '$q', 'camLegacyProcessData',
-  function($scope,   $q,   camLegacyProcessData) {
+          '$scope', '$q', 'camTasklistNotifier', 'camLegacyProcessData',
+  function($scope,   $q,   camTasklistNotifier, camLegacyProcessData) {
     var emptyVariable = {
       name:   '',
       value:  '',
@@ -37,12 +37,10 @@ define([
     };
 
     function close(result) {
-      var isFunction = $scope.$parent &&
-                       $scope.$parent.$parent &&
-                       angular.isFunction($scope.$parent.$parent.$close);
+      var isFunction = angular.isFunction($scope.$close);
 
       var cb =  isFunction ?
-                $scope.$parent.$parent.$close :
+                $scope.$close :
                 angular.noop;
 
       cb(result);
@@ -83,6 +81,9 @@ define([
     // };
 
 
+    $scope.close = close;
+
+
     $scope.selected = function($item, $model, $label) {
       $scope.startingProcess = $item;
     };
@@ -96,8 +97,7 @@ define([
           nameLike: '%'+ val +'%'
         }).then(function(res){
           $scope.loadingProcesses = false;
-
-          return $scope.processes;
+          return res;
         }, loadError);
       }
       else {
@@ -118,7 +118,11 @@ define([
     $scope.loadProcesses = function() {
       $scope.loadingProcesses = true;
       var where = {};
-      // startableBy?
+
+      // I found that in the REST API documentation,
+      // I supposed it was aimed to be used,
+      // but using it lead to empty results
+      // where.startableBy = camStorage.get('user').id;
 
       camLegacyProcessData.count(where)
       .then(function(result) {
@@ -130,9 +134,15 @@ define([
         .then(function(processes) {
           $scope.loadingProcesses = false;
 
-          $scope.processes = processes;
-
-          console.info('processes loaded', $scope);
+          $scope.processes = processes.sort(function(a, b) {
+            var aName = (a.name || a.key).toLowerCase();
+            var bName = (b.name || b.key).toLowerCase();
+            if (aName < bName)
+               return -1;
+            if (aName > bName)
+              return 1;
+            return 0;
+          });
         }, loadError);
       }, loadError);
     };
@@ -143,7 +153,6 @@ define([
       $scope.startingProcess = startingProcess;
       $scope.variables = [];
       $scope.addVariable();
-      // camLegacyProcessData.getForm(startingProcess.key).then(function() {});
     };
 
 
@@ -184,24 +193,28 @@ define([
           variables: vars
         }
       }).then(function(result) {
+        camTasklistNotifier.add({
+          type: 'success',
+          text: 'The process has been started.'
+        });
         close(result);
-      }, loadError);
+      }, function(err) {
+        camTasklistNotifier.add(err);
+      });
     };
   }]);
 
 
   processModule.controller('processStartCtrl', [
-          '$modal', '$scope', '$location', '$rootScope',
-  function($modal,   $scope,   $location,   $rootScope) {
-    var instance = $modal.open({
-      size: 'lg',
-      // scope: $scope,
-      template: require('text!camunda-tasklist-ui/process/start.html')
-    });
-
-    function goHome() { $location.path('/'); }
-
-    instance.result.then(goHome, goHome);
+          '$modal', '$scope',
+  function($modal,   $scope) {
+    $scope.openProcessStartModal = function() {
+      $modal.open({
+        size: 'lg',
+        controller: 'processStartModalFormCtrl',
+        template: require('text!camunda-tasklist-ui/process/start.html')
+      });
+    };
   }]);
 
   return processModule;
