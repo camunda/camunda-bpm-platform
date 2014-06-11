@@ -13,27 +13,19 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.camunda.bpm.model.bpmn.builder.InclusiveGatewayBuilder;
 
 /**
+ * The BPMN inclusiveGateway element
+ *
  * @author Sebastian Menski
  */
-public class ExclusiveGatewayTest extends AbstractGatewayTest<ExclusiveGateway> {
+public interface InclusiveGateway extends Gateway {
 
-  public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return Arrays.asList(
-      new AttributeAssumption("default")
-    );
-  }
+  InclusiveGatewayBuilder builder();
 
-  @Test
-  public void getDefault() {
-    assertThat(gateway.getDefault().getId()).isEqualTo("flow");
-  }
+  SequenceFlow getDefault();
+
+  void setDefault(SequenceFlow defaultFlow);
 
 }

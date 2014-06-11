@@ -13,27 +13,24 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.camunda.bpm.model.bpmn.EventBasedGatewayType;
+import org.camunda.bpm.model.bpmn.builder.EventBasedGatewayBuilder;
 
 /**
+ * The BPMN eventBasedGateway element
+ *
  * @author Sebastian Menski
  */
-public class ExclusiveGatewayTest extends AbstractGatewayTest<ExclusiveGateway> {
+public interface EventBasedGateway extends Gateway {
 
-  public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return Arrays.asList(
-      new AttributeAssumption("default")
-    );
-  }
+  EventBasedGatewayBuilder builder();
 
-  @Test
-  public void getDefault() {
-    assertThat(gateway.getDefault().getId()).isEqualTo("flow");
-  }
+  boolean isInstantiate();
+
+  void setInstantiate(boolean isInstantiate);
+
+  EventBasedGatewayType getEventGatewayType();
+
+  void setEventGatewayType(EventBasedGatewayType eventGatewayType);
 
 }

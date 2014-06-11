@@ -11,29 +11,17 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.model.bpmn.instance;
-
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package org.camunda.bpm.model.bpmn;
 
 /**
+ * The BPMN tEventBasedGatewayType simpleType
+ *
  * @author Sebastian Menski
  */
-public class ExclusiveGatewayTest extends AbstractGatewayTest<ExclusiveGateway> {
+public enum EventBasedGatewayType {
 
-  public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return Arrays.asList(
-      new AttributeAssumption("default")
-    );
-  }
+  Exclusive,
 
-  @Test
-  public void getDefault() {
-    assertThat(gateway.getDefault().getId()).isEqualTo("flow");
-  }
+  Parallel
 
 }

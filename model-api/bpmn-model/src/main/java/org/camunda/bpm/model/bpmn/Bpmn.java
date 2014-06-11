@@ -223,6 +223,7 @@ public class Bpmn {
   }
 
   protected void doRegisterTypes(ModelBuilder bpmnModelBuilder) {
+    ActivationConditionImpl.registerType(bpmnModelBuilder);
     ActivityImpl.registerType(bpmnModelBuilder);
     ArtifactImpl.registerType(bpmnModelBuilder);
     AssignmentImpl.registerType(bpmnModelBuilder);
@@ -243,6 +244,7 @@ public class Bpmn {
     CompensateEventDefinitionImpl.registerType(bpmnModelBuilder);
     ConditionImpl.registerType(bpmnModelBuilder);
     ConditionalEventDefinitionImpl.registerType(bpmnModelBuilder);
+    ComplexGatewayImpl.registerType(bpmnModelBuilder);
     ConditionExpression.registerType(bpmnModelBuilder);
     ConversationAssociationImpl.registerType(bpmnModelBuilder);
     ConversationImpl.registerType(bpmnModelBuilder);
@@ -273,6 +275,7 @@ public class Bpmn {
     ErrorRef.registerType(bpmnModelBuilder);
     EscalationImpl.registerType(bpmnModelBuilder);
     EscalationEventDefinitionImpl.registerType(bpmnModelBuilder);
+    EventBasedGatewayImpl.registerType(bpmnModelBuilder);
     EventDefinitionImpl.registerType(bpmnModelBuilder);
     EventDefinitionRef.registerType(bpmnModelBuilder);
     EventImpl.registerType(bpmnModelBuilder);
@@ -288,6 +291,7 @@ public class Bpmn {
     GatewayImpl.registerType(bpmnModelBuilder);
     GlobalConversationImpl.registerType(bpmnModelBuilder);
     ImportImpl.registerType(bpmnModelBuilder);
+    InclusiveGatewayImpl.registerType(bpmnModelBuilder);
     Incoming.registerType(bpmnModelBuilder);
     InMessageRef.registerType(bpmnModelBuilder);
     InnerParticipantRef.registerType(bpmnModelBuilder);

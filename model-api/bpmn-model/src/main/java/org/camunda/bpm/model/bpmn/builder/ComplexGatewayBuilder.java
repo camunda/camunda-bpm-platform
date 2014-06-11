@@ -11,29 +11,18 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.model.bpmn.instance;
+package org.camunda.bpm.model.bpmn.builder;
 
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.ComplexGateway;
 
 /**
  * @author Sebastian Menski
  */
-public class ExclusiveGatewayTest extends AbstractGatewayTest<ExclusiveGateway> {
+public class ComplexGatewayBuilder extends AbstractComplexGatewayBuilder<ComplexGatewayBuilder> {
 
-  public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return Arrays.asList(
-      new AttributeAssumption("default")
-    );
-  }
-
-  @Test
-  public void getDefault() {
-    assertThat(gateway.getDefault().getId()).isEqualTo("flow");
+  public ComplexGatewayBuilder(BpmnModelInstance modelInstance, ComplexGateway element) {
+    super(modelInstance, element, ComplexGatewayBuilder.class);
   }
 
 }

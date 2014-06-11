@@ -191,6 +191,10 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_TIME_CYCLE = "timeCycle";
   public static final String BPMN_ELEMENT_ESCALATION = "escalation";
   public static final String BPMN_ELEMENT_ESCALATION_EVENT_DEFINITION = "escalationEventDefinition";
+  public static final String BPMN_ELEMENT_ACTIVATION_CONDITION = "activationCondition";
+  public static final String BPMN_ELEMENT_COMPLEX_GATEWAY = "complexGateway";
+  public static final String BPMN_ELEMENT_EVENT_BASED_GATEWAY = "eventBasedGateway";
+  public static final String BPMN_ELEMENT_INCLUSIVE_GATEWAY = "inclusiveGateway";
 
   /** DC */
 
@@ -313,6 +317,7 @@ public final class BpmnModelConstants {
   public static final String BPMN_ATTRIBUTE_SIGNAL_REF = "signalRef";
   public static final String BPMN_ATTRIBUTE_ESCALATION_CODE = "escalationCode";
   public static final String BPMN_ATTRIBUTE_ESCALATION_REF = "escalationRef";
+  public static final String BPMN_ATTRIBUTE_EVENT_GATEWAY_TYPE = "eventGatewayType";
 
   /** DC */
 

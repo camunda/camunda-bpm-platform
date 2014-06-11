@@ -21,15 +21,7 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 /**
  * @author Sebastian Menski
  */
-public class ParallelGatewayTest extends BpmnModelElementInstanceTest {
-
-  public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(Gateway.class, false);
-  }
-
-  public Collection<ChildElementAssumption> getChildElementAssumptions() {
-    return null;
-  }
+public class ParallelGatewayTest extends AbstractGatewayTest<ParallelGateway> {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
@@ -37,4 +29,5 @@ public class ParallelGatewayTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "exclusive", false, false, true)
     );
   }
+
 }

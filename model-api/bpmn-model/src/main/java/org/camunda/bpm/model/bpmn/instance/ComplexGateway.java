@@ -13,27 +13,23 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.camunda.bpm.model.bpmn.builder.ComplexGatewayBuilder;
 
 /**
+ * The BPMN complexGateway element
+ *
  * @author Sebastian Menski
  */
-public class ExclusiveGatewayTest extends AbstractGatewayTest<ExclusiveGateway> {
+public interface ComplexGateway extends Gateway {
 
-  public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return Arrays.asList(
-      new AttributeAssumption("default")
-    );
-  }
+  ComplexGatewayBuilder builder();
 
-  @Test
-  public void getDefault() {
-    assertThat(gateway.getDefault().getId()).isEqualTo("flow");
-  }
+  SequenceFlow getDefault();
+
+  void setDefault(SequenceFlow defaultFlow);
+
+  ActivationCondition getActivationCondition();
+
+  void setActivationCondition(ActivationCondition activationCondition);
 
 }

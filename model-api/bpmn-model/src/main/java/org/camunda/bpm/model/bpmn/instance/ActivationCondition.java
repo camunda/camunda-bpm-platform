@@ -13,27 +13,11 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
+ * The BPMN element activationCondition of the BPMN tComplexGateway type
+ *
  * @author Sebastian Menski
  */
-public class ExclusiveGatewayTest extends AbstractGatewayTest<ExclusiveGateway> {
-
-  public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return Arrays.asList(
-      new AttributeAssumption("default")
-    );
-  }
-
-  @Test
-  public void getDefault() {
-    assertThat(gateway.getDefault().getId()).isEqualTo("flow");
-  }
+public interface ActivationCondition extends Expression {
 
 }
