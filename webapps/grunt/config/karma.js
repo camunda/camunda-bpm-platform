@@ -11,14 +11,9 @@ module.exports = function() {
         'node_modules/karma-jasmine/lib/jasmine.js',
         'node_modules/karma-jasmine/lib/adapter.js',
 
-        // {pattern: 'client/bower_components/**/*.js', included: false},
-        // {pattern: 'client/scripts/**/*.js', included: false},
-
         {pattern: 'test/integration/**/*Spec.js', included: false},
-
+        {pattern: 'client/bower_components/**/*.js', included: false},
         {pattern: 'client/scripts/**/*.js', included: false},
-        {pattern: 'dist/scripts/deps.js', included: false},
-        {pattern: 'dist/scripts/camunda-tasklist-ui.js', included: false},
 
         'test/integration/main.js'
       ],
