@@ -49,8 +49,10 @@ public class SpinScriptEnv {
   }
 
   /**
-   * @param languageName
-   * @return
+   * Get file extension for script language.
+   *
+   * @param language the language name
+   * @return the file extension as string or null if the language is not in the set of languages supported by spin
    */
   public static String getExtension(String language) {
     language = language.toLowerCase();
