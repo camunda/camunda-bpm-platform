@@ -18,7 +18,7 @@
                  placeholder="Process name"
                  tooltip="Search by process name, case sensitive."
                  tooltip-placement="left"
-                 typeahead="process.name for process in getProcess($viewValue)"
+                 typeahead="process.name for process in lookupProcess($viewValue)"
                  typeahead-loading="loadingProcesses"
                  typeahead-wait-ms="100"
                  typeahead-on-select="selected($item, $model, $label)"
