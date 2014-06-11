@@ -15,6 +15,7 @@ package org.camunda.bpm.model.xml.impl.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,9 +32,12 @@ public final class StringUtil {
    * contain expressions with commas in it.
    *
    * @param text  the comma separated list
-   * @return the Strings of the list
+   * @return the Strings of the list or an empty List if text is empty or null
    */
   public static List<String> splitCommaSeparatedList(String text) {
+    if (text == null || text.isEmpty()) {
+      return Collections.emptyList();
+    }
     Matcher matcher = pattern.matcher(text);
     List<String> parts = new ArrayList<String>();
     while(matcher.find()) {
@@ -46,7 +50,7 @@ public final class StringUtil {
    * Joins a list of Strings to a comma separated single String.
    *
    * @param list  the list to join
-   * @return the resulting comma separated string
+   * @return the resulting comma separated string or null if the list is null
    */
   public static String joinCommaSeparatedList(List<String> list) {
     return joinList(list, ", ");
