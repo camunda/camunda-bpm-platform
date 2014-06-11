@@ -26,11 +26,11 @@ public interface OutputSet extends BaseElement {
 
   void setName(String name);
 
-  Collection<DataInput> getDataOutputRefs();
+  Collection<DataOutput> getDataOutputRefs();
 
-  Collection<DataInput> getOptionalOutputRefs();
+  Collection<DataOutput> getOptionalOutputRefs();
 
-  Collection<DataInput> getWhileExecutingOutputRefs();
+  Collection<DataOutput> getWhileExecutingOutputRefs();
 
   Collection<InputSet> getInputSetRefs();
 }

@@ -13,10 +13,7 @@
 
 package org.camunda.bpm.model.bpmn.impl.instance;
 
-import org.camunda.bpm.model.bpmn.instance.BaseElement;
-import org.camunda.bpm.model.bpmn.instance.DataInput;
-import org.camunda.bpm.model.bpmn.instance.InputSet;
-import org.camunda.bpm.model.bpmn.instance.OutputSet;
+import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -37,9 +34,9 @@ import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeIn
 public class OutputSetImpl extends BaseElementImpl implements OutputSet {
 
   protected static Attribute<String> nameAttribute;
-  protected static ElementReferenceCollection<DataInput, DataOutputRefs> dataOutputRefsCollection;
-  protected static ElementReferenceCollection<DataInput, OptionalOutputRefs> optionalOutputRefsCollection;
-  protected static ElementReferenceCollection<DataInput, WhileExecutingOutputRefs> whileExecutingOutputRefsCollection;
+  protected static ElementReferenceCollection<DataOutput, DataOutputRefs> dataOutputRefsCollection;
+  protected static ElementReferenceCollection<DataOutput, OptionalOutputRefs> optionalOutputRefsCollection;
+  protected static ElementReferenceCollection<DataOutput, WhileExecutingOutputRefs> whileExecutingOutputRefsCollection;
   protected static ElementReferenceCollection<InputSet, InputSetRefs>  inputSetInputSetRefsCollection;
 
   public static void registerType(ModelBuilder modelBuilder) {
@@ -58,15 +55,15 @@ public class OutputSetImpl extends BaseElementImpl implements OutputSet {
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
     dataOutputRefsCollection = sequenceBuilder.elementCollection(DataOutputRefs.class)
-      .idElementReferenceCollection(DataInput.class)
+      .idElementReferenceCollection(DataOutput.class)
       .build();
 
     optionalOutputRefsCollection = sequenceBuilder.elementCollection(OptionalOutputRefs.class)
-      .idElementReferenceCollection(DataInput.class)
+      .idElementReferenceCollection(DataOutput.class)
       .build();
 
     whileExecutingOutputRefsCollection = sequenceBuilder.elementCollection(WhileExecutingOutputRefs.class)
-      .idElementReferenceCollection(DataInput.class)
+      .idElementReferenceCollection(DataOutput.class)
       .build();
 
     inputSetInputSetRefsCollection = sequenceBuilder.elementCollection(InputSetRefs.class)
@@ -88,15 +85,15 @@ public class OutputSetImpl extends BaseElementImpl implements OutputSet {
     nameAttribute.setValue(this, name);
   }
 
-  public Collection<DataInput> getDataOutputRefs() {
+  public Collection<DataOutput> getDataOutputRefs() {
     return dataOutputRefsCollection.getReferenceTargetElements(this);
   }
 
-  public Collection<DataInput> getOptionalOutputRefs() {
+  public Collection<DataOutput> getOptionalOutputRefs() {
     return optionalOutputRefsCollection.getReferenceTargetElements(this);
   }
 
-  public Collection<DataInput> getWhileExecutingOutputRefs() {
+  public Collection<DataOutput> getWhileExecutingOutputRefs() {
     return whileExecutingOutputRefsCollection.getReferenceTargetElements(this);
   }
 
