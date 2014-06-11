@@ -20,13 +20,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.*;
-import static org.camunda.bpm.model.xml.impl.util.StringUtil.joinCommaSeparatedList;
-import static org.camunda.bpm.model.xml.impl.util.StringUtil.splitCommaSeparatedList;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 /**
  * @author Sebastian Menski
@@ -451,41 +449,48 @@ public class CamundaExtensionsTest {
   }
 
   @Test
-  public void testStringListSplit() {
-    assertThat(splitCommaSeparatedList("")).isEmpty();
-    assertThat(splitCommaSeparatedList("  ")).isEmpty();
-    assertThat(splitCommaSeparatedList("a")).containsExactly("a");
-    assertThat(splitCommaSeparatedList("  a  ")).containsExactly("a");
-    assertThat(splitCommaSeparatedList("a,b")).containsExactly("a", "b");
-    assertThat(splitCommaSeparatedList("a , b, c ")).containsExactly("a", "b", "c");
-    assertThat(splitCommaSeparatedList("${}")).containsExactly("${}");
-    assertThat(splitCommaSeparatedList(" #{ } ")).containsExactly("#{ }");
-    assertThat(splitCommaSeparatedList(" #{}, ${a}, #{b} ")).containsExactly("#{}", "${a}", "#{b}");
-    assertThat(splitCommaSeparatedList(" a, ${b}, #{c} ")).containsExactly("a", "${b}", "#{c}");
-    assertThat(splitCommaSeparatedList(" #{a}, b, ,c ,${d} ")).containsExactly("#{a}", "b", "c", "${d}");
-    assertThat(splitCommaSeparatedList(" #{a(b,c)}, d, ,e ,${fg(h , i , j)} ")).containsExactly("#{a(b,c)}", "d", "e", "${fg(h , i , j)}");
-    assertThat(splitCommaSeparatedList(" #{a == (b, c)}, d = e, f ,${fg(h , i , j)} ")).containsExactly("#{a == (b, c)}", "d = e", "f", "${fg(h , i , j)}");
-    assertThat(splitCommaSeparatedList("accountancy, ${fakeLdapService.findManagers(execution, emp)}")).containsExactly("accountancy", "${fakeLdapService.findManagers(execution, emp)}");
+  public void testGetNonExistingCamundaCandidateUsers() {
+    userTask.removeAttributeNs(CAMUNDA_NS, "candidateUsers");
+    assertThat(userTask.getCamundaCandidateUsers()).isNull();
+    assertThat(userTask.getCamundaCandidateUsersList()).isEmpty();
   }
 
   @Test
-  public void testStringListJoin() {
-    assertThat(joinCommaSeparatedList(null)).isNull();
-    List<String> testList = new ArrayList<String>();
-    assertThat(joinCommaSeparatedList(testList)).isEqualTo("");
-    testList.add("a");
-    assertThat(joinCommaSeparatedList(testList)).isEqualTo("a");
-    testList.add("b");
-    assertThat(joinCommaSeparatedList(testList)).isEqualTo("a, b");
-    testList.add("${a,b,c}");
-    assertThat(joinCommaSeparatedList(testList)).isEqualTo("a, b, ${a,b,c}");
-    testList.add("foo");
-    assertThat(joinCommaSeparatedList(testList)).isEqualTo("a, b, ${a,b,c}, foo");
-    testList.add("#{bar(e,f,g)}");
-    assertThat(joinCommaSeparatedList(testList)).isEqualTo("a, b, ${a,b,c}, foo, #{bar(e,f,g)}");
-    String testString = joinCommaSeparatedList(testList);
-    assertThat(splitCommaSeparatedList(testString)).containsAll(testList);
+  public void testSetNullCamundaCandidateUsers() {
+    assertThat(userTask.getCamundaCandidateUsers()).isNotEmpty();
+    assertThat(userTask.getCamundaCandidateUsersList()).isNotEmpty();
+    userTask.setCamundaCandidateUsers(null);
+    assertThat(userTask.getCamundaCandidateUsers()).isNull();
+    assertThat(userTask.getCamundaCandidateUsersList()).isEmpty();
   }
+
+  @Test
+  public void testEmptyCamundaCandidateUsers() {
+    assertThat(userTask.getCamundaCandidateUsers()).isNotEmpty();
+    assertThat(userTask.getCamundaCandidateUsersList()).isNotEmpty();
+    userTask.setCamundaCandidateUsers("");
+    assertThat(userTask.getCamundaCandidateUsers()).isNull();
+    assertThat(userTask.getCamundaCandidateUsersList()).isEmpty();
+  }
+
+  @Test
+  public void testSetNullCamundaCandidateUsersList() {
+    assertThat(userTask.getCamundaCandidateUsers()).isNotEmpty();
+    assertThat(userTask.getCamundaCandidateUsersList()).isNotEmpty();
+    userTask.setCamundaCandidateUsersList(null);
+    assertThat(userTask.getCamundaCandidateUsers()).isNull();
+    assertThat(userTask.getCamundaCandidateUsersList()).isEmpty();
+  }
+
+  @Test
+  public void testEmptyCamundaCandidateUsersList() {
+    assertThat(userTask.getCamundaCandidateUsers()).isNotEmpty();
+    assertThat(userTask.getCamundaCandidateUsersList()).isNotEmpty();
+    userTask.setCamundaCandidateUsersList(Collections.<String>emptyList());
+    assertThat(userTask.getCamundaCandidateUsers()).isNull();
+    assertThat(userTask.getCamundaCandidateUsersList()).isEmpty();
+  }
+
 
   @After
   public void validateModel() {
