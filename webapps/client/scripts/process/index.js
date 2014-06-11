@@ -96,7 +96,6 @@ define([
           nameLike: '%'+ val +'%'
         }).then(function(res){
           $scope.loadingProcesses = false;
-          $scope.processes = res;
 
           return $scope.processes;
         }, loadError);
@@ -104,7 +103,6 @@ define([
       else {
         var deferred = $q.defer();
 
-        $scope.processes = $scope.processes || [];
         deferred.resolve($scope.processes);
 
         return deferred.promise;
