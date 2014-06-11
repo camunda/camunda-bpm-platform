@@ -271,6 +271,8 @@ public class Bpmn {
     ErrorEventDefinitionImpl.registerType(bpmnModelBuilder);
     ErrorImpl.registerType(bpmnModelBuilder);
     ErrorRef.registerType(bpmnModelBuilder);
+    EscalationImpl.registerType(bpmnModelBuilder);
+    EscalationEventDefinitionImpl.registerType(bpmnModelBuilder);
     EventDefinitionImpl.registerType(bpmnModelBuilder);
     EventDefinitionRef.registerType(bpmnModelBuilder);
     EventImpl.registerType(bpmnModelBuilder);

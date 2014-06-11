@@ -6,6 +6,7 @@
   <error id="error"/>
   <itemDefinition id="itemDef"/>
   <signal id="signal" name="signal" structureRef="itemDef"/>
+  <escalation id="escalation" name="escalation" escalationCode="1337" structureRef="itemDef"/>
   <process id="process">
     <intermediateThrowEvent id="event">
       <cancelEventDefinition/>
@@ -13,6 +14,7 @@
       <conditionalEventDefinition>
         <condition>${test}</condition>
       </conditionalEventDefinition>
+      <escalationEventDefinition escalationRef="escalation"/>
       <errorEventDefinition errorRef="error"/>
       <linkEventDefinition id="link" name="link">
         <source>link</source>

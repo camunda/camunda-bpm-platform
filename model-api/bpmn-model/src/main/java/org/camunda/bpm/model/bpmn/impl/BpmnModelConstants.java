@@ -189,6 +189,8 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_TIME_DATE = "timeDate";
   public static final String BPMN_ELEMENT_TIME_DURATION = "timeDuration";
   public static final String BPMN_ELEMENT_TIME_CYCLE = "timeCycle";
+  public static final String BPMN_ELEMENT_ESCALATION = "escalation";
+  public static final String BPMN_ELEMENT_ESCALATION_EVENT_DEFINITION = "escalationEventDefinition";
 
   /** DC */
 
@@ -309,6 +311,8 @@ public final class BpmnModelConstants {
   public static final String BPMN_ATTRIBUTE_ACTIVITY_REF = "activityRef";
   public static final String BPMN_ATTRIBUTE_ERROR_REF = "errorRef";
   public static final String BPMN_ATTRIBUTE_SIGNAL_REF = "signalRef";
+  public static final String BPMN_ATTRIBUTE_ESCALATION_CODE = "escalationCode";
+  public static final String BPMN_ATTRIBUTE_ESCALATION_REF = "escalationRef";
 
   /** DC */
 
