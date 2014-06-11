@@ -154,6 +154,7 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_PARALLEL_GATEWAY = "parallelGateway";
   public static final String BPMN_ELEMENT_EXCLUSIVE_GATEWAY = "exclusiveGateway";
   public static final String BPMN_ELEMENT_INTERMEDIATE_CATCH_EVENT = "intermediateCatchEvent";
+  public static final String BPMN_ELEMENT_INTERMEDIATE_THROW_EVENT = "intermediateThrowEvent";
   public static final String BPMN_ELEMENT_END_POINT = "endPoint";
   public static final String BPMN_ELEMENT_PARTICIPANT_MULTIPLICITY = "participantMultiplicity";
   public static final String BPMN_ELEMENT_PARTICIPANT = "participant";
