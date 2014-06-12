@@ -18,8 +18,8 @@ import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 /**
  * The holder of registered cockpit plugins.
  *
- * This class is deprecated, use
- *
+ * This class is deprecated, use {@link AppPluginRegistry}
+ * 
  * @author nico.rehwaldt
  */
 @Deprecated
