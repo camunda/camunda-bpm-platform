@@ -34,6 +34,8 @@ public class XmlQName {
     KNOWN_PREFIXES.put("http://activiti.org/bpmn", "camunda");
     KNOWN_PREFIXES.put("http://www.omg.org/spec/BPMN/20100524/MODEL", "bpmn2");
     KNOWN_PREFIXES.put("http://www.omg.org/spec/BPMN/20100524/DI", "bpmndi");
+    KNOWN_PREFIXES.put("http://www.omg.org/spec/DD/20100524/DI", "di");
+    KNOWN_PREFIXES.put("http://www.omg.org/spec/DD/20100524/DC", "dc");
     KNOWN_PREFIXES.put(XMLNS_ATTRIBUTE_NS_URI, "");
   }
 
