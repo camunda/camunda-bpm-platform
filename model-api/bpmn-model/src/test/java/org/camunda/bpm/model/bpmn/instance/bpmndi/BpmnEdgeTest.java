@@ -38,10 +38,10 @@ public class BpmnEdgeTest extends BpmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption(BPMNDI_NS, "bpmnElement"),
-      new AttributeAssumption(BPMNDI_NS, "sourceElement"),
-      new AttributeAssumption(BPMNDI_NS, "targetElement"),
-      new AttributeAssumption(BPMNDI_NS, "messageVisibleKind")
+      new AttributeAssumption("bpmnElement"),
+      new AttributeAssumption("sourceElement"),
+      new AttributeAssumption("targetElement"),
+      new AttributeAssumption("messageVisibleKind")
     );
   }
 }

@@ -37,7 +37,7 @@ public class DiagramElementTest extends BpmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption(DI_NS, "id", true)
+      new AttributeAssumption("id", true)
     );
   }
 }

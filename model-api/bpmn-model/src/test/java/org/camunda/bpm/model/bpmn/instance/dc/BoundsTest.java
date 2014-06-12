@@ -35,10 +35,10 @@ public class BoundsTest extends BpmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption(DC_NS, "x", false, true),
-      new AttributeAssumption(DC_NS, "y", false, true),
-      new AttributeAssumption(DC_NS, "width", false, true),
-      new AttributeAssumption(DC_NS, "height", false, true)
+      new AttributeAssumption("x", false, true),
+      new AttributeAssumption("y", false, true),
+      new AttributeAssumption("width", false, true),
+      new AttributeAssumption("height", false, true)
     );
   }
 }

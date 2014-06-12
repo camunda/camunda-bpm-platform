@@ -55,22 +55,18 @@ public class BpmnEdgeImpl extends LabeledEdgeImpl implements BpmnEdge {
       });
 
     bpmnElementAttribute = typeBuilder.stringAttribute(BPMNDI_ATTRIBUTE_BPMN_ELEMENT)
-      .namespace(BPMNDI_NS)
       .qNameAttributeReference(BaseElement.class)
       .build();
 
     sourceElementAttribute = typeBuilder.stringAttribute(BPMNDI_ATTRIBUTE_SOURCE_ELEMENT)
-      .namespace(BPMNDI_NS)
       .qNameAttributeReference(DiagramElement.class)
       .build();
 
     targetElementAttribute = typeBuilder.stringAttribute(BPMNDI_ATTRIBUTE_TARGET_ELEMENT)
-      .namespace(BPMNDI_NS)
       .qNameAttributeReference(DiagramElement.class)
       .build();
 
     messageVisibleKindAttribute = typeBuilder.enumAttribute(BPMNDI_ATTRIBUTE_MESSAGE_VISIBLE_KIND, MessageVisibleKind.class)
-      .namespace(BPMNDI_NS)
       .build();
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();

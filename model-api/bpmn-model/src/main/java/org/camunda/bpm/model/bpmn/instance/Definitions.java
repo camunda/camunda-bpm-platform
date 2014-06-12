@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.model.bpmn.instance;
 
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnDiagram;
+
 import java.util.Collection;
 
 /**
@@ -54,6 +56,8 @@ public interface Definitions extends BpmnModelElementInstance {
   Collection<Extension> getExtensions();
 
   Collection<RootElement> getRootElements();
+
+  Collection<BpmnDiagram> getBpmDiagrams();
 
   Collection<Relationship> getRelationships();
 

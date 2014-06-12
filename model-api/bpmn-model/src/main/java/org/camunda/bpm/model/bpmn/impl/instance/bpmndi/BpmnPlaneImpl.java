@@ -47,7 +47,6 @@ public class BpmnPlaneImpl extends PlaneImpl implements BpmnPlane {
       });
 
     bpmnElementAttribute = typeBuilder.stringAttribute(BPMNDI_ATTRIBUTE_BPMN_ELEMENT)
-      .namespace(BPMNDI_NS)
       .qNameAttributeReference(BaseElement.class)
       .build();
 

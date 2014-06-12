@@ -35,12 +35,12 @@ public class FontTest extends BpmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption(DC_NS, "name"),
-      new AttributeAssumption(DC_NS, "size"),
-      new AttributeAssumption(DC_NS, "isBold"),
-      new AttributeAssumption(DC_NS, "isItalic"),
-      new AttributeAssumption(DC_NS, "isUnderline"),
-      new AttributeAssumption(DC_NS, "isStrikeThrough")
+      new AttributeAssumption("name"),
+      new AttributeAssumption("size"),
+      new AttributeAssumption("isBold"),
+      new AttributeAssumption("isItalic"),
+      new AttributeAssumption("isUnderline"),
+      new AttributeAssumption("isStrikeThrough")
     );
   }
 }

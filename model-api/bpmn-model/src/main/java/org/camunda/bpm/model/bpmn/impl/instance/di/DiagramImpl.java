@@ -40,19 +40,15 @@ public abstract class DiagramImpl extends BpmnModelElementInstanceImpl implement
       .abstractType();
 
     nameAttribute = typeBuilder.stringAttribute(DI_ATTRIBUTE_NAME)
-      .namespace(DI_NS)
       .build();
 
     documentationAttribute = typeBuilder.stringAttribute(DI_ATTRIBUTE_DOCUMENTATION)
-      .namespace(DI_NS)
       .build();
 
     resolutionAttribute = typeBuilder.doubleAttribute(DI_ATTRIBUTE_RESOLUTION)
-      .namespace(DI_NS)
       .build();
 
     idAttribute = typeBuilder.stringAttribute(DI_ATTRIBUTE_ID)
-      .namespace(DI_NS)
       .idAttribute()
       .build();
 

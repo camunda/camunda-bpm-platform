@@ -45,22 +45,18 @@ public class BoundsImpl extends BpmnModelElementInstanceImpl implements Bounds {
       });
 
     xAttribute = typeBuilder.doubleAttribute(DC_ATTRIBUTE_X)
-      .namespace(DC_NS)
       .required()
       .build();
 
     yAttribute = typeBuilder.doubleAttribute(DC_ATTRIBUTE_Y)
-      .namespace(DC_NS)
       .required()
       .build();
 
     widthAttribute = typeBuilder.doubleAttribute(DC_ATTRIBUTE_WIDTH)
-      .namespace(DC_NS)
       .required()
       .build();
 
     heightAttribute = typeBuilder.doubleAttribute(DC_ATTRIBUTE_HEIGHT)
-      .namespace(DC_NS)
       .required()
       .build();
 

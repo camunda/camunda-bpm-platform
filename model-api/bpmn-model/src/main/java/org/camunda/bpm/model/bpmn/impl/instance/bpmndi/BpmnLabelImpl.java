@@ -47,7 +47,6 @@ public class BpmnLabelImpl extends LabelImpl implements BpmnLabel {
       });
 
     labelStyleAttribute = typeBuilder.stringAttribute(BPMNDI_ATTRIBUTE_LABEL_STYLE)
-      .namespace(BPMNDI_NS)
       .qNameAttributeReference(BpmnLabelStyle.class)
       .build();
 

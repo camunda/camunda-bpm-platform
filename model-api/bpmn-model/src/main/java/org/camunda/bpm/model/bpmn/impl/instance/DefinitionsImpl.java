@@ -13,6 +13,7 @@
 package org.camunda.bpm.model.bpmn.impl.instance;
 
 import org.camunda.bpm.model.bpmn.instance.*;
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnDiagram;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -43,6 +44,7 @@ public class DefinitionsImpl extends BpmnModelElementInstanceImpl implements Def
   protected static ChildElementCollection<Import> importCollection;
   protected static ChildElementCollection<Extension> extensionCollection;
   protected static ChildElementCollection<RootElement> rootElementCollection;
+  protected static ChildElementCollection<BpmnDiagram> bpmnDiagramCollection;
   protected static ChildElementCollection<Relationship> relationshipCollection;
 
   public static void registerType(ModelBuilder bpmnModelBuilder) {
@@ -91,7 +93,8 @@ public class DefinitionsImpl extends BpmnModelElementInstanceImpl implements Def
     rootElementCollection = sequenceBuilder.elementCollection(RootElement.class)
       .build();
 
-    // TODO: add bpmndi:BPMNDiagram
+    bpmnDiagramCollection = sequenceBuilder.elementCollection(BpmnDiagram.class)
+      .build();
 
     relationshipCollection = sequenceBuilder.elementCollection(Relationship.class)
       .build();
@@ -169,6 +172,10 @@ public class DefinitionsImpl extends BpmnModelElementInstanceImpl implements Def
 
   public Collection<RootElement> getRootElements() {
     return rootElementCollection.get(this);
+  }
+
+  public Collection<BpmnDiagram> getBpmDiagrams() {
+    return bpmnDiagramCollection.get(this);
   }
 
   public Collection<Relationship> getRelationships() {

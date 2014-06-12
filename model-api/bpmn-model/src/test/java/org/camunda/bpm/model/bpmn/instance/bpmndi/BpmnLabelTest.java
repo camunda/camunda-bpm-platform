@@ -36,7 +36,7 @@ public class BpmnLabelTest extends BpmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption(BPMNDI_NS, "labelStyle")
+      new AttributeAssumption("labelStyle")
     );
   }
 }

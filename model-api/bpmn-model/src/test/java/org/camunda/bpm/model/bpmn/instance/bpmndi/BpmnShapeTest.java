@@ -38,13 +38,13 @@ public class BpmnShapeTest extends BpmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption(BPMNDI_NS, "bpmnElement"),
-      new AttributeAssumption(BPMNDI_NS, "isHorizontal"),
-      new AttributeAssumption(BPMNDI_NS, "isExpanded"),
-      new AttributeAssumption(BPMNDI_NS, "isMarkerVisible"),
-      new AttributeAssumption(BPMNDI_NS, "isMessageVisible"),
-      new AttributeAssumption(BPMNDI_NS, "participantBandKind"),
-      new AttributeAssumption(BPMNDI_NS, "choreographyActivityShape")
+      new AttributeAssumption("bpmnElement"),
+      new AttributeAssumption("isHorizontal"),
+      new AttributeAssumption("isExpanded"),
+      new AttributeAssumption("isMarkerVisible"),
+      new AttributeAssumption("isMessageVisible"),
+      new AttributeAssumption("participantBandKind"),
+      new AttributeAssumption("choreographyActivityShape")
     );
   }
 }

@@ -39,7 +39,6 @@ public abstract class StyleImpl extends BpmnModelElementInstanceImpl implements 
       .abstractType();
 
     idAttribute = typeBuilder.stringAttribute(DI_ATTRIBUTE_ID)
-      .namespace(DI_NS)
       .idAttribute()
       .build();
 

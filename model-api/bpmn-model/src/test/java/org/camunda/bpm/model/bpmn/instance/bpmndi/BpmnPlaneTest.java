@@ -36,7 +36,7 @@ public class BpmnPlaneTest extends BpmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption(BPMNDI_NS, "bpmnElement")
+      new AttributeAssumption("bpmnElement")
     );
   }
 }

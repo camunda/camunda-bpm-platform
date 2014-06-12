@@ -47,27 +47,21 @@ public class FontImpl extends BpmnModelElementInstanceImpl implements Font {
       });
 
     nameAttribute = typeBuilder.stringAttribute(DC_ATTRIBUTE_NAME)
-      .namespace(DC_NS)
       .build();
 
     sizeAttribute = typeBuilder.doubleAttribute(DC_ATTRIBUTE_SIZE)
-      .namespace(DC_NS)
       .build();
 
     isBoldAttribute = typeBuilder.booleanAttribute(DC_ATTRIBUTE_IS_BOLD)
-      .namespace(DC_NS)
       .build();
 
     isItalicAttribute = typeBuilder.booleanAttribute(DC_ATTRIBUTE_IS_ITALIC)
-      .namespace(DC_NS)
       .build();
 
     isUnderlineAttribute = typeBuilder.booleanAttribute(DC_ATTRIBUTE_IS_UNDERLINE)
-      .namespace(DC_NS)
       .build();
 
     isStrikeTroughAttribute = typeBuilder.booleanAttribute(DC_ATTRIBUTE_IS_STRIKE_THROUGH)
-      .namespace(DC_NS)
       .build();
 
     typeBuilder.build();

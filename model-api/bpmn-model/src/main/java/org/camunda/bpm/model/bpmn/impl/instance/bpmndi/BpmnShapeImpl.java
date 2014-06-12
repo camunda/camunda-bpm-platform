@@ -57,32 +57,25 @@ public class BpmnShapeImpl extends LabeledShapeImpl implements BpmnShape {
       });
 
     bpmnElementAttribute = typeBuilder.stringAttribute(BPMNDI_ATTRIBUTE_BPMN_ELEMENT)
-      .namespace(BPMNDI_NS)
       .qNameAttributeReference(BaseElement.class)
       .build();
 
     isHorizontalAttribute = typeBuilder.booleanAttribute(BPMNDI_ATTRIBUTE_IS_HORIZONTAL)
-      .namespace(BPMNDI_NS)
       .build();
 
     isExpandedAttribute = typeBuilder.booleanAttribute(BPMNDI_ATTRIBUTE_IS_EXPANDED)
-      .namespace(BPMNDI_NS)
       .build();
 
     isMarkerVisibleAttribute = typeBuilder.booleanAttribute(BPMNDI_ATTRIBUTE_IS_MARKER_VISIBLE)
-      .namespace(BPMNDI_NS)
       .build();
 
     isMessageVisibleAttribute = typeBuilder.booleanAttribute(BPMNDI_ATTRIBUTE_IS_MESSAGE_VISIBLE)
-      .namespace(BPMNDI_NS)
       .build();
 
     participantBandKindAttribute = typeBuilder.enumAttribute(BPMNDI_ATTRIBUTE_PARTICIPANT_BAND_KIND, ParticipantBandKind.class)
-      .namespace(BPMNDI_NS)
       .build();
 
     choreographyActivityShapeAttribute = typeBuilder.stringAttribute(BPMNDI_ATTRIBUTE_CHOREOGRAPHY_ACTIVITY_SHAPE)
-      .namespace(BPMNDI_NS)
       .qNameAttributeReference(BpmnShape.class)
       .build();
 

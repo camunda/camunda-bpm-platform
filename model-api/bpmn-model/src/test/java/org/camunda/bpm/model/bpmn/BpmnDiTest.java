@@ -16,8 +16,10 @@ package org.camunda.bpm.model.bpmn;
 import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.*;
+import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.bpmn.instance.dc.Font;
 import org.camunda.bpm.model.bpmn.instance.di.DiagramElement;
+import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -162,6 +164,81 @@ public class BpmnDiTest {
     assertThat(endEvent.getIncoming()).doesNotContain(sequenceFlow);
 
     assertThat(edge.getBpmnElement()).isEqualTo(sequenceFlow);
+  }
+
+  public void shouldCreateValidBpmnDi() {
+    modelInstance = Bpmn
+      .createProcess("process")
+      .startEvent("start")
+      .sequenceFlowId("flow")
+      .endEvent("end")
+      .done();
+
+    process = modelInstance.getModelElementById("process");
+    startEvent = modelInstance.getModelElementById("start");
+    sequenceFlow = modelInstance.getModelElementById("flow");
+    endEvent = modelInstance.getModelElementById("end");
+
+    // create bpmn diagram
+    BpmnDiagram bpmnDiagram = modelInstance.newInstance(BpmnDiagram.class);
+    bpmnDiagram.setId("diagram");
+    bpmnDiagram.setName("diagram");
+    bpmnDiagram.setDocumentation("bpmn diagram element");
+    bpmnDiagram.setResolution(120.0);
+    modelInstance.getDefinitions().addChildElement(bpmnDiagram);
+
+    // create plane for process
+    BpmnPlane processPlane = modelInstance.newInstance(BpmnPlane.class);
+    processPlane.setId("plane");
+    processPlane.setBpmnElement(process);
+    bpmnDiagram.setBpmnPlane(processPlane);
+
+    // create shape for start event
+    BpmnShape startEventShape = modelInstance.newInstance(BpmnShape.class);
+    startEventShape.setId("startShape");
+    startEventShape.setBpmnElement(startEvent);
+    processPlane.getDiagramElements().add(startEventShape);
+
+    // create bounds for start event shape
+    Bounds startEventBounds = modelInstance.newInstance(Bounds.class);
+    startEventBounds.setHeight(36.0);
+    startEventBounds.setWidth(36.0);
+    startEventBounds.setX(632.0);
+    startEventBounds.setY(312.0);
+    startEventShape.setBounds(startEventBounds);
+
+    // create shape for end event
+    BpmnShape endEventShape = modelInstance.newInstance(BpmnShape.class);
+    endEventShape.setId("endShape");
+    endEventShape.setBpmnElement(endEvent);
+    processPlane.getDiagramElements().add(endEventShape);
+
+    // create bounds for end event shape
+    Bounds endEventBounds = modelInstance.newInstance(Bounds.class);
+    endEventBounds.setHeight(36.0);
+    endEventBounds.setWidth(36.0);
+    endEventBounds.setX(718.0);
+    endEventBounds.setY(312.0);
+    endEventShape.setBounds(endEventBounds);
+
+    // create edge for sequence flow
+    BpmnEdge flowEdge = modelInstance.newInstance(BpmnEdge.class);
+    flowEdge.setId("flowEdge");
+    flowEdge.setBpmnElement(sequenceFlow);
+    flowEdge.setSourceElement(startEventShape);
+    flowEdge.setTargetElement(endEventShape);
+    processPlane.getDiagramElements().add(flowEdge);
+
+    // create waypoints for sequence flow edge
+    Waypoint startWaypoint = modelInstance.newInstance(Waypoint.class);
+    startWaypoint.setX(668.0);
+    startWaypoint.setY(330.0);
+    flowEdge.getWaypoints().add(startWaypoint);
+
+    Waypoint endWaypoint = modelInstance.newInstance(Waypoint.class);
+    endWaypoint.setX(718.0);
+    endWaypoint.setY(330.0);
+    flowEdge.getWaypoints().add(endWaypoint);
   }
 
   @After

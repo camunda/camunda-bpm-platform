@@ -35,10 +35,10 @@ public class DiagramTest extends BpmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption(DI_NS, "name"),
-      new AttributeAssumption(DI_NS, "documentation"),
-      new AttributeAssumption(DI_NS, "resolution"),
-      new AttributeAssumption(DI_NS, "id", true)
+      new AttributeAssumption("name"),
+      new AttributeAssumption("documentation"),
+      new AttributeAssumption("resolution"),
+      new AttributeAssumption("id", true)
     );
   }
 }

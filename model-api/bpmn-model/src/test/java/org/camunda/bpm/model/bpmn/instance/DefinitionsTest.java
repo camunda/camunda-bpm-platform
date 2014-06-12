@@ -13,8 +13,12 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnDiagram;
+
 import java.util.Arrays;
 import java.util.Collection;
+
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMNDI_NS;
 
 /**
  * @author Sebastian Menski
@@ -30,7 +34,7 @@ public class DefinitionsTest extends BpmnModelElementInstanceTest {
       new ChildElementAssumption(Import.class),
       new ChildElementAssumption(Extension.class),
       new ChildElementAssumption(RootElement.class),
-      // TODO: bpmndi:BPMNDiagram missing
+      new ChildElementAssumption(BPMNDI_NS, BpmnDiagram.class),
       new ChildElementAssumption(Relationship.class)
     );
   }
