@@ -11,7 +11,7 @@ camunda-spin
 </p>
 
 Library for simple XML and JSON processing on the JVM (Java Virtual Machine), targeting Java and
-JVM-based scripting languages such as Groovy, JRuby, Jython and Javascript and Java Expression
+JVM-based scripting languages such as Groovy, JRuby, Jython, Javascript and Java Expression
 Language.
 
 # Why Spin?
