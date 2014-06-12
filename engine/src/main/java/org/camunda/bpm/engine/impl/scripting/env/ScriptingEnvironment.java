@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -115,9 +114,9 @@ public class ScriptingEnvironment {
 
     List<ExecutableScript> scripts = new ArrayList<ExecutableScript>();
     for (ScriptEnvResolver resolver : envResolvers) {
-      Reader[] resolvedScripts = resolver.resolve(language);
+      String[] resolvedScripts = resolver.resolve(language);
       if(resolvedScripts != null) {
-        for (Reader resolvedScript : resolvedScripts) {
+        for (String resolvedScript : resolvedScripts) {
           scripts.add(scriptFactory.createScript(resolvedScript, language));
         }
       }

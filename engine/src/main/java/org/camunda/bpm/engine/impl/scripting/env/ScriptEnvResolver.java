@@ -29,6 +29,6 @@ public interface ScriptEnvResolver {
    * @return an array of environment script sources or null if this
    * resolver does not provide any scripts for the given language
    */
-  Reader[] resolve(String language);
+  String[] resolve(String language);
 
 }

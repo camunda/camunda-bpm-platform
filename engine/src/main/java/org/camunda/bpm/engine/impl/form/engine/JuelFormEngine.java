@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.form.engine;
 
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.form.FormData;
@@ -28,6 +25,8 @@ import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
+
+import java.io.UnsupportedEncodingException;
 
 
 /**
@@ -61,7 +60,7 @@ public class JuelFormEngine implements FormEngine {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     ScriptingEnvironment scriptingEnvironment = processEngineConfiguration.getScriptingEnvironment();
     ScriptFactory scriptFactory = processEngineConfiguration.getScriptFactory();
-    ExecutableScript script = scriptFactory.createScript(new StringReader(scriptSrc), ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE);
+    ExecutableScript script = scriptFactory.createScript(scriptSrc, ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE);
     return scriptingEnvironment.execute(script, scope);
   }
 

@@ -22,8 +22,6 @@ import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 
-import java.io.StringReader;
-
 public class ScriptTaskListener implements TaskListener {
 	private Expression script;
 
@@ -43,7 +41,7 @@ public class ScriptTaskListener implements TaskListener {
 		ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     ScriptingEnvironment scriptEnv = processEngineConfiguration.getScriptingEnvironment();
     ScriptFactory scriptFactory = processEngineConfiguration.getScriptFactory();
-    ExecutableScript executableScript = scriptFactory.createScript(new StringReader(script.getExpressionText()), language.getExpressionText());
+    ExecutableScript executableScript = scriptFactory.createScript(script.getExpressionText(), language.getExpressionText());
 
     Object result = scriptEnv.execute(executableScript, delegateTask);
 

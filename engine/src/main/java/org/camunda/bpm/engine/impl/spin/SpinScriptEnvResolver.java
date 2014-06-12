@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.spin;
 
-import java.io.Reader;
-import java.io.StringReader;
-
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.spin.scripting.SpinScriptEnv;
 
@@ -26,10 +23,10 @@ import org.camunda.spin.scripting.SpinScriptEnv;
  */
 public class SpinScriptEnvResolver implements ScriptEnvResolver {
 
-  public Reader[] resolve(String language) {
+  public String[] resolve(String language) {
     String envScript = SpinScriptEnv.get(language);
     if(envScript != null) {
-      return new Reader[] { new StringReader(envScript) };
+      return new String[] { envScript };
     }
     return null;
   }

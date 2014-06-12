@@ -12,26 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.scripting.engine;
 
-import java.io.Reader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.script.Bindings;
-import javax.script.Compilable;
-import javax.script.CompiledScript;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
+
+import javax.script.*;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * <p>Manager for JSR-223 {@link ScriptEngine} handling.</p>
@@ -100,20 +87,20 @@ public class ScriptingEngines {
    * {@link #enableScriptEngineCaching} is set to 'true'. Depending on the implementation, the compiled
    * script will keep references to the script engine which created it.</p>
    *
-   * @param reader a reader for the source of the script
+   * @param src a string of the source of the script
    * @param language the script language in which the script is written
    * @return a {@link CompiledScript} or null if script engine can be found but does not support compilation.
    * @throws ProcessEngineException if no {@link ScriptEngine} can be resolved for the provided language or
    *         if the script cannot be compiled (sytax error ...).
    */
-  public CompiledScript compile(Reader reader, String language) {
+  public CompiledScript compile(String src, String language) {
     ScriptEngine scriptEngine = getScriptEngineForLanguage(language);
 
     if(scriptEngine instanceof Compilable && !scriptEngine.getFactory().getLanguageName().equalsIgnoreCase("ecmascript")) {
       Compilable compilingEngine = (Compilable) scriptEngine;
 
       try {
-        CompiledScript compiledScript = compilingEngine.compile(reader);
+        CompiledScript compiledScript = compilingEngine.compile(src);
 
         LOG.log(Level.FINE, "Compiled script using {0} script engine ", language);
 

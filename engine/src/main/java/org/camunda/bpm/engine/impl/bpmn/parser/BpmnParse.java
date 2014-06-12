@@ -1486,7 +1486,7 @@ public class BpmnParse extends Parse {
   protected ExecutableScript parseScript(String script, String language) {
     ExecutableScript executableScript = Context.getProcessEngineConfiguration()
       .getScriptFactory()
-      .createScript(new StringReader(script), language);
+      .createScript(script, language);
     return executableScript;
   }
 
