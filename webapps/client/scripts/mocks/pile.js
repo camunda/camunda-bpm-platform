@@ -96,7 +96,8 @@ define([
         },
         _embedded: {
           piles: _.toArray(_mockedPiles)
-        }
+        },
+        total: _.size(_mockedPiles)
       };
 
       this.responseText = JSON.stringify(hal);
@@ -110,6 +111,7 @@ define([
     url: pileDetailsExp,
     urlParams: ['pileId'],
     response: function(settings) {
+      var pileId = settings.urlParams.pileId;
       var hal = {
         _links: {
           self: {
@@ -118,10 +120,7 @@ define([
         }
       };
 
-      // _.extend(hal, _mockedPiles[expResult[1]] || {});
-      _.extend(hal, _mockedPiles[settings.pileId] || {});
-
-      hal._embedded = {tasks: {}};
+      _.extend(hal, _mockedPiles[pileId] || {});
 
       this.responseText = JSON.stringify(hal);
     }

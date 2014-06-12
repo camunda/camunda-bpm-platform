@@ -278,16 +278,21 @@ define([
     contentType: 'application/hal+json',
 
     url: '/tasklist/tasks',
-    response: function() {
+    response: function(settings) {
+      console.info('query data', settings.data);
+
       var hal = {
         _links: {
           self: {
             href: '/tasklist/tasks'
           }
         },
+
         _embedded: {
-          tasks: _.toArray(_mockedTasks)
-        }
+          tasks: _.toArray(_mockedTasks).slice(settings.data.offset, settings.data.offset + settings.data.limit)
+        },
+
+        total: _.size(_mockedTasks)
       };
 
       this.responseText = JSON.stringify(hal);
@@ -298,18 +303,20 @@ define([
     method: 'GET',
     contentType: 'application/hal+json',
 
-    url: /\/tasklist\/tasks\/([0-9a-z-]+)$/g,
-    data: ['taskId'],
+    url: /\/tasklist\/tasks\/([^\/]+)$/g,
+    urlParams: ['taskId'],
     response: function(settings) {
+      var taskId = settings.urlParams.taskId;
+
       var hal = {
         _links: {
           self: {
-            href: '/tasklist/tasks/'+ settings.taskId
+            href: '/tasklist/tasks/'+ taskId
           }
         }
       };
 
-      _.extend(hal, _mockedTasks[settings.taskId]);
+      _.extend(hal, _mockedTasks[taskId]);
 
       this.responseText = JSON.stringify(hal);
     }

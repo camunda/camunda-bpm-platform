@@ -11,7 +11,7 @@ module.exports = function() {
         'node_modules/karma-jasmine/lib/jasmine.js',
         'node_modules/karma-jasmine/lib/adapter.js',
 
-        {pattern: 'test/integration/**/*Spec.js', included: false},
+        {pattern: 'test/integration/**/*Spec.js', included: true},
         {pattern: 'client/bower_components/**/*.js', included: false},
         {pattern: 'client/scripts/**/*.js', included: false},
 

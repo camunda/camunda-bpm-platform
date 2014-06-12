@@ -122,6 +122,7 @@ define(function() {
         main: 'index'
       },
 
+      // NOTE: not "/mocks" but "-mocks"!
       {
         name: 'camunda-tasklist-ui-mocks',
         main: 'index'

@@ -58,12 +58,14 @@ define([
 
   CamTaskData.prototype.get =   function() {};
 
-  CamTaskData.prototype.query = function() {
+  CamTaskData.prototype.query = function(where) {
+    console.info('load tasks where...', where);
     var deferred = this.$q.defer();
 
     deferred.notify('request:start');
 
     $.ajax({
+      data: where,
       url: '/tasklist/tasks'
     })
     .done(function(data) {

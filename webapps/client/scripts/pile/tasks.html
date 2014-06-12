@@ -1,14 +1,16 @@
-<!--
-<pagination total-items="tasks.length"
-            items-per-page="10"
+<pagination ng-show="totalItems > pageSize"
+            total-items="totalItems"
+            items-per-page="pageSize"
             max-size="5"
             class="pagination-sm"
             boundary-links="true"
+            ng-model="pageNum"
+            ng-change="pageChange()"
             next-text="&rsaquo;"
             last-text="&raquo;"
             previous-text="&lsaquo;"
             first-text="&laquo;"></pagination>
- -->
+
 <form role="form">
   <ol class="list-unstyled">
     <li class="task" ng-repeat="(delta, task) in tasks">
@@ -63,3 +65,16 @@
     </li>
   </ol>
 </form>
+
+<pagination ng-show="totalItems > pageSize"
+            total-items="totalItems"
+            items-per-page="pageSize"
+            max-size="5"
+            class="pagination-sm"
+            boundary-links="true"
+            ng-model="pageNum"
+            ng-change="pageChange()"
+            next-text="&rsaquo;"
+            last-text="&raquo;"
+            previous-text="&lsaquo;"
+            first-text="&laquo;"></pagination>

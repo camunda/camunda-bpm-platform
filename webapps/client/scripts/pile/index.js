@@ -1,16 +1,30 @@
 'use strict';
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
+
+/**
+ * @module  cam.tasklist.pile
+ * @belongsto cam.tasklist
+ *
+ * Piles are predefined filters for tasks.
+ */
+
+
+
 define([
            'require', 'angular', 'moment',
+           'camunda-tasklist-ui/utils',
            'camunda-tasklist-ui/pile/data',
+           'camunda-tasklist-ui/task/data',
            'text!camunda-tasklist-ui/pile/form.html',
            'text!camunda-tasklist-ui/pile/list.html',
            'text!camunda-tasklist-ui/pile/details.html',
            'text!camunda-tasklist-ui/pile/tasks.html'
 ], function(require,   angular,   moment) {
   var pileModule = angular.module('cam.tasklist.pile', [
-    'cam.tasklist.pile.data',
+    require('camunda-tasklist-ui/utils').name,
+    require('camunda-tasklist-ui/pile/data').name,
+    require('camunda-tasklist-ui/task/data').name,
     'ui.bootstrap',
     'cam.form',
     'angularMoment'
@@ -20,7 +34,37 @@ define([
   var $ = angular.element;
 
 
+  pileModule.factory('camTasklistPileFilterConversion', [
+          'camStorage',
+  function(camStorage) {
+    var tokenExp = /(\{[^\}]+\})/g;
+    function tokenReplace(val) {
+      if (val === '{self}') {
+        return camStorage.get('user').id;
+      }
 
+      if (val === '{now}') {
+        return Math.round((new Date()).getTime() / 1000);
+      }
+
+      if (val === '{day}') {
+        return 60 * 60 * 24;
+      }
+
+      if (!tokenExp.test(val)) {
+        return val;
+      }
+
+      var pieces = [];
+
+      angular.forEach(val.split(tokenExp), function(piece) {
+        pieces.push(tokenReplace(piece));
+      });
+
+      return pieces.join('');
+    }
+    return tokenReplace;
+  }]);
 
 
   pileModule.directive('camTasklistPile', [
@@ -119,38 +163,67 @@ define([
 
 
   pileModule.directive('camTasklistPileTasks', [
-          '$modal', '$rootScope', 'camPileData',
-  function($modal,   $rootScope,   camPileData) {
+          '$modal', '$rootScope', 'camTasklistPileFilterConversion', 'camTaskData',
+  function($modal,   $rootScope,   camTasklistPileFilterConversion,   camTaskData) {
     return {
       link: function(scope) {
+        scope.pageSize = 5;
+        scope.pageNum = 1;
+        scope.totalItems = 0;
+
         scope.now = new Date();
+
         scope.tasks = scope.tasks || [];
+
         scope.pile = scope.pile || $rootScope.currentPile;
 
-        scope.batchOperationSelect = function() {
-          console.info('selected task', this);
-        };
-
-        // $rootScope.$on('tasklist.pile.current', function() {
-        $rootScope.$watch('currentPile', function() {
-          if (!$rootScope.currentPile) {
-            return;
-          }
-
-          camPileData.tasks($rootScope.currentPile).then(function(results) {
-            console.info('tasklist.pile.current tasks', results);
-            $rootScope.currentPile.tasks = scope.tasks = results;
-          }, function(err) {
-            console.warn('tasklist.pile.current tasks', err);
+        function loadItems() {
+          var where = {};
+          angular.forEach(scope.pile.filters, function(pair) {
+            where[pair.key] = camTasklistPileFilterConversion(pair.value);
           });
-        });
+          where.offset = (scope.pageNum - 1) * scope.pageSize;
+          where.limit = scope.pageSize;
 
+          camTaskData
+            .query(where)
+            // QUESTION: results? or only tasks? which level should be abstracted/available?
+            // What about a `result.total` property?
+            // What will I do eat for lunch?
+            .then(function(results) {
+              scope.totalItems = results.total;
+              results._embedded = results._embedded || {};
+              results._embedded.tasks = results._embedded.tasks || [];
+              $rootScope.currentPile.tasks = scope.tasks = results._embedded.tasks;
+            }, function(err) {
+              console.warn('tasklist.pile.current tasks', err);
+            });
+        }
+
+
+        scope.pageChange = loadItems;
 
 
         scope.focus = function(delta) {
           $rootScope.currentTask = scope.tasks[delta];
           $rootScope.$emit('tasklist.task.current');
         };
+
+
+        scope.batchOperationSelect = function() {
+          console.info('selected task', this);
+        };
+
+
+        $rootScope.$watch('currentPile', function() {
+          console.info('currentPile thingy', $rootScope.currentPile, scope.pile);
+          if (!$rootScope.currentPile || (scope.pile && (scope.pile.id === $rootScope.currentPile.id))) {
+            return;
+          }
+
+          scope.pile = $rootScope.currentPile;
+          loadItems();
+        });
       },
 
       template: require('text!camunda-tasklist-ui/pile/tasks.html')
@@ -184,7 +257,6 @@ define([
   pileModule.controller('pileNewCtrl', [
           '$modal', '$scope', '$rootScope',
   function($modal,   $scope,   $rootScope) {
-    console.warn('Should open a modal window with new pile form.');
     $rootScope.currentPile = {
       name: '',
       description: '',
