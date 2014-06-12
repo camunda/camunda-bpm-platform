@@ -210,11 +210,13 @@
                 <!-- HEMERA-2453 -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
                 <exclude>**_OTHERS.java</exclude>
-                <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
-                <excludes>**/SpringServletPALifecycleTest.java</excludes>
-                <excludes>**/ManagedDomainTestCase_JBOSS.java</excludes>
+                <exclude>**/SpringPAExpressionResolvingTest.java</exclude>
+                <exclude>**/SpringServletPALifecycleTest.java</exclude>
+                <exclude>**/ManagedDomainTestCase_JBOSS.java</exclude>
                 <!-- CAM-1778 -->
-                <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
+                <exclude>**/TestWarDeploymentWithProcessEnginePlugin.java</exclude>
+                <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
+                <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
@@ -335,6 +337,7 @@
                 <excludes>**/SpringServletPALifecycleTest.java</excludes>
                 <!-- CAM-1778 -->
                 <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
+                <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
