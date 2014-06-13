@@ -129,6 +129,16 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
     return attributeNames;
   }
 
+  public String textContent() {
+    return domElement.getTextContent();
+  }
+
+  public SpinXmlTreeElement textContent(String textContent) {
+    ensureNotNull("textContent", textContent);
+    domElement.setTextContent(textContent);
+    return this;
+  }
+
   public SpinXmlTreeElement childElement(String elementName) {
     return childElement(namespace(), elementName);
   }

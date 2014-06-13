@@ -52,10 +52,6 @@ public class SpinTestLogger extends SpinLogger {
     return new SpinScriptException(exceptionMessage("002", "No script engine found for script language '{}'", scriptLanguage));
   }
 
-  public SpinScriptException scriptVariableIncomplete(String variableName) {
-    return new SpinScriptException(exceptionMessage("003", "Script variable '{}' incomplete. No value or file set", variableName));
-  }
-
   public SpinScriptException scriptExecutionError(String scriptPath, Throwable cause) {
     return new SpinScriptException(exceptionMessage("004", "Error during execution of script '{}'", scriptPath), cause);
   }

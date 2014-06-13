@@ -134,13 +134,26 @@ element = attribute.remove()
 assertFalse(element.hasAttrNs("http://camunda.org/example", "name"));
 ```
 
+## Text Content
+
+It is possible to read and write the text content of a Xml element with the `textContent` method.
+
+```java
+import static org.camunda.spin.Spin.XML;
+
+SpinXmlDomElement element = XML("<customer>Foo</customer>");
+assertEquals("Foo", element.textContent());
+element.textContent("Bar");
+```
+
 
 ## Child Elements
 
 
 ### Reading child elements from Xml
 
-Besides attributes you can also get a unique or all child elements of a specific type. Optionally a namespace can be passed to the methods as first parameter.
+Besides attributes you can also get a unique or all child elements of a specific type. Optionally a
+namespace can be passed to the methods as first parameter.
 
 ```java
 import static org.camunda.spin.Spin.XML;

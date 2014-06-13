@@ -1238,4 +1238,59 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
+  @Test
+  @Script("XmlDomElementScriptTest.readTextContent")
+  @ScriptVariable(name = "input", value="<customer>Foo</customer>")
+  public void canReadTextContent() {
+    String textContent = script.getVariable("textContent");
+    assertThat(textContent).isEqualTo("Foo");
+  }
+
+  @Test
+  @Script("XmlDomElementScriptTest.readTextContent")
+  @ScriptVariable(name = "input", value="<customer/>")
+  public void canEmptyReadTextContent() {
+    String textContent = script.getVariable("textContent");
+    assertThat(textContent).isEmpty();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.writeTextContent",
+    variables = {
+      @ScriptVariable(name = "input", value="<customer/>"),
+      @ScriptVariable(name = "text", value = "Foo")
+    }
+  )
+  public void canWriteTextContent() {
+    String textContent = script.getVariable("textContent");
+    assertThat(textContent).isEqualTo("Foo");
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomElementScriptTest.writeTextContent",
+    variables = {
+      @ScriptVariable(name = "input", value="<customer/>"),
+      @ScriptVariable(name = "text", value = "")
+    }
+  )
+  public void canWriteEmptyTextContent() {
+    String textContent = script.getVariable("textContent");
+    assertThat(textContent).isEmpty();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @Script(
+    name = "XmlDomElementScriptTest.writeTextContent",
+    variables = {
+      @ScriptVariable(name = "input", value="<customer/>"),
+      @ScriptVariable(name = "text", isNull = true)
+    },
+    execute = false
+  )
+  public void cannotWriteNullTextContent() throws Throwable {
+    failingWithException();
+  }
+
 }

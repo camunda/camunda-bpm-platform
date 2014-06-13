@@ -733,4 +733,31 @@ public class XmlDomElementTest {
     assertThat(xml.childElements()).isNotEmpty();
   }
 
+  // text content
+
+  @Test
+  public void canReadTextContent() {
+    assertThat(XML("<customer>Foo</customer>").textContent()).isEqualTo("Foo");
+  }
+
+  @Test
+  public void canReadEmptyTextContent() {
+    assertThat(XML("<customer/>").textContent()).isEmpty();
+  }
+
+  @Test
+  public void canWriteTextContent() {
+    assertThat(XML("<customer/>").textContent("Foo").textContent()).isEqualTo("Foo");
+  }
+
+  @Test
+  public void canWriteEmptyTextContent() {
+    assertThat(XML("<customer>Foo</customer>").textContent("").textContent()).isEmpty();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotWriteNullTextContent() {
+    XML("<customer/>").textContent(null);
+  }
+
 }

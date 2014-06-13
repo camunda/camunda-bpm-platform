@@ -139,6 +139,21 @@ public abstract class SpinXmlTreeElement extends SpinXmlTreeNode<SpinXmlTreeElem
   public abstract List<String> attrNames(String namespace);
 
   /**
+   * Returns the text content of an element.
+   *
+   * @return the text content or an empty string if non exists
+   */
+  public abstract String textContent();
+
+  /**
+   * Sets the text content of an element.
+   * @param textContent the text content to set
+   * @return the wrapped {@link SpinXmlTreeElement element}
+   * @throws IllegalArgumentException if the textContent is null
+   */
+  public abstract SpinXmlTreeElement textContent(String textContent);
+
+  /**
    * Returns a single wrapped child element for the given name
    * in the local namespace of this element.
    *

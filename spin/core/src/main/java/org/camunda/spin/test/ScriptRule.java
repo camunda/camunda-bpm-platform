@@ -154,10 +154,6 @@ public class ScriptRule implements TestRule {
       variables.put(name, null);
       LOG.scriptVariableFound(name, "isNull", null);
     }
-    else if (!value.isEmpty()) {
-      variables.put(name, value);
-      LOG.scriptVariableFound(name, "string", value);
-    }
     else if (!filename.isEmpty()) {
       File file = IoUtil.getClasspathFile(filename, description.getTestClass().getClassLoader());
       InputStream fileAsStream = IoUtil.fileAsStream(file);
@@ -165,7 +161,8 @@ public class ScriptRule implements TestRule {
       LOG.scriptVariableFound(name, "input stream", filename);
     }
     else {
-      throw LOG.scriptVariableIncomplete(name);
+      variables.put(name, value);
+      LOG.scriptVariableFound(name, "string", value);
     }
   }
 
