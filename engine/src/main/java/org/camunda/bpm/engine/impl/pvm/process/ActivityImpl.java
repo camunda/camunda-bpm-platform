@@ -42,7 +42,9 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   protected boolean isScope;
 
-  protected boolean isAsync;
+  protected boolean isAsyncBefore;
+
+  protected boolean isAsyncAfter;
 
   protected boolean isCancelScope = false;
 
@@ -187,12 +189,36 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     this.height = height;
   }
 
+  /**
+   * Deprecated since 7.2, use {@link #isAsyncBefore()}
+   */
+  @Deprecated
   public boolean isAsync() {
-    return isAsync;
+    return isAsyncBefore;
   }
 
+  /**
+   * Deprecated since 7.2, use {@link #setAsyncBefore(boolean)}
+   */
+  @Deprecated
   public void setAsync(boolean isAsync) {
-    this.isAsync = isAsync;
+    this.isAsyncBefore = isAsync;
+  }
+
+  public boolean isAsyncBefore() {
+    return isAsyncBefore;
+  }
+
+  public void setAsyncBefore(boolean isAsyncBefore) {
+    this.isAsyncBefore = isAsyncBefore;
+  }
+
+  public boolean isAsyncAfter() {
+    return isAsyncAfter;
+  }
+
+  public void setAsyncAfter(boolean isAsyncAfter) {
+    this.isAsyncAfter = isAsyncAfter;
   }
 
   public String getActivityId() {

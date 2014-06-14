@@ -28,7 +28,7 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
 
   private static Logger log = Logger.getLogger(PvmAtomicOperationTransitionDestroyScope.class.getName());
 
-  public boolean isAsync(PvmExecutionImpl execution) {
+  public boolean isAsync(PvmExecutionImpl instance) {
     return false;
   }
 

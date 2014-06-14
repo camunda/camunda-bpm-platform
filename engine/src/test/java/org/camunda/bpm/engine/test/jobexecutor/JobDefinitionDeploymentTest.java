@@ -147,7 +147,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
     assertNotNull(jobDefinition);
     assertEquals(AsyncContinuationJobHandler.TYPE, jobDefinition.getJobType());
     assertEquals("theService", jobDefinition.getActivityId());
-    assertEquals(null, jobDefinition.getJobConfiguration());
+    assertEquals("async-before", jobDefinition.getJobConfiguration());
     assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
   }
 

@@ -44,7 +44,7 @@ public class ProcessInstanceStartContext {
   }
 
   public boolean isAsync() {
-    return initial.isAsync();
+    return initial.isAsyncBefore();
   }
 
 }

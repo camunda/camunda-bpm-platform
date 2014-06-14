@@ -33,7 +33,7 @@ public class PvmAtomicOperationTransitionNotifyListenerTake implements PvmAtomic
   private static Logger log = Logger.getLogger(PvmAtomicOperationTransitionNotifyListenerTake.class.getName());
 
   public boolean isAsync(PvmExecutionImpl execution) {
-    return false;
+    return execution.getActivity().isAsyncAfter();
   }
 
   public void execute(PvmExecutionImpl execution) {

@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
 /**
  * <p>Declaration of a Message Job (Asynchronous continuation job)</p>
@@ -36,5 +38,21 @@ public class MessageJobDeclaration extends JobDeclaration<MessageEntity> {
     return message;
   }
 
+  public void setJobHandlerConfiguration(MessageEntity message, ExecutionEntity execution, AtomicOperation executionOperation) {
+    String configuration = executionOperation.getCanonicalName();
+    ActivityImpl activity = execution.getActivity();
+
+    if(activity != null && activity.isAsyncAfter()) {
+      if(execution.getTransition() != null) {
+        // store id of selected transition in case this is async after.
+        // id is not serialized with the execution -> we need to remember it as
+        // job handler configuration.
+        configuration += "$"+execution.getTransition().getId();
+      }
+    }
+
+    message.setJobHandlerConfiguration(configuration);
+
+  }
 
 }

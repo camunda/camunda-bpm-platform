@@ -200,7 +200,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     isActive = false;
     isEnded = true;
-    performOperation(PvmAtomicOperation.ACTIVITY_END);
+    performOperation(PvmAtomicOperation.ACTIVITY_NOTIFY_LISTENER_END);
   }
 
   public void remove() {

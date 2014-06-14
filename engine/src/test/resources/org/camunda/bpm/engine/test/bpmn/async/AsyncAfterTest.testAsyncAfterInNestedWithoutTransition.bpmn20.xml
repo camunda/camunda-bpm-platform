@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="testProcess">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1"  sourceRef="theStart" targetRef="sub1" />
+
+    <subProcess id="sub1">
+
+      <extensionElements>
+
+        <camunda:executionListener
+            event="end"
+            expression="${execution.setVariable('subprocess-listenerEndInvoked', true)}" />
+
+      </extensionElements>
+
+      <startEvent id="theInnerStart" />
+
+      <sequenceFlow id="flow2"  sourceRef="theInnerStart" targetRef="service" />
+
+      <serviceTask id="service" camunda:expression="${execution.setVariable('behaviorInvoked', true)}" camunda:asyncAfter="true">
+
+        <extensionElements>
+
+            <camunda:executionListener
+                event="start"
+                expression="${execution.setVariable('listenerStartInvoked', true)}" />
+
+            <camunda:executionListener
+                event="end"
+                expression="${execution.setVariable('listenerEndInvoked', true)}" />
+
+          </extensionElements>
+
+      </serviceTask>
+
+      <!-- no outgoing sequence flow -->
+
+    </subProcess>
+
+    <sequenceFlow id="flow3"  sourceRef="sub1" targetRef="taskAfterSubprocess1" />
+
+    <receiveTask id="taskAfterSubprocess1" />
+
+  </process>
+
+</definitions>

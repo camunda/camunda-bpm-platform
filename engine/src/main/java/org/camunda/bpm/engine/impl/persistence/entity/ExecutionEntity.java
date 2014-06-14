@@ -433,7 +433,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
     if(messageJobDeclaration != null) {
       MessageEntity message = messageJobDeclaration.createJobInstance(this);
-      message.setJobHandlerConfiguration(executionOperation.getCanonicalName());
+      messageJobDeclaration.setJobHandlerConfiguration(message, this, executionOperation);
 
       Context
         .getCommandContext()

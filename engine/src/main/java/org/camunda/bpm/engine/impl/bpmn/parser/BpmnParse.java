@@ -59,7 +59,6 @@ import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.URL;
 import java.text.StringCharacterIterator;
 import java.util.*;
@@ -955,6 +954,17 @@ public class BpmnParse extends Parse {
     if (activity.getActivityBehavior() instanceof ExclusiveGatewayActivityBehavior) {
       validateExclusiveGateway(activity);
     }
+    validateOutgoingFlows(activity);
+  }
+
+  protected void validateOutgoingFlows(ActivityImpl activity) {
+    if(activity.isAsyncAfter()) {
+      for (PvmTransition transition : activity.getOutgoingTransitions()) {
+        if(transition.getId() == null) {
+          addError("Sequence flow with sourceRef='"+activity.getId()+"' must have an id, activity with id '"+activity.getId()+"' uses 'asyncAfter'.", null);
+        }
+      }
+    }
   }
 
   public void validateExclusiveGateway(ActivityImpl activity) {
@@ -1581,15 +1591,36 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseAsynchronousContinuation(Element element, ActivityImpl activity) {
-    if(isAsync(element)) {
-      activity.setAsync(true);
-      // create message event declaration:
+
+    boolean isAsyncBefore = isAsyncBefore(element);
+    boolean isAsyncAfter = isAsyncAfter(element);
+    boolean exclusive = isExclusive(element);
+
+    // set properties on activity
+    activity.setAsyncBefore(isAsyncBefore);
+    activity.setAsyncAfter(isAsyncAfter);
+
+    if(isAsyncBefore) {
+
       MessageJobDeclaration messageJobDecl = new MessageJobDeclaration();
-      boolean exclusive = isExclusive(element);
       messageJobDecl.setExclusive(exclusive);
       messageJobDecl.setActivityId(activity.getId());
+      messageJobDecl.setJobConfiguration("async-before");
+
       activity.setProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION, messageJobDecl);
       addJobDeclaration(messageJobDecl, activity.getProcessDefinition());
+    }
+
+    if(isAsyncAfter) {
+
+      MessageJobDeclaration messageJobDecl = new MessageJobDeclaration();
+      messageJobDecl.setExclusive(exclusive);
+      messageJobDecl.setActivityId(activity.getId());
+      messageJobDecl.setJobConfiguration("async-after");
+
+      activity.setProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION, messageJobDecl);
+      addJobDeclaration(messageJobDecl, activity.getProcessDefinition());
+
     }
   }
 
@@ -3177,8 +3208,13 @@ public class BpmnParse extends Parse {
     return "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "exclusive", String.valueOf(JobEntity.DEFAULT_EXCLUSIVE)));
   }
 
-  protected boolean isAsync(Element element) {
-    return "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "async"));
+  protected boolean isAsyncBefore(Element element) {
+    return "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "async"))
+        || "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "asyncBefore"));
+  }
+
+  protected boolean isAsyncAfter(Element element) {
+    return "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "asyncAfter"));
   }
 
   private boolean isServiceTaskLike(Element element) {
