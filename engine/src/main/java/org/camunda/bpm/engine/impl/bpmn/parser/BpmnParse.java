@@ -27,11 +27,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.mapping.InputParameter;
 import org.camunda.bpm.engine.impl.core.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.mapping.OutputParameter;
-import org.camunda.bpm.engine.impl.core.mapping.value.ConstantValueProvider;
-import org.camunda.bpm.engine.impl.core.mapping.value.ListValueProvider;
-import org.camunda.bpm.engine.impl.core.mapping.value.MapValueProvider;
-import org.camunda.bpm.engine.impl.core.mapping.value.NullValueProvider;
-import org.camunda.bpm.engine.impl.core.mapping.value.ParameterValueProvider;
+import org.camunda.bpm.engine.impl.core.mapping.value.*;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
@@ -1602,29 +1598,37 @@ public class BpmnParse extends Parse {
 
     if(isAsyncBefore) {
 
-      MessageJobDeclaration messageJobDecl = new MessageJobDeclaration();
-      messageJobDecl.setExclusive(exclusive);
-      messageJobDecl.setActivityId(activity.getId());
-      messageJobDecl.setJobConfiguration("async-before");
+      MessageJobDeclaration messageJobDeclaration = new AsyncBeforeMessageJobDeclaration();
+      messageJobDeclaration.setExclusive(exclusive);
+      messageJobDeclaration.setActivityId(activity.getId());
 
-      activity.setProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION, messageJobDecl);
-      addJobDeclaration(messageJobDecl, activity.getProcessDefinition());
+      addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
+      addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
     }
 
     if(isAsyncAfter) {
 
-      MessageJobDeclaration messageJobDecl = new MessageJobDeclaration();
-      messageJobDecl.setExclusive(exclusive);
-      messageJobDecl.setActivityId(activity.getId());
-      messageJobDecl.setJobConfiguration("async-after");
+      MessageJobDeclaration messageJobDeclaration = new AsyncAfterMessageJobDeclaration();
+      messageJobDeclaration.setExclusive(exclusive);
+      messageJobDeclaration.setActivityId(activity.getId());
 
-      activity.setProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION, messageJobDecl);
-      addJobDeclaration(messageJobDecl, activity.getProcessDefinition());
-
+      addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
+      addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
     }
+
   }
 
-  protected void addJobDeclaration(JobDeclaration<?> jobDeclaration, ProcessDefinitionImpl processDefinition) {
+  @SuppressWarnings("unchecked")
+  protected void addMessageJobDeclarationToActivity(MessageJobDeclaration messageJobDeclaration, ActivityImpl activity) {
+    List<MessageJobDeclaration> messageJobDeclarations = (List<MessageJobDeclaration>) activity.getProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION);
+    if (messageJobDeclarations == null) {
+      messageJobDeclarations = new ArrayList<MessageJobDeclaration>();
+      activity.setProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION, messageJobDeclarations);
+    }
+    messageJobDeclarations.add(messageJobDeclaration);
+  }
+
+  protected void addJobDeclarationToProcessDefinition(JobDeclaration<?> jobDeclaration, ProcessDefinitionImpl processDefinition) {
     ProcessDefinition definition = (ProcessDefinition) processDefinition;
     String key = definition.getKey();
 
@@ -2481,7 +2485,7 @@ public class BpmnParse extends Parse {
     }
     timerDeclaration.setActivityId(timerActivity.getId());
     timerDeclaration.setJobConfiguration(type.toString() + ": " +expression.getExpressionText());
-    addJobDeclaration(timerDeclaration, timerActivity.getProcessDefinition());
+    addJobDeclarationToProcessDefinition(timerDeclaration, timerActivity.getProcessDefinition());
 
     return timerDeclaration;
   }

@@ -26,11 +26,9 @@
 
     </serviceTask>
 
-    <sequenceFlow id="flow2" sourceRef="service" targetRef="taskAfterFlow2">
-    </sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="service" targetRef="taskAfterFlow2"/>
 
-    <sequenceFlow id="flow3" sourceRef="service" targetRef="taskAfterFlow3">
-    </sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="service" targetRef="taskAfterFlow3"/>
 
     <receiveTask id="taskAfterFlow2" />
 

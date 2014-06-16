@@ -426,10 +426,20 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     return false;
   }
 
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings({"unchecked", "deprecation"})
   protected void scheduleAtomicOperationAsync(AtomicOperation executionOperation) {
 
-    final MessageJobDeclaration messageJobDeclaration = (MessageJobDeclaration) getActivity().getProperty(BpmnParse.PROPERTYNAME_MESSAGE_JOB_DECLARATION);
+    MessageJobDeclaration messageJobDeclaration = null;
+
+    List<MessageJobDeclaration> messageJobDeclarations = (List<MessageJobDeclaration>) getActivity().getProperty(BpmnParse.PROPERTYNAME_MESSAGE_JOB_DECLARATION);
+    if (messageJobDeclarations != null) {
+      for (MessageJobDeclaration declaration : messageJobDeclarations) {
+        if (declaration.isApplicableForOperation(executionOperation)) {
+          messageJobDeclaration = declaration;
+          break;
+        }
+      }
+    }
 
     if(messageJobDeclaration != null) {
       MessageEntity message = messageJobDeclaration.createJobInstance(this);

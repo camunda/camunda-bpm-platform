@@ -152,7 +152,6 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
     // start process instance
     Map<String, Object> varMap = new HashMap<String, Object>();
-    varMap.put("flowToTake", "flow2");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", varMap);
 
     // the service task is completely invoked

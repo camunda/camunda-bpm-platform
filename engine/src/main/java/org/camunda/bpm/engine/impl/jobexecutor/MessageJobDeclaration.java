@@ -25,11 +25,17 @@ import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
  */
 public class MessageJobDeclaration extends JobDeclaration<MessageEntity> {
 
-  public MessageJobDeclaration() {
-    super(AsyncContinuationJobHandler.TYPE);
-  }
+  public static final String ASYNC_BEFORE = "async-before";
+  public static final String ASYNC_AFTER = "async-after";
 
   private static final long serialVersionUID = 1L;
+
+  protected String[] operationIdentifier;
+
+  public MessageJobDeclaration(String[] operationsIdentifier) {
+    super(AsyncContinuationJobHandler.TYPE);
+    this.operationIdentifier = operationsIdentifier;
+  }
 
   protected MessageEntity newJobInstance(ExecutionEntity execution) {
     MessageEntity message = new MessageEntity();
@@ -53,6 +59,15 @@ public class MessageJobDeclaration extends JobDeclaration<MessageEntity> {
 
     message.setJobHandlerConfiguration(configuration);
 
+  }
+
+  public boolean isApplicableForOperation(AtomicOperation operation) {
+    for (String identifier : operationIdentifier) {
+      if (operation.getCanonicalName().equals(identifier)) {
+        return true;
+      }
+    }
+    return false;
   }
 
 }
