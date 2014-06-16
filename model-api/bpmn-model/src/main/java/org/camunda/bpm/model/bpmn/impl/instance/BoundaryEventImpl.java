@@ -63,6 +63,7 @@ public class BoundaryEventImpl extends CatchEventImpl implements BoundaryEvent {
     super(context);
   }
 
+  @SuppressWarnings("rawtypes")
   public AbstractFlowNodeBuilder builder() {
     throw new ModelTypeException("Builder is not supported for type " + getClass());
   }

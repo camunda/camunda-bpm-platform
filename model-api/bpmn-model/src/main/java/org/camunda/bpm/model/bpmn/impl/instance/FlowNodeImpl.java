@@ -66,10 +66,12 @@ public abstract class FlowNodeImpl extends FlowElementImpl implements FlowNode {
     super(context);
   }
 
+  @SuppressWarnings("rawtypes")
   public AbstractFlowNodeBuilder builder() {
     throw new BpmnModelException("No builder implemented for type " + getElementType().getTypeNamespace() +":" + getElementType().getTypeName());
   }
 
+  @SuppressWarnings("rawtypes")
   public void updateAfterReplacement() {
     super.updateAfterReplacement();
     Collection<Reference> incomingReferences = getIncomingReferencesByType(SequenceFlow.class);

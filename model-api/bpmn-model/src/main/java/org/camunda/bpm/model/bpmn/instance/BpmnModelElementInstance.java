@@ -27,6 +27,7 @@ public interface BpmnModelElementInstance extends ModelElementInstance {
    *
    * @return the builder object
    */
+  @SuppressWarnings("rawtypes")
   AbstractBaseElementBuilder builder();
 
   /**

@@ -50,7 +50,6 @@ public class IntermediateThrowEventImpl extends ThrowEventImpl implements Interm
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public IntermediateThrowEventBuilder builder() {
     return new IntermediateThrowEventBuilder((BpmnModelInstance) modelInstance, this);
   }

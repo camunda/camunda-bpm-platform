@@ -24,6 +24,7 @@ import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
  */
 public interface Gateway extends FlowNode {
 
+  @SuppressWarnings("rawtypes")
   AbstractGatewayBuilder builder();
 
   GatewayDirection getGatewayDirection();

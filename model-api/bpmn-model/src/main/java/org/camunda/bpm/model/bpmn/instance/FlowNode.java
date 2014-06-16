@@ -24,6 +24,7 @@ import java.util.Collection;
  */
 public interface FlowNode extends FlowElement {
 
+  @SuppressWarnings("rawtypes")
   AbstractFlowNodeBuilder builder();
 
   Collection<SequenceFlow> getIncoming();

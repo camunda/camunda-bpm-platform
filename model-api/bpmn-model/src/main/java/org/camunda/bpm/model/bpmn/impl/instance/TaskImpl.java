@@ -67,6 +67,7 @@ public class TaskImpl extends ActivityImpl implements Task {
     super(context);
   }
 
+  @SuppressWarnings("rawtypes")
   public AbstractTaskBuilder builder() {
     throw new ModelTypeException("No builder implemented.");
   }

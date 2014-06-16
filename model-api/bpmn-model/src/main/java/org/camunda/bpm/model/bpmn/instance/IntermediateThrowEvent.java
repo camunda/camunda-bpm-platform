@@ -22,7 +22,6 @@ import org.camunda.bpm.model.bpmn.builder.IntermediateThrowEventBuilder;
  */
 public interface IntermediateThrowEvent extends ThrowEvent {
 
-  @SuppressWarnings("unchecked")
   IntermediateThrowEventBuilder builder();
 
 }

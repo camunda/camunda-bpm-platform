@@ -190,10 +190,12 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     }
   }
 
+  @SuppressWarnings("rawtypes")
   public AbstractGatewayBuilder moveToLastGateway() {
     return findLastGateway().builder();
   }
 
+  @SuppressWarnings("rawtypes")
   public AbstractFlowNodeBuilder moveToNode(String identifier) {
     ModelElementInstance instance = modelInstance.getModelElementById(identifier);
     if (instance != null && instance instanceof FlowNode) {
@@ -204,6 +206,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     }
   }
 
+  @SuppressWarnings("rawtypes")
   public AbstractFlowNodeBuilder connectTo(String identifier) {
     ModelElementInstance target = modelInstance.getModelElementById(identifier);
     if (target == null) {

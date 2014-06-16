@@ -31,6 +31,7 @@ public abstract class BpmnModelElementInstanceImpl extends ModelElementInstanceI
     super(instanceContext);
   }
 
+  @SuppressWarnings("rawtypes")
   public AbstractBaseElementBuilder builder() {
     throw new BpmnModelException("No builder implemented for " + this);
   }

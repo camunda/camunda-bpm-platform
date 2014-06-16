@@ -20,7 +20,7 @@ import org.camunda.bpm.model.bpmn.instance.StartEvent;
  */
 public class EmbeddedSubProcessBuilder extends AbstractEmbeddedSubProcessBuilder<EmbeddedSubProcessBuilder, SubProcessBuilder> {
 
-
+  @SuppressWarnings("rawtypes")
   protected EmbeddedSubProcessBuilder(AbstractSubProcessBuilder subProcessBuilder) {
     super((SubProcessBuilder) subProcessBuilder, EmbeddedSubProcessBuilder.class);
   }

@@ -22,7 +22,6 @@ import org.camunda.bpm.model.bpmn.builder.IntermediateCatchEventBuilder;
  */
 public interface IntermediateCatchEvent extends CatchEvent {
 
-  @SuppressWarnings("unchecked")
   IntermediateCatchEventBuilder builder();
 
 }

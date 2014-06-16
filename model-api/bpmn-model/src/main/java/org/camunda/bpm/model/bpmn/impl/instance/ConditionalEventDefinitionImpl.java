@@ -16,7 +16,6 @@ package org.camunda.bpm.model.bpmn.impl.instance;
 import org.camunda.bpm.model.bpmn.instance.Condition;
 import org.camunda.bpm.model.bpmn.instance.ConditionalEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.EventDefinition;
-import org.camunda.bpm.model.bpmn.instance.Expression;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;

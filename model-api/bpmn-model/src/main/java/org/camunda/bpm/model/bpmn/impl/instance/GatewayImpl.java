@@ -33,7 +33,7 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.*;
 public abstract class GatewayImpl extends FlowNodeImpl implements Gateway {
 
   protected static Attribute<GatewayDirection> gatewayDirectionAttribute;
- 
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Gateway.class, BPMN_ELEMENT_GATEWAY)
       .namespaceUri(BPMN20_NS)
@@ -43,14 +43,15 @@ public abstract class GatewayImpl extends FlowNodeImpl implements Gateway {
     gatewayDirectionAttribute = typeBuilder.enumAttribute(BPMN_ATTRIBUTE_GATEWAY_DIRECTION, GatewayDirection.class)
       .defaultValue(GatewayDirection.Unspecified)
       .build();
-  
+
     typeBuilder.build();
   }
-  
+
   public GatewayImpl(ModelTypeInstanceContext context) {
     super(context);
   }
 
+  @SuppressWarnings("rawtypes")
   public abstract AbstractGatewayBuilder builder();
 
   public GatewayDirection getGatewayDirection() {

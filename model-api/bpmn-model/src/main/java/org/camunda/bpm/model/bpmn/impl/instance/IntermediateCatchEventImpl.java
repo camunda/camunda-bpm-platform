@@ -50,7 +50,6 @@ public class IntermediateCatchEventImpl extends CatchEventImpl implements Interm
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public IntermediateCatchEventBuilder builder() {
     return new IntermediateCatchEventBuilder((BpmnModelInstance) modelInstance, this);
   }

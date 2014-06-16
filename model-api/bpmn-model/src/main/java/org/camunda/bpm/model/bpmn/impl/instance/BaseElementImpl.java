@@ -92,6 +92,7 @@ public abstract class BaseElementImpl extends BpmnModelElementInstanceImpl imple
     extensionElementsChild.setChild(this, extensionElements);
   }
 
+  @SuppressWarnings("rawtypes")
   public DiagramElement getDiagramElement() {
     Collection<Reference> incomingReferences = getIncomingReferencesByType(DiagramElement.class);
     for (Reference<?> reference : incomingReferences) {
@@ -105,7 +106,7 @@ public abstract class BaseElementImpl extends BpmnModelElementInstanceImpl imple
     return null;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Collection<Reference> getIncomingReferencesByType(Class<? extends ModelElementInstance> referenceSourceTypeClass) {
     Collection<Reference> references = new ArrayList<Reference>();
     // we traverse all incoming references in reverse direction
