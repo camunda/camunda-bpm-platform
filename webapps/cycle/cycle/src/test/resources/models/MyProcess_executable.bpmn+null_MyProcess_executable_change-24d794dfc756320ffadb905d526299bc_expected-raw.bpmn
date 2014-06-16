@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-e4901347-2fe8-43cf-bf8e-921c68a3095e" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.8.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-cc51089f-7720-4183-be88-36269765aabc" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
    <process id="MyProcess2" isClosed="false" isExecutable="true" name="MyProcess2" processType="None">
       <startEvent id="startevent1" name="Start">
          <outgoing>flow1</outgoing>
@@ -39,28 +39,49 @@
       <sequenceFlow id="flow9" isImmediate="true" name="" sourceRef="exclusivegateway2" targetRef="servicetask1"/>
       <sequenceFlow id="flow8" isImmediate="true" name="" sourceRef="usertask1" targetRef="exclusivegateway2"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-77ac162b-6e61-4ed6-b5a4-45c6a83dddd4">
-      <bpmndi:BPMNPlane bpmnElement="MyProcess2" id="sid-3b258593-6267-4803-aff3-084a3de382d3">
+   <bpmndi:BPMNDiagram id="sid-4c0c8638-0066-41e1-ba7f-009e75845611">
+      <bpmndi:BPMNPlane bpmnElement="MyProcess2" id="sid-251f0495-1c64-4897-8f8e-bef789f1c4c7">
          <bpmndi:BPMNShape bpmnElement="startevent1" id="startevent1_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="52.5" y="82.5"/>
+            <bpmndi:BPMNLabel labelStyle="sid-cbdbedfe-5b43-437d-9171-b46589493784">
+               <omgdc:Bounds height="11.0" width="28.28571319580078" x="53.35714340209961" y="114.5"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="usertask1" id="usertask1_gui">
             <omgdc:Bounds height="55.0" width="105.0" x="120.0" y="70.0"/>
+            <bpmndi:BPMNLabel labelStyle="sid-850a9fd0-3c73-4d39-9eb9-a6f8202e9c36">
+               <omgdc:Bounds height="24.0" width="63.42857360839844" x="140.78571319580078" y="84.5"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="servicetask1" id="servicetask1_gui">
             <omgdc:Bounds height="55.0" width="105.0" x="370.0" y="16.0"/>
+            <bpmndi:BPMNLabel labelStyle="sid-850a9fd0-3c73-4d39-9eb9-a6f8202e9c36">
+               <omgdc:Bounds height="24.0" width="60.857147216796875" x="392.07142639160156" y="30.5"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="servicetask2" id="servicetask2_gui">
             <omgdc:Bounds height="55.0" width="105.0" x="370.0" y="110.0"/>
+            <bpmndi:BPMNLabel labelStyle="sid-850a9fd0-3c73-4d39-9eb9-a6f8202e9c36">
+               <omgdc:Bounds height="12.0" width="89.14285278320312" x="377.92857360839844" y="130.5"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="endevent1" id="endevent1_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="602.5" y="82.5"/>
+            <bpmndi:BPMNLabel labelStyle="sid-cbdbedfe-5b43-437d-9171-b46589493784">
+               <omgdc:Bounds height="11.0" width="21.21428680419922" x="605.8928565979004" y="112.5"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="exclusivegateway1_gui" isMarkerVisible="true">
             <omgdc:Bounds height="40.0" width="40.0" x="510.0" y="77.0"/>
+            <bpmndi:BPMNLabel labelStyle="sid-cbdbedfe-5b43-437d-9171-b46589493784">
+               <omgdc:Bounds height="12.0" width="110.57142639160156" x="540.5" y="107.5"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="exclusivegateway2_gui" isMarkerVisible="true">
             <omgdc:Bounds height="40.0" width="40.0" x="271.0" y="77.0"/>
+            <bpmndi:BPMNLabel labelStyle="sid-cbdbedfe-5b43-437d-9171-b46589493784">
+               <omgdc:Bounds height="12.0" width="110.57142639160156" x="301.5" y="107.5"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNEdge bpmnElement="flow10" id="flow10_gui">
             <omgdi:waypoint x="291.0" y="117.0"/>
@@ -95,5 +116,11 @@
             <omgdi:waypoint x="271.0" y="97.0"/>
          </bpmndi:BPMNEdge>
       </bpmndi:BPMNPlane>
+      <bpmndi:BPMNLabelStyle id="sid-cbdbedfe-5b43-437d-9171-b46589493784">
+         <omgdc:Font isBold="false" isItalic="false" isStrikeThrough="false" isUnderline="false" name="Arial" size="11.0"/>
+      </bpmndi:BPMNLabelStyle>
+      <bpmndi:BPMNLabelStyle id="sid-850a9fd0-3c73-4d39-9eb9-a6f8202e9c36">
+         <omgdc:Font isBold="false" isItalic="false" isStrikeThrough="false" isUnderline="false" name="Arial" size="12.0"/>
+      </bpmndi:BPMNLabelStyle>
    </bpmndi:BPMNDiagram>
 </definitions>

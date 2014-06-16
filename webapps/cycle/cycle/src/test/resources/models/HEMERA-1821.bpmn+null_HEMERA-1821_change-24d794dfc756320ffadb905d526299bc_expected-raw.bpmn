@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-6029fb47-fc19-4b59-8351-fa8b9014db5a" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <collaboration id="sid-760f8534-8ae6-4e33-a0e4-9409d3024696">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.8.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-74968d0f-dc07-4080-aa76-676e9e857e3b" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <collaboration id="sid-20ec5c2e-a104-4096-8168-a2d69be5b05a">
       <participant id="TestLane_1" name="TestLane" processRef="CollaborationDropTest_">
          <extensionElements/>
       </participant>
    </collaboration>
    <process id="CollaborationDropTest_" isClosed="false" isExecutable="true" name="TestLane" processType="None">
       <extensionElements/>
-      <laneSet id="sid-39897862-0d15-4409-8250-238729a51e90">
+      <laneSet id="sid-5269e2ee-875d-4855-a19e-fceb92a2d65a">
          <lane id="lane_5">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -38,10 +38,13 @@
       <sequenceFlow id="sequenceFlow_28" isImmediate="true" name="" sourceRef="Task1_16" targetRef="endEvent_23"/>
       <sequenceFlow id="sequenceFlow_27" isImmediate="true" name="" sourceRef="startEvent_12" targetRef="Task1_16"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-3230e2d6-f4b5-4e39-a981-51d6f73a6b36">
-      <bpmndi:BPMNPlane bpmnElement="sid-760f8534-8ae6-4e33-a0e4-9409d3024696" id="sid-78e7c664-caa7-41cb-a16f-d5898824880b">
+   <bpmndi:BPMNDiagram id="sid-2481e974-bcdd-4126-b745-d3434d144a1b">
+      <bpmndi:BPMNPlane bpmnElement="sid-20ec5c2e-a104-4096-8168-a2d69be5b05a" id="sid-d4936052-6e58-44d2-8a36-75c26bf35009">
          <bpmndi:BPMNShape bpmnElement="TestLane_1" id="TestLane_1_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="600.0" x="0.0" y="0.0"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a27ea0b4-aa7c-4e98-8448-3f4f35e9b8c1">
+               <omgdc:Bounds height="54.857147216796875" width="12.000000000000012" x="5.999999999999995" y="97.57142639160156"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="lane_5" id="lane_5_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="570.0" x="30.0" y="0.0"/>
@@ -51,6 +54,9 @@
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Task1_16" id="Task1_16_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="150.0" y="65.0"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a27ea0b4-aa7c-4e98-8448-3f4f35e9b8c1">
+               <omgdc:Bounds height="12.0" width="36.0" x="182.0" y="98.0"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="endEvent_23" id="endEvent_23_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="294.0" y="90.0"/>
@@ -64,5 +70,8 @@
             <omgdi:waypoint x="150.0" y="105.0"/>
          </bpmndi:BPMNEdge>
       </bpmndi:BPMNPlane>
+      <bpmndi:BPMNLabelStyle id="sid-a27ea0b4-aa7c-4e98-8448-3f4f35e9b8c1">
+         <omgdc:Font isBold="false" isItalic="false" isStrikeThrough="false" isUnderline="false" name="Arial" size="12.0"/>
+      </bpmndi:BPMNLabelStyle>
    </bpmndi:BPMNDiagram>
 </definitions>

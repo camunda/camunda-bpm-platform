@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-615da6ef-e24c-4f1d-893d-ee85348524ec" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <message id="sid-4454ab85-e3b0-4b91-a279-8c19bee1127e" name="AutomatedAcquisition"/>
-   <message id="sid-c5f4ac8b-2c58-4e49-b20e-4b098048b531" name="ManualAcquisition"/>
-   <dataStore capacity="0" id="sid-9024c90f-dfcb-4e7c-b566-6f9f359a7055" isUnlimited="false" name="Speicherort X"/>
-   <error id="sid-7a58c91d-d61f-48d1-bfe6-606a9dfed23f"/>
-   <collaboration id="sid-93eb77a4-c81e-44f6-843c-31a9a441f856">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.8.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-4945f191-4195-4da2-a939-39d023c77771" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <dataStore capacity="0" id="sid-4920434a-0856-4439-bdbb-13ed8750a4e4" isUnlimited="false" name="Speicherort X"/>
+   <message id="sid-f944eaf1-2542-4633-a21b-682f7016cae7" name="AutomatedAcquisition"/>
+   <message id="sid-b803fd85-2c59-43ec-944a-27fdb38c7208" name="ManualAcquisition"/>
+   <error id="sid-d733e0fb-e8af-441d-8a8a-6fe8f204db33"/>
+   <collaboration id="sid-6d0e3863-e74f-40b4-92e3-2d6796c9e13e">
       <participant id="Prozess_Engine_Akquise_Prozess_15" name="Prozess Engine&#10;Akquise Prozess" processRef="CC-Akquise_">
          <extensionElements/>
       </participant>
@@ -36,13 +36,13 @@
       <messageFlow id="sid-2CDC64C0-B8AE-4E0D-97DD-CC1C4C8AA8A7" name="" sourceRef="Akquisedaten_erfassen_69" targetRef="Akquise_Metadaten_erfassen_474"/>
       <messageFlow id="Akquisetyp__manuell_23" name="Akquisetyp:&#10;manuell" sourceRef="GP_identifiziert___angelegt__467" targetRef="Manuelle_Akquise_95">
          <extensionElements>
-            <signavio:signavioLabel align="left" distance="7.1534123" from="2" orientation="ul" ref="text_name" to="3" valign="top" x="1230.0" y="756.0904480621806"/>
+            <signavio:signavioLabel align="left" bold="" distance="7.1534123" fill="" fontFamily="" fontSize="" from="2" italic="" orientation="ul" ref="text_name" to="3" valign="top" x="1230.0" y="756.0904480621806"/>
          </extensionElements>
       </messageFlow>
       <messageFlow id="sid-30C5AD1D-CECB-4B9B-B892-8328F0EB436B" name="" sourceRef="sid-157F1C83-2948-4441-A569-681981442BBC" targetRef="GP-Suche_308"/>
       <messageFlow id="Akquisetyp__automatisch_21" name="Akquisetyp: &#10;automatisiert" sourceRef="GP_identifiziert___angelegt__467" targetRef="GP_identifizieren_62">
          <extensionElements>
-            <signavio:signavioLabel align="left" distance="8.0" from="2" orientation="ul" ref="text_name" to="3" valign="top" x="1094.0" y="665.0"/>
+            <signavio:signavioLabel align="left" bold="" distance="8.0" fill="" fontFamily="" fontSize="" from="2" italic="" orientation="ul" ref="text_name" to="3" valign="top" x="1094.0" y="665.0"/>
          </extensionElements>
       </messageFlow>
       <messageFlow id="sid-8E05A857-A918-4C97-A8C5-D25D6A235FDD" name="" sourceRef="GP_identifizieren_62" targetRef="ggf__Trefferliste_Dublettenpr_fung_323"/>
@@ -55,7 +55,7 @@
    </collaboration>
    <process id="sid-8F910D12-126A-4FB0-90D0-9EEE4C676B2F" isClosed="false" isExecutable="false" name="Batch Prozess" processType="None">
       <extensionElements/>
-      <laneSet id="sid-04a2035b-928d-41e1-b8d6-879a49840275">
+      <laneSet id="sid-f6ece230-62df-4157-bddb-80579731d8a7">
          <lane id="sid-A69F434F-CBCB-48BB-8AE2-7A1C04B9A695">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -71,7 +71,7 @@
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
          <outgoing>sid-806885CB-AA54-4F14-AC74-166CBB0C9879</outgoing>
-         <timerEventDefinition id="sid-85f4d6f1-d69b-4777-af4b-773cb4674423"/>
+         <timerEventDefinition id="sid-6c651707-7575-402a-8dbc-f434d456c115"/>
       </startEvent>
       <task completionQuantity="1" id="sid-B4E09B22-4468-4220-998C-76426E821809" isForCompensation="false" name="Daten ermitteln" startQuantity="1">
          <extensionElements>
@@ -99,7 +99,7 @@
    </process>
    <process id="GUI__JSF2__183" isClosed="true" isExecutable="false" name="GUI (JSF2)" processType="None">
       <extensionElements/>
-      <laneSet id="sid-5c77d612-6f6f-4659-a57a-3808cdf059d7">
+      <laneSet id="sid-6c837bdb-ca8d-4a62-8550-0bf450a3b029">
          <lane id="lane_183">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -134,13 +134,6 @@
             <flowNodeRef>sid-DA19EC49-00AC-4A18-A8C7-CD9C123B70FD</flowNodeRef>
             <flowNodeRef>sid-CA67E836-B3BE-4DA4-97A0-18B7AAE00547</flowNodeRef>
             <flowNodeRef>sid-3060BA51-56EC-49B0-9ABC-84748C727C4D</flowNodeRef>
-            <flowNodeRef>textAnnotation_551</flowNodeRef>
-            <flowNodeRef>textAnnotation_553</flowNodeRef>
-            <flowNodeRef>textAnnotation_555</flowNodeRef>
-            <flowNodeRef>textAnnotation_557</flowNodeRef>
-            <flowNodeRef>textAnnotation_561</flowNodeRef>
-            <flowNodeRef>textAnnotation_565</flowNodeRef>
-            <flowNodeRef>textAnnotation_569</flowNodeRef>
          </lane>
       </laneSet>
       <task completionQuantity="1" id="Login__falls_Session_expired__226" isForCompensation="false" name="Login (falls Session expired)" startQuantity="1">
@@ -220,7 +213,7 @@
          </extensionElements>
          <incoming>sequenceFlow_538</incoming>
          <outgoing>sequenceFlow_511</outgoing>
-         <messageEventDefinition id="sid-4fe18d83-06bc-4cc9-abbf-574e4a06b82c"/>
+         <messageEventDefinition id="sid-f3f846d1-49bd-4994-83a3-d7ef6bd816a6"/>
       </intermediateThrowEvent>
       <task completionQuantity="1" id="GP-Suche_308" isForCompensation="false" name="GP suchen und auswählen&#10;[F-2]" startQuantity="1">
          <extensionElements>
@@ -258,7 +251,7 @@
          </extensionElements>
          <incoming>sequenceFlow_501</incoming>
          <outgoing>sequenceFlow_512</outgoing>
-         <messageEventDefinition id="sid-e7990a03-33c0-4475-8cf6-55d4c515d5f2"/>
+         <messageEventDefinition id="sid-beec9dd1-1179-48f4-b40b-0c663af7477b"/>
       </intermediateThrowEvent>
       <exclusiveGateway gatewayDirection="Converging" id="exclusiveGateway_414" name="">
          <extensionElements>
@@ -284,21 +277,21 @@
       </eventBasedGateway>
       <intermediateCatchEvent id="technische__Stammdaten_und_WB__angelegt_430" name="technische &#10;Stammdaten&#10;und WB &#10;angelegt">
          <extensionElements>
-            <signavio:signavioLabel align="left" ref="text_name" x="27.0" y="26.0"/>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+            <signavio:signavioLabel align="left" bold="" fill="" fontFamily="" fontSize="" italic="" ref="text_name" x="27.0" y="26.0"/>
          </extensionElements>
          <incoming>sequenceFlow_516</incoming>
          <outgoing>sequenceFlow_515</outgoing>
-         <messageEventDefinition id="sid-ab7d7eb7-f9cb-46ca-87df-28832fafac99"/>
+         <messageEventDefinition id="sid-23196672-acb2-40c6-a292-72a1b26e82b8"/>
       </intermediateCatchEvent>
       <intermediateCatchEvent id="Fehler_bei__technische__Stammdaten__anlegen_438" name="Fehler bei &#10;technische &#10;Stammdaten &#10;anlegen">
          <extensionElements>
-            <signavio:signavioLabel ref="text_name" valign="middle" x="-62.0" y="-20.0"/>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+            <signavio:signavioLabel bold="" fill="" fontFamily="" fontSize="" italic="" ref="text_name" valign="middle" x="-62.0" y="-20.0"/>
          </extensionElements>
          <incoming>sequenceFlow_517</incoming>
          <outgoing>sequenceFlow_519</outgoing>
-         <messageEventDefinition id="sid-0fab36e9-6125-4fe0-ab9b-070c7e0ea3b3"/>
+         <messageEventDefinition id="sid-e442cef6-bb67-497f-b89a-c539f4e6445e"/>
       </intermediateCatchEvent>
       <eventBasedGateway eventGatewayType="Exclusive" gatewayDirection="Diverging" id="eventBasedGateway_446" instantiate="false" name="">
          <extensionElements>
@@ -310,12 +303,12 @@
       </eventBasedGateway>
       <intermediateCatchEvent id="Fehler_bei__Kontakt__schreiben_452" name="Fehler bei &#10;Kontakt &#10;schreiben">
          <extensionElements>
-            <signavio:signavioLabel ref="text_name" valign="middle" x="71.0" y="28.0"/>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+            <signavio:signavioLabel bold="" fill="" fontFamily="" fontSize="" italic="" ref="text_name" valign="middle" x="71.0" y="28.0"/>
          </extensionElements>
          <incoming>sequenceFlow_525</incoming>
          <outgoing>sequenceFlow_530</outgoing>
-         <messageEventDefinition id="sid-f29a613c-72eb-4b6b-860f-fa32c3e4d507"/>
+         <messageEventDefinition id="sid-4e81eecd-1d60-4871-89ba-6272115a12ed"/>
       </intermediateCatchEvent>
       <intermediateCatchEvent id="Kontakt_geschrieben_460" name="Kontakt&#10;geschrieben">
          <extensionElements>
@@ -323,17 +316,17 @@
          </extensionElements>
          <incoming>sequenceFlow_524</incoming>
          <outgoing>sequenceFlow_523</outgoing>
-         <messageEventDefinition id="sid-b0a2ca4a-aa24-4007-bca6-daa323dede49"/>
+         <messageEventDefinition id="sid-f8cb1db8-5d79-4d4c-9ab5-0905ed499f58"/>
       </intermediateCatchEvent>
       <intermediateThrowEvent id="GP_identifiziert___angelegt__467" name="GP identifiziert &#10;(angelegt)">
          <extensionElements>
-            <signavio:signavioLabel ref="text_name" valign="bottom" x="16.0" y="-8.0"/>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+            <signavio:signavioLabel bold="" fill="" fontFamily="" fontSize="" italic="" ref="text_name" valign="bottom" x="16.0" y="-8.0"/>
          </extensionElements>
          <incoming>sid-BD800F1D-CF41-4855-BE75-507CFA8E5668</incoming>
          <outgoing>sequenceFlow_535</outgoing>
-         <cancelEventDefinition id="sid-e267720d-be64-497b-9e79-e6a6d5991756"/>
-         <terminateEventDefinition id="sid-3decacf2-ee15-4389-a285-1f8180931932"/>
+         <cancelEventDefinition id="sid-f0194b07-0159-4ab1-abe2-cd864a4eb67e"/>
+         <terminateEventDefinition id="sid-37d087f2-316d-4cf5-9417-fc11ed994381"/>
       </intermediateThrowEvent>
       <task completionQuantity="1" id="Akquise_Metadaten_erfassen_474" isForCompensation="false" name="Akquise Metadaten erfassen&#10;[F-7]" startQuantity="1">
          <extensionElements>
@@ -355,7 +348,7 @@
          </extensionElements>
          <incoming>sid-0748D121-3E77-4C0D-9AA7-5B3EBD3BE19C</incoming>
          <outgoing>sid-529534D6-C76E-476E-BF93-9ACC3F44F608</outgoing>
-         <messageEventDefinition id="sid-abcc1fac-8c41-4f56-962c-33edb3907430"/>
+         <messageEventDefinition id="sid-409cbc78-e49d-46c2-b900-ee24e88647a3"/>
       </intermediateThrowEvent>
       <exclusiveGateway gatewayDirection="Diverging" id="sid-CA67E836-B3BE-4DA4-97A0-18B7AAE00547" name="">
          <extensionElements>
@@ -380,14 +373,14 @@
       <sequenceFlow id="manuell_490" isImmediate="true" name="manuell" sourceRef="Akquisetyp_316" targetRef="GP-Suche_308"/>
       <sequenceFlow id="sequenceFlow_530" isImmediate="true" name="" sourceRef="Fehler_bei__Kontakt__schreiben_452" targetRef="exclusiveGateway_414">
          <extensionElements>
-            <signavio:signavioLabel align="center" ref="text_name" valign="middle" x="1299.816131419636" y="-6241.088435713209"/>
+            <signavio:signavioLabel align="center" bold="" fill="" fontFamily="" fontSize="" italic="" ref="text_name" valign="middle" x="1299.816131419636" y="-6241.088435713209"/>
          </extensionElements>
       </sequenceFlow>
       <sequenceFlow id="sequenceFlow_533" isImmediate="true" name="" sourceRef="Akquise_Metadaten_erfassen_474" targetRef="VS__AO__Suche_und_Auswahl_247"/>
       <sequenceFlow id="sequenceFlow_535" isImmediate="true" name="" sourceRef="GP_identifiziert___angelegt__467" targetRef="exclusiveGateway_241"/>
       <sequenceFlow id="nein_522" isImmediate="true" name="Kein nächster Akquisefall vorhanden" sourceRef="sid-CA67E836-B3BE-4DA4-97A0-18B7AAE00547" targetRef="Auswahl_manuell___automatisiert___beenden_233">
          <extensionElements>
-            <signavio:signavioLabel align="center" distance="15.677734" from="1" orientation="ce" ref="text_name" to="2" valign="middle" x="503.42002868652344" y="564.0"/>
+            <signavio:signavioLabel align="center" bold="" distance="15.677734" fill="" fontFamily="" fontSize="" from="1" italic="" orientation="ce" ref="text_name" to="2" valign="middle" x="503.42002868652344" y="564.0"/>
          </extensionElements>
       </sequenceFlow>
       <sequenceFlow id="sequenceFlow_491" isImmediate="true" name="" sourceRef="startEvent_277" targetRef="Login__falls_Session_expired__226"/>
@@ -408,7 +401,7 @@
       <sequenceFlow id="sid-0748D121-3E77-4C0D-9AA7-5B3EBD3BE19C" isImmediate="true" name="" sourceRef="sid-CA67E836-B3BE-4DA4-97A0-18B7AAE00547" targetRef="sid-DA19EC49-00AC-4A18-A8C7-CD9C123B70FD"/>
       <sequenceFlow id="sequenceFlow_519" isImmediate="true" name="" sourceRef="Fehler_bei__technische__Stammdaten__anlegen_438" targetRef="Statusanzeige__Fehlermeldungen__295">
          <extensionElements>
-            <signavio:signavioLabel align="right" distance="7.0" from="0" orientation="ur" ref="text_name" to="1" valign="top" x="2449.880034846925" y="520.8122743336277"/>
+            <signavio:signavioLabel align="right" bold="" distance="7.0" fill="" fontFamily="" fontSize="" from="0" italic="" orientation="ur" ref="text_name" to="1" valign="top" x="2449.880034846925" y="520.8122743336277"/>
          </extensionElements>
       </sequenceFlow>
       <sequenceFlow id="sequenceFlow_514" isImmediate="true" name="" sourceRef="Login__falls_Session_expired__226" targetRef="Auswahl_manuell___automatisiert___beenden_233"/>
@@ -457,7 +450,7 @@ Weiterleitungen
    </process>
    <process id="CC-Akquise_" isClosed="true" isExecutable="true" name="Prozess Engine&#10;Akquise Prozess" processType="None">
       <extensionElements/>
-      <laneSet id="sid-39d20691-54c5-44a4-bfb8-4f2abe1c3bde">
+      <laneSet id="sid-f346ad78-3e3f-486d-a3f0-25c286f4f710">
          <lane id="lane_32">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -475,11 +468,10 @@ Weiterleitungen
             <flowNodeRef>sid-B39EF6E5-1092-4217-8DEF-9E0E345DF1C2</flowNodeRef>
             <flowNodeRef>sid-E9D4B6B6-11FC-4739-85EC-C50F7E46452A</flowNodeRef>
             <flowNodeRef>sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610</flowNodeRef>
-            <flowNodeRef>sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1</flowNodeRef>
          </lane>
       </laneSet>
       <userTask activiti:assignee="#{userService.getUserId()}" activiti:formKey="content/businessPartnerIdentification/identifyBusinessPartner" completionQuantity="1" id="GP_identifizieren_62" isForCompensation="false" name="Geschäftspartner identifizieren" startQuantity="1">
-         <documentation id="sid-b8c29244-dd5d-4bae-bf6a-b4118d217951">Geschäftspartner identifizieren</documentation>
+         <documentation id="sid-46a7b8a5-3872-4cd6-88f7-b58c55606fe5">Geschäftspartner identifizieren</documentation>
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
          </extensionElements>
@@ -488,7 +480,7 @@ Weiterleitungen
          <outgoing>sequenceFlow_127</outgoing>
       </userTask>
       <userTask activiti:assignee="#{userService.getUserId()}" activiti:formKey="content/premiseLookup/listPremises" completionQuantity="1" id="Akquisedaten_erfassen_69" isForCompensation="false" name="Akquisedaten erfassen" startQuantity="1">
-         <documentation id="sid-7bc1ecb3-22d9-44e1-b207-9f1b65c85420">Akquisedaten erfassen</documentation>
+         <documentation id="sid-928f5483-c01b-43e2-ba84-b56c877e3437">Akquisedaten erfassen</documentation>
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
          </extensionElements>
@@ -519,7 +511,7 @@ Weiterleitungen
          <outgoing>sid-4214F095-D614-44A3-BF14-A53BC2AD638F</outgoing>
       </intermediateThrowEvent>
       <userTask activiti:assignee="#{userService.getUserId()}" activiti:formKey="content/contactNotice/createContactNotice" completionQuantity="1" id="Kontakt_abschlie_en_101" isForCompensation="false" name="Kontakt abschließen" startQuantity="1">
-         <documentation id="sid-8d15042e-10b0-4ae8-92c2-e889e214416f">Kontakt abschließen</documentation>
+         <documentation id="sid-42c871ad-6097-491a-8e0e-5015a95324ac">Kontakt abschließen</documentation>
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
          </extensionElements>
@@ -528,7 +520,7 @@ Weiterleitungen
          <outgoing>sequenceFlow_130</outgoing>
       </userTask>
       <serviceTask activiti:class="com.camunda.training.delegate.SysoutDelegate" completionQuantity="1" id="SAP_Kontakt_schreiben_109" isForCompensation="false" name="SAP Kontakt schreiben" startQuantity="1">
-         <documentation id="sid-5d741eba-a3a4-4a33-9313-2125ff18e634">SAP Kontakt schreiben</documentation>
+         <documentation id="sid-be4afc74-d7b1-44ee-9d17-8b650c1b3191">SAP Kontakt schreiben</documentation>
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
          </extensionElements>
@@ -546,22 +538,22 @@ Weiterleitungen
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
          <outgoing>sid-E156F180-515A-4AC1-A569-102492F85DD1</outgoing>
-         <messageEventDefinition id="sid-b4235bb8-cd7b-4273-ac5e-cfceb2fad989" messageRef="sid-4454ab85-e3b0-4b91-a279-8c19bee1127e"/>
+         <messageEventDefinition id="sid-60555e8a-ea0c-48bb-88ae-e0e9267741fb" messageRef="sid-f944eaf1-2542-4633-a21b-682f7016cae7"/>
       </startEvent>
       <startEvent id="Manuelle_Akquise_95" name="Manuelle Akquise">
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
          <outgoing>sequenceFlow_131</outgoing>
-         <messageEventDefinition id="sid-fd4a9a44-2c29-438d-8315-b813f9b9e249" messageRef="sid-c5f4ac8b-2c58-4e49-b20e-4b098048b531"/>
+         <messageEventDefinition id="sid-10b2d14f-322e-43d4-80bf-6e6ff262ea2c" messageRef="sid-b803fd85-2c59-43ec-944a-27fdb38c7208"/>
       </startEvent>
       <boundaryEvent attachedToRef="SAP_Kontakt_schreiben_109" cancelActivity="true" id="sid-B39EF6E5-1092-4217-8DEF-9E0E345DF1C2" name="" parallelMultiple="false">
          <outgoing>sid-F223FE79-E217-4172-8D38-F179542E907F</outgoing>
-         <errorEventDefinition errorRef="sid-7a58c91d-d61f-48d1-bfe6-606a9dfed23f" id="sid-19ee8abb-67aa-457f-a90c-cfecb77cab35"/>
+         <errorEventDefinition errorRef="sid-d733e0fb-e8af-441d-8a8a-6fe8f204db33" id="sid-35a62ad7-cb93-463d-9689-0a0f69f6d3cd"/>
       </boundaryEvent>
       <boundaryEvent attachedToRef="Technische_Stammdaten_anlegen_77" cancelActivity="true" id="sid-E9D4B6B6-11FC-4739-85EC-C50F7E46452A" name="" parallelMultiple="false">
          <outgoing>sid-0B758BD1-91CC-484D-81E6-87F04264A2A9</outgoing>
-         <errorEventDefinition errorRef="sid-7a58c91d-d61f-48d1-bfe6-606a9dfed23f" id="sid-bd39fb3f-87eb-4b79-9abb-f08182451301"/>
+         <errorEventDefinition errorRef="sid-d733e0fb-e8af-441d-8a8a-6fe8f204db33" id="sid-d9a210d9-43e9-49a6-a8c8-cfae847dcdc4"/>
       </boundaryEvent>
       <startEvent id="sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610" name="Blanko Start">
          <extensionElements>
@@ -569,11 +561,6 @@ Weiterleitungen
          </extensionElements>
          <outgoing>sid-354B1DA1-3E86-4E84-8E3E-989A97C3204C</outgoing>
       </startEvent>
-      <dataStoreReference dataStoreRef="sid-9024c90f-dfcb-4e7c-b566-6f9f359a7055" id="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1" name="Speicherort X">
-         <extensionElements>
-            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
-         </extensionElements>
-      </dataStoreReference>
       <sequenceFlow id="sid-E156F180-515A-4AC1-A569-102492F85DD1" isImmediate="true" name="" sourceRef="Automatische_Akquise_56" targetRef="GP_identifizieren_62"/>
       <sequenceFlow id="sid-354B1DA1-3E86-4E84-8E3E-989A97C3204C" isImmediate="true" name="" sourceRef="sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610" targetRef="GP_identifizieren_62"/>
       <sequenceFlow id="sid-F223FE79-E217-4172-8D38-F179542E907F" isImmediate="true" name="" sourceRef="sid-B39EF6E5-1092-4217-8DEF-9E0E345DF1C2" targetRef="Kontakt_abschlie_en_101"/>
@@ -586,27 +573,50 @@ Weiterleitungen
       <sequenceFlow id="sequenceFlow_131" isImmediate="true" name="" sourceRef="Manuelle_Akquise_95" targetRef="GP_identifiziert___angelegt_84"/>
       <sequenceFlow id="sequenceFlow_130" isImmediate="true" name="" sourceRef="Kontakt_abschlie_en_101" targetRef="SAP_Kontakt_schreiben_109"/>
       <sequenceFlow id="sid-4214F095-D614-44A3-BF14-A53BC2AD638F" isImmediate="true" name="" sourceRef="Akquisedaten_erfasst_90" targetRef="Kontakt_abschlie_en_101"/>
+      <dataStoreReference dataStoreRef="sid-4920434a-0856-4439-bdbb-13ed8750a4e4" id="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1" name="Speicherort X">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
+      </dataStoreReference>
       <association associationDirection="None" id="sid-CF081184-611E-4826-8411-C2FEA011597D" sourceRef="SAP_Kontakt_schreiben_109" targetRef="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-8ba4c9b3-91df-42ae-86ea-7680c92386df">
-      <bpmndi:BPMNPlane bpmnElement="sid-93eb77a4-c81e-44f6-843c-31a9a441f856" id="sid-2cdcf24f-05cb-41a9-bdff-9661b4fa2be1">
+   <bpmndi:BPMNDiagram id="sid-ce3a6fec-8827-4941-b92b-2ada90197eb7">
+      <bpmndi:BPMNPlane bpmnElement="sid-6d0e3863-e74f-40b4-92e3-2d6796c9e13e" id="sid-b783fad5-e5a5-41d5-ab59-8a4fa5929433">
          <bpmndi:BPMNShape bpmnElement="Prozess_Engine_Akquise_Prozess_15" id="Prozess_Engine_Akquise_Prozess_15_gui" isHorizontal="true">
             <omgdc:Bounds height="260.02565779060274" width="1405.1814369673925" x="766.8185630326076" y="757.7866165430252"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="98.57142639160156" width="24.0" x="766.8187346255875" y="838.5137322425257"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-3663B6F3-9D03-4668-8DC6-04A73453A5B7" id="sid-3663B6F3-9D03-4668-8DC6-04A73453A5B7_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="527.0" x="2370.0" y="762.7866165430252"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="85.71428680419922" width="12.0" x="2376.0" y="844.9294731409256"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="UI_Mediator_6" id="UI_Mediator_6_gui" isHorizontal="true">
             <omgdc:Bounds height="60.0" width="361.0" x="59.0" y="630.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="20.0" width="114.28570556640625" x="182.35714721679688" y="649.8122743336277"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-157F1C83-2948-4441-A569-681981442BBC" id="sid-157F1C83-2948-4441-A569-681981442BBC_gui" isHorizontal="true">
             <omgdc:Bounds height="47.138467002994275" width="3610.1353311526354" x="59.0" y="1065.0"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="20.0" width="134.2857666015625" x="1796.9251098632812" y="1077.5690002441406"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="GUI__JSF2__9" id="GUI__JSF2__9_gui" isHorizontal="true">
             <omgdc:Bounds height="433.2494614479517" width="3611.1353311526354" x="58.0" y="180.5628128856758"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="65.14286041259766" width="12.000000000000014" x="64.00026927602414" y="364.61611340335287"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="textAnnotation_28" id="textAnnotation_28_gui">
             <omgdc:Bounds height="67.0" width="119.0" x="467.0" y="643.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="48.0" width="118.28571319580078" x="471.0" y="650.9722741810398"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNEdge bpmnElement="association_30" id="association_30_gui">
             <omgdi:waypoint x="420.0" y="659.8122743336277"/>
@@ -617,63 +627,111 @@ Weiterleitungen
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-A7BB308E-4699-47B5-B17E-EE671392EAE9" id="sid-A7BB308E-4699-47B5-B17E-EE671392EAE9_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="2460.0" y="872.7866165430252"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="22.0" width="93.5" x="2428.25" y="904.7866165430252"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-B4E09B22-4468-4220-998C-76426E821809" id="sid-B4E09B22-4468-4220-998C-76426E821809_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="2535.0" y="847.7866165430252"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="12.0" width="93.42857360839844" x="2538.285713195801" y="880.7866165430252"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-9023389D-0702-4B9D-8B36-990599D47286" id="sid-9023389D-0702-4B9D-8B36-990599D47286_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="2680.0" y="847.7866165430252"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="24.0" width="62.57142639160156" x="2698.714286804199" y="874.7866165430252"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-37DB0BD8-E002-43FF-ABCA-0A7E63EC5FF9" id="sid-37DB0BD8-E002-43FF-ABCA-0A7E63EC5FF9_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="2824.0" y="872.7866165430252"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="22.0" width="58.142852783203125" x="2808.9285736083984" y="902.7866165430252"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="lane_183" id="lane_183_gui" isHorizontal="true">
             <omgdc:Bounds height="433.2494614479517" width="3581.1353311526354" x="88.0" y="180.5628128856758"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Login__falls_Session_expired__226" id="Login__falls_Session_expired__226_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="195.0" y="356.06512806914304"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="36.0" width="65.14286041259766" x="212.42856979370117" y="377.06512806914304"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Auswahl_manuell___automatisiert___beenden_233" id="Auswahl_manuell___automatisiert___beenden_233_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="360.0" y="356.06512806914304"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="48.0" width="79.71429443359375" x="370.1428527832031" y="371.06512806914304"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="exclusiveGateway_241" id="exclusiveGateway_241_gui" isMarkerVisible="true">
             <omgdc:Bounds height="40.0" width="40.0" x="1279.0" y="376.06512806914304"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="VS__AO__Suche_und_Auswahl_247" id="VS__AO__Suche_und_Auswahl_247_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="1566.0" y="356.12834150302183"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="48.0" width="71.14286041259766" x="1580.4285697937012" y="371.12834150302183"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Auswahl___Definition_Anlagen_254" id="Auswahl___Definition_Anlagen_254_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="2072.0" y="356.12834150302183"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="48.0" width="59.142852783203125" x="2092.4285736083984" y="371.12834150302183"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Statusanzeige_-__alles_ok__Wechselbelege______263" id="Statusanzeige_-__alles_ok__Wechselbelege______263_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="2797.0" y="356.12834150302183"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="60.0" width="93.42857360839844" x="2800.285713195801" y="365.12834150302183"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Kontakt_abschlie_en_270" id="Kontakt_abschlie_en_270_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="3088.0" y="356.12834150302183"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="36.0" width="61.71428680419922" x="3107.1428565979004" y="377.12834150302183"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="startEvent_277" id="startEvent_277_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="109.0" y="381.06512806914304"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Stammdaten_bearbeiten_288" id="Stammdaten_bearbeiten_288_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="1020.0" y="356.1283415030217"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="36.0" width="84.0" x="1028.0" y="377.1283415030217"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Statusanzeige__Fehlermeldungen__295" id="Statusanzeige__Fehlermeldungen__295_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="2349.0" y="480.81227433362767"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="36.0" width="92.57142639160156" x="2352.714286804199" y="501.81227433362767"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Akquisedaten_erfasst_302" id="Akquisedaten_erfasst_302_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="2319.0019062457704" y="381.12834150302183"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="11.0" width="117.07142639160156" x="2275.4661930499697" y="413.12834150302183"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="GP-Suche_308" id="GP-Suche_308_gui">
             <omgdc:Bounds height="79.99999999999997" width="100.0" x="596.0" y="215.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="35.99999999999997" width="90.0" x="601.0" y="236.8122743336277"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Akquisetyp_316" id="Akquisetyp_316_gui" isMarkerVisible="true">
             <omgdc:Bounds height="40.0" width="40.0" x="527.0" y="376.06512806914304"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="12.0" width="66.85713958740234" x="557.5" y="406.56512806914304"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Ergebnisse_340" id="Ergebnisse_340_gui" isMarkerVisible="true">
             <omgdc:Bounds height="40.0" width="40.0" x="930.0" y="376.06512806914304"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="ggf__Trefferliste_Dublettenpr_fung_323" id="ggf__Trefferliste_Dublettenpr_fung_323_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="795.0" y="476.06512806914304"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="48.0" width="97.71429443359375" x="796.1428527832031" y="491.06512806914304"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="intermediateThrowEvent_408" id="intermediateThrowEvent_408_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="3261.0" y="381.12834150302183"/>
@@ -689,27 +747,48 @@ Weiterleitungen
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="technische__Stammdaten_und_WB__angelegt_430" id="technische__Stammdaten_und_WB__angelegt_430_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="2699.0" y="381.12834150302183"/>
+            <bpmndi:BPMNLabel labelStyle="sid-db67e043-b3e4-4b4e-bbf6-e9beda99e0b4">
+               <omgdc:Bounds height="44.0" width="70.71428680419922" x="2726.0" y="407.12834150302183"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Fehler_bei__technische__Stammdaten__anlegen_438" id="Fehler_bei__technische__Stammdaten__anlegen_438_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="2593.0" y="505.8122743336278"/>
+            <bpmndi:BPMNLabel labelStyle="sid-db67e043-b3e4-4b4e-bbf6-e9beda99e0b4">
+               <omgdc:Bounds height="44.0" width="70.71428680419922" x="2495.6428565979004" y="462.8122743336278"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="eventBasedGateway_446" id="eventBasedGateway_446_gui">
             <omgdc:Bounds height="40.0" width="40.0" x="3339.5" y="376.12834150302183"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Fehler_bei__Kontakt__schreiben_452" id="Fehler_bei__Kontakt__schreiben_452_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="3344.5" y="278.81227433362767"/>
+            <bpmndi:BPMNLabel labelStyle="sid-db67e043-b3e4-4b4e-bbf6-e9beda99e0b4">
+               <omgdc:Bounds height="33.0" width="52.642852783203125" x="3389.1785736083984" y="288.81227433362767"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Kontakt_geschrieben_460" id="Kontakt_geschrieben_460_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="3449.0" y="381.12834150302183"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="22.0" width="66.0" x="3431.0" y="413.12834150302183"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="GP_identifiziert___angelegt__467" id="GP_identifiziert___angelegt__467_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="1175.8465878400139" y="381.1283415030217"/>
+            <bpmndi:BPMNLabel labelStyle="sid-db67e043-b3e4-4b4e-bbf6-e9beda99e0b4">
+               <omgdc:Bounds height="22.0" width="79.35713958740234" x="1152.1680180463127" y="351.1283415030217"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Akquise_Metadaten_erfassen_474" id="Akquise_Metadaten_erfassen_474_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="1384.0" y="356.06512806914304"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="48.0" width="62.57142639160156" x="1402.7142868041992" y="371.06512806914304"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="VK_Auswahl_481" id="VK_Auswahl_481_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="1906.0" y="356.12834150302183"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="24.0" width="71.14286041259766" x="1920.4285697937012" y="383.12834150302183"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-DA19EC49-00AC-4A18-A8C7-CD9C123B70FD" id="sid-DA19EC49-00AC-4A18-A8C7-CD9C123B70FD_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="692.0" y="501.06512806914304"/>
@@ -719,72 +798,129 @@ Weiterleitungen
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-3060BA51-56EC-49B0-9ABC-84748C727C4D" id="sid-3060BA51-56EC-49B0-9ABC-84748C727C4D_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="1736.0" y="356.06512806914304"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="48.0" width="74.57142639160156" x="1748.7142868041992" y="371.06512806914304"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="textAnnotation_551" id="textAnnotation_551_gui">
             <omgdc:Bounds height="80.0" width="119.0" x="271.0" y="230.9090532798947"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="72.0" width="113.14286041259766" x="275.0" y="232.3090548057736"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="textAnnotation_553" id="textAnnotation_553_gui">
             <omgdc:Bounds height="80.0" width="157.0" x="1469.0" y="230.81227433362767"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="72.0" width="159.42857360839844" x="1473.0" y="232.21227585950658"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="textAnnotation_555" id="textAnnotation_555_gui">
             <omgdc:Bounds height="64.5" width="100.0" x="1686.0" y="243.81227433362767"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="36.0" width="94.28571319580078" x="1690.0" y="255.77227341810033"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="textAnnotation_557" id="textAnnotation_557_gui">
             <omgdc:Bounds height="64.50000000000003" width="100.0" x="2872.0" y="238.81227433362764"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="48.00000000000003" width="91.71428680419922" x="2876.0" y="244.7722734181003"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="textAnnotation_561" id="textAnnotation_561_gui">
             <omgdc:Bounds height="67.0" width="247.99986863595495" x="1982.0" y="540.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="60.0" width="232.2857208251953" x="1986.0" y="541.9722741810398"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="textAnnotation_565" id="textAnnotation_565_gui">
             <omgdc:Bounds height="64.5" width="100.0" x="435.0" y="188.81227433362767"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="48.0" width="62.57142639160156" x="439.0" y="194.77227341810033"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="textAnnotation_569" id="textAnnotation_569_gui">
             <omgdc:Bounds height="49.99999999999997" width="100.0" x="2072.0" y="230.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="35.99999999999997" width="94.28571319580078" x="2076.0" y="235.8122743336277"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="lane_32" id="lane_32_gui" isHorizontal="true">
             <omgdc:Bounds height="260.02565779060274" width="1375.1814369673925" x="796.8185630326076" y="757.7866165430252"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="GP_identifizieren_62" id="GP_identifizieren_62_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="930.0" y="852.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="24.0" width="92.57142639160156" x="933.7142868041992" y="879.8122743336277"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Akquisedaten_erfassen_69" id="Akquisedaten_erfassen_69_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="1302.0" y="852.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="24.0" width="81.42857360839844" x="1311.2857131958008" y="879.8122743336277"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Technische_Stammdaten_anlegen_77" id="Technische_Stammdaten_anlegen_77_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="1483.0" y="852.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="36.0" width="89.14285278320312" x="1488.4285736083984" y="873.8122743336277"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="GP_identifiziert___angelegt_84" id="GP_identifiziert___angelegt_84_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="1175.8465878400139" y="877.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="22.0" width="79.35713958740234" x="1151.1680180463127" y="909.8122743336277"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Akquisedaten_erfasst_90" id="Akquisedaten_erfasst_90_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="1672.0" y="877.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="11.0" width="117.07142639160156" x="1628.4642868041992" y="909.8122743336277"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Kontakt_abschlie_en_101" id="Kontakt_abschlie_en_101_gui">
             <omgdc:Bounds height="80.0" width="100.00000000000011" x="1774.0" y="852.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="24.0" width="69.42857360839844" x="1789.2857131958008" y="879.8122743336277"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="SAP_Kontakt_schreiben_109" id="SAP_Kontakt_schreiben_109_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="1939.0" y="852.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="24.0" width="76.28571319580078" x="1950.8571434020996" y="879.8122743336277"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="endEvent_116" id="endEvent_116_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="2124.7402871355407" y="877.8122743336277"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Automatische_Akquise_56" id="Automatische_Akquise_56_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="832.0" y="877.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="22.0" width="80.92857360839844" x="806.5357131958008" y="909.8122743336277"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Manuelle_Akquise_95" id="Manuelle_Akquise_95_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="1215.0" y="797.202454283132"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="11.0" width="93.5" x="1183.25" y="829.202454283132"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-B39EF6E5-1092-4217-8DEF-9E0E345DF1C2" id="sid-B39EF6E5-1092-4217-8DEF-9E0E345DF1C2_gui">
-            <omgdc:Bounds height="30.0" width="30.0" x="1945.0647951199498" y="917.8122743336277"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="1945.064795119944" y="917.8122743336277"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-E9D4B6B6-11FC-4739-85EC-C50F7E46452A" id="sid-E9D4B6B6-11FC-4739-85EC-C50F7E46452A_gui">
-            <omgdc:Bounds height="30.0" width="30.0" x="1488.2300506404717" y="917.8122743336277"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="1488.2300506404504" y="917.8122743336277"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610" id="sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="870.0" y="960.0"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="11.0" width="69.14286041259766" x="850.4285697937012" y="992.0"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1" id="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1_gui">
             <omgdc:Bounds height="61.173" width="63.001000000000204" x="2074.5" y="781.702454283132"/>
+            <bpmndi:BPMNLabel labelStyle="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+               <omgdc:Bounds height="12.0" width="82.28571701049805" x="2063.4321422576904" y="847.0404517196555"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNEdge bpmnElement="association_548" id="association_548_gui">
             <omgdi:waypoint x="1433.0" y="356.06512806914304"/>
@@ -848,6 +984,9 @@ Weiterleitungen
             <omgdi:waypoint x="547.0" y="376.06512806914304"/>
             <omgdi:waypoint x="547.0" y="255.81227433362767"/>
             <omgdi:waypoint x="596.0" y="255.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="45.4285888671875" width="12.0" x="526.9998743722632" y="323.13653920195554"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_530" id="sequenceFlow_530_gui">
             <omgdi:waypoint x="3344.5" y="293.81227433362767"/>
@@ -887,6 +1026,9 @@ Weiterleitungen
             <omgdi:waypoint x="599.484986161412" y="564.0"/>
             <omgdi:waypoint x="410.0" y="564.0"/>
             <omgdi:waypoint x="410.0" y="436.06512806914304"/>
+            <bpmndi:BPMNLabel labelStyle="sid-db67e043-b3e4-4b4e-bbf6-e9beda99e0b4">
+               <omgdc:Bounds height="12.0" width="218.57144165039062" x="394.13429260253906" y="572.677978515625"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="messageFlow_25" id="messageFlow_25_gui">
             <omgdi:waypoint x="2334.0019062457704" y="411.12834150302183"/>
@@ -899,6 +1041,9 @@ Weiterleitungen
             <omgdi:waypoint x="3276.0" y="722.0"/>
             <omgdi:waypoint x="1840.6666666666667" y="722.0"/>
             <omgdi:waypoint x="1840.6666666666667" y="852.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="12.0" width="95.142822265625" x="2510.7615966796875" y="702.0"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_491" id="sequenceFlow_491_gui">
             <omgdi:waypoint x="139.0" y="396.01170826586514"/>
@@ -943,6 +1088,9 @@ Weiterleitungen
             <omgdi:waypoint x="1807.3333333333333" y="690.0"/>
             <omgdi:waypoint x="3138.0" y="690.0"/>
             <omgdi:waypoint x="3138.0" y="436.12834150302183"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="12.0" width="92.571533203125" x="2426.3812255859375" y="670.0"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sid-0E42033D-6712-4B30-BE34-F5F539644010" id="sid-0E42033D-6712-4B30-BE34-F5F539644010_gui">
             <omgdi:waypoint x="2780.0" y="887.7866165430252"/>
@@ -985,7 +1133,7 @@ Weiterleitungen
             <omgdi:waypoint x="1434.0" y="436.06512806914304"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sid-F223FE79-E217-4172-8D38-F179542E907F" id="sid-F223FE79-E217-4172-8D38-F179542E907F_gui">
-            <omgdi:waypoint x="1960.0647951199498" y="947.8122743336277"/>
+            <omgdi:waypoint x="1960.064795119946" y="947.8122743336277"/>
             <omgdi:waypoint x="1960.0647951199498" y="975.0"/>
             <omgdi:waypoint x="1824.0" y="975.0"/>
             <omgdi:waypoint x="1824.0" y="932.8122743336277"/>
@@ -995,6 +1143,9 @@ Weiterleitungen
             <omgdi:waypoint x="1190.8465878400139" y="665.0"/>
             <omgdi:waypoint x="1230.0" y="665.0"/>
             <omgdi:waypoint x="1230.0" y="797.202454283132"/>
+            <bpmndi:BPMNLabel labelStyle="sid-db67e043-b3e4-4b4e-bbf6-e9beda99e0b4">
+               <omgdc:Bounds height="24.0" width="72.0" x="1237.1529541015625" y="756.0900268554688"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_133" id="sequenceFlow_133_gui">
             <omgdi:waypoint x="1402.0" y="892.8122743336277"/>
@@ -1041,7 +1192,7 @@ Weiterleitungen
             <omgdi:waypoint x="2797.0" y="395.87548776750646"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sid-0B758BD1-91CC-484D-81E6-87F04264A2A9" id="sid-0B758BD1-91CC-484D-81E6-87F04264A2A9_gui">
-            <omgdi:waypoint x="1503.2300506404717" y="947.8122743336277"/>
+            <omgdi:waypoint x="1503.230050640458" y="947.8122743336277"/>
             <omgdi:waypoint x="1503.2300506404717" y="974.0"/>
             <omgdi:waypoint x="1377.0" y="974.0"/>
             <omgdi:waypoint x="1377.0" y="932.8122743336277"/>
@@ -1060,6 +1211,9 @@ Weiterleitungen
             <omgdi:waypoint x="1164.0" y="665.0"/>
             <omgdi:waypoint x="996.6666666666666" y="665.0"/>
             <omgdi:waypoint x="996.6666666666666" y="852.8122743336277"/>
+            <bpmndi:BPMNLabel labelStyle="sid-db67e043-b3e4-4b4e-bbf6-e9beda99e0b4">
+               <omgdc:Bounds height="24.0" width="79.7142333984375" x="1094.0" y="673.0"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sid-CF081184-611E-4826-8411-C2FEA011597D" id="sid-CF081184-611E-4826-8411-C2FEA011597D_gui">
             <omgdi:waypoint x="2039.0" y="858.2058089740557"/>
@@ -1104,7 +1258,19 @@ Weiterleitungen
             <omgdi:waypoint x="547.0" y="416.06512806914304"/>
             <omgdi:waypoint x="547.0" y="516.065128069143"/>
             <omgdi:waypoint x="578.984986161412" y="516.065128069143"/>
+            <bpmndi:BPMNLabel labelStyle="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+               <omgdc:Bounds height="79.71429443359375" width="12.0" x="527.0004780248452" y="327.8752238794517"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNEdge>
       </bpmndi:BPMNPlane>
+      <bpmndi:BPMNLabelStyle id="sid-a3d40601-b902-46d0-abac-a18f1799b85b">
+         <omgdc:Font isBold="false" isItalic="false" isStrikeThrough="false" isUnderline="false" name="Arial" size="11.0"/>
+      </bpmndi:BPMNLabelStyle>
+      <bpmndi:BPMNLabelStyle id="sid-db67e043-b3e4-4b4e-bbf6-e9beda99e0b4">
+         <omgdc:Font isBold="false" isItalic="false"/>
+      </bpmndi:BPMNLabelStyle>
+      <bpmndi:BPMNLabelStyle id="sid-5ef33ebc-b9ff-4173-994b-27dfb4c3b7e6">
+         <omgdc:Font isBold="false" isItalic="false" isStrikeThrough="false" isUnderline="false" name="Arial" size="12.0"/>
+      </bpmndi:BPMNLabelStyle>
    </bpmndi:BPMNDiagram>
 </definitions>

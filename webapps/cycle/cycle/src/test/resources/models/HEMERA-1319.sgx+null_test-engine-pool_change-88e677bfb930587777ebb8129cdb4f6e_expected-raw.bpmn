@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-9bed646b-5e45-4feb-ae5b-f51141aa6b6d" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.8.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-3368c714-172d-4892-9e7f-73110db7738e" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
    <process id="test-engine-pool" isClosed="false" isExecutable="true" processType="None">
       <startEvent id="StartNoneEvent" name="">
          <extensionElements>
@@ -57,8 +57,8 @@
       <sequenceFlow id="SequenceFlow_2" isImmediate="true" name="" sourceRef="Exclusive_Databased_Gateway_2" targetRef="Task"/>
       <sequenceFlow id="SequenceFlow_3" isImmediate="true" name="" sourceRef="Task_2" targetRef="Exclusive_Databased_Gateway_2"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-2b59aaaf-4a1a-4348-b146-3d0f6e7560f7">
-      <bpmndi:BPMNPlane bpmnElement="test-engine-pool" id="sid-219b49fc-13b4-45a9-99ce-94913edd7539">
+   <bpmndi:BPMNDiagram id="sid-6fbd372d-d3c8-4449-bd33-671cc971ab77">
+      <bpmndi:BPMNPlane bpmnElement="test-engine-pool" id="sid-97a8cc25-650b-427c-834f-d926619fa784">
          <bpmndi:BPMNShape bpmnElement="StartNoneEvent" id="StartNoneEvent_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="106.0" y="216.0"/>
          </bpmndi:BPMNShape>
@@ -70,6 +70,9 @@
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Task_abc" id="Task_abc_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="855.0" y="255.0"/>
+            <bpmndi:BPMNLabel labelStyle="sid-2005dedf-fe38-42c4-8092-03641a5928e8">
+               <omgdc:Bounds height="12.0" width="56.57142639160156" x="876.7142868041992" y="288.0"/>
+            </bpmndi:BPMNLabel>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="EndNoneEvent" id="EndNoneEvent_gui">
             <omgdc:Bounds height="30.0" width="30.0" x="1019.0" y="280.0"/>
@@ -112,5 +115,8 @@
             <omgdi:waypoint x="467.0" y="230.0"/>
          </bpmndi:BPMNEdge>
       </bpmndi:BPMNPlane>
+      <bpmndi:BPMNLabelStyle id="sid-2005dedf-fe38-42c4-8092-03641a5928e8">
+         <omgdc:Font isBold="false" isItalic="false" isStrikeThrough="false" isUnderline="false" name="Arial" size="12.0"/>
+      </bpmndi:BPMNLabelStyle>
    </bpmndi:BPMNDiagram>
 </definitions>
