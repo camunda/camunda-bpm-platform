@@ -5,7 +5,7 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.anySetOf;
+import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -315,6 +317,55 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
     verify(mockedQuery).variableValueNotEquals(anotherVariableName, anotherVariableValue);
 
+  }
+
+  @Test
+  public void testDateVariableParameter() {
+    String variableName = "varName";
+    String variableValue = "2014-06-16T10:00:00";
+    String queryValue = variableName + "_eq_" + variableValue;
+
+    given()
+      .queryParam("variables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_INSTANCE_QUERY_URL);
+
+    Date date = DateTimeUtil.parseDate(variableValue);
+
+    verify(mockedQuery).variableValueEquals(variableName, date);
+  }
+
+  @Test
+  public void testDateVariableParameterAsPost() {
+    String variableName = "varName";
+    String variableValue = "2014-06-16T10:00:00";
+
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", variableName);
+    variableJson.put("operator", "eq");
+    variableJson.put("value", variableValue);
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_QUERY_URL);
+
+    Date date = DateTimeUtil.parseDate(variableValue);
+
+    verify(mockedQuery).variableValueEquals(variableName, date);
   }
 
   @Test

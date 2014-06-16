@@ -12,9 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.camunda.bpm.engine.impl.QueryOperator;
+import org.camunda.bpm.engine.rest.util.DtoUtil;
 
 /**
  * @author roman.smirnov
@@ -52,6 +55,13 @@ public class ConditionQueryParameterDto {
     return value;
   }
   public void setValue(Object value) {
+    try {
+      this.value = DtoUtil.toDate(value);
+      return;
+    } catch (ParseException e) {
+      // ignore exception
+    }
+
     this.value = value;
   }
 

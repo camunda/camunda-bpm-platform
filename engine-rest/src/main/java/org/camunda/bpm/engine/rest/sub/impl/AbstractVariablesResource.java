@@ -13,14 +13,13 @@
 package org.camunda.bpm.engine.rest.sub.impl;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.variable.BooleanType;
@@ -142,9 +141,7 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
         // date
         if (type.equalsIgnoreCase(DateType.TYPE_NAME)) {
-          SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-          Date date = pattern.parse(String.valueOf(value));
-          setVariableEntity(variableName, date);
+          setVariableEntity(variableName, DtoUtil.toDate(value));
           return;
         }
 

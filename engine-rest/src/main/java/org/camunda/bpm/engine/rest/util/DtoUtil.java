@@ -84,9 +84,7 @@ public class DtoUtil {
 
         // date
         if (type.equalsIgnoreCase(DateType.TYPE_NAME)) {
-          SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-          Date date = pattern.parse(String.valueOf(value));
-          variablesMap.put(variable.getKey(), date);
+          variablesMap.put(variable.getKey(), toDate(value));
           continue;
         }
 
@@ -98,5 +96,11 @@ public class DtoUtil {
       variablesMap.put(variable.getKey(), value);
     }
     return variablesMap;
+  }
+
+  public static Date toDate(Object value) throws ParseException {
+    String stringValue = String.valueOf(value);
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    return dateFormat.parse(stringValue);
   }
 }
