@@ -10,7 +10,7 @@
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
             <li ng-class="activeClass('tab=group')">
-              <a href="#/groups/{{group.id}}?tab=group">Group</a>
+              <a href="#/groups/{{group.id | escape}}?tab=group">Group</a>
             </li>                 
           </ul>          
         </div>

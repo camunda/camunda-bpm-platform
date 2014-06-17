@@ -9,7 +9,7 @@ define(['angular'], function(angular) {
 
     $scope.group = null;
     $scope.groupName = null;
-    $scope.groupId = $routeParams.groupId;
+    $scope.groupId = $routeParams.groupId.replace(/%2F/g, "/");
 
     $scope.availableOperations = {};
 
@@ -25,7 +25,7 @@ define(['angular'], function(angular) {
     // update group form /////////////////////////////
 
     var loadGroup = $scope.loadGroup = function() {
-      GroupResource.get({groupId : $routeParams.groupId}).$promise.then(function(response) {
+      GroupResource.get({groupId : $scope.groupId}).$promise.then(function(response) {
         // $scope.group = response.data;
         // $scope.groupName = (!!response.data.name ? response.data.name : response.data.id);
         // $scope.groupCopy = angular.copy(response.data);
@@ -35,7 +35,7 @@ define(['angular'], function(angular) {
       });
     }
 
-    GroupResource.OPTIONS({groupId : $routeParams.groupId}).$promise.then(function(response) {
+    GroupResource.OPTIONS({groupId : $scope.groupId}).$promise.then(function(response) {
       // angular.forEach(response.data.links, function(link){
       angular.forEach(response.links, function(link){
         $scope.availableOperations[link.rel] = true;
