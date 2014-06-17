@@ -10,13 +10,13 @@
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
             <li ng-class="activeClass('profile')">
-              <a href="#/users/{{user.id}}?tab=profile">Profile</a>
+              <a href="#/users/{{user.id | escape}}?tab=profile">Profile</a>
             </li>
             <li ng-class="activeClass('account')" ng-show="availableOperations.update">
-              <a href="#/users/{{user.id}}?tab=account">Account</a>
+              <a href="#/users/{{user.id | escape}}?tab=account">Account</a>
             </li>
             <li ng-class="activeClass('groups')">
-              <a href="#/users/{{user.id}}?tab=groups">Groups</a>
+              <a href="#/users/{{user.id | escape}}?tab=groups">Groups</a>
             </li>                    
           </ul>          
         </div>

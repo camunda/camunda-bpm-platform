@@ -11,7 +11,7 @@ define([ 'angular', 'require' ], function(angular, require) {
               '$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authenticatedUser',
       function($scope,   $window,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authenticatedUser) {
 
-        $scope.userId = $routeParams.userId;
+        $scope.userId = $routeParams.userId.replace(/%2F/g, "/");
         $scope.authenticatedUser = authenticatedUser;
 
         // used to display information about the user
