@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.rest.GroupRestService;
 import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.sub.identity.GroupMembersResource;
+import org.camunda.bpm.engine.rest.util.PathUtil;
 
 /**
  * @author Daniel Meyer
@@ -38,16 +39,18 @@ public class GroupMembersResourceImpl extends AbstractIdentityResource implement
 
   public void createGroupMember(String userId) {
     ensureNotReadOnly();
-    
-    identityService.createMembership(userId, resourceId);      
+
+    userId = PathUtil.decodePathParam(userId);
+    identityService.createMembership(userId, resourceId);
   }
 
   public void deleteGroupMember(String userId) {
     ensureNotReadOnly();
-    
+
+    userId = PathUtil.decodePathParam(userId);
     identityService.deleteMembership(userId, resourceId);
   }
-  
+
   public ResourceOptionsDto availableOperations(UriInfo context) {
 
     ResourceOptionsDto dto = new ResourceOptionsDto();
@@ -58,16 +61,16 @@ public class GroupMembersResourceImpl extends AbstractIdentityResource implement
         .path(resourceId)
         .path(PATH)
         .build();
-    
+
     if (!identityService.isReadOnly() && isAuthorized(DELETE)) {
       dto.addReflexiveLink(uri, HttpMethod.DELETE, "delete");
     }
     if (!identityService.isReadOnly() && isAuthorized(CREATE)) {
       dto.addReflexiveLink(uri, HttpMethod.PUT, "create");
     }
-    
+
     return dto;
-    
+
   }
 
 }

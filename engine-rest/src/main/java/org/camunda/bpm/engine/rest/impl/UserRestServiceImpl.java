@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,13 +36,14 @@ import org.camunda.bpm.engine.rest.dto.identity.UserQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.UserResource;
 import org.camunda.bpm.engine.rest.sub.identity.impl.UserResourceImpl;
+import org.camunda.bpm.engine.rest.util.PathUtil;
 
 /**
  * @author Daniel Meyer
  *
  */
 public class UserRestServiceImpl extends AbstractAuthorizedRestResource implements UserRestService {
-  
+
   public UserRestServiceImpl() {
     super(USER, ANY);
   }
@@ -52,6 +53,7 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
   }
 
   public UserResource getUser(String id) {
+    id = PathUtil.decodePathParam(id);
     return new UserResourceImpl(getProcessEngine().getName(), id, relativeRootResourcePath);
   }
 
@@ -61,19 +63,19 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
   }
 
   public List<UserProfileDto> queryUsers(UserQueryDto queryDto, Integer firstResult, Integer maxResults) {
-    
+
     UserQuery query = queryDto.toQuery(getProcessEngine());
-    
+
     List<User> resultList;
     if(firstResult != null || maxResults != null) {
       resultList = executePaginatedQuery(query, firstResult, maxResults);
     } else {
       resultList = query.list();
     }
-    
+
     return UserProfileDto.fromUserList(resultList);
   }
-  
+
 
   public CountResultDto getUserCount(UriInfo uriInfo) {
     UserQueryDto queryDto = new UserQueryDto(uriInfo.getQueryParameters());
@@ -81,63 +83,63 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
   }
 
   protected CountResultDto getUserCount(UserQueryDto queryDto) {
-    UserQuery query = queryDto.toQuery(getProcessEngine());    
+    UserQuery query = queryDto.toQuery(getProcessEngine());
     long count = query.count();
     return new CountResultDto(count);
   }
-  
+
   public void createUser(UserDto userDto) {
     final IdentityService identityService = getIdentityService();
-    
+
     if(identityService.isReadOnly()) {
       throw new InvalidRequestException(Status.FORBIDDEN, "Identity service implementation is read-only.");
     }
-    
-    UserProfileDto profile = userDto.getProfile();    
+
+    UserProfileDto profile = userDto.getProfile();
     if(profile == null || profile.getId() == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "request object must provide profile information with valid id.");
     }
-    
-    User newUser = identityService.newUser(profile.getId());    
+
+    User newUser = identityService.newUser(profile.getId());
     profile.update(newUser);
-    
+
     if(userDto.getCredentials() != null) {
       newUser.setPassword(userDto.getCredentials().getPassword());
     }
-    
-    identityService.saveUser(newUser);      
-      
+
+    identityService.saveUser(newUser);
+
   }
-    
+
   public ResourceOptionsDto availableOperations(UriInfo context) {
-    
+
     final IdentityService identityService = getIdentityService();
-    
+
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
         .path(relativeRootResourcePath)
         .path(UserRestService.class);
-    
+
     ResourceOptionsDto resourceOptionsDto = new ResourceOptionsDto();
-    
+
     // GET /
-    URI baseUri = baseUriBuilder.build();    
+    URI baseUri = baseUriBuilder.build();
     resourceOptionsDto.addReflexiveLink(baseUri, HttpMethod.GET, "list");
-    
+
     // GET /count
     URI countUri = baseUriBuilder.clone().path("/count").build();
     resourceOptionsDto.addReflexiveLink(countUri, HttpMethod.GET, "count");
-    
+
     // POST /create
     if(!identityService.isReadOnly() && isAuthorized(CREATE)) {
       URI createUri = baseUriBuilder.clone().path("/create").build();
-      resourceOptionsDto.addReflexiveLink(createUri, HttpMethod.POST, "create");  
+      resourceOptionsDto.addReflexiveLink(createUri, HttpMethod.POST, "create");
     }
-    
+
     return resourceOptionsDto;
   }
-  
+
   // utility methods //////////////////////////////////////
-  
+
   protected List<User> executePaginatedQuery(UserQuery query, Integer firstResult, Integer maxResults) {
     if (firstResult == null) {
       firstResult = 0;
@@ -145,7 +147,7 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
     if (maxResults == null) {
       maxResults = Integer.MAX_VALUE;
     }
-    return query.listPage(firstResult, maxResults); 
+    return query.listPage(firstResult, maxResults);
   }
 
   protected IdentityService getIdentityService() {
