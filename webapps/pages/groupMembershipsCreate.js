@@ -4,8 +4,8 @@ ngDefine('admin.pages', function(module) {
   'use strict';
 
   module.controller('GroupMembershipDialogController', [
-            '$scope', '$q', '$location', 'Uri', 'Notifications', 'GroupMembershipResource', 'GroupResource', '$modalInstance', 'user', 'groupIdList',
-    function($scope,   $q,   $location,   Uri,   Notifications,   GroupMembershipResource,   GroupResource,   $modalInstance,   user,   groupIdList) {
+            '$scope', '$q', '$location', 'Uri', 'Notifications', 'GroupMembershipResource', 'GroupResource', '$modalInstance', 'user', 'userId', 'groupIdList',
+    function($scope,   $q,   $location,   Uri,   Notifications,   GroupMembershipResource,   GroupResource,   $modalInstance,   user,   userId,   groupIdList) {
 
     var BEFORE_CREATE = 'beforeCreate',
         PERFORM_CREATE = 'performCancel',
@@ -15,6 +15,7 @@ ngDefine('admin.pages', function(module) {
 
     $scope.user = user;
     $scope.groupIdList = groupIdList;
+    $scope.userId = userId;
 
     $scope.$on('$routeChangeStart', function () {
       $modalInstance.close($scope.status);
@@ -61,8 +62,9 @@ ngDefine('admin.pages', function(module) {
       var completeCount = 0;
       var deferred = $q.defer();
       angular.forEach(selectedGroupIds, function(groupId) {
-
-        GroupMembershipResource.create({'groupId': groupId, 'userId': $scope.user.id}).$promise.then(function () {
+        var encodedGroupId = groupId.replace(/\//g, '%2F');
+        
+        GroupMembershipResource.create({'groupId': encodedGroupId, 'userId': $scope.userId}).$promise.then(function (response) {          
           completeCount++;
           if(completeCount == selectedGroupIds.length) {
             deferred.resolve();
