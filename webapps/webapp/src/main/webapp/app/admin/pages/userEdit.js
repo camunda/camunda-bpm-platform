@@ -5,13 +5,14 @@ define([ 'angular', 'require' ], function(angular, require) {
   var module = angular.module('admin.pages');
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
-    $routeProvider.when('/users/:userId*', {
+    $routeProvider.when('/users/:userId', {
       templateUrl: require.toUrl('./pages/userEdit.html'),
       controller: [
               '$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authenticatedUser',
       function($scope,   $window,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authenticatedUser) {
 
-        $scope.userId = $routeParams.userId.replace(/%2F/g, "/");
+        $scope.encodedUserId = $routeParams.userId.replace(/\//g, '%2F');
+        $scope.decodedUserId = $routeParams.userId.replace(/%2F/g, '/');
         $scope.authenticatedUser = authenticatedUser;
 
         // used to display information about the user
@@ -46,7 +47,7 @@ define([ 'angular', 'require' ], function(angular, require) {
 
         // load options ////////////////////////////////////
 
-        UserResource.OPTIONS({userId : $scope.userId}).$promise.then(function(response) {
+        UserResource.OPTIONS({userId : $scope.encodedUserId}).$promise.then(function(response) {
           // angular.forEach(response.data.links, function(link){
           angular.forEach(response.links, function(link){
             $scope.availableOperations[link.rel] = true;
@@ -56,7 +57,7 @@ define([ 'angular', 'require' ], function(angular, require) {
         // update profile form /////////////////////////////
 
         var loadProfile = $scope.loadProfile = function() {
-          UserResource.profile({userId : $scope.userId}).$promise.then(function(response) {
+          UserResource.profile({userId : $scope.encodedUserId}).$promise.then(function(response) {
             // console.warn('not sure it blends', response);
             $scope.user = response;
             // $scope.profile = angular.copy(response.data);
@@ -68,7 +69,7 @@ define([ 'angular', 'require' ], function(angular, require) {
 
         $scope.updateProfile = function() {
 
-          UserResource.updateProfile($scope.profile).$promise.then(
+          UserResource.updateProfile({userId: $scope.encodedUserId}, $scope.profile).$promise.then(
             function() {
               Notifications.addMessage({type:'success', status:'Success', message:'User profile successfully updated.'});
               loadProfile();
@@ -90,7 +91,7 @@ define([ 'angular', 'require' ], function(angular, require) {
         };
 
         $scope.updateCredentials = function() {
-          var pathParams = { userId: $scope.user.id },
+          var pathParams = { userId: $scope.encodedUserId },
               params = {authenticatedUserPassword: $scope.credentials.authenticatedUserPassword, password: $scope.credentials.password };
 
           UserResource.updateCredentials(pathParams, params).$promise.then(
@@ -102,7 +103,7 @@ define([ 'angular', 'require' ], function(angular, require) {
 
             function(error) {
               if (error.status === 400) {
-                if ($scope.userId === $scope.authenticatedUser) {
+                if ($scope.decodedUserId === $scope.authenticatedUser) {
                   Notifications.addError({ status: 'Password', message: 'Old password is not valid.', exclusive: true });
                 } else {
                   Notifications.addError({ status: 'Password', message: 'Your password is not valid.', exclusive: true });
@@ -125,7 +126,7 @@ define([ 'angular', 'require' ], function(angular, require) {
             return;
           }
 
-          UserResource.delete({'userId':$scope.user.id}).$promise.then(
+          UserResource.delete({'userId':$scope.encodedUserId}).$promise.then(
             function(){
               Notifications.addMessage({type:'success', status:'Success', message:'User '+$scope.user.id+' successfully deleted.'});
               $location.path('/users');
@@ -136,7 +137,7 @@ define([ 'angular', 'require' ], function(angular, require) {
         // group form /////////////////////////////
 
         var loadGroups = $scope.loadGroups = function() {
-          GroupResource.query({'member' : $routeParams.userId}).$promise.then(function(response) {
+          GroupResource.query({'member' : $scope.decodedUserId}).$promise.then(function(response) {
             // $scope.groupList = response.data;
             $scope.groupList = response;
             $scope.groupIdList = [];
@@ -147,7 +148,7 @@ define([ 'angular', 'require' ], function(angular, require) {
         };
 
         $scope.removeGroup = function(groupId) {
-          GroupMembershipResource.delete({'userId':$scope.user.id, 'groupId': groupId}).$promise.then(
+          GroupMembershipResource.delete({'userId':$scope.encodedUserId, 'groupId': groupId}).$promise.then(
             function(){
               Notifications.addMessage({type:'success', status:'Success', message:'User '+$scope.user.id+' removed from group.'});
               loadGroups();
@@ -162,6 +163,9 @@ define([ 'angular', 'require' ], function(angular, require) {
             resolve: {
               user: function() {
                 return $scope.user;
+              },
+              userId: function() {
+                return $scope.encodedUserId;
               },
               groupIdList: function() {
                 return $scope.groupIdList;
