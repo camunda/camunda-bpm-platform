@@ -11,5 +11,6 @@ ngDefine('camunda.common.services', [
   'module:camunda.common.services.uri:./uri',
   './engineRequestHeaderProvider',
   './RequestLogger',
-  './RequestStatusInterceptor'
+  './RequestStatusInterceptor',
+  './escape'
 ], function() {});

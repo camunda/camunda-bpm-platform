@@ -98,7 +98,7 @@ define(['angular'], function(angular) {
   }];
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
-    $routeProvider.when('/groups/:groupId', {
+    $routeProvider.when('/groups/:groupId*', {
       templateUrl: require.toUrl('./app/admin/pages/groupEdit.html'),
       controller: Controller,
       resolve: {

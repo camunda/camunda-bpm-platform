@@ -5,7 +5,7 @@ define([ 'angular', 'require' ], function(angular, require) {
   var module = angular.module('admin.pages');
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
-    $routeProvider.when('/users/:userId', {
+    $routeProvider.when('/users/:userId*', {
       templateUrl: require.toUrl('./pages/userEdit.html'),
       controller: [
               '$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authenticatedUser',
