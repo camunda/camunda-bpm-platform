@@ -23,7 +23,7 @@
           <i class="icon-th"></i>
         </td>
         <td>
-          <a href="#/groups/{{group.id}}">{{group.id}}</a>
+          <a href="#/groups/{{group.id | escape}}">{{group.id}}</a>
         </td>            
         <td>
           {{group.name}}
@@ -32,7 +32,7 @@
           {{group.type}}
         </td>
         <td>  
-          <a href="#/groups/{{group.id}}">Edit</a>
+          <a href="#/groups/{{group.id | escape}}">Edit</a>
         </td>
       </tr>
     </tbody>

@@ -23,11 +23,11 @@
           <i class="icon-user"></i>
         </td>            
         <td>
-          <a href="#/users/{{user.id}}">{{user.firstName}} {{user.lastName}}</a>
+          <a ng-href="#/users/{{user.id | escape}}">{{user.firstName}} {{user.lastName}}</a>
         </td>
         <td>{{user.id}}</td>
-        <td>  
-          <a href="#/users/{{user.id}}">Edit</a> 
+        <td>
+          <a ng-href="#/users/{{user.id | escape}}">Edit</a> 
         </td>
       </tr>
     </tbody>
