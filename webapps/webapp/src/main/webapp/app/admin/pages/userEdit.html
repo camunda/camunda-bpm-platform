@@ -152,7 +152,7 @@
                       <!-- add group icon here -->
                     </td>
                     <td>
-                      <a href="#/groups/{{group.id}}?tab=group">{{group.id}}</a>
+                      <a href="#/groups/{{group.id | escape}}?tab=group">{{group.id}}</a>
                     </td>            
                     <td>
                       {{group.name}}
