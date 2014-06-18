@@ -20,7 +20,7 @@
           <input type="checkbox" ng-model="group.checked" />
         </td>
         <td>
-          <a href="#/groups/{{group.id}}">{{group.id}}</a>
+          <a href="#/groups/{{group.id | escape}}">{{group.id}}</a>
         </td>            
         <td>
           {{group.name}}
