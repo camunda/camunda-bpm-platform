@@ -64,7 +64,7 @@ ngDefine('admin.pages', function(module) {
       angular.forEach(selectedGroupIds, function(groupId) {
         var encodedGroupId = groupId.replace(/\//g, '%2F');
         
-        GroupMembershipResource.create({'groupId': encodedGroupId, 'userId': $scope.userId}).$promise.then(function (response) {          
+        GroupMembershipResource.create({'groupId': encodedGroupId, 'userId': $scope.userId}).$promise.then(function () {
           completeCount++;
           if(completeCount == selectedGroupIds.length) {
             deferred.resolve();
