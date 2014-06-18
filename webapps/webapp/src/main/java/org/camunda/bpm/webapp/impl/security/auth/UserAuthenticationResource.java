@@ -82,7 +82,7 @@ public class UserAuthenticationResource {
 
     final ProcessEngine processEngine = lookupProcessEngine(engineName);
     if(processEngine == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Process engine with name "+engineName+" does not exisist");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Process engine with name "+engineName+" does not exist");
     }
 
     // make sure authentication is executed without authentication :)
