@@ -13,6 +13,7 @@
 package org.camunda.bpm.webapp.impl.engine;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,8 +23,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.camunda.bpm.cockpit.Cockpit;
+import org.camunda.bpm.cockpit.CockpitRuntimeDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.webapp.impl.IllegalWebAppConfigurationException;
 import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
 import org.camunda.bpm.webapp.impl.security.SecurityActions;
 import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
@@ -190,6 +193,21 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   }
 
   protected String getDefaultEngineName() {
-    return Cockpit.getRuntimeDelegate().getDefaultProcessEngine().getName();
+    CockpitRuntimeDelegate runtimeDelegate = Cockpit.getRuntimeDelegate();
+
+    Set<String> processEngineNames = runtimeDelegate.getProcessEngineNames();
+    if(processEngineNames.isEmpty()) {
+      throw new IllegalWebAppConfigurationException("No process engine found. camunda Webapp cannot work without a process engine. ");
+
+    } else {
+      ProcessEngine defaultProcessEngine = runtimeDelegate.getDefaultProcessEngine();
+      if(defaultProcessEngine != null) {
+        return defaultProcessEngine.getName();
+
+      } else {
+        return processEngineNames.iterator().next();
+
+      }
+    }
   }
 }
