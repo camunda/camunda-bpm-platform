@@ -29,6 +29,9 @@ public class CmmnModelConstants {
 
   public static final String XPATH_NS = "http://www.w3.org/1999/XPath";
 
+  /** CAMUNDA_NS namespace */
+  public static final String CAMUNDA_NS = "http://camunda.org/schema/1.0/cmmn";
+
   // elements ///////////////////////////////////////////////////////////////////////////
 
   public static final String CMMN_ELEMENT = "cmmnElement";
@@ -161,5 +164,14 @@ public class CmmnModelConstants {
   public static final String CMMN_ATTRIBUTE_EXIT_CRITERIA_REFS = "exitCriteriaRefs";
   public static final String CMMN_ATTRIBUTE_APPLICABILITY_RULE_REFS = "applicabilityRuleRefs";
   public static final String CMMN_ATTRIBUTE_AUTHORIZED_ROLE_REFS = "authorizedRoleRefs";
+
+  // camunda attribute extensions ////////////////////////////////////////////////////
+
+  public static final String CAMUNDA_ATTRIBUTE_ASSIGNEE = "assignee";
+  public static final String CAMUNDA_ATTRIBUTE_CANDIDATE_GROUPS = "candidateGroups";
+  public static final String CAMUNDA_ATTRIBUTE_CANDIDATE_USERS = "candidateUsers";
+  public static final String CAMUNDA_ATTRIBUTE_DUE_DATE = "dueDate";
+  public static final String CAMUNDA_ATTRIBUTE_FORM_KEY = "formKey";
+  public static final String CAMUNDA_ATTRIBUTE_PRIORITY = "priority";
 
 }

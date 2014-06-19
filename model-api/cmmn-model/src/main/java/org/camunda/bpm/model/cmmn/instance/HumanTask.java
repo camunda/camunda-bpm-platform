@@ -13,6 +13,7 @@
 package org.camunda.bpm.model.cmmn.instance;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Roman Smirnov
@@ -25,5 +26,39 @@ public interface HumanTask extends Task {
   void setPerformer(Role performerRef);
 
   Collection<PlanningTable> getPlanningTables();
+
+  /** camunda extensions */
+
+  String getCamundaAssignee();
+
+  void setCamundaAssignee(String camundaAssignee);
+
+  String getCamundaCandidateGroups();
+
+  void setCamundaCandidateGroups(String camundaCandidateGroups);
+
+  List<String> getCamundaCandidateGroupsList();
+
+  void setCamundaCandidateGroupsList(List<String> camundaCandidateGroupsList);
+
+  String getCamundaCandidateUsers();
+
+  void setCamundaCandidateUsers(String camundaCandidateUsers);
+
+  List<String> getCamundaCandidateUsersList();
+
+  void setCamundaCandidateUsersList(List<String> camundaCandidateUsersList);
+
+  String getCamundaDueDate();
+
+  void setCamundaDueDate(String camundaDueDate);
+
+  String getCamundaFormKey();
+
+  void setCamundaFormKey(String camundaFormKey);
+
+  String getCamundaPriority();
+
+  void setCamundaPriority(String camundaPriority);
 
 }

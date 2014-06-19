@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_NS;
+
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -33,7 +35,14 @@ public class HumanTaskTest extends CmmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-          new AttributeAssumption("performerRef")
+          new AttributeAssumption("performerRef"),
+          /** camunda extensions */
+          new AttributeAssumption(CAMUNDA_NS, "assignee"),
+          new AttributeAssumption(CAMUNDA_NS, "candidateGroups"),
+          new AttributeAssumption(CAMUNDA_NS, "candidateUsers"),
+          new AttributeAssumption(CAMUNDA_NS, "dueDate"),
+          new AttributeAssumption(CAMUNDA_NS, "formKey"),
+          new AttributeAssumption(CAMUNDA_NS, "priority")
         );
   }
 
