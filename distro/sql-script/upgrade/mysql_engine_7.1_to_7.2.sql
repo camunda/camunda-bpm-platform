@@ -23,7 +23,16 @@ ALTER TABLE ACT_RU_VARIABLE
 
 ALTER TABLE ACT_RU_VARIABLE
   ADD CASE_INST_ID_ varchar(64);
-  
+
+ALTER TABLE ACT_RU_TASK
+  ADD CASE_EXECUTION_ID_ varchar(64);
+
+ALTER TABLE ACT_RU_TASK
+  ADD CASE_INST_ID_ varchar(64);
+
+ALTER TABLE ACT_RU_TASK
+  ADD CASE_DEF_ID_ varchar(64);
+
 -- create case definition table --
 create table ACT_RE_CASE_DEF (
     ID_ varchar(64) not null,
@@ -85,3 +94,19 @@ alter table ACT_RU_VARIABLE
     add constraint ACT_FK_VAR_CASE_INST
     foreign key (CASE_INST_ID_)
     references ACT_RU_CASE_EXECUTION(ID_);
+
+-- create foreign key constraints on ACT_RU_TASK --
+alter table ACT_RU_TASK
+    add constraint ACT_FK_TASK_CASE_EXE
+    foreign key (CASE_EXECUTION_ID_)
+    references ACT_RU_CASE_EXECUTION(ID_);
+
+alter table ACT_RU_TASK
+    add constraint ACT_FK_TASK_CASE_INST
+    foreign key (CASE_INST_ID_)
+    references ACT_RU_CASE_EXECUTION(ID_);
+
+alter table ACT_RU_TASK
+  add constraint ACT_FK_TASK_CASE_DEF
+  foreign key (CASE_DEF_ID_)
+  references ACT_RE_CASE_DEF(ID_);
