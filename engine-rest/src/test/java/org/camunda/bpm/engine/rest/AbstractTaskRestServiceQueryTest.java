@@ -125,6 +125,9 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedTaskDefinitionKey = from(content).getString("[0].taskDefinitionKey");
+    String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
+    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_NAME, returnedTaskName);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_ID, returnedId);
@@ -141,6 +144,9 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_DEFINITION_KEY, returnedTaskDefinitionKey);
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, returnedCaseDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, returnedCaseExecutionId);
 
   }
 
@@ -232,6 +238,14 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     parameters.put("unassigned", "true");
     parameters.put("active", "true");
     parameters.put("suspended", "true");
+    parameters.put("caseDefinitionKey", "aCaseDefKey");
+    parameters.put("caseDefinitionId", "aCaseDefId");
+    parameters.put("caseDefinitionName", "aCaseDefName");
+    parameters.put("caseDefinitionNameLike", "aCaseDefNameLike");
+    parameters.put("caseInstanceId", "anCaseInstanceId");
+    parameters.put("caseInstanceBusinessKey", "aCaseInstanceBusinessKey");
+    parameters.put("caseInstanceBusinessKeyLike", "aCaseInstanceBusinessKeyLike");
+    parameters.put("caseExecutionId", "aCaseExecutionId");
 
     return parameters;
   }
@@ -259,6 +273,15 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     verify(mockQuery).taskName(stringQueryParameters.get("name"));
     verify(mockQuery).taskNameLike(stringQueryParameters.get("nameLike"));
     verify(mockQuery).taskOwner(stringQueryParameters.get("owner"));
+    verify(mockQuery).caseDefinitionKey(stringQueryParameters.get("caseDefinitionKey"));
+    verify(mockQuery).caseDefinitionId(stringQueryParameters.get("caseDefinitionId"));
+    verify(mockQuery).caseDefinitionName(stringQueryParameters.get("caseDefinitionName"));
+    verify(mockQuery).caseDefinitionNameLike(stringQueryParameters.get("caseDefinitionNameLike"));
+    verify(mockQuery).caseInstanceId(stringQueryParameters.get("caseInstanceId"));
+    verify(mockQuery).caseInstanceBusinessKey(stringQueryParameters.get("caseInstanceBusinessKey"));
+    verify(mockQuery).caseInstanceBusinessKeyLike(stringQueryParameters.get("caseInstanceBusinessKeyLike"));
+    verify(mockQuery).caseExecutionId(stringQueryParameters.get("caseExecutionId"));
+
   }
 
   private void verifyStringArrayParametersInvocations() {
@@ -351,8 +374,78 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     inOrder.verify(mockQuery).desc();
 
     inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("instanceId", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByProcessInstanceId();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("created", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskCreateTime();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("id", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskId();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("priority", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskPriority();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("executionId", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByExecutionId();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("assignee", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskAssignee();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("description", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskDescription();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("name", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskName();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("caseInstanceId", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByCaseInstanceId();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("dueDate", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByDueDate();
+    inOrder.verify(mockQuery).asc();
+
+    inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("followUpDate", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByFollowUpDate();
+    inOrder.verify(mockQuery).asc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("instanceId", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByProcessInstanceId();
+    inOrder.verify(mockQuery).asc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("created", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskCreateTime();
+    inOrder.verify(mockQuery).asc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("id", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskId();
+    inOrder.verify(mockQuery).asc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("priority", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskPriority();
     inOrder.verify(mockQuery).asc();
 
     inOrder = Mockito.inOrder(mockQuery);
@@ -361,19 +454,9 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     inOrder.verify(mockQuery).asc();
 
     inOrder = Mockito.inOrder(mockQuery);
-    executeAndVerifySorting("instanceId", "desc", Status.OK);
-    inOrder.verify(mockQuery).orderByProcessInstanceId();
-    inOrder.verify(mockQuery).desc();
-
-    inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("assignee", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByTaskAssignee();
     inOrder.verify(mockQuery).asc();
-
-    inOrder = Mockito.inOrder(mockQuery);
-    executeAndVerifySorting("created", "desc", Status.OK);
-    inOrder.verify(mockQuery).orderByTaskCreateTime();
-    inOrder.verify(mockQuery).desc();
 
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("description", "asc", Status.OK);
@@ -381,19 +464,15 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     inOrder.verify(mockQuery).asc();
 
     inOrder = Mockito.inOrder(mockQuery);
-    executeAndVerifySorting("id", "desc", Status.OK);
-    inOrder.verify(mockQuery).orderByTaskId();
-    inOrder.verify(mockQuery).desc();
-
-    inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("name", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByTaskName();
     inOrder.verify(mockQuery).asc();
 
     inOrder = Mockito.inOrder(mockQuery);
-    executeAndVerifySorting("priority", "desc", Status.OK);
-    inOrder.verify(mockQuery).orderByTaskPriority();
-    inOrder.verify(mockQuery).desc();
+    executeAndVerifySorting("caseInstanceId", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByCaseInstanceId();
+    inOrder.verify(mockQuery).asc();
+
   }
 
   private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
@@ -607,6 +686,102 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
   }
 
   @Test
+  public void testCaseVariableParameters() {
+    // equals
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_eq_" + variableValue;
+
+    given()
+      .queryParam("caseInstanceVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(TASK_QUERY_URL);
+
+    verify(mockQuery).caseInstanceVariableValueEquals(variableName, variableValue);
+
+    // greater then
+    queryValue = variableName + "_gt_" + variableValue;
+
+    given()
+      .queryParam("caseInstanceVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(TASK_QUERY_URL);
+
+    verify(mockQuery).caseInstanceVariableValueGreaterThan(variableName, variableValue);
+
+    // greater then equals
+    queryValue = variableName + "_gteq_" + variableValue;
+
+    given()
+      .queryParam("caseInstanceVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(TASK_QUERY_URL);
+
+    verify(mockQuery).caseInstanceVariableValueGreaterThanOrEquals(variableName, variableValue);
+
+    // lower then
+    queryValue = variableName + "_lt_" + variableValue;
+
+    given()
+      .queryParam("caseInstanceVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(TASK_QUERY_URL);
+
+    verify(mockQuery).caseInstanceVariableValueLessThan(variableName, variableValue);
+
+    // lower then equals
+    queryValue = variableName + "_lteq_" + variableValue;
+
+    given()
+      .queryParam("caseInstanceVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(TASK_QUERY_URL);
+
+    verify(mockQuery).caseInstanceVariableValueLessThanOrEquals(variableName, variableValue);
+
+    // like
+    queryValue = variableName + "_like_" + variableValue;
+
+    given()
+      .queryParam("caseInstanceVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(TASK_QUERY_URL);
+
+    verify(mockQuery).caseInstanceVariableValueLike(variableName, variableValue);
+
+    // not equals
+    queryValue = variableName + "_neq_" + variableValue;
+
+    given()
+      .queryParam("caseInstanceVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(TASK_QUERY_URL);
+
+    verify(mockQuery).caseInstanceVariableValueNotEquals(variableName, variableValue);
+  }
+
+  @Test
   public void testMultipleVariableParameters() {
     String variableName1 = "varName";
     String variableValue1 = "varValue";
@@ -624,26 +799,6 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     verify(mockQuery).taskVariableValueEquals(variableName1, variableValue1);
     verify(mockQuery).taskVariableValueNotEquals(variableName2, variableValue2);
-  }
-
-  @Test
-  public void testMultipleProcessVariableParameters() {
-    String variableName1 = "varName";
-    String variableValue1 = "varValue";
-    String variableParameter1 = variableName1 + "_eq_" + variableValue1;
-
-    String variableName2 = "anotherVarName";
-    String variableValue2 = "anotherVarValue";
-    String variableParameter2 = variableName2 + "_neq_" + variableValue2;
-
-    String queryValue = variableParameter1 + "," + variableParameter2;
-
-    given().queryParam("processVariables", queryValue)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(TASK_QUERY_URL);
-
-    verify(mockQuery).processVariableValueEquals(variableName1, variableValue1);
-    verify(mockQuery).processVariableValueNotEquals(variableName2, variableValue2);
   }
 
   @Test
@@ -677,6 +832,120 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     verify(mockQuery).taskVariableValueEquals(variableName, variableValue);
     verify(mockQuery).taskVariableValueNotEquals(anotherVariableName, anotherVariableValue);
 
+  }
+
+  @Test
+  public void testMultipleProcessVariableParameters() {
+    String variableName1 = "varName";
+    String variableValue1 = "varValue";
+    String variableParameter1 = variableName1 + "_eq_" + variableValue1;
+
+    String variableName2 = "anotherVarName";
+    String variableValue2 = "anotherVarValue";
+    String variableParameter2 = variableName2 + "_neq_" + variableValue2;
+
+    String queryValue = variableParameter1 + "," + variableParameter2;
+
+    given().queryParam("processVariables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);
+
+    verify(mockQuery).processVariableValueEquals(variableName1, variableValue1);
+    verify(mockQuery).processVariableValueNotEquals(variableName2, variableValue2);
+  }
+
+  @Test
+  public void testMultipleProcessVariableParametersAsPost() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String anotherVariableName = "anotherVarName";
+    Integer anotherVariableValue = 30;
+
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", variableName);
+    variableJson.put("operator", "eq");
+    variableJson.put("value", variableValue);
+
+    Map<String, Object> anotherVariableJson = new HashMap<String, Object>();
+    anotherVariableJson.put("name", anotherVariableName);
+    anotherVariableJson.put("operator", "neq");
+    anotherVariableJson.put("value", anotherVariableValue);
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    variables.add(anotherVariableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("processVariables", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(TASK_QUERY_URL);
+
+    verify(mockQuery).processVariableValueEquals(variableName, variableValue);
+    verify(mockQuery).processVariableValueNotEquals(anotherVariableName, anotherVariableValue);
+  }
+
+  @Test
+  public void testMultipleCaseVariableParameters() {
+    String variableName1 = "varName";
+    String variableValue1 = "varValue";
+    String variableParameter1 = variableName1 + "_eq_" + variableValue1;
+
+    String variableName2 = "anotherVarName";
+    String variableValue2 = "anotherVarValue";
+    String variableParameter2 = variableName2 + "_neq_" + variableValue2;
+
+    String queryValue = variableParameter1 + "," + variableParameter2;
+
+    given().queryParam("caseInstanceVariables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);
+
+    verify(mockQuery).caseInstanceVariableValueEquals(variableName1, variableValue1);
+    verify(mockQuery).caseInstanceVariableValueNotEquals(variableName2, variableValue2);
+  }
+
+  @Test
+  public void testMultipleCaseVariableParametersAsPost() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String anotherVariableName = "anotherVarName";
+    Integer anotherVariableValue = 30;
+
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", variableName);
+    variableJson.put("operator", "eq");
+    variableJson.put("value", variableValue);
+
+    Map<String, Object> anotherVariableJson = new HashMap<String, Object>();
+    anotherVariableJson.put("name", anotherVariableName);
+    anotherVariableJson.put("operator", "neq");
+    anotherVariableJson.put("value", anotherVariableValue);
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    variables.add(anotherVariableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("caseInstanceVariables", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(TASK_QUERY_URL);
+
+    verify(mockQuery).caseInstanceVariableValueEquals(variableName, variableValue);
+    verify(mockQuery).caseInstanceVariableValueNotEquals(anotherVariableName, anotherVariableValue);
   }
 
   @Test

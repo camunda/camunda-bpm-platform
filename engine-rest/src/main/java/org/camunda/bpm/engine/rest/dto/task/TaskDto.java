@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,6 +34,9 @@ public class TaskDto {
   private String processDefinitionId;
   private String processInstanceId;
   private String taskDefinitionKey;
+  private String caseExecutionId;
+  private String caseInstanceId;
+  private String caseDefinitionId;
 
   public String getId() {
     return id;
@@ -42,7 +45,7 @@ public class TaskDto {
   public String getName() {
     return name;
   }
-  
+
   public String getAssignee() {
     return assignee;
   }
@@ -95,6 +98,18 @@ public class TaskDto {
     return followUp;
   }
 
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
   public static TaskDto fromTask(Task task) {
     TaskDto dto = new TaskDto();
     dto.id = task.getId();
@@ -112,6 +127,9 @@ public class TaskDto {
     dto.processDefinitionId = task.getProcessDefinitionId();
     dto.processInstanceId = task.getProcessInstanceId();
     dto.taskDefinitionKey = task.getTaskDefinitionKey();
+    dto.caseDefinitionId = task.getCaseDefinitionId();
+    dto.caseExecutionId = task.getCaseExecutionId();
+    dto.caseInstanceId = task.getCaseInstanceId();
     return dto;
   }
 }

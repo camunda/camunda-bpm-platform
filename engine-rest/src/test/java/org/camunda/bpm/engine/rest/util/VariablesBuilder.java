@@ -15,42 +15,60 @@ import java.util.Map;
  *    "anotherKey" : {"value" : "anotherValue", "type" : "String"}
  * }
  * </code>
- * 
+ *
  * @author Thorben Lindhauer
  *
  */
 public class VariablesBuilder {
 
   private Map<String, Object> variables;
-  
+
   private VariablesBuilder() {
     variables = new HashMap<String, Object>();
   }
-  
+
   public static VariablesBuilder create() {
     VariablesBuilder builder = new VariablesBuilder();
     return builder;
   }
-  
+
   public VariablesBuilder variable(String name, Object value, String type) {
     Map<String, Object> variableValue = getVariableValueMap(value, type);
     variables.put(name, variableValue);
     return this;
   }
-  
+
+  public VariablesBuilder variable(String name, Object value, String type, boolean local) {
+    Map<String, Object> variableValue = getVariableValueMap(value, type, local);
+    variables.put(name, variableValue);
+    return this;
+  }
+
   public VariablesBuilder variable(String name, Object value) {
     return variable(name, value, null);
   }
-  
+
+  public VariablesBuilder variable(String name, Object value, boolean local) {
+    return variable(name, value, null, local);
+  }
+
   public Map<String, Object> getVariables() {
     return variables;
   }
-  
+
   public static Map<String, Object> getVariableValueMap(Object value) {
     return getVariableValueMap(value, null);
   }
-  
+
+  public static Map<String, Object> getVariableValueMap(Object value, boolean local) {
+    return getVariableValueMap(value, null, local);
+  }
+
   public static Map<String, Object> getVariableValueMap(Object value, String type) {
+    return getVariableValueMap(value, type, false);
+  }
+
+  public static Map<String, Object> getVariableValueMap(Object value, String type, boolean local) {
     Map<String, Object> variable = new HashMap<String, Object>();
     if (value != null) {
       variable.put("value", value);
@@ -58,7 +76,9 @@ public class VariablesBuilder {
     if (type != null) {
       variable.put("type", type);
     }
-    
+
+    variable.put("local", local);
+
     return variable;
   }
 }

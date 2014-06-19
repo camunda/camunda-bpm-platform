@@ -37,9 +37,11 @@ import org.camunda.bpm.engine.task.TaskQuery;
 public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
+  private static final String SORT_BY_CASE_INSTANCE_ID_VALUE = "caseInstanceId";
   private static final String SORT_BY_DUE_DATE_VALUE = "dueDate";
   private static final String SORT_BY_FOLLOW_UP_VALUE = "followUpDate";
   private static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
+  private static final String SORT_BY_CASE_EXECUTION_ID_VALUE = "caseExecutionId";
   private static final String SORT_BY_ASSIGNEE_VALUE = "assignee";
   private static final String SORT_BY_CREATE_TIME_VALUE = "created";
   private static final String SORT_BY_DESCRIPTION_VALUE = "description";
@@ -51,9 +53,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_CASE_INSTANCE_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DUE_DATE_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_FOLLOW_UP_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_EXECUTION_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_CASE_EXECUTION_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ASSIGNEE_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_CREATE_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DESCRIPTION_VALUE);
@@ -90,6 +94,15 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private Boolean active;
   private Boolean suspended;
 
+  private String caseDefinitionKey;
+  private String caseDefinitionId;
+  private String caseDefinitionName;
+  private String caseDefinitionNameLike;
+  private String caseInstanceId;
+  private String caseInstanceBusinessKey;
+  private String caseInstanceBusinessKeyLike;
+  private String caseExecutionId;
+
   private Date dueAfter;
   private Date dueBefore;
   private Date dueDate;
@@ -106,6 +119,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   private List<VariableQueryParameterDto> taskVariables;
   private List<VariableQueryParameterDto> processVariables;
+  private List<VariableQueryParameterDto> caseInstanceVariables;
 
   public TaskQueryDto() {
 
@@ -315,6 +329,51 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.processVariables = processVariables;
   }
 
+  @CamundaQueryParam("caseDefinitionId")
+  public void setCaseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
+  }
+
+  @CamundaQueryParam("caseDefinitionKey")
+  public void setCaseDefinitionKey(String caseDefinitionKey) {
+    this.caseDefinitionKey = caseDefinitionKey;
+  }
+
+  @CamundaQueryParam("caseDefinitionName")
+  public void setCaseDefinitionName(String caseDefinitionName) {
+    this.caseDefinitionName = caseDefinitionName;
+  }
+
+  @CamundaQueryParam("caseDefinitionNameLike")
+  public void setCaseDefinitionNameLike(String caseDefinitionNameLike) {
+    this.caseDefinitionNameLike = caseDefinitionNameLike;
+  }
+
+  @CamundaQueryParam("caseExecutionId")
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
+  }
+
+  @CamundaQueryParam("caseInstanceBusinessKey")
+  public void setCaseInstanceBusinessKey(String caseInstanceBusinessKey) {
+    this.caseInstanceBusinessKey = caseInstanceBusinessKey;
+  }
+
+  @CamundaQueryParam("caseInstanceBusinessKeyLike")
+  public void setCaseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike) {
+    this.caseInstanceBusinessKeyLike = caseInstanceBusinessKeyLike;
+  }
+
+  @CamundaQueryParam("caseInstanceId")
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  @CamundaQueryParam(value = "caseInstanceVariables", converter = VariableListConverter.class)
+  public void setCaseInstanceVariables(List<VariableQueryParameterDto> caseInstanceVariables) {
+    this.caseInstanceVariables = caseInstanceVariables;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -441,6 +500,30 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (suspended != null && suspended == true) {
       query.suspended();
     }
+    if (caseDefinitionId != null) {
+      query.caseDefinitionId(caseDefinitionId);
+    }
+    if (caseDefinitionKey != null) {
+      query.caseDefinitionKey(caseDefinitionKey);
+    }
+    if (caseDefinitionName != null) {
+      query.caseDefinitionName(caseDefinitionName);
+    }
+    if (caseDefinitionNameLike != null) {
+      query.caseDefinitionNameLike(caseDefinitionNameLike);
+    }
+    if (caseExecutionId != null) {
+      query.caseExecutionId(caseExecutionId);
+    }
+    if (caseInstanceBusinessKey != null) {
+      query.caseInstanceBusinessKey(caseInstanceBusinessKey);
+    }
+    if (caseInstanceBusinessKeyLike != null) {
+      query.caseInstanceBusinessKeyLike(caseInstanceBusinessKeyLike);
+    }
+    if (caseInstanceId != null) {
+      query.caseInstanceId(caseInstanceId);
+    }
 
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {
@@ -495,6 +578,33 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
       }
     }
+
+    if (caseInstanceVariables != null) {
+      for (VariableQueryParameterDto variableQueryParam : caseInstanceVariables) {
+        String variableName = variableQueryParam.getName();
+        String op = variableQueryParam.getOperator();
+        Object variableValue = variableQueryParam.getValue();
+
+        if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
+          query.caseInstanceVariableValueEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
+          query.caseInstanceVariableValueNotEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {
+          query.caseInstanceVariableValueGreaterThan(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OR_EQUALS_OPERATOR_NAME)) {
+          query.caseInstanceVariableValueGreaterThanOrEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OPERATOR_NAME)) {
+          query.caseInstanceVariableValueLessThan(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OR_EQUALS_OPERATOR_NAME)) {
+          query.caseInstanceVariableValueLessThanOrEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
+          query.caseInstanceVariableValueLike(variableName, String.valueOf(variableValue));
+        } else {
+          throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid case variable comparator specified: " + op);
+        }
+
+      }
+    }
   }
 
   @Override
@@ -502,12 +612,16 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (sortBy != null) {
       if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
         query.orderByProcessInstanceId();
+      } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_ID_VALUE)) {
+        query.orderByCaseInstanceId();
       } else if (sortBy.equals(SORT_BY_DUE_DATE_VALUE)) {
         query.orderByDueDate();
       } else if (sortBy.equals(SORT_BY_FOLLOW_UP_VALUE)) {
         query.orderByFollowUpDate();
       } else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
         query.orderByExecutionId();
+      } else if (sortBy.equals(SORT_BY_CASE_EXECUTION_ID_VALUE)) {
+        query.orderByCaseExecutionId();
       } else if (sortBy.equals(SORT_BY_ASSIGNEE_VALUE)) {
         query.orderByTaskAssignee();
       } else if (sortBy.equals(SORT_BY_CREATE_TIME_VALUE)) {

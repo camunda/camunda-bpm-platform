@@ -43,59 +43,59 @@ public class DtoUtil {
     Map<String, Object> variablesMap = new HashMap<String, Object>();
     for (Entry<String, VariableValueDto> variable : variables.entrySet()) {
       String type = variable.getValue().getType();
-      Object value = variable.getValue().getValue();
-
-      if (type != null && !type.equals("") && value != null) {
-        // boolean
-        if (type.equalsIgnoreCase(BooleanType.TYPE_NAME)) {
-          variablesMap.put(variable.getKey(), Boolean.valueOf(value.toString()));
-          continue;
-        }
-
-        // string
-        if (type.equalsIgnoreCase(StringType.TYPE_NAME)) {
-          variablesMap.put(variable.getKey(), String.valueOf(value));
-          continue;
-        }
-
-        // integer
-        if (type.equalsIgnoreCase(IntegerType.TYPE_NAME)) {
-          variablesMap.put(variable.getKey(), Integer.valueOf(value.toString()));
-          continue;
-        }
-
-        // short
-        if (type.equalsIgnoreCase(ShortType.TYPE_NAME)) {
-          variablesMap.put(variable.getKey(), Short.valueOf(value.toString()));
-          continue;
-        }
-
-        // long
-        if (type.equalsIgnoreCase(LongType.TYPE_NAME)) {
-          variablesMap.put(variable.getKey(), Long.valueOf(value.toString()));
-          continue;
-        }
-
-        // double
-        if (type.equalsIgnoreCase(DoubleType.TYPE_NAME)) {
-          variablesMap.put(variable.getKey(), Double.valueOf(value.toString()));
-          continue;
-        }
-
-        // date
-        if (type.equalsIgnoreCase(DateType.TYPE_NAME)) {
-          variablesMap.put(variable.getKey(), toDate(value));
-          continue;
-        }
-
-        // passed a non supported type
-        throw new IllegalArgumentException("The variable type '" + type + "' is not supported.");
-      }
-
-      // no type specified or value equals null then simply add the variable
-      variablesMap.put(variable.getKey(), value);
+      Object originalValue = variable.getValue().getValue();
+      Object concreteValue = toType(type, originalValue);
+      variablesMap.put(variable.getKey(), concreteValue);
     }
     return variablesMap;
+  }
+
+  public static Object toType(String type, Object value) throws ParseException {
+
+    if (type != null && !type.equals("") && value != null) {
+      // boolean
+      if (type.equalsIgnoreCase(BooleanType.TYPE_NAME)) {
+        return Boolean.valueOf(value.toString());
+      }
+
+      // string
+      if (type.equalsIgnoreCase(StringType.TYPE_NAME)) {
+        return String.valueOf(value);
+      }
+
+      // integer
+      if (type.equalsIgnoreCase(IntegerType.TYPE_NAME)) {
+        return Integer.valueOf(value.toString());
+      }
+
+      // short
+      if (type.equalsIgnoreCase(ShortType.TYPE_NAME)) {
+        return Short.valueOf(value.toString());
+      }
+
+      // long
+      if (type.equalsIgnoreCase(LongType.TYPE_NAME)) {
+        return Long.valueOf(value.toString());
+      }
+
+      // double
+      if (type.equalsIgnoreCase(DoubleType.TYPE_NAME)) {
+        return Double.valueOf(value.toString());
+      }
+
+      // date
+      if (type.equalsIgnoreCase(DateType.TYPE_NAME)) {
+        SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Date date = pattern.parse(String.valueOf(value));
+        return date;
+      }
+
+      // passed a non supported type
+      throw new IllegalArgumentException("The variable type '" + type + "' is not supported.");
+    }
+
+    // no type specified or value equals null then simply return the value
+    return value;
   }
 
   public static Date toDate(Object value) throws ParseException {
