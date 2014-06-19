@@ -19,6 +19,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
  * A script which is provided as source code. This is used if the corresponding
@@ -39,9 +40,9 @@ public class SourceExecutableScript extends ExecutableScript {
     scriptSrc = src;
   }
 
-  public Object execute(ScriptEngine engine, Bindings bindings) {
+  public Object execute(ScriptEngine engine, VariableScope variableScope, Bindings bindings) {
     try {
-      LOG.log(Level.FINE, "Evaluationg un-compiled script using {0} script engine ", language);
+      LOG.log(Level.FINE, "Evaluating un-compiled script using {0} script engine ", language);
       return engine.eval(scriptSrc, bindings);
 
     } catch (ScriptException e) {

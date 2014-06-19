@@ -13,8 +13,10 @@
 package org.camunda.bpm.engine.test.bpmn.scripttask;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -35,6 +37,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
   private static final String PYTHON = "python";
   private static final String RUBY = "ruby";
   private static final String GROOVY = "groovy";
+  private static final String JUEL = "juel";
 
   private List<String> deploymentIds = new ArrayList<String>();
 
@@ -382,6 +385,60 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
     assertNull(variableValue);
 
+  }
+
+  public void testJuelExpression() {
+    deployProcess(JUEL, "${execution.setVariable('foo', 'bar')}");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
+    assertEquals("bar", variableValue);
+  }
+
+  public void testSourceAsExpressionAsVariable() {
+    deployProcess(PYTHON, "${scriptSource}");
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptSource", "execution.setVariable('foo', 'bar')");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
+    assertEquals("bar", variableValue);
+  }
+
+  public void testSourceAsExpressionAsNonExistingVariable() {
+    deployProcess(PYTHON, "${scriptSource}");
+
+    try {
+      runtimeService.startProcessInstanceByKey("testProcess");
+      fail("Process variable 'scriptSource' not defined");
+    }
+    catch (ProcessEngineException e) {
+      assertTextPresentIgnoreCase("Cannot resolve identifier 'scriptSource'", e.getMessage());
+    }
+  }
+
+  public void testSourceAsExpressionAsBean() {
+    deployProcess(PYTHON, "#{scriptResourceBean.getSource()}");
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptResourceBean", new ScriptResourceBean());
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
+    assertEquals("bar", variableValue);
+  }
+
+  public void testSourceAsExpressionWithWhitespace() {
+    deployProcess(PYTHON, "\t\n  \t \n  ${scriptSource}");
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptSource", "execution.setVariable('foo', 'bar')");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
+    assertEquals("bar", variableValue);
   }
 
   protected void deployProcess(String scriptFormat, String scriptText) {

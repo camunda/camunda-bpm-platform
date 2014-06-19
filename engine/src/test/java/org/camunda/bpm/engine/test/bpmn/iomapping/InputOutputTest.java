@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.test.bpmn.iomapping;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -67,6 +69,152 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testInputScriptValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
+    Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(execution.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testInputScriptValueAsVariable() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptSource", "return 1 + 1");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+    Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(execution.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testInputScriptValueAsBean() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("onePlusOneBean", new OnePlusOneBean());
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+    Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(execution.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testInputExternalScriptValue() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+    Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(execution.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testInputExternalScriptValueAsVariable() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptPath", "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+    Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(execution.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testInputExternalScriptValueAsBean() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("onePlusOneBean", new OnePlusOneBean());
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+    Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(execution.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testInputExternalClasspathScriptValue() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+    Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(execution.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testInputExternalClasspathScriptValueAsVariable() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptPath", "classpath://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+    Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(execution.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testInputExternalClasspathScriptValueAsBean() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("onePlusOneBean", new OnePlusOneBean());
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+    Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(execution.getId(), variable.getExecutionId());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValue.bpmn",
+    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
+  })
+  public void testInputExternalDeploymentScriptValue() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+    Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(execution.getId(), variable.getExecutionId());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValueAsVariable.bpmn",
+    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
+  })
+  public void testInputExternalDeploymentScriptValueAsVariable() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptPath", "deployment://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+    Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(execution.getId(), variable.getExecutionId());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValueAsBean.bpmn",
+    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
+  })
+  public void testInputExternalDeploymentScriptValueAsBean() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("onePlusOneBean", new OnePlusOneBean());
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
     VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
@@ -225,6 +373,141 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testOutputScriptValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testOutputScriptValueAsVariable() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptSource", "return 1 + 1");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testOutputScriptValueAsBean() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("onePlusOneBean", new OnePlusOneBean());
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testOutputExternalScriptValue() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testOutputExternalScriptValueAsVariable() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptPath", "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testOutputExternalScriptValueAsBean() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("onePlusOneBean", new OnePlusOneBean());
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testOutputExternalClasspathScriptValue() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testOutputExternalClasspathScriptValueAsVariable() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptPath", "classpath://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
+
+  @Deployment
+  public void testOutputExternalClasspathScriptValueAsBean() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("onePlusOneBean", new OnePlusOneBean());
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValue.bpmn",
+    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
+  })
+  public void testOutputExternalDeploymentScriptValue() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValueAsVariable.bpmn",
+    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
+  })
+  public void testOutputExternalDeploymentScriptValueAsVariable() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptPath", "deployment://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    assertEquals(2, variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValueAsBean.bpmn",
+    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
+  })
+  public void testOutputExternalDeploymentScriptValueAsBean() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("onePlusOneBean", new OnePlusOneBean());
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
     assertNotNull(variable);

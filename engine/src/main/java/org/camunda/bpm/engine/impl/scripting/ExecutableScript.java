@@ -16,6 +16,7 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
  * <p>Represents an executable script.</p>
@@ -38,11 +39,12 @@ public abstract class ExecutableScript {
   * <p>Evaluates the script using the provided engine and bindings</p>
   *
   * @param scriptEngine the script engine to use for evaluating the script.
+  * @param variableScope the variable scope of the execution
   * @param bindings the bindings to use for evaluating the script.
   * @throws ProcessEngineException in case the script cannot be evaluated.
   * @return the result of the script evaluation
   */
-  public abstract Object execute(ScriptEngine scriptEngine, Bindings bindings);
+  public abstract Object execute(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings);
 
   /**
    * The language in which the script is written.

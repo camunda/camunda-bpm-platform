@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 
 /**
@@ -54,8 +55,8 @@ public class FormValidators {
         		constraint);
 
       } else {
-        if(config.startsWith("$") || config.startsWith("#")) {
-          // espression
+        if(StringUtil.isExpression(config)) {
+          // expression
           Expression validatorExpression = expressionManager.createExpression(config);
           return new DelegateFormFieldValidator(validatorExpression);
         } else {

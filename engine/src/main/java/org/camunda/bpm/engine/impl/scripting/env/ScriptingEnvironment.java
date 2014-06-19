@@ -77,11 +77,11 @@ public class ScriptingEnvironment {
     // first, evaluate the env scripts (if any)
     List<ExecutableScript> envScripts = getEnvScripts(scriptLanguage);
     for (ExecutableScript envScript : envScripts) {
-      envScript.execute(scriptEngine, bindings);
+      envScript.execute(scriptEngine, scope, bindings);
     }
 
     // next evaluate the actual script
-    return script.execute(scriptEngine, bindings);
+    return script.execute(scriptEngine, scope, bindings);
   }
 
   /**

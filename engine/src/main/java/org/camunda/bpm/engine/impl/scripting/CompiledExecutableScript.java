@@ -18,6 +18,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
  * A pre-compiled script.
@@ -41,7 +42,7 @@ public class CompiledExecutableScript extends ExecutableScript {
     this.compiledScript = compiledScript;
   }
 
-  public Object execute(ScriptEngine scriptEngine, Bindings bindings) {
+  public Object execute(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
     try {
       return compiledScript.eval(bindings);
     } catch (ScriptException e) {
