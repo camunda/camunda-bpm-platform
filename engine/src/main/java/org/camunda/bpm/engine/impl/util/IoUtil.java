@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
+import java.nio.charset.Charset;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 
@@ -59,7 +60,7 @@ public class IoUtil {
     } finally {
       IoUtil.closeSilently(inputStream);
     }
-    return new String(buffer);
+    return new String(buffer, Charset.forName("UTF-8"));
   }
   
   public static File getFile(String filePath) {
