@@ -516,7 +516,7 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
 
     HistoricVariableInstanceEntity variableEntity = (HistoricVariableInstanceEntity) variable;
 
-    // the revision have to be 0
+    // the revision has to be 0
     assertEquals(0, variableEntity.getRevision());
 
     List<HistoricDetail> details = historyService
@@ -551,7 +551,7 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
 
     HistoricVariableInstanceEntity variableEntity = (HistoricVariableInstanceEntity) variable;
 
-    // the revision have to be 2
+    // the revision has to be 2
     assertEquals(2, variableEntity.getRevision());
 
     List<HistoricDetail> details = historyService
