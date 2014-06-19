@@ -498,4 +498,75 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
 
   }
 
+  @Deployment
+  public void testHistoricVariableInstanceRevision() {
+    // given:
+    // a finished process instance
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertProcessEnded(processInstance.getId());
+
+    // when
+
+    // then
+    HistoricVariableInstance variable = historyService
+      .createHistoricVariableInstanceQuery()
+      .singleResult();
+
+    assertNotNull(variable);
+
+    HistoricVariableInstanceEntity variableEntity = (HistoricVariableInstanceEntity) variable;
+
+    // the revision have to be 0
+    assertEquals(0, variableEntity.getRevision());
+
+    List<HistoricDetail> details = historyService
+      .createHistoricDetailQuery()
+      .orderByVariableRevision()
+      .asc()
+      .list();
+
+    for (HistoricDetail detail : details) {
+      HistoricVariableUpdate variableDetail = (HistoricVariableUpdate) detail;
+      assertEquals(0, variableDetail.getRevision());
+    }
+  }
+
+  @Deployment
+  public void testHistoricVariableInstanceRevisionAsync() {
+    // given:
+    // a finished process instance
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    executeAvailableJobs();
+
+    // then
+    assertProcessEnded(processInstance.getId());
+
+    HistoricVariableInstance variable = historyService
+      .createHistoricVariableInstanceQuery()
+      .singleResult();
+
+    assertNotNull(variable);
+
+    HistoricVariableInstanceEntity variableEntity = (HistoricVariableInstanceEntity) variable;
+
+    // the revision have to be 2
+    assertEquals(2, variableEntity.getRevision());
+
+    List<HistoricDetail> details = historyService
+      .createHistoricDetailQuery()
+      .orderByVariableRevision()
+      .asc()
+      .list();
+
+    int i = 0;
+    for (HistoricDetail detail : details) {
+      HistoricVariableUpdate variableDetail = (HistoricVariableUpdate) detail;
+      assertEquals(i, variableDetail.getRevision());
+      i++;
+    }
+
+  }
+
 }
