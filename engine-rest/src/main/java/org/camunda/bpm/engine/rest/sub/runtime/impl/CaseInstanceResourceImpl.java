@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.runtime.CaseInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.CaseInstanceResource;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 
@@ -50,6 +51,10 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
 
     CaseInstanceDto result = CaseInstanceDto.fromCaseInstance(instance);
     return result;
+  }
+
+  public VariableResource getVariablesResource() {
+    return new CaseExecutionVariablesResource(engine, caseInstanceId);
   }
 
 }
