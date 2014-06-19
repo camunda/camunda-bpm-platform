@@ -3,12 +3,22 @@
                   xmlns="http://www.omg.org/spec/CMMN/20131201/MODEL"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   targetNamespace="Examples">
-  <case id="oneTaskCase" name="One Task Case">
+
+  <case id="oneStageCase" name="One Stage Case">
   
     <casePlanModel id="CasePlanModel_1">
-      <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
+      <planItem id="PI_Stage_1" definitionRef="Stage_1" />
+
       <humanTask id="HumanTask_1" name="A HumanTask" />
+      <humanTask id="HumanTask_2" name="Another HumanTask" />
+
+      <stage id="Stage_1" name="A Stage">
+        <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
+        <planItem id="PI_HumanTask_2" definitionRef="HumanTask_1" />
+      </stage>
+
     </casePlanModel>
+
   </case>
   
 </definitions>

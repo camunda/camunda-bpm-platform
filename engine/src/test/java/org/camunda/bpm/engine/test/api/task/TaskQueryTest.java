@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
@@ -1081,6 +1082,35 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId).list().size());
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseActivityInstanceId() throws Exception {
+    String caseDefinitionKey = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getKey();
+
+    caseService
+      .createCaseInstanceByKey(caseDefinitionKey)
+      .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.activityInstanceIdIn(caseExecutionId);
+
+    verifyQueryResults(query, 1);
+
+  }
+
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testQueryByMultipleActivityInstanceIds() throws Exception {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -1146,6 +1176,8 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(12, taskService.createTaskQuery().orderByTaskCreateTime().asc().list().size());
     assertEquals(12, taskService.createTaskQuery().orderByDueDate().asc().list().size());
     assertEquals(12, taskService.createTaskQuery().orderByFollowUpDate().asc().list().size());
+    assertEquals(12, taskService.createTaskQuery().orderByCaseInstanceId().asc().list().size());
+    assertEquals(12, taskService.createTaskQuery().orderByCaseExecutionId().asc().list().size());
 
     assertEquals(12, taskService.createTaskQuery().orderByTaskId().desc().list().size());
     assertEquals(12, taskService.createTaskQuery().orderByTaskName().desc().list().size());
@@ -1157,6 +1189,8 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(12, taskService.createTaskQuery().orderByTaskCreateTime().desc().list().size());
     assertEquals(12, taskService.createTaskQuery().orderByDueDate().desc().list().size());
     assertEquals(12, taskService.createTaskQuery().orderByFollowUpDate().desc().list().size());
+    assertEquals(12, taskService.createTaskQuery().orderByCaseInstanceId().desc().list().size());
+    assertEquals(12, taskService.createTaskQuery().orderByCaseExecutionId().desc().list().size());
 
     assertEquals(6, taskService.createTaskQuery().orderByTaskId().taskName("testTask").asc().list().size());
     assertEquals(6, taskService.createTaskQuery().orderByTaskId().taskName("testTask").desc().list().size());
@@ -1191,6 +1225,2360 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
     assertEquals(5, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Task.class)).listPage(0, 5).size());
     assertEquals(2, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Task.class)).listPage(10, 12).size());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseDefinitionId() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseDefinitionId(caseDefinitionId);
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidCaseDefinitionId() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseDefinitionId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseDefinitionId(null);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseDefinitionKey() {
+    String caseDefinitionKey = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getKey();
+
+    caseService
+      .createCaseInstanceByKey(caseDefinitionKey)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseDefinitionKey(caseDefinitionKey);
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidCaseDefinitionKey() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseDefinitionKey("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseDefinitionKey(null);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseDefinitionName() {
+    CaseDefinition caseDefinition = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult();
+
+    String caseDefinitionId = caseDefinition.getId();
+    String caseDefinitionName = caseDefinition.getName();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseDefinitionName(caseDefinitionName);
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidCaseDefinitionName() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseDefinitionName("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseDefinitionName(null);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseDefinitionNameLike() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseDefinitionNameLike("One T%");
+    verifyQueryResults(query, 1);
+
+    query.caseDefinitionNameLike("%Task Case");
+    verifyQueryResults(query, 1);
+
+    query.caseDefinitionNameLike("%Task%");
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidCaseDefinitionNameLike() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseDefinitionNameLike("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseDefinitionNameLike(null);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceId() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .create()
+      .getId();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceId(caseInstanceId);
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidCaseInstanceId() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseInstanceId(null);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceBusinessKey() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    String businessKey = "aBusinessKey";
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .businessKey(businessKey)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceBusinessKey(businessKey);
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidCaseInstanceBusinessKey() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceBusinessKey("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseInstanceBusinessKey(null);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceBusinessKeyLike() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    String businessKey = "aBusinessKey";
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .businessKey(businessKey)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceBusinessKeyLike("aBus%");
+    verifyQueryResults(query, 1);
+
+    query.caseInstanceBusinessKeyLike("%sinessKey");
+    verifyQueryResults(query, 1);
+
+    query.caseInstanceBusinessKeyLike("%sines%");
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidCaseInstanceBusinessKeyLike() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceBusinessKeyLike("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseInstanceBusinessKeyLike(null);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseExecutionId() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseExecutionId(humanTaskExecutionId);
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidCaseExecutionId() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseExecutionId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.caseExecutionId(null);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByNullCaseInstanceVariableValueEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aNullValue", null)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueEquals("aNullValue", null);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByStringCaseInstanceVariableValueEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aStringValue", "abc")
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueEquals("aStringValue", "abc");
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByBooleanCaseInstanceVariableValueEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aBooleanValue", true)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueEquals("aBooleanValue", true);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByShortCaseInstanceVariableValueEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aShortValue", (short) 123)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueEquals("aShortValue", (short) 123);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByIntegerCaseInstanceVariableValueEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("anIntegerValue", 456)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueEquals("anIntegerValue", 456);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByLongCaseInstanceVariableValueEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aLongValue", (long) 789)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueEquals("aLongValue", (long) 789);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDateCaseInstanceVariableValueEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    Date now = new Date();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDateValue", now)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueEquals("aDateValue", now);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDoubleCaseInstanceVariableValueEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDoubleValue", 1.5)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueEquals("aDoubleValue", 1.5);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByByteArrayCaseInstanceVariableValueEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    byte[] bytes = "somebytes".getBytes();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aByteArrayValue", bytes)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueEquals("aByteArrayValue", bytes).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryBySerializableCaseInstanceVariableValueEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    List<String> serializable = new ArrayList<String>();
+    serializable.add("one");
+    serializable.add("two");
+    serializable.add("three");
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aSerializableValue", serializable)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueEquals("aSerializableValue", serializable).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByStringCaseInstanceVariableValueNotEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aStringValue", "abc")
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueNotEquals("aStringValue", "abd");
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByBooleanCaseInstanceVariableValueNotEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aBooleanValue", true)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueNotEquals("aBooleanValue", false);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByShortCaseInstanceVariableValueNotEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aShortValue", (short) 123)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueNotEquals("aShortValue", (short) 124);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByIntegerCaseInstanceVariableValueNotEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("anIntegerValue", 456)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueNotEquals("anIntegerValue", 457);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByLongCaseInstanceVariableValueNotEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aLongValue", (long) 789)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueNotEquals("aLongValue", (long) 790);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDateCaseInstanceVariableValueNotEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    Date now = new Date();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDateValue", now)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    Date before = new Date(now.getTime() - 100000);
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueNotEquals("aDateValue", before);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDoubleCaseInstanceVariableValueNotEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDoubleValue", 1.5)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueNotEquals("aDoubleValue", 1.6);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByByteArrayCaseInstanceVariableValueNotEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    byte[] bytes = "somebytes".getBytes();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aByteArrayValue", bytes)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueNotEquals("aByteArrayValue", bytes).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryBySerializableCaseInstanceVariableValueNotEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    List<String> serializable = new ArrayList<String>();
+    serializable.add("one");
+    serializable.add("two");
+    serializable.add("three");
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aSerializableValue", serializable)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueNotEquals("aSerializableValue", serializable).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByNullCaseInstanceVariableValueGreaterThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aNullValue", null)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueGreaterThan("aNullValue", null).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByStringCaseInstanceVariableValueGreaterThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aStringValue", "abc")
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThan("aStringValue", "ab");
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByBooleanCaseInstanceVariableValueGreaterThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aBooleanValue", true)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueGreaterThan("aBooleanValue", false).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByShortCaseInstanceVariableValueGreaterThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aShortValue", (short) 123)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThan("aShortValue", (short) 122);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByIntegerCaseInstanceVariableValueGreaterThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("anIntegerValue", 456)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThan("anIntegerValue", 455);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByLongCaseInstanceVariableValueGreaterThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aLongValue", (long) 789)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThan("aLongValue", (long) 788);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDateCaseInstanceVariableValueGreaterThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    Date now = new Date();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDateValue", now)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    Date before = new Date(now.getTime() - 100000);
+
+    query.caseInstanceVariableValueGreaterThan("aDateValue", before);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDoubleCaseInstanceVariableValueGreaterThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDoubleValue", 1.5)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThan("aDoubleValue", 1.4);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByByteArrayCaseInstanceVariableValueGreaterThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    byte[] bytes = "somebytes".getBytes();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aByteArrayValue", bytes)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueGreaterThan("aByteArrayValue", bytes).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryBySerializableCaseInstanceVariableGreaterThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    List<String> serializable = new ArrayList<String>();
+    serializable.add("one");
+    serializable.add("two");
+    serializable.add("three");
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aSerializableValue", serializable)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueGreaterThan("aSerializableValue", serializable).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByNullCaseInstanceVariableValueGreaterThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aNullValue", null)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueGreaterThanOrEquals("aNullValue", null).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByStringCaseInstanceVariableValueGreaterThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aStringValue", "abc")
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("aStringValue", "ab");
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("aStringValue", "abc");
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByBooleanCaseInstanceVariableValueGreaterThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aBooleanValue", true)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueGreaterThanOrEquals("aBooleanValue", false).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByShortCaseInstanceVariableValueGreaterThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aShortValue", (short) 123)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("aShortValue", (short) 122);
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("aShortValue", (short) 123);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByIntegerCaseInstanceVariableValueGreaterThanOrEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("anIntegerValue", 456)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("anIntegerValue", 455);
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("anIntegerValue", 456);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByLongCaseInstanceVariableValueGreaterThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aLongValue", (long) 789)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("aLongValue", (long) 788);
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("aLongValue", (long) 789);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDateCaseInstanceVariableValueGreaterThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    Date now = new Date();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDateValue", now)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    Date before = new Date(now.getTime() - 100000);
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("aDateValue", before);
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("aDateValue", now);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDoubleCaseInstanceVariableValueGreaterThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDoubleValue", 1.5)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("aDoubleValue", 1.4);
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueGreaterThanOrEquals("aDoubleValue", 1.5);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByByteArrayCaseInstanceVariableValueGreaterThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    byte[] bytes = "somebytes".getBytes();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aByteArrayValue", bytes)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueGreaterThanOrEquals("aByteArrayValue", bytes).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryBySerializableCaseInstanceVariableGreaterThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    List<String> serializable = new ArrayList<String>();
+    serializable.add("one");
+    serializable.add("two");
+    serializable.add("three");
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aSerializableValue", serializable)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueGreaterThanOrEquals("aSerializableValue", serializable).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByNullCaseInstanceVariableValueLessThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aNullValue", null)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueLessThan("aNullValue", null).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByStringCaseInstanceVariableValueLessThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aStringValue", "abc")
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThan("aStringValue", "abd");
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByBooleanCaseInstanceVariableValueLessThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aBooleanValue", true)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueLessThan("aBooleanValue", false).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByShortCaseInstanceVariableValueLessThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aShortValue", (short) 123)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThan("aShortValue", (short) 124);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByIntegerCaseInstanceVariableValueLessThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("anIntegerValue", 456)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThan("anIntegerValue", 457);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByLongCaseInstanceVariableValueLessThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aLongValue", (long) 789)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThan("aLongValue", (long) 790);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDateCaseInstanceVariableValueLessThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    Date now = new Date();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDateValue", now)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    Date after = new Date(now.getTime() + 100000);
+
+    query.caseInstanceVariableValueLessThan("aDateValue", after);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDoubleCaseInstanceVariableValueLessThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDoubleValue", 1.5)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThan("aDoubleValue", 1.6);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByByteArrayCaseInstanceVariableValueLessThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    byte[] bytes = "somebytes".getBytes();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aByteArrayValue", bytes)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueLessThan("aByteArrayValue", bytes).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryBySerializableCaseInstanceVariableLessThan() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    List<String> serializable = new ArrayList<String>();
+    serializable.add("one");
+    serializable.add("two");
+    serializable.add("three");
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aSerializableValue", serializable)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueLessThan("aSerializableValue", serializable).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByNullCaseInstanceVariableValueLessThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aNullValue", null)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueLessThanOrEquals("aNullValue", null).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByStringCaseInstanceVariableValueLessThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aStringValue", "abc")
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThanOrEquals("aStringValue", "abd");
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThanOrEquals("aStringValue", "abc");
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByBooleanCaseInstanceVariableValueLessThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aBooleanValue", true)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueLessThanOrEquals("aBooleanValue", false).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByShortCaseInstanceVariableValueLessThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aShortValue", (short) 123)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThanOrEquals("aShortValue", (short) 124);
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThanOrEquals("aShortValue", (short) 123);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByIntegerCaseInstanceVariableValueLessThanOrEquals() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("anIntegerValue", 456)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThanOrEquals("anIntegerValue", 457);
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThanOrEquals("anIntegerValue", 456);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByLongCaseInstanceVariableValueLessThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aLongValue", (long) 789)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThanOrEquals("aLongValue", (long) 790);
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThanOrEquals("aLongValue", (long) 789);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDateCaseInstanceVariableValueLessThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    Date now = new Date();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDateValue", now)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    Date after = new Date(now.getTime() + 100000);
+
+    query.caseInstanceVariableValueLessThanOrEquals("aDateValue", after);
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThanOrEquals("aDateValue", now);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByDoubleCaseInstanceVariableValueLessThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aDoubleValue", 1.5)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThanOrEquals("aDoubleValue", 1.6);
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLessThanOrEquals("aDoubleValue", 1.5);
+
+    verifyQueryResults(query, 1);
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByByteArrayCaseInstanceVariableValueLessThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    byte[] bytes = "somebytes".getBytes();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aByteArrayValue", bytes)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueLessThanOrEquals("aByteArrayValue", bytes).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryBySerializableCaseInstanceVariableLessThanOrEqual() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    List<String> serializable = new ArrayList<String>();
+    serializable.add("one");
+    serializable.add("two");
+    serializable.add("three");
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aSerializableValue", serializable)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueLessThanOrEquals("aSerializableValue", serializable).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByNullCaseInstanceVariableValueLike() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aNullValue", null)
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueLike("aNullValue", null).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByStringCaseInstanceVariableValueLike() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+      .createCaseInstanceById(caseDefinitionId)
+      .setVariable("aStringValue", "abc")
+      .create();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLike("aStringValue", "ab%");
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLike("aStringValue", "%bc");
+
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueLike("aStringValue", "%b%");
+
+    verifyQueryResults(query, 1);
+  }
+
+  private void verifyQueryResults(TaskQuery query, int countExpected) {
+    assertEquals(countExpected, query.list().size());
+    assertEquals(countExpected, query.count());
+
+    if (countExpected == 1) {
+      assertNotNull(query.singleResult());
+    } else if (countExpected > 1){
+      verifySingleResultFails(query);
+    } else if (countExpected == 0) {
+      assertNull(query.singleResult());
+    }
+  }
+
+  private void verifySingleResultFails(TaskQuery query) {
+    try {
+      query.singleResult();
+      fail();
+    } catch (ProcessEngineException e) {}
   }
 
   /**

@@ -19,6 +19,9 @@ import org.camunda.bpm.engine.impl.core.handler.ModelElementHandler;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
 /**
+ * <p>This handler handles an instance of a {@link CmmnElement} to create
+ * a new {@link CmmnActivity activity}.</p>
+ *
  * @author Roman Smirnov
  *
  */

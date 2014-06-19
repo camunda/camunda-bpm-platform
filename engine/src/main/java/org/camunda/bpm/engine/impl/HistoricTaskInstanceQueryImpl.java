@@ -190,12 +190,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQueryImpl taskVariableValueEquals(String variableName, Object variableValue) {
-    variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true));
+    variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true, false));
     return this;
   }
 
   public HistoricTaskInstanceQuery processVariableValueEquals(String variableName, Object variableValue) {
-    variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, false));
+    variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, false, true));
     return this;
   }
 

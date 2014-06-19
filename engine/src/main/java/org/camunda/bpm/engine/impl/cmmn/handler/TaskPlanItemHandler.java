@@ -25,7 +25,9 @@ import org.camunda.bpm.model.cmmn.instance.Task;
 public class TaskPlanItemHandler extends PlanItemHandler {
 
   @Override
-  protected void handleElementProperties(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeActivity(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
+    super.initializeActivity(planItem, activity, context);
+
     Task task = (Task) planItem.getDefinition();
     activity.setProperty("isBlocking", task.isBlocking());
   }

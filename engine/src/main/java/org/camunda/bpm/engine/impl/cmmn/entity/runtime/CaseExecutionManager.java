@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -55,6 +57,11 @@ public class CaseExecutionManager extends AbstractManager {
     if(execution == null) {
       throw new BadUserRequestException("No case instance found for id '" + caseInstanceId + "'");
     }
+
+    CommandContext commandContext = Context.getCommandContext();
+    commandContext
+      .getTaskManager()
+      .deleteTasksByCaseInstanceId(caseInstanceId, deleteReason, cascade);
 
     execution.deleteCascade();
   }

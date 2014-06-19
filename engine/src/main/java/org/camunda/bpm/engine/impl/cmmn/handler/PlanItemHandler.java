@@ -29,9 +29,6 @@ public abstract class PlanItemHandler extends CmmnElementHandler<PlanItem> {
     // initialize activity
     initializeActivity(planItem, newActivity, context);
 
-    // perform custom transformation
-    handleElementProperties(planItem, newActivity, context);
-
     return newActivity;
   }
 
@@ -44,10 +41,6 @@ public abstract class PlanItemHandler extends CmmnElementHandler<PlanItem> {
     activity.setName(name);
 
     // TODO: set properties: itemControl (vs.) defaultControl
-  }
-
-  protected void handleElementProperties(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
-    // noop
   }
 
 }

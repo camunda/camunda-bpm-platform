@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
@@ -22,17 +26,13 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.task.Task;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 
 /**
  * @author Tom Baeyens
  */
 public class TaskManager extends AbstractManager {
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason, boolean cascade) {
     List<TaskEntity> tasks = (List) getDbSqlSession()
       .createTaskQuery()
@@ -44,6 +44,20 @@ public class TaskManager extends AbstractManager {
     for (TaskEntity task: tasks) {
       task.delete(reason, cascade);
     }
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public void deleteTasksByCaseInstanceId(String caseInstanceId, String deleteReason, boolean cascade) {
+    List<TaskEntity> tasks = (List) getDbSqlSession()
+        .createTaskQuery()
+        .caseInstanceId(caseInstanceId)
+        .list();
+
+      String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
+
+      for (TaskEntity task: tasks) {
+        task.delete(reason, cascade);
+      }
   }
 
   public void deleteTask(TaskEntity task, String deleteReason, boolean cascade) {
@@ -156,4 +170,5 @@ public class TaskManager extends AbstractManager {
     getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
 
   }
+
 }

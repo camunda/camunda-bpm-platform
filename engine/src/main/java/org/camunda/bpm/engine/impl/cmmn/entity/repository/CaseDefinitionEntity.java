@@ -12,12 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.repository;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 
 /**
@@ -34,6 +37,7 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
   protected int version;
   protected String deploymentId;
   protected String resourceName;
+  protected Map<String, TaskDefinition> taskDefinitions;
 
   public CaseDefinitionEntity() {
     super(null);
@@ -89,6 +93,14 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
 
   public void setResourceName(String resourceName) {
     this.resourceName = resourceName;
+  }
+
+  public Map<String, TaskDefinition> getTaskDefinitions() {
+    return taskDefinitions;
+  }
+
+  public void setTaskDefinitions(Map<String, TaskDefinition> taskDefinitions) {
+    this.taskDefinitions = taskDefinitions;
   }
 
   @Override

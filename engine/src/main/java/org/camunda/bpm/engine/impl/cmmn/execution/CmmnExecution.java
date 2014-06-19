@@ -231,24 +231,19 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   // state transition ///////////////////////////////////////////
 
-  /** Creates new case instance without businessKey and variables */
   public void create() {
     create(null, null);
   }
 
-  /** Creates new case instance with variables but without businessKey */
   public void create(Map<String, Object> variables) {
     create(null, variables);
   }
 
-  /** Creates new case instance with businessKey but without variables */
   public void create(String businessKey) {
     create(businessKey, null);
   }
 
-  /** Creates new case instance with businessKey and variables */
   public void create(String businessKey, Map<String, Object> variables) {
-
     if(variables != null) {
       setVariables(variables);
     }
@@ -263,25 +258,34 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     performOperation(CASE_INSTANCE_NOTIFY_LISTENER_CREATE);
   }
 
-  public void create(List<CmmnActivity> activities) {
+  public void createChildExecutions(List<CmmnActivity> activities) {
     // this execution must be in the active state
     if (!isActive()) {
-      // TODO: provide a proper exception message
-      throw new ProcessEngineException();
+      String message = "Cannot create child case executions on case execution '"
+          +id+"' as parent because the case execution is not active.";
+      throw new ProcessEngineException(message);
     }
 
     List<CmmnExecution> children = new ArrayList<CmmnExecution>();
 
+    // first create new child case executions
     for (CmmnActivity currentActivity : activities) {
       CmmnExecution child = createCaseExecution(currentActivity);
       children.add(child);
     }
 
+    // then notify create listener for each created
+    // child case execution
     for (CmmnExecution child : children) {
       if (isActive()) {
+        // only do this when the this case execution is
+        // still active
         child.performOperation(CASE_EXECUTION_NOTIFY_LISTENER_CREATE);
       } else {
-        log.fine("Not taking child '" + child + "', parent plan item has ended.");
+        // if this case execution is not active anymore,
+        // then stop notifying create listener and executing
+        // of each child case execution
+        break;
       }
     }
   }
@@ -291,22 +295,46 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   protected abstract CmmnExecution newCaseExecution();
 
   public void enable() {
+    if (isCaseInstanceExecution()) {
+      String message = "Cannot perform transition on case execution '"+id+"': it is not possible to enable a case instance.";
+      throw new ProcessEngineException(message);
+    }
+
     transition(AVAILABLE, ENABLED, CASE_EXECUTION_NOTIFY_LISTENER_ENABLE);
   }
 
   public void disable() {
+    if (isCaseInstanceExecution()) {
+      String message = "Cannot perform transition on case execution '"+id+"': it is not possible to disable a case instance.";
+      throw new ProcessEngineException(message);
+    }
+
     transition(ENABLED, DISABLED, CASE_EXECUTION_NOTIFY_LISTENER_DISABLE);
   }
 
   public void reenable() {
+    if (isCaseInstanceExecution()) {
+      String message = "Cannot perform transition on case execution '"+id+"': it is not possible to re-enable a case instance.";
+      throw new ProcessEngineException(message);
+    }
+
     transition(DISABLED, ENABLED, CASE_EXECUTION_NOTIFY_LISTENER_RE_ENABLE);
   }
 
   public void manualStart() {
+    if (isCaseInstanceExecution()) {
+      String message = "Cannot perform transition on case execution '"+id+"': it is not possible to start a case instance manually.";
+      throw new ProcessEngineException(message);
+    }
+
     transition(ENABLED, ACTIVE, CASE_EXECUTION_NOTIFY_LISTENER_MANUAL_START);
   }
 
   public void start() {
+    if (isCaseInstanceExecution()) {
+      String message = "Cannot perform transition on case execution '"+id+"': it is not possible to start a case instance.";
+      throw new ProcessEngineException(message);
+    }
     transition(AVAILABLE, ACTIVE, CASE_EXECUTION_NOTIFY_LISTENER_START);
   }
 
@@ -314,16 +342,23 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     transition(ACTIVE, COMPLETED, CASE_EXECUTION_NOTIFY_LISTENER_COMPLETE);
   }
 
-  protected void transition(CaseExecutionState from, CaseExecutionState to, CmmnAtomicOperation nextOperation) {
-    // is this execution in the expected state
+  protected void transition(CaseExecutionState from, CaseExecutionState target, CmmnAtomicOperation nextOperation) {
+    CaseExecutionState currentFrom = CaseExecutionState.CASE_EXECUTION_STATES.get(currentState);
+
+    // is this case execution already in the target state
+    if (currentState == target.getStateCode()) {
+      String message = "Cannot perform transition on case execution '"+id+"': the case execution is already in the state '"+currentFrom+"'.";
+      throw new ProcessEngineException(message);
+    } else
+    // is this case execution in the expected state
     if (currentState != from.getStateCode()) {
       // if not throw an exception
-      // TODO: provide proper exception message
-      throw new ProcessEngineException();
+      String message = "Cannot perform transition on case execution '"+id+"' to the state '"+target+"': the expected current state is '"+from+"', but was '"+currentFrom+"'.";
+      throw new ProcessEngineException(message);
     }
 
     // perform transition: set the new state
-    setCurrentState(to);
+    setCurrentState(target);
 
     // if a next operation is provided, execute it.
     if (nextOperation != null) {

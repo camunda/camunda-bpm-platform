@@ -78,6 +78,17 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected boolean excludeSubtasks = false;
   protected SuspensionState suspensionState;
 
+  // case management /////////////////////////////
+  protected String caseDefinitionKey;
+  protected String caseDefinitionId;
+  protected String caseDefinitionName;
+  protected String caseDefinitionNameLike;
+  protected String caseInstanceId;
+  protected String caseInstanceBusinessKey;
+  protected String caseInstanceBusinessKeyLike;
+  protected String caseExecutionId;
+
+
   public TaskQueryImpl() {
   }
 
@@ -297,74 +308,157 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  public TaskQuery caseInstanceId(String caseInstanceId) {
+    assertParamNotNull("caseInstanceId", caseInstanceId);
+    this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
+  public TaskQuery caseInstanceBusinessKey(String caseInstanceBusinessKey) {
+    assertParamNotNull("caseInstanceBusinessKey", caseInstanceBusinessKey);
+    this.caseInstanceBusinessKey = caseInstanceBusinessKey;
+    return this;
+  }
+
+  public TaskQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike) {
+    assertParamNotNull("caseInstanceBusinessKeyLike", caseInstanceBusinessKeyLike);
+    this.caseInstanceBusinessKeyLike = caseInstanceBusinessKeyLike;
+    return this;
+  }
+
+  public TaskQuery caseExecutionId(String caseExecutionId) {
+    assertParamNotNull("caseExecutionId", caseExecutionId);
+    this.caseExecutionId = caseExecutionId;
+    return this;
+  }
+
+  public TaskQuery caseDefinitionId(String caseDefinitionId) {
+    assertParamNotNull("caseDefinitionId", caseDefinitionId);
+    this.caseDefinitionId = caseDefinitionId;
+    return this;
+  }
+
+  public TaskQuery caseDefinitionKey(String caseDefinitionKey) {
+    assertParamNotNull("caseDefinitionKey", caseDefinitionKey);
+    this.caseDefinitionKey = caseDefinitionKey;
+    return this;
+  }
+
+  public TaskQuery caseDefinitionName(String caseDefinitionName) {
+    assertParamNotNull("caseDefinitionName", caseDefinitionName);
+    this.caseDefinitionName = caseDefinitionName;
+    return this;
+  }
+
+  public TaskQuery caseDefinitionNameLike(String caseDefinitionNameLike) {
+    assertParamNotNull("caseDefinitionNameLike", caseDefinitionNameLike);
+    this.caseDefinitionNameLike = caseDefinitionNameLike;
+    return this;
+  }
+
   public TaskQuery taskVariableValueEquals(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.EQUALS, true);
+    addVariable(variableName, variableValue, QueryOperator.EQUALS, true, false);
     return this;
   }
 
   public TaskQuery taskVariableValueNotEquals(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, true);
+    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, true, false);
     return this;
   }
 
   public TaskQuery taskVariableValueLike(String variableName, String variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.LIKE, true);
+    addVariable(variableName, variableValue, QueryOperator.LIKE, true, false);
   	return this;
   }
 
   public TaskQuery taskVariableValueGreaterThan(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, true);
+    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, true, false);
   	return this;
   }
 
   public TaskQuery taskVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, true);
+    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, true, false);
   	return this;
   }
 
   public TaskQuery taskVariableValueLessThan(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.LESS_THAN, true);
+    addVariable(variableName, variableValue, QueryOperator.LESS_THAN, true, false);
   	return this;
   }
 
   public TaskQuery taskVariableValueLessThanOrEquals(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, true);
+    addVariable(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, true, false);
   	return this;
   }
 
   public TaskQuery processVariableValueEquals(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.EQUALS, false);
+    addVariable(variableName, variableValue, QueryOperator.EQUALS, false, true);
     return this;
   }
 
   public TaskQuery processVariableValueNotEquals(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false);
+    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false, true);
     return this;
   }
 
   public TaskQuery processVariableValueLike(String variableName, String variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.LIKE, false);
+    addVariable(variableName, variableValue, QueryOperator.LIKE, false, true);
   	return this;
   }
 
   public TaskQuery processVariableValueGreaterThan(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, false);
+    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, false, true);
   	return this;
   }
 
   public TaskQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, false);
+    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, false, true);
   	return this;
   }
 
   public TaskQuery processVariableValueLessThan(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.LESS_THAN, false);
+    addVariable(variableName, variableValue, QueryOperator.LESS_THAN, false, true);
   	return this;
   }
 
   public TaskQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, false);
+    addVariable(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, false, true);
   	return this;
+  }
+
+  public TaskQuery caseInstanceVariableValueEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.EQUALS, false, false);
+    return this;
+  }
+
+  public TaskQuery caseInstanceVariableValueNotEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false, false);
+    return this;
+  }
+
+  public TaskQuery caseInstanceVariableValueLike(String variableName, String variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LIKE, false, false);
+    return this;
+  }
+
+  public TaskQuery caseInstanceVariableValueGreaterThan(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, false, false);
+    return this;
+  }
+
+  public TaskQuery caseInstanceVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, false, false);
+    return this;
+  }
+
+  public TaskQuery caseInstanceVariableValueLessThan(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LESS_THAN, false, false);
+    return this;
+  }
+
+  public TaskQuery caseInstanceVariableValueLessThanOrEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, false, false);
+    return this;
   }
 
   public TaskQuery processDefinitionKey(String processDefinitionKey) {
@@ -466,7 +560,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
   }
 
-  protected void addVariable(String name, Object value, QueryOperator operator, boolean processInstanceScope) {
+  protected void addVariable(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
     if(name == null) {
       throw new ProcessEngineException("name is null");
     }
@@ -488,7 +582,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
         break;
       }
     }
-    variables.add(new TaskQueryVariableValue(name, value, operator, processInstanceScope));
+    variables.add(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable));
   }
 
   private boolean isBoolean(Object value) {
@@ -520,8 +614,16 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return orderBy(TaskQueryProperty.PROCESS_INSTANCE_ID);
   }
 
+  public TaskQuery orderByCaseInstanceId() {
+    return orderBy(TaskQueryProperty.CASE_INSTANCE_ID);
+  }
+
   public TaskQuery orderByExecutionId() {
     return orderBy(TaskQueryProperty.EXECUTION_ID);
+  }
+
+  public TaskQuery orderByCaseExecutionId() {
+    return orderBy(TaskQueryProperty.CASE_EXECUTION_ID);
   }
 
   public TaskQuery orderByTaskAssignee() {
@@ -563,91 +665,153 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public String getName() {
     return name;
   }
+
   public String getNameLike() {
     return nameLike;
   }
+
   public String getAssignee() {
     return assignee;
   }
+
   public String getAssigneeLike() {
     return assigneeLike;
   }
+
   public boolean getUnassigned() {
     return unassigned;
   }
+
   public DelegationState getDelegationState() {
     return delegationState;
   }
+
   public boolean getNoDelegationState() {
     return noDelegationState;
   }
+
   public String getDelegationStateString() {
     return (delegationState!=null ? delegationState.toString() : null);
   }
+
   public String getCandidateUser() {
     return candidateUser;
   }
+
   public String getCandidateGroup() {
     return candidateGroup;
   }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public String getExecutionId() {
     return executionId;
   }
+
   public String[] getActivityInstanceIdIn() {
     return activityInstanceIdIn;
   }
+
   public String getTaskId() {
     return taskId;
   }
+
   public String getDescription() {
     return description;
   }
+
   public String getDescriptionLike() {
     return descriptionLike;
   }
+
   public Integer getPriority() {
     return priority;
   }
+
   public Date getCreateTime() {
     return createTime;
   }
+
   public Date getCreateTimeBefore() {
     return createTimeBefore;
   }
+
   public Date getCreateTimeAfter() {
     return createTimeAfter;
   }
+
   public String getKey() {
     return key;
   }
+
   public String getKeyLike() {
     return keyLike;
   }
+
   public List<TaskQueryVariableValue> getVariables() {
     return variables;
   }
+
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
   public String getProcessDefinitionName() {
     return processDefinitionName;
   }
+
   public String getProcessDefinitionNameLike() {
     return processDefinitionNameLike;
   }
+
   public String getProcessInstanceBusinessKey() {
     return processInstanceBusinessKey;
   }
+
   public String getProcessInstanceBusinessKeyLike() {
     return processInstanceBusinessKeyLike;
   }
+
   public boolean getExcludeSubtasks() {
     return excludeSubtasks;
   }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public String getCaseInstanceBusinessKey() {
+    return caseInstanceBusinessKey;
+  }
+
+  public String getCaseInstanceBusinessKeyLike() {
+    return caseInstanceBusinessKeyLike;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
+  }
+
+  public String getCaseDefinitionName() {
+    return caseDefinitionName;
+  }
+
+  public String getCaseDefinitionNameLike() {
+    return caseDefinitionNameLike;
+  }
+
 }

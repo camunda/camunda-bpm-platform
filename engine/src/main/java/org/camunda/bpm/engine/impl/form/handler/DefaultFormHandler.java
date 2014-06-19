@@ -42,7 +42,6 @@ import org.camunda.bpm.engine.impl.util.xml.Element;
  */
 public class DefaultFormHandler implements FormHandler {
 
-  protected Expression formKey;
   protected String deploymentId;
 
   protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<FormPropertyHandler>();
@@ -55,12 +54,6 @@ public class DefaultFormHandler implements FormHandler {
     ExpressionManager expressionManager = Context
         .getProcessEngineConfiguration()
         .getExpressionManager();
-
-    String formKeyAttribute = activityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "formKey");
-
-    if (formKeyAttribute != null) {
-      this.formKey = expressionManager.createExpression(formKeyAttribute);
-    }
 
     Element extensionElement = activityElement.element("extensionElements");
     if (extensionElement != null) {
@@ -287,14 +280,6 @@ public class DefaultFormHandler implements FormHandler {
 
 
   // getters and setters //////////////////////////////////////////////////////
-
-  public Expression getFormKey() {
-    return formKey;
-  }
-
-  public void setFormKey(Expression formKey) {
-    this.formKey = formKey;
-  }
 
   public String getDeploymentId() {
     return deploymentId;

@@ -26,7 +26,7 @@ public class StageActivityBehavior extends AbstractCmmnActivityBehavior {
 
   protected void performActiveBehavior(CmmnActivityExecution execution, CmmnActivity activity) {
     List<CmmnActivity> childActivities = activity.getActivities();
-    execution.create(childActivities);
+    execution.createChildExecutions(childActivities);
   }
 
   public void lastExecutionEnded(ActivityExecution execution) {

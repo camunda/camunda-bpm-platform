@@ -17,7 +17,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.HumanTaskBehavior;
+import org.camunda.bpm.engine.impl.cmmn.behavior.HumanTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
 import org.camunda.bpm.engine.impl.cmmn.handler.HumanTaskDiscretionaryItemHandler;
@@ -76,7 +76,7 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
 
     // then
     CmmnActivityBehavior behavior = activity.getActivityBehavior();
-    assertTrue(behavior instanceof HumanTaskBehavior);
+    assertTrue(behavior instanceof HumanTaskActivityBehavior);
   }
 
   @Test

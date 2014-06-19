@@ -12,12 +12,27 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
@@ -27,7 +42,6 @@ import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.delegate.TaskListenerInvocation;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextCloseListener;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
@@ -39,9 +53,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-
-import java.io.Serializable;
-import java.util.*;
 
 /**
  * @author Tom Baeyens
@@ -75,6 +86,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   protected boolean isIdentityLinksInitialized = false;
   protected transient List<IdentityLinkEntity> taskIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
 
+  // execution
   protected String executionId;
   protected transient ExecutionEntity execution;
 
@@ -83,6 +95,14 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
 
   protected String processDefinitionId;
 
+  // caseExecution
+  protected String caseExecutionId;
+  protected transient CaseExecutionEntity caseExecution;
+
+  protected String caseInstanceId;
+  protected String caseDefinitionId;
+
+  // taskDefinition
   protected transient TaskDefinition taskDefinition;
   protected String taskDefinitionKey;
 
@@ -120,9 +140,13 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   }
 
   /** creates and initializes a new persistent task. */
-  public static TaskEntity createAndInsert(ActivityExecution execution) {
+  public static TaskEntity createAndInsert(VariableScope execution) {
     TaskEntity task = create();
-    task.insert((ExecutionEntity) execution);
+    if (execution instanceof ExecutionEntity) {
+      task.insert((ExecutionEntity) execution);
+    } else {
+      task.insert(null);
+    }
     return task;
   }
 
@@ -218,6 +242,12 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
     }
     if (processDefinitionId != null) {
       persistentState.put("processDefinitionId", this.processDefinitionId);
+    }
+    if (caseExecutionId != null) {
+      persistentState.put("caseExecutionId", this.caseExecutionId);
+    }
+    if (caseDefinitionId != null) {
+      persistentState.put("caseDefinitionId", this.caseDefinitionId);
     }
     if (createTime != null) {
       persistentState.put("createTime", this.createTime);
@@ -351,6 +381,62 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
       this.processInstanceId = null;
       this.processDefinitionId = null;
     }
+  }
+
+  // case execution ////////////////////////////////////////////////////////////////
+
+  public CaseExecutionEntity getCaseExecution() {
+    ensureCaseExecutionInitialized();
+    return caseExecution;
+  }
+
+  protected void ensureCaseExecutionInitialized() {
+    if ((caseExecution==null) && (caseExecutionId!=null) ) {
+      caseExecution = Context
+        .getCommandContext()
+        .getCaseExecutionManager()
+        .findCaseExecutionById(caseExecutionId);
+    }
+  }
+
+  public void setCaseExecution(DelegateCaseExecution caseExecution) {
+    if (caseExecution!=null) {
+
+      this.caseExecution = (CaseExecutionEntity) caseExecution;
+      this.caseExecutionId = this.caseExecution.getId();
+      this.caseInstanceId = this.caseExecution.getCaseInstanceId();
+      this.caseDefinitionId = this.caseExecution.getCaseDefinitionId();
+
+    } else {
+      this.caseExecution = null;
+      this.caseExecutionId = null;
+      this.caseInstanceId = null;
+      this.caseDefinitionId = null;
+    }
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
+  }
+
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public void setCaseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
   }
 
   // task assignment //////////////////////////////////////////////////////////
@@ -632,11 +718,26 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
 
   public TaskDefinition getTaskDefinition() {
     if (taskDefinition==null && taskDefinitionKey!=null) {
-      ProcessDefinitionEntity processDefinition = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .findDeployedProcessDefinitionById(processDefinitionId);
-      taskDefinition = processDefinition.getTaskDefinitions().get(taskDefinitionKey);
+
+      Map<String, TaskDefinition> taskDefinitions = null;
+      if (processDefinitionId != null) {
+        ProcessDefinitionEntity processDefinition = Context
+            .getProcessEngineConfiguration()
+            .getDeploymentCache()
+            .findDeployedProcessDefinitionById(processDefinitionId);
+
+        taskDefinitions = processDefinition.getTaskDefinitions();
+
+      } else {
+        CaseDefinitionEntity caseDefinition = Context
+            .getProcessEngineConfiguration()
+            .getDeploymentCache()
+            .findDeployedCaseDefinitionById(caseDefinitionId);
+
+        taskDefinitions = caseDefinition.getTaskDefinitions();
+      }
+
+      taskDefinition = taskDefinitions.get(taskDefinitionKey);
     }
     return taskDefinition;
   }

@@ -25,16 +25,16 @@ import org.camunda.bpm.engine.ProcessEngineException;
 public interface CaseInstanceBuilder {
 
   /**
-   * A business key can be provided to associate the case instance with a
+   * <p>A business key can be provided to associate the case instance with a
    * certain identifier that has a clear business meaning. This business key can
    * then be used to easily look up that case instance, see
-   * {@link CaseInstanceQuery#caseInstanceBusinessKey(String)}. Providing such a business
-   * key is definitely a best practice.
+   * {@link CaseInstanceQuery#caseInstanceBusinessKey(String)}. Providing such a
+   * business key is definitely a best practice.</p>
    *
-   * Note that a business key MUST be unique for the given case definition WHEN you have added
-   * a database constraint for it.
-   * In this case, only case instance from different case definition are allowed to have the
-   * same business key and the combination of caseDefinitionKey-businessKey must be unique.
+   * <p>Note that a business key MUST be unique for the given case definition WHEN
+   * you have added a database constraint for it. In this case, only case instance
+   * from different case definition are allowed to have the same business key and
+   * the combination of caseDefinitionKey-businessKey must be unique.</p>
    *
    * @param businessKey
    *          a key that uniquely identifies the case instance in the context
@@ -66,7 +66,7 @@ public interface CaseInstanceBuilder {
   CaseInstanceBuilder setVariables(Map<String, Object> variables);
 
   /**
-   * Creates a new {@link CaseInstance}, which will be in the ACTIVE state.
+   * <p>Creates a new {@link CaseInstance}, which will be in the ACTIVE state.</p>
    *
    * @throws ProcessEngineException when no case definition is deployed with the given key or id.
    */

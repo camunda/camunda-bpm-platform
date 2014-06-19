@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.query.Query;
 
@@ -98,10 +99,10 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks for the given process instance id. */
   TaskQuery processInstanceId(String processInstanceId);
 
-  /** Only select tasks foe the given business key */
+  /** Only select tasks for the given process instance business key */
   TaskQuery processInstanceBusinessKey(String processInstanceBusinessKey);
 
-  /** Only select tasks matching the given business key.
+  /** Only select tasks matching the given process instance business key.
    *  The syntax is that of SQL: for example usage: nameLike(%activiti%)*/
   TaskQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey);
 
@@ -137,6 +138,43 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * &lt;userTask id="xxx" .../&gt;
    **/
   TaskQuery taskDefinitionKeyLike(String keyLike);
+
+  /** Only select tasks for the given case instance id. */
+  TaskQuery caseInstanceId(String caseInstanceId);
+
+  /** Only select tasks for the given case instance business key */
+  TaskQuery caseInstanceBusinessKey(String caseInstanceBusinessKey);
+
+  /** Only select tasks matching the given case instance business key.
+   *  The syntax is that of SQL: for example usage: nameLike(%aBusinessKey%)*/
+  TaskQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike);
+
+  /** Only select tasks for the given case execution. */
+  TaskQuery caseExecutionId(String caseExecutionId);
+
+  /**
+   * Only select tasks which are part of a case instance which has the given
+   * case definition key.
+   */
+  TaskQuery caseDefinitionKey(String caseDefinitionKey);
+
+  /**
+   * Only select tasks which are part of a case instance which has the given
+   * case definition id.
+   */
+  TaskQuery caseDefinitionId(String caseDefinitionId);
+
+  /**
+   * Only select tasks which are part of a case instance which has the given
+   * case definition name.
+   */
+  TaskQuery caseDefinitionName(String caseDefinitionName);
+
+  /**
+   * Only select tasks which are part of a case instance which case definition
+   * name is like the given parameter.
+   * The syntax is that of SQL: for example usage: nameLike(%processDefinitionName%)*/
+  TaskQuery caseDefinitionNameLike(String caseDefinitionNameLike);
 
   /**
    * Only select tasks which have a local task variable with the given name
@@ -228,6 +266,90 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue);
 
   /**
+   * Only select tasks which are part of a case instance that have a variable
+   * with the given name set to the given value. The type of variable is determined based
+   * on the value, using types configured in {@link ProcessEngineConfiguration#getVariableTypes()}.
+   *
+   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
+   * are not supported.
+   *
+   * @param name name of the variable, cannot be null.
+   */
+  TaskQuery caseInstanceVariableValueEquals(String variableName, Object variableValue);
+
+  /**
+   * Only select tasks which are part of a case instance that have a variable
+   * with the given name, but with a different value than the passed value. The
+   * type of variable is determined based on the value, using types configured
+   * in {@link ProcessEngineConfiguration#getVariableTypes()}.
+   *
+   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
+   * are not supported.
+   *
+   * @param name name of the variable, cannot be null.
+   */
+  TaskQuery caseInstanceVariableValueNotEquals(String variableName, Object variableValue);
+
+  /**
+   * Only select tasks which are part of a case instance that have a variable value
+   * like the given value.
+   *
+   * This be used on string variables only.
+   *
+   * @param name variable name, cannot be null.
+   *
+   * @param value variable value. The string can include the
+   * wildcard character '%' to express like-strategy:
+   * starts with (string%), ends with (%string) or contains (%string%).
+   */
+  TaskQuery caseInstanceVariableValueLike(String variableName, String variableValue);
+
+
+  /**
+   * Only select tasks which are part of a case instance that have a variable
+   * with the given name and a variable value greater than the passed value.
+   *
+   * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
+   * are not supported.
+   *
+   * @param name variable name, cannot be null.
+   */
+  TaskQuery caseInstanceVariableValueGreaterThan(String variableName, Object variableValue);
+
+  /**
+   * Only select tasks which are part of a case instance that have a
+   * variable value greater than or equal to the passed value.
+   *
+   * Booleans, Byte-arrays and {@link Serializable} objects (which
+   * are not primitive type wrappers) are not supported.
+   *
+   * @param name variable name, cannot be null.
+   */
+  TaskQuery caseInstanceVariableValueGreaterThanOrEquals(String variableName, Object variableValue);
+
+  /**
+   * Only select tasks which are part of a case instance that have a variable
+   * value less than the passed value.
+   *
+   * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
+   * are not supported.
+   *
+   * @param name variable name, cannot be null.
+   */
+  TaskQuery caseInstanceVariableValueLessThan(String variableName, Object variableValue);
+
+  /**
+   * Only select tasks which are part of a case instance that have a variable
+   * value less than or equal to the passed value.
+   *
+   * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
+   * are not supported.
+   *
+   * @param name variable name, cannot be null.
+   */
+  TaskQuery caseInstanceVariableValueLessThanOrEquals(String variableName, Object variableValue);
+
+  /**
    * Only select tasks which are part of a process instance which has the given
    * process definition key.
    */
@@ -314,8 +436,14 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Order by process instance id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   TaskQuery orderByProcessInstanceId();
 
+  /** Order by case instance id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  TaskQuery orderByCaseInstanceId();
+
   /** Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   TaskQuery orderByExecutionId();
+
+  /** Order by case execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  TaskQuery orderByCaseExecutionId();
 
   /** Order by due date (needs to be followed by {@link #asc()} or {@link #desc()}). */
   TaskQuery orderByDueDate();

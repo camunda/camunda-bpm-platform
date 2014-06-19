@@ -15,8 +15,12 @@ package org.camunda.bpm.engine.impl.form.handler;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.form.StartFormDataImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -29,16 +33,30 @@ import org.camunda.bpm.engine.impl.util.xml.Element;
  */
 public class DefaultStartFormHandler extends DefaultFormHandler implements StartFormHandler {
 
+  protected Expression formKey;
+
   @Override
   public void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
     super.parseConfiguration(activityElement, deployment, processDefinition, bpmnParse);
-    if (formKey!=null) {
+
+    ExpressionManager expressionManager = Context
+        .getProcessEngineConfiguration()
+        .getExpressionManager();
+
+    String formKeyAttribute = activityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "formKey");
+
+    if (formKeyAttribute != null) {
+      this.formKey = expressionManager.createExpression(formKeyAttribute);
+    }
+
+    if (formKey != null) {
       processDefinition.setStartFormKey(true);
     }
   }
 
   public StartFormData createStartFormData(ProcessDefinitionEntity processDefinition) {
     StartFormDataImpl startFormData = new StartFormDataImpl();
+
     if (formKey != null) {
       startFormData.setFormKey(formKey.getExpressionText());
     }
@@ -52,5 +70,11 @@ public class DefaultStartFormHandler extends DefaultFormHandler implements Start
   public ExecutionEntity submitStartFormData(ExecutionEntity processInstance, Map<String, Object> properties) {
     submitFormProperties(properties, processInstance);
     return processInstance;
+  }
+
+  // getters //////////////////////////////////////////////
+
+  public Expression getFormKey() {
+    return formKey;
   }
 }

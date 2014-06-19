@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.execution;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 
 /**
@@ -19,6 +22,8 @@ package org.camunda.bpm.engine.impl.cmmn.execution;
  *
  */
 public interface CaseExecutionState {
+
+  Map<Integer, CaseExecutionState> CASE_EXECUTION_STATES = new HashMap<Integer, CaseExecutionState>();
 
   CaseExecutionState AVAILABLE = new CaseExecutionStateImpl(1, "available");
   CaseExecutionState ENABLED = new CaseExecutionStateImpl(2, "enabled");
@@ -42,6 +47,8 @@ public interface CaseExecutionState {
     public CaseExecutionStateImpl(int stateCode, String string) {
       this.stateCode = stateCode;
       this.name = string;
+
+      CASE_EXECUTION_STATES.put(stateCode, this);
     }
 
     public int getStateCode() {
