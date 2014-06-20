@@ -25,6 +25,7 @@ public class CaseExecutionDto {
   protected String caseInstanceId;
   protected boolean enabled;
   protected boolean active;
+  protected boolean disabled;
 
   public String getId() {
     return id;
@@ -42,6 +43,10 @@ public class CaseExecutionDto {
     return active;
   }
 
+  public boolean isDisabled() {
+    return disabled;
+  }
+
   public static CaseExecutionDto fromCaseExecution(CaseExecution caseExecution) {
     CaseExecutionDto dto = new CaseExecutionDto();
 
@@ -49,6 +54,7 @@ public class CaseExecutionDto {
     dto.caseInstanceId = caseExecution.getCaseInstanceId();
     dto.active = caseExecution.isActive();
     dto.enabled = caseExecution.isEnabled();
+    dto.disabled = caseExecution.isDisabled();
 
     return dto;
   }

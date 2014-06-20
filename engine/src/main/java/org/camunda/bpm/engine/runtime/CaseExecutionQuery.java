@@ -47,6 +47,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
   /** Only select case executions which are active. **/
   CaseExecutionQuery active();
 
+  /** Only select case executions which are disabled. **/
+  CaseExecutionQuery disabled();
+
   /**
    * Only select case executions which have a local variable with the given value. The type
    * of variable is determined based on the value, using types configured in

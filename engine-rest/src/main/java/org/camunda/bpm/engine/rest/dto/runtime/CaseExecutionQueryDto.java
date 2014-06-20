@@ -53,6 +53,7 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   protected String activityId;
   protected Boolean enabled;
   protected Boolean active;
+  protected Boolean disabled;
 
   protected List<VariableQueryParameterDto> variables;
   protected List<VariableQueryParameterDto> caseInstanceVariables;
@@ -102,6 +103,11 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   @CamundaQueryParam(value="active", converter = BooleanConverter.class)
   public void setActive(Boolean active) {
     this.active = active;
+  }
+
+  @CamundaQueryParam(value="disabled", converter = BooleanConverter.class)
+  public void setDisabled(Boolean disabled) {
+    this.disabled = disabled;
   }
 
   @CamundaQueryParam(value = "variables", converter = VariableListConverter.class)
@@ -156,6 +162,10 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
 
     if (enabled != null && enabled == true) {
       query.enabled();
+    }
+
+    if (disabled != null && disabled == true) {
+      query.disabled();
     }
 
     if (variables != null) {

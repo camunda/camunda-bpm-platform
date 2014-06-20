@@ -96,6 +96,11 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
     return this;
   }
 
+  public CaseExecutionQuery disabled() {
+    state = CaseExecutionState.DISABLED;
+    return this;
+  }
+
   public CaseExecutionQuery caseInstanceVariableValueEquals(String name, Object value) {
     addVariable(name, value, QueryOperator.EQUALS, false);
     return this;

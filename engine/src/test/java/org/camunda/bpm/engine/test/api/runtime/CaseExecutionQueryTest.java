@@ -321,6 +321,27 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   }
 
+  public void testQueryByDisabled() {
+    List<CaseExecution> caseExecutions= caseService
+        .createCaseExecutionQuery()
+        .caseDefinitionKey(CASE_DEFINITION_KEY)
+        .activityId("PI_HumanTask_1")
+        .list();
+
+    for (CaseExecution caseExecution : caseExecutions) {
+      caseService
+        .withCaseExecution(caseExecution.getId())
+        .disable();
+    }
+
+    CaseExecutionQuery query = caseService.createCaseExecutionQuery();
+
+    query.disabled();
+
+    verifyQueryResults(query, 4);
+
+  }
+
   public void testQueryByNullVariableValueEquals() {
     caseService
       .createCaseInstanceByKey(CASE_DEFINITION_KEY)

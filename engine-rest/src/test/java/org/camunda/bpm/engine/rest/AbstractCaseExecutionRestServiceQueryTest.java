@@ -318,11 +318,13 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
     boolean returnedEnabledState = from(content).getBoolean("[0].enabled");
+    boolean returnedDisabledState = from(content).getBoolean("[0].disabled");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     assertThat(returnedCaseInstanceId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID);
     assertThat(returnedEnabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
+    assertThat(returnedDisabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_DISABLED);
   }
 
   @Test
@@ -337,6 +339,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
     queryParameters.put("activityId", "anActivityId");
     queryParameters.put("active", "true");
     queryParameters.put("enabled", "true");
+    queryParameters.put("disabled", "true");
 
     given()
       .queryParams(queryParameters)
@@ -354,6 +357,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
     verify(mockedQuery).activityId(queryParameters.get("activityId"));
     verify(mockedQuery).active();
     verify(mockedQuery).enabled();
+    verify(mockedQuery).disabled();
     verify(mockedQuery).list();
   }
 
@@ -376,6 +380,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
     queryParameters.put("activityId", anActivityId);
     queryParameters.put("active", "true");
     queryParameters.put("enabled", "true");
+    queryParameters.put("disabled", "true");
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -394,6 +399,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
     verify(mockedQuery).activityId(anActivityId);
     verify(mockedQuery).active();
     verify(mockedQuery).enabled();
+    verify(mockedQuery).disabled();
     verify(mockedQuery).list();
   }
 
