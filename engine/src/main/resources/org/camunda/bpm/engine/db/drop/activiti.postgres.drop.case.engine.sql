@@ -28,13 +28,13 @@ alter table ACT_RU_VARIABLE
     drop CONSTRAINT ACT_FK_VAR_CASE_INST;
 
 alter table ACT_RU_TASK
-    drop foreign key ACT_FK_TASK_CASE_EXE;
+    drop CONSTRAINT ACT_FK_TASK_CASE_EXE;
 
 alter table ACT_RU_TASK
-    drop foreign key ACT_FK_TASK_CASE_INST;
+    drop CONSTRAINT ACT_FK_TASK_CASE_INST;
 
 alter table ACT_RU_TASK
-    drop foreign key ACT_FK_TASK_CASE_DEF;
+    drop CONSTRAINT ACT_FK_TASK_CASE_DEF;
 
 drop table ACT_RE_CASE_DEF;
 drop table ACT_RU_CASE_EXECUTION;
