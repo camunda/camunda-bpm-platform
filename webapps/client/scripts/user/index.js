@@ -16,7 +16,7 @@ define([
    */
 
   var userModule = angular.module('cam.tasklist.user', [
-    'cam.tasklist.user.data',
+    require('camunda-tasklist-ui/api').name,
     'ui.bootstrap',
     'cam.form'
   ]);

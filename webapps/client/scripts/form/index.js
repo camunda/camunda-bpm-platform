@@ -17,8 +17,6 @@ define([
   var c = 1000;
 
 
-  // formModule.directive('camTasklistTaskForm', ['camTasklistForm', function(camTasklistForm) {
-  // }]);
 
   formModule.directive('camFormInlineField', function() {
     return {
@@ -49,6 +47,8 @@ define([
     };
   });
 
+
+
   formModule.directive('camForm', function() {
     return {
       link: function(scope) {
@@ -57,8 +57,6 @@ define([
 
         scope.labelsWidth = 3;
         scope.fieldsWidth = 12 - scope.labelsWidth;
-
-        // scope.fields = camTasklistForm(null, null);
       },
       template: require('text!camunda-tasklist-ui/form/form.html')
     };

@@ -5,7 +5,6 @@ define('camunda-tasklist-ui', [
            'camunda-tasklist-ui/rjsconf',
            'camunda-tasklist-ui/utils'
 ], function(rjsConf, utils) {
-  rjsConf.shim['camunda-tasklist-ui'].push('camunda-tasklist-ui-mocks');
   var tasklistConf = typeof window !== 'undefined' ? (window.tasklistConf || {}) : {};
 
   /**
@@ -47,31 +46,6 @@ define('camunda-tasklist-ui', [
 
     tasklistApp = angular.module('cam.tasklist', ngDeps);
 
-    // tasklistApp.controller('TasklistAppCtrl', [
-    //         '$rootScope', 'camStorage', 'camLegacySessionData',
-    // function($rootScope,   camStorage,   camLegacySessionData) {
-    //   console.info('tasklistApp', tasklistApp, camLegacySessionData);
-
-    //   $rootScope.$on('tasklist.pile.current', function() {
-    //     $('.task-board').removeClass('pile-edit');
-    //     if ($rootScope.currentPile) {
-    //       $('.controls .current-pile h5').text($rootScope.currentPile.name || '&nbsp;');
-    //     }
-    //   });
-
-    //   $rootScope.batchActions = {
-    //     selected: []
-    //   };
-
-    //   $rootScope.currentPile = camStorage('currentPile') || {};
-
-    //   $rootScope.currentTask = camStorage('currentTask') || {};
-
-    //   camLegacySessionData.retrieve().success(function(data) {
-    //     $rootScope.user = data;
-    //   });
-    // }]);
-
 
     tasklistApp.config([
             '$routeProvider', '$locationProvider',
@@ -83,12 +57,6 @@ define('camunda-tasklist-ui', [
           template: tasklistTemplate,
           controller: [function() {}]
         })
-
-
-        // .when('/piles/new', {
-        //   template: tasklistTemplate,
-        //   controller: 'pileNewCtrl'
-        // })
 
 
         .when('/login', {

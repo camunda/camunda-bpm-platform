@@ -36,7 +36,6 @@ module.exports = function(config) {
       tasks: [
         'newer:jshint:scripts',
         // 'requirejs:dependencies',
-        'requirejs:mocks',
         'requirejs:scripts'
       ]
     },
@@ -47,7 +46,6 @@ module.exports = function(config) {
       ],
       tasks: [
         'copy:sdk',
-        'requirejs:mocks',
         'requirejs:scripts'
       ]
     },

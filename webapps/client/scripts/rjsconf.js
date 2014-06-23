@@ -26,8 +26,6 @@ define(function() {
       'camunda-tasklist-ui':        'scripts',
 
 
-      'jquery-mockjax':             'bower_components/jquery-mockjax/jquery.mockjax',
-      'camunda-tasklist-ui-mocks':  'scripts/mocks',
       'camunda-bpm-sdk':            'bower_components/camunda-bpm-sdk-js/index',
       'camunda-bpm-sdk-mock':       'bower_components/camunda-bpm-sdk-js-mock/index',
       'uuid':                       'bower_components/node-uuid/uuid',
@@ -79,16 +77,8 @@ define(function() {
                                       'text!camunda-tasklist-ui/index.html'
                                     ],
 
-      'jquery-mockjax':             ['jquery'],
       'underscore.string':          ['underscore'],
-      'fixturer':                   ['underscore.string'],
-      'camunda-tasklist-ui-mocks':  [
-                                      'uuid',
-                                      'fixturer',
-                                      'angular',
-                                      'jquery',
-                                      'jquery-mockjax'
-                                    ]
+      'fixturer':                   ['underscore.string']
     },
 
     packages: [
@@ -126,12 +116,6 @@ define(function() {
       },
       {
         name: 'camunda-tasklist-ui/user',
-        main: 'index'
-      },
-
-      // NOTE: not "/mocks" but "-mocks"!
-      {
-        name: 'camunda-tasklist-ui-mocks',
         main: 'index'
       }
     ]

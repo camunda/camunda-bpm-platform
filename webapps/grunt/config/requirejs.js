@@ -21,8 +21,6 @@ module.exports = function(config) {
     'angular-moment'
   ];
 
-  var mockDeps = _.uniq(deps.concat(rjsConf.shim['camunda-tasklist-ui-mocks'], ['camunda-tasklist-ui-mocks']));
-
   _.extend(rjsConf.paths, {
     rjsconf: 'scripts/rjsconf'
   });
@@ -78,19 +76,6 @@ module.exports = function(config) {
         ])
       }
     },
-
-
-
-    mocks: {
-      options: {
-        // name: 'scripts/index',
-        name: '<%= pkg.name %>-mocks',
-        out: 'dist/scripts/deps-n-mocks.js',
-        include: mockDeps
-      }
-    },
-
-
 
     scripts: {
       options: {

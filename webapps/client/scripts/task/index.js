@@ -5,18 +5,14 @@ define([
            'angular', 'moment',
            'camunda-tasklist-ui/utils',
            'camunda-tasklist-ui/api',
-           'camunda-tasklist-ui/task/data',
-           'camunda-tasklist-ui/form/data',
            'angular-bootstrap',
            'text!camunda-tasklist-ui/task/task.html',
            'text!camunda-tasklist-ui/task/form.html',
            'text!camunda-tasklist-ui/task/history.html'
 ], function(angular,   moment) {
   var taskModule = angular.module('cam.tasklist.task', [
-    'cam.tasklist.utils',
-    'cam.tasklist.client',
-    'cam.tasklist.task.data',
-    'cam.tasklist.form.data',
+    require('camunda-tasklist-ui/utils').name,
+    require('camunda-tasklist-ui/api').name,
     'ui.bootstrap',
     'cam.form',
     'angularMoment'
@@ -55,8 +51,8 @@ define([
 
   // should be moved to the form module...
   taskModule.directive('camTasklistTaskForm', [
-          'camTaskFormData', '$rootScope', 'camUID',
-  function(camTaskFormData,   $rootScope,   camUID) {
+          'camAPI', '$rootScope', 'camUID',
+  function(camAPI,   $rootScope,   camUID) {
     return {
       link: function(scope, element) {
         scope.elUID = camUID();
@@ -64,8 +60,9 @@ define([
         scope.labelsWidth = 3;
         scope.fieldsWidth = 12 - scope.labelsWidth;
 
-        $rootScope.$on('tasklist.task.current', function() {
-          scope.fields = camTaskFormData();
+        $rootScope.$watch('currentTask', function() {
+          console.info('Current task is now', $rootScope.currentTask);
+          // scope.fields = camTaskFormData();
         });
       },
       template: require('text!camunda-tasklist-ui/task/form.html')
@@ -73,15 +70,16 @@ define([
   }]);
 
   taskModule.directive('camTasklistTaskHistory', [
-          'camTaskHistoryData', '$rootScope', '$timeout',
-  function(camTaskHistoryData,   $rootScope,   $timeout) {
+          'camAPI', '$rootScope', '$timeout',
+  function(camAPI,   $rootScope,   $timeout) {
     return {
       link: function(scope, element) {
         scope.history = [];
         scope.days = [];
 
         $rootScope.$on('tasklist.task.current', function() {
-          scope.history = camTaskHistoryData(null, null);
+          // scope.history = camTaskHistoryData(null, null);
+          scope.history = [];
           scope.now = new Date();
           var days = {};
           angular.forEach(scope.history, function(event) {

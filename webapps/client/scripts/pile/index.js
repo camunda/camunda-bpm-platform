@@ -14,8 +14,7 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
 define([
            'require', 'angular', 'moment',
            'camunda-tasklist-ui/utils',
-           'camunda-tasklist-ui/pile/data',
-           'camunda-tasklist-ui/task/data',
+           'camunda-tasklist-ui/api',
            'text!camunda-tasklist-ui/pile/form.html',
            'text!camunda-tasklist-ui/pile/list.html',
            'text!camunda-tasklist-ui/pile/details.html',
@@ -23,8 +22,7 @@ define([
 ], function(require,   angular,   moment) {
   var pileModule = angular.module('cam.tasklist.pile', [
     require('camunda-tasklist-ui/utils').name,
-    require('camunda-tasklist-ui/pile/data').name,
-    require('camunda-tasklist-ui/task/data').name,
+    require('camunda-tasklist-ui/api').name,
     'ui.bootstrap',
     'cam.form',
     'angularMoment'
