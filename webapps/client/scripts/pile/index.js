@@ -77,8 +77,10 @@ define([
   function ($scope,   $rootScope,   $timeout,   camAPI) {
     var Pile = camAPI.resource('pile');
     $scope.piles = [];
+    $scope.loading = true;
 
     Pile.list({}, function(err, res) {
+      $scope.loading = false;
       if (err) {
         throw err;
       }
@@ -229,8 +231,8 @@ define([
 
 
   pileModule.directive('camTasklistPileTasks', [
-          '$modal', '$rootScope', 'camTasklistPileFilterConversion', 'camAPI',
-  function($modal,   $rootScope,   camTasklistPileFilterConversion,   camAPI) {
+          '$modal', '$rootScope', '$timeout', 'camTasklistPileFilterConversion', 'camAPI',
+  function($modal,   $rootScope,   $timeout,   camTasklistPileFilterConversion,   camAPI) {
     var Task = camAPI.resource('task');
     return {
       link: function(scope) {
@@ -240,11 +242,16 @@ define([
 
         scope.now = new Date();
 
+        scope.loading = true;
+
         scope.tasks = scope.tasks || [];
 
         scope.pile = scope.pile || $rootScope.currentPile;
 
         function loadItems() {
+          scope.loading = true;
+          scope.tasks = [];
+
           var where = {};
           angular.forEach(scope.pile.filters, function(pair) {
             where[pair.key] = camTasklistPileFilterConversion(pair.value);
@@ -253,12 +260,16 @@ define([
           where.maxResults = scope.pageSize;
 
           Task.list(where, function(err, res) {
+            scope.loading = false;
+
             if (err) {
               throw err;
             }
 
-            scope.totalItems = res.total;
-            $rootScope.currentPile.tasks = scope.tasks = res.items;
+            $timeout(function() {
+              scope.totalItems = res.count;
+              scope.tasks = res.items;
+            }, 0);
           });
         }
 
@@ -276,11 +287,10 @@ define([
           console.info('selected task', this);
         };
 
-        $rootScope.$on('tasklist.pile.current', function() {
-          // console.info('root current', !!$rootScope.currentPile, 'scope pile', !!scope.pile);
-          // if (!$rootScope.currentPile || (scope.pile && (scope.pile.id === $rootScope.currentPile.id))) {
-          //   return;
-          // }
+        $rootScope.$watch('currentPile', function() {
+          if (!$rootScope.currentPile || (scope.pile && (scope.pile.id === $rootScope.currentPile.id))) {
+            return;
+          }
           scope.pile = $rootScope.currentPile;
           loadItems();
         });

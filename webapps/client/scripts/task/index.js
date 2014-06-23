@@ -47,7 +47,6 @@ define([
 
         $rootScope.$on('tasklist.task.current', function() {
           scope.task = $rootScope.currentTask;
-          element.find('[data-toggle="tooltip"]').tooltip();
         });
       },
       template: require('text!camunda-tasklist-ui/task/task.html')
@@ -67,7 +66,6 @@ define([
 
         $rootScope.$on('tasklist.task.current', function() {
           scope.fields = camTaskFormData();
-          element.find('[data-toggle="tooltip"]').tooltip();
         });
       },
       template: require('text!camunda-tasklist-ui/task/form.html')
@@ -75,8 +73,8 @@ define([
   }]);
 
   taskModule.directive('camTasklistTaskHistory', [
-          'camTaskHistoryData', '$rootScope',
-  function(camTaskHistoryData,   $rootScope) {
+          'camTaskHistoryData', '$rootScope', '$timeout',
+  function(camTaskHistoryData,   $rootScope,   $timeout) {
     return {
       link: function(scope, element) {
         scope.history = [];
@@ -103,9 +101,6 @@ define([
             days[date].events[time].push(event);
           });
           scope.days = days;
-          setTimeout(function() {
-            element.find('[data-toggle="tooltip"]').tooltip();
-          }, 10);
         });
       },
       template: require('text!camunda-tasklist-ui/task/history.html')

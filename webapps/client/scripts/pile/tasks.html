@@ -11,70 +11,81 @@
             previous-text="&lsaquo;"
             first-text="&laquo;"></pagination>
 
-<form role="form">
-  <ol class="list-unstyled">
-    <li class="task" ng-repeat="(delta, task) in tasks">
-      <h4 ng-click="focus(delta)">{{ task.name }}</h4>
-      <ul class="list-inline">
-        <li>
-          <input type="checkbox" name="batch" ng-model="batch" ng-change="batchOperationSelect()" />
-        </li>
-        <li data-toggle="tooltip"
-            data-placement="top"
-            title="Follow-up date"
-            class="followup-date"
-            ng-class="(task.followUp < now ? 'overdue' : '')">
-          <span class="glyphicon glyphicon-bell"></span>
-          <span cam-form-inline-field value="task.followUp">
-            <span am-time-ago="task.followUp">{{ task.followUp }}</span>
-          </span>
-        </li>
-        <li data-toggle="tooltip"
-            data-placement="top"
-            title="Due date"
-            class="due-date"
-            ng-class="(task.due < now ? 'overdue' : '')">
-          <span class="glyphicon glyphicon-calendar"></span>
-          <span cam-form-inline-field value="task.due">
-            <span am-time-ago="task.due">{{ task.due }}</span>
-          </span>
-        </li>
+<div ng-show="loading"
+     class="loader">Loading...</div>
 
-        <!--
-        <li data-toggle="tooltip"
-            data-placement="top"
-            title="Assignee"
-            class="assignee">
-          <span class="glyphicon glyphicon-user"></span>
-          <span cam-form-inline-field value="task.assignee">
-            {{ task.assignee }}
-          </span>
-        </li>
-        <li data-toggle="tooltip"
-            data-placement="top"
-            title="Owner"
-            class="owner">
-          <span class="glyphicon glyphicon-certificate"></span>
-          <span cam-form-inline-field value="task.owner">
-            {{ task.owner }}
-          </span>
-        </li>
-        -->
+<div ng-hide="loading">
+  <div ng-hide="totalItems">
+    No task macthing filters found.
+  </div>
 
-      </ul>
-    </li>
-  </ol>
-</form>
+  <form ng-show="totalItems"
+        role="form">
+    <ol class="list-unstyled">
+      <li class="task"
+          ng-repeat="(delta, task) in tasks">
+        <h4 ng-click="focus(delta)">{{ task.name }}</h4>
+        <ul class="list-inline">
+          <li>
+            <input type="checkbox" name="batch" ng-model="batch" ng-change="batchOperationSelect()" />
+          </li>
+          <li data-toggle="tooltip"
+              data-placement="top"
+              title="Follow-up date"
+              class="followup-date"
+              ng-class="(task.followUp < now ? 'overdue' : '')">
+            <span class="glyphicon glyphicon-bell"></span>
+            <span cam-form-inline-field value="task.followUp">
+              <span am-time-ago="task.followUp">{{ task.followUp }}</span>
+            </span>
+          </li>
+          <li data-toggle="tooltip"
+              data-placement="top"
+              title="Due date"
+              class="due-date"
+              ng-class="(task.due < now ? 'overdue' : '')">
+            <span class="glyphicon glyphicon-calendar"></span>
+            <span cam-form-inline-field value="task.due">
+              <span am-time-ago="task.due">{{ task.due }}</span>
+            </span>
+          </li>
+
+          <!--
+          <li data-toggle="tooltip"
+              data-placement="top"
+              title="Assignee"
+              class="assignee">
+            <span class="glyphicon glyphicon-user"></span>
+            <span cam-form-inline-field value="task.assignee">
+              {{ task.assignee }}
+            </span>
+          </li>
+          <li data-toggle="tooltip"
+              data-placement="top"
+              title="Owner"
+              class="owner">
+            <span class="glyphicon glyphicon-certificate"></span>
+            <span cam-form-inline-field value="task.owner">
+              {{ task.owner }}
+            </span>
+          </li>
+          -->
+
+        </ul>
+      </li>
+    </ol>
+  </form>
+</div>
 
 <pagination ng-show="totalItems > pageSize"
-            total-items="totalItems"
-            items-per-page="pageSize"
-            max-size="5"
-            class="pagination-sm"
-            boundary-links="true"
-            ng-model="pageNum"
-            ng-change="pageChange()"
-            next-text="&rsaquo;"
-            last-text="&raquo;"
-            previous-text="&lsaquo;"
-            first-text="&laquo;"></pagination>
+              total-items="totalItems"
+              items-per-page="pageSize"
+              max-size="5"
+              class="pagination-sm"
+              boundary-links="true"
+              ng-model="pageNum"
+              ng-change="pageChange()"
+              next-text="&rsaquo;"
+              last-text="&raquo;"
+              previous-text="&lsaquo;"
+              first-text="&laquo;"></pagination>
