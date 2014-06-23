@@ -28,6 +28,8 @@ define(function() {
 
       'jquery-mockjax':             'bower_components/jquery-mockjax/jquery.mockjax',
       'camunda-tasklist-ui-mocks':  'scripts/mocks',
+      'camunda-bpm-sdk':            'bower_components/camunda-bpm-sdk-js/index',
+      'camunda-bpm-sdk-mock':       'bower_components/camunda-bpm-sdk-js-mock/index',
       'uuid':                       'bower_components/node-uuid/uuid',
       'fixturer':                   'bower_components/fixturer/index',
       'underscore':                 'bower_components/underscore/index',
@@ -60,6 +62,7 @@ define(function() {
                                       'angular-animate',
 
 
+                                      'camunda-tasklist-ui/api',
                                       'camunda-tasklist-ui/utils',
                                       'camunda-tasklist-ui/user',
                                       'camunda-tasklist-ui/controls',
@@ -91,6 +94,10 @@ define(function() {
     packages: [
       {
         name: 'camunda-tasklist-ui',
+        main: 'index'
+      },
+      {
+        name: 'camunda-tasklist-ui/api',
         main: 'index'
       },
       {

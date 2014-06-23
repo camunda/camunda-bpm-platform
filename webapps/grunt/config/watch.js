@@ -36,6 +36,18 @@ module.exports = function(config) {
       tasks: [
         'newer:jshint:scripts',
         // 'requirejs:dependencies',
+        'requirejs:mocks',
+        'requirejs:scripts'
+      ]
+    },
+
+    sdk: {
+      files: [
+        'node_modules/camunda-bpm-sdk-js/dist/**/*.js'
+      ],
+      tasks: [
+        'copy:sdk',
+        'requirejs:mocks',
         'requirejs:scripts'
       ]
     },

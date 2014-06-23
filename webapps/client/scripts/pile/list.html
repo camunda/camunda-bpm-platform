@@ -1,3 +1,6 @@
-<div ng-repeat="pile in piles" cam-tasklist-pile>
-
+<div ng-controller="pilesCtrl">
+  <div ng-if="!piles.length">Loading...</div>
+  <div ng-if="piles.length"
+       ng-repeat="pile in piles"
+       cam-tasklist-pile></div>
 </div>

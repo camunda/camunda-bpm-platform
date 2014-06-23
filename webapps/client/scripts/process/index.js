@@ -3,25 +3,29 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
            'angular', 'angular-bootstrap',
-           'camunda-tasklist-ui/process/data',
+           'camunda-tasklist-ui/api',
            'text!camunda-tasklist-ui/process/start.html'
 ], function(angular) {
 
   var processModule = angular.module('cam.tasklist.process', [
-    'cam.tasklist.process.data',
+    'cam.tasklist.client',
     'ui.bootstrap'
   ]);
 
 
 
   processModule.controller('processStartModalFormCtrl', [
-          '$scope', '$q', 'camTasklistNotifier', 'camLegacyProcessData',
-  function($scope,   $q,   camTasklistNotifier, camLegacyProcessData) {
+          '$scope', '$q', 'camAPI', 'camTasklistNotifier',
+  function($scope,   $q,   camAPI,   camTasklistNotifier) {
+
+    var ProcessDefinition = camAPI.resource('process-definition');
+
     var emptyVariable = {
       name:   '',
       value:  '',
       type:   ''
     };
+
 
     // http://docs.camunda.org/latest/api-references/rest/#process-definition-start-process-instance-method
     // Valid variable values are Boolean, Number, String and Date values.
@@ -65,22 +69,6 @@ define([
 
     $scope.loadingProcesses = false;
 
-
-    // $scope.setPage = function (pageNo) {
-    //   $scope.currentPage = pageNo;
-    // };
-
-    // $scope.$watch('currentPage', function() {
-    //   console.info('Changed currentPage', $scope.currentPage);
-    // });
-
-    // $scope.pageChanged = function() {
-    //   console.log('Page changed to: ' + $scope.currentPage, $scope.$id, this.$id);
-    //   // $scope.currentPage = this.currentPage;
-    //   $scope.setPage(this.currentPage);
-    // };
-
-
     $scope.close = close;
 
 
@@ -90,23 +78,26 @@ define([
 
 
     $scope.lookupProcess = function(val) {
+      var deferred = $q.defer();
+
       if (val.length > 2) {
         $scope.loadingProcesses = true;
 
-        return camLegacyProcessData.list({
+        ProcessDefinition.list({
           nameLike: '%'+ val +'%'
-        }).then(function(res){
+        }, function(err, res) {
           $scope.loadingProcesses = false;
-          return res;
-        }, loadError);
+          if (err) {
+            return deferred.reject(err);
+          }
+          deferred.resolve(res);
+        });
       }
       else {
-        var deferred = $q.defer();
-
         deferred.resolve($scope.processes);
-
-        return deferred.promise;
       }
+
+      return deferred.promise;
     };
 
 
@@ -124,27 +115,27 @@ define([
       // but using it lead to empty results
       // where.startableBy = camStorage.get('user').id;
 
-      camLegacyProcessData.count(where)
-      .then(function(result) {
-        $scope.totalProcesses = result.count;
+      where.maxResults = where.maxResults || $scope.itemsPerPage;
 
-        where.maxResults = where.maxResults || $scope.itemsPerPage;
+      ProcessDefinition.list(where, function(err, res) {
+        $scope.loadingProcesses = false;
+        if (err) {
+          camTasklistNotifier.add(err);
+          throw err;
+        }
+        $scope.totalProcesses = res.count;
 
-        camLegacyProcessData.list(where)
-        .then(function(processes) {
-          $scope.loadingProcesses = false;
 
-          $scope.processes = processes.sort(function(a, b) {
-            var aName = (a.name || a.key).toLowerCase();
-            var bName = (b.name || b.key).toLowerCase();
-            if (aName < bName)
-               return -1;
-            if (aName > bName)
-              return 1;
-            return 0;
-          });
-        }, loadError);
-      }, loadError);
+        $scope.processes = res.items.sort(function(a, b) {
+          var aName = (a.name || a.key).toLowerCase();
+          var bName = (b.name || b.key).toLowerCase();
+          if (aName < bName)
+             return -1;
+          if (aName > bName)
+            return 1;
+          return 0;
+        });
+      });
     };
     $scope.loadProcesses();
 
@@ -188,19 +179,34 @@ define([
         }
       });
 
-      camLegacyProcessData.start($scope.startingProcess.key, {
-        data: {
-          variables: vars
+      ProcessDefinition.submit({
+        key: $scope.startingProcess.key,
+        variables: vars
+      }, function(err, res) {
+        if (err) {
+          camTasklistNotifier.add(err);
+          throw err;
         }
-      }).then(function(result) {
+
         camTasklistNotifier.add({
           type: 'success',
           text: 'The process has been started.'
         });
-        close(result);
-      }, function(err) {
-        camTasklistNotifier.add(err);
+        close(res);
       });
+      // camAPI.start($scope.startingProcess.key, {
+      //   data: {
+      //     variables: vars
+      //   }
+      // }).then(function(result) {
+      //   camTasklistNotifier.add({
+      //     type: 'success',
+      //     text: 'The process has been started.'
+      //   });
+      //   close(result);
+      // }, function(err) {
+      //   camTasklistNotifier.add(err);
+      // });
     };
   }]);
 

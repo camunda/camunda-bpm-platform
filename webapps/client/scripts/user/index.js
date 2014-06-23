@@ -3,7 +3,7 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
            'require', 'angular', 'moment', 'jquery',
-           'camunda-tasklist-ui/user/data',
+           'camunda-tasklist-ui/api',
            'text!camunda-tasklist-ui/user/login.html'
 ], function(require,   angular,   moment,   $) {
 

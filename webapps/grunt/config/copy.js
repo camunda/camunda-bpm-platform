@@ -38,6 +38,18 @@ module.exports = function() {
           dest: 'dist/scripts/'
         }
       ]
+    },
+    sdk: {
+      files: [
+        {
+          src: 'node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk.js',
+          dest: 'client/bower_components/camunda-bpm-sdk-js/index.js'
+        },
+        {
+          src: 'node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk-mock.js',
+          dest: 'client/bower_components/camunda-bpm-sdk-js-mock/index.js'
+        }
+      ]
     }
   };
 };

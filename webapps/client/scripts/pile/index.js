@@ -67,6 +67,71 @@ define([
   }]);
 
 
+
+
+
+
+
+  pileModule.controller('pilesCtrl', [
+           '$scope', '$rootScope', '$timeout', 'camAPI',
+  function ($scope,   $rootScope,   $timeout,   camAPI) {
+    var Pile = camAPI.resource('pile');
+    $scope.piles = [];
+
+    Pile.list({}, function(err, res) {
+      if (err) {
+        throw err;
+      }
+
+
+      $timeout(function() {
+        $scope.piles = res.items;
+        $rootScope.currentPile = $scope.piles[0];
+        $rootScope.$emit('tasklist.pile.current');
+      }, 0);
+    });
+  }]);
+
+
+  pileModule.controller('pileNewCtrl', [
+          '$modal', '$scope', '$rootScope',
+  function($modal,   $scope,   $rootScope) {
+    $rootScope.currentPile = {
+      name: '',
+      description: '',
+      color: '',
+      filters: []
+    };
+
+    $('.task-board').addClass('pile-edit');
+
+    var modalInstance = $modal.open({
+      // pass the current scope to the $modalInstance
+      scope: $scope,
+
+      size: 'lg',
+
+      template: require('text!camunda-tasklist-ui/pile/form.html'),
+
+      controller: [
+              '$modalInstance',
+      function($modalInstance) {
+        console.info('Hello from the modal instance controller', $modalInstance);
+      }]
+    })
+    .result.then(function(result) {
+      console.info('modalInstance created', result);
+    }, function(reason) {
+      console.info('modalInstance aborted', reason);
+    });
+  }]);
+
+
+
+
+
+
+
   pileModule.directive('camTasklistPile', [
           '$modal', '$rootScope',
   function($modal,   $rootScope) {
@@ -155,6 +220,7 @@ define([
           '$modal', '$rootScope',
   function($modal,   $rootScope) {
     return {
+      // controller: 'pilesCtrl',
       template: require('text!camunda-tasklist-ui/pile/list.html')
     };
   }]);
@@ -163,11 +229,12 @@ define([
 
 
   pileModule.directive('camTasklistPileTasks', [
-          '$modal', '$rootScope', 'camTasklistPileFilterConversion', 'camTaskData',
-  function($modal,   $rootScope,   camTasklistPileFilterConversion,   camTaskData) {
+          '$modal', '$rootScope', 'camTasklistPileFilterConversion', 'camAPI',
+  function($modal,   $rootScope,   camTasklistPileFilterConversion,   camAPI) {
+    var Task = camAPI.resource('task');
     return {
       link: function(scope) {
-        scope.pageSize = 5;
+        scope.pageSize = 15;
         scope.pageNum = 1;
         scope.totalItems = 0;
 
@@ -182,22 +249,17 @@ define([
           angular.forEach(scope.pile.filters, function(pair) {
             where[pair.key] = camTasklistPileFilterConversion(pair.value);
           });
-          where.offset = (scope.pageNum - 1) * scope.pageSize;
-          where.limit = scope.pageSize;
+          where.firstResult = (scope.pageNum - 1) * scope.pageSize;
+          where.maxResults = scope.pageSize;
 
-          camTaskData
-            .query(where)
-            // QUESTION: results? or only tasks? which level should be abstracted/available?
-            // What about a `result.total` property?
-            // What will I do eat for lunch?
-            .then(function(results) {
-              scope.totalItems = results.total;
-              results._embedded = results._embedded || {};
-              results._embedded.tasks = results._embedded.tasks || [];
-              $rootScope.currentPile.tasks = scope.tasks = results._embedded.tasks;
-            }, function(err) {
-              console.warn('tasklist.pile.current tasks', err);
-            });
+          Task.list(where, function(err, res) {
+            if (err) {
+              throw err;
+            }
+
+            scope.totalItems = res.total;
+            $rootScope.currentPile.tasks = scope.tasks = res.items;
+          });
         }
 
 
@@ -214,13 +276,11 @@ define([
           console.info('selected task', this);
         };
 
-
-        $rootScope.$watch('currentPile', function() {
-          console.info('currentPile thingy', $rootScope.currentPile, scope.pile);
-          if (!$rootScope.currentPile || (scope.pile && (scope.pile.id === $rootScope.currentPile.id))) {
-            return;
-          }
-
+        $rootScope.$on('tasklist.pile.current', function() {
+          // console.info('root current', !!$rootScope.currentPile, 'scope pile', !!scope.pile);
+          // if (!$rootScope.currentPile || (scope.pile && (scope.pile.id === $rootScope.currentPile.id))) {
+          //   return;
+          // }
           scope.pile = $rootScope.currentPile;
           loadItems();
         });
@@ -228,63 +288,6 @@ define([
 
       template: require('text!camunda-tasklist-ui/pile/tasks.html')
     };
-  }]);
-
-
-
-
-
-
-
-  pileModule.controller('pilesCtrl', [
-           '$scope', '$rootScope', '$modal', 'camPileData',
-  function ($scope,   $rootScope,   $modal,   camPileData) {
-    $scope.piles = [];
-
-    camPileData.query({
-      user: $scope.user
-    }).then(function(piles) {
-      console.info('camPileData piles', piles);
-      $scope.piles = piles;
-      $rootScope.currentPile = $scope.piles[2];
-      $rootScope.$emit('tasklist.pile.current');
-    }, function(err) {
-      console.info('camPileData query error', err.stack);
-    });
-  }]);
-
-
-  pileModule.controller('pileNewCtrl', [
-          '$modal', '$scope', '$rootScope',
-  function($modal,   $scope,   $rootScope) {
-    $rootScope.currentPile = {
-      name: '',
-      description: '',
-      color: '',
-      filters: []
-    };
-
-    $('.task-board').addClass('pile-edit');
-
-    var modalInstance = $modal.open({
-      // pass the current scope to the $modalInstance
-      scope: $scope,
-
-      size: 'lg',
-
-      template: require('text!camunda-tasklist-ui/pile/form.html'),
-
-      controller: [
-              '$modalInstance',
-      function($modalInstance) {
-        console.info('Hello from the modal instance controller', $modalInstance);
-      }]
-    })
-    .result.then(function(result) {
-      console.info('modalInstance created', result);
-    }, function(reason) {
-      console.info('modalInstance aborted', reason);
-    });
   }]);
 
   return pileModule;

@@ -4,6 +4,7 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
 define([
            'angular', 'moment',
            'camunda-tasklist-ui/utils',
+           'camunda-tasklist-ui/api',
            'camunda-tasklist-ui/task/data',
            'camunda-tasklist-ui/form/data',
            'angular-bootstrap',
@@ -13,6 +14,7 @@ define([
 ], function(angular,   moment) {
   var taskModule = angular.module('cam.tasklist.task', [
     'cam.tasklist.utils',
+    'cam.tasklist.client',
     'cam.tasklist.task.data',
     'cam.tasklist.form.data',
     'ui.bootstrap',

@@ -81,14 +81,14 @@ define('camunda-tasklist-ui', [
       $routeProvider
         .when('/', {
           template: tasklistTemplate,
-          controller: 'pilesCtrl'
+          controller: [function() {}]
         })
 
 
-        .when('/piles/new', {
-          template: tasklistTemplate,
-          controller: 'pileNewCtrl'
-        })
+        // .when('/piles/new', {
+        //   template: tasklistTemplate,
+        //   controller: 'pileNewCtrl'
+        // })
 
 
         .when('/login', {
