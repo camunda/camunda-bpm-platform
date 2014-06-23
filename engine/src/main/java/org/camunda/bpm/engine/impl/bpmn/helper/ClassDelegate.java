@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -170,9 +171,19 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
   }
 
   public static Object instantiateDelegate(String className, List<FieldDeclaration> fieldDeclarations) {
-    Object object = ReflectUtil.instantiate(className);
-    applyFieldDeclaration(fieldDeclarations, object);
-    return object;
+    ArtifactFactory artifactFactory = Context.getProcessEngineConfiguration().getArtifactFactory();
+
+    try {
+      Class<?> clazz = ReflectUtil.loadClass(className);
+
+      Object object = artifactFactory.getArtifact(clazz);
+
+      applyFieldDeclaration(fieldDeclarations, object);
+      return object;
+    } catch (Exception e) {
+      throw new ProcessEngineException("couldn't instantiate class " + className, e);
+    }
+
   }
 
   public static void applyFieldDeclaration(List<FieldDeclaration> fieldDeclarations, Object target) {

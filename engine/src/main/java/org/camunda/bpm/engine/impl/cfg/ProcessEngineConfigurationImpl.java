@@ -45,6 +45,7 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.camunda.bpm.connect.soap.httpclient.SoapHttpConnector;
+import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FormService;
@@ -58,6 +59,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
+import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
 import org.camunda.bpm.engine.impl.FormServiceImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
@@ -408,6 +410,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected ProcessEngineImpl processEngine;
 
+  /** used to create instances for listeners, JavaDelegates, etc */
+  protected ArtifactFactory artifactFactory;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   public ProcessEngine buildProcessEngine() {
@@ -427,6 +432,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initExpressionManager();
     initVariableTypes();
     initBeans();
+    initArtifactFactory(); //X TODO Daniel please verify if this is the correct order of initializing the ArtifactFactory
     initFormEngines();
     initFormTypes();
     initFormFieldValidators();
@@ -457,8 +463,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initResourceAuthorizationProvider();
     initSpin();
     initConnectors();
+
     invokePostInit();
   }
+
 
   protected void invokePreInit() {
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
@@ -1273,6 +1281,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initBeans() {
     if (beans == null) {
       beans = new HashMap<Object, Object>();
+    }
+  }
+
+  protected void initArtifactFactory() {
+    if (artifactFactory == null) {
+      artifactFactory = new DefaultArtifactFactory();
     }
   }
 
@@ -2307,5 +2321,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setConnectors(Connectors connectors) {
     this.connectors = connectors;
+  }
+
+  public ProcessEngineConfiguration setArtifactService(ArtifactFactory artifactFactory) {
+    this.artifactFactory = artifactFactory;
+    return this;
+  }
+
+  public ArtifactFactory getArtifactFactory() {
+    return artifactFactory;
   }
 }
