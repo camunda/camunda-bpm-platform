@@ -67,13 +67,8 @@ public class CdiBeanResolutionTest extends AbstractFoxPlatformIntegrationTest {
   @Test
   @OperateOnDeployment("clientDeployment")
   public void testResolveBean() {
-    try {
-      // assert that we cannot resolve the bean here:
-      ProgrammaticBeanLookup.lookup("exampleBean");
-      Assert.fail("exception expected");
-    }catch (Exception e) {
-      // expected
-    }
+    // assert that we cannot resolve the bean here:
+    Assert.assertNull(ProgrammaticBeanLookup.lookup("exampleBean"));
 
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBean").count());
     // but the process engine can:

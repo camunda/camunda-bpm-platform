@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.cdi.impl.util;
 
-import java.lang.reflect.Type;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -29,47 +27,100 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  * Utility class for performing programmatic bean lookups.
  *
  * @author Daniel Meyer
+ * @author Mark Struberg
  */
 public class ProgrammaticBeanLookup {
 
   public final static Logger LOG = Logger.getLogger(ProgrammaticBeanLookup.class.getName());
 
-  @SuppressWarnings("unchecked")
   public static <T> T lookup(Class<T> clazz, BeanManager bm) {
-    Iterator<Bean< ? >> iter = bm.getBeans(clazz).iterator();
-    if (!iter.hasNext()) {
-      throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type " + clazz.getName());
-    }
-    Bean<T> bean = (Bean<T>) iter.next();
-    CreationalContext<T> ctx = bm.createCreationalContext(bean);
-    if(isDependentScoped(bean)) {
-      releaseOnContextClose(ctx, bean);
-    }
-    T dao = (T) bm.getReference(bean, clazz, ctx);
-    return dao;
+    return lookup(clazz, bm, true);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public static <T> T lookup(Class<T> clazz, BeanManager bm, boolean optional) {
+    Set<Bean<?>> beans = bm.getBeans(clazz);
+    T instance = getContextualReference(bm, beans, clazz);
+    if (!optional && instance == null) {
+      throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type '" + clazz.getName() + "'");
+    }
+    return instance;
+  }
+
   public static Object lookup(String name, BeanManager bm) {
-    Set<Bean< ? >> beans = bm.getBeans(name);
-    if (beans.isEmpty()) {
+    return lookup(name, bm, true);
+  }
+
+  public static Object lookup(String name, BeanManager bm, boolean optional) {
+    Set<Bean<?>> beans = bm.getBeans(name);
+
+    // NOTE: we use Object.class as BeanType of the ContextualReference to resolve.
+    // Mark says this is not strictly spec compliant but should work on all implementations.
+    // A strictly compliant implementation would
+    // - collect all bean types of the bean
+    // - calculate the type such that it has the most types in the set of bean types which are assignable from this type.
+    Object instance = getContextualReference(bm, beans, Object.class);
+    if (!optional && instance == null) {
       throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type '" + name + "'");
     }
-    Bean bean = bm.resolve(beans);
-    CreationalContext ctx = bm.createCreationalContext(bean);
-    if(isDependentScoped(bean)) {
-      releaseOnContextClose(ctx, bean);
-    }
-    // select one beantype randomly. A bean has a non-empty set of beantypes.
-    Type type = (Type) bean.getTypes().iterator().next();
-    return bm.getReference(bean, type, ctx);
+    return instance;
   }
 
-  public static <T> boolean isDependentScoped(Bean<T> bean) {
+  /**
+   * @return a ContextualInstance of the given type
+   * @throws javax.enterprise.inject.AmbiguousResolutionException if the given type is satisfied by more than one Bean
+   * @see #lookup(Class, boolean)
+   */
+  public static <T> T lookup(Class<T> clazz) {
+    return lookup(clazz, true);
+  }
+
+  /**
+   * @param optional if <code>false</code> then the bean must exist.
+   * @return a ContextualInstance of the given type if optional is <code>false</code>. If optional is <code>true</code> null might be returned if no bean got found.
+   * @throws IllegalStateException if there is no bean of the given class, but only if optional is <code>false</code>
+   * @throws javax.enterprise.inject.AmbiguousResolutionException if the given type is satisfied by more than one Bean
+   * @see #lookup(Class, boolean)
+   */
+  public static <T> T lookup(Class<T> clazz, boolean optional) {
+    BeanManager bm = BeanManagerLookup.getBeanManager();
+    return lookup(clazz, bm, optional);
+  }
+
+  public static Object lookup(String name) {
+    BeanManager bm = BeanManagerLookup.getBeanManager();
+    return lookup(name, bm);
+  }
+
+
+  @SuppressWarnings("unchecked")
+  private static <T> T getContextualReference(BeanManager bm, Set<Bean<?>> beans, Class<?> type) {
+    if (beans == null || beans.size() == 0) {
+      return null;
+    }
+
+    // if we would resolve to multiple beans then BeanManager#resolve would throw an AmbiguousResolutionException
+    Bean<?> bean = bm.resolve(beans);
+    if (bean == null) {
+      return null;
+
+    } else {
+      CreationalContext<?> creationalContext = bm.createCreationalContext(bean);
+
+      // if we obtain a contextual reference to a @Dependent scope bean, make sure it is released
+      if(isDependentScoped(bean)) {
+        releaseOnContextClose(creationalContext, bean);
+      }
+
+      return (T) bm.getReference(bean, type, creationalContext);
+
+    }
+  }
+
+  private static boolean isDependentScoped(Bean<?> bean) {
     return Dependent.class.equals(bean.getScope());
   }
 
-  public static void releaseOnContextClose(CreationalContext<?> creationalContext, Bean bean) {
+  private static void releaseOnContextClose(CreationalContext<?> creationalContext, Bean<?> bean) {
     CommandContext commandContext = Context.getCommandContext();
     if(commandContext != null) {
       commandContext.registerCommandContextCloseListener(new CreationalContextReleaseListener(creationalContext));
@@ -79,16 +130,6 @@ public class ProgrammaticBeanLookup {
           + "Bean instance will not be destroyed. This is likely to create a memory leak. Please use a normal scope like @ApplicationScoped for this bean.");
 
     }
-  }
-
-  public static <T> T lookup(Class<T> clazz) {
-    BeanManager bm = BeanManagerLookup.getBeanManager();
-    return lookup(clazz, bm);
-  }
-
-  public static Object lookup(String name) {
-    BeanManager bm = BeanManagerLookup.getBeanManager();
-    return lookup(name, bm);
   }
 
 }

@@ -37,8 +37,30 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.camunda.bpm.connect.soap.httpclient.SoapHttpConnector;
-import org.camunda.bpm.engine.*;
-import org.camunda.bpm.engine.impl.*;
+import org.camunda.bpm.engine.ArtifactFactory;
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
+import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
+import org.camunda.bpm.engine.impl.FormServiceImpl;
+import org.camunda.bpm.engine.impl.HistoryServiceImpl;
+import org.camunda.bpm.engine.impl.IdentityServiceImpl;
+import org.camunda.bpm.engine.impl.ManagementServiceImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
+import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
+import org.camunda.bpm.engine.impl.ServiceImpl;
+import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
@@ -300,6 +322,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected ProcessEngineImpl processEngine;
 
+  /** used to create instances for listeners, JavaDelegates, etc */
+  protected ArtifactFactory artifactFactory;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   public ProcessEngine buildProcessEngine() {
@@ -319,6 +344,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initExpressionManager();
     initVariableTypes();
     initBeans();
+    initArtifactFactory();
     initFormEngines();
     initFormTypes();
     initFormFieldValidators();
@@ -349,8 +375,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initResourceAuthorizationProvider();
     initSpin();
     initConnectors();
+
     invokePostInit();
   }
+
 
   protected void invokePreInit() {
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
@@ -1163,6 +1191,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initBeans() {
     if (beans == null) {
       beans = new HashMap<Object, Object>();
+    }
+  }
+
+  protected void initArtifactFactory() {
+    if (artifactFactory == null) {
+      artifactFactory = new DefaultArtifactFactory();
     }
   }
 
@@ -2197,5 +2231,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setConnectors(Connectors connectors) {
     this.connectors = connectors;
+  }
+
+  public ProcessEngineConfiguration setArtifactFactory(ArtifactFactory artifactFactory) {
+    this.artifactFactory = artifactFactory;
+    return this;
+  }
+
+  public ArtifactFactory getArtifactFactory() {
+    return artifactFactory;
   }
 }
