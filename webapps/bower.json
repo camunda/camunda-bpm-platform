@@ -37,7 +37,8 @@
     "requirejs-domready": "2.0.1",
     "angular-bootstrap": "0.11.0",
     "angular-route": "1.2.16",
-    "angular-animate": "1.2.16"
+    "angular-animate": "1.2.16",
+    "camunda-bpm-sdk-js": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk.js"
   },
   "devDependencies": {
     "jquery-mockjax": "1.5.3",
