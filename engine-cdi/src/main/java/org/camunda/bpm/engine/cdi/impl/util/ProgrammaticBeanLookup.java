@@ -24,39 +24,71 @@ import javax.enterprise.inject.spi.BeanManager;
  * Utility class for performing programmatic bean lookups.
  * 
  * @author Daniel Meyer
+ * @author Mark Struberg
  */
 public class ProgrammaticBeanLookup {
 
-  @SuppressWarnings("unchecked")
   public static <T> T lookup(Class<T> clazz, BeanManager bm) {
-    Iterator<Bean< ? >> iter = bm.getBeans(clazz).iterator();
-    if (!iter.hasNext()) {
-      throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type " + clazz.getName());
-    }
-    Bean<T> bean = (Bean<T>) iter.next();
-    CreationalContext<T> ctx = bm.createCreationalContext(bean);
-    T dao = (T) bm.getReference(bean, clazz, ctx);
-    return dao;
+    return lookup(clazz, bm, true);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public static <T> T lookup(Class<T> clazz, BeanManager bm, boolean optional) {
+    Set<Bean<?>> beans = bm.getBeans(clazz);
+    T instance = getContextualReference(bm, beans);
+    if (!optional && instance == null) {
+      throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type '" + clazz.getName() + "'");
+    }
+
+    return instance;
+  }
+
   public static Object lookup(String name, BeanManager bm) {
-    Set<Bean< ? >> beans = bm.getBeans(name);
-    if (beans.isEmpty()) {
+    Set<Bean<?>> beans = bm.getBeans(name);
+    Object instance = getContextualReference(bm, beans);
+    if (instance == null) {
       throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type '" + name + "'");
     }
-    Bean bean = bm.resolve(beans);
-    CreationalContext ctx = bm.createCreationalContext(bean);
-    // select one beantype randomly. A bean has a non-empty set of beantypes.
-    Type type = (Type) bean.getTypes().iterator().next();
-    return bm.getReference(bean, type, ctx);
+
+    return instance;
   }
-  
+
+  private static <T> T getContextualReference(BeanManager bm, Set<Bean<?>> beans) {
+    if (beans == null || beans.size() == 0) {
+      return null;
+    }
+
+    // if we would resolve to multiple beans than BeanManager#resolve would throw an AmbiguousResolutionException
+    Bean<?> bean = bm.resolve(beans);
+    if (bean == null) {
+      return null;
+    }
+    CreationalContext<?> creationalContext = bm.createCreationalContext(bean);
+
+    return (T) bm.getReference(bean, bean.getBeanClass(), creationalContext);
+  }
+
+  /**
+   * @return a ContextualInstance of the given type
+   * @throws IllegalStateException if there is no bean of the given class
+   * @throws javax.enterprise.inject.AmbiguousResolutionException if the given type is satisfied by more than one Bean
+   * @see #lookup(Class, boolean)
+   */
   public static <T> T lookup(Class<T> clazz) {
-    BeanManager bm = BeanManagerLookup.getBeanManager();
-    return lookup(clazz, bm);
+    return lookup(clazz, false);
   }
-  
+
+  /**
+   * @param optional if <code>false</code> then the bean must exist.
+   * @return a ContextualInstance of the given type if optional is <code>false</code>. If optional is <code>true</code> null might be returned if no bean got found.
+   * @throws IllegalStateException if there is no bean of the given class, but only if optional is <code>false</code>
+   * @throws javax.enterprise.inject.AmbiguousResolutionException if the given type is satisfied by more than one Bean
+   * @see #lookup(Class, boolean)
+   */
+  public static <T> T lookup(Class<T> clazz, boolean optional) {
+    BeanManager bm = BeanManagerLookup.getBeanManager();
+    return lookup(clazz, bm, optional);
+  }
+
   public static Object lookup(String name) {
     BeanManager bm = BeanManagerLookup.getBeanManager();
     return lookup(name, bm);
