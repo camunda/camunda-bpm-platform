@@ -41,8 +41,12 @@ define([
         element.find('.nav li').eq(0).addClass('active');
         element.find('.tab-pane').eq(0).addClass('active');
 
-        $rootScope.$on('tasklist.task.current', function() {
+        $rootScope.$watch('currentTask', function() {
+          if (!$rootScope.currentTask || (scope.task && scope.task.id === $rootScope.currentTask.id)) {
+            return;
+          }
           scope.task = $rootScope.currentTask;
+          console.info('Current task is now', scope.task);
         });
       },
       template: require('text!camunda-tasklist-ui/task/task.html')
@@ -55,13 +59,19 @@ define([
   function(camAPI,   $rootScope,   camUID) {
     return {
       link: function(scope, element) {
+        scope.task = scope.task || $rootScope.currentTask;
+
         scope.elUID = camUID();
 
         scope.labelsWidth = 3;
         scope.fieldsWidth = 12 - scope.labelsWidth;
 
         $rootScope.$watch('currentTask', function() {
-          console.info('Current task is now', $rootScope.currentTask);
+          if (!$rootScope.currentTask || (scope.task && scope.task.id === $rootScope.currentTask.id)) {
+            return;
+          }
+          scope.task = $rootScope.currentTask;
+          console.info('Current task is now, get the form', scope.task);
           // scope.fields = camTaskFormData();
         });
       },
