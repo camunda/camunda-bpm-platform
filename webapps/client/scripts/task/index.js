@@ -80,8 +80,8 @@ define([
   }]);
 
   taskModule.directive('camTasklistTaskHistory', [
-          'camAPI', '$rootScope', '$timeout',
-  function(camAPI,   $rootScope,   $timeout) {
+          'camAPI', '$rootScope',
+  function(camAPI,   $rootScope) {
     return {
       link: function(scope, element) {
         scope.history = [];

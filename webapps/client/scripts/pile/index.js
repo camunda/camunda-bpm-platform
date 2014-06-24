@@ -72,8 +72,8 @@ define([
 
 
   pileModule.controller('pilesCtrl', [
-           '$scope', '$rootScope', '$timeout', 'camAPI',
-  function ($scope,   $rootScope,   $timeout,   camAPI) {
+           '$scope', '$rootScope', 'camAPI',
+  function ($scope,   $rootScope,   camAPI) {
     var Pile = camAPI.resource('pile');
     $scope.piles = [];
     $scope.loading = true;
@@ -84,12 +84,11 @@ define([
         throw err;
       }
 
-
-      $timeout(function() {
+      $scope.$apply(function() {
         $scope.piles = res.items;
         $rootScope.currentPile = $scope.piles[0];
         $rootScope.$emit('tasklist.pile.current');
-      }, 0);
+      });
     });
   }]);
 
@@ -265,10 +264,10 @@ define([
               throw err;
             }
 
-            $timeout(function() {
+            scope.$apply(function() {
               scope.totalItems = res.count;
               scope.tasks = res.items;
-            }, 0);
+            });
           });
         }
 
