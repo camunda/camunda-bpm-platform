@@ -1,5 +1,5 @@
 'use strict';
-describe('The API', function() {
+xdescribe('The API', function() {
   var apiModule, User;
 
   describe('module', function() {

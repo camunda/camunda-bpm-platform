@@ -1,5 +1,5 @@
 'use strict';
-describe('The legacy API', function() {
+xdescribe('The legacy API', function() {
   var apiModule, ProcessDefinition, Q, $, angular;
 
   describe('module', function() {

@@ -1,5 +1,5 @@
 'use strict';
-describe('The - integration - environement', function() {
+xdescribe('The - integration - environement', function() {
   describe('module loading', function() {
     var camundaTasklist;
 

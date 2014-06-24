@@ -1,7 +1,7 @@
 (function(root) {
   'use strict';
 
-  var tests = ['camunda-tasklist-ui-mocks'];
+  var tests = [];
   for (var file in root.__karma__.files) {
     if (root.__karma__.files.hasOwnProperty(file)) {
       if (/Spec\.js$/.test(file)) {
