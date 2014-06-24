@@ -22,14 +22,6 @@
 
             <li>
               <a tooltip-placement="bottom"
-                 tooltip="Manage your account"
-                 ng-href="/camunda/app/admin/default/#/users/{{ user.id }}?tab=profile">
-                {{ user.id }}
-              </a>
-            </li>
-
-            <li>
-              <a tooltip-placement="bottom"
                  tooltip="Start a process"
                  ng-controller="processStartCtrl"
                  ng-click="openProcessStartModal()"
@@ -37,11 +29,20 @@
                 <i class="glyphicon glyphicon-list-alt"></i>
               </a>
             </li>
+
+            <li class="user-account">
+              <a tooltip-placement="bottom"
+                 tooltip="Manage your account"
+                 ng-href="/camunda/app/admin/default/#/users/{{ user.id }}?tab=profile">
+                <i class="glyphicon glyphicon-user"></i>
+                {{ user.id }}
+              </a>
+            </li>
             <li>
               <a tooltip-placement="bottom"
                  tooltip="Log out"
                  href="#/logout">
-                <i class="glyphicon glyphicon-log-out"></i>
+                <i class="glyphicon glyphicon-off"></i>
               </a>
             </li>
 

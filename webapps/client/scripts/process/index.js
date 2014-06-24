@@ -123,8 +123,8 @@ define([
           camTasklistNotifier.add(err);
           throw err;
         }
-        $scope.totalProcesses = res.count;
 
+        $scope.totalProcesses = res.count;
 
         $scope.processes = res.items.sort(function(a, b) {
           var aName = (a.name || a.key).toLowerCase();

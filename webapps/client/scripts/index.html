@@ -3,17 +3,24 @@
 
 
     <!-- # page-navigation -->
-    <nav class="navbar navbar-default" role="navigation" cam-tasklist-navigation>
+    <nav class="navbar navbar-default"
+         role="navigation"
+         cam-tasklist-navigation>
     </nav>
     <!-- / page-navigation -->
 
 
     <div class="container-fluid">
       <div class="row controls">
-        <div class="cols col-sm-2 task-piles">
+        <div class="cols col-sm-2 task-piles"
+             ng-controller="pileCreateCtrl">
           <div class="inner">
             <h5>
-              <a href="#/piles/new">New pile <span class="glyphicon glyphicon-plus-sign"></span></a>
+              <a href
+                 ng-click="createPile()">
+                New pile
+                <span class="glyphicon glyphicon-plus-sign"></span>
+              </a>
             </h5>
           </div>
         </div>
@@ -28,26 +35,40 @@
               </div>
               <div class="col-xs-6 dropdown sorting">
               -->
-                <a data-toggle="dropdown" href="#">Sort by <span class="sort-by">Due date</span></a>
-                <a href="#" class="sort-direction glyphicon glyphicon-chevron-up"></a>
+                <a href
+                   data-toggle="dropdown">Sort by <span class="sort-by">Due date</span></a>
+
+                <a href
+                   class="sort-direction glyphicon glyphicon-chevron-up"></a>
+
                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
                   <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#">Due date</a>
+                    <a role="menuitem"
+                       tabindex="-1"
+                       href>Due date</a>
                   </li>
 
                   <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#">Follow up date</a>
+                    <a role="menuitem"
+                       tabindex="-1"
+                       href>Follow up date</a>
                   </li>
 
                   <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#">Task name</a>
+                    <a role="menuitem"
+                       tabindex="-1"
+                       href>Task name</a>
                   </li>
 
                   <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#">Assignee</a>
+                    <a role="menuitem"
+                       tabindex="-1"
+                       href>Assignee</a>
                   </li>
                   <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#">Owner</a>
+                    <a role="menuitem"
+                       tabindex="-1"
+                       href>Owner</a>
                   </li>
 
                 </ul>

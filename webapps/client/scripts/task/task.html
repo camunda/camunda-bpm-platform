@@ -1,4 +1,8 @@
-<div ng-hide="!!task && task.name"></div>
+<div ng-hide="!!task && task.name">
+  <div class="no-task well">
+    <i class="glyphicon glyphicon-info-sign"></i> Select a task in the list.
+  </div>
+</div>
 <section ng-show="!!task && task.name"
          class="task-card">
   <header class="row">

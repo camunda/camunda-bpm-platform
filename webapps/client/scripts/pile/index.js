@@ -36,6 +36,8 @@ define([
           'camStorage',
   function(camStorage) {
     var tokenExp = /(\{[^\}]+\})/g;
+
+
     function tokenReplace(val) {
       var user = camStorage.get('user');
       if (val === '{self}') {
@@ -62,6 +64,7 @@ define([
 
       return pieces.join('');
     }
+
     return tokenReplace;
   }]);
 
@@ -75,6 +78,7 @@ define([
            '$scope', '$rootScope', 'camAPI',
   function ($scope,   $rootScope,   camAPI) {
     var Pile = camAPI.resource('pile');
+
     $scope.piles = [];
     $scope.loading = true;
 
