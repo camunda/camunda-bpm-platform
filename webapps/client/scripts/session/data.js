@@ -49,6 +49,28 @@ define([
       reqParams.data = options.data;
     }
 
+    // a simple override for static development..
+    var baseHref = angular.element('base').attr('href');
+    if (reqParams.data && baseHref === '/') {
+      deferred.notify('request:start');
+
+      deferred.notify('request:complete');
+      if (reqParams.data.username === 'jonny1' && reqParams.data.password === 'jonny1') {
+        deferred.resolve({
+          userId: 'jonny1',
+          authorizedApps: [
+            'cockpit',
+            'admin',
+            'tasklist'
+          ]
+        });
+      }
+      else {
+        deferred.reject(new Error('Only jonny1 can login in the demo'));
+      }
+      return deferred.promise;
+    }
+
     deferred.notify('request:start');
 
     ajax(reqParams)
