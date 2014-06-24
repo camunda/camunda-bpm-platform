@@ -1,4 +1,6 @@
-<section class="task-card">
+<div ng-hide="!!task && task.name"></div>
+<section ng-show="!!task && task.name"
+         class="task-card">
   <header class="row">
     <div class="col-xs-12">
       <div class="actions">
@@ -26,7 +28,8 @@
             class="followup-date"
             ng-class="(task.followUp < now ? 'overdue' : '')">
           <span class="glyphicon glyphicon-bell"></span>
-          <span cam-form-inline-field value="task.followUp">
+          <span cam-form-inline-field
+                value="task.followUp">
             <span am-time-ago="task.followUp">{{ task.followUp }}</span>
           </span>
         </li>
@@ -36,7 +39,8 @@
             class="due-date"
             ng-class="(task.due < now ? 'overdue' : '')">
           <span class="glyphicon glyphicon-calendar"></span>
-          <span cam-form-inline-field value="task.due">
+          <span cam-form-inline-field
+                value="task.due">
             <span am-time-ago="task.due">{{ task.due }}</span>
           </span>
         </li>
@@ -46,7 +50,8 @@
             title="Assignee"
             class="assignee">
           <span class="glyphicon glyphicon-user"></span>
-          <span cam-form-inline-field value="task.assignee">
+          <span cam-form-inline-field
+                value="task.assignee">
             {{ task.assignee }}
           </span>
         </li>
@@ -55,7 +60,8 @@
             title="Owner"
             class="owner">
           <span class="glyphicon glyphicon-certificate"></span>
-          <span cam-form-inline-field value="task.owner">
+          <span cam-form-inline-field
+                value="task.owner">
             {{ task.owner }}
           </span>
         </li>
@@ -65,46 +71,28 @@
 
   <div class="row tabbed-content">
     <div class="col-xs-12">
-      <ul class="nav nav-tabs">
-        <li>
-          <a href="#tab-{{ elUID }}-form" data-toggle="tab">Form</a>
-        </li>
-
-        <li>
-          <a href="#tab-{{ elUID }}-description" data-toggle="tab">Description</a>
-        </li>
-
-        <li>
-          <a href="#tab-{{ elUID }}-history" data-toggle="tab">History</a>
-        </li>
-
-        <li>
-          <a href="#tab-{{ elUID }}-process" data-toggle="tab">Process</a>
-        </li>
-      </ul>
-
-      <div class="tab-content">
-        <div class="tab-pane"
-             id="tab-{{ elUID }}-form"
+      <tabset>
+        <tab heading="Form">
+          <div class="tab-pane"
              cam-tasklist-task-form
              task="task"></div>
+        </tab>
 
-        <div class="tab-pane"
-             id="tab-{{ elUID }}-description">
-          {{ task.description }}
-        </div>
+        <tab heading="Description">
+          <div class="tab-pane">{{ task.description }}</div>
+        </tab>
 
-        <div class="tab-pane"
-             id="tab-{{ elUID }}-history"
+        <tab heading="History">
+          <div class="tab-pane"
              cam-tasklist-task-history
              history="history">
-        </div>
+          </div>
+        </tab>
 
-        <div class="tab-pane"
-             id="tab-{{ elUID }}-process">
-          <img src="/images/user-task.png" />
-        </div>
-      </div>
+        <tab heading="Diagram">
+          <div class="tab-pane">TODO</div>
+        </tab>
+      </tabset>
     </div>
   </div>
 </section>
