@@ -37,8 +37,9 @@ define([
   function(camStorage) {
     var tokenExp = /(\{[^\}]+\})/g;
     function tokenReplace(val) {
+      var user = camStorage.get('user');
       if (val === '{self}') {
-        return camStorage.get('user').id;
+        return user ? user.id : 'anonymous';
       }
 
       if (val === '{now}') {

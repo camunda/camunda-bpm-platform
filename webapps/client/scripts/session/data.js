@@ -2,10 +2,8 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
-//            'angular', 'jquery', 'hyperagent'
-// ], function(angular,   $,        Hyperagent) {
-           'angular', 'jquery'
-], function(angular,   $) {
+           'angular'
+], function(angular) {
 
   /**
    * @module cam.tasklist.session.data
@@ -16,7 +14,7 @@ define([
    */
 
   var sessionDataModule = angular.module('cam.tasklist.session.data', []);
-
+  var ajax = angular.element.ajax;
 
 
   function replaceVars(str, vars) {
@@ -25,12 +23,6 @@ define([
     }
     return str;
   }
-
-
-
-
-
-
 
 
 
@@ -52,7 +44,6 @@ define([
       contentType:  'application/x-www-form-urlencoded',
       url:          this.baseUrl + replaceVars(options.path || '', options.instance || {})
     };
-    // var stack = (new Error()).stack;
 
     if (options.data) {
       reqParams.data = options.data;
@@ -60,7 +51,7 @@ define([
 
     deferred.notify('request:start');
 
-    $.ajax(reqParams)
+    ajax(reqParams)
     .done(function(data) {
       deferred.resolve(data);
     })

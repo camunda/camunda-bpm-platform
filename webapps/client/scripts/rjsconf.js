@@ -20,18 +20,11 @@ define(function() {
       'angular-moment':             'bower_components/angular-moment/angular-moment',
 
 
-      // 'hyperagent':                 'bower_components/hyperagent/dist/amd',
-
-
       'camunda-tasklist-ui':        'scripts',
 
 
       'camunda-bpm-sdk':            'bower_components/camunda-bpm-sdk-js/index',
-      'camunda-bpm-sdk-mock':       'bower_components/camunda-bpm-sdk-js-mock/index',
-      'uuid':                       'bower_components/node-uuid/uuid',
-      'fixturer':                   'bower_components/fixturer/index',
-      'underscore':                 'bower_components/underscore/index',
-      'underscore.string':          'bower_components/underscore.string/index'
+      'camunda-bpm-sdk-mock':       'bower_components/camunda-bpm-sdk-js-mock/index'
     },
 
     shim: {
@@ -46,13 +39,6 @@ define(function() {
 
       'angular-bootstrap':          ['angular'],
       'angular-moment':             ['angular', 'moment'],
-
-      // 'hyperagent':                 {
-      //                                 exports: 'Hyperagent',
-      //                                 deps: [],
-      //                               },
-      // 'camunda-tasklist-ui/pile/data': ['hyperagent'],
-      // 'camunda-tasklist-ui/task/data': ['hyperagent'],
 
 
       'camunda-tasklist-ui':        [
@@ -75,10 +61,7 @@ define(function() {
                                       'camunda-tasklist-ui/notifier/index',
 
                                       'text!camunda-tasklist-ui/index.html'
-                                    ],
-
-      'underscore.string':          ['underscore'],
-      'fixturer':                   ['underscore.string']
+                                    ]
     },
 
     packages: [
