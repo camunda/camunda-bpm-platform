@@ -144,7 +144,6 @@ utils.expectLoginFailed = function() {
 utils.login = function(username, password, valid) {
   username = username || 'jonny1';
   password = password || 'jonny1';
-  browser.get('/camunda');
 
   element(by.model('username')).clear();
   element(by.model('password')).clear();
@@ -170,10 +169,35 @@ utils.login = function(username, password, valid) {
  @param {string} appName   - Admin Tasklist Cockpit
  */
 utils.switchWebapp = function(appName) {
-  element(by.css('.navbar [sem-show-apps]')).click();
+  element(by.css('.navbar [sem-show-applications]')).click();
   element(by.css('.navbar [sem-jump-to-'+ appName + ']')).click();
 };
 
+/**
+ Navbar
+ @memberof cam.test.e2e.utils
+
+ @param {string} appName   - Admin Tasklist Cockpit
+ */
+utils.logoutWebapp = function() {
+  element(by.css('.navbar [sem-show-user-actions]')).click();
+  element(by.css('.navbar [sem-log-out]')).click();
+};
+
+
+/**
+ webapp
+ @memberof cam.test.e2e.utils
+
+ @param {string} appName   - Admin Tasklist Cockpit
+ */
+utils.startWebapp = function(appName) {
+  browser.get('camunda/app/' + appName.toLowerCase() + '/');
+  browser.driver.manage().window().maximize();
+
+  var navbarName = element(by.css('.brand'));
+  expect(navbarName.getText()).toEqual('camunda ' + appName);
+};
 
 
 

@@ -1,5 +1,5 @@
 var global = this;
-describe('tasklist dashboard', function() {
+xdescribe('tasklist dashboard', function() {
 
   it('should load the home page', function() {
     var ptor = protractor.getInstance();
