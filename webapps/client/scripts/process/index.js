@@ -135,6 +135,8 @@ define([
             return 1;
           return 0;
         });
+        // $scope.$apply(function() {
+        // });
       });
     };
     $scope.loadProcesses();

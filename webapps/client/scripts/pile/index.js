@@ -84,46 +84,50 @@ define([
         throw err;
       }
 
-      $scope.$apply(function() {
-        $scope.piles = res.items;
-        $rootScope.currentPile = $scope.piles[0];
-        $rootScope.$emit('tasklist.pile.current');
-      });
+      $scope.piles = res.items;
+      $rootScope.currentPile = $scope.piles[0];
+      $rootScope.$emit('tasklist.pile.current');
+      // $scope.$apply(function() {
+      // });
     });
   }]);
 
 
-  pileModule.controller('pileNewCtrl', [
+  pileModule.controller('pileCreateCtrl', [
           '$modal', '$scope', '$rootScope',
   function($modal,   $scope,   $rootScope) {
-    $rootScope.currentPile = {
-      name: '',
-      description: '',
-      color: '',
-      filters: []
+
+
+    $scope.createPile = function() {
+      $('.task-board').addClass('pile-edit');
+
+      $rootScope.currentPile = {
+        name: '',
+        description: '',
+        color: '',
+        filters: []
+      };
+
+      $modal.open({
+        // pass the current scope to the $modalInstance
+        scope: $scope,
+
+        size: 'lg',
+
+        template: require('text!camunda-tasklist-ui/pile/form.html'),
+
+        controller: [
+                '$modalInstance',
+        function($modalInstance) {
+          console.info('Hello from the modal instance controller', $modalInstance);
+        }]
+      })
+      .result.then(function(result) {
+        console.info('modalInstance created', result);
+      }, function(reason) {
+        console.info('modalInstance aborted', reason);
+      });
     };
-
-    $('.task-board').addClass('pile-edit');
-
-    var modalInstance = $modal.open({
-      // pass the current scope to the $modalInstance
-      scope: $scope,
-
-      size: 'lg',
-
-      template: require('text!camunda-tasklist-ui/pile/form.html'),
-
-      controller: [
-              '$modalInstance',
-      function($modalInstance) {
-        console.info('Hello from the modal instance controller', $modalInstance);
-      }]
-    })
-    .result.then(function(result) {
-      console.info('modalInstance created', result);
-    }, function(reason) {
-      console.info('modalInstance aborted', reason);
-    });
   }]);
 
 
@@ -264,10 +268,10 @@ define([
               throw err;
             }
 
-            scope.$apply(function() {
-              scope.totalItems = res.count;
-              scope.tasks = res.items;
-            });
+            scope.totalItems = res.count;
+            scope.tasks = res.items;
+            // scope.$apply(function() {
+            // });
           });
         }
 
