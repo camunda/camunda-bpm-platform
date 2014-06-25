@@ -3392,7 +3392,7 @@ public class BpmnParse extends Parse {
       return parseParamValueProvider(element.elements().get(0));
 
     } else {
-      addError("Output parameter can at most have one child element", element);
+      addError("Nested parameter can at most have one child element", element);
       return null;
     }
   }
@@ -3404,7 +3404,7 @@ public class BpmnParse extends Parse {
       List<ParameterValueProvider> providerList = new ArrayList<ParameterValueProvider>();
       for (Element element : parameterElement.elements()) {
         // parse nested provider
-        providerList.add(parseNestedParamValueProvider(element));
+        providerList.add(parseParamValueProvider(element));
       }
       return new ListValueProvider(providerList);
     }
