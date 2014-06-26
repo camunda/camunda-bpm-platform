@@ -19,11 +19,7 @@ import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
@@ -31,21 +27,13 @@ import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
 /**
  * @author Thorben Lindhauer
  * @author Daniel Meyer
+ * @author Michael Scholz
  */
-public class CorrelateMessageCmd implements Command<Void> {
-
-  protected final String messageName;
-  protected final String businessKey;
-  protected final Map<String, Object> correlationKeys;
-  protected final Map<String, Object> processVariables;
-  protected String processInstanceId;
+public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd {
 
   public CorrelateMessageCmd(String messageName, String businessKey,
       Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
-    this.messageName = messageName;
-    this.businessKey = businessKey;
-    this.correlationKeys = correlationKeys;
-    this.processVariables = processVariables;
+    super(messageName, businessKey, correlationKeys, processVariables);
   }
 
   /**
@@ -54,11 +42,7 @@ public class CorrelateMessageCmd implements Command<Void> {
    * @param messageCorrelationBuilderImpl
    */
   public CorrelateMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl) {
-    this.messageName = messageCorrelationBuilderImpl.getMessageName();
-    this.processVariables = messageCorrelationBuilderImpl.getPayloadProcessInstanceVariables();
-    this.correlationKeys = messageCorrelationBuilderImpl.getCorrelationProcessInstanceVariables();
-    this.businessKey = messageCorrelationBuilderImpl.getBusinessKey();
-    this.processInstanceId = messageCorrelationBuilderImpl.getProcessInstanceId();
+    super(messageCorrelationBuilderImpl);
   }
 
   public Void execute(CommandContext commandContext) {
@@ -84,16 +68,4 @@ public class CorrelateMessageCmd implements Command<Void> {
 
     return null;
   }
-
-  protected void triggerExecution(CommandContext commandContext, MessageCorrelationResult correlationResult) {
-    new MessageEventReceivedCmd(messageName, correlationResult.getExecutionEntity().getId(), processVariables).execute(commandContext);
-  }
-
-  protected void instantiateProcess(CommandContext commandContext, MessageCorrelationResult correlationResult) {
-    ProcessDefinitionEntity processDefinitionEntity = correlationResult.getProcessDefinitionEntity();
-    ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
-    ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(businessKey, messageStartEvent);
-    processInstance.start(businessKey, processVariables);
-  }
-
 }

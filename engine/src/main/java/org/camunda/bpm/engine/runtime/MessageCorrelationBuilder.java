@@ -96,7 +96,7 @@ public interface MessageCorrelationBuilder {
    * <p>This will result in any number of the following:
    * <ul>
    * <li>Any number of waiting executions are notified to continue. The notification is performed synchronously.</li>
-   * <li>Zero or one Process Instances is started in case the message name matches a message start event of a
+   * <li>Zero or one Process Instance is started in case the message name matches a message start event of a
    *     process. The instantiation is performed synchronously.</li>
    * </ul>
    * </p>
