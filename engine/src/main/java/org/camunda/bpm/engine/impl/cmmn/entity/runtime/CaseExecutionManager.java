@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -64,6 +65,17 @@ public class CaseExecutionManager extends AbstractManager {
       .deleteTasksByCaseInstanceId(caseInstanceId, deleteReason, cascade);
 
     execution.deleteCascade();
+
+    // TODO: move this later to HistoricCaseInstance
+    int historyLevel = Context
+      .getProcessEngineConfiguration()
+      .getHistoryLevel();
+
+    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      commandContext
+        .getOperationLogManager()
+        .deleteOperationLogEntriesByCaseInstanceId(caseInstanceId);
+    }
   }
 
   public CaseExecutionEntity findCaseExecutionById(String caseExecutionId) {

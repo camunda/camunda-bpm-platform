@@ -30,6 +30,9 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   protected String processDefinitionId;
   protected String processInstanceId;
   protected String executionId;
+  protected String caseDefinitionId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
   protected String taskId;
   protected String userId;
   protected String operationId;
@@ -60,6 +63,25 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     this.executionId = executionId;
     return this;
   }
+
+  public UserOperationLogQuery caseDefinitionId(String caseDefinitionId) {
+    assertParamNotNull("caseDefinitionId", caseDefinitionId);
+    this.caseDefinitionId = caseDefinitionId;
+    return this;
+  }
+
+  public UserOperationLogQuery caseInstanceId(String caseInstanceId) {
+    assertParamNotNull("caseInstanceId", caseInstanceId);
+    this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
+  public UserOperationLogQuery caseExecutionId(String caseExecutionId) {
+    assertParamNotNull("caseExecutionId", caseExecutionId);
+    this.caseExecutionId = caseExecutionId;
+    return this;
+  }
+
 
   public UserOperationLogQuery taskId(String taskId) {
     assertParamNotNull("taskId", taskId);

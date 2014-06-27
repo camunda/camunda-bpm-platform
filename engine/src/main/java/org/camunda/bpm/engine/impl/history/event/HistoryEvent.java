@@ -85,6 +85,15 @@ public class HistoryEvent implements Serializable, PersistentObject {
   /** the id of the process definition */
   protected String processDefinitionId;
 
+  /** the case instance in which the event has happened */
+  protected String caseInstanceId;
+
+  /** the id of the case execution in which the event has happened */
+  protected String caseExecutionId;
+
+  /** the id of the case definition */
+  protected String caseDefinitionId;
+
   /**
    * The type of the activity audit event.
    *
@@ -127,6 +136,30 @@ public class HistoryEvent implements Serializable, PersistentObject {
 
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public void setCaseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
+  }
+
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
   }
 
   public void setId(String id) {

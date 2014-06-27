@@ -52,6 +52,10 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     getDbSqlSession().delete("deleteUserOperationLogEntriesByProcessInstanceId", historicProcessInstanceId);
   }
 
+  public void deleteOperationLogEntriesByCaseInstanceId(String caseInstanceId) {
+    getDbSqlSession().delete("deleteUserOperationLogEntriesByCaseInstanceId", caseInstanceId);
+  }
+
   public void deleteOperationLogEntriesByTaskId(String taskId) {
     getDbSqlSession().delete("deleteUserOperationLogEntriesByTaskId", taskId);
   }
@@ -105,6 +109,9 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     context.setProcessDefinitionId(task.getProcessDefinitionId());
     context.setProcessInstanceId(task.getProcessInstanceId());
     context.setExecutionId(task.getExecutionId());
+    context.setCaseDefinitionId(task.getCaseDefinitionId());
+    context.setCaseInstanceId(task.getCaseInstanceId());
+    context.setCaseExecutionId(task.getCaseExecutionId());
     context.setTaskId(task.getId());
 
     return context;

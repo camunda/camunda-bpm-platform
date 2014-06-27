@@ -26,6 +26,9 @@ public class UserOperationLogContext {
   protected String processDefinitionId;
   protected String processInstanceId;
   protected String executionId;
+  protected String caseDefinitionId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
   protected String taskId;
   protected String operationType;
   protected String entityType;
@@ -55,6 +58,30 @@ public class UserOperationLogContext {
 
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public void setCaseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
+  }
+
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
   }
 
   public String getTaskId() {

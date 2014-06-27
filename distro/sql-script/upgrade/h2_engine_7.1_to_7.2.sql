@@ -33,6 +33,15 @@ ALTER TABLE ACT_RU_TASK
 ALTER TABLE ACT_RU_TASK
   ADD CASE_DEF_ID_ varchar(64);
 
+ALTER TABLE ACT_HI_OP_LOG
+  ADD CASE_EXECUTION_ID_ varchar(64);
+
+ALTER TABLE ACT_HI_OP_LOG
+  ADD CASE_INST_ID_ varchar(64);
+
+ALTER TABLE ACT_HI_OP_LOG
+  ADD CASE_DEF_ID_ varchar(64);
+
 -- create case definition table --
 
 create table ACT_RE_CASE_DEF (

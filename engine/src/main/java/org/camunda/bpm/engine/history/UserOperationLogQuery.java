@@ -52,6 +52,15 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
   /** Query entries which are existing for the given execution. */
   UserOperationLogQuery executionId(String executionId);
 
+  /** Query entries which are existing for the given case definition id. */
+  UserOperationLogQuery caseDefinitionId(String caseDefinitionId);
+
+  /** Query entries which are existing for the given case instance. */
+  UserOperationLogQuery caseInstanceId(String caseInstanceId);
+
+  /** Query entries which are existing for the given case execution. */
+  UserOperationLogQuery caseExecutionId(String caseExecutionId);
+
   /** Query entries which are existing for the task. */
   UserOperationLogQuery taskId(String taskId);
 
