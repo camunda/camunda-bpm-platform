@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl.cmmn.behavior;
 
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
-import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
@@ -24,11 +23,11 @@ import org.camunda.bpm.engine.impl.task.TaskDefinition;
  * @author Roman Smirnov
  *
  */
-public class HumanTaskActivityBehavior extends AbstractCmmnActivityBehavior {
+public class HumanTaskActivityBehavior extends TaskActivityBehavior {
 
   protected TaskDecorator taskDecorator;
 
-  protected void performActiveBehavior(CmmnActivityExecution execution, CmmnActivity activity) {
+  public void started(CmmnActivityExecution execution) {
     TaskEntity task = TaskEntity.createAndInsert(execution);
     task.setCaseExecution(execution);
 

@@ -29,6 +29,7 @@ public interface CaseExecutionListener extends DelegateListener<DelegateCaseExec
   String RE_ACTIVATE = "reactivate";
   String TERMINATE = "terminate";
   String EXIT = "exit";
+  String PARENT_TERMINATE = "parentTerminate";
   String SUSPEND = "suspend";
   String RESUME = "resume";
   String PARENT_SUSPEND = "parentSuspend";

@@ -19,27 +19,37 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMP
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.NEW;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_COMPLETE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_CREATE;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_DELETE_CASCADE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_COMPLETE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_CREATE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_DISABLE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_ENABLE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_MANUAL_START;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_RE_ENABLE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_START;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_INSTANCE_NOTIFY_LISTENER_CREATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_DISABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_ENABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_EXIT;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_MANUAL_COMPLETE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_MANUAL_START;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_OCCUR;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_PARENT_RESUME;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_PARENT_SUSPEND;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_PARENT_TERMINATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_RESUME;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_RE_ACTIVATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_RE_ENABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_START;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_SUSPEND;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TERMINATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_INSTANCE_CLOSE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_INSTANCE_CREATE;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 
@@ -51,8 +61,6 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   private static final long serialVersionUID = 1L;
 
-  private static Logger log = Logger.getLogger(CmmnExecution.class.getName());
-
   protected transient CmmnCaseDefinition caseDefinition;
 
   // current position //////////////////////////////////////
@@ -63,9 +71,11 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   /** the activity which is to be started next */
   protected transient CmmnActivity nextActivity;
 
+  protected boolean required;
+
   protected int previousState;
 
-  protected int currentState;
+  protected int currentState = NEW.getStateCode();
 
   public CmmnExecution() {
   }
@@ -73,6 +83,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   // plan items ///////////////////////////////////////////////////////////////
 
   public abstract List<? extends CmmnExecution> getCaseExecutions();
+
+  protected abstract List<? extends CmmnExecution> getCaseExecutionsInternal();
 
   public CmmnExecution findCaseExecution(String activityId) {
     if ((getActivity()!=null) && (getActivity().getId().equals(activityId))) {
@@ -164,14 +176,24 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   public void remove() {
    CmmnExecution parent = getParent();
    if (parent!=null) {
-     parent.getCaseExecutions().remove(this);
+     parent.getCaseExecutionsInternal().remove(this);
    }
+  }
+
+  // required //////////////////////////////////////////////////
+
+  public boolean isRequired() {
+    return required;
+  }
+
+  public void setRequired(boolean required) {
+    this.required = required;
   }
 
   // state /////////////////////////////////////////////////////
 
-  public int getCurrentState() {
-    return currentState;
+  public CaseExecutionState getCurrentState() {
+    return CaseExecutionState.CASE_EXECUTION_STATES.get(getState());
   }
 
   public void setCurrentState(CaseExecutionState currentState) {
@@ -179,8 +201,16 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     this.currentState = currentState.getStateCode();
   }
 
-  public void setCurrentState(int currentState) {
-    this.currentState = currentState;
+  public int getState() {
+    return currentState;
+  }
+
+  public void setState(int state) {
+    this.currentState = state;
+  }
+
+  public boolean isNew() {
+    return currentState == NEW.getStateCode();
   }
 
   public boolean isAvailable() {
@@ -221,11 +251,15 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   // previous state /////////////////////////////////////////////
 
-  public int getPreviousState() {
+  public CaseExecutionState getPreviousState() {
+    return CaseExecutionState.CASE_EXECUTION_STATES.get(getPrevious());
+  }
+
+  public int getPrevious() {
     return previousState;
   }
 
-  public void setPreviousState(int previousState) {
+  public void setPrevious(int previousState) {
     this.previousState = currentState;
   }
 
@@ -252,10 +286,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       setBusinessKey(businessKey);
     }
 
-    // the case instance is "ACTIVE" after creation
-    setCurrentState(ACTIVE);
-
-    performOperation(CASE_INSTANCE_NOTIFY_LISTENER_CREATE);
+    performOperation(CASE_INSTANCE_CREATE);
   }
 
   public void createChildExecutions(List<CmmnActivity> activities) {
@@ -277,10 +308,9 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     // then notify create listener for each created
     // child case execution
     for (CmmnExecution child : children) {
+
       if (isActive()) {
-        // only do this when the this case execution is
-        // still active
-        child.performOperation(CASE_EXECUTION_NOTIFY_LISTENER_CREATE);
+        child.performOperation(CASE_EXECUTION_CREATE);
       } else {
         // if this case execution is not active anymore,
         // then stop notifying create listener and executing
@@ -295,82 +325,78 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   protected abstract CmmnExecution newCaseExecution();
 
   public void enable() {
-    if (isCaseInstanceExecution()) {
-      String message = "Cannot perform transition on case execution '"+id+"': it is not possible to enable a case instance.";
-      throw new ProcessEngineException(message);
-    }
-
-    transition(AVAILABLE, ENABLED, CASE_EXECUTION_NOTIFY_LISTENER_ENABLE);
+    performOperation(CASE_EXECUTION_ENABLE);
   }
 
   public void disable() {
-    if (isCaseInstanceExecution()) {
-      String message = "Cannot perform transition on case execution '"+id+"': it is not possible to disable a case instance.";
-      throw new ProcessEngineException(message);
-    }
-
-    transition(ENABLED, DISABLED, CASE_EXECUTION_NOTIFY_LISTENER_DISABLE);
+    performOperation(CASE_EXECUTION_DISABLE);
   }
 
   public void reenable() {
-    if (isCaseInstanceExecution()) {
-      String message = "Cannot perform transition on case execution '"+id+"': it is not possible to re-enable a case instance.";
-      throw new ProcessEngineException(message);
-    }
-
-    transition(DISABLED, ENABLED, CASE_EXECUTION_NOTIFY_LISTENER_RE_ENABLE);
+    performOperation(CASE_EXECUTION_RE_ENABLE);
   }
 
   public void manualStart() {
-    if (isCaseInstanceExecution()) {
-      String message = "Cannot perform transition on case execution '"+id+"': it is not possible to start a case instance manually.";
-      throw new ProcessEngineException(message);
-    }
-
-    transition(ENABLED, ACTIVE, CASE_EXECUTION_NOTIFY_LISTENER_MANUAL_START);
+    performOperation(CASE_EXECUTION_MANUAL_START);
   }
 
   public void start() {
-    if (isCaseInstanceExecution()) {
-      String message = "Cannot perform transition on case execution '"+id+"': it is not possible to start a case instance.";
-      throw new ProcessEngineException(message);
-    }
-    transition(AVAILABLE, ACTIVE, CASE_EXECUTION_NOTIFY_LISTENER_START);
+    performOperation(CASE_EXECUTION_START);
   }
 
   public void complete() {
-    transition(ACTIVE, COMPLETED, CASE_EXECUTION_NOTIFY_LISTENER_COMPLETE);
+    performOperation(CASE_EXECUTION_COMPLETE);
   }
 
-  protected void transition(CaseExecutionState from, CaseExecutionState target, CmmnAtomicOperation nextOperation) {
-    CaseExecutionState currentFrom = CaseExecutionState.CASE_EXECUTION_STATES.get(currentState);
+  public void manualComplete() {
+    performOperation(CASE_EXECUTION_MANUAL_COMPLETE);
+  }
 
-    // is this case execution already in the target state
-    if (currentState == target.getStateCode()) {
-      String message = "Cannot perform transition on case execution '"+id+"': the case execution is already in the state '"+currentFrom+"'.";
-      throw new ProcessEngineException(message);
-    } else
-    // is this case execution in the expected state
-    if (currentState != from.getStateCode()) {
-      // if not throw an exception
-      String message = "Cannot perform transition on case execution '"+id+"' to the state '"+target+"': the expected current state is '"+from+"', but was '"+currentFrom+"'.";
-      throw new ProcessEngineException(message);
-    }
+  public void occur() {
+    performOperation(CASE_EXECUTION_OCCUR);
+  }
 
-    // perform transition: set the new state
-    setCurrentState(target);
+  public void terminate() {
+    performOperation(CASE_EXECUTION_TERMINATE);
+  }
 
-    // if a next operation is provided, execute it.
-    if (nextOperation != null) {
-      performOperation(nextOperation);
-    }
+  public void parentTerminate() {
+    performOperation(CASE_EXECUTION_PARENT_TERMINATE);
+  }
+
+  public void exit() {
+    performOperation(CASE_EXECUTION_EXIT);
+  }
+
+  public void suspend() {
+    performOperation(CASE_EXECUTION_SUSPEND);
+  }
+
+  public void parentSuspend() {
+    performOperation(CASE_EXECUTION_PARENT_SUSPEND);
+  }
+
+  public void resume() {
+    performOperation(CASE_EXECUTION_RESUME);
+  }
+
+  public void parentResume() {
+    performOperation(CASE_EXECUTION_PARENT_RESUME);
+  }
+
+  public void reactivate() {
+    performOperation(CASE_EXECUTION_RE_ACTIVATE);
+  }
+
+  public void close() {
+    performOperation(CASE_INSTANCE_CLOSE);
   }
 
   // toString() /////////////////////////////////////////////////
 
   public String toString() {
     if (isCaseInstanceExecution()) {
-      return "CaseInstance[" + getToStringIdentity() + "]";
+      return "CaseInstance["+getToStringIdentity()+"]";
     } else {
       return "CmmnExecution["+getToStringIdentity() + "]";
     }

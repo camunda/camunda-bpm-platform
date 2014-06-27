@@ -12,21 +12,27 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import static org.camunda.bpm.engine.delegate.CaseExecutionListener.PARENT_SUSPEND;
 
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionNotifyListenerSuspend extends AbstractAtomicOperationNotifyListener {
+public class AtomicOperationCaseExecutionParentSuspend extends AbstractAtomicOperationCaseExecutionSuspend {
 
   public String getCanonicalName() {
-    return "plan-item-notify-listener-suspend";
+    return "case-execution-parent-suspend";
   }
 
   protected String getEventName() {
-    return CaseExecutionListener.SUSPEND;
+    return PARENT_SUSPEND;
+  }
+
+  protected void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution) {
+    behavior.onParentSuspension(execution);
   }
 
 }

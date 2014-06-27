@@ -10,28 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmmn.operation;
+package org.camunda.bpm.engine.test.cmmn.operation;
 
-import org.camunda.bpm.engine.delegate.CaseExecutionListener;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.cmmn.behavior.TaskActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseInstanceNotifyListenerCreate extends AbstractAtomicOperationNotifyListener {
+public class TaskWaitState extends TaskActivityBehavior {
 
-  public String getCanonicalName() {
-    return "case-notify-listener-create";
-  }
-
-  protected String getEventName() {
-    return CaseExecutionListener.CREATE;
-  }
-
-  @Override
-  protected void eventNotificationsCompleted(CmmnExecution execution) {
-    execution.performOperation(ACTIVITY_EXECUTE);
+  public void started(CmmnActivityExecution execution) throws Exception {
   }
 
 }

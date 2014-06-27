@@ -15,15 +15,16 @@ package org.camunda.bpm.engine.impl.cmmn.handler;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.HumanTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
+import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
@@ -34,6 +35,26 @@ import org.camunda.bpm.model.cmmn.instance.Role;
  *
  */
 public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
+
+  public CmmnActivity handleElement(PlanItem planItem, CmmnHandlerContext context) {
+    HumanTask definition = (HumanTask) planItem.getDefinition();
+
+    if (!definition.isBlocking()) {
+      // The CMMN 1.0 specification says:
+      // When a HumanTask is not 'blocking' (isBlocking is 'false'),
+      // it can be considered a 'manual' Task, i.e., the Case management
+      // system is not tracking the lifecycle of the HumanTask (instance).
+      return null;
+    }
+
+    return super.handleElement(planItem, context);
+  }
+
+
+  protected CmmnActivity createActivity(CmmnElement element, CmmnHandlerContext context) {
+    // TODO Auto-generated method stub
+    return super.createActivity(element, context);
+  }
 
   @Override
   protected void initializeActivity(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {

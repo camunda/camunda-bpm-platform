@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;

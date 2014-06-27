@@ -10,19 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.cmmn.operation;
+package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.AbstractCmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
-import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+
 
 /**
- * @author smirnov
+ * @author Roman Smirnov
  *
  */
-public class WaitState extends AbstractCmmnActivityBehavior {
+public interface CompositeActivityBehavior extends CmmnActivityBehavior {
 
-  protected void performActiveBehavior(CmmnActivityExecution execution, CmmnActivity activity) {
-  }
+  public void childStateChanged(CmmnExecution execution, CmmnExecution child);
 
 }

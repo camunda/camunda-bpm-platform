@@ -10,23 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmmn.operation;
+package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import org.camunda.bpm.engine.delegate.CaseExecutionListener;
-
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionNotifyListenerDisable extends AbstractAtomicOperationNotifyListener {
+public class EventListenerActivityBehavior extends EventListenerOrMilestoneActivityBehavior {
 
-  public String getCanonicalName() {
-    return "plan-item-notify-listener";
-  }
+  public void created(CmmnActivityExecution execution) {
+    // TODO: implement this:
 
-  protected String getEventName() {
-    return CaseExecutionListener.DISABLE;
+    // (1) in case of a UserEventListener there is nothing to do!
+
+    // (2) in case of TimerEventListener we have to check
+    // whether the timer must be triggered, when a transition
+    // on another plan item or case file item happens!
   }
 
 }

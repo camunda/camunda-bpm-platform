@@ -12,6 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.execution;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.CmmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
@@ -20,13 +25,6 @@ import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStore;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Roman Smirnov
@@ -37,8 +35,6 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private static Logger log = Logger.getLogger(CaseExecutionImpl.class.getName());
-
-  private static AtomicInteger idGenerator = new AtomicInteger();
 
   // current position /////////////////////////////////////////////////////////
 
@@ -88,6 +84,10 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   // case executions ////////////////////////////////////////////////////////////////
 
   public List<CaseExecutionImpl> getCaseExecutions() {
+    return new ArrayList<CaseExecutionImpl>(getCaseExecutionsInternal());
+  }
+
+  protected List<CaseExecutionImpl> getCaseExecutionsInternal() {
     if (caseExecutions == null) {
       caseExecutions = new ArrayList<CaseExecutionImpl>();
     }
@@ -110,27 +110,18 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   protected CaseExecutionImpl createCaseExecution(CmmnActivity activity) {
     CaseExecutionImpl child = newCaseExecution();
 
-    // TODO: evaluate "RepetitionRule" and "RequiredRule"
-
     // set activity to execute
     child.setActivity(activity);
 
     // handle child/parent-relation
     child.setParent(this);
-    getCaseExecutions().add(child);
+    getCaseExecutionsInternal().add(child);
 
     // set case instance
     child.setCaseInstance(getCaseInstance());
 
     // set case definition
     child.setCaseDefinition(getCaseDefinition());
-
-    // set state to available
-    child.setCurrentState(CaseExecutionState.AVAILABLE);
-
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("Child caseExecution " + child + " created with parent " + this);
-    }
 
     return child;
   };

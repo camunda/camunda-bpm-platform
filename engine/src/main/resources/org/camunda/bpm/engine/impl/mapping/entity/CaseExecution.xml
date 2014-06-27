@@ -15,8 +15,8 @@
       #{caseDefinitionId, jdbcType=VARCHAR},
       #{activityId, jdbcType=VARCHAR},
       #{parentId, jdbcType=VARCHAR},
-      #{currentState, jdbcType=INTEGER},
-      #{previousState, jdbcType=INTEGER},
+      #{state, jdbcType=INTEGER},
+      #{previous, jdbcType=INTEGER},
       1
     )
   </insert>
@@ -26,8 +26,8 @@
   <update id="updateCaseExecution" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity">
     update ${prefix}ACT_RU_CASE_EXECUTION set
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      CURRENT_STATE_ = #{currentState, jdbcType=INTEGER},
-      PREV_STATE_ = #{previousState, jdbcType=INTEGER}
+      CURRENT_STATE_ = #{state, jdbcType=INTEGER},
+      PREV_STATE_ = #{previous, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -48,8 +48,8 @@
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
-    <result property="currentState" column="CURRENT_STATE_" jdbcType="INTEGER"/>
-    <result property="previousStage" column="PREVIOUS_STATE_" jdbcType="INTEGER"/>
+    <result property="state" column="CURRENT_STATE_" jdbcType="INTEGER"/>
+    <result property="previous" column="PREVIOUS_STATE_" jdbcType="INTEGER"/>
   </resultMap>
 
   <!-- CASE EXECUTION SELECT -->

@@ -12,15 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
-import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
@@ -42,9 +40,6 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 public class CaseExecutionEntity extends CmmnExecution implements CaseExecution, CaseInstance, PersistentObject, HasRevision {
 
   private static final long serialVersionUID = 1L;
-
-  private static Logger log = Logger.getLogger(CmmnExecution.class.getName());
-
 
   // current position /////////////////////////////////////////////////////////
 
@@ -171,6 +166,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   // case executions ////////////////////////////////////////////////////////////////
 
   public List<CaseExecutionEntity> getCaseExecutions() {
+    return new ArrayList<CaseExecutionEntity>(getCaseExecutionsInternal());
+  }
+
+  protected List<CaseExecutionEntity> getCaseExecutionsInternal() {
     ensureCaseExecutionsInitialized();
     return caseExecutions;
   }
@@ -222,27 +221,18 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected CaseExecutionEntity createCaseExecution(CmmnActivity activity) {
     CaseExecutionEntity child = newCaseExecution();
 
-    // TODO: evaluate "RepetitionRule" and "RequiredRule"
-
     // set activity to execute
     child.setActivity(activity);
 
     // handle child/parent-relation
     child.setParent(this);
-    getCaseExecutions().add(child);
+    getCaseExecutionsInternal().add(child);
 
     // set case instance
     child.setCaseInstance(getCaseInstance());
 
     // set case definition
     child.setCaseDefinition(getCaseDefinition());
-
-    // set state to available
-    child.setCurrentState(CaseExecutionState.AVAILABLE);
-
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("Child caseExecution " + child + " created with parent " + this);
-    }
 
     return child;
   };

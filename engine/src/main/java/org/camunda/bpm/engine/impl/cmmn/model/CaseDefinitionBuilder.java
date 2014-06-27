@@ -15,8 +15,8 @@ package org.camunda.bpm.engine.impl.cmmn.model;
 import java.util.Stack;
 
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 
 /**
@@ -61,6 +61,11 @@ public class CaseDefinitionBuilder {
 
   public CaseDefinitionBuilder behavior(CmmnActivityBehavior behavior) {
     getActivity().setActivityBehavior(behavior);
+    return this;
+  }
+
+  public CaseDefinitionBuilder autoComplete(boolean autoComplete) {
+    getActivity().setProperty("autoComplete", autoComplete);
     return this;
   }
 

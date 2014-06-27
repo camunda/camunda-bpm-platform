@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.core.model.CoreActivity;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 

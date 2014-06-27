@@ -10,28 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmmn.operation;
+package org.camunda.bpm.engine.impl.cmmn;
 
-import org.camunda.bpm.engine.delegate.CaseExecutionListener;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionNotifyListenerStart extends AbstractAtomicOperationNotifyListener {
+public interface CaseRule {
 
-  public String getCanonicalName() {
-    return "plan-item-notify-listener-start";
-  }
-
-  protected String getEventName() {
-    return CaseExecutionListener.START;
-  }
-
-  @Override
-  protected void eventNotificationsCompleted(CmmnExecution execution) {
-    execution.performOperation(ACTIVITY_EXECUTE);
-  }
+  boolean evaluate(CmmnActivityExecution execution);
 
 }

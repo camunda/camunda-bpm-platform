@@ -10,23 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmmn.operation;
+package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import org.camunda.bpm.engine.delegate.CaseExecutionListener;
-
+import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionNotifyListenerFault extends AbstractAtomicOperationNotifyListener {
+public class ManualActivationRuleImpl extends CaseRuleImpl {
 
-  public String getCanonicalName() {
-    return "plan-item-notify-listener-fault";
+  public ManualActivationRuleImpl(Expression expression) {
+    super(expression);
   }
 
-  protected String getEventName() {
-    return CaseExecutionListener.FAULT;
+  public boolean evaluate(CmmnActivityExecution execution) {
+    return !super.evaluate(execution);
   }
 
 }

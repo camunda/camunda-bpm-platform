@@ -18,8 +18,8 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.TaskActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
 import org.camunda.bpm.engine.impl.cmmn.handler.TaskPlanItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;

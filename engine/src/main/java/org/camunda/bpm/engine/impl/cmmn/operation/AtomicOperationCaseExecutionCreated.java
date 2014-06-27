@@ -12,9 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import java.util.logging.Logger;
-
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
@@ -22,34 +20,30 @@ import org.camunda.bpm.engine.impl.pvm.PvmException;
 /**
  * @author Tom Baeyens
  */
-public class AtomicOperationActivityExecute implements CmmnAtomicOperation {
-
-  private static Logger log = Logger.getLogger(AtomicOperationActivityExecute.class.getName());
+public class AtomicOperationCaseExecutionCreated implements CmmnAtomicOperation {
 
   public boolean isAsync(CmmnExecution execution) {
     return false;
   }
 
   public void execute(CmmnExecution execution) {
+    String id = execution.getId();
     CmmnActivity activity = execution.getActivity();
 
-    CmmnActivityBehavior activityBehavior = activity.getActivityBehavior();
-    if (activityBehavior==null) {
-      throw new PvmException("no behavior specified in "+activity);
+    if (activity == null) {
+      throw new PvmException("Case execution '"+id+"': has no current activity.");
     }
 
-    log.fine(execution+" executes "+activity+": "+activityBehavior.getClass().getName());
+    CmmnActivityBehavior behavior = activity.getActivityBehavior();
 
-    try {
-      activityBehavior.execute(execution);
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new PvmException("couldn't execute activity <"+activity.getProperty("type")+" id=\""+activity.getId()+"\" ...>: "+e.getMessage(), e);
+    if (behavior==null) {
+      throw new PvmException("There is no behavior specified in "+activity+" for case execution '"+id+"'.");
     }
+
+    behavior.created(execution);
   }
 
   public String getCanonicalName() {
-    return "activity-execute";
+    return "case-execution-created";
   }
 }

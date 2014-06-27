@@ -324,7 +324,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByDisabled() {
     List<CaseExecution> caseExecutions= caseService
         .createCaseExecutionQuery()
-        .caseDefinitionKey(CASE_DEFINITION_KEY)
+        .caseDefinitionKey(CASE_DEFINITION_KEY_2)
         .activityId("PI_HumanTask_1")
         .list();
 
@@ -338,7 +338,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     query.disabled();
 
-    verifyQueryResults(query, 4);
+    verifyQueryResults(query, 1);
 
   }
 

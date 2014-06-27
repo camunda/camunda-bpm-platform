@@ -12,21 +12,21 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import org.camunda.bpm.engine.delegate.CaseExecutionListener;
-
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionNotifyListenerResume extends AbstractAtomicOperationNotifyListener {
+public class AtomicOperationCaseExecutionComplete extends AbstractAtomicOperationCaseExecutionComplete {
 
   public String getCanonicalName() {
-    return "plan-item-notify-listener-resume";
+    return "case-execution-complete";
   }
 
-  protected String getEventName() {
-    return CaseExecutionListener.RESUME;
+  protected void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution) {
+    behavior.onCompletion(execution);
   }
 
 }

@@ -12,23 +12,25 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
-
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class TaskActivityBehavior extends StageOrTaskActivityBehavior {
+public class MilestoneActivityBehavior extends EventListenerOrMilestoneActivityBehavior {
 
-  public void onReactivation(CmmnActivityExecution execution) {
-    ensureTransitionAllowed(execution, FAILED, ACTIVE, "re-activate");
+  protected void creating(CmmnActivityExecution execution) {
+    evaluateRequiredRule(execution);
+    evaluateRepetitionRule(execution);
   }
 
-  public void started(CmmnActivityExecution execution) throws Exception {
-    execution.complete();
+  public void created(CmmnActivityExecution execution) {
+    // Check Entry Sentries
+    // TODO: Check Entry Sentries, if the entryCriterias
+    // are not fulfilled then stay in state AVAILABLE.
+    // But if the entryCriterias are already fulfilled
+    // then perform transition "occur" on given case execution.
   }
 
 }

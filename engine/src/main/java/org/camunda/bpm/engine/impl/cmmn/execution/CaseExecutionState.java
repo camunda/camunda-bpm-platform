@@ -25,6 +25,7 @@ public interface CaseExecutionState {
 
   Map<Integer, CaseExecutionState> CASE_EXECUTION_STATES = new HashMap<Integer, CaseExecutionState>();
 
+  CaseExecutionState NEW = new CaseExecutionStateImpl(0, "new");
   CaseExecutionState AVAILABLE = new CaseExecutionStateImpl(1, "available");
   CaseExecutionState ENABLED = new CaseExecutionStateImpl(2, "enabled");
   CaseExecutionState DISABLED = new CaseExecutionStateImpl(3, "disabled");

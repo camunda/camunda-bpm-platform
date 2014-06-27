@@ -49,9 +49,9 @@ public interface CaseExecution {
   boolean isEnabled();
 
   /**
-   * <p>Returns <code>true</code> if the case instance is active.</p>
+   * <p>Returns <code>true</code> if the case execution is disabled.</p>
    *
-   * <p><strong>Note:</strong> If this case execution is the case execution, it will
+   * <p><strong>Note:</strong> If this case execution is the case instance, it will
    * return always <code>false</code>.</p>
    */
   boolean isDisabled();

@@ -12,26 +12,43 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import static org.camunda.bpm.engine.delegate.CaseExecutionListener.CLOSE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.CLOSED;
+
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionNotifyListenerManualStart extends AbstractAtomicOperationNotifyListener {
+public class AtomicOperationCaseInstanceClose extends AbstractCmmnEventAtomicOperation {
 
   public String getCanonicalName() {
-    return "plan-item-notify-listener-manual-start";
+    return "case-instance-close";
   }
 
   protected String getEventName() {
-    return CaseExecutionListener.MANUAL_START;
+    return CLOSE;
   }
 
-  @Override
+  protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
+    try {
+      CmmnActivityBehavior behavior = getActivityBehavior(execution);
+      behavior.onClose(execution);
+
+      execution.setCurrentState(CLOSED);
+    } catch (RuntimeException e) {
+      String id = execution.getId();
+      throw new PvmException("Cannot close case instance '"+id+"'.", e);
+    }
+
+    return execution;
+  }
+
   protected void eventNotificationsCompleted(CmmnExecution execution) {
-    execution.performOperation(ACTIVITY_EXECUTE);
+    execution.deleteCascade();
   }
 
 }

@@ -10,16 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmmn.execution;
+package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public interface CmmnActivityBehavior extends CoreActivityBehavior<CmmnActivityExecution> {
+public class AtomicOperationCaseExecutionManualComplete extends AbstractAtomicOperationCaseExecutionComplete {
 
-  public void execute(CmmnActivityExecution execution) throws Exception;
+  public String getCanonicalName() {
+    return "case-execution-manual-complete";
+  }
 
+  protected void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution) {
+    behavior.onManualCompletion(execution);
+  }
 }

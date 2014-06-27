@@ -12,21 +12,27 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import static org.camunda.bpm.engine.delegate.CaseExecutionListener.PARENT_RESUME;
 
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionNotifyListenerParentResume extends AbstractAtomicOperationNotifyListener {
+public class AtomicOperationCaseExecutionParentResume extends AbstractAtomicOperationCaseExecutionResume {
 
   public String getCanonicalName() {
-    return "plan-item-notify-listener-parent-resume";
+    return "case-execution-parent-resume";
   }
 
   protected String getEventName() {
-    return CaseExecutionListener.PARENT_RESUME;
+    return PARENT_RESUME;
+  }
+
+  protected void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution) {
+    behavior.onParentResume(execution);
   }
 
 }

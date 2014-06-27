@@ -12,9 +12,17 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
+import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CaseRuleImpl;
+import org.camunda.bpm.engine.impl.cmmn.behavior.ManualActivationRuleImpl;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
+import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
+import org.camunda.bpm.model.cmmn.instance.RepetitionRule;
+import org.camunda.bpm.model.cmmn.instance.RequiredRule;
 
 /**
  * @author Roman Smirnov
@@ -40,7 +48,90 @@ public abstract class PlanItemHandler extends CmmnElementHandler<PlanItem> {
     }
     activity.setName(name);
 
-    // TODO: set properties: itemControl (vs.) defaultControl
+    // requiredRule
+    initializeRequiredRule(planItem, activity, context);
+
+    // manualActivation
+    initializeManualActivationRule(planItem, activity, context);
+
+    // repetitionRule
+    initializeRepetitionRule(planItem, activity, context);
+
+  }
+
+  protected void initializeRequiredRule(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
+    PlanItemDefinition definition = planItem.getDefinition();
+
+    PlanItemControl itemControl = planItem.getItemControl();
+    PlanItemControl defaultControl = definition.getDefaultControl();
+
+    ExpressionManager expressionManager = context.getExpressionManager();
+
+    RequiredRule requiredRule = null;
+    if (itemControl != null) {
+      requiredRule = itemControl.getRequiredRule();
+    }
+    if (requiredRule == null && defaultControl != null) {
+      requiredRule = defaultControl.getRequiredRule();
+    }
+
+    if (requiredRule != null) {
+      String rule = requiredRule.getCondition().getBody();
+      Expression requiredRuleExpression = expressionManager.createExpression(rule);
+      CaseRuleImpl caseRule = new CaseRuleImpl(requiredRuleExpression);
+      activity.setProperty("requiredRule", caseRule);
+    }
+
+  }
+
+  protected void initializeManualActivationRule(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
+    PlanItemDefinition definition = planItem.getDefinition();
+
+    PlanItemControl itemControl = planItem.getItemControl();
+    PlanItemControl defaultControl = definition.getDefaultControl();
+
+    ExpressionManager expressionManager = context.getExpressionManager();
+
+    ManualActivationRule manualActivationRule = null;
+    if (itemControl != null) {
+      manualActivationRule = itemControl.getManualActivationRule();
+    }
+    if (manualActivationRule == null && defaultControl != null) {
+      manualActivationRule = defaultControl.getManualActivationRule();
+    }
+
+    if (manualActivationRule != null) {
+      String rule = manualActivationRule.getCondition().getBody();
+      Expression requiredRuleExpression = expressionManager.createExpression(rule);
+      CaseRuleImpl caseRule = new ManualActivationRuleImpl(requiredRuleExpression);
+      activity.setProperty("manualActivationRule", caseRule);
+    }
+
+  }
+
+  protected void initializeRepetitionRule(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
+    PlanItemDefinition definition = planItem.getDefinition();
+
+    PlanItemControl itemControl = planItem.getItemControl();
+    PlanItemControl defaultControl = definition.getDefaultControl();
+
+    ExpressionManager expressionManager = context.getExpressionManager();
+
+    RepetitionRule repetitionRule = null;
+    if (itemControl != null) {
+      repetitionRule = itemControl.getRepetitionRule();
+    }
+    if (repetitionRule == null && defaultControl != null) {
+      repetitionRule = defaultControl.getRepetitionRule();
+    }
+
+    if (repetitionRule != null) {
+      String rule = repetitionRule.getCondition().getBody();
+      Expression requiredRuleExpression = expressionManager.createExpression(rule);
+      CaseRuleImpl caseRule = new CaseRuleImpl(requiredRuleExpression);
+      activity.setProperty("repetitionRule", caseRule);
+    }
+
   }
 
 }
