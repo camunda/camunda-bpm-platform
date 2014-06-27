@@ -16,6 +16,6 @@ package org.camunda.bpm.model.cmmn.instance;
  * @author Roman Smirnov
  *
  */
-public interface UserEvent extends Event {
+public interface UserEventListener extends EventListener {
 
 }

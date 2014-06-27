@@ -13,10 +13,10 @@
 package org.camunda.bpm.model.cmmn.impl.instance;
 
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_USER_EVENT;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_EVENT;
 
-import org.camunda.bpm.model.cmmn.instance.Event;
-import org.camunda.bpm.model.cmmn.instance.UserEvent;
+import org.camunda.bpm.model.cmmn.instance.EventListener;
+import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -26,19 +26,19 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceP
  * @author Roman Smirnov
  *
  */
-public class UserEventImpl extends EventImpl implements UserEvent {
+public class EventListenerImpl extends PlanItemDefinitionImpl implements EventListener {
 
-  public UserEventImpl(ModelTypeInstanceContext instanceContext) {
+  public EventListenerImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(UserEvent.class, CMMN_ELEMENT_USER_EVENT)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(EventListener.class, CMMN_ELEMENT_EVENT)
         .namespaceUri(CMMN10_NS)
-        .extendsType(Event.class)
-        .instanceProvider(new ModelTypeInstanceProvider<UserEvent>() {
-          public UserEvent newInstance(ModelTypeInstanceContext instanceContext) {
-            return new UserEventImpl(instanceContext);
+        .extendsType(PlanItemDefinition.class)
+        .instanceProvider(new ModelTypeInstanceProvider<EventListener>() {
+          public EventListener newInstance(ModelTypeInstanceContext instanceContext) {
+            return new EventListenerImpl(instanceContext);
           }
         });
 

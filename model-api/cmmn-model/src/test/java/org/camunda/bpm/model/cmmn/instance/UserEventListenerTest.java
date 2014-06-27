@@ -12,26 +12,20 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
-import java.util.Arrays;
 import java.util.Collection;
-
-import org.camunda.bpm.model.cmmn.impl.instance.TimerExpression;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class TimerEventTest extends CmmnModelElementInstanceTest {
+public class UserEventListenerTest extends CmmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(Event.class, false);
+    return new TypeAssumption(EventListener.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
-    return Arrays.asList(
-          new ChildElementAssumption(TimerExpression.class, 0, 1),
-          new ChildElementAssumption(StartTrigger.class, 0, 1)
-        );
+    return null;
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {

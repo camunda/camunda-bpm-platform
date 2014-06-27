@@ -15,9 +15,9 @@ package org.camunda.bpm.model.cmmn.impl.instance;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_TIMER_EVENT;
 
-import org.camunda.bpm.model.cmmn.instance.Event;
+import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.StartTrigger;
-import org.camunda.bpm.model.cmmn.instance.TimerEvent;
+import org.camunda.bpm.model.cmmn.instance.TimerEventListener;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -29,12 +29,12 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
  * @author Roman Smirnov
  *
  */
-public class TimerEventImpl extends EventImpl implements TimerEvent {
+public class TimerEventListenerImpl extends EventListenerImpl implements TimerEventListener {
 
   protected static ChildElement<TimerExpression> timerExpressionChild;
   protected static ChildElement<StartTrigger> timerStartChild;
 
-  public TimerEventImpl(ModelTypeInstanceContext instanceContext) {
+  public TimerEventListenerImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
@@ -55,12 +55,12 @@ public class TimerEventImpl extends EventImpl implements TimerEvent {
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(TimerEvent.class, CMMN_ELEMENT_TIMER_EVENT)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(TimerEventListener.class, CMMN_ELEMENT_TIMER_EVENT)
         .namespaceUri(CMMN10_NS)
-        .extendsType(Event.class)
-        .instanceProvider(new ModelTypeInstanceProvider<TimerEvent>() {
-          public TimerEvent newInstance(ModelTypeInstanceContext instanceContext) {
-            return new TimerEventImpl(instanceContext);
+        .extendsType(EventListener.class)
+        .instanceProvider(new ModelTypeInstanceProvider<TimerEventListener>() {
+          public TimerEventListener newInstance(ModelTypeInstanceContext instanceContext) {
+            return new TimerEventListenerImpl(instanceContext);
           }
         });
 

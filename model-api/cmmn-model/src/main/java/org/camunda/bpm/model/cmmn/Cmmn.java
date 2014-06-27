@@ -41,7 +41,7 @@ import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
 import org.camunda.bpm.model.cmmn.impl.instance.DefinitionsImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.DiscretionaryItemImpl;
-import org.camunda.bpm.model.cmmn.impl.instance.EventImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.EventListenerImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ExpressionImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.HumanTaskImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.IfPartImpl;
@@ -77,10 +77,10 @@ import org.camunda.bpm.model.cmmn.impl.instance.StageImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.StartTriggerImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.TableItemImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.TaskImpl;
-import org.camunda.bpm.model.cmmn.impl.instance.TimerEventImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.TimerEventListenerImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.TimerExpression;
 import org.camunda.bpm.model.cmmn.impl.instance.TransformationExpression;
-import org.camunda.bpm.model.cmmn.impl.instance.UserEventImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.UserEventListenerImpl;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.ModelException;
@@ -269,7 +269,7 @@ public class Cmmn {
     DefaultControl.registerType(modelBuilder);
     DefinitionsImpl.registerType(modelBuilder);
     DiscretionaryItemImpl.registerType(modelBuilder);
-    EventImpl.registerType(modelBuilder);
+    EventListenerImpl.registerType(modelBuilder);
     ExpressionImpl.registerType(modelBuilder);
     HumanTaskImpl.registerType(modelBuilder);
     IfPartImpl.registerType(modelBuilder);
@@ -305,10 +305,10 @@ public class Cmmn {
     StartTriggerImpl.registerType(modelBuilder);
     TableItemImpl.registerType(modelBuilder);
     TaskImpl.registerType(modelBuilder);
-    TimerEventImpl.registerType(modelBuilder);
+    TimerEventListenerImpl.registerType(modelBuilder);
     TimerExpression.registerType(modelBuilder);
     TransformationExpression.registerType(modelBuilder);
-    UserEventImpl.registerType(modelBuilder);
+    UserEventListenerImpl.registerType(modelBuilder);
   }
 
   /**

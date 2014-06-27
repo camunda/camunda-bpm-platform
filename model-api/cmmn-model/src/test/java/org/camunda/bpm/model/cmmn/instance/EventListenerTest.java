@@ -18,7 +18,7 @@ import java.util.Collection;
  * @author Roman Smirnov
  *
  */
-public class EventTest extends CmmnModelElementInstanceTest {
+public class EventListenerTest extends CmmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
     return new TypeAssumption(PlanItemDefinition.class, false);
