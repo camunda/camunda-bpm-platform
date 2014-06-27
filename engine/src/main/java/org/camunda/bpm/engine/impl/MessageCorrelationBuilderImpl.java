@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -92,6 +93,15 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public void correlate() {
     CorrelateMessageCmd command = new CorrelateMessageCmd(this);
+    if(commandExecutor != null) {
+      commandExecutor.execute(command);
+    } else {
+      command.execute(commandContext);
+    }
+  }
+
+  public void correlateAll() {
+    CorrelateAllMessageCmd command = new CorrelateAllMessageCmd(this);
     if(commandExecutor != null) {
       commandExecutor.execute(command);
     } else {

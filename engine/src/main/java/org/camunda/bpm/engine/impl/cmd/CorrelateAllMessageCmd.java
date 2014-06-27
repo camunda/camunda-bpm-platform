@@ -13,9 +13,9 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -29,9 +29,9 @@ import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
  * @author Daniel Meyer
  * @author Michael Scholz
  */
-public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd {
+public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd {
 
-  public CorrelateMessageCmd(String messageName, String businessKey,
+  public CorrelateAllMessageCmd(String messageName, String businessKey,
       Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
     super(messageName, businessKey, correlationKeys, processVariables);
   }
@@ -41,7 +41,7 @@ public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd {
    *
    * @param messageCorrelationBuilderImpl
    */
-  public CorrelateMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl) {
+  public CorrelateAllMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl) {
     super(messageCorrelationBuilderImpl);
   }
 
@@ -53,17 +53,14 @@ public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd {
     CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
 
     CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys);
-    MessageCorrelationResult correlationResult = correlationHandler.correlateMessage(commandContext, messageName, correlationSet);
+    List<MessageCorrelationResult> correlationResults = correlationHandler.correlateMessages(commandContext, messageName, correlationSet);
 
-    if(correlationResult == null) {
-      throw new MismatchingMessageCorrelationException(messageName, "No process definition or execution matches the parameters");
-
-    } else if(MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
-      triggerExecution(commandContext, correlationResult);
-
-    } else {
-      instantiateProcess(commandContext, correlationResult);
-
+    for(MessageCorrelationResult correlationResult : correlationResults) {
+      if(MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
+        triggerExecution(commandContext, correlationResult);
+      } else {
+        instantiateProcess(commandContext, correlationResult);
+      }
     }
 
     return null;
