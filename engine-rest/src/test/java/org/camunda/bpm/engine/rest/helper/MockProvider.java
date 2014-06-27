@@ -1133,6 +1133,9 @@ public abstract class MockProvider {
     when(entry.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
     when(entry.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(entry.getExecutionId()).thenReturn(EXAMPLE_EXECUTION_ID);
+    when(entry.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_DEFINITION_ID);
+    when(entry.getCaseInstanceId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
+    when(entry.getCaseExecutionId()).thenReturn(EXAMPLE_CASE_EXECUTION_ID);
     when(entry.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(entry.getUserId()).thenReturn(EXAMPLE_USER_ID);
     when(entry.getTimestamp()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_USER_OPERATION_TIMESTAMP).toDate());

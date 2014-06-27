@@ -12,8 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.Date;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
@@ -31,6 +32,9 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   private String processDefinitionId;
   private String processInstanceId;
   private String executionId;
+  private String caseDefinitionId;
+  private String caseInstanceId;
+  private String caseExecutionId;
   private String taskId;
   private String userId;
   private String operationId;
@@ -64,6 +68,15 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
     }
     if (executionId != null) {
       query.executionId(executionId);
+    }
+    if (caseDefinitionId != null) {
+      query.caseDefinitionId(caseDefinitionId);
+    }
+    if (caseInstanceId != null) {
+      query.caseInstanceId(caseInstanceId);
+    }
+    if (caseExecutionId != null) {
+      query.caseExecutionId(caseExecutionId);
     }
     if (taskId != null) {
       query.taskId(taskId);
@@ -117,6 +130,21 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   @CamundaQueryParam("executionId")
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
+  }
+
+  @CamundaQueryParam("caseDefinitionId")
+  public void setCaseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
+  }
+
+  @CamundaQueryParam("caseInstanceId")
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  @CamundaQueryParam("caseExecutionId")
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
   }
 
   @CamundaQueryParam("taskId")
