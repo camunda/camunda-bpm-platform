@@ -38,6 +38,8 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
@@ -535,6 +537,56 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
     assertEquals(1, variables.size());
     assertEquals("myValue", variables.get("myParam"));
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCompleteTaskShouldCompleteCaseExecution() {
+    // given
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    // when
+    taskService.complete(task.getId());
+
+    // then
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertNull(task);
+
+    CaseExecution caseExecution = caseService
+      .createCaseExecutionQuery()
+      .activityId("PI_HumanTask_1")
+      .singleResult();
+
+    assertNull(caseExecution);
+
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
   }
 
   public void testResolveTaskNullTaskId() {
@@ -1240,6 +1292,75 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       taskService.deleteTasks(Arrays.asList(task.getId()), "test");
     } catch(ProcessEngineException ae) {
       assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
+    }
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testDeleteTaskPartOfCaseInstance() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    try {
+      taskService.deleteTask(task.getId());
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
+    }
+
+    try {
+      taskService.deleteTask(task.getId(), true);
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
+    }
+
+    try {
+      taskService.deleteTask(task.getId(), "test");
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
+    }
+
+    try {
+      taskService.deleteTasks(Arrays.asList(task.getId()));
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
+    }
+
+    try {
+      taskService.deleteTasks(Arrays.asList(task.getId()), true);
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
+    }
+
+    try {
+      taskService.deleteTasks(Arrays.asList(task.getId()), "test");
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
     }
 
   }

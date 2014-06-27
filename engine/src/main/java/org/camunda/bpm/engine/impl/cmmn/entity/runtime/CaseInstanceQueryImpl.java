@@ -76,6 +76,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     return this;
   }
 
+  public CaseInstanceQuery completed() {
+    state = CaseExecutionState.COMPLETED;
+    return this;
+  }
+
   //ordering /////////////////////////////////////////////////////////////////
 
   public CaseInstanceQuery orderByCaseInstanceId() {

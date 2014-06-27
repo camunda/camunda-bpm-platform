@@ -72,6 +72,9 @@
       <if test="processDefinitionKey != null">
         PROC_DEF_ID_ IN (SELECT ID_ FROM ${prefix}ACT_RE_PROCDEF WHERE KEY_ = #{processDefinitionKey, jdbcType=VARCHAR})
       </if>
+      <if test="caseExecutionId != null">
+        CASE_EXECUTION_ID_ = #{caseExecutionId, jdbcType=VARCHAR}
+      </if>
     </where>
   </update>
 
@@ -119,6 +122,12 @@
     select distinct T.*
     from ${prefix}ACT_RU_TASK T
     where T.EXECUTION_ID_ = #{parameter}
+  </select>
+
+  <select id="selectTaskByCaseExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
+    select distinct T.*
+    from ${prefix}ACT_RU_TASK T
+    where T.CASE_EXECUTION_ID_ = #{parameter}
   </select>
 
   <select id="selectTasksByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="taskResultMap">

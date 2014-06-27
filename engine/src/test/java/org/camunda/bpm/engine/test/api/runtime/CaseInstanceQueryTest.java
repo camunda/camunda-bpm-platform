@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 
@@ -170,6 +171,25 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     query.active();
+
+    verifyQueryResults(query, 5);
+  }
+
+  public void testQueryByCompleted() {
+    List<CaseExecution> executions = caseService
+      .createCaseExecutionQuery()
+      .activityId("PI_HumanTask_1")
+      .list();
+
+    for (CaseExecution caseExecution : executions) {
+      caseService
+        .withCaseExecution(caseExecution.getId())
+        .disable();
+    }
+
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery();
+
+    query.completed();
 
     verifyQueryResults(query, 5);
   }

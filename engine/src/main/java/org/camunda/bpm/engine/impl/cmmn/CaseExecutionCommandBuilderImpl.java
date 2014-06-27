@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.cmd.CaseExecutionVariableCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.CompleteCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.DisableCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.ManualStartCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.ReenableCaseExecutionCmd;
@@ -177,6 +178,11 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
 
   public void reenable() {
     ReenableCaseExecutionCmd command = new ReenableCaseExecutionCmd(this);
+    executeCommand(command);
+  }
+
+  public void complete() {
+    CompleteCaseExecutionCmd command = new CompleteCaseExecutionCmd(this);
     executeCommand(command);
   }
 

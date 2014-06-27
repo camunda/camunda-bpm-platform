@@ -17,6 +17,9 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.model.cmmn.instance.CaseTask;
+import org.camunda.bpm.model.cmmn.instance.HumanTask;
+import org.camunda.bpm.model.cmmn.instance.ProcessTask;
 import org.camunda.bpm.model.cmmn.instance.Stage;
 import org.camunda.bpm.model.cmmn.instance.Task;
 
@@ -29,6 +32,7 @@ import org.camunda.bpm.model.cmmn.instance.Task;
  *    <li>{@link #manualStart()}</li>
  *    <li>{@link #disable()}</li>
  *    <li>{@link #enable()}</li>
+ *    <li>{@link #complete()}</li>
  *  </ul>
  * </p>
  *
@@ -233,6 +237,11 @@ public interface CaseExecutionCommandBuilder {
    * that the with the case execution related {@link Stage} or {@link Task} should
    * not be executed in the case instance.</p>
    *
+   * <p>If the given case execution has a parent case execution, that parent
+   * case execution will be notified that the given case execution has been
+   * completed. This can lead to a completion of the parent case execution if
+   * the completion criteria are fulfilled.</p>
+   *
    * @throws ProcessEngineException this exception will be thrown
    *  <ul>
    *    <li>when the passed case execution id is null or</li>
@@ -261,5 +270,57 @@ public interface CaseExecutionCommandBuilder {
    *  </ul>
    */
   void reenable();
+
+  /**
+   * <p>Additionally to {@link #execute()} the associated case execution will
+   * be completed. Therefore there happens a transition from the state <code>ACTIVE</code>
+   * to state <code>COMPLETED</code>.</p>
+   *
+   * <p>It is only possible to complete a case execution which is associated with a
+   * {@link Stage} or {@link Task}.</p>
+   *
+   * <p>In case of a {@link Stage} the completion can only be performed when the following
+   * criteria are fulfilled:<br>
+   * <ul>
+   *  <li>there are no children in the state <code>ACTIVE</code></li>
+   *  <li>all required (<code>requiredRule</code> evaluates to <code>true</code>) children
+   *      are in state:
+   *    <ul>
+   *      <li><code>DISABLED</code></li>
+   *      <li><code>COMPLETED</code></li>
+   *      <li><code>TERMINATED</code></li>
+   *      <li><code>FAILED</code></li>
+   *    </ul>
+   *  </li>
+   * </ul>
+   * </p>
+   *
+   * <p>For a {@link Task} instance, this means its purpose has been accomplished:<br>
+   *  <ul>
+   *    <li>{@link HumanTask} have been completed by human.</li>
+   *    <li>{@link CaseTask} have launched a new {@link CaseInstance} and if output parameters
+   *        are required and/or the property <code>isBlocking</code> is set to <code>true</code>,
+   *        then the launched {@link CaseInstance} has completed and returned the
+   *        output parameters.</li>
+   *    <li>{@link ProcessTask} have launched a new {@link ProcessInstance} and if output parameters
+   *        are required and/or the property <code>isBlocking</code> is set to <code>true</code>,
+   *        then the launched {@link ProcessInstance} has completed and returned the
+   *        output parameters.</li>
+   *  </ul>
+   * </p>
+   *
+   * <p>If the given case execution has a parent case execution, that parent
+   * case execution will be notified that the given case execution has been
+   * completed. This can lead to a completion of the parent case execution if
+   * the completion criteria are fulfilled.</p>
+   *
+   * @throws ProcessEngineException this exception will be thrown
+   *  <ul>
+   *    <li>when the passed case execution id is null or</li>
+   *    <li>when no case execution is found for the given case execution id or</li>
+   *    <li>when the transition is not allowed to be done or</li>
+   *  </ul>
+   */
+  void complete();
 
 }

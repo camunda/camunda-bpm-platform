@@ -187,20 +187,53 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   }
 
   public void complete() {
+    // if the task is associated with a case
+    // execution then call complete on the
+    // associated case execution. The case
+    // execution handles the completion of
+    // the task.
+    if (caseExecutionId != null) {
+      getCaseExecution().manualComplete();
+      return;
+    }
+
+    // in the other case:
+
+    // ensure the the Task is not suspended
     ensureTaskActive();
 
+    // trigger TaskListener.complete event
     fireEvent(TaskListener.EVENTNAME_COMPLETE);
 
+    // delete the task
     Context
       .getCommandContext()
       .getTaskManager()
       .deleteTask(this, TaskEntity.DELETE_REASON_COMPLETED, false);
 
+    // if the task is associated with a
+    // execution (and not a case execution)
+    // then call signal an the associated
+    // execution.
     if (executionId!=null) {
       ExecutionEntity execution = getExecution();
       execution.removeTask(this);
       execution.signal(null, null);
     }
+  }
+
+  public void caseExecutionCompleted() {
+    // ensure the the Task is not suspended
+    ensureTaskActive();
+
+    // trigger TaskListener.complete event
+    fireEvent(TaskListener.EVENTNAME_COMPLETE);
+
+    // delete the task
+    Context
+      .getCommandContext()
+      .getTaskManager()
+      .deleteTask(this, TaskEntity.DELETE_REASON_COMPLETED, false);
   }
 
   public void delete(String deleteReason, boolean cascade) {

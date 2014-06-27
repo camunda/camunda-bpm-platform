@@ -112,6 +112,10 @@ public class TaskManager extends AbstractManager {
     return getDbSqlSession().selectList("selectTasksByExecutionId", executionId);
   }
 
+  public TaskEntity findTaskByCaseExecutionId(String caseExecutionId) {
+    return (TaskEntity) getDbSqlSession().selectOne("selectTaskByCaseExecutionId", caseExecutionId);
+  }
+
   @SuppressWarnings("unchecked")
   public List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId) {
     return getDbSqlSession().selectList("selectTasksByProcessInstanceId", processInstanceId);
@@ -166,6 +170,13 @@ public class TaskManager extends AbstractManager {
   public void updateTaskSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
+  }
+
+  public void updateTaskSuspensionStateByCaseExecutionId(String caseExecutionId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("caseExecutionId", caseExecutionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
 

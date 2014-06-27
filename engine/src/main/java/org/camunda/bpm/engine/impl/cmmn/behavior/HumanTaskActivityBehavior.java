@@ -14,7 +14,9 @@ package org.camunda.bpm.engine.impl.cmmn.behavior;
 
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -35,6 +37,48 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
 
     // All properties set, now firing 'create' event
     task.fireEvent(TaskListener.EVENTNAME_CREATE);
+  }
+
+  protected void terminating(CmmnActivityExecution execution) {
+    TaskEntity task = getTask(execution);
+    // it can happen that a there does not exist
+    // a task, because the given execution was never
+    // active.
+    if (task != null) {
+      task.delete("terminated", false);
+    }
+  }
+
+  public void completing(CmmnActivityExecution execution) {
+    TaskEntity task = getTask(execution);
+    if (task != null) {
+      task.caseExecutionCompleted();
+    }
+  }
+
+  public void suspending(CmmnActivityExecution execution) {
+    String id = execution.getId();
+
+    Context
+      .getCommandContext()
+      .getTaskManager()
+      .updateTaskSuspensionStateByCaseExecutionId(id, SuspensionState.SUSPENDED);
+  }
+
+  public void resuming(CmmnActivityExecution execution) {
+    String id = execution.getId();
+
+    Context
+      .getCommandContext()
+      .getTaskManager()
+      .updateTaskSuspensionStateByCaseExecutionId(id, SuspensionState.ACTIVE);
+  }
+
+  protected TaskEntity getTask(CmmnActivityExecution execution) {
+    return Context
+        .getCommandContext()
+        .getTaskManager()
+        .findTaskByCaseExecutionId(execution.getId());
   }
 
   // getters/setters /////////////////////////////////////////////////

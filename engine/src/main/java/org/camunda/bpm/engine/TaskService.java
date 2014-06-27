@@ -60,7 +60,7 @@ public interface TaskService {
 	 * @param taskId The id of the task that will be deleted, cannot be null. If no task
 	 * exists with the given taskId, the operation is ignored.
 	 * @throws ProcessEngineException when an error occurs while deleting the task or in case the task is part
-   *   of a running process.
+   *   of a running process or case instance.
 	 */
 	void deleteTask(String taskId);
 
@@ -70,7 +70,7 @@ public interface TaskService {
 	 * @param taskIds The id's of the tasks that will be deleted, cannot be null. All
 	 * id's in the list that don't have an existing task will be ignored.
 	 * @throws ProcessEngineException when an error occurs while deleting the tasks or in case one of the tasks
-   *  is part of a running process.
+   *  is part of a running process or case instance.
 	 */
 	void deleteTasks(Collection<String> taskIds);
 
@@ -80,7 +80,7 @@ public interface TaskService {
    * exists with the given taskId, the operation is ignored.
    * @param cascade If cascade is true, also the historic information related to this task is deleted.
    * @throws ProcessEngineException when an error occurs while deleting the task or in case the task is part
-   *   of a running process.
+   *   of a running process or case instance.
    */
   void deleteTask(String taskId, boolean cascade);
 
@@ -92,7 +92,7 @@ public interface TaskService {
    * @throws ProcessEngineException when an error occurs while deleting the tasks or in case one of the tasks
    *  is part of a running process.
    * @throws ProcessEngineException when an error occurs while deleting the tasks or in case one of the tasks
-   *  is part of a running process.
+   *  is part of a running process or case instance.
    */
   void deleteTasks(Collection<String> taskIds, boolean cascade);
 
@@ -102,7 +102,7 @@ public interface TaskService {
    * exists with the given taskId, the operation is ignored.
    * @param deleteReason reason the task is deleted. Is recorded in history, if enabled.
    * @throws ProcessEngineException when an error occurs while deleting the task or in case the task is part
-   *  of a running process
+   *  of a running process or case instance.
    */
   void deleteTask(String taskId, String deleteReason);
 
@@ -112,7 +112,7 @@ public interface TaskService {
    * id's in the list that don't have an existing task will be ignored.
    * @param deleteReason reason the task is deleted. Is recorded in history, if enabled.
    * @throws ProcessEngineException when an error occurs while deleting the tasks or in case one of the tasks
-   *  is part of a running process.
+   *  is part of a running process or case instance.
    */
   void deleteTasks(Collection<String> taskIds, String deleteReason);
 

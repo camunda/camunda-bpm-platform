@@ -3158,4 +3158,1046 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     }
   }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testDisableTaskShouldCompleteCaseInstance() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .disable();
+
+    // then
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance has been completed
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .completed()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testDisableStageShouldCompleteCaseInstance() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult()
+        .getId();
+
+    // when
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .disable();
+
+    // then
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance has been completed
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .completed()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCompleteTaskShouldCompleteCaseInstance() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNotNull(task);
+
+    // when
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .complete();
+
+    // then
+
+    // the task has been completed and has been deleted
+    task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNull(task);
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance has been completed
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .completed()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testCompleteStageShouldCompleteCaseInstance() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    // when
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .complete();
+
+    // then
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance has been completed
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .completed()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testCompleteTask() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNotNull(task);
+
+    // when
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .complete();
+
+    // then
+
+    // the task has been completed and has been deleted
+    task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNull(task);
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance is still active
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .active()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isActive());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageCase.cmmn"})
+  public void testCompleteStage() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    // when
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .complete();
+
+    // then
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance is still active
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .active()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isActive());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCompleteCaseInstanceWithEnabledTask() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    String caseInstanceId = caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    // when
+
+    caseService
+      .withCaseExecution(caseInstanceId)
+      .complete();
+
+    // then
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testCompleteCaseInstanceWithEnabledStage() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    String caseInstanceId = caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    // when
+
+    caseService
+      .withCaseExecution(caseInstanceId)
+      .complete();
+
+    // then
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCompleteCaseInstanceWithActiveTask() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    String caseInstanceId = caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    // when
+
+    try {
+      caseService
+        .withCaseExecution(caseInstanceId)
+        .complete();
+      fail("It should not be possible to complete a case instance containing an active task.");
+    } catch (ProcessEngineException e) {}
+
+    // then
+
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNotNull(caseExecution);
+    assertTrue(caseExecution.isActive());
+
+    // the case instance is still active
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isActive());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testCompleteCaseInstanceWithActiveStage() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    String caseInstanceId = caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    // when
+
+    try {
+      caseService
+        .withCaseExecution(caseInstanceId)
+        .complete();
+      fail("It should not be possible to complete a case instance containing an active stage.");
+    } catch (ProcessEngineException e) {}
+
+    // then
+
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult();
+
+    assertNotNull(caseExecution);
+    assertTrue(caseExecution.isActive());
+
+    // the case instance is still active
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isActive());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCompleteEnabledTask() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    try {
+      // when
+      caseService
+        .withCaseExecution(caseExecutionId)
+        .complete();
+      fail("Should not be able to complete task.");
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testCompleteEnabledStage() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult()
+        .getId();
+
+    try {
+      // when
+      caseService
+        .withCaseExecution(caseExecutionId)
+        .complete();
+      fail("Should not be able to complete stage.");
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testCompleteDisabledTask() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .disable();
+
+    try {
+      // when
+      caseService
+        .withCaseExecution(caseExecutionId)
+        .complete();
+      fail("Should not be able to complete task.");
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageCase.cmmn"})
+  public void testCompleteDisabledStage() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .disable();
+
+    try {
+      // when
+      caseService
+        .withCaseExecution(caseExecutionId)
+        .complete();
+      fail("Should not be able to complete stage.");
+    } catch (ProcessEngineException e) {}
+  }
+
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testCompleteTaskAndSetVariables() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    String caseInstanceId = caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNotNull(task);
+
+    // when
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .setVariable("aVariableName", "abc")
+      .setVariable("anotherVariableName", 999)
+      .complete();
+
+    // then
+
+    // the task has been completed and has been deleted
+    task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNull(task);
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance is still active
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .active()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isActive());
+
+    // the case instance has two variables:
+    // - aVariableName
+    // - anotherVariableName
+    List<VariableInstance> result = runtimeService
+        .createVariableInstanceQuery()
+        .list();
+
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+
+    for (VariableInstance variable : result) {
+
+      assertEquals(caseInstanceId, variable.getCaseExecutionId());
+      assertEquals(caseInstanceId, variable.getCaseInstanceId());
+
+      if (variable.getName().equals("aVariableName")) {
+        assertEquals("aVariableName", variable.getName());
+        assertEquals("abc", variable.getValue());
+      } else if (variable.getName().equals("anotherVariableName")) {
+        assertEquals("anotherVariableName", variable.getName());
+        assertEquals(999, variable.getValue());
+      } else {
+        fail("Unexpected variable: " + variable.getName());
+      }
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testCompleteTaskAndSetVariableLocal() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNotNull(task);
+
+    // when
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .setVariableLocal("aVariableName", "abc")
+      .setVariableLocal("anotherVariableName", 999)
+      .complete();
+
+    // then
+
+    // the task has been completed and has been deleted
+    task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNull(task);
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance is still active
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .active()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isActive());
+
+    // the variables has been set and due to the completion
+    // also removed in one command
+    List<VariableInstance> result = runtimeService
+        .createVariableInstanceQuery()
+        .list();
+
+    assertTrue(result.isEmpty());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testCompleteTaskAndRemoveVariables() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .setVariable("aVariableName", "abc")
+      .setVariable("anotherVariableName", 999)
+      .manualStart();
+
+    Task task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNotNull(task);
+
+    // when
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .removeVariable("aVariableName")
+      .removeVariable("anotherVariableName")
+      .complete();
+
+    // then
+
+    // the task has been completed and has been deleted
+    task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNull(task);
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance is still active
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .active()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isActive());
+
+    List<VariableInstance> result = runtimeService
+        .createVariableInstanceQuery()
+        .list();
+
+    assertTrue(result.isEmpty());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testCompleteTaskAndRemoveVariableLocal() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .setVariableLocal("aVariableName", "abc")
+      .setVariableLocal("anotherVariableName", 999)
+      .manualStart();
+
+    Task task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNotNull(task);
+
+    // when
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .removeVariableLocal("aVariableName")
+      .removeVariableLocal("anotherVariableName")
+      .complete();
+
+    // then
+
+    // the task has been completed and has been deleted
+    task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNull(task);
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance is still active
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .active()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isActive());
+
+    List<VariableInstance> result = runtimeService
+        .createVariableInstanceQuery()
+        .list();
+
+    assertTrue(result.isEmpty());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyCasePlanModelCase.cmmn"})
+  public void testAutoCompletionOfEmtyCase() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // when
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    // then
+    CaseInstance caseInstance = caseService
+      .createCaseInstanceQuery()
+      .completed()
+      .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  public void testAutoCompletionOfEmtyStage() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    // then
+
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    CaseInstance caseInstance = caseService
+      .createCaseInstanceQuery()
+      .completed()
+      .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
+  }
+
+  public void testCompleteInvalidCaseExeuction() {
+    try {
+      caseService
+        .withCaseExecution("invalid")
+        .complete();
+      fail("The case execution should not be found.");
+    } catch (ProcessEngineException e) {
+
+    }
+
+    try {
+      caseService
+        .withCaseExecution(null)
+        .complete();
+      fail("The case execution should not be found.");
+    } catch (ProcessEngineException e) {
+
+    }
+  }
 }
