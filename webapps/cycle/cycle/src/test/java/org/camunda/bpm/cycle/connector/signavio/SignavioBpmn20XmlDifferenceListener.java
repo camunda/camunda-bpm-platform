@@ -38,7 +38,9 @@ public class SignavioBpmn20XmlDifferenceListener implements DifferenceListener {
           "BPMNPlane",
           "conditionExpression",
           "multiInstanceLoopCharacteristics",
-          "documentation"
+          "documentation",
+          "BPMNLabel",
+          "BPMNLabelStyle"
           );
 
   private List<String> attributesForWhichSignavioGeneratesNewIds = Arrays.asList(
@@ -46,7 +48,8 @@ public class SignavioBpmn20XmlDifferenceListener implements DifferenceListener {
           "messageRef",
           "errorRef",
           "bpmnElement",
-          "dataStoreRef"
+          "dataStoreRef",
+          "labelStyle"
           );
 
   @Override
