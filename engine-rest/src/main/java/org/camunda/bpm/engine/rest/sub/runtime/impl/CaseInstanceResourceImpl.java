@@ -12,14 +12,25 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
+import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
+
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.rest.dto.runtime.CaseExecutionTriggerDto;
 import org.camunda.bpm.engine.rest.dto.runtime.CaseInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.TriggerVariableValueDto;
+import org.camunda.bpm.engine.rest.dto.runtime.VariableNameDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.CaseInstanceResource;
+import org.camunda.bpm.engine.rest.util.DtoUtil;
+import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 
 /**
@@ -51,6 +62,69 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
 
     CaseInstanceDto result = CaseInstanceDto.fromCaseInstance(instance);
     return result;
+  }
+
+  public void complete(CaseExecutionTriggerDto triggerDto) {
+    try {
+      CaseService caseService = engine.getCaseService();
+      CaseExecutionCommandBuilder commandBuilder = caseService.withCaseExecution(caseInstanceId);
+
+      initializeCommand(commandBuilder, triggerDto, "complete");
+
+      commandBuilder.complete();
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot complete case instance with id '" + caseInstanceId + "'.");
+    }
+  }
+
+  protected void initializeCommand(CaseExecutionCommandBuilder commandBuilder, CaseExecutionTriggerDto triggerDto, String transition) {
+    Map<String, TriggerVariableValueDto> variables = triggerDto.getVariables();
+    if (variables != null && !variables.isEmpty()) {
+      initializeCommandWithVariables(commandBuilder, variables, transition);
+    }
+
+    List<VariableNameDto> deletions = triggerDto.getDeletions();
+    if (deletions != null && !deletions.isEmpty()) {
+      initializeCommandWithDeletions(commandBuilder, deletions, transition);
+    }
+  }
+
+  protected void initializeCommandWithVariables(CaseExecutionCommandBuilder commandBuilder, Map<String, TriggerVariableValueDto> variables, String transition) {
+    for(String variableName : variables.keySet()) {
+      try {
+        TriggerVariableValueDto variableValue = variables.get(variableName);
+        Object value = DtoUtil.toType(variableValue.getType(), variableValue.getValue());
+
+        if (variableValue.isLocal()) {
+          commandBuilder.setVariableLocal(variableName, value);
+
+        } else {
+          commandBuilder.setVariable(variableName, value);
+        }
+
+      } catch (NumberFormatException e) {
+        String errorMessage = String.format("Cannot %s case instance %s due to number format exception of variable %s: %s", transition, caseInstanceId, variableName, e.getMessage());
+        throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+
+      } catch (ParseException e) {
+        String errorMessage = String.format("Cannot %s case instance %s due to parse exception of variable %s: %s", transition, variableName, variableName, e.getMessage());
+        throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+
+      } catch (IllegalArgumentException e) {
+        String errorMessage = String.format("Cannot %s case instance %s because of variable %s: %s", transition, variableName, variableName, e.getMessage());
+        throw new RestException(Status.BAD_REQUEST, errorMessage);
+      }
+    }
+  }
+
+  protected void initializeCommandWithDeletions(CaseExecutionCommandBuilder commandBuilder, List<VariableNameDto> deletions, String transition) {
+    for (VariableNameDto variableName : deletions) {
+      if (variableName.isLocal()) {
+        commandBuilder.removeVariableLocal(variableName.getName());
+      } else {
+        commandBuilder.removeVariable(variableName.getName());
+      }
+    }
   }
 
   public VariableResource getVariablesResource() {

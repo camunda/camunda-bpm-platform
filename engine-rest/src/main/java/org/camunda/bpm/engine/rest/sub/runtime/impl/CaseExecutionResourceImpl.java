@@ -106,6 +106,19 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
     }
   }
 
+  public void complete(CaseExecutionTriggerDto triggerDto) {
+    try {
+      CaseService caseService = engine.getCaseService();
+      CaseExecutionCommandBuilder commandBuilder = caseService.withCaseExecution(caseExecutionId);
+
+      initializeCommand(commandBuilder, triggerDto, "complete");
+
+      commandBuilder.complete();
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot complete case execution with id '" + caseExecutionId + "'.");
+    }
+  }
+
   protected void initializeCommand(CaseExecutionCommandBuilder commandBuilder, CaseExecutionTriggerDto triggerDto, String transition) {
     Map<String, TriggerVariableValueDto> variables = triggerDto.getVariables();
     if (variables != null && !variables.isEmpty()) {
