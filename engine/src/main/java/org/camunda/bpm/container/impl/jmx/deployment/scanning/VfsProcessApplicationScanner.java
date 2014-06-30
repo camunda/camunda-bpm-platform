@@ -46,7 +46,11 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
 
   private static Logger log = Logger.getLogger(VfsProcessApplicationScanner.class.getName());
 
-  public Map<String, byte[]> findResources(ClassLoader classLoader, String resourceRootPath, URL processesXml) {   
+  public Map<String, byte[]> findResources(ClassLoader classLoader, String resourceRootPath, URL processesXml) {
+    return findResources(classLoader, resourceRootPath, processesXml, null);
+  }
+
+  public Map<String, byte[]> findResources(ClassLoader classLoader, String resourceRootPath, URL processesXml, String[] additionalResourceSuffixes) {
 
     // the map in which we collect the resources
     final Map<String, byte[]> resources = new HashMap<String, byte[]>();
@@ -65,7 +69,7 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
         while (resourceRoots.hasMoreElements()) {
           URL resourceRoot = (URL) resourceRoots.nextElement();
           VirtualFile virtualRoot = getVirtualFileForUrl(resourceRoot);
-          scanRoot(virtualRoot, resources);          
+          scanRoot(virtualRoot, additionalResourceSuffixes, resources);
         }
           
     } else {
@@ -83,7 +87,7 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
         }
         
         // perform the scanning
-        scanRoot(resourceRoot, resources);
+        scanRoot(resourceRoot, additionalResourceSuffixes, resources);
         
       } 
     }
@@ -100,11 +104,11 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
     }
   }
 
-  protected void scanRoot(VirtualFile processArchiveRoot, Map<String, byte[]> resources) {
+  protected void scanRoot(VirtualFile processArchiveRoot, final String[] additionalResourceSuffixes, Map<String, byte[]> resources) {
     try {
       List<VirtualFile> processes = processArchiveRoot.getChildrenRecursively(new VirtualFileFilter() {
         public boolean accepts(VirtualFile file) {
-          return file.isFile() && ProcessApplicationScanningUtil.isDeployable(file.getName());
+          return file.isFile() && ProcessApplicationScanningUtil.isDeployable(file.getName(), additionalResourceSuffixes);
         }
       });
       for (final VirtualFile process : processes) {

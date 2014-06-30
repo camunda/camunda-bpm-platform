@@ -109,12 +109,17 @@
         <directory>src/test/resources</directory>
         <filtering>true</filtering>
         <includes>
-          <include>**/*.cmmn</include>
           <include>**/*.xml</include>
           <include>**/*.properties</include>
-          <include>**/*.png</include>
-          <include>**/*.jpg</include>
         </includes>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/*.xml</exclude>
+          <exclude>**/*.properties</exclude>
+        </excludes>
       </testResource>
     </testResources>
     <plugins>

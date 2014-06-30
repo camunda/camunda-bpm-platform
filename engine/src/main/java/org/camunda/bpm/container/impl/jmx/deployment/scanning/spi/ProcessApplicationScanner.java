@@ -35,4 +35,18 @@ public interface ProcessApplicationScanner {
    */
   public abstract Map<String, byte[]> findResources(ClassLoader classLoader, String paResourceRootPath, URL metaFileUrl);
 
+  /**
+   *
+   * @param classLoader
+   *          the classloader to scan
+   * @param paResourceRootPath
+   *          see {@link ProcessArchiveXml#PROP_RESOURCE_ROOT_PATH}
+   * @param metaFileUrl
+   *          the URL to the META-INF/processes.xml file
+   * @param additionalResourceSuffixes
+   *          a list of additional suffixes for resources
+   * @return a Map of process definitions
+   */
+  public abstract Map<String, byte[]> findResources(ClassLoader classLoader, String paResourceRootPath, URL metaFileUrl, String[] additionalResourceSuffixes);
+
 }

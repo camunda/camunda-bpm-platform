@@ -4,13 +4,14 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
 
-  <process-archive>
-    <process-engine>default</process-engine>
-
+  <process-archive name="pa">
+    
     <properties>
       <property name="isDeleteUponUndeploy">true</property>
-      <property name="isScanForProcessDefinitions">false</property>
+      <property name="isScanForProcessDefinitions">true</property>
+      <property name="additionalResourceSuffixes">py,groovy</property>
     </properties>
+
   </process-archive>
-  
+
 </process-application>

@@ -77,6 +77,12 @@ public interface ProcessArchiveXml {
   public static final String PROP_RESOURCE_ROOT_PATH = "resourceRootPath";
 
   /**
+   * A semicolon separated list of additional suffixes for resources to scan for.
+   */
+  public static final String PROP_ADDITIONAL_RESOURCE_SUFFIXES = "additionalResourceSuffixes";
+  public static final String PROP_ADDITIONAL_RESOURCE_SUFFIXES_SEPARATOR = ",";
+
+  /**
    * @return the name of the process archive. Must not be null.
    */
   public String getName();

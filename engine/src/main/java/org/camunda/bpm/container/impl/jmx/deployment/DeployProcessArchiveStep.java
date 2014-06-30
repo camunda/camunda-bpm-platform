@@ -33,6 +33,7 @@ import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 
@@ -87,7 +88,8 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     // scan for additional process definitions if not turned off
     if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, true)) {
       String paResourceRoot = processArchive.getProperties().get(ProcessArchiveXml.PROP_RESOURCE_ROOT_PATH);
-      deploymentMap.putAll(ProcessApplicationScanningUtil.findResources(processApplicationClassloader, paResourceRoot, metaFileUrl));
+      String[] additionalResourceSuffixes = StringUtil.split(processArchive.getProperties().get(ProcessArchiveXml.PROP_ADDITIONAL_RESOURCE_SUFFIXES), ProcessArchiveXml.PROP_ADDITIONAL_RESOURCE_SUFFIXES_SEPARATOR);
+      deploymentMap.putAll(ProcessApplicationScanningUtil.findResources(processApplicationClassloader, paResourceRoot, metaFileUrl, additionalResourceSuffixes));
     }
 
     // perform process engine deployment

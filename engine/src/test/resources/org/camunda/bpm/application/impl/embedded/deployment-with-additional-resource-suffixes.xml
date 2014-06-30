@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-archive>
+    <process-engine>default</process-engine>
+
+    <properties>
+      <property name="isDeleteUponUndeploy">true</property>
+      <property name="isScanForProcessDefinitions">true</property>
+      <property name="resourceRootPath">pa:embedded</property>
+      <property name="additionalResourceSuffixes">py,groovy,rb</property>
+    </properties>
+  </process-archive>
+  
+</process-application>

@@ -29,4 +29,20 @@ public final class StringUtil {
     return text.startsWith("${") || text.startsWith("#{");
   }
 
+  public static String[] split(String text, String regex) {
+    if (text == null) {
+      return null;
+    }
+    else if (regex == null) {
+      return new String[] { text };
+    }
+    else {
+      String[] result = text.split(regex);
+      for (int i = 0; i < result.length; i++) {
+        result[i] = result[i].trim();
+      }
+      return result;
+    }
+  }
+
 }

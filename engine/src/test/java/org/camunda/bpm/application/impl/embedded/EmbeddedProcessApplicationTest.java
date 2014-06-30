@@ -12,12 +12,15 @@
  */
 package org.camunda.bpm.application.impl.embedded;
 
+import java.util.List;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.Resource;
 
 /**
  * @author Daniel Meyer
@@ -94,6 +97,32 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     // unregister process engine
     runtimeContainerDelegate.unregisterProcessEngine(processEngine);
 
+  }
+
+  public void testDeployAppWithAdditionalResourceSuffixes() {
+    // register existing process engine with BPM platform
+    RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
+    runtimeContainerDelegate.registerProcessEngine(processEngine);
+
+    TestApplicationWithAdditionalResourceSuffixes processApplication = new TestApplicationWithAdditionalResourceSuffixes();
+    processApplication.deploy();
+
+    try {
+
+      Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+
+      assertNotNull(deployment);
+
+      List<Resource> deploymentResources = repositoryService.getDeploymentResources(deployment.getId());
+      assertEquals(4, deploymentResources.size());
+    }
+    finally {
+      processApplication.undeploy();
+      assertEquals(0, repositoryService.createDeploymentQuery().count());
+
+      // unregister process engine
+      runtimeContainerDelegate.unregisterProcessEngine(processEngine);
+    }
   }
 
 
