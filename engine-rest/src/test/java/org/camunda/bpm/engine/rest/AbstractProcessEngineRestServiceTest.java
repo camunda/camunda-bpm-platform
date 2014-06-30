@@ -12,6 +12,31 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import com.jayway.restassured.http.ContentType;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.ws.rs.core.Response.Status;
+import org.camunda.bpm.engine.*;
+import org.camunda.bpm.engine.history.*;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.management.JobDefinitionQuery;
+import org.camunda.bpm.engine.repository.*;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.runtime.*;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Matchers;
+
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -20,72 +45,8 @@ import static org.junit.matchers.JUnitMatchers.hasItems;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.Response.Status;
-
-import org.camunda.bpm.engine.CaseService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.history.HistoricActivityInstance;
-import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
-import org.camunda.bpm.engine.history.HistoricActivityStatistics;
-import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
-import org.camunda.bpm.engine.history.HistoricDetail;
-import org.camunda.bpm.engine.history.HistoricDetailQuery;
-import org.camunda.bpm.engine.history.HistoricIncident;
-import org.camunda.bpm.engine.history.HistoricIncidentQuery;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.GroupQuery;
-import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.identity.UserQuery;
-import org.camunda.bpm.engine.management.JobDefinition;
-import org.camunda.bpm.engine.management.JobDefinitionQuery;
-import org.camunda.bpm.engine.repository.CaseDefinition;
-import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.DeploymentQuery;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.helper.EqualsMap;
-import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.runtime.CaseExecution;
-import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
-import org.camunda.bpm.engine.runtime.CaseInstance;
-import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.ExecutionQuery;
-import org.camunda.bpm.engine.runtime.Incident;
-import org.camunda.bpm.engine.runtime.IncidentQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.VariableInstance;
-import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.jayway.restassured.http.ContentType;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.*;
 
 public abstract class AbstractProcessEngineRestServiceTest extends
     AbstractRestServiceTest {
@@ -132,6 +93,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   private ManagementService mockManagementService;
   private HistoryService mockHistoryService;
   private CaseService mockCaseService;
+  private MessageCorrelationBuilder mockMessageCorrelationBuilder;
 
   @Before
   public void setUpRuntimeData() {
@@ -161,6 +123,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createJobDefinitionMock();
     createIncidentMock();
     createDeploymentMock();
+    createMessageCorrelationBuilderMock();
     createCaseDefinitionMock();
     createCaseInstanceMock();
     createCaseExecutionMock();
@@ -174,12 +137,12 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createHistoricIncidentMock();
   }
 
-
   private void createProcessDefinitionMock() {
     ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
 
     when(mockRepoService.getProcessDefinition(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(mockDefinition);
   }
+
 
   private void createCaseDefinitionMock() {
     List<CaseDefinition> caseDefinitions = new ArrayList<CaseDefinition>();
@@ -261,7 +224,6 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(mockIdentityService.createUserQuery()).thenReturn(sampleUserQuery);
   }
 
-
   private void createVariableInstanceMock() {
     List<VariableInstance> variables = new ArrayList<VariableInstance>();
     VariableInstance mockInstance = MockProvider.createMockVariableInstance();
@@ -287,6 +249,18 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     List<Incident> incidents = MockProvider.createMockIncidents();
     when(mockIncidentQuery.list()).thenReturn(incidents);
     when(mockRuntimeService.createIncidentQuery()).thenReturn(mockIncidentQuery);
+  }
+
+  private void createMessageCorrelationBuilderMock() {
+    mockMessageCorrelationBuilder = mock(MessageCorrelationBuilder.class);
+
+    when(mockRuntimeService.createMessageCorrelation(anyString())).thenReturn(mockMessageCorrelationBuilder);
+    when(mockMessageCorrelationBuilder.processInstanceId(anyString())).thenReturn(mockMessageCorrelationBuilder);
+    when(mockMessageCorrelationBuilder.processInstanceBusinessKey(anyString())).thenReturn(mockMessageCorrelationBuilder);
+    when(mockMessageCorrelationBuilder.processInstanceVariableEquals(anyString(), any())).thenReturn(mockMessageCorrelationBuilder);
+    when(mockMessageCorrelationBuilder.setVariables(Matchers.<Map<String,Object>>any())).thenReturn(mockMessageCorrelationBuilder);
+    when(mockMessageCorrelationBuilder.setVariable(anyString(), any())).thenReturn(mockMessageCorrelationBuilder);
+
   }
 
   private void createHistoricActivityInstanceMock() {
@@ -438,8 +412,9 @@ public abstract class AbstractProcessEngineRestServiceTest extends
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(MESSAGE_URL);
 
-    verify(mockRuntimeService).correlateMessage(eq(messageName), eq((String) null),
-        argThat(new EqualsMap(null)), argThat(new EqualsMap(null)));
+    verify(mockRuntimeService).createMessageCorrelation(eq(messageName));
+    verify(mockMessageCorrelationBuilder).setVariables(argThat(new EqualsMap(null)));
+    verify(mockMessageCorrelationBuilder).processInstanceBusinessKey(eq((String) null));
     verifyZeroInteractions(processEngine);
   }
 
