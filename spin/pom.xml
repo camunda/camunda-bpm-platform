@@ -59,7 +59,7 @@
       <dependency>
         <groupId>org.jruby</groupId>
         <artifactId>jruby-complete</artifactId>
-        <version>1.7.11</version>
+        <version>1.7.13</version>
       </dependency>
 
       <dependency>
