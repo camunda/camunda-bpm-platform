@@ -6,8 +6,8 @@
   
   <process-archive name="pa1">
     <process-engine>default</process-engine>
-    <process>process1.bpmn</process>
-    <process>process2.bpmn</process>
+    <resource>process1.bpmn</resource>
+    <resource>process2.bpmn</resource>
     <properties>
         <property name="prop1">value1</property>
         <property name="prop2">value2</property>

@@ -39,6 +39,8 @@ public class DeploymentMetadataConstants {
   public static final String PLUGIN_CLASS = "class";
 
   public static final String PROCESS_ARCHIVE = "process-archive";
+  // deprecated since 7.2.0 (use resource instead)
   public static final String PROCESS = "process";
+  public static final String RESOURCE = "resource";
 
 }

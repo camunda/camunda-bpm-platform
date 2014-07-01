@@ -28,6 +28,19 @@ import org.camunda.bpm.engine.repository.Resource;
  */
 public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCase {
 
+  RuntimeContainerDelegate runtimeContainerDelegate = null;
+
+  public void registerProcessEngine() {
+    runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
+    runtimeContainerDelegate.registerProcessEngine(processEngine);
+  }
+
+  public void tearDown() {
+    if (runtimeContainerDelegate != null) {
+      runtimeContainerDelegate.unregisterProcessEngine(processEngine);
+    }
+  }
+
   public void testDeployAppWithoutEngine() {
 
     TestApplicationWithoutEngine processApplication = new TestApplicationWithoutEngine();
@@ -39,24 +52,16 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
   public void testDeployAppWithoutProcesses() {
 
-    // register existing process engine with BPM platform
-    RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
-    runtimeContainerDelegate.registerProcessEngine(processEngine);
-    try {
+    registerProcessEngine();
 
-      TestApplicationWithoutProcesses processApplication = new TestApplicationWithoutProcesses();
-      processApplication.deploy();
+    TestApplicationWithoutProcesses processApplication = new TestApplicationWithoutProcesses();
+    processApplication.deploy();
 
-      ProcessEngine processEngine = BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
-      long deployments = processEngine.getRepositoryService().createDeploymentQuery().count();
-      assertEquals(0, deployments);
+    ProcessEngine processEngine = BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
+    long deployments = processEngine.getRepositoryService().createDeploymentQuery().count();
+    assertEquals(0, deployments);
 
-      processApplication.undeploy();
-
-    } finally {
-      // unregister process engine
-      runtimeContainerDelegate.unregisterProcessEngine(processEngine);
-    }
+    processApplication.undeploy();
 
   }
 
@@ -81,9 +86,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
   public void testDeployAppReusingExistingEngine() {
 
-    // register existing process engine with BPM platform
-    RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
-    runtimeContainerDelegate.registerProcessEngine(processEngine);
+    registerProcessEngine();
 
     TestApplicationReusingExistingEngine processApplication = new TestApplicationReusingExistingEngine();
     processApplication.deploy();
@@ -94,37 +97,41 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
     assertEquals(0, repositoryService.createDeploymentQuery().count());
 
-    // unregister process engine
-    runtimeContainerDelegate.unregisterProcessEngine(processEngine);
-
   }
 
   public void testDeployAppWithAdditionalResourceSuffixes() {
-    // register existing process engine with BPM platform
-    RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
-    runtimeContainerDelegate.registerProcessEngine(processEngine);
+    registerProcessEngine();
 
     TestApplicationWithAdditionalResourceSuffixes processApplication = new TestApplicationWithAdditionalResourceSuffixes();
     processApplication.deploy();
 
-    try {
 
-      Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
 
-      assertNotNull(deployment);
+    assertNotNull(deployment);
 
-      List<Resource> deploymentResources = repositoryService.getDeploymentResources(deployment.getId());
-      assertEquals(4, deploymentResources.size());
-    }
-    finally {
-      processApplication.undeploy();
-      assertEquals(0, repositoryService.createDeploymentQuery().count());
+    List<Resource> deploymentResources = repositoryService.getDeploymentResources(deployment.getId());
+    assertEquals(4, deploymentResources.size());
 
-      // unregister process engine
-      runtimeContainerDelegate.unregisterProcessEngine(processEngine);
-    }
+    processApplication.undeploy();
+    assertEquals(0, repositoryService.createDeploymentQuery().count());
   }
 
+  public void testDeployAppWithResources() {
+    registerProcessEngine();
 
+    TestApplicationWithResources processApplication = new TestApplicationWithResources();
+    processApplication.deploy();
+
+    Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+
+    assertNotNull(deployment);
+
+    List<Resource> deploymentResources = repositoryService.getDeploymentResources(deployment.getId());
+    assertEquals(4, deploymentResources.size());
+
+    processApplication.undeploy();
+    assertEquals(0, repositoryService.createDeploymentQuery().count());
+  }
 
 }

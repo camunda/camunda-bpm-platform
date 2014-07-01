@@ -6,7 +6,7 @@
 
   <process-archive name="pa">
   
-    <process>org/camunda/bpm/engine/spring/test/application/process.bpmn20.xml</process>
+    <resource>org/camunda/bpm/engine/spring/test/application/process.bpmn20.xml</resource>
     
     <properties>
       <property name="isScanForProcessDefinitions">false</property>
