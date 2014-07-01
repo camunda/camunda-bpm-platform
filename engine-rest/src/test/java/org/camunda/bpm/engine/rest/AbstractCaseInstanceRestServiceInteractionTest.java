@@ -70,6 +70,7 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
   protected static final String SINGLE_CASE_INSTANCE_URL = CASE_INSTANCE_URL + "/{id}";
 
   protected static final String CASE_INSTANCE_COMPLETE_URL = SINGLE_CASE_INSTANCE_URL + "/complete";
+  protected static final String CASE_INSTANCE_CLOSE_URL = SINGLE_CASE_INSTANCE_URL + "/close";
 
   protected static final String CASE_INSTANCE_VARIABLES_URL = SINGLE_CASE_INSTANCE_URL + "/variables";
   protected static final String SINGLE_CASE_INSTANCE_VARIABLE_URL = CASE_INSTANCE_VARIABLES_URL + "/{varId}";
@@ -1172,6 +1173,389 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
     verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
     verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
     verify(caseExecutionCommandBuilderMock).complete();
+  }
+
+
+  @Test
+  public void testClose() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(EMPTY_JSON_OBJECT)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).close();
+  }
+
+  @Test
+  public void testUnsuccessfulClose() {
+    doThrow(new ProcessEngineException("expected exception")).when(caseExecutionCommandBuilderMock).close();
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(EMPTY_JSON_OBJECT)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot close case instance with id '" + MockProvider.EXAMPLE_CASE_INSTANCE_ID + "'."))
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).close();
+  }
+
+  @Test
+  public void testCloseWithSetVariable() {
+    String aVariableKey = "aKey";
+    int aVariableValue = 123;
+
+    String anotherVariableKey = "anotherKey";
+    String anotherVariableValue = "abc";
+
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+          .variable(aVariableKey, aVariableValue, "Integer")
+          .variable(anotherVariableKey, anotherVariableValue, "String")
+          .getVariables();
+
+    variablesJson.put("variables", variables);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(variablesJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).setVariable(aVariableKey, aVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).close();
+  }
+
+  @Test
+  public void testCloseWithSetVariableLocal() {
+    String aVariableKey = "aKey";
+    int aVariableValue = 123;
+
+    String anotherVariableKey = "anotherKey";
+    String anotherVariableValue = "abc";
+
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+          .variable(aVariableKey, aVariableValue, "Integer", true)
+          .variable(anotherVariableKey, anotherVariableValue, "String", true)
+          .getVariables();
+
+    variablesJson.put("variables", variables);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(variablesJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(aVariableKey, aVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).close();
+  }
+
+  @Test
+  public void testCloseWithSetVariableAndVariableLocal() {
+    String aVariableKey = "aKey";
+    int aVariableValue = 123;
+
+    String anotherVariableKey = "anotherKey";
+    String anotherVariableValue = "abc";
+
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+          .variable(aVariableKey, aVariableValue, "Integer")
+          .variable(anotherVariableKey, anotherVariableValue, "String", true)
+          .getVariables();
+
+    variablesJson.put("variables", variables);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(variablesJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).setVariable(aVariableKey, aVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).close();
+  }
+
+  @Test
+  public void testCloseWithRemoveVariable() {
+    String aVariableKey = "aKey";
+    String anotherVariableKey = "anotherKey";
+
+    List<VariableNameDto> variableNames = new ArrayList<VariableNameDto>();
+
+    VariableNameDto firstVariableName = new VariableNameDto(aVariableKey);
+    variableNames.add(firstVariableName);
+    VariableNameDto secondVariableName = new VariableNameDto(anotherVariableKey);
+    variableNames.add(secondVariableName);
+
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+
+    variablesJson.put("deletions", variableNames);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(variablesJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).removeVariable(aVariableKey);
+    verify(caseExecutionCommandBuilderMock).removeVariable(anotherVariableKey);
+    verify(caseExecutionCommandBuilderMock).close();
+  }
+
+  @Test
+  public void testCloseWithRemoveVariableLocal() {
+    String aVariableKey = "aKey";
+    String anotherVariableKey = "anotherKey";
+
+    List<VariableNameDto> variableNames = new ArrayList<VariableNameDto>();
+
+    VariableNameDto firstVariableName = new VariableNameDto(aVariableKey, true);
+    variableNames.add(firstVariableName);
+    VariableNameDto secondVariableName = new VariableNameDto(anotherVariableKey, true);
+    variableNames.add(secondVariableName);
+
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+
+    variablesJson.put("deletions", variableNames);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(variablesJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
+    verify(caseExecutionCommandBuilderMock).removeVariableLocal(anotherVariableKey);
+    verify(caseExecutionCommandBuilderMock).close();
+  }
+
+  @Test
+  public void testCloseWithRemoveVariableAndVariableLocal() {
+    String aVariableKey = "aKey";
+    String anotherVariableKey = "anotherKey";
+
+    List<VariableNameDto> variableNames = new ArrayList<VariableNameDto>();
+
+    VariableNameDto firstVariableName = new VariableNameDto(aVariableKey, true);
+    variableNames.add(firstVariableName);
+    VariableNameDto secondVariableName = new VariableNameDto(anotherVariableKey);
+    variableNames.add(secondVariableName);
+
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+
+    variablesJson.put("deletions", variableNames);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(variablesJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
+    verify(caseExecutionCommandBuilderMock).removeVariable(anotherVariableKey);
+    verify(caseExecutionCommandBuilderMock).close();
+  }
+
+  @Test
+  public void testCloseWithSetVariableAndRemoveVariable() {
+    String aVariableKey = "aKey";
+    String anotherVariableKey = "anotherKey";
+    String anotherVariableValue = "abc";
+
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+          .variable(anotherVariableKey, anotherVariableValue, "String")
+          .getVariables();
+
+    List<VariableNameDto> variableNames = new ArrayList<VariableNameDto>();
+
+    VariableNameDto firstVariableName = new VariableNameDto(aVariableKey);
+    variableNames.add(firstVariableName);
+
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+
+    variablesJson.put("variables", variables);
+    variablesJson.put("deletions", variableNames);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(variablesJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).removeVariable(aVariableKey);
+    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).close();
+  }
+
+  @Test
+  public void testCloseWithSetVariableAndRemoveVariableLocal() {
+    String aVariableKey = "aKey";
+    String anotherVariableKey = "anotherKey";
+    String anotherVariableValue = "abc";
+
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+          .variable(anotherVariableKey, anotherVariableValue, "String")
+          .getVariables();
+
+    List<VariableNameDto> variableNames = new ArrayList<VariableNameDto>();
+
+    VariableNameDto firstVariableName = new VariableNameDto(aVariableKey, true);
+    variableNames.add(firstVariableName);
+
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+
+    variablesJson.put("variables", variables);
+    variablesJson.put("deletions", variableNames);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(variablesJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
+    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).close();
+  }
+
+  @Test
+  public void testCloseWithSetVariableLocalAndRemoveVariable() {
+    String aVariableKey = "aKey";
+    String anotherVariableKey = "anotherKey";
+    String anotherVariableValue = "abc";
+
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+          .variable(anotherVariableKey, anotherVariableValue, "String", true)
+          .getVariables();
+
+    List<VariableNameDto> variableNames = new ArrayList<VariableNameDto>();
+
+    VariableNameDto firstVariableName = new VariableNameDto(aVariableKey);
+    variableNames.add(firstVariableName);
+
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+
+    variablesJson.put("variables", variables);
+    variablesJson.put("deletions", variableNames);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(variablesJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).removeVariable(aVariableKey);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).close();
+  }
+
+  @Test
+  public void testCloseWithSetVariableLocalAndRemoveVariableLocal() {
+    String aVariableKey = "aKey";
+    String anotherVariableKey = "anotherKey";
+    String anotherVariableValue = "abc";
+
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+          .variable(anotherVariableKey, anotherVariableValue, "String", true)
+          .getVariables();
+
+    List<VariableNameDto> variableNames = new ArrayList<VariableNameDto>();
+
+    VariableNameDto firstVariableName = new VariableNameDto(aVariableKey, true);
+    variableNames.add(firstVariableName);
+
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+
+    variablesJson.put("variables", variables);
+    variablesJson.put("deletions", variableNames);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(variablesJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(CASE_INSTANCE_CLOSE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).close();
   }
 
 }

@@ -77,6 +77,19 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
     }
   }
 
+  public void close(CaseExecutionTriggerDto triggerDto) {
+    try {
+      CaseService caseService = engine.getCaseService();
+      CaseExecutionCommandBuilder commandBuilder = caseService.withCaseExecution(caseInstanceId);
+
+      initializeCommand(commandBuilder, triggerDto, "close");
+
+      commandBuilder.close();
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot close case instance with id '" + caseInstanceId + "'.");
+    }
+  }
+
   protected void initializeCommand(CaseExecutionCommandBuilder commandBuilder, CaseExecutionTriggerDto triggerDto, String transition) {
     Map<String, TriggerVariableValueDto> variables = triggerDto.getVariables();
     if (variables != null && !variables.isEmpty()) {
