@@ -33,6 +33,7 @@ import org.camunda.bpm.model.cmmn.instance.Task;
  *    <li>{@link #disable()}</li>
  *    <li>{@link #enable()}</li>
  *    <li>{@link #complete()}</li>
+ *    <li>{@link #close()}</li>
  *  </ul>
  * </p>
  *
@@ -322,5 +323,21 @@ public interface CaseExecutionCommandBuilder {
    *  </ul>
    */
   void complete();
+
+  /**
+   * <p>Additionally to {@link #execute()} the associated case instance will
+   * be closed, so that no further work or modifications is allowed for the
+   * associated case instance. Therefore there happens a transition from the
+   * state <code>COMPLETED</code> to state <code>CLOSED</code>.</p>
+   *
+   * @throws ProcessEngineException this exception will be thrown
+   *  <ul>
+   *    <li>when the passed case execution id is null or</li>
+   *    <li>when no case execution (ie. case instance) is found for the given
+   *        case execution id or</li>
+   *    <li>when the transition is not allowed to be done</li>
+   *  </ul>
+   */
+  void close();
 
 }

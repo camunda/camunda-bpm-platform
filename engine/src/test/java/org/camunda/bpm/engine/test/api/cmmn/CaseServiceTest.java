@@ -4200,4 +4200,156 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     }
   }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCloseActiveCaseInstance() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    try {
+      // when
+      caseService
+        .withCaseExecution(caseInstanceId)
+        .close();
+      fail("It should not be possible to close an active case instance.");
+    } catch (ProcessEngineException e) {
+    }
+
+    // then
+    CaseInstance caseInstance = caseService
+      .createCaseInstanceQuery()
+      .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isActive());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCloseCompletedCaseInstance() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // disable human task -> case instance is completed
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .disable();
+
+    // when
+    caseService
+      .withCaseExecution(caseInstanceId)
+      .close();
+
+    // then
+    CaseInstance caseInstance = caseService
+      .createCaseInstanceQuery()
+      .singleResult();
+
+    assertNull(caseInstance);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCloseTask() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    try {
+      // when
+      caseService
+        .withCaseExecution(caseExecutionId)
+        .close();
+      fail("It should not be possible to close a task.");
+    } catch (ProcessEngineException e) {
+
+    }
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testCloseStage() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    caseService
+       .createCaseInstanceById(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult()
+        .getId();
+
+    try {
+      // when
+      caseService
+        .withCaseExecution(caseExecutionId)
+        .close();
+      fail("It should not be possible to close a stage.");
+    } catch (ProcessEngineException e) {
+
+    }
+
+  }
+
+  public void testCloseInvalidCaseExeuction() {
+    try {
+      caseService
+        .withCaseExecution("invalid")
+        .close();
+      fail("The case execution should not be found.");
+    } catch (ProcessEngineException e) {
+
+    }
+
+    try {
+      caseService
+        .withCaseExecution(null)
+        .close();
+      fail("The case execution should not be found.");
+    } catch (ProcessEngineException e) {
+
+    }
+  }
 }

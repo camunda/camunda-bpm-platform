@@ -186,6 +186,11 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
     executeCommand(command);
   }
 
+  public void close() {
+    CloseCaseInstanceCmd command = new CloseCaseInstanceCmd(this);
+    executeCommand(command);
+  }
+
   protected void executeCommand(Command<?> command) {
     if(commandExecutor != null) {
       commandExecutor.execute(command);
