@@ -366,7 +366,7 @@ module.exports = function(grunt) {
           //   }
           // ],
 
-          baseUrl: 'http://localhost:8080',
+          baseUrl: 'http://localhost:<%= app.port %>',
 
           // ----- The test framework -----
           //
@@ -392,7 +392,7 @@ module.exports = function(grunt) {
           args: {
             seleniumServerJar: '<%= app.standaloneSeleniumJar() %>',
             chromeDriver: '<%= app.chromeDriverPath() %>',
-            baseUrl: 'http://localhost:8080',
+            baseUrl: 'http://localhost:<%= app.port %>',
             specs: [
               './../../../qa/integration-tests-webapps/src/test/javascript/e2e/admin/**/*.js'
             ]
@@ -404,7 +404,7 @@ module.exports = function(grunt) {
           args: {
             seleniumServerJar: '<%= app.standaloneSeleniumJar() %>',
             chromeDriver: '<%= app.chromeDriverPath() %>',
-            baseUrl: 'http://localhost:8080',
+            baseUrl: 'http://localhost:<%= app.port %>',
             specs: [
               './../../../qa/integration-tests-webapps/src/test/javascript/e2e/cockpit/**/*.js'
             ]
@@ -416,7 +416,7 @@ module.exports = function(grunt) {
           args: {
             seleniumServerJar: '<%= app.standaloneSeleniumJar() %>',
             chromeDriver: '<%= app.chromeDriverPath() %>',
-            baseUrl: 'http://localhost:8080',
+            baseUrl: 'http://localhost:<%= app.port %>',
             specs: [
               './../../../qa/integration-tests-webapps/src/test/javascript/e2e/tasklist/**/*.js'
             ]
