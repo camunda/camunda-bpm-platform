@@ -1,14 +1,14 @@
 camunda Webapp
 ==============
 
-This folder contains the camunda webapp maven projects.
+This is the camunda BPM webapplication backend and assembly.
 Clean, package and install it via [Maven](https://maven.apache.org/).
 
 The structure is as follows:
 
-* `camunda-core` - camunda core application and plugin infrastructure
-* `camunda-webapp` - camunda web application
-* `camunda-{container}` - projects that produce camunda web application for the different bpm platform containers
+* `core` - camunda core application and plugin infrastructure
+* `webapp` - camunda web application
+* `distro/{container}` - projects that produce camunda web application for the different bpm platform containers
 
 
 Plugins
