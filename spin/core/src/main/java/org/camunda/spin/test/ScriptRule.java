@@ -258,7 +258,7 @@ public class ScriptRule implements TestRule {
    * @return the processed path
    */
   private String replaceDotsWithPathSeparators(String path) {
-    return path.replaceAll("\\.", File.separator);
+    return path.replace(".", File.separator);
   }
 
   /**
