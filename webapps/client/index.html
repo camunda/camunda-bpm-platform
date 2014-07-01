@@ -25,7 +25,6 @@
 </head>
 
 <body>
-  <!-- <body ng-controller="TasklistAppCtrl"> -->
   <div class="page-wrap" ng-view>
   </div>
 
@@ -39,36 +38,16 @@
   <div cam-tasklist-notifier></div>
 
   <script type="text/javascript">
-    var root = '//'+ location.host +'/';
-    var tasklistConf = {
-      'cam.tasklist': {
-        useMocks: true
-      },
-
-      'cam.tasklist.navigation': {
-        links: [
-          {
-            // title: '',
-            // css: '',
-            icon: 'home',
-            links: [
-              {
-                title: 'Cockpit',
-                href: root +'camunda/app/cockpit'
-              },
-              {
-                title: 'Admin',
-                href: root +'camunda/app/admin'
-              }
-            ]
-          }
-        ]
-      }
-    };
+    // override the following line to include configuration
+    var tasklistConf = {};
   </script>
+
   <script type="text/javascript" src="scripts/deps.js" data-main="scripts/camunda-tasklist-ui"></script>
+
+  <!-- #prod-remove -->
   <script type="text/javascript">
   document.write('<s'+'cript src="//'+ location.hostname +':'+ (parseInt(location.port, 10)+1) +'/livereload.js?snipver=1"><'+'/script>')
   </script>
+  <!-- /prod-remove -->
 </body>
 </html>

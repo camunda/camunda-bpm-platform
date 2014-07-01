@@ -1,3 +1,4 @@
+<!--
 <pagination ng-show="totalItems > pageSize"
             total-items="totalItems"
             items-per-page="pageSize"
@@ -10,6 +11,28 @@
             last-text="&raquo;"
             previous-text="&lsaquo;"
             first-text="&laquo;"></pagination>
+-->
+
+<div class="input-group has-feedback"
+     ng-if="!!totalItems">
+  <input type="text"
+         ng-model="searchTask"
+         placeholder="Task name"
+         tooltip="Search by task name, case sensitive."
+         tooltip-placement="left"
+         typeahead="filteredTask.name for filteredTask in lookupTask($viewValue)"
+         typeahead-loading="loadingTasks"
+         typeahead-wait-ms="100"
+         typeahead-on-select="selectedTask($item, $model, $label)"
+         class="form-control">
+  <span class="input-group-addon">
+    <i ng-show="loadingTasks"
+       class="glyphicon glyphicon-refresh"></i>
+
+    <i ng-show="!loadingTasks"
+       class="glyphicon glyphicon-search"></i>
+  </span>
+</div>
 
 <div ng-show="loading"
      class="loader">

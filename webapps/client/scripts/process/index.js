@@ -80,22 +80,19 @@ define([
     $scope.lookupProcess = function(val) {
       var deferred = $q.defer();
 
-      if (val.length > 2) {
-        $scope.loadingProcesses = true;
+      $scope.loadingProcesses = true;
 
-        ProcessDefinition.list({
-          nameLike: '%'+ val +'%'
-        }, function(err, res) {
-          $scope.loadingProcesses = false;
-          if (err) {
-            return deferred.reject(err);
-          }
-          deferred.resolve(res);
-        });
-      }
-      else {
-        deferred.resolve($scope.processes);
-      }
+      ProcessDefinition.list({
+        nameLike: '%'+ val +'%'
+      }, function(err, res) {
+        $scope.loadingProcesses = false;
+
+        if (err) {
+          return deferred.reject(err);
+        }
+
+        deferred.resolve(res.items);
+      });
 
       return deferred.promise;
     };
@@ -185,6 +182,8 @@ define([
         key: $scope.startingProcess.key,
         variables: vars
       }, function(err, res) {
+        console.info('start process', err, res);
+
         if (err) {
           camTasklistNotifier.add(err);
           throw err;

@@ -30,6 +30,12 @@ define([
 
   var modalUID = 0;
   var $ = angular.element;
+  var blankPile = {
+    name: '',
+    description: '',
+    color: '',
+    filters: []
+  };
 
 
   pileModule.factory('camTasklistPileFilterConversion', [
@@ -91,26 +97,32 @@ define([
       $scope.piles = res.items;
       $rootScope.currentPile = $scope.piles[0];
       $rootScope.$emit('tasklist.pile.current');
-      // $scope.$apply(function() {
-      // });
     });
+  }]);
+
+
+  pileModule.controller('pileCreateModalCtrl', [
+          '$modalInstance', '$scope',
+  function($modalInstance,   $scope) {
+    $scope.createPile = function() {
+      console.info('createPile', arguments);
+    };
+
+    $scope.addFilter = function() {
+      console.info('addFilter', arguments, $scope);
+    };
+
+    $scope.abort = $modalInstance.dismiss;
+
+    console.info('Hello from the modal instance controller', $modalInstance, $scope);
   }]);
 
 
   pileModule.controller('pileCreateCtrl', [
           '$modal', '$scope', '$rootScope',
   function($modal,   $scope,   $rootScope) {
-
-
     $scope.createPile = function() {
-      $('.task-board').addClass('pile-edit');
-
-      $rootScope.currentPile = {
-        name: '',
-        description: '',
-        color: '',
-        filters: []
-      };
+      // $rootScope.currentPile = blankPile;
 
       $modal.open({
         // pass the current scope to the $modalInstance
@@ -120,16 +132,12 @@ define([
 
         template: require('text!camunda-tasklist-ui/pile/form.html'),
 
-        controller: [
-                '$modalInstance',
-        function($modalInstance) {
-          console.info('Hello from the modal instance controller', $modalInstance);
-        }]
-      })
-      .result.then(function(result) {
-        console.info('modalInstance created', result);
-      }, function(reason) {
-        console.info('modalInstance aborted', reason);
+        controller: 'pileCreateModalCtrl'
+      // })
+      // .result.then(function(result) {
+      //   console.info('modalInstance created', result);
+      // }, function(reason) {
+      //   console.info('modalInstance aborted', reason);
       });
     };
   }]);
@@ -161,47 +169,47 @@ define([
           $rootScope.$emit('tasklist.pile.current');
         };
 
-        scope.edit = function() {
-          modalUID++;
-          var pile = this.$parent.pile;
+        // scope.edit = function() {
+        //   modalUID++;
+        //   var pile = this.$parent.pile;
 
-          var modalInstance = $modal.open({
-            size: 'lg',
+        //   var modalInstance = $modal.open({
+        //     size: 'lg',
 
-            controller: [
-                    '$scope',
-            function($scope) {
-              $scope.elUID = 'modal'+ modalUID;
-              $scope.labelsWidth = 3;
-              $scope.fieldsWidth = 9;
-              $scope.pile = pile;
+        //     controller: [
+        //             '$scope',
+        //     function($scope) {
+        //       $scope.elUID = 'modal'+ modalUID;
+        //       $scope.labelsWidth = 3;
+        //       $scope.fieldsWidth = 9;
+        //       $scope.pile = pile;
 
-              $scope.addFilter = function() {
-                console.info('add filter');
-                $scope.pile.filters.push({
-                  key: '',
-                  operator: '',
-                  value: ''
-                });
-              };
+        //       $scope.addFilter = function() {
+        //         console.info('add filter');
+        //         $scope.pile.filters.push({
+        //           key: '',
+        //           operator: '',
+        //           value: ''
+        //         });
+        //       };
 
-              $scope.ok = function() {
-                modalInstance.close($scope.pile);
-              };
+        //       $scope.ok = function() {
+        //         modalInstance.close($scope.pile);
+        //       };
 
-              $scope.abort = function() {
-                modalInstance.dismiss('cancel');
-              };
-            }],
-            templateUrl: 'scripts/pile/form.html'
-          });
+        //       $scope.abort = function() {
+        //         modalInstance.dismiss('cancel');
+        //       };
+        //     }],
+        //     templateUrl: 'scripts/pile/form.html'
+        //   });
 
-          modalInstance.result.then(function (pile) {
-            console.info('completed', pile);
-          }, function (reason) {
-            console.info('rejected', reason);
-          });
-        };
+        //   modalInstance.result.then(function (pile) {
+        //     console.info('completed', pile);
+        //   }, function (reason) {
+        //     console.info('rejected', reason);
+        //   });
+        // };
 
         if (scope.pile && scope.pile.color) {
           var style = {

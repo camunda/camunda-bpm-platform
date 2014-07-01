@@ -249,16 +249,43 @@ strong {
   }
 }
 
+
+
+
+/*
+┌─────────────────────────────────────────┐
+│ Modal dialogs                           │
+└─────────────────────────────────────────┘
+*/
 .modal[ng-click] {
   cursor: default;
 }
 
 .modal-content {
-  padding: @grid-gutter-width / 2;
   .form-actions {
     margin-bottom: 0;
   }
 }
+.modal-header,
+.modal-footer {
+  margin: 0;
+  background-color: lighten(@gray-lighter, 3%);
+}
+
+.modal-header {
+  border-bottom: 1px solid @gray-lighter;
+}
+.modal-footer {
+  border-top: 1px solid @gray-lighter;
+}
+
+
+
+
+
+
+
+
 
 @import "../scripts/form/styles.less";
 @import "../scripts/user/styles.less";

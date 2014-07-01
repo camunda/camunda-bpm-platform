@@ -20,6 +20,7 @@
                  typeahead="process.name for process in lookupProcess($viewValue)"
                  typeahead-loading="loadingProcesses"
                  typeahead-wait-ms="100"
+                 typeahead-min-length="3"
                  typeahead-on-select="selected($item, $model, $label)"
                  class="form-control">
           <span class="input-group-addon">
@@ -132,26 +133,26 @@
     <div ng-if="!startingProcess">
       <div class="row">
         <div class="col-xs-8">
-    <!--
-      <pagination boundary-links="true"
-                  items-per-page="itemsPerPage"
-                  total-items="totalProcesses"
-                  ng-model="currentPage"
-                  ng-change="pageChanged()"
-                  class="pagination-sm"
-                  previous-text="&lsaquo;"
-                  next-text="&rsaquo;"
-                  first-text="&laquo;"
-                  last-text="&raquo;"></pagination>
-    -->
+        <!--
+          <pagination boundary-links="true"
+                      items-per-page="itemsPerPage"
+                      total-items="totalProcesses"
+                      ng-model="currentPage"
+                      ng-change="pageChanged()"
+                      class="pagination-sm"
+                      previous-text="&lsaquo;"
+                      next-text="&rsaquo;"
+                      first-text="&laquo;"
+                      last-text="&raquo;"></pagination>
+        -->
         </div>
+
         <div class="col-xs-4">
           <button class="btn btn-xs btn-link"
                   type="button"
                   ng-click="close()">Cancel</button>
         </div>
       </div>
-
     </div>
 
     <div ng-if="startingProcess">

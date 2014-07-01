@@ -1,6 +1,8 @@
 
 .task-piles {
-
+  .task-pile:first-child {
+    margin-top: 0;
+  }
 }
 
 .task-pile {
@@ -111,7 +113,6 @@
 .no-match {
   text-align: center;
   margin: 20px auto;
-
 }
 
 // .display,
@@ -147,6 +148,14 @@
 //   }
 // }
 
-.filter-add {
-  text-align: right;
+form[name="pile"] {
+  .description-field,
+  .filter-add,
+  .pile-filter {
+    margin-top: (@grid-gutter-width / 2);
+  }
+
+  .filter-add {
+    text-align: right;
+  }
 }
