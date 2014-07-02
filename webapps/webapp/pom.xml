@@ -18,6 +18,9 @@
     <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
     <java.resources.override>src/main/runtime/default/resources</java.resources.override>
     <properties.override>src/main/runtime/default/config.properties</properties.override>
+    
+    <frontend.development.cockpit.path>../../camunda-cockpit-ui/dist</frontend.development.cockpit.path>
+    <frontend.development.tasklist.path>../../camunda-tasklist-ui/dist</frontend.development.tasklist.path>
 
     <exec.shell>bash</exec.shell>
     <exec.arg>-c</exec.arg>
@@ -352,9 +355,8 @@
                 <defaultsDescriptor>${project.basedir}/src/main/runtime/develop/jetty/webdefault.xml</defaultsDescriptor>
                 <resourceBases>
                   <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
-                  <resourceBase>${project.basedir}/target/webapp</resourceBase>
-<!--                   <resourceBase>${frontend.development.tasklist.path}</resourceBase>
-                  <resourceBase>${frontend.development.cockpit.path}</resourceBase> -->
+                  <resourceBase>${frontend.development.cockpit.path}</resourceBase>
+                  <resourceBase>${frontend.development.tasklist.path}</resourceBase>
                 </resourceBases>
               </webAppConfig>
             </configuration>
