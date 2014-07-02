@@ -52,7 +52,7 @@ public abstract class AbstractClientPluginsFilter<T extends AppPlugin> extends A
     this.runtimeDelegate = runtimeDelegate;
     this.appName = appName;
 
-    this.pluginPackageFormat = "{ name: '"+appName+"-plugin-%s', location: 'api/"+appName+"/plugin/%s/static/app', main: 'plugin.js' }";
+    this.pluginPackageFormat = "{ name: '"+appName+"-plugin-%s', location: '%s/api/"+appName+"/plugin/%s/static/app', main: 'plugin.js' }";
     this.pluginDependencyFormat = "'module:"+appName+".plugin.%s:"+appName+"-plugin-%s'";
   }
 
@@ -61,7 +61,7 @@ public abstract class AbstractClientPluginsFilter<T extends AppPlugin> extends A
 
     String data = getWebResourceContents(request.getRequestURI().replaceFirst(request.getContextPath(), ""));
 
-    data = data.replace(PLUGIN_PACKAGES, createPluginPackagesStr());
+    data = data.replace(PLUGIN_PACKAGES, createPluginPackagesStr(request));
 
     data = data.replace(PLUGIN_DEPENDENCIES, createPluginDependenciesStr());
 
@@ -71,7 +71,7 @@ public abstract class AbstractClientPluginsFilter<T extends AppPlugin> extends A
     response.getWriter().append(data);
   }
 
-  protected CharSequence createPluginPackagesStr() {
+  protected CharSequence createPluginPackagesStr(HttpServletRequest request) {
     final List<T> plugins = getPlugins();
 
     StringBuilder builder = new StringBuilder();
@@ -81,7 +81,7 @@ public abstract class AbstractClientPluginsFilter<T extends AppPlugin> extends A
         builder.append(", ").append("\n");
       }
 
-      String definition = String.format(pluginPackageFormat, plugin.getId(), plugin.getId());
+      String definition = String.format(pluginPackageFormat, plugin.getId(), request.getServletContext().getContextPath(), plugin.getId());
 
       builder.append(definition);
     }
