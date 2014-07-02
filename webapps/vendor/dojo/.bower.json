@@ -1,0 +1,6 @@
+{
+  "name": "dojo",
+  "_source": "/home/meyerd/Documents/Workspace/camunda-bpm-platform/webapps/camunda-webapp/webapp/src/main/webapp/assets/local/dojo",
+  "_target": "*",
+  "_originalSource": "./src/main/webapp/assets/local/dojo"
+}
