@@ -23,10 +23,18 @@ function tasklistPunches(content, srcpath, dev) {
           content
             // .replace('<base href="/" />', '<base href="$BASE" />')
 
-            .replace('scripts/deps-n-mocks.js', dev ? 'scripts/deps-n-mocks.js' : 'scripts/deps.js')
+            // .replace('scripts/deps-n-mocks.js', dev ? 'scripts/deps-n-mocks.js' : 'scripts/deps.js')
 
             .replace('var tasklistConf = {};', 'var tasklistConf = '+ JSON.stringify({
-            }) +';') :
+              apiUri: '/camunda/api/engine',
+              mock: true,
+              // overrides the settings above
+              resources: {
+                'process-definition': {
+                  mock: false
+                }
+              }
+            }, null, 2) +';') :
 
           content;
 }
