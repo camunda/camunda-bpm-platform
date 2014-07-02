@@ -102,7 +102,7 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
       Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
 
       instance = caseService
-          .createCaseInstanceById(caseDefinitionId)
+          .withCaseDefinition(caseDefinitionId)
           .businessKey(businessKey)
           .setVariables(variables)
           .create();

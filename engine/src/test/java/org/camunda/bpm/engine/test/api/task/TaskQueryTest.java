@@ -1090,7 +1090,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getKey();
 
     caseService
-      .createCaseInstanceByKey(caseDefinitionKey)
+      .withCaseDefinitionByKey(caseDefinitionKey)
       .create();
 
     String caseExecutionId = caseService
@@ -1235,7 +1235,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .create();
 
     String humanTaskExecutionId = caseService
@@ -1278,7 +1278,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getKey();
 
     caseService
-      .createCaseInstanceByKey(caseDefinitionKey)
+      .withCaseDefinitionByKey(caseDefinitionKey)
       .create();
 
     String humanTaskExecutionId = caseService
@@ -1323,7 +1323,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     String caseDefinitionName = caseDefinition.getName();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .create();
 
     String humanTaskExecutionId = caseService
@@ -1366,7 +1366,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .create();
 
     String humanTaskExecutionId = caseService
@@ -1414,7 +1414,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     String caseInstanceId = caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .create()
       .getId();
 
@@ -1460,7 +1460,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     String businessKey = "aBusinessKey";
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .businessKey(businessKey)
       .create();
 
@@ -1506,7 +1506,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     String businessKey = "aBusinessKey";
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .businessKey(businessKey)
       .create();
 
@@ -1555,7 +1555,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .create();
 
     String humanTaskExecutionId = caseService
@@ -1598,7 +1598,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
@@ -1627,7 +1627,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -1656,7 +1656,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -1685,7 +1685,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -1714,7 +1714,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -1743,7 +1743,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -1774,7 +1774,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDateValue", now)
       .create();
 
@@ -1803,7 +1803,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -1834,7 +1834,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -1869,7 +1869,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -1899,7 +1899,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -1928,7 +1928,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -1957,7 +1957,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -1986,7 +1986,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -2015,7 +2015,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -2046,7 +2046,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDateValue", now)
       .create();
 
@@ -2077,7 +2077,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -2108,7 +2108,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -2143,7 +2143,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -2173,7 +2173,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
@@ -2204,7 +2204,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -2234,7 +2234,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -2265,7 +2265,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -2295,7 +2295,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -2325,7 +2325,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -2357,7 +2357,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDateValue", now)
       .create();
 
@@ -2389,7 +2389,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -2421,7 +2421,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -2456,7 +2456,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -2486,7 +2486,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
@@ -2517,7 +2517,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -2553,7 +2553,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -2584,7 +2584,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -2620,7 +2620,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -2656,7 +2656,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -2694,7 +2694,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDateValue", now)
       .create();
 
@@ -2732,7 +2732,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -2770,7 +2770,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -2805,7 +2805,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -2835,7 +2835,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
@@ -2866,7 +2866,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -2896,7 +2896,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -2927,7 +2927,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -2957,7 +2957,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -2987,7 +2987,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -3019,7 +3019,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDateValue", now)
       .create();
 
@@ -3051,7 +3051,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -3083,7 +3083,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -3118,7 +3118,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -3148,7 +3148,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
@@ -3179,7 +3179,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -3215,7 +3215,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -3246,7 +3246,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -3282,7 +3282,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -3318,7 +3318,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -3356,7 +3356,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDateValue", now)
       .create();
 
@@ -3394,7 +3394,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -3432,7 +3432,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -3467,7 +3467,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -3497,7 +3497,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
@@ -3528,7 +3528,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 

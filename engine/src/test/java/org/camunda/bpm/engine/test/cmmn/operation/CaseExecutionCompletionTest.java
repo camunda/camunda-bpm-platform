@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.test.cmmn.operation;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
@@ -23,7 +22,6 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
-import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -44,7 +42,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testCompleteActiveTask() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -109,7 +106,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testManualCompleteActiveTask() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -174,7 +170,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testCompleteEnabledTask() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -226,7 +221,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testManualCompleteEnabledTask() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -278,7 +272,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testCompleteAlreadyCompletedTask() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -333,7 +326,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testManualCompleteAlreadyCompletedTask() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -388,7 +380,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testCompleteTerminatedTask() {
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
 
@@ -441,7 +432,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testManualCompleteTerminatedTask() {
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
 
@@ -494,7 +484,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testDisableTaskShouldCompleteCaseInstance() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -560,7 +549,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testTerminateTaskShouldCompleteCaseInstance() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -628,7 +616,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testCompleteActiveCaseInstanceWithEnabledTask() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -679,7 +666,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testManualCompleteActiveCaseInstanceWithEnabledTask() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -740,7 +726,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testCompleteActiveCaseInstanceWithActiveTask() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -793,7 +778,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testManualCompleteActiveCaseInstanceWithActiveTask() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -846,7 +830,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testCompleteAlreadyCompletedCaseInstance() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -900,7 +883,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testManualCompleteAlreadyCompletedCaseInstance() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -958,7 +940,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-------------------------------------+
    *
    */
-  @Test
   public void testCompleteOnlyTaskA() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -1069,7 +1050,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-------------------------------------+
    *
    */
-  @Test
   public void testManualCompleteOnlyTaskA() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -1180,7 +1160,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-------------------------------------+
    *
    */
-  @Test
   public void testDisableOnlyTaskA() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -1278,7 +1257,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-------------------------------------+
    *
    */
-  @Test
   public void testTerminateOnlyTaskA() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -1379,7 +1357,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-------------------------------------+
    *
    */
-  @Test
   public void testCompleteTaskAAndTaskB() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -1493,7 +1470,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-------------------------------------+
    *
    */
-  @Test
   public void testManualCompleteTaskAAndTaskB() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -1607,7 +1583,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-------------------------------------+
    *
    */
-  @Test
   public void testDisableTaskAAndTaskB() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -1711,7 +1686,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-------------------------------------+
    *
    */
-  @Test
   public void testTerminateTaskAAndTaskB() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
@@ -1815,7 +1789,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-----------------------+
    *
    */
-  @Test
   public void testAutoCompletionCaseInstanceWithoutChildren() {
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
 
@@ -1860,7 +1833,6 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
    *   +-------------------------------------+
    *
    */
-  @Test
   public void testAutoCompletionStageWithoutChildren() {
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
 

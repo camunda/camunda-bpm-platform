@@ -34,25 +34,22 @@ public interface CaseService {
   /**
    * <p>Define a {@link CaseInstance} using a fluent builder.</p>
    *
-   * @param caseDefinitionKey The key of case definition to create a new case instance in
-   * the latest version of the case definition with the given key, cannot be null.
+   * <p>Starts a new case instance with the latest version of the corresponding case definition.</p>
    *
+   * @param caseDefinitionKey the key of a case definition to create a new case instance of, cannot be null
    * @return a {@link CaseInstanceBuilder fluent builder} for defining a new case instance
    */
-  CaseInstanceBuilder createCaseInstanceByKey(String caseDefinitionKey);
+  CaseInstanceBuilder withCaseDefinitionByKey(String caseDefinitionKey);
 
   /**
    * <p>Define a {@link CaseInstance} using a fluent builder.</p>
    *
-   * <p>Starts a new case instance in the exactly specified version of the case definition
-   * with the given id.</p>
+   * <p>Starts a new case instance with the case definition version corresponding to the given id.</p>
    *
-   * @param caseDefinitionId The id of case definition to create a new case instance in
-   * the exactly specified version of the case definition with the given id, cannot be null.
-   *
+   * @param caseDefinitionId the id of a case definition to create a new case instance, cannot be null
    * @return a {@link CaseInstanceBuilder fluent builder} for defining a new case instance
    */
-  CaseInstanceBuilder createCaseInstanceById(String caseDefinitionId);
+  CaseInstanceBuilder withCaseDefinition(String caseDefinitionId);
 
   /**
    * <p>Creates a new {@link CaseInstanceQuery} instance, that can be used
@@ -69,8 +66,7 @@ public interface CaseService {
   /**
    * <p>Define a command to be executed for a {@link CaseExecution} using a fluent builder.</p>
    *
-   * @param caseExecutionId The id of a case execution to define a command for it.
-   *
+   * @param caseExecutionId the id of a case execution to define a command for it
    * @return a {@link CaseExecutionCommandBuilder fluent builder} for defining a command
    *         for a case execution
    */
@@ -82,11 +78,9 @@ public interface CaseService {
    * <p>If you have many local variables and you only need a few, consider
    * using {@link #getVariables(String, Collection)} for better performance.</p>
    *
-   * @param caseExecutionId id of case instance or case execution, cannot be null.
-   *
-   * @return the variables or an empty map if no such variables are found.
-   *
-   * @throws ProcessEngineException when no case execution is found for the given case execution id.
+   * @param caseExecutionId the id of a case instance or case execution, cannot be null
+   * @return the variables or an empty map if no such variables are found
+   * @throws ProcessEngineException when no case execution is found for the given case execution id
    */
   Map<String, Object> getVariables(String caseExecutionId);
 
@@ -97,11 +91,9 @@ public interface CaseService {
    * <p>If you have many local variables and you only need a few, consider
    * using {@link #getVariablesLocal(String, Collection)} for better performance.</p>
    *
-   * @param caseExecutionId id of case execution, cannot be null.
-   *
-   * @return the variables or an empty map if no such variables are found.
-   *
-   * @throws ProcessEngineException when no case execution is found for the given case execution id.
+   * @param caseExecutionId the id of a case execution, cannot be null
+   * @return the variables or an empty map if no such variables are found
+   * @throws ProcessEngineException when no case execution is found for the given case execution id
    */
   Map<String, Object> getVariablesLocal(String caseExecutionId);
 
@@ -110,12 +102,10 @@ public interface CaseService {
    * into account which are visible from the given case execution scope
    * (including parent scopes).</p>
    *
-   * @param caseExecutionId id of case instance or case execution, cannot be null.
-   * @param variableNames the collection of variable names that should be retrieved.
-   *
-   * @return the variables or an empty map if no such variables are found.
-   *
-   * @throws ProcessEngineException when no case execution is found for the given case execution id.
+   * @param caseExecutionId the id of a case instance or case execution, cannot be null
+   * @param variableNames the collection of variable names that should be retrieved
+   * @return the variables or an empty map if no such variables are found
+   * @throws ProcessEngineException when no case execution is found for the given case execution id
    */
   Map<String, Object> getVariables(String caseExecutionId, Collection<String> variableNames);
 
@@ -123,12 +113,10 @@ public interface CaseService {
    * <p>The variable values for the given variableNames only taking the given case
    * execution scope into account, not looking in outer scopes.</p>
    *
-   * @param caseExecutionId id of case execution, cannot be null.
-   * @param variableNames the collection of variable names that should be retrieved.
-   *
-   * @return the variables or an empty map if no such variables are found.
-   *
-   * @throws ProcessEngineException when no case execution is found for the given case execution id.
+   * @param caseExecutionId the id of a case execution, cannot be null
+   * @param variableNames the collection of variable names that should be retrieved
+   * @return the variables or an empty map if no such variables are found
+   * @throws ProcessEngineException when no case execution is found for the given case execution id
    */
   Map<String, Object> getVariablesLocal(String caseExecutionId, Collection<String> variableNames);
 
@@ -136,15 +124,13 @@ public interface CaseService {
    * <p>Searching for the variable is done in all scopes that are visible
    * to the given case execution (including parent scopes).</p>
    *
-   * <p>Returns null when no variable value is found with the given name o
+   * <p>Returns null when no variable value is found with the given name or
    * when the value is set to null.</p>
    *
-   * @param caseExecutionId id of case instance or case execution, cannot be null.
-   * @param variableName name of variable, cannot be null.
-   *
-   * @return the variable value or null if the variable is undefined or the value of the variable is null.
-   *
-   * @throws ProcessEngineException when no case execution is found for the given case execution id.
+   * @param caseExecutionId the id of a case instance or case execution, cannot be null
+   * @param variableName the name of a variable, cannot be null
+   * @return the variable value or null if the variable is undefined or the value of the variable is null
+   * @throws ProcessEngineException when no case execution is found for the given case execution id
    */
   Object getVariable(String caseExecutionId, String variableName);
 
@@ -155,12 +141,11 @@ public interface CaseService {
    * <p>Returns null when no variable value is found with the given name or when the value is
    * set to null.</p>
    *
-   * @param caseExecutionId id of case instance or case execution, cannot be null.
-   * @param variableName name of variable, cannot be null.
+   * @param caseExecutionId the id of a case instance or case execution, cannot be null
+   * @param variableName the name of a variable, cannot be null
    *
-   * @return the variable value or null if the variable is undefined or the value of the variable is null.
-   *
-   * @throws ProcessEngineException when no case execution is found for the given case execution id.
+   * @return the variable value or null if the variable is undefined or the value of the variable is null
+   * @throws ProcessEngineException when no case execution is found for the given case execution id
    */
   Object getVariableLocal(String caseExecutionId, String variableName);
 }

@@ -31,7 +31,7 @@ import org.camunda.bpm.model.cmmn.instance.Task;
  *    <li>{@link #execute()}</li>
  *    <li>{@link #manualStart()}</li>
  *    <li>{@link #disable()}</li>
- *    <li>{@link #enable()}</li>
+ *    <li>{@link #reenable()}</li>
  *    <li>{@link #complete()}</li>
  *    <li>{@link #close()}</li>
  *  </ul>
@@ -208,7 +208,7 @@ public interface CaseExecutionCommandBuilder {
 
   /**
    * <p>Additionally to {@link #execute()} the associated case execution will
-   * be started manually. Therefore the happens a transition from the state
+   * be started manually. Therefore there happens a transition from the state
    * <code>ENABLED</code> to state <code>ACTIVE</code>.</p>
    *
    * <p>According to CMMN 1.0 specification the state <code>ACTIVE</code> means,
@@ -240,7 +240,7 @@ public interface CaseExecutionCommandBuilder {
    *
    * <p>If the given case execution has a parent case execution, that parent
    * case execution will be notified that the given case execution has been
-   * completed. This can lead to a completion of the parent case execution if
+   * disabled. This can lead to a completion of the parent case execution if
    * the completion criteria are fulfilled.</p>
    *
    * @throws ProcessEngineException this exception will be thrown

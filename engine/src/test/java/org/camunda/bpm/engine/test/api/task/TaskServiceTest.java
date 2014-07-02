@@ -549,7 +549,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService
@@ -1305,7 +1305,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService

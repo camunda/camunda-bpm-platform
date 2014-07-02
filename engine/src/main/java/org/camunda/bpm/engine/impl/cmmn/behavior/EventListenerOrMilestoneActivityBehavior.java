@@ -12,13 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAILABLE;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.*;
 
 /**
  * @author Roman Smirnov
@@ -95,7 +92,7 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
   }
 
   public void onResume(CmmnActivityExecution execution) {
-    ensureTransitionAllowed(execution, SUSPENDED, AVAILABLE, "suspend");
+    ensureTransitionAllowed(execution, SUSPENDED, AVAILABLE, "resume");
 
     CmmnActivityExecution parent = execution.getParent();
     if (parent != null) {

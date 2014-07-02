@@ -42,7 +42,7 @@ public class CaseTest extends PluggableProcessEngineTestCase {
     // create a new case instance by id
 
     CaseInstance caseInstance = caseService
-      .createCaseInstanceById(caseDefinition.getId())
+      .withCaseDefinition(caseDefinition.getId())
       .create();
 
     // then
@@ -77,7 +77,7 @@ public class CaseTest extends PluggableProcessEngineTestCase {
     // create a new case instance by key
 
     CaseInstance caseInstance = caseService
-      .createCaseInstanceByKey(caseDefinition.getKey())
+      .withCaseDefinitionByKey(caseDefinition.getKey())
       .create();
 
     // then
@@ -112,7 +112,7 @@ public class CaseTest extends PluggableProcessEngineTestCase {
     // create a new case instance by key
 
     CaseInstance caseInstance = caseService
-      .createCaseInstanceByKey(caseDefinition.getKey())
+      .withCaseDefinitionByKey(caseDefinition.getKey())
       .create();
 
     // then
@@ -171,7 +171,7 @@ public class CaseTest extends PluggableProcessEngineTestCase {
     // create a new case instance by key
 
     CaseInstance caseInstance = caseService
-      .createCaseInstanceByKey(caseDefinition.getKey())
+      .withCaseDefinitionByKey(caseDefinition.getKey())
       .create();
 
     // then

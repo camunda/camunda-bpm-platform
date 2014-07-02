@@ -94,7 +94,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     caseInstanceBuilder = mock(CaseInstanceBuilder.class);
     CaseInstance mockCaseInstance = MockProvider.createMockCaseInstance();
 
-    when(caseServiceMock.createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID)).thenReturn(caseInstanceBuilder);
+    when(caseServiceMock.withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID)).thenReturn(caseInstanceBuilder);
     when(caseInstanceBuilder.businessKey(anyString())).thenReturn(caseInstanceBuilder);
     when(caseInstanceBuilder.setVariables(Matchers.<Map<String, Object>>any())).thenReturn(caseInstanceBuilder);
     when(caseInstanceBuilder.create()).thenReturn(mockCaseInstance);
@@ -210,7 +210,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     .when()
       .post(CREATE_INSTANCE_URL);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(null);
     verify(caseInstanceBuilder).setVariables(null);
     verify(caseInstanceBuilder).create();
@@ -230,7 +230,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     .when()
       .post(CREATE_INSTANCE_BY_KEY_URL);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(null);
     verify(caseInstanceBuilder).setVariables(null);
     verify(caseInstanceBuilder).create();
@@ -252,7 +252,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     .when()
       .post(CREATE_INSTANCE_URL);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
     verify(caseInstanceBuilder).setVariables(null);
     verify(caseInstanceBuilder).create();
@@ -275,7 +275,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     .when()
       .post(CREATE_INSTANCE_BY_KEY_URL);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
     verify(caseInstanceBuilder).setVariables(null);
     verify(caseInstanceBuilder).create();
@@ -308,7 +308,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     expectedVariables.put("aVariableName", "abc");
     expectedVariables.put("anotherVariableName", 999);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(null);
     verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
     verify(caseInstanceBuilder).create();
@@ -342,7 +342,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     expectedVariables.put("aVariableName", "abc");
     expectedVariables.put("anotherVariableName", 999);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(null);
     verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
     verify(caseInstanceBuilder).create();
@@ -376,7 +376,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     expectedVariables.put("aVariableName", "abc");
     expectedVariables.put("anotherVariableName", 999);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey("aBusinessKey");
     verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
     verify(caseInstanceBuilder).create();
@@ -411,7 +411,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     expectedVariables.put("aVariableName", "abc");
     expectedVariables.put("anotherVariableName", 999);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey("aBusinessKey");
     verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
     verify(caseInstanceBuilder).create();

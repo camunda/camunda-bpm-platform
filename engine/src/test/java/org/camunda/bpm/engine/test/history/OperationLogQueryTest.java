@@ -219,7 +219,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService
@@ -259,7 +259,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -300,7 +300,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService

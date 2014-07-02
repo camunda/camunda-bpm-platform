@@ -122,7 +122,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         if (!child.isDisabled()) {
 
           if (throwException) {
-            throw new ProcessEngineException("At least one required child case execution is availabe|enabled|suspended.");
+            throw new ProcessEngineException("At least one required child case execution is available|enabled|suspended.");
           }
 
           return false;

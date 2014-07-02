@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.runtime;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.query.Query;
 
 /**
@@ -23,22 +24,46 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecution> {
 
-  /** Only select case executions which have the given case instance id. **/
+  /**
+   * Only select case executions which have the given case instance id.
+   *
+   * @param caseInstanceId the id of the case instance
+   */
   CaseExecutionQuery caseInstanceId(String caseInstanceId);
 
-  /** Only select case executions which have the given case definition id. **/
+  /**
+   * Only select case executions which have the given case definition id.
+   *
+   * @param caseDefinitionId the id of hte case definition
+   */
   CaseExecutionQuery caseDefinitionId(String caseDefinitionId);
 
-  /** Only select case executions which have the given case definition key. **/
+  /**
+   * Only select case executions which have the given case definition key.
+   *
+   * @param caseDefinitionKey the key of the case definition
+   */
   CaseExecutionQuery caseDefinitionKey(String caseDefinitionKey);
 
-  /** Only select case executions that belong to a case instance with the given business key */
+  /**
+   * Only select case executions that belong to a case instance with the given business key
+   *
+   * @param caseInstanceBusinessKey the business key of the case instance
+   */
   CaseExecutionQuery caseInstanceBusinessKey(String caseInstanceBusinessKey);
 
-  /** Only select case executions with the given id. **/
+  /**
+   * Only select case executions with the given id.
+   *
+   * @param executionId the id of the case execution
+   */
   CaseExecutionQuery caseExecutionId(String executionId);
 
-  /** Only select case executions which contain an activity with the given id. **/
+  /**
+   * Only select case executions which contain an activity with the given id.
+   *
+   * @param activityId the id of the activity
+   */
   CaseExecutionQuery activityId(String activityId);
 
   /** Only select case executions which are enabled. **/
@@ -53,12 +78,13 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
   /**
    * Only select case executions which have a local variable with the given value. The type
    * of variable is determined based on the value, using types configured in
-   * {@link ProcessEngineConfiguration#getVariableTypes()}.
+   * {@link ProcessEngineConfigurationImpl#getVariableTypes()}.
    *
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name name of the variable, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable
    */
   CaseExecutionQuery variableValueEquals(String name, Object value);
 
@@ -69,7 +95,8 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name name of the variable, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable
    */
   CaseExecutionQuery variableValueNotEquals(String name, Object value);
 
@@ -80,7 +107,8 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable, cannot be null
    */
   CaseExecutionQuery variableValueGreaterThan(String name, Object value);
 
@@ -91,7 +119,8 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Booleans, Byte-arrays and {@link Serializable} objects (which
    * are not primitive type wrappers) are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable, cannot be null
    */
   CaseExecutionQuery variableValueGreaterThanOrEqual(String name, Object value);
 
@@ -101,7 +130,8 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable, cannot be null
    */
   CaseExecutionQuery variableValueLessThan(String name, Object value);
 
@@ -111,19 +141,20 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable, cannot be null
    */
   CaseExecutionQuery variableValueLessThanOrEqual(String name, Object value);
 
   /**
    * Only select case executions which have a local variable value like the given value.
    *
-   * This be used on string variables only.
+   * This can be used on string variables only.
    *
-   * @param name variable name, cannot be null.
-   * @param value variable value. The string can include the
-   * wildcard character '%' to express like-strategy:
-   * starts with (string%), ends with (%string) or contains (%string%).
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable, cannot be null. The string can include the
+   *              wildcard character '%' to express like-strategy:
+   *              starts with (string%), ends with (%string) or contains (%string%).
    */
   CaseExecutionQuery variableValueLike(String name, String value);
 
@@ -135,7 +166,8 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name name of the variable, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable
    */
   CaseExecutionQuery caseInstanceVariableValueEquals(String name, Object value);
 
@@ -146,7 +178,8 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name name of the variable, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable
    */
   CaseExecutionQuery caseInstanceVariableValueNotEquals(String name, Object value);
 
@@ -158,7 +191,8 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable, cannot be null
    */
   CaseExecutionQuery caseInstanceVariableValueGreaterThan(String name, Object value);
 
@@ -169,7 +203,8 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Booleans, Byte-arrays and {@link Serializable} objects (which
    * are not primitive type wrappers) are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable, cannot be null
    */
   CaseExecutionQuery caseInstanceVariableValueGreaterThanOrEqual(String name, Object value);
 
@@ -180,7 +215,8 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable, cannot be null
    */
   CaseExecutionQuery caseInstanceVariableValueLessThan(String name, Object value);
 
@@ -191,7 +227,8 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable, cannot be null
    */
   CaseExecutionQuery caseInstanceVariableValueLessThanOrEqual(String name, Object value);
 
@@ -199,13 +236,12 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Only select case executions which are part of a case instance that have a variable value
    * like the given value.
    *
-   * This be used on string variables only.
+   * This can be used on string variables only.
    *
-   * @param name variable name, cannot be null.
-   *
-   * @param value variable value. The string can include the
-   * wildcard character '%' to express like-strategy:
-   * starts with (string%), ends with (%string) or contains (%string%).
+   * @param name the name of the variable, cannot be null
+   * @param value the value of the variable, cannot be null. The string can include the
+   *              wildcard character '%' to express like-strategy:
+   *              starts with (string%), ends with (%string) or contains (%string%).
    */
   CaseExecutionQuery caseInstanceVariableValueLike(String name, String value);
 

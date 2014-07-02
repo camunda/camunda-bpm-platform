@@ -44,12 +44,12 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     for (int i = 0; i < 4; i++) {
       caseService
-        .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+        .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
         .businessKey(i + "")
         .create();
     }
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY_2)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY_2)
       .businessKey("1")
       .create();
   }
@@ -344,7 +344,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -357,7 +357,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -370,7 +370,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -383,7 +383,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -396,7 +396,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -409,7 +409,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -423,7 +423,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByDateVariableValueEquals() {
     Date now = new Date();
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -436,7 +436,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -451,7 +451,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -470,7 +470,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -484,7 +484,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -497,7 +497,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -510,7 +510,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -523,7 +523,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -536,7 +536,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -551,7 +551,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -566,7 +566,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -581,7 +581,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -600,7 +600,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -614,7 +614,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -629,7 +629,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -643,7 +643,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -658,7 +658,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -672,7 +672,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -686,7 +686,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -702,7 +702,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -718,7 +718,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -734,7 +734,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -753,7 +753,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -767,7 +767,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -782,7 +782,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -802,7 +802,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -817,7 +817,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -837,7 +837,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerVariableValueGreaterThanOrEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -857,7 +857,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -879,7 +879,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -901,7 +901,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -923,7 +923,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -942,7 +942,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -956,7 +956,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -971,7 +971,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -985,7 +985,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -1000,7 +1000,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -1014,7 +1014,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -1028,7 +1028,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -1044,7 +1044,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -1060,7 +1060,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -1076,7 +1076,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -1095,7 +1095,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -1109,7 +1109,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -1124,7 +1124,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -1144,7 +1144,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -1159,7 +1159,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -1179,7 +1179,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerVariableValueLessThanOrEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -1199,7 +1199,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -1221,7 +1221,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -1243,7 +1243,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -1265,7 +1265,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -1284,7 +1284,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -1298,7 +1298,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullVariableValueLike() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -1313,7 +1313,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringVariableValueLike() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -1338,7 +1338,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullCaseInstanceVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -1351,7 +1351,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringCaseInstanceVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -1364,7 +1364,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanCaseInstanceVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -1377,7 +1377,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortCaseInstanceVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -1390,7 +1390,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerCaseInstanceVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -1403,7 +1403,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongCaseInstanceVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -1417,7 +1417,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByDateCaseInstanceVariableValueEquals() {
     Date now = new Date();
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -1430,7 +1430,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleCaseInstanceVariableValueEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -1445,7 +1445,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -1464,7 +1464,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -1478,7 +1478,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringCaseInstanceVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -1491,7 +1491,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanCaseInstanceVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -1504,7 +1504,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortCaseInstanceVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -1517,7 +1517,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerCaseInstanceVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -1530,7 +1530,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongCaseInstanceVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -1545,7 +1545,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -1560,7 +1560,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleCaseInstanceVariableValueNotEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -1575,7 +1575,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -1594,7 +1594,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -1608,7 +1608,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullCaseInstanceVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -1623,7 +1623,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringCaseInstanceVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -1637,7 +1637,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanCaseInstanceVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -1652,7 +1652,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortCaseInstanceVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -1666,7 +1666,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerCaseInstanceVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -1680,7 +1680,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongCaseInstanceVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -1696,7 +1696,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -1712,7 +1712,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleCaseInstanceVariableValueGreaterThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -1728,7 +1728,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -1747,7 +1747,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -1761,7 +1761,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullCaseInstanceVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -1776,7 +1776,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringCaseInstanceVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -1796,7 +1796,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanCaseInstanceVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -1811,7 +1811,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortCaseInstanceVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -1831,7 +1831,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerCaseInstanceVariableValueGreaterThanOrEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -1851,7 +1851,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongCaseInstanceVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -1873,7 +1873,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -1895,7 +1895,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleCaseInstanceVariableValueGreaterThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -1917,7 +1917,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -1936,7 +1936,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -1950,7 +1950,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullCaseInstanceVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -1965,7 +1965,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringCaseInstanceVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -1979,7 +1979,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanCaseInstanceVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -1994,7 +1994,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortCaseInstanceVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -2008,7 +2008,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerCaseInstanceVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -2022,7 +2022,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongCaseInstanceVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -2038,7 +2038,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -2054,7 +2054,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleCaseInstanceVariableValueLessThan() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -2070,7 +2070,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -2089,7 +2089,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -2103,7 +2103,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullCaseInstanceVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -2118,7 +2118,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringCaseInstanceVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 
@@ -2138,7 +2138,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByBooleanCaseInstanceVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aBooleanValue", true)
       .create();
 
@@ -2153,7 +2153,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByShortCaseInstanceVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aShortValue", (short) 123)
       .create();
 
@@ -2173,7 +2173,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByIntegerCaseInstanceVariableValueLessThanOrEquals() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("anIntegerValue", 456)
       .create();
 
@@ -2193,7 +2193,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByLongCaseInstanceVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aLongValue", (long) 789)
       .create();
 
@@ -2215,7 +2215,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     Date now = new Date();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDateValue", now)
       .create();
 
@@ -2237,7 +2237,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDoubleCaseInstanceVariableValueLessThanOrEqual() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
@@ -2259,7 +2259,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     byte[] bytes = "somebytes".getBytes();
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aByteArrayValue", bytes)
       .create();
 
@@ -2278,7 +2278,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("three");
 
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aSerializableValue", serializable)
       .create();
 
@@ -2292,7 +2292,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByNullCaseInstanceVariableValueLike() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aNullValue", null)
       .create();
 
@@ -2307,7 +2307,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByStringCaseInstanceVariableValueLike() {
     caseService
-      .createCaseInstanceByKey(CASE_DEFINITION_KEY)
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .setVariable("aStringValue", "abc")
       .create();
 

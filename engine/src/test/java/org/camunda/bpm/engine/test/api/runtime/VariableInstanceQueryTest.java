@@ -2247,7 +2247,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseExecutionId() {
     CaseInstance instance = caseService
-      .createCaseInstanceByKey("oneTaskCase")
+      .withCaseDefinitionByKey("oneTaskCase")
       .setVariable("aVariableName", "abc")
       .create();
 
@@ -2274,12 +2274,12 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseExecutionIds() {
     CaseInstance instance1 = caseService
-      .createCaseInstanceByKey("oneTaskCase")
+      .withCaseDefinitionByKey("oneTaskCase")
       .setVariable("aVariableName", "abc")
       .create();
 
     CaseInstance instance2 = caseService
-        .createCaseInstanceByKey("oneTaskCase")
+        .withCaseDefinitionByKey("oneTaskCase")
         .setVariable("anotherVariableName", "xyz")
         .create();
 
@@ -2312,7 +2312,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseInstanceId() {
     CaseInstance instance = caseService
-      .createCaseInstanceByKey("oneTaskCase")
+      .withCaseDefinitionByKey("oneTaskCase")
       .setVariable("aVariableName", "abc")
       .create();
 
@@ -2339,12 +2339,12 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseInstanceIds() {
     CaseInstance instance1 = caseService
-      .createCaseInstanceByKey("oneTaskCase")
+      .withCaseDefinitionByKey("oneTaskCase")
       .setVariable("aVariableName", "abc")
       .create();
 
     CaseInstance instance2 = caseService
-        .createCaseInstanceByKey("oneTaskCase")
+        .withCaseDefinitionByKey("oneTaskCase")
         .setVariable("anotherVariableName", "xyz")
         .create();
 
@@ -2377,7 +2377,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseActivityInstanceId() {
     CaseInstance instance = caseService
-      .createCaseInstanceByKey("oneTaskCase")
+      .withCaseDefinitionByKey("oneTaskCase")
       .setVariable("aVariableName", "abc")
       .create();
 
@@ -2404,12 +2404,12 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseActivityInstanceIds() {
     CaseInstance instance1 = caseService
-      .createCaseInstanceByKey("oneTaskCase")
+      .withCaseDefinitionByKey("oneTaskCase")
       .setVariable("aVariableName", "abc")
       .create();
 
     CaseInstance instance2 = caseService
-        .createCaseInstanceByKey("oneTaskCase")
+        .withCaseDefinitionByKey("oneTaskCase")
         .setVariable("anotherVariableName", "xyz")
         .create();
 

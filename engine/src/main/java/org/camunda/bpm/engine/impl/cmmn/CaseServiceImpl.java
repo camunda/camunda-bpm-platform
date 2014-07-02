@@ -32,11 +32,11 @@ import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
  */
 public class CaseServiceImpl extends ServiceImpl implements CaseService {
 
-  public CaseInstanceBuilder createCaseInstanceByKey(String caseDefinitionKey) {
+  public CaseInstanceBuilder withCaseDefinitionByKey(String caseDefinitionKey) {
     return new CaseInstanceBuilderImpl(commandExecutor, caseDefinitionKey, null);
   }
 
-  public CaseInstanceBuilder createCaseInstanceById(String caseDefinitionId) {
+  public CaseInstanceBuilder withCaseDefinition(String caseDefinitionId) {
     return new CaseInstanceBuilderImpl(commandExecutor, null, caseDefinitionId);
   }
 

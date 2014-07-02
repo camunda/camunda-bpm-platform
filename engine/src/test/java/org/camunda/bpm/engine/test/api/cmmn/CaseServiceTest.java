@@ -45,7 +45,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // when
     CaseInstance caseInstance = caseService
-        .createCaseInstanceByKey("oneTaskCase")
+        .withCaseDefinitionByKey("oneTaskCase")
         .create();
 
     // then
@@ -75,14 +75,14 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   public void testCreateCaseInstanceByInvalidKey() {
     try {
       caseService
-          .createCaseInstanceByKey("invalid")
+          .withCaseDefinitionByKey("invalid")
           .create();
       fail();
     } catch (ProcessEngineException e) { }
 
     try {
       caseService
-          .createCaseInstanceByKey(null)
+          .withCaseDefinitionByKey(null)
           .create();
       fail();
     } catch (ProcessEngineException e) { }
@@ -99,7 +99,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // when
     CaseInstance caseInstance = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     // then
@@ -130,14 +130,14 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   public void testCreateCaseInstanceByInvalidId() {
     try {
       caseService
-          .createCaseInstanceById("invalid")
+          .withCaseDefinition("invalid")
           .create();
       fail();
     } catch (ProcessEngineException e) { }
 
     try {
       caseService
-          .createCaseInstanceById(null)
+          .withCaseDefinition(null)
           .create();
       fail();
     } catch (ProcessEngineException e) { }
@@ -154,7 +154,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // when
     CaseInstance caseInstance = caseService
-        .createCaseInstanceByKey("oneTaskCase")
+        .withCaseDefinitionByKey("oneTaskCase")
         .businessKey("aBusinessKey")
         .create();
 
@@ -193,7 +193,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // when
     CaseInstance caseInstance = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .businessKey("aBusinessKey")
         .create();
 
@@ -228,7 +228,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // when
     CaseInstance caseInstance = caseService
-        .createCaseInstanceByKey("oneTaskCase")
+        .withCaseDefinitionByKey("oneTaskCase")
         .setVariable("aVariableName", "aVariableValue")
         .setVariable("anotherVariableName", 999)
         .create();
@@ -273,7 +273,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // when
     CaseInstance caseInstance = caseService
-        .createCaseInstanceByKey("oneTaskCase")
+        .withCaseDefinitionByKey("oneTaskCase")
         .setVariables(variables)
         .create();
 
@@ -317,7 +317,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // when
     CaseInstance caseInstance = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .setVariable("aVariableName", "aVariableValue")
         .setVariable("anotherVariableName", 999)
         .create();
@@ -367,7 +367,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // when
     CaseInstance caseInstance = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .setVariables(variables)
         .create();
 
@@ -412,7 +412,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -439,7 +439,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -464,7 +464,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -507,7 +507,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .create();
 
     CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
@@ -553,7 +553,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -629,7 +629,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -709,7 +709,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -785,7 +785,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -865,7 +865,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-      .createCaseInstanceById(caseDefinitionId)
+      .withCaseDefinition(caseDefinitionId)
       .create();
 
     CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
@@ -923,7 +923,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -1009,7 +1009,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -1099,7 +1099,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -1185,7 +1185,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -1276,7 +1276,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     // an active case instance
 
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     String caseExecutionId = caseService
@@ -1306,7 +1306,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
@@ -1346,7 +1346,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     String caseExecutionId = caseService
@@ -1381,7 +1381,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     // an active case instance and the containing
     // human task is enabled
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
@@ -1415,7 +1415,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
@@ -1451,7 +1451,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     String caseExecutionId = caseService
@@ -1485,7 +1485,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     String caseExecutionId = caseService
@@ -1519,7 +1519,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     String caseExecutionId = caseService
@@ -1553,7 +1553,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     String caseExecutionId = caseService
@@ -1583,7 +1583,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
@@ -1623,7 +1623,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     String caseExecutionId = caseService
@@ -1641,7 +1641,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
       caseService
         .withCaseExecution(caseExecutionId)
         .reenable();
-      fail("It should not be possible to re-enable an active human task.");
+      fail("It should not be possible to re-enable an active stage.");
     } catch (Exception e) {
     }
   }
@@ -1658,7 +1658,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     // an active case instance and the containing
     // human task is enabled
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
@@ -1692,7 +1692,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
@@ -1712,7 +1712,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
       caseService
         .withCaseExecution(caseExecutionId)
         .disable();
-      fail("It should not be possible to disable a already disabled human task.");
+      fail("It should not be possible to disable a already disabled stage.");
     } catch (Exception e) {
     }
   }
@@ -1728,7 +1728,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     String caseExecutionId = caseService
@@ -1746,7 +1746,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
       caseService
         .withCaseExecution(caseExecutionId)
         .disable();
-      fail("It should not be possible to disable an active human task.");
+      fail("It should not be possible to disable an active stage.");
     } catch (Exception e) {
     }
   }
@@ -1762,7 +1762,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     String caseExecutionId = caseService
@@ -1780,7 +1780,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
       caseService
         .withCaseExecution(caseExecutionId)
         .manualStart();
-      fail("It should not be possible to start a disabled human task manually.");
+      fail("It should not be possible to start a disabled stage manually.");
     } catch (Exception e) {
     }
   }
@@ -1796,7 +1796,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create();
 
     String caseExecutionId = caseService
@@ -1814,7 +1814,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
       caseService
         .withCaseExecution(caseExecutionId)
         .manualStart();
-      fail("It should not be possible to start an already active human task manually.");
+      fail("It should not be possible to start an already active stage manually.");
     } catch (Exception e) {
     }
   }
@@ -1847,7 +1847,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -1911,7 +1911,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -1978,7 +1978,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -2049,7 +2049,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -2131,7 +2131,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -2215,7 +2215,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -2306,7 +2306,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -2394,7 +2394,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .setVariable("aVariableName", "abc")
         .setVariable("anotherVariableName", 999)
         .create()
@@ -2443,7 +2443,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .setVariable("aVariableName", "abc")
         .setVariable("anotherVariableName", 999)
         .create()
@@ -2496,7 +2496,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .setVariable("aVariableName", "abc")
         .setVariable("anotherVariableName", 999)
         .setVariable("aThirdVariable", 123)
@@ -2550,7 +2550,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -2603,7 +2603,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -2660,7 +2660,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -2718,7 +2718,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -2776,7 +2776,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
      caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .setVariable("aVariableName", "abc")
         .create()
         .getId();
@@ -2811,7 +2811,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
      caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .setVariable("aVariableName", "abc")
         .create()
         .getId();
@@ -2846,7 +2846,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
      caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .setVariable("aVariableName", "abc")
         .setVariable("anotherVariableName", 999)
         .create()
@@ -2898,7 +2898,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
      caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .setVariable("aVariableName", "abc")
         .setVariable("anotherVariableName", 999)
         .setVariable("thirVariable", "xyz")
@@ -2955,7 +2955,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
      caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -3011,7 +3011,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3071,7 +3071,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
      caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .setVariable("aVariableName", "abc")
         .setVariable("anotherVariableName", 999)
         .setVariable("thirVariable", "xyz")
@@ -3119,7 +3119,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
      caseService
-        .createCaseInstanceById(caseDefinitionId)
+        .withCaseDefinition(caseDefinitionId)
         .create()
         .getId();
 
@@ -3170,7 +3170,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3218,7 +3218,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3266,7 +3266,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3331,7 +3331,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3383,7 +3383,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3448,7 +3448,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3500,7 +3500,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3540,7 +3540,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3580,7 +3580,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3633,7 +3633,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3686,7 +3686,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService
@@ -3715,7 +3715,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService
@@ -3744,7 +3744,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService
@@ -3777,7 +3777,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService
@@ -3811,7 +3811,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     String caseInstanceId = caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -3904,7 +3904,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService
@@ -3978,7 +3978,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService
@@ -4052,7 +4052,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // an active case instance
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService
@@ -4116,7 +4116,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyCasePlanModelCase.cmmn"})
-  public void testAutoCompletionOfEmtyCase() {
+  public void testAutoCompletionOfEmptyCase() {
     // given:
     // a deployed case definition
     String caseDefinitionId = repositoryService
@@ -4126,7 +4126,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     // when
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     // then
@@ -4140,7 +4140,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
-  public void testAutoCompletionOfEmtyStage() {
+  public void testAutoCompletionOfEmptyStage() {
     // given:
     // a deployed case definition
     String caseDefinitionId = repositoryService
@@ -4149,7 +4149,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService
@@ -4211,7 +4211,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .getId();
 
     String caseInstanceId = caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -4243,7 +4243,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .getId();
 
     String caseInstanceId = caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
 
@@ -4281,7 +4281,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService
@@ -4312,7 +4312,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .getId();
 
     caseService
-       .createCaseInstanceById(caseDefinitionId)
+       .withCaseDefinition(caseDefinitionId)
        .create();
 
     String caseExecutionId = caseService

@@ -27,7 +27,7 @@ import org.junit.Test;
 public class CaseExecutionTerminationTest extends PvmTestCase {
 
   @Test
-  public void testSuspendCaseInstance() {
+  public void testTerminateCaseInstance() {
 
     // given ///////////////////////////////////////////////////////////////
 
@@ -71,7 +71,7 @@ public class CaseExecutionTerminationTest extends PvmTestCase {
   }
 
   @Test
-  public void testSuspendStage() {
+  public void testTerminateStage() {
 
     // given ///////////////////////////////////////////////////////////////
 
@@ -115,7 +115,7 @@ public class CaseExecutionTerminationTest extends PvmTestCase {
   }
 
   @Test
-  public void testSuspendTask() {
+  public void testTerminateTask() {
 
     // given ///////////////////////////////////////////////////////////////
 

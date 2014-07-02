@@ -12,18 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAILABLE;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.*;
 
 /**
  * @author Roman Smirnov
@@ -40,9 +34,9 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
     // Step 2: Check ManualActiviation
     boolean manualActivation = true;
-    Object requiredRule = activity.getProperty("manualActivationRule");
-    if (requiredRule != null) {
-      CaseControlRule rule = (CaseControlRule) requiredRule;
+    Object manualActivationRule = activity.getProperty("manualActivationRule");
+    if (manualActivationRule != null) {
+      CaseControlRule rule = (CaseControlRule) manualActivationRule;
       manualActivation = rule.evaluate(execution);
     }
 
@@ -65,8 +59,8 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
   }
 
   public void onDisable(CmmnActivityExecution execution) {
-    ensureNotCaseInstance(execution, "re-enable");
-    ensureTransitionAllowed(execution, ENABLED, DISABLED, "re-enable");
+    ensureNotCaseInstance(execution, "disable");
+    ensureTransitionAllowed(execution, ENABLED, DISABLED, "disable");
   }
 
   public void onStart(CmmnActivityExecution execution) {

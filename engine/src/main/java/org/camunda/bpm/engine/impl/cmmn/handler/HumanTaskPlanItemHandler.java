@@ -52,7 +52,6 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
 
 
   protected CmmnActivity createActivity(CmmnElement element, CmmnHandlerContext context) {
-    // TODO Auto-generated method stub
     return super.createActivity(element, context);
   }
 

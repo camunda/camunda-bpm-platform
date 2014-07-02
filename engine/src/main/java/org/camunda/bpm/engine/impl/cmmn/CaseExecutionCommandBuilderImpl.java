@@ -66,7 +66,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder setVariables(Map<String, Object> variables) {
-    ensureVariableShouldNotBeRemoved(variables.keySet());
+    ensureVariablesShouldNotBeRemoved(variables.keySet());
     if (this.variables == null) {
       this.variables = new HashMap<String, Object>();
     }
@@ -84,7 +84,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder setVariablesLocal(Map<String, Object> variablesLocal) {
-    ensureVariableShouldNotBeRemoved(variablesLocal.keySet());
+    ensureVariablesShouldNotBeRemoved(variablesLocal.keySet());
     if (this.variablesLocal == null) {
       this.variablesLocal = new HashMap<String, Object>();
     }
@@ -102,7 +102,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder removeVariables(Collection<String> variableNames) {
-    ensureVariableShouldNotBeSet(variableNames);
+    ensureVariablesShouldNotBeSet(variableNames);
     if (variableDeletions == null) {
       variableDeletions = new ArrayList<String>();
     }
@@ -120,7 +120,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder removeVariablesLocal(Collection<String> variableNames) {
-    ensureVariableShouldNotBeSet(variableNames);
+    ensureVariablesShouldNotBeSet(variableNames);
     if (variableLocalDeletions == null) {
       variableLocalDeletions = new ArrayList<String>();
     }
@@ -128,7 +128,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
     return this;
   }
 
-  protected void ensureVariableShouldNotBeRemoved(Collection<String> variableNames) {
+  protected void ensureVariablesShouldNotBeRemoved(Collection<String> variableNames) {
     for (String variableName : variableNames) {
       ensureVariableShouldNotBeRemoved(variableName);
     }
@@ -141,7 +141,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
     }
   }
 
-  protected void ensureVariableShouldNotBeSet(Collection<String> variableNames) {
+  protected void ensureVariablesShouldNotBeSet(Collection<String> variableNames) {
     for (String variableName : variableNames) {
       ensureVariableShouldNotBeSet(variableName);
     }

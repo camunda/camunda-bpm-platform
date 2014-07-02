@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import static org.camunda.bpm.engine.delegate.CaseExecutionListener.CREATE;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
-
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
+
+import static org.camunda.bpm.engine.delegate.CaseExecutionListener.CREATE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
 
 /**
  * @author Roman Smirnov
@@ -53,7 +53,7 @@ public class AtomicOperationCaseInstanceCreate extends AbstractCmmnEventAtomicOp
 
     } catch (Exception e) {
       String id = execution.getId();
-      throw new PvmException("During the execution of case execution '"+id+"' occured an exception.", e);
+      throw new PvmException("During the execution of case execution '"+id+"' occurred an exception.", e);
     }
   }
 

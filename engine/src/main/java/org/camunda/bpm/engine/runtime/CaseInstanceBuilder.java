@@ -66,7 +66,7 @@ public interface CaseInstanceBuilder {
   CaseInstanceBuilder setVariables(Map<String, Object> variables);
 
   /**
-   * <p>Creates a new {@link CaseInstance}, which will be in the ACTIVE state.</p>
+   * <p>Creates a new {@link CaseInstance}, which will be in the <code>ACTIVE</code> state.</p>
    *
    * @throws ProcessEngineException when no case definition is deployed with the given key or id.
    */

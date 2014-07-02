@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -28,8 +27,6 @@ import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
-import org.junit.After;
-import org.junit.Before;
 
 /**
  * @author Roman Smirnov
@@ -42,7 +39,6 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
   protected TaskDecorator taskDecorator;
   protected ExpressionManager expressionManager;
 
-  @Before
   public void setUp() {
     task = (TaskEntity) taskService.newTask();
     taskService.saveTask(task);
@@ -54,7 +50,6 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     taskDecorator = new TaskDecorator(taskDefinition, expressionManager);
   }
 
-  @After
   public void tearDown() {
     processEngineConfiguration
       .getCommandExecutorTxRequired()
