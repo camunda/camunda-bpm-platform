@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
  * @author Roman Smirnov
  *
  */
-public interface CaseRule {
+public interface CaseControlRule {
 
   boolean evaluate(CmmnActivityExecution execution);
 

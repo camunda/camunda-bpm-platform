@@ -16,7 +16,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAI
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.NEW;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cmmn.CaseRule;
+import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
@@ -88,7 +88,7 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
 
     Object requiredRule = activity.getProperty("requiredRule");
     if (requiredRule != null) {
-      CaseRule rule = (CaseRule) requiredRule;
+      CaseControlRule rule = (CaseControlRule) requiredRule;
       boolean required = rule.evaluate(execution);
       execution.setRequired(required);
     }
@@ -99,7 +99,7 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
 
     Object repetitionRule = activity.getProperty("repetitionRule");
     if (repetitionRule != null) {
-      CaseRule rule = (CaseRule) repetitionRule;
+      CaseControlRule rule = (CaseControlRule) repetitionRule;
       rule.evaluate(execution);
       // TODO: set the value on execution?
     }

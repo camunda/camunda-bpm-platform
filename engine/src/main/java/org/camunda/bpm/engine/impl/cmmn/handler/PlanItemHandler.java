@@ -13,8 +13,8 @@
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
 import org.camunda.bpm.engine.delegate.Expression;
-import org.camunda.bpm.engine.impl.cmmn.behavior.CaseRuleImpl;
-import org.camunda.bpm.engine.impl.cmmn.behavior.ManualActivationRuleImpl;
+import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
@@ -78,7 +78,7 @@ public abstract class PlanItemHandler extends CmmnElementHandler<PlanItem> {
     if (requiredRule != null) {
       String rule = requiredRule.getCondition().getBody();
       Expression requiredRuleExpression = expressionManager.createExpression(rule);
-      CaseRuleImpl caseRule = new CaseRuleImpl(requiredRuleExpression);
+      CaseControlRule caseRule = new CaseControlRuleImpl(requiredRuleExpression);
       activity.setProperty("requiredRule", caseRule);
     }
 
@@ -103,7 +103,7 @@ public abstract class PlanItemHandler extends CmmnElementHandler<PlanItem> {
     if (manualActivationRule != null) {
       String rule = manualActivationRule.getCondition().getBody();
       Expression requiredRuleExpression = expressionManager.createExpression(rule);
-      CaseRuleImpl caseRule = new ManualActivationRuleImpl(requiredRuleExpression);
+      CaseControlRule caseRule = new CaseControlRuleImpl(requiredRuleExpression);
       activity.setProperty("manualActivationRule", caseRule);
     }
 
@@ -128,7 +128,7 @@ public abstract class PlanItemHandler extends CmmnElementHandler<PlanItem> {
     if (repetitionRule != null) {
       String rule = repetitionRule.getCondition().getBody();
       Expression requiredRuleExpression = expressionManager.createExpression(rule);
-      CaseRuleImpl caseRule = new CaseRuleImpl(requiredRuleExpression);
+      CaseControlRule caseRule = new CaseControlRuleImpl(requiredRuleExpression);
       activity.setProperty("repetitionRule", caseRule);
     }
 

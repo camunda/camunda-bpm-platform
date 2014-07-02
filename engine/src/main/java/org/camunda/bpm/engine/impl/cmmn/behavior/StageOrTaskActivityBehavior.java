@@ -21,7 +21,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSP
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cmmn.CaseRule;
+import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 
@@ -42,7 +42,7 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     boolean manualActivation = true;
     Object requiredRule = activity.getProperty("manualActivationRule");
     if (requiredRule != null) {
-      CaseRule rule = (CaseRule) requiredRule;
+      CaseControlRule rule = (CaseControlRule) requiredRule;
       manualActivation = rule.evaluate(execution);
     }
 

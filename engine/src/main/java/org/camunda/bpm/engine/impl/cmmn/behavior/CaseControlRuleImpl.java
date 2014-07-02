@@ -12,21 +12,39 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class ManualActivationRuleImpl extends CaseRuleImpl {
+public class CaseControlRuleImpl implements CaseControlRule {
 
-  public ManualActivationRuleImpl(Expression expression) {
-    super(expression);
+  protected Expression expression;
+
+  public CaseControlRuleImpl(Expression expression) {
+    this.expression = expression;
   }
 
   public boolean evaluate(CmmnActivityExecution execution) {
-    return !super.evaluate(execution);
+    if (expression == null) {
+      return false;
+    }
+
+    Object result = expression.getValue(execution);
+
+    if (result==null) {
+      throw new ProcessEngineException("rule expression returns null");
+    }
+
+    if (!(result instanceof Boolean)) {
+      throw new ProcessEngineException("rule expression returns non-Boolean: "+result+" ("+result.getClass().getName()+")");
+    }
+
+    return (Boolean) result;
   }
 
 }
