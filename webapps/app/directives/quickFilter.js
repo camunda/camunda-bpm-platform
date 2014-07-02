@@ -59,7 +59,7 @@ ngDefine('cockpit.directives', ['jquery'], function(module, $) {
 
       restrict: 'A',
 
-      templateUrl: require.toUrl('./app/cockpit/directives/quick-filter.html'),
+      templateUrl: require.toUrl('./directives/quick-filter.html'),
 
       link: function(scope, element, attrs) {
         if (!scope.holderSelector) {

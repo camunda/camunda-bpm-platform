@@ -11,7 +11,7 @@ ngDefine('cockpit.directives', ['angular'], function(module, angular) {
 
       restrict: 'A',
 
-      templateUrl: require.toUrl('./app/cockpit/directives/breadcrumbs.html'),
+      templateUrl: require.toUrl('./directives/breadcrumbs.html'),
 
       link: function(scope) {
         // event triggered by the breadcrumbs service when the breadcrumbs are alterated

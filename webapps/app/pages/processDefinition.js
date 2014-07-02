@@ -3,7 +3,7 @@ ngDefine('cockpit.pages.processDefinition', [
   'angular',
   'cockpit/util/routeUtil',
   'module:dataDepend:angular-data-depend',
-  'module:camunda.common.services:camunda-common/services/main'
+  'module:camunda.common.services:camunda-commons-ui/services/main'
 ], function(module, angular) {
   'use strict';
 
@@ -608,7 +608,7 @@ ngDefine('cockpit.pages.processDefinition', [
       redirectTo: routeUtil.redirectToRuntime
     })
     .when('/process-definition/:id/runtime', {
-      templateUrl: require.toUrl('./app/cockpit/pages/process-definition.html'),
+      templateUrl: require.toUrl('./pages/process-definition.html'),
 
       controller: Controller,
       resolve: {

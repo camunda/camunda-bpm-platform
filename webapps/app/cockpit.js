@@ -20,7 +20,7 @@
    * @name cockpit
    */
   var cockpitCore = [
-    'module:cockpit.plugin:cockpit-plugin',
+    'module:cockpit.plugin:camunda-commons-ui/plugin/main',
     'module:cockpit.services:./services/main',
     'module:cockpit.pages:./pages/main',
     'module:cockpit.directives:./directives/main',
@@ -28,10 +28,10 @@
     'module:cockpit.resources:./resources/main' ];
 
   var commons = [
-    'module:camunda.common.directives:camunda-common/directives/main',
-    'module:camunda.common.extensions:camunda-common/extensions/main',
-    'module:camunda.common.services:camunda-common/services/main',
-    'module:camunda.common.pages:camunda-common/pages/main' ];
+    'module:camunda.common.directives:camunda-commons-ui/directives/main',
+    'module:camunda.common.extensions:camunda-commons-ui/extensions/main',
+    'module:camunda.common.services:camunda-commons-ui/services/main',
+    'module:camunda.common.pages:camunda-commons-ui/pages/main' ];
 
   var plugins = window.PLUGIN_DEPENDENCIES || [];
 
