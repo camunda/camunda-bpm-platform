@@ -1,5 +1,4 @@
 module.exports = function(config) {
-  config = config || {};
 
   return {
     options: {
@@ -82,10 +81,9 @@ module.exports = function(config) {
     },
 
     served: {
-      files: ['dist/**/*.{js,css,jpg,png,webp,eot,svg,ttf,otf,woff}'],
-      tasks: [],
+      files: ['<%= buildTarget %>/**/*.{js,css,jpg,png,webp,eot,svg,ttf,otf,woff}'],
       options: {
-        livereload: parseInt(config.livereloadPort || 35729)
+        livereload: config.livereloadPort || false
       }
     }
   };

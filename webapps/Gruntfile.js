@@ -7,17 +7,17 @@ module.exports = function(grunt) {
 
   var pkg = require('./package.json');
 
-  var config = pkg.gruntConfig || {
-    connectPort:    7070
-  };
+  var config = pkg.gruntConfig || {};
 
-  config.connectPort = parseInt(process.env.CONNECT_PORT || config.connectPort);
-  config.livereloadPort = parseInt(process.env.LR_PORT || (config.connectPort + 1));
+  config.connectPort = parseInt(process.env.CONNECT_PORT || config.connectPort, 10) || 7070;
+  config.livereloadPort = (parseInt(process.env.LIVERELOAD_PORT, 10) || config.connectPort + 1);
 
   config.grunt = grunt;
   config.pkg = pkg;
 
   grunt.initConfig({
+    buildTarget:      grunt.option('target'),
+
     pkg:              pkg,
 
     bower:            require('./grunt/config/bower')(config),
@@ -49,21 +49,15 @@ module.exports = function(grunt) {
     clean:            ['doc', 'dist', '.tmp']
   });
 
-  grunt.registerTask('build', function(target) {
-    target = target || 'prod';
-
-    var tasks = [
-      'clean',
-      'jshint',
-      'jsdoc',
-      'bower',
-      'copy',
-      'less',
-      'requirejs'
-    ];
-
-    grunt.task.run(tasks);
-  });
+  grunt.registerTask('build', [
+    'clean',
+    'jshint',
+    'jsdoc',
+    'bower',
+    'copy',
+    'less',
+    'requirejs'
+  ]);
 
   grunt.registerTask('auto-build', [
     'build',

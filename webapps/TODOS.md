@@ -7,7 +7,7 @@ The "_real_" issue queue for this project is the
 [camunda Jira](https://app.camunda.com/jira/issues/?jql=project%20%3D%20CAM%20AND%20resolution%20%3D%20Unresolved%20AND%20fixVersion%20%3D%20%227.2.0%22%20AND%20component%20%3D%20tasklist%20AND%20text%20~%20%22tasklist%22%20ORDER%20BY%20assignee%20ASC%2C%20priority%20DESC)
 
 
- - [ ] favicon rendering (probably mime type)
+ - [ ] favicon rendering (probably related to the number of bytes sent)
  - [ ] fonts rendering in IE (mime type / headers /redirection)
  - [ ] fonts rendering in firefox (headers)
  - [x] problem with "mocks" build
@@ -21,7 +21,7 @@ The "_real_" issue queue for this project is the
    - [x] should notify when process successfully starts
    - [ ] processes start access
    - [ ] add pager
-   - [ ] search for process provides results
+   - [x] search for process provides results
  - __User authentication__
    - [ ] logout from other app does not reflect on the tasklist
    - [ ] notification messages at logout

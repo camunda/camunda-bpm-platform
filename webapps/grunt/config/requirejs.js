@@ -3,11 +3,10 @@ module.exports = function(config) {
   var _ = require('underscore');
   var fs = require('fs');
   var path = require('path');
-
-  config = config || {};
-
+  var grunt = config.grunt;
   var rjsConfPath = path.resolve('./client/scripts/rjsconf');
   var rjsConf = require(rjsConfPath);
+  var optimization = grunt.option("target") === "dist" ? 'uglify2' : 'none';
 
   var deps = [
     'camunda-tasklist-ui/rjsconf',
@@ -29,14 +28,9 @@ module.exports = function(config) {
     options: {
       stubModules: ['text'],
 
-      optimize: 'uglify2',
+      optimize: optimization,
       preserveLicenseComments: false,
       generateSourceMaps: true,
-
-      // optimize: 'none',
-      // preserveLicenseComments: true,
-      // generateSourceMaps: false,
-
 
       baseUrl: './client',
       paths: rjsConf.paths,
@@ -53,7 +47,7 @@ module.exports = function(config) {
         on the plugin, may or may not have something inlined in the
         module bundle.
         */
-        console.info('onModuleBundleComplete', data.path+':\n'+data.included.join('\n'));
+        console.info('onModuleBundleComplete', data.path+':\n\n'+data.included.join('\n') +'\n');
 
         // // add a timestamp to the sourcemap URL to prevent caching
         // fs.readFile(data.path, {encoding: 'utf8'}, function(err, content) {
@@ -69,7 +63,7 @@ module.exports = function(config) {
       options: {
         create: true,
         name: '<%= pkg.name %>-deps',
-        out: 'dist/scripts/deps.js',
+        out: '<%= buildTarget %>/scripts/deps.js',
         // include: deps
         include: deps.concat([
           'camunda-tasklist-ui/rjsconf'
@@ -81,7 +75,7 @@ module.exports = function(config) {
       options: {
         // name: 'scripts/index',
         name: 'camunda-tasklist-ui',
-        out: 'dist/scripts/<%= pkg.name %>.js',
+        out: '<%= buildTarget %>/scripts/<%= pkg.name %>.js',
         // exclude: deps,
         exclude: deps.concat([
           'camunda-tasklist-ui/rjsconf'
@@ -91,13 +85,11 @@ module.exports = function(config) {
     }
   };
 
-  if (process.env.RJS_OPTIMIZATION) {
-    rConf.options.optimize = process.env.RJS_OPTIMIZATION;
-    // if (process.env.RJS_OPTIMIZATION === 'none') {
-    //   rConf.options.generateSourceMaps = false;
-    // }
-  }
-
+  // if (process.env.RJS_OPTIMIZATION || grunt.option('target') !== 'dist') {
+  //   grunt.log.writeln('The compiled modules will NOT be optimized!');
+  //   rConf.options.optimize = 'none';
+  //   // rConf.options.generateSourceMaps = false;
+  // }
 
   return rConf;
 };
