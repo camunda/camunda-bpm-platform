@@ -12,30 +12,23 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
-import java.util.Arrays;
 import java.util.Collection;
+
+import org.camunda.bpm.model.cmmn.Query;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CmmnElementTest extends CmmnModelElementInstanceTest {
+public interface ExtensionElements extends CmmnModelElementInstance {
 
-  public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(true);
-  }
+  Collection<ModelElementInstance> getElements();
 
-  public Collection<ChildElementAssumption> getChildElementAssumptions() {
-    return Arrays.asList(
-        new ChildElementAssumption(ExtensionElements.class, 0, 1)
-      );
-  }
+  Query<ModelElementInstance> getElementsQuery();
 
-  public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return Arrays.asList(
-        new AttributeAssumption("id", true),
-        new AttributeAssumption("description")
-      );
-  }
+  ModelElementInstance addExtensionElement(String namespaceUri, String localName);
+
+  <T extends ModelElementInstance> T addExtensionElement(Class<T> extensionElementClass);
 
 }

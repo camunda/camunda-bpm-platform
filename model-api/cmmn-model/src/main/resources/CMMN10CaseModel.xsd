@@ -14,11 +14,14 @@
         tCmmnElement is the base type for ALL CMMN complex types except tExpression.
       </xsd:documentation>
     </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element ref="extensionElements" minOccurs="0" maxOccurs="1" /> 
+    </xsd:sequence>
     <xsd:attribute name="id" type="xsd:ID" use="optional"/>
     <xsd:attribute name="description" type="xsd:string" use="optional"/>
     <xsd:anyAttribute namespace="##other" processContents="lax"/>
   </xsd:complexType>
-	
+
   <!-- Introduce tCmmnElementWithMixedContent for expressions to allow mixed content -->
   <xsd:complexType name="tCmmnElementWithMixedContent" abstract="true" mixed="true">
     <xsd:annotation>
@@ -27,11 +30,30 @@
         identical to tCmmnElement except that it allows for mixed content.
       </xsd:documentation>
     </xsd:annotation>
-      <xsd:attribute name="id" type="xsd:ID" use="optional"/>
-      <xsd:attribute name="description" type="xsd:string" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+    <xsd:sequence>
+      <xsd:element ref="extensionElements" minOccurs="0" maxOccurs="1" /> 
+    </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:ID" use="optional"/>
+    <xsd:attribute name="description" type="xsd:string" use="optional"/>
+    <xsd:anyAttribute namespace="##other" processContents="lax"/>
   </xsd:complexType>
-	  
+
+  <!--
+    Extensibility
+  -->
+  <xsd:element name="extensionElements" type="tExtensionElements" /> 
+  <xsd:complexType name="tExtensionElements">
+    <xsd:annotation>
+      <xsd:documentation>
+        tExtensionElements allows to extend the specified meta model in a way that it is
+        still CMMN-compliant.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" /> 
+    </xsd:sequence>
+  </xsd:complexType>
+
   <!--
     CMMN Case elements
   -->
@@ -82,7 +104,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <!--
     Plan Item Control
   -->
@@ -110,7 +132,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="repetitionRule" type="tRepetitionRule">
     <xsd:annotation>
       <xsd:documentation>
@@ -204,7 +226,7 @@
     </xsd:complexContent>
   </xsd:complexType>
 
-  <!-- 
+  <!--
     CMMN Information Model (Case File)
   -->
   <xsd:element name="caseFile" type="tCaseFile">
@@ -229,7 +251,6 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-
 
   <xsd:element name="caseFileItem" type="tCaseFileItem">
     <xsd:annotation>
@@ -278,7 +299,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:complexType name="tChildren">
     <xsd:annotation>
       <xsd:documentation>
@@ -293,7 +314,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="caseFileItemDefinition" type="tCaseFileItemDefinition">
     <xsd:annotation>
       <xsd:documentation>
@@ -333,7 +354,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="property" type="tProperty"/>
   <xsd:complexType name="tProperty">
     <xsd:complexContent>
@@ -343,7 +364,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:simpleType name="MultiplicityEnum">
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="ZeroOrOne"/>
@@ -374,7 +395,6 @@
     </xsd:union>
   </xsd:simpleType>
 
-  
   <xsd:element name="expression" type="tExpression"/>
   <xsd:complexType name="tExpression" mixed="true">
     <xsd:complexContent>
@@ -387,12 +407,12 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
-  
+
+
   <!--
     Plan Item Definition
   -->
-  
+
   <!-- planItemDefinition is an abstract element that is used for inheritance (via substitutionGroup) -->
   <xsd:element name="planItemDefinition" type="tPlanItemDefinition"/>
   <xsd:complexType name="tPlanItemDefinition" abstract="true">
@@ -425,7 +445,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="event" type="tEvent" substitutionGroup="planItemDefinition">
     <xsd:annotation>
       <xsd:documentation>
@@ -439,7 +459,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="milestone" type="tMilestone" substitutionGroup="planItemDefinition"/>
   <xsd:complexType name="tMilestone">
     <xsd:complexContent>
@@ -451,7 +471,7 @@
   <!--
     Task elements
   -->
-  
+
   <xsd:element name="parameter" type="tParameter"/>
   <xsd:complexType name="tParameter" abstract="true">
     <xsd:complexContent>
@@ -460,7 +480,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="caseParameter" type="tCaseParameter" substitutionGroup="parameter"/>
   <xsd:complexType name="tCaseParameter">
     <xsd:complexContent>
@@ -478,7 +498,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="processParameter" type="tProcessParameter" substitutionGroup="parameter"/>
   <xsd:complexType name="tProcessParameter">
     <xsd:complexContent>
@@ -486,7 +506,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="humanTask" type="tHumanTask" substitutionGroup="task">
     <xsd:annotation>
       <xsd:documentation>
@@ -517,7 +537,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="processTask" type="tProcessTask" substitutionGroup="task">
     <xsd:annotation>
       <xsd:documentation>
@@ -548,7 +568,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="process" type="tProcess">
     <xsd:annotation>
       <xsd:documentation>
@@ -627,7 +647,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="parameterMapping" type="tParameterMapping"/>
   <xsd:complexType name="tParameterMapping">
     <xsd:complexContent>
@@ -652,7 +672,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <!--
     Event elements
   -->
@@ -663,7 +683,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="timerEvent" type="tTimerEvent" substitutionGroup="event"/>
   <xsd:complexType name="tTimerEvent">
     <xsd:complexContent>
@@ -696,7 +716,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="caseFileItemStartTrigger" type="tCaseFileItemStartTrigger" substitutionGroup="timerStart"/>
   <xsd:complexType name="tCaseFileItemStartTrigger">
     <xsd:complexContent>
@@ -714,7 +734,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="planItemStartTrigger" type="tPlanItemStartTrigger" substitutionGroup="timerStart"/>
   <xsd:complexType name="tPlanItemStartTrigger">
     <xsd:complexContent>
@@ -732,7 +752,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <!--
     Sentry
   -->
@@ -760,8 +780,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
-  
+
   <xsd:element name="onPart" type="tOnPart"/>
   <xsd:complexType name="tOnPart" abstract="true">
     <xsd:complexContent>
@@ -769,7 +788,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="caseFileItemOnPart" type="tCaseFileItemOnPart" substitutionGroup="onPart"/>
   <xsd:complexType name="tCaseFileItemOnPart">
     <xsd:complexContent>
@@ -787,7 +806,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="planItemOnPart" type="tPlanItemOnPart" substitutionGroup="onPart"/>
   <xsd:complexType name="tPlanItemOnPart">
     <xsd:complexContent>
@@ -812,7 +831,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="ifPart" type="tIfPart"/>
   <xsd:complexType name="tIfPart">
     <xsd:complexContent>
@@ -875,7 +894,7 @@
       <xsd:enumeration value="terminate"/>
     </xsd:restriction>
   </xsd:simpleType>
-  
+
   <!--
     Stage and Plan Fragment
   -->
@@ -902,7 +921,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="stage" type="tStage" substitutionGroup="planItemDefinition">
     <xsd:annotation>
       <xsd:documentation>
@@ -936,7 +955,7 @@
       </xsd:extension>      
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="planItem" type="tPlanItem"/>
   <xsd:complexType name="tPlanItem">
     <xsd:complexContent>
@@ -969,8 +988,8 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
-  <!-- 
+
+  <!--
     Planning Table
   -->
   <xsd:element name="tableItem" type="tTableItem"/>
@@ -994,7 +1013,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="planningTable" type="tPlanningTable" substitutionGroup="tableItem"/>
   <xsd:complexType name="tPlanningTable">
     <xsd:complexContent>
@@ -1006,7 +1025,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="discretionaryItem" type="tDiscretionaryItem" substitutionGroup="tableItem"/>
   <xsd:complexType name="tDiscretionaryItem">
     <xsd:complexContent>
@@ -1024,7 +1043,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:element name="applicabilityRule" type="tApplicabilityRule"/>
   <xsd:complexType name="tApplicabilityRule">
     <xsd:complexContent>

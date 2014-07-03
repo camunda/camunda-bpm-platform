@@ -18,11 +18,14 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT;
 
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
+import org.camunda.bpm.model.xml.type.child.ChildElement;
+import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
 /**
  * @author Roman Smirnov
@@ -32,6 +35,7 @@ public abstract class CmmnElementImpl extends CmmnModelElementInstanceImpl imple
 
   protected static Attribute<String> idAttribute;
   protected static Attribute<String> descriptionAttribute;
+  protected static ChildElement<ExtensionElements> extensionElementsChild;
 
   public CmmnElementImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -67,6 +71,11 @@ public abstract class CmmnElementImpl extends CmmnModelElementInstanceImpl imple
 
     descriptionAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_DESCRIPTION)
         .build();
+
+    SequenceBuilder sequenceBuilder = typeBuilder.sequence();
+
+    extensionElementsChild = sequenceBuilder.element(ExtensionElements.class)
+      .build();
 
     typeBuilder.build();
   }

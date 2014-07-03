@@ -15,27 +15,26 @@ package org.camunda.bpm.model.cmmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+
 /**
  * @author Roman Smirnov
  *
  */
-public class CmmnElementTest extends CmmnModelElementInstanceTest {
+public class ExtensionElementsTest extends CmmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(true);
+    return new TypeAssumption(false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-        new ChildElementAssumption(ExtensionElements.class, 0, 1)
-      );
+      new ChildElementAssumption(null, ModelElementInstance.class)
+    );
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return Arrays.asList(
-        new AttributeAssumption("id", true),
-        new AttributeAssumption("description")
-      );
+    return null;
   }
 
 }

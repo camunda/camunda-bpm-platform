@@ -37,6 +37,7 @@ public class CmmnModelConstants {
   public static final String CMMN_ELEMENT = "cmmnElement";
   public static final String CMMN_ELEMENT_DEFINITIONS = "definitions";
   public static final String CMMN_ELEMENT_IMPORT = "import";
+  public static final String CMMN_ELEMENT_EXTENSION_ELEMENTS= "extensionElements";
 
   // case
   public static final String CMMN_ELEMENT_CASE = "case";

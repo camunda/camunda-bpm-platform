@@ -43,6 +43,7 @@ import org.camunda.bpm.model.cmmn.impl.instance.DefinitionsImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.DiscretionaryItemImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.EventListenerImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ExpressionImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.ExtensionElementsImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.HumanTaskImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.IfPartImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ImportImpl;
@@ -86,6 +87,7 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelParseException;
 import org.camunda.bpm.model.xml.ModelValidationException;
+import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.util.IoUtil;
 
 /**
@@ -271,6 +273,7 @@ public class Cmmn {
     DiscretionaryItemImpl.registerType(modelBuilder);
     EventListenerImpl.registerType(modelBuilder);
     ExpressionImpl.registerType(modelBuilder);
+    ExtensionElementsImpl.registerType(modelBuilder);
     HumanTaskImpl.registerType(modelBuilder);
     IfPartImpl.registerType(modelBuilder);
     ImportImpl.registerType(modelBuilder);
@@ -279,6 +282,7 @@ public class Cmmn {
     InputsCaseParameter.registerType(modelBuilder);
     ManualActivationRuleImpl.registerType(modelBuilder);
     MilestoneImpl.registerType(modelBuilder);
+    ModelElementInstanceImpl.registerType(modelBuilder);
     OnPartImpl.registerType(modelBuilder);
     OutputCaseParameter.registerType(modelBuilder);
     OutputProcessParameter.registerType(modelBuilder);
