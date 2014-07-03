@@ -115,7 +115,7 @@ In place of a guide, just follow the formatting of existing code.
 
 ## License
 
-The camunda tasklist is licensed under [Apache License Version 2.0](./LICENSE).
+Unless otherwise specified this project is licensed under [Apache License Version 2.0](./LICENSE).
 
 ## Authors
 

@@ -1,7 +1,59 @@
-module.exports = function() {
+module.exports = function(config) {
+  var grunt = config.grunt;
+  var productionRemoveExp = /<!-- #production-remove.*\/production-remove -->/igm;
+  var prod = grunt.option('target') === 'dist';
+
+
+  function productionRemove(content, srcpath) {
+    if (!prod) { return content; }
+
+    grunt.log.writeln('Removing development snippets');
+    return content.replace(productionRemoveExp, '');
+  }
+
+
+  function livereloadPort(content, srcpath) {
+    if (srcpath.slice(-4) !== 'html' || prod) {
+      return content;
+    }
+
+    grunt.log.writeln('Replacing "LIVERELOAD_PORT" with "'+ config.livereloadPort +'"');
+    return content.replace('LIVERELOAD_PORT', config.livereloadPort);
+  }
+
+
+  function appConf(content, srcpath) {
+    if (srcpath.slice(-4) !== 'html') { return content; }
+
+    var tasklistConf = 'var tasklistConf = '+ JSON.stringify({
+      apiUri: '/camunda/api/engine',
+      mock: true,
+      // overrides the settings above
+      resources: {
+        'process-definition': {
+          mock: false
+        }
+      }
+    }, null, 2) +';';
+
+    grunt.log.writeln('Wrote application configuration');
+    return content.replace('var tasklistConf = {};', tasklistConf);
+  }
+
+
+  function copyReplace(content, srcpath) {
+    content = productionRemove(content, srcpath);
+    content = appConf(content, srcpath);
+    content = livereloadPort(content, srcpath);
+    return content;
+  }
+
   return {
     options: {},
     assets: {
+      options: {
+        process: copyReplace
+      },
       files: [
         {
           expand: true,
@@ -10,32 +62,32 @@ module.exports = function() {
             '*.{ico,txt}',
             'index.html'
           ],
-          dest: 'dist/'
+          dest: '<%= buildTarget %>/',
         },
         {
           expand: true,
           cwd: 'client/fonts',
           src: ['*/*.{eot,svg,ttf,woff}'],
-          dest: 'dist/fonts/'
+          dest: '<%= buildTarget %>/fonts/'
         },
         {
           expand: true,
           cwd: 'client/bower_components/bootstrap/fonts',
           src: ['**'],
-          dest: 'dist/fonts/bootstrap'
+          dest: '<%= buildTarget %>/fonts/bootstrap/'
         },
         {
           expand: true,
           cwd: 'client/images',
           src: ['**'],
-          dest: 'dist/images/'
-        },
-        // -----------------------
-        {
-          expand: true,
-          cwd: 'client/scripts',
-          src: ['**/*.{jpg,png,gif,webp}'],
-          dest: 'dist/scripts/'
+          dest: '<%= buildTarget %>/images/'
+        // },
+        // // -----------------------
+        // {
+        //   expand: true,
+        //   cwd: 'client/scripts',
+        //   src: ['**/*.{jpg,png,gif,webp}'],
+        //   dest: '<%= buildTarget %>/scripts/'
         }
       ]
     },

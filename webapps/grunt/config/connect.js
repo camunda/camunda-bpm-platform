@@ -7,7 +7,7 @@ module.exports = function(config) {
     },
     dev: {
       options: {
-        base: ['dist']
+        base: ['<%= buildTarget %>']
       }
     }
   };
