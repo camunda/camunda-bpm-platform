@@ -44,6 +44,8 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: packageJSON,
 
+    buildTarget: grunt.option('target'),
+
     app: {
       port: parseInt(process.env.APP_PORT || 8080, 10),
       liveReloadPort: parseInt(process.env.LIVERELOAD_PORT || 8081, 10),
@@ -51,7 +53,7 @@ module.exports = function(grunt) {
 
     clean: {
       target: [
-        '<%= grunt.option("target") %>/',
+        '<%= buildTarget %>/',
         'doc/'
       ]
     },
@@ -59,7 +61,7 @@ module.exports = function(grunt) {
     mkdir: {
       target: {
         options: {
-          create: ['<%= grunt.option("target") %>/']
+          create: ['<%= buildTarget %>/']
         },
       },
     },
@@ -71,7 +73,7 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'app/',
             src: ['**'],
-            dest: grunt.option("target"),
+            dest: '<%= buildTarget %>/',
           },
           {
             expand: true,
@@ -79,7 +81,7 @@ module.exports = function(grunt) {
             src: [
               'fonts/**/*.{css,eot,svg,ttf,woff}'
             ],
-            dest: grunt.option("target") + '/assets'
+            dest: '<%= buildTarget %>/assets'
           }
         ],
         options: {
@@ -108,7 +110,7 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'app/',
             src: ['**'],
-            dest: grunt.option("target"),
+            dest: '<%= buildTarget %>'
           },
         ],
         options: {
@@ -122,13 +124,13 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'bower_components/',
             src: '**',
-            dest: grunt.option("target") + '/assets/vendor/'
+            dest: '<%= buildTarget %>/assets/vendor/'
           },
           {
             expand: true,
             cwd: 'assets/',
             src: [ 'img/**' ],
-            dest: grunt.option("target") + '/assets'
+            dest: '<%= buildTarget %>/assets'
           }
 
         ]
@@ -165,7 +167,7 @@ module.exports = function(grunt) {
           livereload: '<%= app.liveReloadPort %>'
         },
         files: [
-          grunt.option("target") + '/**/*.{css,js,html,jpg,png}'
+          '<%= buildTarget %>/**/*.{css,js,html,jpg,png}'
         ],
         tasks: []
       }
@@ -245,13 +247,13 @@ module.exports = function(grunt) {
           compress: true
         },
         files: {
-          '<%= grunt.option("target") %>/assets/css/loader.css': 'assets/styles/loader.less',
+          '<%= buildTarget %>/assets/css/loader.css': 'assets/styles/loader.less',
         }
       },
 
       development: {
         files: {
-          '<%= grunt.option("target") %>/assets/css/loader.css': 'assets/styles/loader.less',
+          '<%= buildTarget %>/assets/css/loader.css': 'assets/styles/loader.less',
         }
       }
     }
