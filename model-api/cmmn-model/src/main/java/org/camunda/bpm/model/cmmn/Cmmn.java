@@ -82,6 +82,8 @@ import org.camunda.bpm.model.cmmn.impl.instance.TimerEventListenerImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.TimerExpression;
 import org.camunda.bpm.model.cmmn.impl.instance.TransformationExpression;
 import org.camunda.bpm.model.cmmn.impl.instance.UserEventListenerImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaInImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaOutImpl;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.ModelException;
@@ -313,6 +315,10 @@ public class Cmmn {
     TimerExpression.registerType(modelBuilder);
     TransformationExpression.registerType(modelBuilder);
     UserEventListenerImpl.registerType(modelBuilder);
+
+    /** camunda extensions */
+    CamundaInImpl.registerType(modelBuilder);
+    CamundaOutImpl.registerType(modelBuilder);
   }
 
   /**

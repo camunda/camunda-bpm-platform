@@ -128,6 +128,10 @@ public class CmmnModelConstants {
   // process
   public static final String CMMN_ELEMENT_PROCESS = "process";
 
+  // camunda elements
+  public static final String CAMUNDA_ELEMENT_IN = "in";
+  public static final String CAMUNDA_ELEMENT_OUT = "out";
+
   // attributes /////////////////////////////////////////////////////////////////////////
 
   public static final String CMMN_ATTRIBUTE_ID = "id";
@@ -174,5 +178,10 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_DUE_DATE = "dueDate";
   public static final String CAMUNDA_ATTRIBUTE_FORM_KEY = "formKey";
   public static final String CAMUNDA_ATTRIBUTE_PRIORITY = "priority";
+  public static final String CAMUNDA_ATTRIBUTE_SOURCE = "source";
+  public static final String CAMUNDA_ATTRIBUTE_SOURCE_EXPRESSION = "sourceExpression";
+  public static final String CAMUNDA_ATTRIBUTE_BUSINESS_KEY = "businessKey";
+  public static final String CAMUNDA_ATTRIBUTE_TARGET = "target";
+  public static final String CAMUNDA_ATTRIBUTE_VARIABLES = "variables";
 
 }
