@@ -12,13 +12,15 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_BINDING;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_VERSION;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_CASE_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CASE_TASK;
 
 import java.util.Collection;
 
-import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.ParameterMapping;
 import org.camunda.bpm.model.cmmn.instance.Task;
@@ -26,9 +28,9 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
-import org.camunda.bpm.model.xml.type.reference.AttributeReference;
 
 /**
  * @author Roman Smirnov
@@ -36,23 +38,42 @@ import org.camunda.bpm.model.xml.type.reference.AttributeReference;
  */
 public class CaseTaskImpl extends TaskImpl implements CaseTask {
 
-  protected static AttributeReference<Case> caseRefAttribute;
+  protected static Attribute<String> caseRefAttribute;
   protected static ChildElementCollection<ParameterMapping> parameterMappingCollection;
+
+  protected static Attribute<String> camundaCaseBindingAttribute;
+  protected static Attribute<String> camundaCaseVersionAttribute;
 
   public CaseTaskImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
-  public Case getCase() {
-    return caseRefAttribute.getReferenceTargetElement(this);
+  public String getCase() {
+    return caseRefAttribute.getValue(this);
   }
 
-  public void setCase(Case caseInstance) {
-    caseRefAttribute.setReferenceTargetElement(this, caseInstance);
+  public void setCase(String caseInstance) {
+    caseRefAttribute.setValue(this, caseInstance);
   }
 
   public Collection<ParameterMapping> getParameterMappings() {
     return parameterMappingCollection.get(this);
+  }
+
+  public String getCamundaCaseBinding() {
+    return camundaCaseBindingAttribute.getValue(this);
+  }
+
+  public void setCamundaCaseBinding(String camundaCaseBinding) {
+    camundaCaseBindingAttribute.setValue(this, camundaCaseBinding);
+  }
+
+  public String getCamundaCaseVersion() {
+    return camundaCaseVersionAttribute.getValue(this);
+  }
+
+  public void setCamundaCaseVersion(String camundaCaseVersion) {
+    camundaCaseVersionAttribute.setValue(this, camundaCaseVersion);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
@@ -66,8 +87,17 @@ public class CaseTaskImpl extends TaskImpl implements CaseTask {
         });
 
     caseRefAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_CASE_REF)
-        .qNameAttributeReference(Case.class)
         .build();
+
+    /** camunda extensions */
+
+    camundaCaseBindingAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CASE_BINDING)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaCaseVersionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CASE_VERSION)
+      .namespace(CAMUNDA_NS)
+      .build();
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 

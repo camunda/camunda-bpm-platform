@@ -20,10 +20,20 @@ import java.util.Collection;
  */
 public interface ProcessTask extends Task {
 
-  Process getProcess();
+  String getProcess();
 
-  void setProcess(Process process);
+  void setProcess(String process);
 
   Collection<ParameterMapping> getParameterMappings();
+
+  /** camunda extensions */
+
+  String getCamundaProcessBinding();
+
+  void setCamundaProcessBinding(String camundaProcessBinding);
+
+  String getCamundaProcessVersion();
+
+  void setCamundaProcessVersion(String camundaProcessVersion);
 
 }

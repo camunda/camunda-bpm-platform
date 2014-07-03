@@ -20,10 +20,20 @@ import java.util.Collection;
  */
 public interface CaseTask extends Task {
 
-  Case getCase();
+  String getCase();
 
-  void setCase(Case caseInstance);
+  void setCase(String caseInstance);
 
   Collection<ParameterMapping> getParameterMappings();
+
+  /** camunda extensions */
+
+  String getCamundaCaseBinding();
+
+  void setCamundaCaseBinding(String camundaCaseBinding);
+
+  String getCamundaCaseVersion();
+
+  void setCamundaCaseVersion(String camundaCaseVersion);
 
 }

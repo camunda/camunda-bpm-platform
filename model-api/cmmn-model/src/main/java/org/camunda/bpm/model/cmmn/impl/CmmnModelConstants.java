@@ -183,5 +183,9 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_BUSINESS_KEY = "businessKey";
   public static final String CAMUNDA_ATTRIBUTE_TARGET = "target";
   public static final String CAMUNDA_ATTRIBUTE_VARIABLES = "variables";
+  public static final String CAMUNDA_ATTRIBUTE_PROCESS_BINDING = "processBinding";
+  public static final String CAMUNDA_ATTRIBUTE_PROCESS_VERSION = "processVersion";
+  public static final String CAMUNDA_ATTRIBUTE_CASE_BINDING = "caseBinding";
+  public static final String CAMUNDA_ATTRIBUTE_CASE_VERSION = "caseVersion";
 
 }

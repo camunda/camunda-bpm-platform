@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_NS;
+
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -33,7 +35,9 @@ public class ProcessTaskTest extends CmmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-        new AttributeAssumption("processRef")
+        new AttributeAssumption("processRef"),
+        new AttributeAssumption(CAMUNDA_NS, "processBinding"),
+        new AttributeAssumption(CAMUNDA_NS, "processVersion")
       );
   }
 
