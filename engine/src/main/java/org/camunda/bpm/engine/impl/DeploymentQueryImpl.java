@@ -15,12 +15,12 @@ package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
 import java.util.List;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -46,25 +46,19 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   }
 
   public DeploymentQueryImpl deploymentId(String deploymentId) {
-    if (deploymentId == null) {
-      throw new ProcessEngineException("Deployment id is null");
-    }
+    ensureNotNull("Deployment id", deploymentId);
     this.deploymentId = deploymentId;
     return this;
   }
   
   public DeploymentQueryImpl deploymentName(String deploymentName) {
-    if (deploymentName == null) {
-      throw new ProcessEngineException("deploymentName is null");
-    }
+    ensureNotNull("deploymentName", deploymentName);
     this.name = deploymentName;
     return this;
   }
 
   public DeploymentQueryImpl deploymentNameLike(String nameLike) {
-    if (nameLike == null) {
-      throw new ProcessEngineException("deploymentNameLike is null");
-    }
+    ensureNotNull("deploymentNameLike", nameLike);
     this.nameLike = nameLike;
     return this;
   }

@@ -27,13 +27,14 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
-import java.io.Serializable;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * Gives access to a deploy BPMN model instance which can be accessed by
@@ -59,9 +60,7 @@ public class GetDeploymentBpmnModelInstanceCmd implements Command<BpmnModelInsta
       .getDeploymentCache()
       .findBpmnModelInstanceForProcessDefinition(processDefinitionId);
 
-    if (modelInstance == null) {
-      throw new ProcessEngineException("no BPMN model instance found for process definition id " + processDefinitionId);
-    }
+    ensureNotNull("no BPMN model instance found for process definition id " + processDefinitionId, "modelInstance", modelInstance);
     return modelInstance;
   }
 }

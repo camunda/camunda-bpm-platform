@@ -15,13 +15,14 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
 import org.camunda.bpm.engine.query.Query;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -96,9 +97,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
   }
   
   protected void addVariable(String name, Object value, QueryOperator operator, boolean processInstanceScope) {
-    if(name == null) {
-      throw new ProcessEngineException("name is null");
-    }
+    ensureNotNull("name", name);
     if(value == null || isBoolean(value)) {
       // Null-values and booleans can only be used in EQUALS and NOT_EQUALS
       switch(operator) {

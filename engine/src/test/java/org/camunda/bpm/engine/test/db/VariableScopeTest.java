@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -26,6 +24,8 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -164,17 +164,13 @@ public class VariableScopeTest extends PluggableProcessEngineTestCase {
     }
 
     public List<String> execute(CommandContext commandContext) {
-      if(executionId == null) {
-        throw new ProcessEngineException("executionId is null");
-      }
-      
+      ensureNotNull("executionId", executionId);
+
       ExecutionEntity execution = commandContext
         .getExecutionManager()
         .findExecutionById(executionId);
-      
-      if (execution==null) {
-        throw new ProcessEngineException("execution "+executionId+" doesn't exist");
-      }
+
+      ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
 
       List<String> executionVariables;
       if (isLocal) {
@@ -182,7 +178,7 @@ public class VariableScopeTest extends PluggableProcessEngineTestCase {
       } else {
         executionVariables = new ArrayList<String>(execution.getVariableNames());
       }
-      
+
       return executionVariables;
     }
     

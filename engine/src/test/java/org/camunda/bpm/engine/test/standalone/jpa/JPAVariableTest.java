@@ -354,7 +354,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
       runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
       fail("Exception expected");
     } catch(ProcessEngineException ae) {
-      assertTextPresent("Value of primary key for JPA-Entity cannot be null", ae.getMessage());
+      assertTextPresent("Value of primary key for JPA-Entity is null", ae.getMessage());
     }
     
     // Starting process instance with an invalid type of ID

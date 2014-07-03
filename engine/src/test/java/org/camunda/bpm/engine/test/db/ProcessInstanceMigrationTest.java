@@ -47,28 +47,28 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
       new SetProcessDefinitionVersionCmd(null, 23);    
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process instance id is mandatory, but 'null' has been provided.", ae.getMessage());
+      assertTextPresent("The process instance id is mandatory: processInstanceId is null", ae.getMessage());
     }
 
     try {
       new SetProcessDefinitionVersionCmd("", 23);    
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process instance id is mandatory, but '' has been provided.", ae.getMessage());
+      assertTextPresent("The process instance id is mandatory: processInstanceId is empty", ae.getMessage());
     }
 
     try {
       new SetProcessDefinitionVersionCmd("42", null);    
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process definition version is mandatory, but 'null' has been provided.", ae.getMessage());
+      assertTextPresent("The process definition version is mandatory: processDefinitionVersion is null", ae.getMessage());
     }
 
     try {
       new SetProcessDefinitionVersionCmd("42", -1);    
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process definition version must be positive, but '-1' has been provided.", ae.getMessage());
+      assertTextPresent("The process definition version must be positive: processDefinitionVersion is not positive", ae.getMessage());
     }
   }
 

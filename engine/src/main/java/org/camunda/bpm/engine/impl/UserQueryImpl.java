@@ -13,11 +13,12 @@
 
 package org.camunda.bpm.engine.impl;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -48,9 +49,7 @@ public abstract class UserQueryImpl extends AbstractQuery<UserQuery, User> imple
   }
 
   public UserQuery userId(String id) {
-    if (id == null) {
-      throw new ProcessEngineException("Provided id is null");
-    }
+    ensureNotNull("Provided id", id);
     this.id = id;
     return this;
   }
@@ -61,9 +60,7 @@ public abstract class UserQueryImpl extends AbstractQuery<UserQuery, User> imple
   }
   
   public UserQuery userFirstNameLike(String firstNameLike) {
-    if (firstNameLike == null) {
-      throw new ProcessEngineException("Provided firstNameLike is null");
-    }
+    ensureNotNull("Provided firstNameLike", firstNameLike);
     this.firstNameLike = firstNameLike;
     return this;
   }
@@ -74,9 +71,7 @@ public abstract class UserQueryImpl extends AbstractQuery<UserQuery, User> imple
   }
   
   public UserQuery userLastNameLike(String lastNameLike) {
-    if (lastNameLike == null) {
-      throw new ProcessEngineException("Provided lastNameLike is null");
-    }
+    ensureNotNull("Provided lastNameLike", lastNameLike);
     this.lastNameLike = lastNameLike;
     return this;
   }
@@ -87,25 +82,19 @@ public abstract class UserQueryImpl extends AbstractQuery<UserQuery, User> imple
   }
   
   public UserQuery userEmailLike(String emailLike) {
-    if (emailLike == null) {
-      throw new ProcessEngineException("Provided emailLike is null");
-    }
+    ensureNotNull("Provided emailLike", emailLike);
     this.emailLike = emailLike;
     return this;
   }
   
   public UserQuery memberOfGroup(String groupId) {
-    if (groupId == null) {
-      throw new ProcessEngineException("Provided groupIds is null or empty");
-    }
+    ensureNotNull("Provided groupId", groupId);
     this.groupId = groupId;
     return this;
   }
   
   public UserQuery potentialStarter(String procDefId) {
-    if (procDefId == null) {
-      throw new ProcessEngineException("Provided processDefinitionId is null or empty");
-    }
+    ensureNotNull("Provided processDefinitionId", procDefId);
     this.procDefId = procDefId;
     return this;
     

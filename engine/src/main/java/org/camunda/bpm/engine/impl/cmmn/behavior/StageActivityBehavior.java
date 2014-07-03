@@ -12,18 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
-
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.*;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -154,15 +151,11 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
 
     CmmnActivity activity = execution.getActivity();
 
-    if (activity == null) {
-      throw new ProcessEngineException("Case execution '"+id+"': has no current activity.");
-    }
+    ensureNotNull("Case execution '" + id + "': has no current activity", "activity", activity);
 
     CmmnActivityBehavior behavior = activity.getActivityBehavior();
 
-    if (behavior==null) {
-      throw new ProcessEngineException("There is no behavior specified in "+activity+" for case execution '"+id+"'.");
-    }
+    ensureNotNull("There is no behavior specified in " + activity + " for case execution '" + id + "'", "behavior", behavior);
 
     return behavior;
   }

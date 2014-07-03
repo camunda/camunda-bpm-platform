@@ -29,7 +29,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceMan
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 
 /**
@@ -65,15 +68,9 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
   private final Integer processDefinitionVersion;
 
   public SetProcessDefinitionVersionCmd(String processInstanceId, Integer processDefinitionVersion) {
-    if (processInstanceId == null || processInstanceId.length() < 1) {
-      throw new ProcessEngineException("The process instance id is mandatory, but '" + processInstanceId + "' has been provided.");
-    }
-    if (processDefinitionVersion == null) {
-      throw new ProcessEngineException("The process definition version is mandatory, but 'null' has been provided.");
-    }
-    if (processDefinitionVersion < 1) {
-      throw new ProcessEngineException("The process definition version must be positive, but '" + processDefinitionVersion + "' has been provided.");
-    }
+    ensureNotEmpty("The process instance id is mandatory", "processInstanceId", processInstanceId);
+    ensureNotNull("The process definition version is mandatory", "processDefinitionVersion", processDefinitionVersion);
+    ensurePositive("The process definition version must be positive", "processDefinitionVersion", processDefinitionVersion);
     this.processInstanceId = processInstanceId;
     this.processDefinitionVersion = processDefinitionVersion;
   }

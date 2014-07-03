@@ -14,15 +14,15 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Map;
-
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Thorben Lindhauer
@@ -46,19 +46,17 @@ public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd {
   }
 
   public Void execute(CommandContext commandContext) {
-    if(messageName == null) {
-      throw new ProcessEngineException("messageName cannot be null");
-    }
+    ensureNotNull("messageName", messageName);
 
     CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
 
     CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys);
     MessageCorrelationResult correlationResult = correlationHandler.correlateMessage(commandContext, messageName, correlationSet);
 
-    if(correlationResult == null) {
+    if (correlationResult == null) {
       throw new MismatchingMessageCorrelationException(messageName, "No process definition or execution matches the parameters");
 
-    } else if(MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
+    } else if (MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
       triggerExecution(commandContext, correlationResult);
 
     } else {

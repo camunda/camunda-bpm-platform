@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
@@ -33,6 +32,8 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -58,19 +59,15 @@ public class DeploymentCache {
   // PROCESS DEFINITION ////////////////////////////////////////////////////////////////////////////////
 
   public ProcessDefinitionEntity findDeployedProcessDefinitionById(String processDefinitionId) {
-    if (processDefinitionId == null) {
-      throw new ProcessEngineException("Invalid process definition id : null");
-    }
+    ensureNotNull("Invalid process definition id", "processDefinitionId", processDefinitionId);
     CommandContext commandContext = Context.getCommandContext();
     ProcessDefinitionEntity processDefinition = commandContext.getDbSqlSession().findInCache(ProcessDefinitionEntity.class, processDefinitionId);
-    if(processDefinition == null) {
+    if (processDefinition == null) {
       processDefinition = commandContext
         .getProcessDefinitionManager()
         .findLatestProcessDefinitionById(processDefinitionId);
     }
-    if(processDefinition == null) {
-      throw new ProcessEngineException("no deployed process definition found with id '" + processDefinitionId + "'");
-    }
+    ensureNotNull("no deployed process definition found with id '" + processDefinitionId + "'", "processDefinition", processDefinition);
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
   }
@@ -80,9 +77,7 @@ public class DeploymentCache {
       .getCommandContext()
       .getProcessDefinitionManager()
       .findLatestProcessDefinitionByKey(processDefinitionKey);
-    if (processDefinition==null) {
-      throw new ProcessEngineException("no processes deployed with key '"+processDefinitionKey+"'");
-    }
+    ensureNotNull("no processes deployed with key '" + processDefinitionKey + "'", "processDefinition", processDefinition);
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
   }
@@ -92,9 +87,7 @@ public class DeploymentCache {
       .getCommandContext()
       .getProcessDefinitionManager()
       .findProcessDefinitionByKeyAndVersion(processDefinitionKey, processDefinitionVersion);
-    if (processDefinition==null) {
-      throw new ProcessEngineException("no processes deployed with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + "'");
-    }
+    ensureNotNull("no processes deployed with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + "'", "processDefinition", processDefinition);
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
   }
@@ -104,9 +97,7 @@ public class DeploymentCache {
       .getCommandContext()
       .getProcessDefinitionManager()
       .findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
-    if (processDefinition==null) {
-      throw new ProcessEngineException("no processes deployed with key = '" + processDefinitionKey + "' in deployment = '" + deploymentId + "'");
-    }
+    ensureNotNull("no processes deployed with key = '" + processDefinitionKey + "' in deployment = '" + deploymentId + "'", "processDefinition", processDefinition);
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
   }
@@ -124,9 +115,7 @@ public class DeploymentCache {
       deploy(deployment);
       cachedProcessDefinition = processDefinitionCache.get(processDefinitionId);
 
-      if (cachedProcessDefinition==null) {
-        throw new ProcessEngineException("deployment '"+deploymentId+"' didn't put process definition '"+processDefinitionId+"' in the cache");
-      }
+      ensureNotNull("deployment '" + deploymentId + "' didn't put process definition '" + processDefinitionId + "' in the cache", "cachedProcessDefinition", cachedProcessDefinition);
     } else {
       // update cached process definition
       cachedProcessDefinition.updateModifiedFieldsFromEntity(processDefinition);
@@ -173,18 +162,16 @@ public class DeploymentCache {
   // CASE DEFINITION ////////////////////////////////////////////////////////////////////////////////
 
   public CaseDefinitionEntity findDeployedCaseDefinitionById(String caseDefinitionId) {
-    if (caseDefinitionId == null) {
-      throw new ProcessEngineException("Invalid case definition id: null");
-    }
+    ensureNotNull("Invalid case definition id", "caseDefinitionId", caseDefinitionId);
 
     CommandContext commandContext = Context.getCommandContext();
 
     // try to load case definition from cache
     CaseDefinitionEntity caseDefinition = commandContext
-        .getDbSqlSession()
-        .findInCache(CaseDefinitionEntity.class, caseDefinitionId);
+      .getDbSqlSession()
+      .findInCache(CaseDefinitionEntity.class, caseDefinitionId);
 
-    if(caseDefinition == null) {
+    if (caseDefinition == null) {
 
       // if not found, then load the case definition
       // from db
@@ -194,9 +181,7 @@ public class DeploymentCache {
 
     }
 
-    if(caseDefinition == null) {
-      throw new ProcessEngineException("no deployed case definition found with id '" + caseDefinitionId + "'");
-    }
+    ensureNotNull("no deployed case definition found with id '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);
 
     caseDefinition = resolveCaseDefinition(caseDefinition);
 
@@ -204,9 +189,7 @@ public class DeploymentCache {
   }
 
   public CaseDefinitionEntity findDeployedLatestCaseDefinitionByKey(String caseDefinitionKey) {
-    if (caseDefinitionKey == null) {
-      throw new ProcessEngineException("Invalid case definition key: null");
-    }
+    ensureNotNull("Invalid case definition key", "caseDefinitionKey", caseDefinitionKey);
 
     // load case definition by key from db
     CaseDefinitionEntity caseDefinition = Context
@@ -214,9 +197,7 @@ public class DeploymentCache {
       .getCaseDefinitionManager()
       .findLatestCaseDefinitionByKey(caseDefinitionKey);
 
-    if (caseDefinition==null) {
-      throw new ProcessEngineException("no case definition deployed with key '"+caseDefinitionKey+"'");
-    }
+    ensureNotNull("no case definition deployed with key '" + caseDefinitionKey + "'", "caseDefinition", caseDefinition);
 
     caseDefinition = resolveCaseDefinition(caseDefinition);
 
@@ -230,9 +211,7 @@ public class DeploymentCache {
       .getCaseDefinitionManager()
       .findCaseDefinitionByKeyAndVersion(caseDefinitionKey, caseDefinitionVersion);
 
-    if (caseDefinition==null) {
-      throw new ProcessEngineException("no case definition deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'");
-    }
+    ensureNotNull("no case definition deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'", "caseDefinition", caseDefinition);
     caseDefinition = resolveCaseDefinition(caseDefinition);
 
     return caseDefinition;
@@ -244,9 +223,7 @@ public class DeploymentCache {
       .getCaseDefinitionManager()
       .findCaseDefinitionByDeploymentAndKey(deploymentId, caseDefinitionKey);
 
-    if (caseDefinition==null) {
-      throw new ProcessEngineException("no case definition deployed with key = '" + caseDefinitionKey + "' in deployment = '" + deploymentId + "'");
-    }
+    ensureNotNull("no case definition deployed with key = '" + caseDefinitionKey + "' in deployment = '" + deploymentId + "'", "caseDefinition", caseDefinition);
     caseDefinition = resolveCaseDefinition(caseDefinition);
 
     return caseDefinition;
@@ -269,9 +246,7 @@ public class DeploymentCache {
 
       cachedCaseDefinition = caseDefinitionCache.get(caseDefinitionId);
 
-      if (cachedCaseDefinition==null) {
-        throw new ProcessEngineException("deployment '"+deploymentId+"' didn't put case definition '"+caseDefinitionId+"' in the cache");
-      }
+      ensureNotNull("deployment '" + deploymentId + "' didn't put case definition '" + caseDefinitionId + "' in the cache", "cachedCaseDefinition", cachedCaseDefinition);
 
     }
     return cachedCaseDefinition;

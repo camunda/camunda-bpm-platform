@@ -70,6 +70,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * @author Tom Baeyens
  * @author Agim Emruli
@@ -257,9 +259,7 @@ public class CommandContext {
     Session session = sessions.get(sessionClass);
     if (session == null) {
       SessionFactory sessionFactory = sessionFactories.get(sessionClass);
-      if (sessionFactory==null) {
-        throw new ProcessEngineException("no session factory configured for "+sessionClass.getName());
-      }
+      ensureNotNull("no session factory configured for " + sessionClass.getName(), "sessionFactory", sessionFactory);
       session = sessionFactory.openSession();
       sessions.put(sessionClass, session);
     }

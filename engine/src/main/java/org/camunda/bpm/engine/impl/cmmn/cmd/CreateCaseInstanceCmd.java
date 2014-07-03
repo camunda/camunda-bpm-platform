@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * @author Roman Smirnov
  *
@@ -56,16 +58,12 @@ public class CreateCaseInstanceCmd implements Command<CaseInstance>, Serializabl
       if (caseDefinitionId!=null) {
         caseDefinition = deploymentCache.findDeployedCaseDefinitionById(caseDefinitionId);
 
-        if (caseDefinition == null) {
-          throw new ProcessEngineException("No case definition found for id = '" + caseDefinitionId + "'");
-        }
+        ensureNotNull("No case definition found for id = '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);
 
-      } else if(caseDefinitionKey != null){
+      } else if(caseDefinitionKey != null) {
         caseDefinition = deploymentCache.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
 
-        if (caseDefinition == null) {
-          throw new ProcessEngineException("No case definition found for key '" + caseDefinitionKey +"'");
-        }
+        ensureNotNull("No case definition found for key '" + caseDefinitionKey + "'", "caseDefinition", caseDefinition);
 
       } else {
         throw new ProcessEngineException("caseDefinitionKey and caseDefinitionId are null");

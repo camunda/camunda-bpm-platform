@@ -12,12 +12,9 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment;
 
-import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESS_APPLICATION;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
@@ -38,6 +35,9 @@ import org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+
+import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESS_APPLICATION;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * <p>Deployment operation step responsible for starting a managed process engine 
@@ -103,10 +103,8 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     
     if(processEngineXml.getJobAcquisitionName() != null && !processEngineXml.getJobAcquisitionName().isEmpty()) {
       JobExecutor jobExecutor = getJobExecutorService(serviceContainer);
-      if(jobExecutor == null) {
-        throw new ProcessEngineException("Cannot find referenced job executor with name '"+processEngineXml.getJobAcquisitionName()+"'");
-      }
-      
+      ensureNotNull("Cannot find referenced job executor with name '" + processEngineXml.getJobAcquisitionName() + "'", "jobExecutor", jobExecutor);
+
       // set JobExecutor on process engine
       configurationImpl.setJobExecutor(jobExecutor);
     }

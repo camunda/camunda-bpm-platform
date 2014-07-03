@@ -12,12 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
 /**
  * @author Daniel Meyer
@@ -33,16 +35,8 @@ public class SaveAuthorizationCmd implements Command<Authorization> {
   }
 
   protected void validate() {
-    if(authorization.getUserId() == null &&
-        authorization.getGroupId() == null) {
-      throw new ProcessEngineException("Authorization must either have a 'userId' or a 'groupId'.");
-    }
-    if(authorization.getUserId() != null && authorization.getGroupId() != null) {
-      throw new ProcessEngineException("Authorization cannot define 'userId' or a 'groupId' at the same time.");
-    }
-    if(authorization.getResource() == null) {
-      throw new ProcessEngineException("Authorization 'resourceType' cannot be null.");
-    }
+    ensureOnlyOneNotNull("Authorization must either have a 'userId' or a 'groupId'.", authorization.getUserId(), authorization.getGroupId());
+    ensureNotNull("Authorization 'resourceType' cannot be null.", "authorization.getResource()", authorization.getResource());
   }
   
   public Authorization execute(CommandContext commandContext) {

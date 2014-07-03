@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -25,6 +24,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobListener;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -44,9 +45,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
   }
 
   public Object execute(CommandContext commandContext) {
-    if(jobId == null) {
-      throw new ProcessEngineException("jobId is null");
-    }
+    ensureNotNull("jobId", jobId);
 
     if (log.isLoggable(Level.FINE)) {
       log.fine("Executing job " + jobId);
@@ -60,7 +59,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
     if (job == null) {
 
-      if(jobExecutorContext != null) {
+      if (jobExecutorContext != null) {
         // CAM-1842
         // Job was acquired but does not exist anymore. This is not a problem.
         // It usually means that the job has been deleted after it was acquired which can happen if the
@@ -76,7 +75,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
     }
 
 
-    if(jobExecutorContext != null) { // if null, then we are not called by the job executor
+    if (jobExecutorContext != null) { // if null, then we are not called by the job executor
       jobExecutorContext.setCurrentJob(job);
     }
 
@@ -86,7 +85,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
     } catch (RuntimeException exception) {
 
-      log.warning("Exception while excuting job '"+job+"': "+exception.getMessage());
+      log.warning("Exception while excuting job '" + job + "': " + exception.getMessage());
 
       // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
       FailedJobListener failedJobListener = createFailedJobListener(exception, commandExecutor);
@@ -94,10 +93,10 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       try {
 
         commandContext.getTransactionContext().addTransactionListener(
-                TransactionState.ROLLED_BACK,
-                failedJobListener);
+          TransactionState.ROLLED_BACK,
+          failedJobListener);
 
-      } catch(Exception ex) {
+      } catch (Exception ex) {
         // if the TX has already been rolled back, the listener cannot be registered.
         log.log(Level.FINE, "Could not register transaction synchronization. Probably the TX has already been rolled back by application code.", ex);
 
@@ -110,7 +109,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       throw exception;
 
     } finally {
-      if(jobExecutorContext != null) {
+      if (jobExecutorContext != null) {
         jobExecutorContext.setCurrentJob(null);
       }
     }

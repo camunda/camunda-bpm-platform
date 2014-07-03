@@ -14,10 +14,11 @@
 package org.camunda.bpm.engine.impl.variable;
 
 import javax.persistence.EntityManagerFactory;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Frederik Heremans
@@ -29,13 +30,11 @@ public class EntityManagerSessionFactory implements SessionFactory {
   protected boolean closeEntityManager;
 
   public EntityManagerSessionFactory(Object entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
-    if(entityManagerFactory == null) {
-      throw new ProcessEngineException("entityManagerFactory is null");
-    }
-    if(!(entityManagerFactory instanceof EntityManagerFactory)) {
+    ensureNotNull("entityManagerFactory", entityManagerFactory);
+    if (!(entityManagerFactory instanceof EntityManagerFactory)) {
       throw new ProcessEngineException("EntityManagerFactory must implement 'javax.persistence.EntityManagerFactory'");
     }
-    
+
     this.entityManagerFactory = (EntityManagerFactory) entityManagerFactory;
     this.handleTransactions = handleTransactions;
     this.closeEntityManager = closeEntityManager;

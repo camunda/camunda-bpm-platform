@@ -16,17 +16,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Joram Barrez
@@ -101,9 +105,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public TaskQueryImpl taskId(String taskId) {
-    if (taskId == null) {
-      throw new ProcessEngineException("Task id is null");
-    }
+    ensureNotNull("Task id", taskId);
     this.taskId = taskId;
     return this;
   }
@@ -114,71 +116,55 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public TaskQueryImpl taskNameLike(String nameLike) {
-    if (nameLike == null) {
-      throw new ProcessEngineException("Task namelike is null");
-    }
+    ensureNotNull("Task namelike", nameLike);
     this.nameLike = nameLike;
     return this;
   }
 
   public TaskQueryImpl taskDescription(String description) {
-    if (description == null) {
-      throw new ProcessEngineException("Description is null");
-    }
+    ensureNotNull("Description", description);
     this.description = description;
     return this;
   }
 
   public TaskQuery taskDescriptionLike(String descriptionLike) {
-    if (descriptionLike == null) {
-      throw new ProcessEngineException("Task descriptionlike is null");
-    }
+    ensureNotNull("Task descriptionLike", descriptionLike);
     this.descriptionLike = descriptionLike;
     return this;
   }
 
   public TaskQuery taskPriority(Integer priority) {
-    if (priority == null) {
-      throw new ProcessEngineException("Priority is null");
-    }
+    ensureNotNull("Priority", priority);
     this.priority = priority;
     return this;
   }
 
   public TaskQuery taskMinPriority(Integer minPriority) {
-    if (minPriority == null) {
-      throw new ProcessEngineException("Min Priority is null");
-    }
+    ensureNotNull("Min Priority", minPriority);
     this.minPriority = minPriority;
     return this;
   }
 
   public TaskQuery taskMaxPriority(Integer maxPriority) {
-    if (maxPriority == null) {
-      throw new ProcessEngineException("Max Priority is null");
-    }
+    ensureNotNull("Max Priority", maxPriority);
     this.maxPriority = maxPriority;
     return this;
   }
 
   public TaskQueryImpl taskAssignee(String assignee) {
-    if (assignee == null) {
-      throw new ProcessEngineException("Assignee is null");
-    }
+    ensureNotNull("Assignee", assignee);
     this.assignee = assignee;
     return this;
   }
 
   public TaskQuery taskAssigneeLike(String assignee) {
-    assertParamNotNull("Assignee", assignee);
+    ensureNotNull("Assignee", assignee);
     this.assigneeLike = assignee;
     return this;
   }
 
   public TaskQueryImpl taskOwner(String owner) {
-    if (owner == null) {
-      throw new ProcessEngineException("Owner is null");
-    }
+    ensureNotNull("Owner", owner);
     this.owner = owner;
     return this;
   }
@@ -204,9 +190,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public TaskQueryImpl taskCandidateUser(String candidateUser) {
-    if (candidateUser == null) {
-      throw new ProcessEngineException("Candidate user is null");
-    }
+    ensureNotNull("Candidate user", candidateUser);
+
     if (candidateGroup != null) {
       throw new ProcessEngineException("Invalid query usage: cannot set both candidateUser and candidateGroup");
     }
@@ -218,17 +203,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public TaskQueryImpl taskInvolvedUser(String involvedUser) {
-    if (involvedUser == null) {
-      throw new ProcessEngineException("Involved user is null");
-    }
+    ensureNotNull("Involved user", involvedUser);
     this.involvedUser = involvedUser;
     return this;
   }
 
   public TaskQueryImpl taskCandidateGroup(String candidateGroup) {
-    if (candidateGroup == null) {
-      throw new ProcessEngineException("Candidate group is null");
-    }
+    ensureNotNull("Candidate group", candidateGroup);
+
     if (candidateUser != null) {
       throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroup and candidateUser");
     }
@@ -240,12 +222,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public TaskQuery taskCandidateGroupIn(List<String> candidateGroups) {
-    if(candidateGroups == null) {
-      throw new ProcessEngineException("Candidate group list is null");
-    }
-    if(candidateGroups.size()== 0) {
-      throw new ProcessEngineException("Candidate group list is empty");
-    }
+    ensureNotEmpty("Candidate group list", candidateGroups);
 
     if (candidateUser != null) {
       throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroupIn and candidateUser");
@@ -309,49 +286,49 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public TaskQuery caseInstanceId(String caseInstanceId) {
-    assertParamNotNull("caseInstanceId", caseInstanceId);
+    ensureNotNull("caseInstanceId", caseInstanceId);
     this.caseInstanceId = caseInstanceId;
     return this;
   }
 
   public TaskQuery caseInstanceBusinessKey(String caseInstanceBusinessKey) {
-    assertParamNotNull("caseInstanceBusinessKey", caseInstanceBusinessKey);
+    ensureNotNull("caseInstanceBusinessKey", caseInstanceBusinessKey);
     this.caseInstanceBusinessKey = caseInstanceBusinessKey;
     return this;
   }
 
   public TaskQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike) {
-    assertParamNotNull("caseInstanceBusinessKeyLike", caseInstanceBusinessKeyLike);
+    ensureNotNull("caseInstanceBusinessKeyLike", caseInstanceBusinessKeyLike);
     this.caseInstanceBusinessKeyLike = caseInstanceBusinessKeyLike;
     return this;
   }
 
   public TaskQuery caseExecutionId(String caseExecutionId) {
-    assertParamNotNull("caseExecutionId", caseExecutionId);
+    ensureNotNull("caseExecutionId", caseExecutionId);
     this.caseExecutionId = caseExecutionId;
     return this;
   }
 
   public TaskQuery caseDefinitionId(String caseDefinitionId) {
-    assertParamNotNull("caseDefinitionId", caseDefinitionId);
+    ensureNotNull("caseDefinitionId", caseDefinitionId);
     this.caseDefinitionId = caseDefinitionId;
     return this;
   }
 
   public TaskQuery caseDefinitionKey(String caseDefinitionKey) {
-    assertParamNotNull("caseDefinitionKey", caseDefinitionKey);
+    ensureNotNull("caseDefinitionKey", caseDefinitionKey);
     this.caseDefinitionKey = caseDefinitionKey;
     return this;
   }
 
   public TaskQuery caseDefinitionName(String caseDefinitionName) {
-    assertParamNotNull("caseDefinitionName", caseDefinitionName);
+    ensureNotNull("caseDefinitionName", caseDefinitionName);
     this.caseDefinitionName = caseDefinitionName;
     return this;
   }
 
   public TaskQuery caseDefinitionNameLike(String caseDefinitionNameLike) {
-    assertParamNotNull("caseDefinitionNameLike", caseDefinitionNameLike);
+    ensureNotNull("caseDefinitionNameLike", caseDefinitionNameLike);
     this.caseDefinitionNameLike = caseDefinitionNameLike;
     return this;
   }
@@ -561,9 +538,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   protected void addVariable(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
-    if(name == null) {
-      throw new ProcessEngineException("name is null");
-    }
+    ensureNotNull("name", name);
 
     if(value == null || isBoolean(value)) {
       // Null-values and booleans can only be used in EQUALS and NOT_EQUALS

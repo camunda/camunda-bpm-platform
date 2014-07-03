@@ -16,12 +16,12 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeleteDeploymentFailListener;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Joram Barrez
@@ -42,9 +42,7 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
-    if(deploymentId == null) {
-      throw new ProcessEngineException("deploymentId is null");
-    }
+    ensureNotNull("deploymentId", deploymentId);
 
     commandContext
       .getDeploymentManager()

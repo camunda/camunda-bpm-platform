@@ -13,12 +13,12 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -34,14 +34,12 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
   }
   
   protected Void executeCmd(CommandContext commandContext) {
-    if(user == null) {
-      throw new ProcessEngineException("user is null");
-    }
-    
+    ensureNotNull("user", user);
+
     commandContext
       .getWritableIdentityProvider()
       .saveUser(user);
-    
+
     return null;
   }
 }

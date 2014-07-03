@@ -18,15 +18,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.Callable;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.BpmnError;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.DelegateTask;
-import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.delegate.*;
 import org.camunda.bpm.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskJavaDelegateActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
@@ -39,6 +33,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -199,17 +195,15 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
       }
     } else {
       Field field = ReflectUtil.getField(declaration.getName(), target);
-      if(field == null) {
-        throw new ProcessEngineException("Field definition uses unexisting field '" + declaration.getName() + "' on class " + target.getClass().getName());
-      }
+      ensureNotNull("Field definition uses unexisting field '" + declaration.getName() + "' on class " + target.getClass().getName(), "field", field);
       // Check if the delegate field's type is correct
-     if(!fieldTypeCompatible(declaration, field)) {
-       throw new ProcessEngineException("Incompatible type set on field declaration '" + declaration.getName()
+      if (!fieldTypeCompatible(declaration, field)) {
+        throw new ProcessEngineException("Incompatible type set on field declaration '" + declaration.getName()
           + "' for class " + target.getClass().getName()
           + ". Declared value has type " + declaration.getValue().getClass().getName()
           + ", while expecting " + field.getType().getName());
-     }
-     ReflectUtil.setField(field, target, declaration.getValue());
+      }
+      ReflectUtil.setField(field, target, declaration.getValue());
     }
   }
 

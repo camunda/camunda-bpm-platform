@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
@@ -30,6 +29,8 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -49,9 +50,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   }
 
   public DeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
-    if (inputStream==null) {
-      throw new ProcessEngineException("inputStream for resource '"+resourceName+"' is null");
-    }
+    ensureNotNull("inputStream for resource '" + resourceName + "' is null", "inputStream", inputStream);
     byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
     ResourceEntity resource = new ResourceEntity();
     resource.setName(resourceName);
@@ -62,16 +61,12 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
   public DeploymentBuilder addClasspathResource(String resource) {
     InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
-    if (inputStream==null) {
-      throw new ProcessEngineException("resource '"+resource+"' not found");
-    }
+    ensureNotNull("resource '" + resource + "' not found", "inputStream", inputStream);
     return addInputStream(resource, inputStream);
   }
 
   public DeploymentBuilder addString(String resourceName, String text) {
-    if (text==null) {
-      throw new ProcessEngineException("text is null");
-    }
+    ensureNotNull("text", text);
     ResourceEntity resource = new ResourceEntity();
     resource.setName(resourceName);
     resource.setBytes(text.getBytes());
@@ -80,9 +75,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   }
 
   public DeploymentBuilder addModelInstance(String resourceName, BpmnModelInstance modelInstance) {
-    if (modelInstance == null) {
-      throw new ProcessEngineException("modelInstance is null");
-    }
+    ensureNotNull("modelInstance", modelInstance);
     String processText = Bpmn.convertToString(modelInstance);
     return addString(resourceName, processText);
   }

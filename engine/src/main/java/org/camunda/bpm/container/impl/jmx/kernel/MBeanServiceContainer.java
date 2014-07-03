@@ -13,18 +13,14 @@
 package org.camunda.bpm.container.impl.jmx.kernel;
 
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation.MBeanDeploymentOperationBuilder;
 import org.camunda.bpm.engine.ProcessEngineException;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * <p>A simple Service Container that delegates to the JVM's {@link MBeanServer}.</p>
@@ -80,14 +76,12 @@ public class MBeanServiceContainer {
   }
   
   public synchronized void stopService(ObjectName serviceName) {
-    
-    final MBeanServer mBeanServer = getmBeanServer();        
+
+    final MBeanServer mBeanServer = getmBeanServer();
     final MBeanService<Object> service = getService(serviceName);
-    
-    if(service == null) {
-      throw new ProcessEngineException("Cannot stop service "+serviceName+": no such service registered.");      
-    }
-    
+
+    ensureNotNull("Cannot stop service " + serviceName + ": no such service registered", "service", service);
+
     try {
       // call the service-provided stop behavior
       service.stop(this);
@@ -101,7 +95,7 @@ public class MBeanServiceContainer {
         throw new ProcessEngineException("Exception while unregistering " + serviceName.getCanonicalName() + " with the MBeanServer", t);
       }
     }
-    
+
   }
   
   public MBeanDeploymentOperationBuilder createDeploymentOperation(String name) {

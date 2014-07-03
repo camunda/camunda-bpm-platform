@@ -14,14 +14,14 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -41,16 +41,12 @@ public class GetStartFormCmd implements Command<StartFormData>, Serializable {
       .getProcessEngineConfiguration()
       .getDeploymentCache()
       .findDeployedProcessDefinitionById(processDefinitionId);
-    if (processDefinition == null) {
-      throw new ProcessEngineException("No process definition found for id '" + processDefinitionId +"'");
-    }
-    
+    ensureNotNull("No process definition found for id '" + processDefinitionId + "'", "processDefinition", processDefinition);
+
     StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
-    if (startFormHandler == null) {
-      throw new ProcessEngineException("No startFormHandler defined in process '" + processDefinitionId +"'");
-    }
-    
-    
+    ensureNotNull("No startFormHandler defined in process '" + processDefinitionId + "'", "startFormHandler", startFormHandler);
+
+
     return startFormHandler.createStartFormData(processDefinition);
   }
 }

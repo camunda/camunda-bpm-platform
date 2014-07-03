@@ -16,11 +16,11 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -41,17 +41,13 @@ public class GetCaseExecutionVariablesCmd implements Command<Map<String, Object>
   }
 
   public Map<String, Object> execute(CommandContext commandContext) {
-    if(caseExecutionId == null) {
-      throw new ProcessEngineException("caseExecutionId is null");
-    }
+    ensureNotNull("caseExecutionId", caseExecutionId);
 
     CaseExecutionEntity caseExecution = commandContext
       .getCaseExecutionManager()
       .findCaseExecutionById(caseExecutionId);
 
-    if (caseExecution==null) {
-      throw new ProcessEngineException("case execution "+caseExecutionId+" doesn't exist");
-    }
+    ensureNotNull("case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
 
     Map<String, Object> caseExecutionVariables;
 
@@ -65,7 +61,7 @@ public class GetCaseExecutionVariablesCmd implements Command<Map<String, Object>
       // if variableNames is not empty, return only variable names mentioned in it
       Map<String, Object> tempVariables = new HashMap<String, Object>();
 
-      for (String variableName: variableNames) {
+      for (String variableName : variableNames) {
         if (caseExecutionVariables.containsKey(variableName)) {
           tempVariables.put(variableName, caseExecutionVariables.get(variableName));
         }

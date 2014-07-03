@@ -17,12 +17,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -45,31 +46,26 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
 
   @Override
   public Void execute(CommandContext commandContext) {
-    if(executionId == null) {
-      throw new ProcessEngineException("executionId is null");
-    }
+    ensureNotNull("executionId", executionId);
+    ensureNotNull("messageName", messageName);
 
-    if(messageName == null) {
-      throw new ProcessEngineException("messageName cannot be null");
-    }
-    
     List<EventSubscriptionEntity> eventSubscriptions = commandContext.getEventSubscriptionManager()
       .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
-    
-    if(eventSubscriptions.isEmpty()) {
-      throw new ProcessEngineException("Execution with id '"+executionId+"' does not have a subscription to a message event with name '"+messageName+"'");
+
+    if (eventSubscriptions.isEmpty()) {
+      throw new ProcessEngineException("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'");
     }
-    
+
     // there can be only one:
     EventSubscriptionEntity eventSubscriptionEntity = eventSubscriptions.get(0);
-    
+
     HashMap<String, Object> payload = null;
-    if(processVariables != null) {
+    if (processVariables != null) {
       payload = new HashMap<String, Object>(processVariables);
     }
-    
+
     eventSubscriptionEntity.eventReceived(payload, false);
-    
+
     return null;
   }
 

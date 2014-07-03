@@ -16,17 +16,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cmmn.cmd.CaseExecutionVariableCmd;
-import org.camunda.bpm.engine.impl.cmmn.cmd.CompleteCaseExecutionCmd;
-import org.camunda.bpm.engine.impl.cmmn.cmd.DisableCaseExecutionCmd;
-import org.camunda.bpm.engine.impl.cmmn.cmd.ManualStartCaseExecutionCmd;
-import org.camunda.bpm.engine.impl.cmmn.cmd.ReenableCaseExecutionCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.*;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -45,17 +42,13 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
 
   public CaseExecutionCommandBuilderImpl(CommandExecutor commandExecutor, String caseExecutionId) {
     this(caseExecutionId);
-    if(commandExecutor == null) {
-      throw new ProcessEngineException("commandExecutor cannot be null");
-    }
+    ensureNotNull("commandExecutor", commandExecutor);
     this.commandExecutor = commandExecutor;
   }
 
   public CaseExecutionCommandBuilderImpl(CommandContext commandContext, String caseExecutionId) {
     this(caseExecutionId);
-    if(commandContext == null) {
-      throw new ProcessEngineException("commandContext cannot be null");
-    }
+    ensureNotNull("commandContext", commandContext);
     this.commandContext = commandContext;
   }
 

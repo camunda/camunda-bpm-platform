@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.io.Serializable;
+import java.util.List;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-import java.io.Serializable;
-import java.util.List;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -34,9 +34,7 @@ public class GetDeploymentResourcesCmd implements Command<List>, Serializable {
   }
 
   public List execute(CommandContext commandContext) {
-    if (deploymentId == null) {
-      throw new ProcessEngineException("deploymentId is null");
-    }
+    ensureNotNull("deploymentId", deploymentId);
 
     return Context
       .getCommandContext()

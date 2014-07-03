@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.bpmn.helper;
 
 import java.util.List;
 import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
@@ -29,6 +28,9 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 
 /**
@@ -142,24 +144,22 @@ public class ErrorPropagation {
   private static void executeCatch(String errorHandlerId, ActivityExecution execution) {
     ProcessDefinitionImpl processDefinition = ((ExecutionEntity) execution).getProcessDefinition();
     ActivityImpl errorHandler = processDefinition.findActivity(errorHandlerId);
-    if (errorHandler == null) {
-      throw new ProcessEngineException(errorHandlerId + " not found in process definition");
-    }
+    ensureNotNull(errorHandlerId + " not found in process definition", "errorHandler", errorHandler);
 
     boolean matchingParentFound = false;
     ActivityExecution leavingExecution = execution;
     ActivityImpl currentActivity = (ActivityImpl) execution.getActivity();
 
     ScopeImpl catchingScope = errorHandler.getParent();
-    if(catchingScope instanceof ActivityImpl) {
+    if (catchingScope instanceof ActivityImpl) {
       ActivityImpl catchingScopeActivity = (ActivityImpl) catchingScope;
-      if(!catchingScopeActivity.isScope()) { // event subprocesses
+      if (!catchingScopeActivity.isScope()) { // event subprocesses
         catchingScope = catchingScopeActivity.getParent();
       }
     }
 
-    if(catchingScope instanceof PvmProcessDefinition) {
-      executeEventHandler(errorHandler, ((ExecutionEntity)execution).getProcessInstance());
+    if (catchingScope instanceof PvmProcessDefinition) {
+      executeEventHandler(errorHandler, ((ExecutionEntity) execution).getProcessInstance());
 
     } else {
       if (currentActivity.getId().equals(catchingScope.getId())) {
@@ -169,7 +169,7 @@ public class ErrorPropagation {
 
         // Traverse parents until one is found that is a scope
         // and matches the activity the boundary event is defined on
-        while(!matchingParentFound && leavingExecution != null && currentActivity != null) {
+        while (!matchingParentFound && leavingExecution != null && currentActivity != null) {
           if (!leavingExecution.isConcurrent() && currentActivity.getId().equals(catchingScope.getId())) {
             matchingParentFound = true;
           } else if (leavingExecution.isConcurrent()) {
@@ -182,9 +182,9 @@ public class ErrorPropagation {
 
         // Follow parents up until matching scope can't be found anymore (needed to support for multi-instance)
         while (leavingExecution != null
-                && leavingExecution.getParent() != null
-                && leavingExecution.getParent().getActivity() != null
-                && leavingExecution.getParent().getActivity().getId().equals(catchingScope.getId())) {
+          && leavingExecution.getParent() != null
+          && leavingExecution.getParent().getActivity() != null
+          && leavingExecution.getParent().getActivity().getId().equals(catchingScope.getId())) {
           leavingExecution = leavingExecution.getParent();
         }
       }

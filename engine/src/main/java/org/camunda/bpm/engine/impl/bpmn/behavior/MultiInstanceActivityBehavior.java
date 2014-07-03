@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -34,6 +33,9 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 
 /**
@@ -248,9 +250,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
       parent = parent.getParent();
     }
 
-    if (value == null) {
-      throw new ProcessEngineException("The variable \"" + variableName + "\" could not be found in execution with id " + execution.getId());
-    }
+    ensureNotNull("The variable \"" + variableName + "\" could not be found in execution with id " + execution.getId(), "value", value);
 
     return (Integer) value;
   }

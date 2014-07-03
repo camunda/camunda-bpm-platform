@@ -16,14 +16,15 @@ package org.camunda.bpm.engine.impl.variable;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.persistence.EntityManager;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Frederik Heremans
@@ -63,9 +64,7 @@ public class JPAEntityMappings {
   }
 
   public String getJPAClassString(Object value) {
-    if(value == null) {
-      throw new ProcessEngineException("null value cannot be saved");
-    }
+    ensureNotNull("null value cannot be saved", "value", value);
     
     EntityMetaData metaData = getEntityMetaData(value.getClass());
     if(!metaData.isJPAEntity()) {
@@ -108,12 +107,10 @@ public class JPAEntityMappings {
   public Object getJPAEntity(String className, String idString) {
     Class<?> entityClass = null;
     entityClass = ReflectUtil.loadClass(className);
-    
+
     EntityMetaData metaData = getEntityMetaData(entityClass);
-    if(metaData == null) {
-      throw new ProcessEngineException("Class is not a JPA-entity: " + className);
-    }
-    
+    ensureNotNull("Class is not a JPA-entity: " + className, "metaData", metaData);
+
     // Create primary key of right type
     Object primaryKey = createId(metaData, idString);
     return findEntity(entityClass, primaryKey);
@@ -124,11 +121,9 @@ public class JPAEntityMappings {
       .getCommandContext()
       .getSession(EntityManagerSession.class)
       .getEntityManager();
-    
+
     Object entity = em.find(entityClass, primaryKey);
-    if(entity == null) {
-      throw new ProcessEngineException("Entity does not exist: " + entityClass.getName() + " - " + primaryKey);
-    }
+    ensureNotNull("Entity does not exist: " + entityClass.getName() + " - " + primaryKey, "entity", entity);
     return entity;
   }
 
@@ -166,19 +161,17 @@ public class JPAEntityMappings {
   }
   
   public String getIdString(Object value) {
-    if(value == null) {
-      throw new ProcessEngineException("Value of primary key for JPA-Entity cannot be null");
-    }
+    ensureNotNull("Value of primary key for JPA-Entity", value);
     // Only java.sql.date and java.util.date require custom handling, the other types
     // can just use toString()
-    if(value instanceof java.util.Date){
-      return "" + ((java.util.Date) value).getTime();
-    } else if(value instanceof java.sql.Date) {
-      return "" + ((java.sql.Date) value).getTime(); 
-    } else if(value instanceof Long || value instanceof String || value instanceof Byte 
-       || value instanceof Short || value instanceof Integer || value instanceof Float 
-       || value instanceof Double || value instanceof Character || value instanceof BigDecimal 
-       || value instanceof BigInteger) {
+    if (value instanceof Date) {
+      return "" + ((Date) value).getTime();
+    } else if (value instanceof java.sql.Date) {
+      return "" + ((java.sql.Date) value).getTime();
+    } else if (value instanceof Long || value instanceof String || value instanceof Byte
+      || value instanceof Short || value instanceof Integer || value instanceof Float
+      || value instanceof Double || value instanceof Character || value instanceof BigDecimal
+      || value instanceof BigInteger) {
       return value.toString();
     } else {
       throw new ProcessEngineException("Unsupported Primary key type for JPA-Entity: " + value.getClass().getName());

@@ -15,11 +15,11 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -37,19 +37,13 @@ public class GetDeploymentResourceForIdCmd implements Command<InputStream>, Seri
   }
 
   public InputStream execute(CommandContext commandContext) {
-    if (deploymentId == null) {
-      throw new ProcessEngineException("deploymentId is null");
-    }
-    if(resourceId == null) {
-      throw new ProcessEngineException("resourceId is null");
-    }
+    ensureNotNull("deploymentId", deploymentId);
+    ensureNotNull("resourceId", resourceId);
 
     ResourceEntity resource = commandContext
       .getResourceManager()
       .findResourceByDeploymentIdAndResourceId(deploymentId, resourceId);
-    if(resource == null) {
-      throw new ProcessEngineException("no resource found with id '" + resourceId + "' in deployment '" + deploymentId + "'");
-    }
+    ensureNotNull("no resource found with id '" + resourceId + "' in deployment '" + deploymentId + "'", "resource", resource);
     return new ByteArrayInputStream(resource.getBytes());
   }
 

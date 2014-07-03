@@ -14,12 +14,13 @@ package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
 import java.util.List;
-
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author roman.smirnov
@@ -48,37 +49,37 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   }
 
   public JobDefinitionQuery jobDefinitionId(String jobDefinitionId) {
-    assertParamNotNull("Job definition id", jobDefinitionId);
+    ensureNotNull("Job definition id", jobDefinitionId);
     this.id = jobDefinitionId;
     return this;
   }
 
   public JobDefinitionQuery activityIdIn(String... activityIds) {
-    assertParamNotNull("Activity ids", activityIds);
+    ensureNotNull("Activity ids", activityIds);
     this.activityIds = activityIds;
     return this;
   }
 
   public JobDefinitionQuery processDefinitionId(String processDefinitionId) {
-    assertParamNotNull("Process definition id", processDefinitionId);
+    ensureNotNull("Process definition id", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   public JobDefinitionQuery processDefinitionKey(String processDefinitionKey) {
-    assertParamNotNull("Process definition key", processDefinitionKey);
+    ensureNotNull("Process definition key", processDefinitionKey);
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
   public JobDefinitionQuery jobType(String jobType) {
-    assertParamNotNull("Job type", jobType);
+    ensureNotNull("Job type", jobType);
     this.jobType = jobType;
     return this;
   }
 
   public JobDefinitionQuery jobConfiguration(String jobConfiguration) {
-    assertParamNotNull("Job configuration", jobConfiguration);
+    ensureNotNull("Job configuration", jobConfiguration);
     this.jobConfiguration = jobConfiguration;
     return this;
   }

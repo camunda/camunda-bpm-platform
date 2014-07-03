@@ -16,8 +16,6 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
@@ -25,6 +23,8 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.task.Task;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -101,9 +101,7 @@ public class TaskManager extends AbstractManager {
 
 
   public TaskEntity findTaskById(String id) {
-    if (id == null) {
-      throw new ProcessEngineException("Invalid task id : null");
-    }
+    ensureNotNull("Invalid task id", "id", id);
     return (TaskEntity) getDbSqlSession().selectById(TaskEntity.class, id);
   }
 

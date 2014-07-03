@@ -293,7 +293,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
       runtimeService.correlateMessage(null);
       fail("Exception expected");
     } catch (ProcessEngineException e) {
-      assertTextPresent("messageName cannot be null", e.getMessage());
+      assertTextPresent("messageName is null", e.getMessage());
     }
 
     //fluent builder
@@ -302,7 +302,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
         .correlate();
       fail("Exception expected");
     } catch (ProcessEngineException e) {
-      assertTextPresent("messageName cannot be null", e.getMessage());
+      assertTextPresent("messageName is null", e.getMessage());
     }
 
     //fluent builder multiple
@@ -311,7 +311,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
         .correlateAll();
       fail("Exception expected");
     } catch (ProcessEngineException e) {
-      assertTextPresent("messageName cannot be null", e.getMessage());
+      assertTextPresent("messageName is null", e.getMessage());
     }
   }
 

@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -26,6 +24,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -49,18 +48,13 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
   }
 
   public PvmProcessInstance createProcessInstance() {
-    if(initial == null) {
-      throw new ProcessEngineException("Process '"+name+"' has no default start activity (e.g. none start event), hence you cannot use 'startProcessInstanceBy...' but have to start it using one of the modeled start events (e.g. message start events).");
-    }
+    ensureNotNull("Process '" + name + "' has no default start activity (e.g. none start event), hence you cannot use 'startProcessInstanceBy...' but have to start it using one of the modeled start events (e.g. message start events)", "initial", initial);
     return createProcessInstanceForInitial(initial);
   }
 
   /** creates a process instance using the provided activity as initial */
   public PvmProcessInstance createProcessInstanceForInitial(ActivityImpl initial) {
-
-    if(initial == null) {
-      throw new ProcessEngineException("Cannot start process instance, initial activity where the process instance should start is null.");
-    }
+    ensureNotNull("Cannot start process instance, initial activity where the process instance should start is null", "initial", initial);
 
     PvmExecutionImpl processInstance = newProcessInstance(initial);
     processInstance.setProcessDefinition(this);

@@ -14,8 +14,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
@@ -23,6 +21,8 @@ import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -45,30 +45,24 @@ public class GetRenderedTaskFormCmd  implements Command<Object>, Serializable {
       .getCommandContext()
       .getTaskManager()
       .findTaskById(taskId);
-    if (task == null) {
-      throw new ProcessEngineException("Task '" + taskId +"' not found");
-    }
-    
-    if (task.getTaskDefinition() == null) {
-      throw new ProcessEngineException("Task form definition for '" + taskId +"' not found");
-    }
-    
+    ensureNotNull("Task '" + taskId + "' not found", "task", task);
+
+    ensureNotNull("Task form definition for '" + taskId + "' not found", "task.getTaskDefinition()", task.getTaskDefinition());
+
     TaskFormHandler taskFormHandler = task.getTaskDefinition().getTaskFormHandler();
     if (taskFormHandler == null) {
       return null;
     }
-    
+
     FormEngine formEngine = Context
       .getProcessEngineConfiguration()
       .getFormEngines()
       .get(formEngineName);
-    
-    if (formEngine==null) {
-      throw new ProcessEngineException("No formEngine '" + formEngineName +"' defined process engine configuration");
-    }
-    
+
+    ensureNotNull("No formEngine '" + formEngineName + "' defined process engine configuration", "formEngine", formEngine);
+
     TaskFormData taskForm = taskFormHandler.createTaskForm(task);
-    
+
     return formEngine.renderTaskForm(taskForm);
   }
 }

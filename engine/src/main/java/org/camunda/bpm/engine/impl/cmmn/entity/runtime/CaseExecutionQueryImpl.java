@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.QueryOperator;
@@ -22,6 +21,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -51,37 +52,37 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   }
 
   public CaseExecutionQuery caseInstanceId(String caseInstanceId) {
-    assertParamNotNull("caseInstanceId", caseInstanceId);
+    ensureNotNull("caseInstanceId", caseInstanceId);
     this.caseInstanceId = caseInstanceId;
     return this;
   }
 
   public CaseExecutionQuery caseDefinitionId(String caseDefinitionId) {
-    assertParamNotNull("caseDefinitionId", caseDefinitionId);
+    ensureNotNull("caseDefinitionId", caseDefinitionId);
     this.caseDefinitionId = caseDefinitionId;
     return this;
   }
 
   public CaseExecutionQuery caseDefinitionKey(String caseDefinitionKey) {
-    assertParamNotNull("caseDefinitionKey", caseDefinitionKey);
+    ensureNotNull("caseDefinitionKey", caseDefinitionKey);
     this.caseDefinitionKey = caseDefinitionKey;
     return this;
   }
 
   public CaseExecutionQuery caseInstanceBusinessKey(String caseInstanceBusinessKey) {
-    assertParamNotNull("caseInstanceBusinessKey", caseInstanceBusinessKey);
+    ensureNotNull("caseInstanceBusinessKey", caseInstanceBusinessKey);
     this.businessKey = caseInstanceBusinessKey;
     return this;
   }
 
   public CaseExecutionQuery caseExecutionId(String caseExecutionId) {
-    assertParamNotNull("caseExecutionId", caseExecutionId);
+    ensureNotNull("caseExecutionId", caseExecutionId);
     this.caseExecutionId = caseExecutionId;
     return this;
   }
 
   public CaseExecutionQuery activityId(String activityId) {
-    assertParamNotNull("activityId", activityId);
+    ensureNotNull("activityId", activityId);
     this.activityId = activityId;
     return this;
   }

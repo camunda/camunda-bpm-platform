@@ -12,42 +12,13 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.util.*;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.form.FormData;
-import org.camunda.bpm.engine.impl.cmd.ActivateProcessInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
-import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableCmd;
-import org.camunda.bpm.engine.impl.cmd.GetExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.GetStartFormCmd;
-import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
-import org.camunda.bpm.engine.impl.cmd.PatchExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.SignalCmd;
-import org.camunda.bpm.engine.impl.cmd.SignalEventReceivedCmd;
-import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceByMessageCmd;
-import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstanceCmd;
-import org.camunda.bpm.engine.runtime.ActivityInstance;
-import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
-import org.camunda.bpm.engine.runtime.ExecutionQuery;
-import org.camunda.bpm.engine.runtime.IncidentQuery;
-import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
-import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
-import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
+import org.camunda.bpm.engine.impl.cmd.*;
+import org.camunda.bpm.engine.runtime.*;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -141,18 +112,14 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public void setVariable(String executionId, String variableName, Object value) {
-    if(variableName == null) {
-      throw new ProcessEngineException("variableName is null");
-    }
+    ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
     commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, false));
   }
 
   public void setVariableLocal(String executionId, String variableName, Object value) {
-    if(variableName == null) {
-      throw new ProcessEngineException("variableName is null");
-    }
+    ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
     commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));

@@ -14,12 +14,12 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -39,30 +39,24 @@ public class GetTaskVariableCmd implements Command<Object>, Serializable {
   }
 
   public Object execute(CommandContext commandContext) {
-    if(taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
-    if(variableName == null) {
-      throw new ProcessEngineException("variableName is null");
-    }
-    
+    ensureNotNull("taskId", taskId);
+    ensureNotNull("variableName", variableName);
+
     TaskEntity task = Context
       .getCommandContext()
       .getTaskManager()
       .findTaskById(taskId);
-    
-    if (task==null) {
-      throw new ProcessEngineException("task "+taskId+" doesn't exist");
-    }
-    
+
+    ensureNotNull("task " + taskId + " doesn't exist", "task", task);
+
     Object value;
-    
+
     if (isLocal) {
       value = task.getVariableLocal(variableName);
     } else {
       value = task.getVariable(variableName);
     }
-    
+
     return value;
   }
 }

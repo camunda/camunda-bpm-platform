@@ -2,11 +2,11 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Collection;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author roman.smirnov
@@ -28,24 +28,20 @@ public class RemoveExecutionVariablesCmd implements Command<Void>, Serializable 
   
   @Override
   public Void execute(CommandContext commandContext) {
-    if (executionId == null) {
-      throw new ProcessEngineException("executionId is null");
-    }
-    
+    ensureNotNull("executionId", executionId);
+
     ExecutionEntity execution = commandContext
-            .getExecutionManager()
-            .findExecutionById(executionId);
-          
-    if (execution==null) {
-      throw new ProcessEngineException("execution "+executionId+" doesn't exist");
-    }
-    
+      .getExecutionManager()
+      .findExecutionById(executionId);
+
+    ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
+
     if (isLocal) {
       execution.removeVariablesLocal(variableNames);
     } else {
       execution.removeVariables(variableNames);
     }
-    
+
     return null;
   }
 }

@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
-
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
@@ -32,11 +31,12 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -173,16 +173,12 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     String processEngineName = processArchive.getProcessEngineName();
     if(processEngineName != null) {
       ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
-      if(processEngine == null) {
-        throw new ProcessEngineException("Cannot deploy process archive '" + processArchive.getName() + "' to process engine '"+processEngineName+"' no such process engine exists.");
-      }
+      ensureNotNull("Cannot deploy process archive '" + processArchive.getName() + "' to process engine '" + processEngineName + "' no such process engine exists", "processEngine", processEngine);
       return processEngine;
 
     } else {
       ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, "default");
-      if(processEngine == null) {
-        throw new ProcessEngineException("Cannot deploy process archive '" + processArchive.getName() + "' to default process: no such process engine exists.");
-      }
+      ensureNotNull("Cannot deploy process archive '" + processArchive.getName() + "' to default process: no such process engine exists", "processEngine", processEngine);
       return processEngine;
     }
   }

@@ -13,58 +13,13 @@
 package org.camunda.bpm.engine.impl;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.util.*;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.impl.cmd.AddCommentCmd;
-import org.camunda.bpm.engine.impl.cmd.AddGroupIdentityLinkCmd;
-import org.camunda.bpm.engine.impl.cmd.AddUserIdentityLinkCmd;
-import org.camunda.bpm.engine.impl.cmd.AssignTaskCmd;
-import org.camunda.bpm.engine.impl.cmd.ClaimTaskCmd;
-import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
-import org.camunda.bpm.engine.impl.cmd.CreateAttachmentCmd;
-import org.camunda.bpm.engine.impl.cmd.DelegateTaskCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteAttachmentCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteGroupIdentityLinkCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteTaskAttachmentCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteTaskCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteUserIdentityLinkCmd;
-import org.camunda.bpm.engine.impl.cmd.GetAttachmentCmd;
-import org.camunda.bpm.engine.impl.cmd.GetAttachmentContentCmd;
-import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForTaskCmd;
-import org.camunda.bpm.engine.impl.cmd.GetProcessInstanceAttachmentsCmd;
-import org.camunda.bpm.engine.impl.cmd.GetProcessInstanceCommentsCmd;
-import org.camunda.bpm.engine.impl.cmd.GetSubTasksCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTaskAttachmentCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTaskAttachmentContentCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTaskAttachmentsCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTaskCommentCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTaskCommentsCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTaskEventsCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTaskVariableCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTaskVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.PatchTaskVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.RemoveTaskVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.ResolveTaskCmd;
-import org.camunda.bpm.engine.impl.cmd.SaveAttachmentCmd;
-import org.camunda.bpm.engine.impl.cmd.SaveTaskCmd;
-import org.camunda.bpm.engine.impl.cmd.SetTaskOwnerCmd;
-import org.camunda.bpm.engine.impl.cmd.SetTaskPriorityCmd;
-import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
+import org.camunda.bpm.engine.impl.cmd.*;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.task.Attachment;
-import org.camunda.bpm.engine.task.Comment;
-import org.camunda.bpm.engine.task.Event;
-import org.camunda.bpm.engine.task.IdentityLink;
-import org.camunda.bpm.engine.task.IdentityLinkType;
-import org.camunda.bpm.engine.task.NativeTaskQuery;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.task.*;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -216,18 +171,14 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   }
 
   public void setVariable(String executionId, String variableName, Object value) {
-    if(variableName == null) {
-      throw new ProcessEngineException("variableName is null");
-    }
+    ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
     commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, false));
   }
 
   public void setVariableLocal(String executionId, String variableName, Object value) {
-    if(variableName == null) {
-      throw new ProcessEngineException("variableName is null");
-    }
+    ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
     commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, true));

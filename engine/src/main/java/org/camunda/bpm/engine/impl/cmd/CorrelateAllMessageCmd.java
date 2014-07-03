@@ -15,14 +15,14 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.List;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Thorben Lindhauer
@@ -46,20 +46,18 @@ public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd {
   }
 
   public Void execute(CommandContext commandContext) {
-    if(messageName == null) {
-      throw new ProcessEngineException("messageName cannot be null");
-    }
+    ensureNotNull("messageName", messageName);
 
     CorrelationHandler correlationHandler = Context
-        .getProcessEngineConfiguration()
-        .getCorrelationHandler();
+      .getProcessEngineConfiguration()
+      .getCorrelationHandler();
 
     CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys);
     List<MessageCorrelationResult> correlationResults = correlationHandler
-        .correlateMessages(commandContext, messageName, correlationSet);
+      .correlateMessages(commandContext, messageName, correlationSet);
 
-    for(MessageCorrelationResult correlationResult : correlationResults) {
-      if(MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
+    for (MessageCorrelationResult correlationResult : correlationResults) {
+      if (MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
         triggerExecution(commandContext, correlationResult);
       } else {
         instantiateProcess(commandContext, correlationResult);

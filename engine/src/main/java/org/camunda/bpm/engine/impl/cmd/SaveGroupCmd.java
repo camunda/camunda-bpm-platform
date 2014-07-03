@@ -13,11 +13,12 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 
 /**
@@ -33,14 +34,12 @@ public class SaveGroupCmd extends AbstractWritableIdentityServiceCmd<Void> imple
   }
   
   protected Void executeCmd(CommandContext commandContext) {
-    if(group == null) {
-      throw new ProcessEngineException("group is null");
-    }
-    
+    ensureNotNull("group", group);
+
     commandContext
       .getWritableIdentityProvider()
       .saveGroup(group);
-    
+
     return null;
   }
 

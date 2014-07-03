@@ -13,7 +13,9 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -25,9 +27,7 @@ import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author  Tom Baeyens
@@ -66,15 +66,13 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
     }
 
     public HistoricTaskInstanceEntity findHistoricTaskInstanceById(final String taskId) {
-        if (taskId == null) {
-            throw new ProcessEngineException("Invalid historic task id : null");
-        }
+      ensureNotNull("Invalid historic task id", "taskId", taskId);
 
-        if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-            return (HistoricTaskInstanceEntity) getDbSqlSession().selectOne("selectHistoricTaskInstance", taskId);
-        }
+      if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+        return (HistoricTaskInstanceEntity) getDbSqlSession().selectOne("selectHistoricTaskInstance", taskId);
+      }
 
-        return null;
+      return null;
     }
 
     public void deleteHistoricTaskInstanceById(final String taskId) {

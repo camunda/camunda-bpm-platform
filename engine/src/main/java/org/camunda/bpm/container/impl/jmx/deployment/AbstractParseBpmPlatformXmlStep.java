@@ -12,15 +12,6 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment;
 
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
-import org.camunda.bpm.container.impl.metadata.BpmPlatformXmlParser;
-import org.camunda.bpm.container.impl.metadata.spi.BpmPlatformXml;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,6 +19,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
+import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
+import org.camunda.bpm.container.impl.metadata.BpmPlatformXmlParser;
+import org.camunda.bpm.container.impl.metadata.spi.BpmPlatformXml;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * <p>Deployment operation step responsible for parsing and attaching the bpm-platform.xml file.</p>
@@ -54,11 +55,8 @@ public abstract class AbstractParseBpmPlatformXmlStep extends MBeanDeploymentOpe
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
 
     URL bpmPlatformXmlSource = getBpmPlatformXmlStream(operationContext);
+    ensureNotNull("Unable to find bpm-platform.xml. This file is necessary for deploying the camunda BPM platform", "bpmPlatformXmlSource", bpmPlatformXmlSource);
 
-    if (bpmPlatformXmlSource == null) {
-      throw new ProcessEngineException("Unable to find bpm-platform.xml. This file is necessary for deploying the camunda BPM platform");
-    }
-    
     // parse the bpm platform xml
     BpmPlatformXml bpmPlatformXml = new BpmPlatformXmlParser().createParse()
       .sourceUrl(bpmPlatformXmlSource)

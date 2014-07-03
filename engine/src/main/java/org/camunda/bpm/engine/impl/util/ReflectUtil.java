@@ -24,6 +24,8 @@ import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 
 /**
  * @author Tom Baeyens
@@ -285,15 +287,13 @@ public abstract class ReflectUtil {
   }
 
   public static Object instantiate(String className, Object[] args) {
-    Class< ? > clazz = loadClass(className);
-    Constructor< ? > constructor = findMatchingConstructor(clazz, args);
-    if (constructor==null) {
-      throw new ProcessEngineException("couldn't find constructor for "+className+" with args "+Arrays.asList(args));
-    }
+    Class<?> clazz = loadClass(className);
+    Constructor<?> constructor = findMatchingConstructor(clazz, args);
+    ensureNotNull("couldn't find constructor for " + className + " with args " + Arrays.asList(args), "constructor", constructor);
     try {
       return constructor.newInstance(args);
     } catch (Exception e) {
-      throw new ProcessEngineException("couldn't find constructor for "+className+" with args "+Arrays.asList(args), e);
+      throw new ProcessEngineException("couldn't find constructor for " + className + " with args " + Arrays.asList(args), e);
     }
   }
 

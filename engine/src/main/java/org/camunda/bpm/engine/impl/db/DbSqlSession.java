@@ -66,6 +66,8 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.variable.DeserializedObject;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 
 /** responsibilities:
  *   - delayed flushing of inserts updates and deletes
@@ -269,9 +271,7 @@ public class DbSqlSession implements Session {
     public void execute() {
       String deleteStatement = dbSqlSessionFactory.getDeleteStatement(persistentObject.getClass());
       deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
-      if (deleteStatement == null) {
-        throw new ProcessEngineException("no delete statement for " + persistentObject.getClass() + " in the ibatis mapping files");
-      }
+      ensureNotNull("no delete statement for " + persistentObject.getClass() + " in the ibatis mapping files", "deleteStatement", deleteStatement);
       log.fine("deleting: " + ClassNameUtil.getClassNameWithoutPackage(persistentObject.getClass()) + "[" + persistentObject.getId() + "]");
 
 
@@ -687,11 +687,9 @@ public class DbSqlSession implements Session {
       String insertStatement = dbSqlSessionFactory.getInsertStatement(insertedObject);
       insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
 
-      if (insertStatement==null) {
-        throw new ProcessEngineException("no insert statement for "+insertedObject.getClass()+" in the ibatis mapping files");
-      }
+      ensureNotNull("no insert statement for " + insertedObject.getClass() + " in the ibatis mapping files", "insertStatement", insertStatement);
 
-      log.fine("inserting: "+toString(insertedObject));
+      log.fine("inserting: " + toString(insertedObject));
       sqlSession.insert(insertStatement, insertedObject);
 
       // See http://jira.codehaus.org/browse/ACT-1290
@@ -706,18 +704,16 @@ public class DbSqlSession implements Session {
     for (PersistentObject updatedObject: updatedObjects) {
       String updateStatement = dbSqlSessionFactory.getUpdateStatement(updatedObject);
       updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
-      if (updateStatement==null) {
-        throw new ProcessEngineException("no update statement for "+updatedObject.getClass()+" in the ibatis mapping files");
-      }
-      if(log.isLoggable(Level.FINE)) {
-        log.fine("updating: "+toString(updatedObject)+"]");
+      ensureNotNull("no update statement for " + updatedObject.getClass() + " in the ibatis mapping files", "updateStatement", updateStatement);
+      if (log.isLoggable(Level.FINE)) {
+        log.fine("updating: " + toString(updatedObject) + "]");
       }
       int updatedRecords = sqlSession.update(updateStatement, updatedObject);
 
       if (updatedObject instanceof HasRevision) {
 
-        if (updatedRecords!=1) {
-          throw new OptimisticLockingException(toString(updatedObject)+" was updated by another transaction concurrently");
+        if (updatedRecords != 1) {
+          throw new OptimisticLockingException(toString(updatedObject) + " was updated by another transaction concurrently");
 
         } else {
           // See http://jira.codehaus.org/browse/ACT-1290
@@ -734,11 +730,9 @@ public class DbSqlSession implements Session {
   protected void flushBulkUpdates() {
     for (BulkUpdateOperation bulkUpdateOperation : bulkUpdates) {
       String updateStatement = bulkUpdateOperation.getStatement();
-      if (updateStatement==null) {
-        throw new ProcessEngineException("no update statement " + updateStatement + " in the ibatis mapping files");
-      }
-      if(log.isLoggable(Level.FINE)) {
-        log.fine("bulk updating: "+ bulkUpdateOperation);
+      ensureNotNull("no update statement " + updateStatement + " in the ibatis mapping files", "updateStatement", updateStatement);
+      if (log.isLoggable(Level.FINE)) {
+        log.fine("bulk updating: " + bulkUpdateOperation);
       }
       sqlSession.update(updateStatement, bulkUpdateOperation.parameter);
     }

@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 
 import java.io.UnsupportedEncodingException;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 
 /**
  * @author Tom Baeyens
@@ -72,9 +74,7 @@ public class JuelFormEngine implements FormEngine {
       .getResourceManager()
       .findResourceByDeploymentIdAndResourceName(deploymentId, formKey);
 
-    if (resourceStream == null) {
-      throw new ProcessEngineException("Form with formKey '"+formKey+"' does not exist");
-    }
+    ensureNotNull("Form with formKey '" + formKey + "' does not exist", "resourceStream", resourceStream);
 
     byte[] resourceBytes = resourceStream.getBytes();
     String encoding = "UTF-8";

@@ -15,12 +15,12 @@ package org.camunda.bpm.engine.impl.cmmn.cmd;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.CaseExecutionCommandBuilderImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -55,17 +55,13 @@ public class CaseExecutionVariableCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
-    if (caseExecutionId == null) {
-      throw new ProcessEngineException("caseExecutionId is null");
-    }
+    ensureNotNull("caseExecutionId", caseExecutionId);
 
     caseExecution = commandContext
       .getCaseExecutionManager()
       .findCaseExecutionById(caseExecutionId);
 
-    if (caseExecution == null) {
-      throw new ProcessEngineException("There does not exist any case execution with id: '" + caseExecutionId + "'.");
-    }
+    ensureNotNull("There does not exist any case execution with id: '" + caseExecutionId + "'", "caseExecution", caseExecution);
 
     if (variablesDeletions != null && !variablesDeletions.isEmpty()) {
       caseExecution.removeVariables(variablesDeletions);

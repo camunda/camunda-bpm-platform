@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -25,6 +24,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.variable.ByteArrayType;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Christian Lipphardt (camunda)
@@ -58,51 +59,51 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   }
 
   public HistoricVariableInstanceQuery variableId(String id) {
-    assertParamNotNull("variableId", id);
+    ensureNotNull("variableId", id);
     this.variableId = id;
     return this;
   }
 
   public HistoricVariableInstanceQueryImpl processInstanceId(String processInstanceId) {
-    assertParamNotNull("processInstanceId", processInstanceId);
+    ensureNotNull("processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
     return this;
   }
 
   public HistoricVariableInstanceQuery taskIdIn(String... taskIds) {
-    assertParamNotNull("Task Ids", taskIds);
+    ensureNotNull("Task Ids", taskIds);
     this.taskIds = taskIds;
     return this;
   }
 
   public HistoricVariableInstanceQuery executionIdIn(String... executionIds) {
-    assertParamNotNull("Execution Ids", executionIds);
+    ensureNotNull("Execution Ids", executionIds);
     this.executionIds = executionIds;
     return this;
   }
 
   public HistoricVariableInstanceQuery activityInstanceIdIn(String... activityInstanceIds) {
-    assertParamNotNull("Activity Instance Ids", activityInstanceIds);
+    ensureNotNull("Activity Instance Ids", activityInstanceIds);
     this.activityInstanceIds = activityInstanceIds;
     return this;
   }
 
   public HistoricVariableInstanceQuery variableName(String variableName) {
-    assertParamNotNull("variableName", variableName);
+    ensureNotNull("variableName", variableName);
     this.variableName = variableName;
     return this;
   }
 
   public HistoricVariableInstanceQuery variableValueEquals(String variableName, Object variableValue) {
-    assertParamNotNull("variableName", variableName);
-    assertParamNotNull("variableValue", variableValue);
+    ensureNotNull("variableName", variableName);
+    ensureNotNull("variableValue", variableValue);
     this.variableName = variableName;
     queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
     return this;
   }
 
   public HistoricVariableInstanceQuery variableNameLike(String variableNameLike) {
-    assertParamNotNull("variableNameLike", variableNameLike);
+    ensureNotNull("variableNameLike", variableNameLike);
     this.variableNameLike = variableNameLike;
     return this;
   }

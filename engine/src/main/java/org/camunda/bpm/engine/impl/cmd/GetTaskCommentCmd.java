@@ -14,11 +14,12 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.task.Comment;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 
 /**
@@ -36,13 +37,8 @@ public class GetTaskCommentCmd implements Command<Comment>, Serializable {
   }
 
   public Comment execute(CommandContext commandContext) {
-    if(taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
-
-    if(commentId == null) {
-      throw new ProcessEngineException("commentId is null");
-    }
+    ensureNotNull("taskId", taskId);
+    ensureNotNull("commentId", commentId);
 
     return commandContext
       .getCommentManager()

@@ -895,7 +895,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       runtimeService.getActivityInstance(null);
       fail("PEE expected!");
     } catch (ProcessEngineException engineException) {
-      assertTrue(engineException.getMessage().contains("processInstanceId cannot be null"));
+      assertTrue(engineException.getMessage().contains("processInstanceId is null"));
     }
   }
 

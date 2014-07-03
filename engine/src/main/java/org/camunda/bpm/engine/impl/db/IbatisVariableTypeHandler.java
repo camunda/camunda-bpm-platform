@@ -17,13 +17,13 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.variable.VariableType;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -36,18 +36,14 @@ public class IbatisVariableTypeHandler implements TypeHandler<VariableType> {
   public VariableType getResult(ResultSet rs, String columnName) throws SQLException {
     String typeName = rs.getString(columnName);
     VariableType type = getVariableTypes().getVariableType(typeName);
-    if (type == null) {
-      throw new ProcessEngineException("unknown variable type name " + typeName);
-    }
+    ensureNotNull("unknown variable type name " + typeName, "type", type);
     return type;
   }
 
   public VariableType getResult(CallableStatement cs, int columnIndex) throws SQLException {
     String typeName = cs.getString(columnIndex);
     VariableType type = getVariableTypes().getVariableType(typeName);
-    if (type == null) {
-      throw new ProcessEngineException("unknown variable type name " + typeName);
-    }
+    ensureNotNull("unknown variable type name " + typeName, "type", type);
     return type;
   }
 
@@ -68,9 +64,7 @@ public class IbatisVariableTypeHandler implements TypeHandler<VariableType> {
   public VariableType getResult(ResultSet resultSet, int columnIndex) throws SQLException {
     String typeName = resultSet.getString(columnIndex);
     VariableType type = getVariableTypes().getVariableType(typeName);
-    if (type == null) {
-      throw new ProcessEngineException("unknown variable type name " + typeName);
-    }
+    ensureNotNull("unknown variable type name " + typeName, "type", type);
     return type;
   }
 }

@@ -17,12 +17,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 
 
 /**
@@ -68,12 +68,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   public HistoricProcessInstanceQuery processInstanceIds(Set<String> processInstanceIds) {
-    if (processInstanceIds == null) {
-      throw new ProcessEngineException("Set of process instance ids is null");
-    }
-    if (processInstanceIds.isEmpty()) {
-      throw new ProcessEngineException("Set of process instance ids is empty");
-    }
+    ensureNotEmpty("Set of process instance ids", processInstanceIds);
     this.processInstanceIds = processInstanceIds;
     return this;
   }

@@ -16,13 +16,14 @@ package org.camunda.bpm.engine.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -100,7 +101,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQuery activityInstanceIdIn(String... activityInstanceIds) {
-    assertParamNotNull("activityInstanceIdsd", activityInstanceIds);
+    ensureNotNull("activityInstanceIds", activityInstanceIds);
     this.activityInstanceIds = activityInstanceIds;
     return this;
   }

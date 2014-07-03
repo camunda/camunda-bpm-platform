@@ -14,14 +14,14 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -41,16 +41,12 @@ public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
       .getCommandContext()
       .getTaskManager()
       .findTaskById(taskId);
-    if (task == null) {
-      throw new ProcessEngineException("No task found for taskId '" + taskId +"'");
-    }
-    
-    if(task.getTaskDefinition() != null) {
+    ensureNotNull("No task found for taskId '" + taskId + "'", "task", task);
+
+    if (task.getTaskDefinition() != null) {
       TaskFormHandler taskFormHandler = task.getTaskDefinition().getTaskFormHandler();
-      if (taskFormHandler == null) {
-        throw new ProcessEngineException("No taskFormHandler specified for task '" + taskId +"'");
-      }
-      
+      ensureNotNull("No taskFormHandler specified for task '" + taskId + "'", "taskFormHandler", taskFormHandler);
+
       return taskFormHandler.createTaskForm(task);
     } else {
       // Standalone task, no TaskFormData available

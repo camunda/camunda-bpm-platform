@@ -23,7 +23,8 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
-import org.camunda.bpm.engine.ProcessEngineException;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * <p>Deployment operation responsible for undeploying all process archives.</p>
@@ -43,17 +44,15 @@ public class UndeployProcessArchivesStep extends MBeanDeploymentOperationStep {
     final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
     final JmxManagedProcessApplication deployedProcessApplication = serviceContainer.getService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
 
-    if(deployedProcessApplication == null) {
-      throw new ProcessEngineException("Cannot find process application with name "+processApplication.getName()+".");
-    }
+    ensureNotNull("Cannot find process application with name " + processApplication.getName(), "deployedProcessApplication", deployedProcessApplication);
 
     Map<String, DeployedProcessArchive> deploymentMap = deployedProcessApplication.getProcessArchiveDeploymentMap();
-    if(deploymentMap != null) {
+    if (deploymentMap != null) {
       List<ProcessesXml> processesXmls = deployedProcessApplication.getProcessesXmls();
       for (ProcessesXml processesXml : processesXmls) {
         for (ProcessArchiveXml parsedProcessArchive : processesXml.getProcessArchives()) {
           DeployedProcessArchive deployedProcessArchive = deploymentMap.get(parsedProcessArchive.getName());
-          if(deployedProcessArchive != null) {
+          if (deployedProcessArchive != null) {
             operationContext.addStep(new UndeployProcessArchiveStep(deployedProcessApplication, parsedProcessArchive, deployedProcessArchive.getProcessEngineName()));
           }
         }

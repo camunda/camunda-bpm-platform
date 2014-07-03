@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 
 /**
  * @author Daniel Meyer
@@ -38,40 +40,38 @@ public class CompensationEventHandler implements EventHandler {
   }
 
   public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
-        
+
     String configuration = eventSubscription.getConfiguration();
-    if(configuration == null) {
-      throw new ProcessEngineException("Compensating execution not set for compensate event subscription with id "+eventSubscription.getId());      
-    }
-    
+    ensureNotNull("Compensating execution not set for compensate event subscription with id " + eventSubscription.getId(), "configuration", configuration);
+
     ExecutionEntity compensatingExecution = commandContext.getExecutionManager()
-            .findExecutionById(configuration);
-   
+      .findExecutionById(configuration);
+
     ActivityImpl compensationHandler = eventSubscription.getActivity();
-    
-    if((compensationHandler.getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION) == null 
-        ||!(Boolean)compensationHandler.getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION))
-            && compensationHandler.isScope()) {      
-   
+
+    if ((compensationHandler.getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION) == null
+      || !(Boolean) compensationHandler.getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION))
+      && compensationHandler.isScope()) {
+
       // activate execution
       compensatingExecution.setActive(true);
       // descend into scope:
-      List<CompensateEventSubscriptionEntity> eventsForThisScope = compensatingExecution.getCompensateEventSubscriptions();      
+      List<CompensateEventSubscriptionEntity> eventsForThisScope = compensatingExecution.getCompensateEventSubscriptions();
       ScopeUtil.throwCompensationEvent(eventsForThisScope, compensatingExecution, false);
-                  
+
     } else {
       try {
 
         compensatingExecution.setActivity(compensationHandler);
-        
+
         // executing the atomic operation makes sure activity start events are fired
         compensatingExecution.performOperation(AtomicOperation.ACTIVITY_START);
-        
-      }catch (Exception e) {
-        throw new ProcessEngineException("Error while handling compensation event "+eventSubscription, e);
+
+      } catch (Exception e) {
+        throw new ProcessEngineException("Error while handling compensation event " + eventSubscription, e);
       }
-            
-    }    
+
+    }
   }
 
 }

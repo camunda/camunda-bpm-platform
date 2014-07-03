@@ -29,6 +29,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * @author Daniel Meyer
  */
@@ -76,9 +78,7 @@ public abstract class EventSubscriptionEntity implements EventSubscription, Pers
   
   protected void processEventSync(Object payload) {
     EventHandler eventHandler = Context.getProcessEngineConfiguration().getEventHandler(eventType);
-    if (eventHandler == null) {
-      throw new ProcessEngineException("Could not find eventhandler for event of type '" + eventType + "'.");
-    }    
+    ensureNotNull("Could not find eventhandler for event of type '" + eventType + "'", "eventHandler", eventHandler);
     eventHandler.handleEvent(this, payload, Context.getCommandContext());
   }
   

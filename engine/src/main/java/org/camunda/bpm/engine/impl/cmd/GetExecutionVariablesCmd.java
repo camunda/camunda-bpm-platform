@@ -16,11 +16,11 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -40,17 +40,13 @@ public class GetExecutionVariablesCmd implements Command<Map<String, Object>>, S
   }
 
   public Map<String, Object> execute(CommandContext commandContext) {
-    if(executionId == null) {
-      throw new ProcessEngineException("executionId is null");
-    }
-    
+    ensureNotNull("executionId", executionId);
+
     ExecutionEntity execution = commandContext
       .getExecutionManager()
       .findExecutionById(executionId);
-    
-    if (execution==null) {
-      throw new ProcessEngineException("execution "+executionId+" doesn't exist");
-    }
+
+    ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
 
     Map<String, Object> executionVariables;
     if (isLocal) {
@@ -58,18 +54,18 @@ public class GetExecutionVariablesCmd implements Command<Map<String, Object>>, S
     } else {
       executionVariables = execution.getVariables();
     }
-    
+
     if (variableNames != null && variableNames.size() > 0) {
       // if variableNames is not empty, return only variable names mentioned in it
       Map<String, Object> tempVariables = new HashMap<String, Object>();
-      for (String variableName: variableNames) {
+      for (String variableName : variableNames) {
         if (executionVariables.containsKey(variableName)) {
           tempVariables.put(variableName, executionVariables.get(variableName));
         }
       }
       executionVariables = tempVariables;
     }
-    
+
     return executionVariables;
   }
 }

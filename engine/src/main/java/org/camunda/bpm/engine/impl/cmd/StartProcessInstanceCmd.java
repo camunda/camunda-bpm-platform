@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 
 /**
  * @author Tom Baeyens
@@ -53,14 +55,10 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
     ProcessDefinitionEntity processDefinition = null;
     if (processDefinitionId!=null) {
       processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      if (processDefinition == null) {
-        throw new ProcessEngineException("No process definition found for id = '" + processDefinitionId + "'");
-      }
-    } else if(processDefinitionKey != null){
+      ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
+    } else if(processDefinitionKey != null) {
       processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
-      if (processDefinition == null) {
-        throw new ProcessEngineException("No process definition found for key '" + processDefinitionKey +"'");
-      }
+      ensureNotNull("No process definition found for key '" + processDefinitionKey + "'", "processDefinition", processDefinition);
     } else {
       throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
     }

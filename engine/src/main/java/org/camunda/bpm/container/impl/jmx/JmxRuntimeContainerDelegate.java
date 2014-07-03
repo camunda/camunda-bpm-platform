@@ -16,32 +16,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.container.impl.jmx.deployment.Attachments;
-import org.camunda.bpm.container.impl.jmx.deployment.DeployProcessArchivesStep;
-import org.camunda.bpm.container.impl.jmx.deployment.ParseProcessesXmlStep;
-import org.camunda.bpm.container.impl.jmx.deployment.PostDeployInvocationStep;
-import org.camunda.bpm.container.impl.jmx.deployment.PreUndeployInvocationStep;
-import org.camunda.bpm.container.impl.jmx.deployment.ProcessesXmlStartProcessEnginesStep;
-import org.camunda.bpm.container.impl.jmx.deployment.ProcessesXmlStopProcessEnginesStep;
-import org.camunda.bpm.container.impl.jmx.deployment.StartProcessApplicationServiceStep;
-import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationServiceStep;
-import org.camunda.bpm.container.impl.jmx.deployment.UndeployProcessArchivesStep;
+import org.camunda.bpm.container.impl.jmx.deployment.*;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer.ServiceType;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * <p>This is the default {@link RuntimeContainerDelegate} implementation that delegates
@@ -103,10 +94,7 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
   // runtime container delegate implementation ///////////////////////////////////////////////
 
   public void registerProcessEngine(ProcessEngine processEngine) {
-
-    if(processEngine == null) {
-      throw new ProcessEngineException("Cannot register process engine in Jmx Runtime Container: process engine is 'null'");
-    }
+    ensureNotNull("Cannot register process engine in Jmx Runtime Container", "process engine", processEngine);
 
     String processEngineName = processEngine.getName();
 
@@ -117,20 +105,14 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
   }
 
   public void unregisterProcessEngine(ProcessEngine processEngine) {
-
-    if(processEngine == null) {
-      throw new ProcessEngineException("Cannot unregister process engine in Jmx Runtime Container: process engine is 'null'");
-    }
+    ensureNotNull("Cannot unregister process engine in Jmx Runtime Container", "process engine", processEngine);
 
     serviceContainer.stopService(ServiceTypes.PROCESS_ENGINE, processEngine.getName());
 
   }
 
   public void deployProcessApplication(AbstractProcessApplication processApplication) {
-
-    if(processApplication == null) {
-      throw new ProcessEngineException("Process application cannot be null");
-    }
+    ensureNotNull("Process application", processApplication);
 
     final String operationName = "Deployment of Process Application "+processApplication.getName();
 
@@ -148,10 +130,7 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
   }
 
   public void undeployProcessApplication(AbstractProcessApplication processApplication) {
-
-    if(processApplication == null) {
-      throw new ProcessEngineException("Process application cannot be null");
-    }
+    ensureNotNull("Process application", processApplication);
 
     final String processAppName = processApplication.getName();
 

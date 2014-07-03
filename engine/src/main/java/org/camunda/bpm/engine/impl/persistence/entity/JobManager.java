@@ -13,26 +13,18 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.util.*;
 import org.camunda.bpm.engine.impl.JobQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.jobexecutor.ExclusiveJobAddedNotification;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
-import org.camunda.bpm.engine.impl.jobexecutor.MessageAddedNotification;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.*;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -48,9 +40,7 @@ public class JobManager extends AbstractManager {
 
   public void schedule(TimerEntity timer) {
     Date duedate = timer.getDuedate();
-    if (duedate==null) {
-      throw new ProcessEngineException("duedate is null");
-    }
+    ensureNotNull("duedate", duedate);
 
     timer.insert();
 
@@ -60,7 +50,7 @@ public class JobManager extends AbstractManager {
 
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
     int waitTimeInMillis = jobExecutor.getWaitTimeInMillis();
-    if (duedate.getTime() < (ClockUtil.getCurrentTime().getTime()+waitTimeInMillis)) {
+    if (duedate.getTime() < (ClockUtil.getCurrentTime().getTime() + waitTimeInMillis)) {
       hintJobExecutor(timer);
     }
   }

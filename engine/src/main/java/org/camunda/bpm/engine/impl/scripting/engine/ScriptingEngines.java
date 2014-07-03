@@ -20,6 +20,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * <p>Manager for JSR-223 {@link ScriptEngine} handling.</p>
  *
@@ -128,13 +130,13 @@ public class ScriptingEngines {
    */
   public ScriptEngine getScriptEngineForLanguage(String language) {
 
-    if(language != null) {
+    if (language != null) {
       language = language.toLowerCase();
     }
 
     ScriptEngine scriptEngine = null;
 
-    if(enableScriptEngineCaching) {
+    if (enableScriptEngineCaching) {
       scriptEngine = getCachedScriptEngine(language);
 
     } else {
@@ -142,9 +144,7 @@ public class ScriptingEngines {
 
     }
 
-    if (scriptEngine == null) {
-      throw new ProcessEngineException("Can't find scripting engine for '" + language + "'");
-    }
+    ensureNotNull("Can't find scripting engine for '" + language + "'", "scriptEngine", scriptEngine);
 
     return scriptEngine;
 

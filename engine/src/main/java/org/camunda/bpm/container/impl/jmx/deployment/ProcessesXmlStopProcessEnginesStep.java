@@ -14,8 +14,6 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
@@ -24,7 +22,8 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
-import org.camunda.bpm.engine.ProcessEngineException;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * <p>Deployment operation responsible for stopping all process engines started by the deployment.</p>
@@ -43,11 +42,9 @@ public class ProcessesXmlStopProcessEnginesStep extends MBeanDeploymentOperation
     final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
     final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);    
     final JmxManagedProcessApplication deployedProcessApplication = serviceContainer.getService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
-    
-    if(deployedProcessApplication == null) {
-      throw new ProcessEngineException("Cannot find process application with name "+processApplication.getName()+".");
-    }
-    
+
+    ensureNotNull("Cannot find process application with name " + processApplication.getName(), "deployedProcessApplication", deployedProcessApplication);
+
     List<ProcessesXml> processesXmls = deployedProcessApplication.getProcessesXmls();
     for (ProcessesXml processesXml : processesXmls) {
       stopProcessEngines(processesXml.getProcessEngines(), operationContext);            

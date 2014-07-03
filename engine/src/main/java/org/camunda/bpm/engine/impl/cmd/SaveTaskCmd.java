@@ -13,13 +13,14 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.task.Task;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 /**
  * @author Joram Barrez
@@ -35,11 +36,9 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
 	}
 
 	public Void execute(CommandContext commandContext) {
-	  if(task == null) {
-	    throw new ProcessEngineException("task is null");
-	  }
+    ensureNotNull("task", task);
 
-    if (task.getRevision()==0) {
+    if (task.getRevision() == 0) {
       task.insert(null);
       commandContext.getHistoricTaskInstanceManager().createHistoricTask(task);
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_CREATE);
@@ -49,6 +48,6 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
     }
 
     return null;
-	}
+  }
 
 }

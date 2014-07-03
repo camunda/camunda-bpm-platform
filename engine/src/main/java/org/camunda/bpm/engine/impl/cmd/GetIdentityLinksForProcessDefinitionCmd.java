@@ -14,13 +14,13 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.List;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.task.IdentityLink;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -38,14 +38,12 @@ public class GetIdentityLinksForProcessDefinitionCmd implements Command<List<Ide
   @SuppressWarnings({"unchecked", "rawtypes"})
   public List<IdentityLink> execute(CommandContext commandContext) {
     ProcessDefinitionEntity processDefinition = Context
-        .getCommandContext()
-        .getProcessDefinitionManager()
-        .findLatestProcessDefinitionById(processDefinitionId);
-      
-    if (processDefinition == null) {
-      throw new ProcessEngineException("Cannot find process definition with id " + processDefinitionId);
-    }
-    
+      .getCommandContext()
+      .getProcessDefinitionManager()
+      .findLatestProcessDefinitionById(processDefinitionId);
+
+    ensureNotNull("Cannot find process definition with id " + processDefinitionId, "processDefinition", processDefinition);
+
     List<IdentityLink> identityLinks = (List) processDefinition.getIdentityLinks();
     return identityLinks;
   }

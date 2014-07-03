@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * @author Joram Barrez
  * @author Frederik Heremans
@@ -165,9 +167,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
     String host = processEngineConfiguration.getMailServerHost();
-    if (host == null) {
-      throw new ProcessEngineException("Could not send email: no SMTP host is configured");
-    }
+    ensureNotNull("Could not send email: no SMTP host is configured", "host", host);
     email.setHostName(host);
 
     int port = processEngineConfiguration.getMailServerPort();

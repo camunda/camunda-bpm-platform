@@ -14,12 +14,13 @@
 package org.camunda.bpm.engine.impl;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 public class ActivityStatisticsQueryImpl extends
     AbstractQuery<ActivityStatisticsQuery, ActivityStatistics> implements ActivityStatisticsQuery{
@@ -81,9 +82,7 @@ public class ActivityStatisticsQueryImpl extends
   
   protected void checkQueryOk() {
     super.checkQueryOk();
-    if (processDefinitionId == null) {
-      throw new ProcessEngineException("No valid process definition id supplied.");
-    }
+    ensureNotNull("No valid process definition id supplied", "processDefinitionId", processDefinitionId);
     if (includeIncidents && includeIncidentsForType != null) {
       throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
     }

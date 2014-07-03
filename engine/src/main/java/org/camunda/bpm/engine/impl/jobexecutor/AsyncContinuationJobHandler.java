@@ -22,6 +22,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  *
  * @author Daniel Meyer
@@ -52,10 +54,10 @@ public class AsyncContinuationJobHandler implements JobHandler {
 
     String operationName = null;
     String transitionId = null;
-    if(configuration.contains("$")) {
+    if (configuration.contains("$")) {
       String[] configParts = configuration.split("\\$");
-      if(configParts.length != 2) {
-        throw new ProcessEngineException("Illegal async continuation job handler configuration: '"+configuration+"': exprecting two parts seperated by '$'.");
+      if (configParts.length != 2) {
+        throw new ProcessEngineException("Illegal async continuation job handler configuration: '" + configuration + "': exprecting two parts seperated by '$'.");
       }
       operationName = configParts[0];
       transitionId = configParts[1];
@@ -65,12 +67,10 @@ public class AsyncContinuationJobHandler implements JobHandler {
     }
 
     PvmAtomicOperation atomicOperation = findMatchingAtomicOperation(operationName);
-    if (atomicOperation == null) {
-      throw new ProcessEngineException("Cannot process job with configuration " + configuration);
-    }
+    ensureNotNull("Cannot process job with configuration " + configuration, "atomicOperation", atomicOperation);
 
     // reset transition id.
-    if(transitionId != null) {
+    if (transitionId != null) {
       ActivityImpl activity = execution.getActivity();
       TransitionImpl transition = activity.findOutgoingTransition(transitionId);
       execution.setTransition(transition);

@@ -13,12 +13,14 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.task.IdentityLinkType;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -47,19 +49,14 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
   }
 
   protected void validateParams(String userId, String groupId, String type, String taskId) {
-    if(taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
-
-    if (type == null) {
-      throw new ProcessEngineException("type is required when adding a new task identity link");
-    }
+    ensureNotNull("taskId", taskId);
+    ensureNotNull("type is required when adding a new task identity link", "type", type);
 
     // Special treatment for assignee, group cannot be used an userId may be null
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       if (groupId != null) {
         throw new ProcessEngineException("Incompatible usage: cannot use ASSIGNEE"
-                + " together with a groupId");
+          + " together with a groupId");
       }
     } else {
       if (userId == null && groupId == null) {
@@ -70,17 +67,13 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
 
   public Void execute(CommandContext commandContext) {
 
-    if(taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
+    ensureNotNull("taskId", taskId);
 
     task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
 
-    if (task == null) {
-      throw new ProcessEngineException("Cannot find task with id " + taskId);
-    }
+    EnsureUtil.ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       task.setAssignee(userId);

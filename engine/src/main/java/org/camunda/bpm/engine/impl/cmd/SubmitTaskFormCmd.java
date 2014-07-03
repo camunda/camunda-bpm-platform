@@ -15,8 +15,6 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -29,6 +27,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.task.DelegationState;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -48,29 +48,25 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
   }
 
   public Object execute(CommandContext commandContext) {
-    if(taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
+    ensureNotNull("taskId", taskId);
 
     TaskEntity task = Context
       .getCommandContext()
       .getTaskManager()
       .findTaskById(taskId);
 
-    if (task == null) {
-      throw new ProcessEngineException("Cannot find task with id " + taskId);
-    }
+    ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
     int historyLevel = processEngineConfiguration.getHistoryLevel();
     ExecutionEntity execution = task.getExecution();
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT && execution != null) {
+    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT && execution != null) {
 
       final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
       final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
 
-      for (String propertyId: properties.keySet()) {
+      for (String propertyId : properties.keySet()) {
         Object propertyValue = properties.get(propertyId);
 
         HistoryEvent evt = eventProducer.createFormPropertyUpdateEvt(execution, propertyId, propertyValue, taskId);
@@ -83,7 +79,7 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
     taskFormHandler.submitFormProperties(properties, task.getExecution());
 
     // complete or resolve the task
-    if(DelegationState.PENDING.equals(task.getDelegationState())) {
+    if (DelegationState.PENDING.equals(task.getDelegationState())) {
       task.resolve();
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_RESOLVE);
     } else {

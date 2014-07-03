@@ -13,8 +13,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
@@ -22,6 +20,8 @@ import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -44,25 +44,21 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
       .getProcessEngineConfiguration()
       .getDeploymentCache()
       .findDeployedProcessDefinitionById(processDefinitionId);
-    if (processDefinition == null) {
-      throw new ProcessEngineException("Process Definition '" + processDefinitionId +"' not found");
-    }
+    ensureNotNull("Process Definition '" + processDefinitionId + "' not found", "processDefinition", processDefinition);
     StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
     if (startFormHandler == null) {
       return null;
     }
-    
+
     FormEngine formEngine = Context
       .getProcessEngineConfiguration()
       .getFormEngines()
       .get(formEngineName);
-    
-    if (formEngine==null) {
-      throw new ProcessEngineException("No formEngine '" + formEngineName +"' defined process engine configuration");
-    }
-    
+
+    ensureNotNull("No formEngine '" + formEngineName + "' defined process engine configuration", "formEngine", formEngine);
+
     StartFormData startForm = startFormHandler.createStartFormData(processDefinition);
-    
+
     return formEngine.renderStartForm(startForm);
   }
 }

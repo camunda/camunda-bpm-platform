@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.test.api.repository;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -286,7 +285,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       repositoryService.getCaseDefinition(null);
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("Invalid case definition id: null", e.getMessage());
+      assertTextPresent("Invalid case definition id: caseDefinitionId is null", e.getMessage());
     }
   }
 

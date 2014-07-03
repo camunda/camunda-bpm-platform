@@ -14,13 +14,13 @@ package org.camunda.bpm.engine.impl.cmmn;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.cmd.CreateCaseInstanceCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -38,17 +38,13 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
 
   public CaseInstanceBuilderImpl(CommandExecutor commandExecutor, String caseDefinitionKey, String caseDefinitionId) {
     this(caseDefinitionKey, caseDefinitionId);
-    if(commandExecutor == null) {
-      throw new ProcessEngineException("commandExecutor cannot be null");
-    }
+    ensureNotNull("commandExecutor", commandExecutor);
     this.commandExecutor = commandExecutor;
   }
 
   public CaseInstanceBuilderImpl(CommandContext commandContext, String caseDefinitionKey, String caseDefinitionId) {
     this(caseDefinitionKey, caseDefinitionId);
-    if(commandContext == null) {
-      throw new ProcessEngineException("commandContext cannot be null");
-    }
+    ensureNotNull("commandContext", commandContext);
     this.commandContext = commandContext;
   }
 

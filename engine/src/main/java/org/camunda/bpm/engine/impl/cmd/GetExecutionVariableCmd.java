@@ -13,11 +13,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -37,29 +37,23 @@ public class GetExecutionVariableCmd implements Command<Object>, Serializable {
   }
 
   public Object execute(CommandContext commandContext) {
-    if(executionId == null) {
-      throw new ProcessEngineException("executionId is null");
-    }
-    if(variableName == null) {
-      throw new ProcessEngineException("variableName is null");
-    }
-    
+    ensureNotNull("executionId", executionId);
+    ensureNotNull("variableName", variableName);
+
     ExecutionEntity execution = commandContext
       .getExecutionManager()
       .findExecutionById(executionId);
-    
-    if (execution==null) {
-      throw new ProcessEngineException("execution "+executionId+" doesn't exist");
-    }
-    
+
+    ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
+
     Object value;
-    
+
     if (isLocal) {
       value = execution.getVariableLocal(variableName);
     } else {
       value = execution.getVariable(variableName);
     }
-    
+
     return value;
   }
 }

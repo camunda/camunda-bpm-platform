@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
@@ -23,6 +22,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.query.QueryProperty;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -81,9 +82,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
 
   @SuppressWarnings("unchecked")
   public T direction(Direction direction) {
-    if (orderProperty==null) {
-      throw new ProcessEngineException("You should call any of the orderBy methods first before specifying a direction");
-    }
+    ensureNotNull("You should call any of the orderBy methods first before specifying a direction", "orderProperty", orderProperty);
     addOrder(orderProperty.getName(), direction.getName());
     orderProperty = null;
     return (T) this;
@@ -179,22 +178,4 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     }
   }
 
-  // helper methods /////////////////////////////////////////
-
-  protected void assertParamNotNull(String paramName, Object[] values) {
-    if(values == null) {
-      throw new ProcessEngineException(paramName +" is null");
-    }
-    for (Object value : values) {
-      if(value == null) {
-        throw new ProcessEngineException(paramName +" contains null value");
-      }
-    }
-  }
-
-  protected void assertParamNotNull(String paramName, Object value) {
-    if(value == null) {
-      throw new ProcessEngineException(paramName +" is null");
-    }
-  }
 }

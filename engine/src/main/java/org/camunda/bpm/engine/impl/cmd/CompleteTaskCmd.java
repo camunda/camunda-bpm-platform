@@ -14,11 +14,11 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -37,22 +37,18 @@ public class CompleteTaskCmd implements Command<Void>, Serializable {
   }
   
   public Void execute(CommandContext commandContext) {
-    if(taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
-    
+    ensureNotNull("taskId", taskId);
+
     TaskEntity task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
-    
-    if (task == null) {
-      throw new ProcessEngineException("Cannot find task with id " + taskId);
-    }
-    
-    if (variables!=null) {
+
+    ensureNotNull("Cannot find task with id " + taskId, "task", task);
+
+    if (variables != null) {
       task.setExecutionVariables(variables);
     }
-    
+
     completeTask(task);
 
     return null;

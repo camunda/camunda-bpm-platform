@@ -3,12 +3,12 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 public class FoxDeleteProcessInstanceCmd implements Command<Void>, Serializable {
@@ -23,17 +23,13 @@ public class FoxDeleteProcessInstanceCmd implements Command<Void>, Serializable 
   }
 
   public Void execute(CommandContext commandContext) {
-    if(processInstanceId == null) {
-      throw new ProcessEngineException("processInstanceId is null");
-    }
+    ensureNotNull("processInstanceId", processInstanceId);
 
     ExecutionEntity execution = commandContext
-                                  .getExecutionManager()
-                                  .findExecutionById(processInstanceId);
+      .getExecutionManager()
+      .findExecutionById(processInstanceId);
 
-    if(execution == null) {
-      throw new ProcessEngineException("No process instance found for id '" + processInstanceId + "'");
-    }
+    ensureNotNull("No process instance found for id '" + processInstanceId + "'", "execution", execution);
 
     commandContext
       .getTaskManager()

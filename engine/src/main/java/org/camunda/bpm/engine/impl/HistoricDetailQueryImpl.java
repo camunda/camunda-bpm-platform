@@ -16,13 +16,14 @@ package org.camunda.bpm.engine.impl;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.variable.ByteArrayType;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -57,13 +58,13 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   }
 
   public HistoricDetailQuery detailId(String id) {
-    assertParamNotNull("detailId", id);
+    ensureNotNull("detailId", id);
     this.detailId = id;
     return this;
   }
 
   public HistoricDetailQuery variableInstanceId(String variableInstanceId) {
-    assertParamNotNull("variableInstanceId", variableInstanceId);
+    ensureNotNull("variableInstanceId", variableInstanceId);
     this.variableInstanceId = variableInstanceId;
     return this;
   }

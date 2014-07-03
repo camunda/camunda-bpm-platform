@@ -33,6 +33,8 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * Stub of the common parts of a Job. You will normally work with a subclass of
  * JobEntity, such as {@link TimerEntity} or {@link MessageEntity}.
@@ -89,9 +91,7 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     ExecutionEntity execution = null;
     if (executionId != null) {
       execution = commandContext.getExecutionManager().findExecutionById(executionId);
-      if(execution == null) {
-        throw new ProcessEngineException("Cannot find execution with id '"+executionId+"' referenced from job '"+ this +"'.");
-      }
+      ensureNotNull("Cannot find execution with id '" + executionId + "' referenced from job '" + this + "'", "execution", execution);
     }
 
     Map<String, JobHandler> jobHandlers = Context.getProcessEngineConfiguration().getJobHandlers();

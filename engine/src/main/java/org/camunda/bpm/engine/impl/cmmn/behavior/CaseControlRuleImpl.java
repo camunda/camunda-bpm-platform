@@ -17,6 +17,8 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * @author Roman Smirnov
  *
@@ -35,10 +37,7 @@ public class CaseControlRuleImpl implements CaseControlRule {
     }
 
     Object result = expression.getValue(execution);
-
-    if (result==null) {
-      throw new ProcessEngineException("rule expression returns null");
-    }
+    ensureNotNull("rule expression returns null", "result", result);
 
     if (!(result instanceof Boolean)) {
       throw new ProcessEngineException("rule expression returns non-Boolean: "+result+" ("+result.getClass().getName()+")");

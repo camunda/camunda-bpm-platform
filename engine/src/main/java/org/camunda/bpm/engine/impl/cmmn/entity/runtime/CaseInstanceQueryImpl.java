@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
@@ -21,6 +20,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -48,25 +49,25 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
   }
 
   public CaseInstanceQuery caseInstanceId(String caseInstanceId) {
-    assertParamNotNull("caseInstanceId", caseInstanceId);
+    ensureNotNull("caseInstanceId", caseInstanceId);
     caseExecutionId = caseInstanceId;
     return this;
   }
 
   public CaseInstanceQuery caseInstanceBusinessKey(String caseInstanceBusinessKey) {
-    assertParamNotNull("businessKey", caseInstanceBusinessKey);
+    ensureNotNull("businessKey", caseInstanceBusinessKey);
     this.businessKey = caseInstanceBusinessKey;
     return this;
   }
 
   public CaseInstanceQuery caseDefinitionKey(String caseDefinitionKey) {
-    assertParamNotNull("caseDefinitionKey", caseDefinitionKey);
+    ensureNotNull("caseDefinitionKey", caseDefinitionKey);
     this.caseDefinitionKey = caseDefinitionKey;
     return this;
   }
 
   public CaseInstanceQuery caseDefinitionId(String caseDefinitionId) {
-    assertParamNotNull("caseDefinitionId", caseDefinitionId);
+    ensureNotNull("caseDefinitionId", caseDefinitionId);
     this.caseDefinitionId = caseDefinitionId;
     return this;
   }

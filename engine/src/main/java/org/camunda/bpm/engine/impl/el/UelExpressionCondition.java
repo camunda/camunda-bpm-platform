@@ -13,10 +13,12 @@
 
 package org.camunda.bpm.engine.impl.el;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.Condition;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -35,13 +37,8 @@ public class UelExpressionCondition implements Condition {
 
   public boolean evaluate(DelegateExecution execution) {
     Object result = expression.getValue(execution);
-    
-    if (result==null) {
-      throw new ProcessEngineException("condition expression returns null");
-    }
-    if (! (result instanceof Boolean)) {
-      throw new ProcessEngineException("condition expression returns non-Boolean: "+result+" ("+result.getClass().getName()+")");
-    }
+    ensureNotNull("condition expression returns null", "result", result);
+    ensureInstanceOf("condition expression returns non-Boolean", "result", result, Boolean.class);
     return (Boolean) result;
   }
 

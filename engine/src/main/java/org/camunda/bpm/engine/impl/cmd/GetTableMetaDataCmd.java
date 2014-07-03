@@ -13,11 +13,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.management.TableMetaData;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -33,9 +33,7 @@ public class GetTableMetaDataCmd implements Command<TableMetaData>, Serializable
   }
   
   public TableMetaData execute(CommandContext commandContext) {
-    if(tableName == null) {
-      throw new ProcessEngineException("tableName is null");
-    }
+    ensureNotNull("tableName", tableName);
     return commandContext
       .getTableDataManager()
       .getTableMetaData(tableName);

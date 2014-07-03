@@ -22,6 +22,8 @@ import org.camunda.bpm.connect.ConnectorRequest;
 import org.camunda.bpm.connect.interceptor.RequestInterceptor;
 import org.camunda.bpm.engine.ProcessEngineException;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 
 /**
  * <p>Simple Registry and factory for connectors.</p>
@@ -46,9 +48,7 @@ public class Connectors {
   @SuppressWarnings("unchecked")
   public <T extends Connector<ConnectorRequest<?>>> T crateConnectorInstance(String id) {
     Class<? extends Connector<?>> connector = getConnector(id);
-    if(connector == null) {
-      throw new ProcessEngineException("Cannot create instance of connector with id '" + id+"' : no such connector registered.");
-    }
+    ensureNotNull("Cannot create instance of connector with id '" + id + "' : no such connector registered", "connector", connector);
 
     try {
       T connectorInstance = (T) connector.newInstance();
@@ -58,9 +58,9 @@ public class Connectors {
       return connectorInstance;
 
     } catch (InstantiationException e) {
-      throw new ProcessEngineException("Cound not create instance of connector '" + id+"': "+e.getMessage(), e);
+      throw new ProcessEngineException("Cound not create instance of connector '" + id + "': " + e.getMessage(), e);
     } catch (IllegalAccessException e) {
-      throw new ProcessEngineException("Cound not create instance of connector '" + id+"': "+e.getMessage(), e);
+      throw new ProcessEngineException("Cound not create instance of connector '" + id + "': " + e.getMessage(), e);
     }
   }
 

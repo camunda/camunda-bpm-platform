@@ -14,13 +14,7 @@
 package org.camunda.bpm.engine.impl.variable;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.util.*;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
@@ -31,6 +25,8 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Sebastian Menski
@@ -48,9 +44,7 @@ public abstract class AbstractVariableStore implements Serializable, CoreVariabl
     if (variableInstances==null) {
       variableInstances = new HashMap<String, VariableInstanceEntity>();
       CommandContext commandContext = Context.getCommandContext();
-      if (commandContext == null) {
-        throw new ProcessEngineException("lazy loading outside command context");
-      }
+      ensureNotNull("lazy loading outside command context", "commandContext", commandContext);
       List<VariableInstanceEntity> variableInstancesList = loadVariableInstances();
       for (VariableInstanceEntity variableInstance : variableInstancesList) {
         variableInstances.put(variableInstance.getName(), variableInstance);
