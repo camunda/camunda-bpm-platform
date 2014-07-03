@@ -13,6 +13,7 @@
 package org.camunda.bpm.model.cmmn.instance;
 
 
+
 /**
  * @author Roman Smirnov
  *
@@ -26,5 +27,9 @@ public interface CmmnElement extends CmmnModelElementInstance {
   String getDescription();
 
   void setDescription(String description);
+
+  ExtensionElements getExtensionElements();
+
+  void setExtensionElements(ExtensionElements extensionElements);
 
 }

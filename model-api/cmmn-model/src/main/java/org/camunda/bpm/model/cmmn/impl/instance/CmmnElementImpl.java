@@ -60,6 +60,14 @@ public abstract class CmmnElementImpl extends CmmnModelElementInstanceImpl imple
     descriptionAttribute.setValue(this, description);
   }
 
+  public ExtensionElements getExtensionElements() {
+    return extensionElementsChild.getChild(this);
+  }
+
+  public void setExtensionElements(ExtensionElements extensionElements) {
+    extensionElementsChild.setChild(this, extensionElements);
+  }
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CmmnElement.class, CMMN_ELEMENT)
         .abstractType()
