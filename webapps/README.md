@@ -17,7 +17,7 @@ git clone git@github.com:camunda/camunda-bpm-sdk-js.git
 git clone git@github.com:camunda/camunda-tasklist-ui.git
 git clone git@github.com:camunda/camunda-cockpit-ui.git
 git clone git@github.com:camunda/camunda-commons-ui.git
-git clone git@github.com:camunda/camunda-cockpit-base-plugin.git
+git clone git@github.com:camunda/camunda-cockpit-plugin-base.git
 git clone git@github.com:camunda/camunda-bpm-webapp.git
 ```
 
