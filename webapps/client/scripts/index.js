@@ -2,7 +2,7 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define('camunda-tasklist-ui', [
-           'camunda-tasklist-ui/rjsconf',
+           'camunda-tasklist-ui/require-conf',
            'camunda-tasklist-ui/utils'
 ], function(rjsConf, utils) {
   var tasklistConf = typeof window !== 'undefined' ? (window.tasklistConf || {}) : {};

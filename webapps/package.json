@@ -24,6 +24,13 @@
     "url": "https://github.com/camunda/camunda-tasklist-ui/issues"
   },
   "homepage": "https://github.com/camunda/camunda-tasklist-ui",
+  "gruntConfig": {
+    "connectPort": 7070,
+    "liverreloadPort": 7071,
+    "clientDir": "client",
+    "prodTarget": "dist",
+    "devTarget":  "dist/app/tasklist"
+  },
   "dependencies": {
     "amdefine": "~0.1.0",
     "cheerio": "~0.16.0",
@@ -62,6 +69,7 @@
     "camunda-bpm-sdk-js": "git+ssh://git@github.com:camunda/camunda-bpm-sdk-js"
   },
   "devDependencies": {
+    "camunda-commons-ui": "git+ssh://git@github.com:camunda/camunda-commons-ui",
     "time-grunt": "~0.3.2",
     "load-grunt-tasks": "~0.4.0",
     "grunt-contrib-jshint": "~0.10.0",
