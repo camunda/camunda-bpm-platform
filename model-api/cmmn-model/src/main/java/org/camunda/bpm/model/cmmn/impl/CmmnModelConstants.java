@@ -39,6 +39,11 @@ public class CmmnModelConstants {
   public static final String CMMN_ELEMENT_IMPORT = "import";
   public static final String CMMN_ELEMENT_EXTENSION_ELEMENTS= "extensionElements";
 
+  // relationship
+  public static final String CMMN_ELEMENT_RELATIONSHIP = "relationship";
+  public static final String CMMN_ELEMENT_SOURCE = "source";
+  public static final String CMMN_ELEMENT_TARGET = "target";
+
   // case
   public static final String CMMN_ELEMENT_CASE = "case";
   public static final String CMMN_ELEMENT_CASE_FILE_MODEL = "caseFileModel";
@@ -169,6 +174,7 @@ public class CmmnModelConstants {
   public static final String CMMN_ATTRIBUTE_EXIT_CRITERIA_REFS = "exitCriteriaRefs";
   public static final String CMMN_ATTRIBUTE_APPLICABILITY_RULE_REFS = "applicabilityRuleRefs";
   public static final String CMMN_ATTRIBUTE_AUTHORIZED_ROLE_REFS = "authorizedRoleRefs";
+  public static final String CMMN_ATTRIBUTE_DIRECTION = "direction";
 
   // camunda attribute extensions ////////////////////////////////////////////////////
 

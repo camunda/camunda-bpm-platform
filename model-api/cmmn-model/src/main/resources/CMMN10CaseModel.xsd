@@ -54,6 +54,32 @@
     </xsd:sequence>
   </xsd:complexType>
 
+  <!---
+    Relationships
+  -->
+  <xsd:element name="relationship" type="tRelationship"/>
+  <xsd:complexType name="tRelationship">
+    <xsd:complexContent>
+      <xsd:extension base="tCmmnElement">
+        <xsd:sequence>
+          <xsd:element name="source" type="xsd:QName" minOccurs="1" maxOccurs="unbounded"/>
+          <xsd:element name="target" type="xsd:QName" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="type" type="xsd:string" use="required"/>
+        <xsd:attribute name="direction" type="tRelationshipDirection"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>	
+
+  <xsd:simpleType name="tRelationshipDirection">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="None"/>
+      <xsd:enumeration value="Forward"/>
+      <xsd:enumeration value="Backward"/>
+      <xsd:enumeration value="Both"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
   <!--
     CMMN Case elements
   -->
