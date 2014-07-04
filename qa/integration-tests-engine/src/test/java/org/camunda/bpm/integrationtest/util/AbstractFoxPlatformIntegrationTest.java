@@ -44,7 +44,7 @@ import org.junit.Before;
 
 
 public abstract class AbstractFoxPlatformIntegrationTest {
-  
+
   protected Logger logger = Logger.getLogger(AbstractFoxPlatformIntegrationTest.class.getName());
 
   protected ProcessEngineService processEngineService;
@@ -58,7 +58,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
-  
+
   public static WebArchive initWebArchiveDeployment(String name, String processesXmlPath) {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, name)
               .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
@@ -66,16 +66,16 @@ public abstract class AbstractFoxPlatformIntegrationTest {
               .addAsResource(processesXmlPath, "META-INF/processes.xml")
               .addClass(AbstractFoxPlatformIntegrationTest.class)
               .addClass(TestContainer.class);
-    
+
     TestContainer.addContainerSpecificResources(archive);
-    
+
     return archive;
   }
-  
+
   public static WebArchive initWebArchiveDeployment(String name) {
     return initWebArchiveDeployment(name, "META-INF/processes.xml");
   }
-  
+
   public static WebArchive initWebArchiveDeployment() {
     return initWebArchiveDeployment("test.war");
   }
@@ -96,18 +96,22 @@ public abstract class AbstractFoxPlatformIntegrationTest {
     taskService = processEngine.getTaskService();
   }
 
+  public void waitForJobExecutorToProcessAllJobs() {
+    waitForJobExecutorToProcessAllJobs(12000);
+  }
+
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
-    
+
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     waitForJobExecutorToProcessAllJobs(jobExecutor, maxMillisToWait);
   }
-  
+
   public void waitForJobExecutorToProcessAllJobs(JobExecutor jobExecutor, long maxMillisToWait) {
-    
+
     int checkInterval = 1000;
 
     jobExecutor.start();
-    
+
     try {
       Timer timer = new Timer();
       InteruptTask task = new InteruptTask(Thread.currentThread());

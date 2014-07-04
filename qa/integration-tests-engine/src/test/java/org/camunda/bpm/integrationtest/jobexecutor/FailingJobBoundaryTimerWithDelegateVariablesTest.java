@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
  * Test camunda BPM platform container job exectuor.
  * FAILING ATM!
  * Expected a job with an exception but it isn't left in db with 0 retries, instead it is completely removed from the job table!
- *  
+ *
  * @author christian.lipphardt@camunda.com
  */
 @RunWith(Arquillian.class)
@@ -62,22 +62,22 @@ public class FailingJobBoundaryTimerWithDelegateVariablesTest extends AbstractFo
     List<Job> jobs = managementService.createJobQuery().list();
     assertEquals(1, jobs.size());
     assertEquals(3, jobs.get(0).getRetries());
-    
+
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).activityId("usertask1").count());
     assertEquals(2, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).count());
-    
-    assertEquals(1, managementService.createJobQuery().executable().count()); 
-    
-    waitForJobExecutorToProcessAllJobs(21000);
+
+    assertEquals(1, managementService.createJobQuery().executable().count());
+
+    waitForJobExecutorToProcessAllJobs();
 
     assertEquals(0, managementService.createJobQuery().executable().count()); // should be 0, because it has failed 3 times
     assertEquals(1, managementService.createJobQuery().withException().count()); // should be 1, because job failed!
-    
+
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).activityId("usertask1").count());
     assertEquals(2, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).count());
-    
+
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId()); // complete task with failed job => complete process
-    
+
     assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).count());
     assertEquals(0, managementService.createJobQuery().count()); // should be 0, because process is finished.
   }

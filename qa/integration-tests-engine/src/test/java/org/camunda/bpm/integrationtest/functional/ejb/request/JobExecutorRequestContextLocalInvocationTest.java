@@ -24,33 +24,33 @@ import org.junit.runner.RunWith;
 
 
 /**
- * This test verifies that if a delegate bean invoked from the Job Executor 
+ * This test verifies that if a delegate bean invoked from the Job Executor
  * calls a LOCAL SLSB from a different deployment, the RequestContest is active there as well.
- *  
- * NOTE: 
+ *
+ * NOTE:
  * - does not work on Jboss (Bug in Jboss AS?) SEE HEMERA-2453
- * - not implemented on Glassfish 
- * 
+ * - not implemented on Glassfish
+ *
  * @author Daniel Meyer
  *
  */
 @RunWith(Arquillian.class)
 public class JobExecutorRequestContextLocalInvocationTest extends AbstractFoxPlatformIntegrationTest {
- 
+
   @Deployment(name="pa", order=2)
-  public static WebArchive processArchive() {    
+  public static WebArchive processArchive() {
     return initWebArchiveDeployment()
-      .addClass(RequestScopedDelegateBean.class)            
+      .addClass(RequestScopedDelegateBean.class)
       .addClass(RequestScopedSFSBDelegate.class)
       .addClass(InvocationCounterDelegateBean.class)
       .addClass(InvocationCounterDelegateBeanLocal.class)
-      .addAsResource("org/camunda/bpm/integrationtest/functional/ejb/request/JobExecutorRequestContextLocalInvocationTest.testContextPropagationEjbLocal.bpmn20.xml")      
+      .addAsResource("org/camunda/bpm/integrationtest/functional/ejb/request/JobExecutorRequestContextLocalInvocationTest.testContextPropagationEjbLocal.bpmn20.xml")
       .addAsWebInfResource("org/camunda/bpm/integrationtest/functional/ejb/request/jboss-deployment-structure.xml","jboss-deployment-structure.xml");
   }
-  
+
   @Deployment(order=1)
-  public static WebArchive delegateDeployment() {    
-    
+  public static WebArchive delegateDeployment() {
+
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "service.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .addClass(AbstractFoxPlatformIntegrationTest.class)
@@ -58,40 +58,40 @@ public class JobExecutorRequestContextLocalInvocationTest extends AbstractFoxPla
       .addClass(InvocationCounterService.class) // interface (remote)
       .addClass(InvocationCounterServiceLocal.class) // interface (local)
       .addClass(InvocationCounterServiceBean.class); // @Stateless ejb
-    
+
     TestContainer.addContainerSpecificResourcesForNonPa(webArchive);
-    
+
     return webArchive;
   }
-    
+
   @Test
   @OperateOnDeployment("pa")
   public void testRequestContextPropagationEjbLocal() throws Exception{
-    
+
     // This fails with  WELD-001303 No active contexts for scope type javax.enterprise.context.RequestScoped as well
-    
+
 //    InvocationCounterServiceLocal service = InitialContext.doLookup("java:/" +
 //    "global/" +
 //    "service/" +
 //    "InvocationCounterServiceBean!org.camunda.bpm.integrationtest.functional.cdi.beans.InvocationCounterServiceLocal");
-//    
+//
 //    service.getNumOfInvocations();
-      
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testContextPropagationEjbLocal");    
-    
-    waitForJobExecutorToProcessAllJobs(6000);
-    
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testContextPropagationEjbLocal");
+
+    waitForJobExecutorToProcessAllJobs();
+
     Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // -> the same bean instance was invoked 2 times!
     Assert.assertEquals(2, variable);
-    
+
     Task task = taskService.createTaskQuery()
       .processInstanceId(pi.getProcessInstanceId())
       .singleResult();
     taskService.complete(task.getId());
-    
-    waitForJobExecutorToProcessAllJobs(6000);
-    
+
+    waitForJobExecutorToProcessAllJobs();
+
     variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // now it's '1' again! -> new instance of the bean
     Assert.assertEquals(1, variable);

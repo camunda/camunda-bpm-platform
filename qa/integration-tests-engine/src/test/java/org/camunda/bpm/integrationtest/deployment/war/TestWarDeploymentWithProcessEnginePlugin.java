@@ -73,7 +73,7 @@ public class TestWarDeploymentWithProcessEnginePlugin extends AbstractFoxPlatfor
 
     ProcessInstance pi = groovyEngine.getRuntimeService().startProcessInstanceByKey("groovyAsync");
 
-    waitForJobExecutorToProcessAllJobs(5000);
+    waitForJobExecutorToProcessAllJobs();
 
     HistoricProcessInstance hpi = groovyEngine.getHistoryService()
         .createHistoricProcessInstanceQuery().processDefinitionKey("groovyAsync").finished().singleResult();

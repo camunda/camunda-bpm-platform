@@ -35,10 +35,10 @@ import javax.transaction.UserTransaction;
  */
 @RunWith(Arquillian.class)
 public class JPAIntegrationTest extends AbstractFoxPlatformIntegrationTest {
-    
+
   @Deployment
-  public static WebArchive processArchive() {    
-    return initWebArchiveDeployment()      
+  public static WebArchive processArchive() {
+    return initWebArchiveDeployment()
       .addClass(SomeEntity.class)
       .addClass(PersistenceDelegateBean.class)
       .addClass(AsyncPersistenceDelegateBean.class)
@@ -46,76 +46,76 @@ public class JPAIntegrationTest extends AbstractFoxPlatformIntegrationTest {
       .addAsResource("org/camunda/bpm/integrationtest/functional/jpa/TransactionIntegrationTest.testAsyncDelegateNewTx.bpmn20.xml")
       .addAsWebInfResource("persistence.xml", "classes/META-INF/persistence.xml");
   }
-  
+
   @Inject
   private UserTransaction utx;
-  
+
   @Inject
   private RuntimeService runtimeService;
-  
+
   @PersistenceContext
   private EntityManager entityManager;
-  
-  @Inject  
+
+  @Inject
   private PersistenceDelegateBean persistenceDelegateBean;
-  
+
   @Inject
   private AsyncPersistenceDelegateBean asyncPersistenceDelegateBean;
-   
+
   @Test
   public void testDelegateParticipateInApplicationTx() throws Exception {
-    
-    /* if we start a transaction here, persist an entity and then 
+
+    /* if we start a transaction here, persist an entity and then
      * start a process instance which synchronously invokes a java delegate,
-     * that delegate is invoked in the same transaction and thus has access to 
+     * that delegate is invoked in the same transaction and thus has access to
      * the same entity manager.
      */
-    
+
     try {
       utx.begin();
-      
+
       SomeEntity e = new SomeEntity();
       entityManager.persist(e);
-      
+
       persistenceDelegateBean.setEntity(e);
-            
+
       runtimeService.startProcessInstanceByKey("testDelegateParticipateInApplicationTx");
-      
+
       utx.commit();
     }catch (Exception e) {
       utx.rollback();
       throw e;
     }
   }
-  
+
 
   @Test
   public void testAsyncDelegateNewTx() throws Exception {
-    
-    /* if we start a transaction here, persist an entity and then 
+
+    /* if we start a transaction here, persist an entity and then
      * start a process instance which asynchronously invokes a java delegate,
-     * that delegate is invoked in a new transaction and thus does not have access to 
+     * that delegate is invoked in a new transaction and thus does not have access to
      * the same entity manager.
      */
-    
+
     try {
       utx.begin();
-      
+
       SomeEntity e = new SomeEntity();
       entityManager.persist(e);
-      
+
       asyncPersistenceDelegateBean.setEntity(e);
-            
+
       runtimeService.startProcessInstanceByKey("testAsyncDelegateNewTx");
-      
+
       utx.commit();
-            
+
     }catch (Exception e) {
       utx.rollback();
       throw e;
     }
-    
-    waitForJobExecutorToProcessAllJobs(10000);
-    
+
+    waitForJobExecutorToProcessAllJobs();
+
   }
 }

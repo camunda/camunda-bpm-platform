@@ -32,41 +32,41 @@ import org.junit.runner.RunWith;
 
 /**
  * <p>Deploys an EAR application which contains a WAR process archive, and a client application deployed as a war</p>
- * 
+ *
  * <p>This test ensures that when the process is started from the client,
- * it is able to make the context switch to the process archvie and resolve classes from the 
- * process archive.</p> 
- * 
- * 
+ * it is able to make the context switch to the process archvie and resolve classes from the
+ * process archive.</p>
+ *
+ *
  * @author Daniel Meyer
  */
 @RunWith(Arquillian.class)
 public class JavaDelegateResolution_ClientAsLibInWebModule extends AbstractFoxPlatformIntegrationTest {
-    
+
   @Deployment
-  public static EnterpriseArchive createProcessArchiveDeplyoment() {    
+  public static EnterpriseArchive createProcessArchiveDeplyoment() {
     WebArchive processArchiveWar = initWebArchiveDeployment()
-      .addClass(ExampleDelegate.class)            
+      .addClass(ExampleDelegate.class)
       .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/JavaDelegateResolutionTest.testResolveClass.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/JavaDelegateResolutionTest.testResolveClassFromJobExecutor.bpmn20.xml");
-    
+
     return ShrinkWrap.create(EnterpriseArchive.class, "test-app.ear")
       .addAsModule(processArchiveWar);
   }
-  
+
   @Deployment(name="clientDeployment")
-  public static WebArchive clientDeployment() {    
+  public static WebArchive clientDeployment() {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "client.war")
         .addClass(AbstractFoxPlatformIntegrationTest.class);
 
     TestContainer.addContainerSpecificResources(webArchive);
-    
+
     return webArchive;
   }
-  
+
   @Test
   @OperateOnDeployment("clientDeployment")
-  public void testResolveClass() {   
+  public void testResolveClass() {
     // assert that we cannot load the delegate here:
     try {
       Class.forName("org.camunda.bpm.integrationtest.functional.classloading.ExampleDelegate");
@@ -74,23 +74,23 @@ public class JavaDelegateResolution_ClientAsLibInWebModule extends AbstractFoxPl
     }catch (ClassNotFoundException e) {
       // expected
     }
-    
+
     // but the process can since it performs context switch to the process archive vor execution
-    runtimeService.startProcessInstanceByKey("testResolveClass");    
+    runtimeService.startProcessInstanceByKey("testResolveClass");
   }
-  
+
   @Test
   @OperateOnDeployment("clientDeployment")
   public void testResolveClassFromJobExecutor() throws InterruptedException, SystemException {
-    
-    runtimeService.startProcessInstanceByKey("testResolveClassFromJobExecutor");        
-    
+
+    runtimeService.startProcessInstanceByKey("testResolveClassFromJobExecutor");
+
     Assert.assertEquals(1, runtimeService.createProcessInstanceQuery().count());
-    
-    waitForJobExecutorToProcessAllJobs(16000);
-    
+
+    waitForJobExecutorToProcessAllJobs();
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-    
+
   }
-  
+
 }

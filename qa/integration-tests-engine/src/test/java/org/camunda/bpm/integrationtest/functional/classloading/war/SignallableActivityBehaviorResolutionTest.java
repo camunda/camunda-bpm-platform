@@ -80,7 +80,7 @@ public class SignallableActivityBehaviorResolutionTest extends AbstractFoxPlatfo
 
     Assert.assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
 
-    waitForJobExecutorToProcessAllJobs(16000);
+    waitForJobExecutorToProcessAllJobs();
 
     Assert.assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
 

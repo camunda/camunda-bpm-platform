@@ -30,39 +30,39 @@ import org.junit.runner.RunWith;
 
 /**
  * <p>Deploys two different WAR applications, a process archive and a client application.</p>
- * 
+ *
  * <p>This test ensures that when the process is started from the client,
- * it is able to make the context switch to the process archvie and resolve classes from the 
- * process archive.</p> 
- * 
- * 
+ * it is able to make the context switch to the process archvie and resolve classes from the
+ * process archive.</p>
+ *
+ *
  * @author Daniel Meyer
  */
 @RunWith(Arquillian.class)
 public class JavaDelegateResolutionTest extends AbstractFoxPlatformIntegrationTest {
-    
+
   @Deployment
-  public static WebArchive createProcessArchiveDeplyoment() {    
+  public static WebArchive createProcessArchiveDeplyoment() {
     return initWebArchiveDeployment()
-            .addClass(ExampleDelegate.class)            
+            .addClass(ExampleDelegate.class)
             .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/JavaDelegateResolutionTest.testResolveClass.bpmn20.xml")
             .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/JavaDelegateResolutionTest.testResolveClassFromJobExecutor.bpmn20.xml");
   }
-  
+
   @Deployment(name="clientDeployment")
-  public static WebArchive clientDeployment() {    
+  public static WebArchive clientDeployment() {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "client.war")
             .addClass(AbstractFoxPlatformIntegrationTest.class);
-    
+
     TestContainer.addContainerSpecificResources(webArchive);
-    
+
     return webArchive;
-            
+
   }
-  
+
   @Test
   @OperateOnDeployment("clientDeployment")
-  public void testResolveClass() {   
+  public void testResolveClass() {
     // assert that we cannot load the delegate here:
     try {
       Class.forName("org.camunda.bpm.integrationtest.functional.classloading.ExampleDelegate");
@@ -70,23 +70,23 @@ public class JavaDelegateResolutionTest extends AbstractFoxPlatformIntegrationTe
     }catch (ClassNotFoundException e) {
       // expected
     }
-    
+
     // but the process can since it performs context switch to the process archive for execution
-    runtimeService.startProcessInstanceByKey("testResolveClass");    
+    runtimeService.startProcessInstanceByKey("testResolveClass");
   }
-  
+
   @Test
   @OperateOnDeployment("clientDeployment")
   public void testResolveClassFromJobExecutor() throws InterruptedException {
-    
-    runtimeService.startProcessInstanceByKey("testResolveClassFromJobExecutor");        
-    
+
+    runtimeService.startProcessInstanceByKey("testResolveClassFromJobExecutor");
+
     Assert.assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveClassFromJobExecutor").count());
-    
-    waitForJobExecutorToProcessAllJobs(16000);
-    
+
+    waitForJobExecutorToProcessAllJobs();
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveClassFromJobExecutor").count());
-    
+
   }
-  
+
 }

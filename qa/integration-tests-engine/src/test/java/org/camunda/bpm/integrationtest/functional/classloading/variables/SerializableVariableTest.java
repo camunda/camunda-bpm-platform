@@ -27,32 +27,32 @@ import org.junit.runner.RunWith;
 
 
 /**
- * <p>Ensures that serializable process variables can be used in 
- * combination with the shared process engine</p> 
- * 
+ * <p>Ensures that serializable process variables can be used in
+ * combination with the shared process engine</p>
+ *
  * @author Daniel Meyer
  */
 @RunWith(Arquillian.class)
 public class SerializableVariableTest extends AbstractFoxPlatformIntegrationTest {
-    
+
   @Deployment
-  public static WebArchive createProcessArchiveDeplyoment() {    
+  public static WebArchive createProcessArchiveDeplyoment() {
     return initWebArchiveDeployment()
       .addClass(GetVariableDelegate.class)
       .addClass(SetVariableDelegate.class)
       .addClass(SerializableVariable.class)
       .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/SerializableVariableTest.testResolveVariable.bpmn20.xml");
   }
-    
+
   @Test
-  public void testResolveClass() {  
-        
+  public void testResolveClass() {
+
     String pid = runtimeService.startProcessInstanceByKey("testResolveVariable").getId();
-            
-    waitForJobExecutorToProcessAllJobs(6000);
-    
+
+    waitForJobExecutorToProcessAllJobs();
+
     Assert.assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pid).singleResult());
-    
+
   }
-    
+
 }

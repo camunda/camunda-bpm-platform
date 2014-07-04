@@ -21,83 +21,83 @@ import org.junit.runner.RunWith;
 
 
 /**
- * This test verifies that a CDI Java Bean Delegate is able to inject and invoke the 
+ * This test verifies that a CDI Java Bean Delegate is able to inject and invoke the
  * remote business interface of a SingletonBean from a different application
- * 
+ *
  * Note:
- * - works on Jboss 
+ * - works on Jboss
  * - works on Glassfish
- * 
+ *
  * @author Daniel Meyer
  *
  */
 @RunWith(Arquillian.class)
 public class RemoteSingletonBeanInvocationTest extends AbstractFoxPlatformIntegrationTest {
- 
+
   @Deployment(name="pa", order=2)
-  public static WebArchive processArchive() {    
+  public static WebArchive processArchive() {
     return initWebArchiveDeployment()
-      .addClass(RemoteSingletonBeanClientDelegateBean.class)        
+      .addClass(RemoteSingletonBeanClientDelegateBean.class)
       .addClass(BusinessInterface.class) // the business interface
-      .addAsResource("org/camunda/bpm/integrationtest/functional/ejb/remote/RemoteSingletonBeanInvocationTest.testInvokeBean.bpmn20.xml");      
+      .addAsResource("org/camunda/bpm/integrationtest/functional/ejb/remote/RemoteSingletonBeanInvocationTest.testInvokeBean.bpmn20.xml");
   }
-  
+
   @Deployment(order=1)
-  public static WebArchive delegateDeployment() {    
+  public static WebArchive delegateDeployment() {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "service.war")
       .addAsLibraries(DeploymentHelper.getEjbClient())
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .addClass(AbstractFoxPlatformIntegrationTest.class)
-      .addClass(RemoteSingletonBean.class) // the EJB 
+      .addClass(RemoteSingletonBean.class) // the EJB
       .addClass(BusinessInterface.class); // the business interface
-    
+
     TestContainer.addContainerSpecificResourcesForNonPa(webArchive);
-    
+
     return webArchive;
   }
-    
+
   @Test
   @OperateOnDeployment("pa")
   public void testInvokeBean() throws Exception{
-    
+
     // this testcase first resolves the Bean synchronously and then from the JobExecutor
-    
+
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testInvokeBean");
-    
+
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), "result"));
-    
+
     runtimeService.setVariable(pi.getId(), "result", false);
-    
+
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
-    
-    waitForJobExecutorToProcessAllJobs(6000);
-    
+
+    waitForJobExecutorToProcessAllJobs();
+
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), "result"));
-    
+
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
   }
-  
+
   @Test
   public void testMultipleInvocations() {
-    
+
     // this is greater than any Datasource / EJB / Thread Pool size -> make sure all resources are released properly.
-    int instances = 100;    
+    int instances = 100;
     String[] ids = new String[instances];
-    
-    for(int i=0; i<instances; i++) {    
-      ids[i] = runtimeService.startProcessInstanceByKey("testInvokeBean").getId();    
-      Assert.assertEquals("Incovation=" + i, true, runtimeService.getVariable(ids[i], "result"));      
+
+    for(int i=0; i<instances; i++) {
+      ids[i] = runtimeService.startProcessInstanceByKey("testInvokeBean").getId();
+      Assert.assertEquals("Incovation=" + i, true, runtimeService.getVariable(ids[i], "result"));
       runtimeService.setVariable(ids[i], "result", false);
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
-        
+
     waitForJobExecutorToProcessAllJobs(60*1000);
-    
-    for(int i=0; i<instances; i++) {    
-      Assert.assertEquals("Incovation=" + i, true, runtimeService.getVariable(ids[i], "result"));    
+
+    for(int i=0; i<instances; i++) {
+      Assert.assertEquals("Incovation=" + i, true, runtimeService.getVariable(ids[i], "result"));
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
-    
+
   }
 
 
