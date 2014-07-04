@@ -2,11 +2,23 @@
   "name": "camunda-cockpit-ui",
   "version": "7.2.0-SNAPSHOT",
   "private": true,
+  "scripts": {
+    "test": "./node_modules/grunt-cli/bin/grunt jasmine_node",
+    "dist": "./node_modules/grunt-cli/bin/grunt build:prod"
+  },
+  "gruntConfig": {
+    "connectPort": 9090,
+    "liverreloadPort": 9091,
+    "clientDir": "client",
+    "prodTarget": "dist",
+    "devTarget":  "dist/app/cockpit"
+  },
   "devDependencies": {
     "async": "~0.2.10",
     "bower": "~1.2.8",
     "grunt": "~0.4.0",
     "grunt-cli": "~0.1.0",
+    "grunt-bower-task": "~0.3.4",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-copy": "~0.5.0",
@@ -33,6 +45,7 @@
     "requirejs": "~2.1.0",
     "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define.git",
     "time-grunt": "~0.2.1",
+    "camunda-commons-ui": "git+ssh://git@github.com:camunda/camunda-commons-ui",
     "underscore": "~1.5.2"
   }
 }
