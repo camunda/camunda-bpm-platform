@@ -10,13 +10,6 @@
  */
 
 /**
- * @name Service
- * @memberof angular
- * @description No idea what angular.js Services **really** are?
- * Me neither, update welcome.
- */
-
-/**
  * @namespace cam
  */
 
@@ -79,27 +72,27 @@
    * @type {Object.<string, string>}
    */
   conf.paths = {
-    'ngDefine':              'assets/vendor/requirejs-angular-define/src/ngDefine',
-    'ngParse':               'assets/vendor/requirejs-angular-define/src/ngParse',
-    'domReady':              'assets/vendor/requirejs-domready/index',
-    'jquery-mousewheel':     'assets/vendor/jquery-mousewheel/index',
-    'jquery-overscroll':     'assets/vendor/jquery-overscroll-fixed/index',
+    'ngDefine':              'bower_components/requirejs-angular-define/src/ngDefine',
+    'ngParse':               'bower_components/requirejs-angular-define/src/ngParse',
+    'domReady':              'bower_components/requirejs-domready/index',
+    'jquery-mousewheel':     'bower_components/jquery-mousewheel/index',
+    'jquery-overscroll':     'bower_components/jquery-overscroll-fixed/index',
 
-    'jquery':                'assets/vendor/jquery/dist/jquery',
-    'bootstrap':             'assets/vendor/bootstrap/di../bootstrap',
-    'bootstrap-part':        'assets/vendor/bootstrap/js',
-    'angular':               'assets/vendor/angular/angular',
-    'angular-resource':      'assets/vendor/angular-resource/angular-resource',
-    'angular-route':         'assets/vendor/angular-route/angular-route',
-    'angular-animate':       'assets/vendor/angular-animate/angular-animate',
-    'angular-sanitize':      'assets/vendor/angular-sanitize/angular-sanitize',
-    'angular-ui':            'assets/vendor/angular-ui/build/angular-ui',
-    'angular-bootstrap':     'assets/vendor/angular-bootstrap/ui-bootstrap-tpls',
-    'jquery-ui':             'assets/vendor/jquery.ui',
+    'jquery':                'bower_components/jquery/dist/jquery',
+    'bootstrap':             'bower_components/bootstrap/di../bootstrap',
+    'bootstrap-part':        'bower_components/bootstrap/js',
+    'angular':               'bower_components/angular/angular',
+    'angular-resource':      'bower_components/angular-resource/angular-resource',
+    'angular-route':         'bower_components/angular-route/angular-route',
+    'angular-animate':       'bower_components/angular-animate/angular-animate',
+    'angular-sanitize':      'bower_components/angular-sanitize/angular-sanitize',
+    'angular-ui':            'bower_components/angular-ui/build/angular-ui',
+    'angular-bootstrap':     'bower_components/angular-bootstrap/ui-bootstrap-tpls',
+    'jquery-ui':             'bower_components/jquery.ui',
 
-    'angular-data-depend':   'assets/vendor/angular-data-depend/src/dataDepend',
+    'angular-data-depend':   'bower_components/angular-data-depend/src/dataDepend',
 
-    'camunda-commons-ui':    'assets/vendor/camunda-commons-ui/lib'
+    'camunda-commons-ui':    'bower_components/camunda-commons-ui/lib'
   };
 
   /**
@@ -156,15 +149,15 @@
     },
     {
       name: 'bpmn',
-      location : './assets/vendor/camunda-bpmn.js/src/bpmn'
+      location : './bower_components/camunda-bpmn.js/src/bpmn'
     },
     {
       name: 'dojo',
-      location : './assets/vendor/dojo'
+      location : './vendor/dojo'
     },
     {
       name: 'dojox',
-      location : './assets/vendor/dojox'
+      location : './vendor/dojox'
     }
   ];
 

@@ -31,284 +31,130 @@ function distFileProcessing(content, srcpath) {
 }
 
 module.exports = function(grunt) {
-
-  // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
-
-  // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
-  var packageJSON = grunt.file.readJSON('package.json');
+  var pkg = require('./package.json');
 
-  // Project configuration.
+  var config = pkg.gruntConfig || {};
+
+  config.grunt = grunt;
+  config.pkg = pkg;
+
   grunt.initConfig({
-    pkg: packageJSON,
+    // the default value should be the "dev" destination
+    // this is not exactly the best solution, but otherwise, when tasks are "rerunned"
+    // with the watch tasks, the value get lost...
+    // so, it's fine for the "dist" build mode
+    // who will override the value but only run once
+    buildTarget:      config.devTarget,
 
-    buildTarget: grunt.option('target'),
+    pkg:              pkg,
 
-    app: {
-      port: parseInt(process.env.APP_PORT || 8080, 10),
-      liveReloadPort: parseInt(process.env.LIVERELOAD_PORT || 8081, 10),
-    },
+    bower:            require('camunda-commons-ui/grunt/config/bower')(config),
 
-    clean: {
-      target: [
-        '<%= buildTarget %>/',
-        'doc/'
-      ]
-    },
+    jasmine_node:     require('camunda-commons-ui/grunt/config/jasmine_node')(config),
 
-    mkdir: {
-      target: {
-        options: {
-          create: ['<%= buildTarget %>/']
-        },
-      },
-    },
+    karma:            require('camunda-commons-ui/grunt/config/karma')(config),
 
-    copy: {
-      development: {
-        files: [
-          {
-            expand: true,
-            cwd: 'app/',
-            src: ['**'],
-            dest: '<%= buildTarget %>/',
-          },
-          {
-            expand: true,
-            cwd: 'assets/',
-            src: [
-              'fonts/**/*.{css,eot,svg,ttf,woff}'
-            ],
-            dest: '<%= buildTarget %>/assets'
-          }
-        ],
-        options: {
-          process: function(content, srcpath) {
-            var liveReloadPort = grunt.config('app.liveReloadPort');
+    protractor:       require('camunda-commons-ui/grunt/config/protractor')(config),
 
-            if (requireConfExp.test(srcpath)) {
-              content = content
-                        .replace(/\/\* live-reload/, '/* live-reload */')
-                        .replace(/LIVERELOAD_PORT/g, liveReloadPort);
-            }
+    seleniuminstall:  require('camunda-commons-ui/grunt/config/seleniuminstall')(config),
 
-            content = content
-                      .replace(/\/\* cache-busting/, '/* cache-busting */')
-                      .replace(/CACHE_BUSTER/g, (new Date()).getTime());
+    requirejs:        require('./grunt/config/requirejs')(config),
 
-            return content;
-          }
-        }
-      },
+    less:             require('camunda-commons-ui/grunt/config/less')(config),
 
-      dist: {
+    copy:             require('camunda-commons-ui/grunt/config/copy')(config),
 
-        files: [
-          {
-            expand: true,
-            cwd: 'app/',
-            src: ['**'],
-            dest: '<%= buildTarget %>'
-          },
-        ],
-        options: {
-          process: distFileProcessing
-        }
-      },
+    watch:            require('./grunt/config/watch')(config),
 
-      assets: {
-        files: [
-          {
-            expand: true,
-            cwd: 'bower_components/',
-            src: '**',
-            dest: '<%= buildTarget %>/assets/vendor/'
-          },
-          {
-            expand: true,
-            cwd: 'assets/',
-            src: [ 'img/**' ],
-            dest: '<%= buildTarget %>/assets'
-          }
+    connect:          require('camunda-commons-ui/grunt/config/connect')(config),
 
-        ]
-      }
-    },
+    jsdoc:            require('camunda-commons-ui/grunt/config/jsdoc')(config),
 
-    watch: {
-      options: {
-        livereload: false
-      },
+    jshint:           require('camunda-commons-ui/grunt/config/jshint')(config),
 
-      // watch for source script changes
-      scripts: {
-        files: [
-          'app/**/*.{js,html}'
-        ],
-        tasks: [
-          // 'newer:jshint:scripts',
-          'newer:copy:development'
-        ]
-      },
+    changelog:        require('camunda-commons-ui/grunt/config/changelog')(config),
 
-      styles: {
-        files: [
-          'assets/**/*.less'
-        ],
-        tasks: [
-          'less:development'
-        ]
-      },
-
-      servedAssets: {
-        options: {
-          livereload: '<%= app.liveReloadPort %>'
-        },
-        files: [
-          '<%= buildTarget %>/**/*.{css,js,html,jpg,png}'
-        ],
-        tasks: []
-      }
-    },
-
-    jshint: {
-      options: {
-        browser: true,
-        globals: {
-          angular:  false,
-          jQuery:   false,
-          ngDefine: false
-        }
-      },
-
-      unitTest: {
-        files: {
-          src: [
-            'test/{config,test,unit}/**/*.js'
-          ]
-        }
-      },
-
-      e2eTest: {
-        files: {
-          src: [
-            'test/e2e/**/*.js'
-          ]
-        }
-      },
-
-      scripts: {
-        files: {
-          src: [
-            'Gruntfile.js',
-            'app/**/*.js'
-          ]
-        }
-      }
-    },
-
-    karma: {
-      // to test the testing environment
-      test: {
-        configFile: 'test/config/karma.test.js'
-      },
-
-      unit: {
-        configFile: 'test/config/karma.unit.js'
-      }
-    },
-
-    jsdoc : {
-      dist : {
-        src: [
-          'README.md',
-          'app/',
-          'bower_components/camunda-commons-ui/lib/'
-        ],
-
-        options: {
-          // grunt-jsdoc has a big problem... some kind of double-parsing...
-          // using the `jsdoc -d doc -r -c jsdoc-conf.json` command works fine
-          // configure: './jsdoc-conf.json',
-          destination: 'doc'
-        }
-      }
-    },
-
-    less: {
-      options: {
-        // paths: []
-      },
-
-      dist: {
-        options: {
-          compress: true
-        },
-        files: {
-          '<%= buildTarget %>/assets/css/loader.css': 'assets/styles/loader.less',
-        }
-      },
-
-      development: {
-        files: {
-          '<%= buildTarget %>/assets/css/loader.css': 'assets/styles/loader.less',
-        }
-      }
-    }
-
+    clean:            ['doc', 'dist', '.tmp']
   });
 
 
-  // automatically (re-)build web assets
-  grunt.registerTask('auto-build', 'Continuously (re-)build front-end assets', function (target) {
-    if (target === 'dist') {
-      throw new Error('dist target not yet supported');
-    }
-
-    grunt.task.run([
-      'build:development',
-      'watch'
-    ]);
-  });
-
-  grunt.registerTask('test', 'Run the tests (by default: karma:unit)', function(target, set) {
-    var tasks = [];
-
-    switch (target) {
-      // test the testing environment
-      case 'test':
-        tasks.push('karma:test');
-        break;
-
-      // unit testing by default
-      default:
-        // tasks.push('karma:unit');
-    }
-
-
-    return grunt.task.run(tasks);
-  });
-
-  // Aimed to hold more complex build processes
-  grunt.registerTask('build', 'Build the frontend assets', function(target) {
-    target = target || 'dist';
-
+  grunt.registerTask('custom-copy', function() {
+    var smthRandom = 'ad'+ (new Date()).getTime();
     var tasks = [
-      'clean:target',
-      'mkdir:target',
-      'copy:assets',
-      'copy:dist',
-      'less:'+ target,
-      'newer:copy:assets',
-      'newer:copy:'+ target
+      'copy:'+ smthRandom,
+      '-custom-copy:'+ smthRandom
     ];
 
-    return grunt.task.run(tasks);
+    grunt.config.data.copy[smthRandom] = {
+
+      files: [
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
+          src: [
+            '**/*.*',
+            '*.*'
+          ],
+          dest: '<%= buildTarget %>/',
+        }
+      ]
+    };
+
+    grunt.task.run(tasks);
   });
 
-  // Default task(s).
-  grunt.registerTask('default', ['build:dist']);
+  grunt.registerTask('-custom-copy', function(id) {
+    for (var t in grunt.config.data) {
+      for (var tt in grunt.config.data[t]) {
+        if (tt.slice(0 - id.length) === id) {
+          delete grunt.config.data[t][tt];
+        }
+      }
+    }
+  });
 
+
+
+  grunt.registerTask('build', function(mode) {
+    mode = mode || 'prod';
+
+    grunt.config.data.buildTarget = (mode === 'prod' ? config.prodTarget : config.devTarget);
+    grunt.log.writeln('Will build the project in "'+ mode +'" mode and place it in "'+ grunt.config('buildTarget') +'"');
+
+    var tasks = [
+      'clean',
+      'jshint',
+      'jsdoc',
+      'bower',
+      'copy',
+      'less',
+      // NOTE: the requirejs task is actually
+      // overriden using "grunt.renameTask".
+      // In a world of unicorns and rainbows,
+      // the normal requirejs should of course be used.
+      'requirejs'
+    ];
+
+    grunt.task.run(tasks);
+  });
+
+
+  grunt.renameTask('custom-copy', 'requirejs');
+
+
+  grunt.registerTask('auto-build', [
+    'build:dev',
+    'connect',
+    'watch'
+  ]);
+
+
+  grunt.registerTask('postinstall', ['seleniuminstall']);
+
+  grunt.registerTask('prepublish', ['build', 'changelog']);
+
+  grunt.registerTask('default', ['build']);
 };
