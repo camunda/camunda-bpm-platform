@@ -59,6 +59,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
   }
 
   public CaseInstanceBuilder setVariable(String variableName, Object variableValue) {
+    ensureNotNull("variableName", variableName);
     if (variables == null) {
       variables = new HashMap<String, Object>();
     }
@@ -67,10 +68,12 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
   }
 
   public CaseInstanceBuilder setVariables(Map<String, Object> variables) {
-    if (this.variables == null) {
-      this.variables = new HashMap<String, Object>();
+    if (variables != null) {
+      if (this.variables == null) {
+        this.variables = new HashMap<String, Object>();
+      }
+      this.variables.putAll(variables);
     }
-    this.variables.putAll(variables);
     return this;
   }
 

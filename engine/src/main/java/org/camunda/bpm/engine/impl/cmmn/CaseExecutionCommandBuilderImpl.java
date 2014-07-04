@@ -57,6 +57,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder setVariable(String variableName, Object variableValue) {
+    ensureNotNull("variableName", variableName);
     ensureVariableShouldNotBeRemoved(variableName);
     if (variables == null) {
       variables = new HashMap<String, Object>();
@@ -66,15 +67,18 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder setVariables(Map<String, Object> variables) {
-    ensureVariablesShouldNotBeRemoved(variables.keySet());
-    if (this.variables == null) {
-      this.variables = new HashMap<String, Object>();
+    if (variables != null) {
+      ensureVariablesShouldNotBeRemoved(variables.keySet());
+      if (this.variables == null) {
+        this.variables = new HashMap<String, Object>();
+      }
+      this.variables.putAll(variables);
     }
-    this.variables.putAll(variables);
     return this;
   }
 
   public CaseExecutionCommandBuilder setVariableLocal(String localVariableName, Object localVariableValue) {
+    ensureNotNull("localVariableName", localVariableName);
     ensureVariableShouldNotBeRemoved(localVariableName);
     if (variablesLocal == null) {
       variablesLocal = new HashMap<String, Object>();
@@ -84,11 +88,13 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder setVariablesLocal(Map<String, Object> variablesLocal) {
-    ensureVariablesShouldNotBeRemoved(variablesLocal.keySet());
-    if (this.variablesLocal == null) {
-      this.variablesLocal = new HashMap<String, Object>();
+    if (variablesLocal != null) {
+      ensureVariablesShouldNotBeRemoved(variablesLocal.keySet());
+      if (this.variablesLocal == null) {
+        this.variablesLocal = new HashMap<String, Object>();
+      }
+      this.variablesLocal.putAll(variablesLocal);
     }
-    this.variablesLocal.putAll(variablesLocal);
     return this;
   }
 
@@ -102,11 +108,13 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder removeVariables(Collection<String> variableNames) {
-    ensureVariablesShouldNotBeSet(variableNames);
-    if (variableDeletions == null) {
-      variableDeletions = new ArrayList<String>();
+    if (variableNames != null) {
+      ensureVariablesShouldNotBeSet(variableNames);
+      if (variableDeletions == null) {
+        variableDeletions = new ArrayList<String>();
+      }
+      variableDeletions.addAll(variableNames);
     }
-    variableDeletions.addAll(variableNames);
     return this;
   }
 
@@ -120,11 +128,13 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder removeVariablesLocal(Collection<String> variableNames) {
-    ensureVariablesShouldNotBeSet(variableNames);
-    if (variableLocalDeletions == null) {
-      variableLocalDeletions = new ArrayList<String>();
+    if (variableNames != null) {
+      ensureVariablesShouldNotBeSet(variableNames);
+      if (variableLocalDeletions == null) {
+        variableLocalDeletions = new ArrayList<String>();
+      }
+      variableLocalDeletions.addAll(variableNames);
     }
-    variableLocalDeletions.addAll(variableNames);
     return this;
   }
 

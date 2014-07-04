@@ -568,7 +568,6 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   public void testCorrelationByBusinessKeyAndVariablesUsingFluentCorrelateAll() {
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
     runtimeService.startProcessInstanceByKey("process", "aBusinessKey", variables);
     runtimeService.startProcessInstanceByKey("process", "aBusinessKey", variables);
@@ -681,4 +680,68 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
         .singleResult();
     assertNull(uncorrelatedExecution);
   }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testCorrelationByBusinessKeyAndNullVariableUsingFluentCorrelateAll() {
+    runtimeService.startProcessInstanceByKey("process", "aBusinessKey");
+
+    String messageName = "newInvoiceMessage";
+
+    try {
+      runtimeService.createMessageCorrelation(messageName)
+        .processInstanceBusinessKey("aBusinessKey")
+        .setVariable(null, "aVariableValue")
+        .correlateAll();
+      fail("Variable name is null");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof ProcessEngineException);
+      assertTextPresent("null", e.getMessage());
+    }
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testCorrelationByBusinessKeyAndNullVariableEqualsUsingFluentCorrelateAll() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "bar");
+    runtimeService.startProcessInstanceByKey("process", "aBusinessKey", variables);
+
+    String messageName = "newInvoiceMessage";
+
+    try {
+      runtimeService.createMessageCorrelation(messageName)
+        .processInstanceBusinessKey("aBusinessKey")
+        .processInstanceVariableEquals(null, "bar")
+        .correlateAll();
+      fail("Variable name is null");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof ProcessEngineException);
+      assertTextPresent("null", e.getMessage());
+    }
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testCorrelationByBusinessKeyAndNullVariablesUsingFluentCorrelateAll() {
+    runtimeService.startProcessInstanceByKey("process", "aBusinessKey");
+
+    String messageName = "newInvoiceMessage";
+
+    runtimeService.createMessageCorrelation(messageName)
+      .processInstanceBusinessKey("aBusinessKey")
+      .setVariables(null)
+      .setVariable("foo", "bar")
+      .correlateAll();
+
+    List<Execution> correlatedExecutions = runtimeService
+      .createExecutionQuery()
+      .activityId("task")
+      .processVariableValueEquals("foo", "bar")
+      .list();
+
+    assertFalse(correlatedExecutions.isEmpty());
+  }
+
 }

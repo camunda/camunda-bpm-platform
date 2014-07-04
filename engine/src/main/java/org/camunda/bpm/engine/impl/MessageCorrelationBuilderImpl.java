@@ -59,6 +59,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   public MessageCorrelationBuilder processInstanceVariableEquals(String variableName, Object variableValue) {
+    ensureNotNull("variableName", variableName);
     if(correlationProcessInstanceVariables == null) {
       correlationProcessInstanceVariables = new HashMap<String, Object>();
     }
@@ -72,6 +73,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   public MessageCorrelationBuilder setVariable(String variableName, Object variableValue) {
+    ensureNotNull("variableName", variableName);
     if(payloadProcessInstanceVariables == null) {
       payloadProcessInstanceVariables = new HashMap<String, Object>();
     }
@@ -80,10 +82,12 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   public MessageCorrelationBuilder setVariables(Map<String, Object> variables) {
-    if(payloadProcessInstanceVariables == null) {
-      payloadProcessInstanceVariables = new HashMap<String, Object>();
+    if (variables != null) {
+      if (payloadProcessInstanceVariables == null) {
+        payloadProcessInstanceVariables = new HashMap<String, Object>();
+      }
+      payloadProcessInstanceVariables.putAll(variables);
     }
-    payloadProcessInstanceVariables.putAll(variables);
     return this;
   }
 
