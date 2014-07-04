@@ -4,12 +4,11 @@ module.exports = function(config) {
   var fs = require('fs');
   var path = require('path');
   var grunt = config.grunt;
-  var rjsConfPath = path.resolve('./client/scripts/rjsconf');
+  var rjsConfPath = path.resolve('./client/scripts/require-conf');
   var rjsConf = require(rjsConfPath);
-  var optimization = grunt.option("target") === "dist" ? 'uglify2' : 'none';
 
   var deps = [
-    'camunda-tasklist-ui/rjsconf',
+    'camunda-tasklist-ui/require-conf',
     './../node_modules/requirejs/require',
     'jquery',
     'angular',
@@ -21,18 +20,20 @@ module.exports = function(config) {
   ];
 
   _.extend(rjsConf.paths, {
-    rjsconf: 'scripts/rjsconf'
+    'require-conf': 'scripts/require-conf'
   });
 
   var rConf = {
     options: {
       stubModules: ['text'],
 
-      optimize: optimization,
+      optimize: '<%= (buildTarget === "dist" ? "uglify2" : "none") %>',
       preserveLicenseComments: false,
       generateSourceMaps: true,
 
-      baseUrl: './client',
+      baseUrl: './<%= pkg.gruntConfig.clientDir %>',
+      // baseUrl: config.clientDir,
+
       paths: rjsConf.paths,
       shim: rjsConf.shim,
       packages: rjsConf.packages,
@@ -64,32 +65,23 @@ module.exports = function(config) {
         create: true,
         name: '<%= pkg.name %>-deps',
         out: '<%= buildTarget %>/scripts/deps.js',
-        // include: deps
         include: deps.concat([
-          'camunda-tasklist-ui/rjsconf'
+          'camunda-tasklist-ui/require-conf'
         ])
       }
     },
 
     scripts: {
       options: {
-        // name: 'scripts/index',
         name: 'camunda-tasklist-ui',
         out: '<%= buildTarget %>/scripts/<%= pkg.name %>.js',
-        // exclude: deps,
         exclude: deps.concat([
-          'camunda-tasklist-ui/rjsconf'
+          'camunda-tasklist-ui/require-conf'
         ]),
         include: rjsConf.shim['camunda-tasklist-ui']
       }
     }
   };
-
-  // if (process.env.RJS_OPTIMIZATION || grunt.option('target') !== 'dist') {
-  //   grunt.log.writeln('The compiled modules will NOT be optimized!');
-  //   rConf.options.optimize = 'none';
-  //   // rConf.options.generateSourceMaps = false;
-  // }
 
   return rConf;
 };

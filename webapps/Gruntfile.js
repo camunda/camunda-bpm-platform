@@ -9,61 +9,75 @@ module.exports = function(grunt) {
 
   var config = pkg.gruntConfig || {};
 
-  config.connectPort = parseInt(process.env.CONNECT_PORT || config.connectPort, 10) || 7070;
-  config.livereloadPort = (parseInt(process.env.LIVERELOAD_PORT, 10) || config.connectPort + 1);
-
   config.grunt = grunt;
   config.pkg = pkg;
 
   grunt.initConfig({
-    buildTarget:      grunt.option('target'),
+    // the default value should be the "dev" destination
+    // this is not exactly the best solution, but otherwise, when tasks are "rerunned"
+    // with the watch tasks, the value get lost...
+    // so, it's fine for the "dist" build mode
+    // who will override the value but only run once
+    buildTarget:      config.devTarget,
 
     pkg:              pkg,
 
-    bower:            require('./grunt/config/bower')(config),
+    bower:            require('camunda-commons-ui/grunt/config/bower')(config),
 
-    jasmine_node:     require('./grunt/config/jasmine_node')(config),
+    jasmine_node:     require('camunda-commons-ui/grunt/config/jasmine_node')(config),
 
-    karma:            require('./grunt/config/karma')(config),
+    karma:            require('camunda-commons-ui/grunt/config/karma')(config),
 
-    protractor:       require('./grunt/config/protractor')(config),
+    protractor:       require('camunda-commons-ui/grunt/config/protractor')(config),
 
-    seleniuminstall:  require('./grunt/config/seleniuminstall')(config),
+    seleniuminstall:  require('camunda-commons-ui/grunt/config/seleniuminstall')(config),
 
     requirejs:        require('./grunt/config/requirejs')(config),
 
-    less:             require('./grunt/config/less')(config),
+    less:             require('camunda-commons-ui/grunt/config/less')(config),
 
-    copy:             require('./grunt/config/copy')(config),
+    copy:             require('camunda-commons-ui/grunt/config/copy')(config),
 
     watch:            require('./grunt/config/watch')(config),
 
-    connect:          require('./grunt/config/connect')(config),
+    connect:          require('camunda-commons-ui/grunt/config/connect')(config),
 
-    jsdoc:            require('./grunt/config/jsdoc')(config),
+    jsdoc:            require('camunda-commons-ui/grunt/config/jsdoc')(config),
 
-    jshint:           require('./grunt/config/jshint')(config),
+    jshint:           require('camunda-commons-ui/grunt/config/jshint')(config),
 
-    changelog:        require('./grunt/config/changelog')(config),
+    changelog:        require('camunda-commons-ui/grunt/config/changelog')(config),
 
     clean:            ['doc', 'dist', '.tmp']
   });
 
-  grunt.registerTask('build', [
-    'clean',
-    'jshint',
-    'jsdoc',
-    'bower',
-    'copy',
-    'less',
-    'requirejs'
-  ]);
+
+  grunt.registerTask('build', function(mode) {
+    mode = mode || 'prod';
+
+    grunt.config.data.buildTarget = (mode === 'prod' ? config.prodTarget : config.devTarget);
+    grunt.log.writeln('Will build the project in "'+ mode +'" mode and place it in "'+ grunt.config('buildTarget') +'"');
+
+    var tasks = [
+      'clean',
+      'jshint',
+      'jsdoc',
+      'bower',
+      'copy',
+      'less',
+      'requirejs'
+    ];
+
+    grunt.task.run(tasks);
+  });
+
 
   grunt.registerTask('auto-build', [
-    'build',
+    'build:dev',
     'connect',
     'watch'
   ]);
+
 
   grunt.registerTask('postinstall', ['seleniuminstall']);
 

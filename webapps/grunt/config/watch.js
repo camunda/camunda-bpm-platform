@@ -7,9 +7,9 @@ module.exports = function(config) {
 
     assets: {
       files: [
-        'client/{fonts,images}/**/*',
-        'client/index.html',
-        'client/favicon.ico'
+        config.clientDir +'/{fonts,images}/**/*',
+        config.clientDir +'/index.html',
+        config.clientDir +'/favicon.ico'
       ],
       tasks: [
         'newer:copy:assets'
@@ -18,8 +18,8 @@ module.exports = function(config) {
 
     styles: {
       files: [
-        'client/styles/**/*.{css,less}',
-        'client/scripts/*/*.{css,less}'
+        config.clientDir +'/styles/**/*.{css,less}',
+        config.clientDir +'/scripts/*/*.{css,less}'
       ],
       tasks: [
         'less'
@@ -29,8 +29,7 @@ module.exports = function(config) {
     scripts: {
       files: [
         'grunt/config/requirejs.js',
-        'client/tasklist.html',
-        'client/scripts/**/*.{js,html}'
+        config.clientDir +'/scripts/**/*.{js,html}'
       ],
       tasks: [
         'newer:jshint:scripts',
