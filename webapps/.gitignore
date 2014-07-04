@@ -18,6 +18,7 @@ dependency-reduced-pom.xml
 *.sublime-workspace
 *.h2.db
 *.lock.db
+.bower_packages
 bower_components/
 node_modules/
 dist/
