@@ -583,7 +583,7 @@
         <xsd:sequence>
           <xsd:element ref="parameterMapping" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
-        <xsd:attribute name="processRef" type="xsd:QName">
+        <xsd:attribute name="processRef" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
               processRef refers a "process" element which is re-usable and can
@@ -662,7 +662,7 @@
         <xsd:sequence>
           <xsd:element ref="parameterMapping" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
-        <xsd:attribute name="caseRef" type="xsd:QName">
+        <xsd:attribute name="caseRef" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
               caseRef refers a "case" element which is re-usable and can 
