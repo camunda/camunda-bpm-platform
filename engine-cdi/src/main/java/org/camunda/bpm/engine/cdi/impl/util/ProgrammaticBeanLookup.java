@@ -43,38 +43,26 @@ public class ProgrammaticBeanLookup {
   }
 
   public static Object lookup(String name, BeanManager bm) {
+    return lookup(name, bm, true);
+  }
+
+  public static Object lookup(String name, BeanManager bm, boolean optional) {
     Set<Bean<?>> beans = bm.getBeans(name);
     Object instance = getContextualReference(bm, beans);
-    if (instance == null) {
+    if (!optional && instance == null) {
       throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type '" + name + "'");
     }
 
     return instance;
   }
 
-  private static <T> T getContextualReference(BeanManager bm, Set<Bean<?>> beans) {
-    if (beans == null || beans.size() == 0) {
-      return null;
-    }
-
-    // if we would resolve to multiple beans than BeanManager#resolve would throw an AmbiguousResolutionException
-    Bean<?> bean = bm.resolve(beans);
-    if (bean == null) {
-      return null;
-    }
-    CreationalContext<?> creationalContext = bm.createCreationalContext(bean);
-
-    return (T) bm.getReference(bean, bean.getBeanClass(), creationalContext);
-  }
-
   /**
    * @return a ContextualInstance of the given type
-   * @throws IllegalStateException if there is no bean of the given class
    * @throws javax.enterprise.inject.AmbiguousResolutionException if the given type is satisfied by more than one Bean
    * @see #lookup(Class, boolean)
    */
   public static <T> T lookup(Class<T> clazz) {
-    return lookup(clazz, false);
+    return lookup(clazz, true);
   }
 
   /**
@@ -92,6 +80,22 @@ public class ProgrammaticBeanLookup {
   public static Object lookup(String name) {
     BeanManager bm = BeanManagerLookup.getBeanManager();
     return lookup(name, bm);
+  }
+
+
+  private static <T> T getContextualReference(BeanManager bm, Set<Bean<?>> beans) {
+    if (beans == null || beans.size() == 0) {
+      return null;
+    }
+
+    // if we would resolve to multiple beans than BeanManager#resolve would throw an AmbiguousResolutionException
+    Bean<?> bean = bm.resolve(beans);
+    if (bean == null) {
+      return null;
+    }
+    CreationalContext<?> creationalContext = bm.createCreationalContext(bean);
+
+    return (T) bm.getReference(bean, bean.getBeanClass(), creationalContext);
   }
 
 }
