@@ -29,7 +29,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
 
   protected TaskDecorator taskDecorator;
 
-  public void started(CmmnActivityExecution execution) {
+  protected void performStart(CmmnActivityExecution execution) {
     TaskEntity task = TaskEntity.createAndInsert(execution);
     task.setCaseExecution(execution);
 
@@ -37,6 +37,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
 
     // All properties set, now firing 'create' event
     task.fireEvent(TaskListener.EVENTNAME_CREATE);
+
   }
 
   protected void terminating(CmmnActivityExecution execution) {
@@ -49,14 +50,18 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
     }
   }
 
-  public void completing(CmmnActivityExecution execution) {
+  protected void completing(CmmnActivityExecution execution) {
     TaskEntity task = getTask(execution);
     if (task != null) {
       task.caseExecutionCompleted();
     }
   }
 
-  public void suspending(CmmnActivityExecution execution) {
+  protected void manualCompleting(CmmnActivityExecution execution) {
+    completing(execution);
+  }
+
+  protected void suspending(CmmnActivityExecution execution) {
     String id = execution.getId();
 
     Context
@@ -65,7 +70,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
       .updateTaskSuspensionStateByCaseExecutionId(id, SuspensionState.SUSPENDED);
   }
 
-  public void resuming(CmmnActivityExecution execution) {
+  protected void resuming(CmmnActivityExecution execution) {
     String id = execution.getId();
 
     Context

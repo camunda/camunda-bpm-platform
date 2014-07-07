@@ -63,15 +63,19 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
     // noop
   }
 
-  public void completing(CmmnActivityExecution execution) {
+  protected void completing(CmmnActivityExecution execution) {
     // noop
   }
 
-  public void suspending(CmmnActivityExecution execution) {
+  protected void manualCompleting(CmmnActivityExecution execution) {
     // noop
   }
 
-  public void resuming(CmmnActivityExecution execution) {
+  protected void suspending(CmmnActivityExecution execution) {
+    // noop
+  }
+
+  protected void resuming(CmmnActivityExecution execution) {
     // noop
   }
 

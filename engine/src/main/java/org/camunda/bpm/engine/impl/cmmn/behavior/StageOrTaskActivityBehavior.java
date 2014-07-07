@@ -25,6 +25,11 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.*;
  */
 public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActivityBehavior {
 
+  protected void creating(CmmnActivityExecution execution) {
+    evaluateRequiredRule(execution);
+    evaluateRepetitionRule(execution);
+  }
+
   public void created(CmmnActivityExecution execution) {
     CmmnActivity activity = execution.getActivity();
 
@@ -80,7 +85,7 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
   public void onManualCompletion(CmmnActivityExecution execution) {
     ensureTransitionAllowed(execution, ACTIVE, COMPLETED, "complete");
-    completing(execution);
+    manualCompleting(execution);
   }
 
   public void onTermination(CmmnActivityExecution execution) {
@@ -166,9 +171,17 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
   }
 
-  protected void creating(CmmnActivityExecution execution) {
-    evaluateRequiredRule(execution);
-    evaluateRepetitionRule(execution);
+  public void started(CmmnActivityExecution execution) throws Exception {
+    // only perform start behavior, when this case execution is
+    // still active.
+    // it can happen that a exit sentry will be triggered, so that
+    // the given case execution will be terminated, in that case we
+    // do not need to perform the start behavior
+    if (execution.isActive()) {
+      performStart(execution);
+    }
   }
+
+  protected abstract void performStart(CmmnActivityExecution execution);
 
 }

@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTI
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 
 /**
  * @author Roman Smirnov
@@ -27,8 +28,17 @@ public class TaskActivityBehavior extends StageOrTaskActivityBehavior {
     ensureTransitionAllowed(execution, FAILED, ACTIVE, "re-activate");
   }
 
-  public void started(CmmnActivityExecution execution) throws Exception {
+  protected void performStart(CmmnActivityExecution execution) {
     execution.complete();
+  }
+
+  protected boolean isBlocking(CmmnActivityExecution execution) {
+    CmmnActivity activity = execution.getActivity();
+    Object isBlockingProperty = activity.getProperty("isBlocking");
+    if (isBlockingProperty != null && isBlockingProperty instanceof Boolean) {
+      return (Boolean) isBlockingProperty;
+    }
+    return false;
   }
 
 }

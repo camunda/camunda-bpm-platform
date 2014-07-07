@@ -28,7 +28,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public class StageActivityBehavior extends StageOrTaskActivityBehavior implements CompositeActivityBehavior {
 
-  public void started(CmmnActivityExecution execution) throws Exception {
+  protected void performStart(CmmnActivityExecution execution) {
     CmmnActivity activity = execution.getActivity();
     List<CmmnActivity> childActivities = activity.getActivities();
 
@@ -177,7 +177,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
     }
   }
 
-  public void suspending(CmmnActivityExecution execution) {
+  protected void suspending(CmmnActivityExecution execution) {
     List<? extends CmmnExecution> children = execution.getCaseExecutions();
     if (children != null && !children.isEmpty()) {
 

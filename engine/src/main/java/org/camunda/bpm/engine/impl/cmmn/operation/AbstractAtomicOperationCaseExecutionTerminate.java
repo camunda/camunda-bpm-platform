@@ -33,7 +33,7 @@ public abstract class AbstractAtomicOperationCaseExecutionTerminate extends Abst
 
     } catch (RuntimeException e) {
       String id = execution.getId();
-      throw new PvmException("Cannot "+getEventName()+" case execution '"+id+"'.");
+      throw new PvmException("Cannot "+getEventName()+" case execution '"+id+"'.", e);
     }
 
 

@@ -24,10 +24,8 @@ import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
-import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
-import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.Role;
 
 /**
@@ -37,7 +35,7 @@ import org.camunda.bpm.model.cmmn.instance.Role;
 public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
 
   public CmmnActivity handleElement(PlanItem planItem, CmmnHandlerContext context) {
-    HumanTask definition = (HumanTask) planItem.getDefinition();
+    HumanTask definition = getDefinition(planItem);
 
     if (!definition.isBlocking()) {
       // The CMMN 1.0 specification says:
@@ -48,11 +46,6 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
     }
 
     return super.handleElement(planItem, context);
-  }
-
-
-  protected CmmnActivity createActivity(CmmnElement element, CmmnHandlerContext context) {
-    return super.createActivity(element, context);
   }
 
   @Override
@@ -112,7 +105,7 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
   protected void initializeTaskDefinitionName(PlanItem planItem, TaskDefinition taskDefinition, CmmnHandlerContext context) {
     String name = planItem.getName();
     if (name == null) {
-      PlanItemDefinition definition = planItem.getDefinition();
+      HumanTask definition = getDefinition(planItem);
       name = definition.getName();
     }
 
@@ -125,7 +118,7 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
   }
 
   protected void initializeTaskDefinitionFormKey(PlanItem planItem, TaskDefinition taskDefinition, CmmnHandlerContext context) {
-    HumanTask definition = (HumanTask) planItem.getDefinition();
+    HumanTask definition = getDefinition(planItem);
 
     String formKey = definition.getCamundaFormKey();
     if (formKey != null) {
@@ -136,7 +129,7 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
   }
 
   protected void initializeTaskDefinitionAssignee(PlanItem planItem, TaskDefinition taskDefinition, CmmnHandlerContext context) {
-    HumanTask definition = (HumanTask) planItem.getDefinition();
+    HumanTask definition = getDefinition(planItem);
     Role performer = definition.getPerformer();
 
     String assignee = null;
@@ -154,7 +147,7 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
   }
 
   protected void initializeTaskDefinitionCandidateUsers(PlanItem planItem, TaskDefinition taskDefinition, CmmnHandlerContext context) {
-    HumanTask definition = (HumanTask) planItem.getDefinition();
+    HumanTask definition = getDefinition(planItem);
     ExpressionManager expressionManager = context.getExpressionManager();
 
     List<String> candidateUsers = definition.getCamundaCandidateUsersList();
@@ -165,7 +158,7 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
   }
 
   protected void initializeTaskDefinitionCandidateGroups(PlanItem planItem, TaskDefinition taskDefinition, CmmnHandlerContext context) {
-    HumanTask definition = (HumanTask) planItem.getDefinition();
+    HumanTask definition = getDefinition(planItem);
     ExpressionManager expressionManager = context.getExpressionManager();
 
     List<String> candidateGroups = definition.getCamundaCandidateGroupsList();
@@ -176,7 +169,7 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
   }
 
   protected void initializeTaskDefinitionDueDate(PlanItem planItem, TaskDefinition taskDefinition, CmmnHandlerContext context) {
-    HumanTask definition = (HumanTask) planItem.getDefinition();
+    HumanTask definition = getDefinition(planItem);
 
     String dueDate = definition.getCamundaDueDate();
     if (dueDate != null) {
@@ -187,7 +180,7 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
   }
 
   protected void initializeTaskDefinitionPriority(PlanItem planItem, TaskDefinition taskDefinition, CmmnHandlerContext context) {
-    HumanTask definition = (HumanTask) planItem.getDefinition();
+    HumanTask definition = getDefinition(planItem);
 
     String priority = definition.getCamundaPriority();
     if (priority != null) {
@@ -195,6 +188,10 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
       Expression priorityExpression = expressionManager.createExpression(priority);
       taskDefinition.setPriorityExpression(priorityExpression);
     }
+  }
+
+  protected HumanTask getDefinition(PlanItem planItem) {
+    return (HumanTask) planItem.getDefinition();
   }
 
   @Override

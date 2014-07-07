@@ -134,4 +134,8 @@ public abstract class PlanItemHandler extends CmmnElementHandler<PlanItem> {
 
   }
 
+  protected PlanItemDefinition getDefinition(PlanItem planItem) {
+    return planItem.getDefinition();
+  }
+
 }
