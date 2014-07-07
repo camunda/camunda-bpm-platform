@@ -13,39 +13,6 @@
 
 package org.camunda.bpm.model.bpmn;
 
-import java.util.Collections;
-
-import org.camunda.bpm.model.bpmn.instance.CallActivity;
-import org.camunda.bpm.model.bpmn.instance.EndEvent;
-import org.camunda.bpm.model.bpmn.instance.Expression;
-import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.ParallelGateway;
-import org.camunda.bpm.model.bpmn.instance.Process;
-import org.camunda.bpm.model.bpmn.instance.ScriptTask;
-import org.camunda.bpm.model.bpmn.instance.SendTask;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
-import org.camunda.bpm.model.bpmn.instance.ServiceTask;
-import org.camunda.bpm.model.bpmn.instance.StartEvent;
-import org.camunda.bpm.model.bpmn.instance.UserTask;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaConstraint;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaField;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormProperty;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaPotentialStarter;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaScript;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaValue;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CALL_ACTIVITY_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.END_EVENT_ID;
@@ -83,6 +50,51 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+
+import org.camunda.bpm.model.bpmn.instance.BaseElement;
+import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
+import org.camunda.bpm.model.bpmn.instance.CallActivity;
+import org.camunda.bpm.model.bpmn.instance.EndEvent;
+import org.camunda.bpm.model.bpmn.instance.Expression;
+import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.ParallelGateway;
+import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.bpmn.instance.ScriptTask;
+import org.camunda.bpm.model.bpmn.instance.SendTask;
+import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
+import org.camunda.bpm.model.bpmn.instance.ServiceTask;
+import org.camunda.bpm.model.bpmn.instance.StartEvent;
+import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaConstraint;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaEntry;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaField;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormProperty;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaList;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaMap;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOutputParameter;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaPotentialStarter;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaScript;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaValue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
@@ -599,6 +611,222 @@ public class CamundaExtensionsTest {
     assertThat(scriptTask.getCamundaResource()).isEqualTo("test.groovy");
   }
 
+  @Test
+  public void testCamundaInputOutput() {
+    CamundaInputOutput camundaInputOutput = serviceTask.getExtensionElements().getElementsQuery().filterByType(CamundaInputOutput.class).singleResult();
+    assertThat(camundaInputOutput).isNotNull();
+    assertThat(camundaInputOutput.getCamundaInputParameters()).hasSize(6);
+    assertThat(camundaInputOutput.getCamundaOutputParameters()).hasSize(1);
+  }
+
+  @Test
+  public void testCamundaInputParameter() {
+    // find existing
+    CamundaInputParameter inputParameter = findInputParameterByName(serviceTask, "shouldBeConstant");
+
+    // modify existing
+    inputParameter.setCamundaName("hello");
+    inputParameter.setTextContent("world");
+    inputParameter = findInputParameterByName(serviceTask, "hello");
+    assertThat(inputParameter.getTextContent()).isEqualTo("world");
+
+    // add new one
+    inputParameter = modelInstance.newInstance(CamundaInputParameter.class);
+    inputParameter.setCamundaName("abc");
+    inputParameter.setTextContent("def");
+    serviceTask.getExtensionElements().getElementsQuery().filterByType(CamundaInputOutput.class).singleResult()
+      .addChildElement(inputParameter);
+
+    // search for new one
+    inputParameter = findInputParameterByName(serviceTask, "abc");
+    assertThat(inputParameter.getCamundaName()).isEqualTo("abc");
+    assertThat(inputParameter.getTextContent()).isEqualTo("def");
+  }
+
+  @Test
+  public void testCamundaNullInputParameter() {
+    CamundaInputParameter inputParameter = findInputParameterByName(serviceTask, "shouldBeNull");
+    assertThat(inputParameter.getCamundaName()).isEqualTo("shouldBeNull");
+    assertThat(inputParameter.getTextContent()).isEmpty();
+  }
+
+  @Test
+  public void testCamundaConstantInputParameter() {
+    CamundaInputParameter inputParameter = findInputParameterByName(serviceTask, "shouldBeConstant");
+    assertThat(inputParameter.getCamundaName()).isEqualTo("shouldBeConstant");
+    assertThat(inputParameter.getTextContent()).isEqualTo("foo");
+  }
+
+  @Test
+  public void testCamundaExpressionInputParameter() {
+    CamundaInputParameter inputParameter = findInputParameterByName(serviceTask, "shouldBeExpression");
+    assertThat(inputParameter.getCamundaName()).isEqualTo("shouldBeExpression");
+    assertThat(inputParameter.getTextContent()).isEqualTo("${1 + 1}");
+  }
+
+  @Test
+  public void testCamundaListInputParameter() {
+    CamundaInputParameter inputParameter = findInputParameterByName(serviceTask, "shouldBeList");
+    assertThat(inputParameter.getCamundaName()).isEqualTo("shouldBeList");
+    assertThat(inputParameter.getTextContent()).isNotEmpty();
+    assertThat(inputParameter.getUniqueChildElementByNameNs(CAMUNDA_NS, "list")).isNotNull();
+
+    CamundaList list = inputParameter.getValue();
+    assertThat(list.getValues()).hasSize(3);
+    for (BpmnModelElementInstance values : list.getValues()) {
+      assertThat(values.getTextContent()).isIn("a", "b", "c");
+    }
+
+    list = modelInstance.newInstance(CamundaList.class);
+    for (int i = 0; i < 4; i++) {
+      CamundaValue value = modelInstance.newInstance(CamundaValue.class);
+      value.setTextContent("test");
+      list.getValues().add(value);
+    }
+    Collection<CamundaValue> testValues = Arrays.asList(modelInstance.newInstance(CamundaValue.class), modelInstance.newInstance(CamundaValue.class));
+    list.getValues().addAll(testValues);
+    inputParameter.setValue(list);
+
+    list = inputParameter.getValue();
+    assertThat(list.getValues()).hasSize(6);
+    list.getValues().removeAll(testValues);
+    ArrayList<BpmnModelElementInstance> camundaValues = new ArrayList<BpmnModelElementInstance>(list.getValues());
+    assertThat(camundaValues).hasSize(4);
+    for (BpmnModelElementInstance value : camundaValues) {
+      assertThat(value.getTextContent()).isEqualTo("test");
+    }
+
+    list.getValues().remove(camundaValues.get(1));
+    assertThat(list.getValues()).hasSize(3);
+
+    list.getValues().removeAll(Arrays.asList(camundaValues.get(0), camundaValues.get(3)));
+    assertThat(list.getValues()).hasSize(1);
+
+    list.getValues().clear();
+    assertThat(list.getValues()).isEmpty();
+
+    inputParameter.removeValue();
+    assertThat(inputParameter.getValue()).isNull();
+  }
+
+  @Test
+  public void testCamundaMapInputParameter() {
+    CamundaInputParameter inputParameter = findInputParameterByName(serviceTask, "shouldBeMap");
+    assertThat(inputParameter.getCamundaName()).isEqualTo("shouldBeMap");
+    assertThat(inputParameter.getTextContent()).isNotEmpty();
+    assertThat(inputParameter.getUniqueChildElementByNameNs(CAMUNDA_NS, "map")).isNotNull();
+
+    CamundaMap map = inputParameter.getValue();
+    assertThat(map.getCamundaEntries()).hasSize(2);
+    for (CamundaEntry entry : map.getCamundaEntries()) {
+      if (entry.getCamundaKey().equals("foo")) {
+        assertThat(entry.getTextContent()).isEqualTo("bar");
+      }
+      else {
+        assertThat(entry.getCamundaKey()).isEqualTo("hello");
+        assertThat(entry.getTextContent()).isEqualTo("world");
+      }
+    }
+
+    map = modelInstance.newInstance(CamundaMap.class);
+    CamundaEntry entry = modelInstance.newInstance(CamundaEntry.class);
+    entry.setCamundaKey("test");
+    entry.setTextContent("value");
+    map.getCamundaEntries().add(entry);
+
+    inputParameter.setValue(map);
+    map = inputParameter.getValue();
+    assertThat(map.getCamundaEntries()).hasSize(1);
+    entry = map.getCamundaEntries().iterator().next();
+    assertThat(entry.getCamundaKey()).isEqualTo("test");
+    assertThat(entry.getTextContent()).isEqualTo("value");
+
+    inputParameter.removeValue();
+    assertThat(inputParameter.getValue()).isNull();
+  }
+
+  @Test
+  public void testCamundaScriptInputParameter() {
+    CamundaInputParameter inputParameter = findInputParameterByName(serviceTask, "shouldBeScript");
+    assertThat(inputParameter.getCamundaName()).isEqualTo("shouldBeScript");
+    assertThat(inputParameter.getTextContent()).isNotEmpty();
+    assertThat(inputParameter.getUniqueChildElementByNameNs(CAMUNDA_NS, "script")).isNotNull();
+    assertThat(inputParameter.getUniqueChildElementByType(CamundaScript.class)).isNotNull();
+
+    CamundaScript script = inputParameter.getValue();
+    assertThat(script.getCamundaScriptFormat()).isEqualTo("groovy");
+    assertThat(script.getCamundaResource()).isNull();
+    assertThat(script.getTextContent()).isEqualTo("1 + 1");
+
+    script = modelInstance.newInstance(CamundaScript.class);
+    script.setCamundaScriptFormat("python");
+    script.setCamundaResource("script.py");
+
+    inputParameter.setValue(script);
+
+    script = inputParameter.getValue();
+    assertThat(script.getCamundaScriptFormat()).isEqualTo("python");
+    assertThat(script.getCamundaResource()).isEqualTo("script.py");
+    assertThat(script.getTextContent()).isEmpty();
+
+    inputParameter.removeValue();
+    assertThat(inputParameter.getValue()).isNull();
+  }
+
+  @Test
+  public void testCamundaNestedOutputParameter() {
+    CamundaOutputParameter camundaOutputParameter = serviceTask.getExtensionElements().getElementsQuery().filterByType(CamundaInputOutput.class).singleResult().getCamundaOutputParameters().iterator().next();
+
+    assertThat(camundaOutputParameter).isNotNull();
+    assertThat(camundaOutputParameter.getCamundaName()).isEqualTo("nested");
+    CamundaList list = camundaOutputParameter.getValue();
+    assertThat(list).isNotNull();
+    assertThat(list.getValues()).hasSize(2);
+    Iterator<BpmnModelElementInstance> iterator = list.getValues().iterator();
+
+    // nested list
+    CamundaList nestedList = (CamundaList) iterator.next().getUniqueChildElementByType(CamundaList.class);
+    assertThat(nestedList).isNotNull();
+    assertThat(nestedList.getValues()).hasSize(2);
+    for (BpmnModelElementInstance value : nestedList.getValues()) {
+      assertThat(value.getTextContent()).isEqualTo("list");
+    }
+
+    // nested map
+    CamundaMap nestedMap = (CamundaMap) iterator.next().getUniqueChildElementByType(CamundaMap.class);
+    assertThat(nestedMap).isNotNull();
+    assertThat(nestedMap.getCamundaEntries()).hasSize(2);
+    Iterator<CamundaEntry> mapIterator = nestedMap.getCamundaEntries().iterator();
+
+    // nested list in nested map
+    CamundaEntry nestedListEntry = mapIterator.next();
+    assertThat(nestedListEntry).isNotNull();
+    assertThat(nestedListEntry.getCamundaKey()).isEqualTo("list");
+    CamundaList nestedNestedList = nestedListEntry.getValue();
+    for (BpmnModelElementInstance value : nestedNestedList.getValues()) {
+      assertThat(value.getTextContent()).isEqualTo("map");
+    }
+
+    // nested map in nested map
+    CamundaEntry nestedMapEntry = mapIterator.next();
+    assertThat(nestedMapEntry).isNotNull();
+    assertThat(nestedMapEntry.getCamundaKey()).isEqualTo("map");
+    CamundaMap nestedNestedMap = nestedMapEntry.getValue();
+    CamundaEntry entry = nestedNestedMap.getCamundaEntries().iterator().next();
+    assertThat(entry.getCamundaKey()).isEqualTo("so");
+    assertThat(entry.getTextContent()).isEqualTo("nested");
+  }
+
+  protected CamundaInputParameter findInputParameterByName(BaseElement baseElement, String name) {
+    Collection<CamundaInputParameter> camundaInputParameters = baseElement.getExtensionElements().getElementsQuery()
+      .filterByType(CamundaInputOutput.class).singleResult().getCamundaInputParameters();
+    for (CamundaInputParameter camundaInputParameter : camundaInputParameters) {
+      if (camundaInputParameter.getCamundaName().equals(name)) {
+        return camundaInputParameter;
+      }
+    }
+    throw new BpmnModelException("Unable to find camunda:inputParameter with name '" + name + "' for element with id '" + baseElement.getId() + "'");
+  }
 
   @After
   public void validateModel() {

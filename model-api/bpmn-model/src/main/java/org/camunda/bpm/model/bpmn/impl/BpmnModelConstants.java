@@ -232,6 +232,7 @@ public final class BpmnModelConstants {
   /** camunda extensions */
   
   public static final String CAMUNDA_ELEMENT_CONSTRAINT = "constraint";
+  public static final String CAMUNDA_ELEMENT_ENTRY = "entry";
   public static final String CAMUNDA_ELEMENT_EXECUTION_LISTENER = "executionListener";
   public static final String CAMUNDA_ELEMENT_EXPRESSION = "expression";
   public static final String CAMUNDA_ELEMENT_FAILED_JOB_RETRY_TIME_CYCLE = "failedJobRetryTimeCycle";
@@ -240,6 +241,11 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ELEMENT_FORM_FIELD = "formField";
   public static final String CAMUNDA_ELEMENT_FORM_PROPERTY = "formProperty";
   public static final String CAMUNDA_ELEMENT_IN = "in";
+  public static final String CAMUNDA_ELEMENT_INPUT_OUTPUT = "inputOutput";
+  public static final String CAMUNDA_ELEMENT_INPUT_PARAMETER = "inputParameter";
+  public static final String CAMUNDA_ELEMENT_LIST = "list";
+  public static final String CAMUNDA_ELEMENT_MAP = "map";
+  public static final String CAMUNDA_ELEMENT_OUTPUT_PARAMETER = "outputParameter";
   public static final String CAMUNDA_ELEMENT_OUT = "out";
   public static final String CAMUNDA_ELEMENT_POTENTIAL_STARTER = "potentialStarter";
   public static final String CAMUNDA_ELEMENT_PROPERTIES = "properties";
@@ -390,6 +396,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_FORM_KEY = "formKey";
   public static final String CAMUNDA_ATTRIBUTE_ID = "id";
   public static final String CAMUNDA_ATTRIBUTE_INITIATOR = "initiator";
+  public static final String CAMUNDA_ATTRIBUTE_KEY = "key";
   public static final String CAMUNDA_ATTRIBUTE_LABEL = "label";
   public static final String CAMUNDA_ATTRIBUTE_NAME = "name";
   public static final String CAMUNDA_ATTRIBUTE_PRIORITY = "priority";

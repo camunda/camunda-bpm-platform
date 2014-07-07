@@ -77,6 +77,53 @@
         camunda:type="mail">
       <extensionElements>
         <camunda:executionListener event="start" delegateExpression="${org.camunda.test.Test}"/>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="shouldBeNull"/>
+          <camunda:inputParameter name="shouldBeConstant">foo</camunda:inputParameter>
+          <camunda:inputParameter name="shouldBeExpression">${1 + 1}</camunda:inputParameter>
+          <camunda:inputParameter name="shouldBeList">
+            <camunda:list>
+              <camunda:value>a</camunda:value>
+              <camunda:value>b</camunda:value>
+              <camunda:value>c</camunda:value>
+            </camunda:list>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="shouldBeMap">
+            <camunda:map>
+              <camunda:entry key="foo">bar</camunda:entry>
+              <camunda:entry key="hello">world</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="shouldBeScript">
+            <camunda:script scriptFormat="groovy">1 + 1</camunda:script>
+          </camunda:inputParameter>
+          <camunda:outputParameter name="nested">
+            <camunda:list>
+              <camunda:value>
+                <camunda:list>
+                  <camunda:value>list</camunda:value>
+                  <camunda:value>list</camunda:value>
+                </camunda:list>
+              </camunda:value>
+              <camunda:value>
+                <camunda:map>
+                  <camunda:entry key="list">
+                    <camunda:list>
+                      <camunda:value>map</camunda:value>
+                      <camunda:value>map</camunda:value>
+                      <camunda:value>map</camunda:value>
+                    </camunda:list>
+                  </camunda:entry>
+                  <camunda:entry key="map">
+                    <camunda:map>
+                      <camunda:entry key="so">nested</camunda:entry>
+                    </camunda:map>
+                  </camunda:entry>
+                </camunda:map>
+              </camunda:value>
+            </camunda:list>
+          </camunda:outputParameter>
+        </camunda:inputOutput>
       </extensionElements>
     </serviceTask>
 

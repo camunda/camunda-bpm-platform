@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.model.bpmn;
 
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,6 +33,7 @@ import org.camunda.bpm.model.bpmn.impl.instance.bpmndi.BpmnLabelStyleImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.bpmndi.BpmnPlaneImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.bpmndi.BpmnShapeImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaConstraintImpl;
+import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaEntryImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaExecutionListenerImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaExpressionImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaFailedJobRetryTimeCycleImpl;
@@ -38,7 +42,12 @@ import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaFormDataImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaFormFieldImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaFormPropertyImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaInImpl;
+import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaInputOutputImpl;
+import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaInputParameterImpl;
+import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaListImpl;
+import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaMapImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaOutImpl;
+import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaOutputParameterImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaPotentialStarterImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaPropertiesImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaPropertyImpl;
@@ -71,9 +80,6 @@ import org.camunda.bpm.model.xml.ModelValidationException;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.util.IoUtil;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
-
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 /**
  * <p>Provides access to the camunda BPMN model api.</p>
@@ -444,6 +450,7 @@ public class Bpmn {
 
     /** camunda extensions */
     CamundaConstraintImpl.registerType(bpmnModelBuilder);
+    CamundaEntryImpl.registerType(bpmnModelBuilder);
     CamundaExecutionListenerImpl.registerType(bpmnModelBuilder);
     CamundaExpressionImpl.registerType(bpmnModelBuilder);
     CamundaFailedJobRetryTimeCycleImpl.registerType(bpmnModelBuilder);
@@ -452,6 +459,11 @@ public class Bpmn {
     CamundaFormFieldImpl.registerType(bpmnModelBuilder);
     CamundaFormPropertyImpl.registerType(bpmnModelBuilder);
     CamundaInImpl.registerType(bpmnModelBuilder);
+    CamundaInputOutputImpl.registerType(bpmnModelBuilder);
+    CamundaInputParameterImpl.registerType(bpmnModelBuilder);
+    CamundaListImpl.registerType(bpmnModelBuilder);
+    CamundaMapImpl.registerType(bpmnModelBuilder);
+    CamundaOutputParameterImpl.registerType(bpmnModelBuilder);
     CamundaOutImpl.registerType(bpmnModelBuilder);
     CamundaPotentialStarterImpl.registerType(bpmnModelBuilder);
     CamundaPropertiesImpl.registerType(bpmnModelBuilder);
