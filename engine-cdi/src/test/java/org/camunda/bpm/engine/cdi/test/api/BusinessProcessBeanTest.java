@@ -16,6 +16,9 @@ import static org.junit.Assert.*;
 
 import java.util.Collections;
 
+import javax.enterprise.inject.AmbiguousResolutionException;
+
+import org.junit.Assert;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.ProcessEngineCdiException;
