@@ -15,7 +15,8 @@ package org.camunda.bpm.integrationtest.deployment.cfg;
 
 import java.util.List;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
@@ -57,10 +58,16 @@ public class TestAdditionalResourceSuffixes extends AbstractFoxPlatformIntegrati
     assertNotNull(processEngine);
     RepositoryService repositoryService = processEngine.getRepositoryService();
 
-    DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-    assertEquals(1, deploymentQuery.count());
+    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery()
+      .processDefinitionKey("invoice-it");
 
-    String deploymentId = deploymentQuery.singleResult().getId();
+    assertEquals(1, processDefinitionQuery.count());
+    ProcessDefinition processDefinition = processDefinitionQuery.singleResult();
+
+    String deploymentId = repositoryService.createDeploymentQuery()
+      .deploymentId(processDefinition.getDeploymentId())
+      .singleResult()
+      .getId();
     List<Resource> deploymentResources = repositoryService.getDeploymentResources(deploymentId);
     assertEquals(3, deploymentResources.size());
   }
