@@ -28,20 +28,18 @@ public class IoUtilTest {
     InputStream inputStream = IoUtil.stringAsInputStream(input);
     
     byte[] firstBytes = IoUtil.readFirstBytes(inputStream, INPUT_STREAM_BYTE_LIMIT);
-    assertThat(new String(firstBytes)).isEqualTo(input.substring(0, INPUT_STREAM_BYTE_LIMIT));
+    assertThat(new String(firstBytes, IoUtil.ENCODING_CHARSET)).isEqualTo(input.substring(0, INPUT_STREAM_BYTE_LIMIT));
   }
   
   @Test
   public void testReadFirstBytesUtf8() {
-    IoUtil.ENCODING_CHARSET.encode("ä");
-    
     String input = "ä string with some content";
     InputStream inputStream = IoUtil.stringAsInputStream(input);
     
     byte[] firstBytes = IoUtil.readFirstBytes(inputStream, INPUT_STREAM_BYTE_LIMIT);
     
     // ä is two bytes in utf-8
-    assertThat(new String(firstBytes)).isEqualTo(input.substring(0, INPUT_STREAM_BYTE_LIMIT - 1));
+    assertThat(new String(firstBytes, IoUtil.ENCODING_CHARSET)).isEqualTo(input.substring(0, INPUT_STREAM_BYTE_LIMIT - 1));
   }
   
 }
