@@ -16,10 +16,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.camunda.spin.impl.xml.dom.XmlDomDataFormat;
-import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.impl.xml.dom.XmlDomDataFormatInstance;
 import org.camunda.spin.json.tree.JsonTreeDataFormat;
+import org.camunda.spin.json.tree.JsonTreeDataFormatInstance;
 import org.camunda.spin.spi.DataFormat;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 
 /**
  * Provides access to all builtin data formats.
@@ -33,16 +33,24 @@ public class DataFormats {
   
   static {
     AVAILABLE_FORMATS = new HashSet<DataFormat<? extends Spin<?>>>();
-    AVAILABLE_FORMATS.add(xmlDom());
-    AVAILABLE_FORMATS.add(jsonTree());
+    AVAILABLE_FORMATS.add(xmlDomFormat());
+    AVAILABLE_FORMATS.add(jsonTreeFormat());
   }
 
-  public static DataFormat<SpinXmlTreeElement> xmlDom() {
+  public static XmlDomDataFormat xmlDomFormat() {
     return XmlDomDataFormat.INSTANCE;
   }
   
-  public static DataFormat<SpinJsonNode> jsonTree() {
+  public static XmlDomDataFormatInstance xmlDom() {
+    return XmlDomDataFormat.INSTANCE.newInstance();
+  }
+  
+  public static JsonTreeDataFormat jsonTreeFormat() {
     return JsonTreeDataFormat.INSTANCE;
+  }
+  
+  public static JsonTreeDataFormatInstance jsonTree() {
+    return JsonTreeDataFormat.INSTANCE.newInstance();
   }
 
 }

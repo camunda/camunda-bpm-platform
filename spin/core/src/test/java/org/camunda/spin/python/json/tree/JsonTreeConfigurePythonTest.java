@@ -10,24 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.spi;
+package org.camunda.spin.python.json.tree;
 
-import org.camunda.spin.Spin;
+import org.camunda.spin.json.tree.JsonTreeConfigureScriptTest;
+import org.camunda.spin.test.ScriptEngine;
 
 /**
+ * @author Thorben Lindhauer
  *
- * @author Sebastian Menski
- * @author Daniel Meyer
  */
-public interface DataFormat<T extends Spin<?>> {
+@ScriptEngine("python")
+public class JsonTreeConfigurePythonTest extends JsonTreeConfigureScriptTest {
 
-  Class<? extends T> getWrapperType();
-
-  T createWrapperInstance(Object parameter);
-
-  String getName();
-  
-  DataFormatInstance<T> newInstance();
-  
-  Configurable<?> getConfiguration();
 }

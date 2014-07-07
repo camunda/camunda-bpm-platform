@@ -37,9 +37,8 @@ public class SpinJsonTreeNode extends SpinJsonNode {
     return null;
   }
 
-  public Object unwrap() {
-    // TODO Auto-generated method stub
-    return null;
+  public JsonNode unwrap() {
+    return jsonNode;
   }
 
   public String toString() {

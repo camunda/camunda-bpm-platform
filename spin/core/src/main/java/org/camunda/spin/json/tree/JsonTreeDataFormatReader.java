@@ -19,12 +19,19 @@ import java.nio.charset.Charset;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.DataFormatReader;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonTreeDataFormatReader implements DataFormatReader {
 
-  private static final JsonTreeLogger JSON_LOGGER = SpinLogger.JSON_TREE_LOGGER; 
+  private static final JsonTreeLogger JSON_LOGGER = SpinLogger.JSON_TREE_LOGGER;
+  
+  protected JsonTreeDataFormatInstance format;
+  
+  public JsonTreeDataFormatReader(JsonTreeDataFormatInstance format) {
+    this.format = format;
+  }
   
   public boolean canRead(byte[] firstBytes) {
     String firstCharacters = new String(firstBytes, Charset.forName("UTF-8")).trim();
@@ -34,6 +41,7 @@ public class JsonTreeDataFormatReader implements DataFormatReader {
 
   public Object readInput(InputStream input) {
     ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(Feature.ALLOW_NUMERIC_LEADING_ZEROS, format.allowsNumericLeadingZeros());
     try {
       return mapper.readTree(input);
     } catch (JsonProcessingException e) {

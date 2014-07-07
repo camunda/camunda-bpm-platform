@@ -13,8 +13,8 @@
 package org.camunda.spin.json.tree;
 
 import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.spi.Configurable;
 import org.camunda.spin.spi.DataFormat;
-import org.camunda.spin.spi.DataFormatReader;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -24,7 +24,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class JsonTreeDataFormat implements DataFormat<SpinJsonNode> {
 
   public static final JsonTreeDataFormat INSTANCE = new JsonTreeDataFormat();
-
+  
+  protected JsonTreeConfiguration configuration;
+  
+  public JsonTreeDataFormat() {
+    this.configuration = new JsonTreeConfiguration();
+  }
+  
   public Class<? extends SpinJsonNode> getWrapperType() {
     return SpinJsonTreeNode.class;
   }
@@ -33,12 +39,19 @@ public class JsonTreeDataFormat implements DataFormat<SpinJsonNode> {
     return new SpinJsonTreeNode((JsonNode) parameter);
   }
 
-  public DataFormatReader getReader() {
-    return new JsonTreeDataFormatReader();
-  }
-
   public String getName() {
     return "application/json; implementation=tree";
+  }
+  
+  // configuration
+
+
+  public JsonTreeDataFormatInstance newInstance() {
+    return new JsonTreeDataFormatInstance(configuration.getConfiguration(), this);
+  }
+
+  public Configurable<?> getConfiguration() {
+    return configuration;
   }
 
 }
