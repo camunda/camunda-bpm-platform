@@ -1,0 +1,18 @@
+{
+  "order": "order1",
+  "dueUntil": 20150112,
+  "customers": [
+    {
+      "name": "Kermit",
+      "contractStartDate": 1354539722
+    },
+    {
+      "name": "Waldo",
+      "contractStartDate": 1320325322
+    },
+    {
+      "name": "Johnny",
+      "contractStartDate": 1286110922
+    }
+  ]
+}

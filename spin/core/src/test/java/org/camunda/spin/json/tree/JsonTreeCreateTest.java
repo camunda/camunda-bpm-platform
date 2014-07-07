@@ -10,82 +10,84 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.xml.dom;
+package org.camunda.spin.json.tree;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.spin.DataFormats.jsonTree;
 import static org.camunda.spin.DataFormats.xmlDom;
+import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.Spin.S;
 import static org.camunda.spin.Spin.XML;
 import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
-import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_EMPTY_STRING;
+import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_EMPTY_STRING;
+import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_INVALID_JSON;
+import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_INVALID_XML;
-import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML;
 
 import java.io.InputStream;
 
+import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.SpinDataFormatException;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.junit.Test;
 
 /**
- * @author Daniel Meyer
- *
+ * @author Thorben Lindhauer
  */
-public class XmlDomCreateTest {
+public class JsonTreeCreateTest {
 
   @Test
   public void shouldCreateForString() {
-    SpinXmlTreeElement xml = XML(EXAMPLE_XML);
-    assertThat(xml).isNotNull();
+    SpinJsonNode json = JSON(EXAMPLE_JSON);
+    assertThat(json).isNotNull();
 
-    xml = S(EXAMPLE_XML, xmlDom());
-    assertThat(xml).isNotNull();
+    json = S(EXAMPLE_JSON, jsonTree());
+    assertThat(json).isNotNull();
 
-    xml = S(EXAMPLE_XML);
-    assertThat(xml).isNotNull();
+    json = S(EXAMPLE_JSON);
+    assertThat(json).isNotNull();
   }
-
+  
   @Test
   public void shouldCreateForInputStream() {
-    SpinXmlTreeElement xml = XML(stringAsInputStream(EXAMPLE_XML));
-    assertThat(xml).isNotNull();
+    SpinJsonNode json = JSON(stringAsInputStream(EXAMPLE_JSON));
+    assertThat(json).isNotNull();
 
-    xml = S(stringAsInputStream(EXAMPLE_XML), xmlDom());
-    assertThat(xml).isNotNull();
+    json = S(stringAsInputStream(EXAMPLE_JSON), jsonTree());
+    assertThat(json).isNotNull();
 
-    xml = S(stringAsInputStream(EXAMPLE_XML));
-    assertThat(xml).isNotNull();
+    json = S(stringAsInputStream(EXAMPLE_JSON));
+    assertThat(json).isNotNull();
   }
 
   @Test
   public void shouldBeIdempotent() {
-    SpinXmlTreeElement xml = XML(EXAMPLE_XML);
-    assertThat(xml).isEqualTo(XML(xml));
-    assertThat(xml).isEqualTo(S(xml, xmlDom()));
-    assertThat(xml).isEqualTo(S(xml));
+    SpinJsonNode json = JSON(EXAMPLE_JSON);
+    assertThat(json).isEqualTo(JSON(json));
+    assertThat(json).isEqualTo(S(json, jsonTree()));
+    assertThat(json).isEqualTo(S(json));
   }
-
+  
   @Test
   public void shouldFailForNull() {
-    SpinXmlTreeElement xmlTreeElement = null;
+    SpinJsonNode jsonNode = null;
     
     try {
-      XML(xmlTreeElement);
+      JSON(jsonNode);
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
     }
 
     try {
-      S(xmlTreeElement, xmlDom());
+      S(jsonNode, jsonTree());
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
     }
 
     try {
-      S(xmlTreeElement);
+      S(jsonNode);
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
@@ -94,14 +96,14 @@ public class XmlDomCreateTest {
     InputStream inputStream = null;
     
     try {
-      XML(inputStream);
+      JSON(inputStream);
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
     }
 
     try {
-      S(inputStream, xmlDom());
+      S(inputStream, jsonTree());
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
@@ -117,14 +119,14 @@ public class XmlDomCreateTest {
     String inputString = null;
     
     try {
-      XML(inputString);
+      JSON(inputString);
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
     }
 
     try {
-      S(inputString, xmlDom());
+      S(inputString, jsonTree());
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
@@ -163,16 +165,40 @@ public class XmlDomCreateTest {
   }
 
   @Test
-  public void shouldFailForEmptyString() {
+  public void shouldFailForInvalidJson() {
     try {
-      XML(EXAMPLE_EMPTY_STRING);
+      JSON(EXAMPLE_INVALID_JSON);
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
     }
 
     try {
-      S(EXAMPLE_EMPTY_STRING, xmlDom());
+      S(EXAMPLE_INVALID_JSON, jsonTree());
+      fail("Expected IllegalArgumentException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
+
+    try {
+      S(EXAMPLE_INVALID_JSON);
+      fail("Expected IllegalArgumentException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void shouldFailForEmptyString() {
+    try {
+      JSON(EXAMPLE_EMPTY_STRING);
+      fail("Expected IllegalArgumentException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
+
+    try {
+      S(EXAMPLE_EMPTY_STRING, jsonTree());
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
@@ -189,14 +215,14 @@ public class XmlDomCreateTest {
   @Test
   public void shouldFailForEmptyInputStream() {
     try {
-      XML(stringAsInputStream(EXAMPLE_EMPTY_STRING));
+      JSON(stringAsInputStream(EXAMPLE_EMPTY_STRING));
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
     }
 
     try {
-      S(stringAsInputStream(EXAMPLE_EMPTY_STRING), xmlDom());
+      S(stringAsInputStream(EXAMPLE_EMPTY_STRING), jsonTree());
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected

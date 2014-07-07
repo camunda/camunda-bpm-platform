@@ -10,22 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.camunda.spin.json;
 
-/*
- * This is the default environment for using camunda Spin in Groovy applications.
- */
-
-/*
- * Bind the Spin S(...) function to the variable S.
- */
-S = org.camunda.spin.Spin.&S
+import org.camunda.spin.Spin;
 
 /**
- * Bind the Spin XML(..) function to the variable XML.
+ * A json node.
+ * 
+ * @author Thorben Lindhauer
  */
-XML = org.camunda.spin.Spin.&XML
+public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
 
-/**
- * Bind the Spin JSON(..) function to the variable JSON.
- */
-JSON = org.camunda.spin.Spin.&JSON
+  
+}

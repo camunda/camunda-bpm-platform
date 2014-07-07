@@ -60,9 +60,17 @@ public class SpinCoreLogger extends SpinLogger {
   public SpinDataFormatException wrongDataFormatException(String requestedDataFormat, String givenDataFormat) {
     return new SpinDataFormatException(exceptionMessage("007", "Wrong data format: requested '{}', given '{}'", requestedDataFormat, givenDataFormat));
   }
+  
+  public SpinDataFormatException unknownDataFormatException(String givenDataFormat) {
+    return new SpinDataFormatException(exceptionMessage("008", "Unknown data format: given '{}'", givenDataFormat));
+  }
+  
+  public SpinDataFormatException unrecognizableDataFormatException() {
+    return new SpinDataFormatException(exceptionMessage("009", "No matching data format detected"));
+  }
 
   public SpinXmlTreeElementException elementIsNotChildOfThisElement(SpinXmlTreeElement existingChildElement, SpinXmlTreeElement parentDomElement) {
-    return new SpinXmlTreeElementException(exceptionMessage("008", "The element with namespace '{}' and name '{}' " +
+    return new SpinXmlTreeElementException(exceptionMessage("010", "The element with namespace '{}' and name '{}' " +
         "is not a child element of the element with namespace '{}' and name '{}'",
       existingChildElement.namespace(), existingChildElement.name(),
       parentDomElement.namespace(), parentDomElement.name()
@@ -70,11 +78,11 @@ public class SpinCoreLogger extends SpinLogger {
   }
 
   public IllegalArgumentException unsupportedParameterType(String parameterName, Object param, Class<?> expectedType) {
-    return new IllegalArgumentException(exceptionMessage("009", "Unsupported parameter '{}' of type '{}'. Expected type '{}'.", parameterName, param.getClass(), expectedType.getName()));
+    return new IllegalArgumentException(exceptionMessage("011", "Unsupported parameter '{}' of type '{}'. Expected type '{}'.", parameterName, param.getClass(), expectedType.getName()));
   }
 
   public SpinScriptException noScriptEnvFoundForLanguage(String scriptLanguage, String path) {
-    return new SpinScriptException(exceptionMessage("010", "No script script env found for script language '{}' at path '{}'", scriptLanguage, path));
+    return new SpinScriptException(exceptionMessage("012", "No script script env found for script language '{}' at path '{}'", scriptLanguage, path));
   }
 
 }

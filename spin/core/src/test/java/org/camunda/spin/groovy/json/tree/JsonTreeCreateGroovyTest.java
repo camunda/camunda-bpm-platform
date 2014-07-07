@@ -10,22 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.camunda.spin.groovy.json.tree;
 
-/*
- * This is the default environment for using camunda Spin in Groovy applications.
- */
-
-/*
- * Bind the Spin S(...) function to the variable S.
- */
-S = org.camunda.spin.Spin.&S
+import org.camunda.spin.json.tree.JsonTreeCreateScriptTest;
+import org.camunda.spin.test.ScriptEngine;
 
 /**
- * Bind the Spin XML(..) function to the variable XML.
+ * @author Thorben Lindhauer
+ *
  */
-XML = org.camunda.spin.Spin.&XML
+@ScriptEngine("groovy")
+public class JsonTreeCreateGroovyTest extends JsonTreeCreateScriptTest {
 
-/**
- * Bind the Spin JSON(..) function to the variable JSON.
- */
-JSON = org.camunda.spin.Spin.&JSON
+}

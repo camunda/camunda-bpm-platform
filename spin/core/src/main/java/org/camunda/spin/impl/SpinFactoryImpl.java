@@ -15,12 +15,15 @@ package org.camunda.spin.impl;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
+import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
 import org.camunda.spin.spi.SpinDataFormatException;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 
 import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
 
@@ -32,12 +35,8 @@ import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
 public class SpinFactoryImpl extends SpinFactory {
 
   private final static SpinCoreLogger LOG = SpinCoreLogger.CORE_LOGGER;
-
-  @SuppressWarnings("unchecked")
-  public <T extends Spin<?>> DataFormat<T> detectDataFormat(Object parameter) {
-    // TODO: use parameter content to automatically detect the data format
-    return (DataFormat<T>) DataFormats.xmlDom();
-  }
+  
+  private final static int READ_SIZE = 16;
 
   /**
    *
@@ -45,9 +44,43 @@ public class SpinFactoryImpl extends SpinFactory {
    * @throws IllegalArgumentException in case the parameter is null or dd:
    */
 
-  public <T extends Spin<?>> T createSpin(Object parameter) {
-    DataFormat<T> spinDataFormat = detectDataFormat(parameter);
-    return createSpin(parameter, spinDataFormat);
+  public <T extends Spin<?>> T createSpin(T parameter) {
+    ensureParameterNotNull(parameter);
+    
+    return parameter;
+  }
+  
+  public <T extends Spin<?>> T createSpin(String parameter) {
+    ensureParameterNotNull(parameter);
+    
+    InputStream input = stringAsInputStream(parameter);
+    return createSpin(input);
+  }
+  
+  public <T extends Spin<?>> T createSpin(InputStream parameter) {
+    ensureParameterNotNull(parameter);
+    
+    PushbackInputStream backUpStream = new PushbackInputStream(parameter, READ_SIZE);
+    byte[] firstBytes = IoUtil.readFirstBytes(backUpStream, READ_SIZE);
+    
+    DataFormat<T> matchingDataFormat = null;
+    for (DataFormat<?> format : DataFormats.AVAILABLE_FORMATS) {
+      if (format.getReader().canRead(firstBytes)) {
+        matchingDataFormat = (DataFormat<T>) format;
+      }
+    }
+    
+    if (matchingDataFormat == null) {
+      throw LOG.unrecognizableDataFormatException();
+    }
+    
+    try {
+      backUpStream.unread(firstBytes);
+    } catch (IOException e) {
+      throw LOG.unableToReadInputStream(e);
+    }
+    
+    return createSpin(backUpStream, matchingDataFormat);
   }
 
   /**
@@ -55,35 +88,32 @@ public class SpinFactoryImpl extends SpinFactory {
    * @throws SpinDataFormatException in case the parameter cannot be read using this data format
    * @throws IllegalArgumentException in case the parameter is null or dd:
    */
-  @SuppressWarnings("unchecked")
-  public <T extends Spin<?>> T createSpin(Object parameter, DataFormat<T> format) {
+  public <T extends Spin<?>> T createSpin(T parameter, DataFormat<T> format) {
 
-    InputStream input;
+    ensureParameterNotNull(parameter);
+    
+    return parameter;
+  }
+
+  public <T extends Spin<?>> T createSpin(String parameter, DataFormat<T> format) {
+    ensureParameterNotNull(parameter);
+    
+    InputStream input = stringAsInputStream(parameter);
+    return createSpin(input, format);
+  }
+
+  public <T extends Spin<?>> T createSpin(InputStream parameter, DataFormat<T> format) {
+    ensureParameterNotNull(parameter);
+    
+    DataFormatReader reader = format.getReader();
+    Object dataFormatInput = reader.readInput(parameter);
+    return format.createWrapperInstance(dataFormatInput);
+  }
+  
+  protected void ensureParameterNotNull(Object parameter) {
     if(parameter == null) {
       throw LOG.unsupportedNullInputParameter();
-
-    } else if (format.getWrapperType().isAssignableFrom(parameter.getClass())) {
-      return (T) parameter;
-
-    } else if(parameter instanceof Spin) {
-      Spin<?> spinParameter = (Spin<?>) parameter;
-      throw LOG.wrongDataFormatException(format.getName(), spinParameter.getDataFormatName());
-
-    } else if (parameter instanceof InputStream) {
-      input = (InputStream) parameter;
-
-    } else if (parameter instanceof String) {
-      String stringInput = (String) parameter;
-      input = stringAsInputStream(stringInput);
-
-    } else {
-      throw LOG.unsupportedInputParameter(parameter.getClass());
-
     }
-
-    DataFormatReader reader = format.getReader();
-    Object dataFormatInput = reader.readInput(input);
-    return format.createWrapperInstance(dataFormatInput);
   }
 
 }

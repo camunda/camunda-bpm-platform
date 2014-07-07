@@ -10,22 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.camunda.spin.json;
 
-/*
- * This is the default environment for using camunda Spin in Groovy applications.
- */
+import org.camunda.spin.impl.util.IoUtil;
 
-/*
- * Bind the Spin S(...) function to the variable S.
- */
-S = org.camunda.spin.Spin.&S
+public class JsonTestConstants {
 
-/**
- * Bind the Spin XML(..) function to the variable XML.
- */
-XML = org.camunda.spin.Spin.&XML
-
-/**
- * Bind the Spin JSON(..) function to the variable JSON.
- */
-JSON = org.camunda.spin.Spin.&JSON
+  public final static String EXAMPLE_JSON_FILE_NAME = "org/camunda/spin/json/example.json";
+  
+  public final static String EXAMPLE_JSON = IoUtil.readFileAsString(EXAMPLE_JSON_FILE_NAME);
+  
+  public final static String EXAMPLE_INVALID_JSON = "{\"invalid\":";
+  
+  public final static String EXAMPLE_EMPTY_STRING = "";
+}

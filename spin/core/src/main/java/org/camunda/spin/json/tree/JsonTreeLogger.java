@@ -10,22 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.camunda.spin.json.tree;
 
-/*
- * This is the default environment for using camunda Spin in Groovy applications.
- */
+import org.camunda.spin.logging.SpinLogger;
+import org.camunda.spin.spi.SpinJsonDataFormatException;
 
-/*
- * Bind the Spin S(...) function to the variable S.
- */
-S = org.camunda.spin.Spin.&S
+public class JsonTreeLogger extends SpinLogger {
 
-/**
- * Bind the Spin XML(..) function to the variable XML.
- */
-XML = org.camunda.spin.Spin.&XML
-
-/**
- * Bind the Spin JSON(..) function to the variable JSON.
- */
-JSON = org.camunda.spin.Spin.&JSON
+  public SpinJsonDataFormatException unableToParseInput(Exception e) {
+    return new SpinJsonDataFormatException(exceptionMessage("001", "Unable to parse input into json node"), e);
+  }
+}

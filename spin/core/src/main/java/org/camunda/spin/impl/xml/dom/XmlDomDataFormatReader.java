@@ -12,16 +12,18 @@
  */
 package org.camunda.spin.impl.xml.dom;
 
-import org.camunda.spin.logging.SpinLogger;
-import org.camunda.spin.spi.DataFormatReader;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
+
+import org.camunda.spin.logging.SpinLogger;
+import org.camunda.spin.spi.DataFormatReader;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**
  * @author Daniel Meyer
@@ -31,9 +33,11 @@ public class XmlDomDataFormatReader implements DataFormatReader {
 
   private static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
 
-  public boolean canRead(InputStream input) {
-    // TODO: check whether this reader can actually read the input
-    return true;
+  public boolean canRead(byte[] firstBytes) {
+    
+    String firstCharacters = new String(firstBytes, Charset.forName("UTF-8")).trim();
+    
+    return firstCharacters.startsWith("<");
   }
 
   public Element readInput(InputStream input) {

@@ -12,21 +12,35 @@
  */
 package org.camunda.spin.impl.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+
 import org.camunda.spin.SpinFileNotFoundException;
 import org.camunda.spin.SpinRuntimeException;
 import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.logging.SpinLogger;
-
-import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
 
 /**
  * @author Daniel Meyer
  *
  */
 public class IoUtil {
+  
+  public final static Charset ENCODING_CHARSET = Charset.forName("UTF-8");
 
   private final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
@@ -63,7 +77,7 @@ public class IoUtil {
       while((read = inputStream.read(buffer)) > 0) {
         os.write(buffer, 0, read);
       }
-      return os.toString("utf-8");
+      return os.toString(ENCODING_CHARSET.name());
     } catch (IOException e) {
       throw LOG.unableToReadInputStream(e);
     }
@@ -73,7 +87,7 @@ public class IoUtil {
   }
 
   public static InputStream stringAsInputStream(String string) {
-    return new ByteArrayInputStream(string.getBytes(Charset.forName("UTF-8")));
+    return new ByteArrayInputStream(string.getBytes(ENCODING_CHARSET));
   }
 
 
@@ -178,6 +192,25 @@ public class IoUtil {
     }
 
     return stringBuilder.toString();
+  }
+  
+  public static byte[] readFirstBytes(InputStream stream, int limit) {
+    try {
+      byte[] result = new byte[limit];
+      int bytesRead = stream.read(result);
+      
+      if (bytesRead == -1) {
+        result = new byte[0];
+      } else if (bytesRead < result.length) {
+        result = Arrays.copyOfRange(result, 0, bytesRead);
+      }
+      
+      return result;
+    } catch(IOException e) {
+      throw LOG.unableToReadInputStream(e);
+    }
+    
+    
   }
 
 }

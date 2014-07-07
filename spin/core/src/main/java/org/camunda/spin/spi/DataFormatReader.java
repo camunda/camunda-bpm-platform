@@ -22,12 +22,12 @@ import java.io.InputStream;
 public interface DataFormatReader {
 
   /**
-   * Returns true if this reader is able to consume the input data
+   * Returns true if this reader estimates to be able to consume the input data
    *
-   * @param input input stream providing the input data
+   * @param firstBytes first bytes of an input
    * @return true if this reader is able to consume the input
    */
-  boolean canRead(InputStream input);
+  boolean canRead(byte[] firstBytes);
 
   /**
    * Read (or parse) an input stream into this data-formats input structure. An Xml-Based data format may return an

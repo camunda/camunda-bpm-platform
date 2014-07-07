@@ -13,7 +13,6 @@
 package org.camunda.spin.spi;
 
 import org.camunda.spin.Spin;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 
 /**
  *
@@ -22,7 +21,7 @@ import org.camunda.spin.xml.tree.SpinXmlTreeElement;
  */
 public interface DataFormat<T extends Spin<?>> {
 
-  Class<? extends SpinXmlTreeElement> getWrapperType();
+  Class<? extends T> getWrapperType();
 
   T createWrapperInstance(Object parameter);
 

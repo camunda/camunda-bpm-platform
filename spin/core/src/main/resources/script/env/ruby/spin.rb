@@ -24,3 +24,8 @@ def XML(*args)
   org.camunda.spin.Spin.XML(*args)
 end
 
+# expose Spin's JSON(...) function globally
+def JSON(*args)
+  org.camunda.spin.Spin.JSON(*args)
+end
+

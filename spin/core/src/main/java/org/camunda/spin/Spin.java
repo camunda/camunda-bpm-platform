@@ -12,12 +12,14 @@
  */
 package org.camunda.spin;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
+
+import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.SpinDataFormatException;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
-
-import java.io.OutputStream;
-import java.io.Writer;
 
 /**
  *
@@ -34,25 +36,73 @@ public abstract class Spin<T extends Spin<?>> {
    * @param format
    * @return
    *
-   * @throws SpinDataFormatException in case the input cannot be read using this data format
    * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
    */
-  public static <T extends Spin<?>> T S(Object input, DataFormat<T> format) {
+  public static <T extends Spin<?>> T S(T input, DataFormat<T> format) {
+    return SPIN_FACTORY.createSpin(input, format);
+  }
+  
+  /**
+  *
+  * @param input
+  * @param format
+  * @return
+  *
+  * @throws SpinDataFormatException in case the input cannot be read using this data format
+  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+  */
+  public static <T extends Spin<?>> T S(String input, DataFormat<T> format) {
+    return SPIN_FACTORY.createSpin(input, format);
+  }
+  
+  /**
+  *
+  * @param input
+  * @param format
+  * @return
+  *
+  * @throws SpinDataFormatException in case the input cannot be read using this data format
+  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+  */
+  public static <T extends Spin<?>> T S(InputStream input, DataFormat<T> format) {
     return SPIN_FACTORY.createSpin(input, format);
   }
 
   /**
    *
    * @param input
-   * @param format
    * @return
    *
-   * @throws SpinDataFormatException in case the input cannot be read using the detected data format
    * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
    */
-  @SuppressWarnings("unchecked")
-  public static <T extends Spin<?>> T S(Object parameter) {
-    return (T) SPIN_FACTORY.createSpin(parameter);
+  public static <T extends Spin<?>> T S(T input) {
+    return (T) SPIN_FACTORY.createSpin(input);
+  }
+  
+  /**
+  *
+  * @param input
+  * @return
+  *
+  * @throws SpinDataFormatException in case the data format cannot be detected or the input cannot be read 
+  *   using the detected format
+  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+  */
+  public static <T extends Spin<?>> T S(InputStream input) {
+    return SPIN_FACTORY.<T>createSpin(input);
+  }
+  
+  /**
+  *
+  * @param input
+  * @return
+  *
+  * @throws SpinDataFormatException in case the data format cannot be detected or the input cannot be read 
+  *   using the detected format
+  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+  */
+  public static <T extends Spin<?>> T S(String input) {
+    return SPIN_FACTORY.<T>createSpin(input);
   }
 
   /**
@@ -60,11 +110,69 @@ public abstract class Spin<T extends Spin<?>> {
    * @param input
    * @return
    *
-   * @throws SpinDataFormatException in case the input cannot be read as XML
    * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
    */
-  public static SpinXmlTreeElement XML(Object parameter) {
-    return SPIN_FACTORY.createSpin(parameter, DataFormats.xmlDom());
+  public static SpinXmlTreeElement XML(SpinXmlTreeElement input) {
+    return SPIN_FACTORY.createSpin(input, DataFormats.xmlDom());
+  }
+  
+  /**
+  *
+  * @param input
+  * @return
+  *
+  * @throws SpinDataFormatException in case the input cannot be read as XML
+  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+  */
+  public static SpinXmlTreeElement XML(InputStream input) {
+    return SPIN_FACTORY.createSpin(input, DataFormats.xmlDom());
+  }
+  
+  /**
+  *
+  * @param input
+  * @return
+  *
+  * @throws SpinDataFormatException in case the input cannot be read as XML
+  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+  */
+  public static SpinXmlTreeElement XML(String input) {
+    return SPIN_FACTORY.createSpin(input, DataFormats.xmlDom());
+  }
+  
+  /**
+  *
+  * @param input
+  * @return
+  *
+  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+  */
+  public static SpinJsonNode JSON(SpinJsonNode input) {
+    return SPIN_FACTORY.createSpin(input, DataFormats.jsonTree());
+  }
+  
+  /**
+  *
+  * @param input
+  * @return
+  *
+  * @throws SpinDataFormatException in case the input cannot be read as JSON
+  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+  */
+  public static SpinJsonNode JSON(InputStream input) {
+    return SPIN_FACTORY.createSpin(input, DataFormats.jsonTree());
+  }
+  
+  /**
+  *
+  * @param input
+  * @return
+  *
+  * @throws SpinDataFormatException in case the input cannot be read as JSON
+  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+  */
+  public static SpinJsonNode JSON(String input) {
+    return SPIN_FACTORY.createSpin(input, DataFormats.jsonTree());
   }
 
   /**
