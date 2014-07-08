@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.json.tree;
+package org.camunda.spin.impl.json.tree;
 
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.Configurable;
@@ -21,22 +21,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * @author Thorben Lindhauer
  */
-public class JsonTreeDataFormat implements DataFormat<SpinJsonNode> {
+public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode> {
 
-  public static final JsonTreeDataFormat INSTANCE = new JsonTreeDataFormat();
+  public static final JsonJacksonTreeDataFormat INSTANCE = new JsonJacksonTreeDataFormat();
   
-  protected JsonTreeConfiguration configuration;
+  protected JsonJacksonTreeConfiguration configuration;
   
-  public JsonTreeDataFormat() {
-    this.configuration = new JsonTreeConfiguration();
+  public JsonJacksonTreeDataFormat() {
+    this.configuration = new JsonJacksonTreeConfiguration();
   }
   
   public Class<? extends SpinJsonNode> getWrapperType() {
-    return SpinJsonTreeNode.class;
+    return SpinJsonJacksonTreeNode.class;
   }
 
   public SpinJsonNode createWrapperInstance(Object parameter) {
-    return new SpinJsonTreeNode((JsonNode) parameter);
+    return new SpinJsonJacksonTreeNode((JsonNode) parameter);
   }
 
   public String getName() {
@@ -46,8 +46,8 @@ public class JsonTreeDataFormat implements DataFormat<SpinJsonNode> {
   // configuration
 
 
-  public JsonTreeDataFormatInstance newInstance() {
-    return new JsonTreeDataFormatInstance(configuration.getConfiguration(), this);
+  public JsonJacksonTreeDataFormatInstance newInstance() {
+    return new JsonJacksonTreeDataFormatInstance(configuration.getConfiguration(), this);
   }
 
   public Configurable<?> getConfiguration() {

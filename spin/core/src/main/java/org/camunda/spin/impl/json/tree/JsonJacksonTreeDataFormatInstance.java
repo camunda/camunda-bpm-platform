@@ -1,4 +1,4 @@
-package org.camunda.spin.json.tree;
+package org.camunda.spin.impl.json.tree;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,22 +7,23 @@ import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormatInstance;
 import org.camunda.spin.spi.DataFormatReader;
 
-public class JsonTreeDataFormatInstance implements DataFormatInstance<SpinJsonNode>, JsonTreeConfigurable<JsonTreeDataFormatInstance> {
+public class JsonJacksonTreeDataFormatInstance implements DataFormatInstance<SpinJsonNode>, 
+  JsonJacksonTreeConfigurable<JsonJacksonTreeDataFormatInstance> {
 
-  protected JsonTreeConfiguration configuration;
-  protected JsonTreeDataFormat dataFormat;
+  protected JsonJacksonTreeConfiguration configuration;
+  protected JsonJacksonTreeDataFormat dataFormat;
   
-  public JsonTreeDataFormatInstance(Map<String, Object> configuration, JsonTreeDataFormat format) {
-    this.configuration = new JsonTreeConfiguration(new HashMap<String, Object>(configuration));
+  public JsonJacksonTreeDataFormatInstance(Map<String, Object> configuration, JsonJacksonTreeDataFormat format) {
+    this.configuration = new JsonJacksonTreeConfiguration(new HashMap<String, Object>(configuration));
     this.dataFormat = format;
   }
   
-  public JsonTreeDataFormatInstance config(String key, Object value) {
+  public JsonJacksonTreeDataFormatInstance config(String key, Object value) {
     configuration.config(key, value);
     return this;
   }
   
-  public JsonTreeDataFormatInstance config(Map<String, Object> config) {
+  public JsonJacksonTreeDataFormatInstance config(Map<String, Object> config) {
     configuration.config(config);
     return this;
   }
@@ -41,12 +42,12 @@ public class JsonTreeDataFormatInstance implements DataFormatInstance<SpinJsonNo
     return configuration.allowsNumericLeadingZeros();
   }
 
-  public JsonTreeDataFormatInstance allowNumericLeadingZeros(Boolean value) {
+  public JsonJacksonTreeDataFormatInstance allowNumericLeadingZeros(Boolean value) {
     configuration.allowNumericLeadingZeros(value);
     return this;
   }
 
-  public JsonTreeDataFormat getDataFormat() {
+  public JsonJacksonTreeDataFormat getDataFormat() {
     return dataFormat;
   }
 
@@ -55,7 +56,7 @@ public class JsonTreeDataFormatInstance implements DataFormatInstance<SpinJsonNo
   }
   
   public DataFormatReader getReader() {
-    return new JsonTreeDataFormatReader(this);
+    return new JsonJacksonTreeDataFormatReader(this);
   }
 
 }

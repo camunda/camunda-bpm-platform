@@ -15,6 +15,7 @@ package org.camunda.spin.json.tree;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON_FILE_NAME;
 
+import org.camunda.spin.impl.json.tree.SpinJsonJacksonTreeNode;
 import org.camunda.spin.test.Script;
 import org.camunda.spin.test.ScriptTest;
 import org.camunda.spin.test.ScriptVariable;
@@ -31,13 +32,13 @@ public abstract class JsonTreeCreateScriptTest extends ScriptTest {
   @ScriptVariable(name="input", value = "{\"root\": 1}")
   public void shouldCreateForString() {
 
-    SpinJsonTreeNode json1 = script.getVariable("json1");
+    SpinJsonJacksonTreeNode json1 = script.getVariable("json1");
     assertThat(json1).isNotNull();
 
-    SpinJsonTreeNode json2 = script.getVariable("json2");
+    SpinJsonJacksonTreeNode json2 = script.getVariable("json2");
     assertThat(json2).isNotNull();
 
-    SpinJsonTreeNode json3 = script.getVariable("json3");
+    SpinJsonJacksonTreeNode json3 = script.getVariable("json3");
     assertThat(json3).isNotNull();
 
   }
@@ -52,13 +53,13 @@ public abstract class JsonTreeCreateScriptTest extends ScriptTest {
   )
   public void shouldCreateForInputStream() {
 
-    SpinJsonTreeNode json1 = script.getVariable("json1");
+    SpinJsonJacksonTreeNode json1 = script.getVariable("json1");
     assertThat(json1).isNotNull();
 
-    SpinJsonTreeNode json2 = script.getVariable("json2");
+    SpinJsonJacksonTreeNode json2 = script.getVariable("json2");
     assertThat(json2).isNotNull();
 
-    SpinJsonTreeNode json3 = script.getVariable("json3");
+    SpinJsonJacksonTreeNode json3 = script.getVariable("json3");
     assertThat(json3).isNotNull();
 
   }
@@ -68,7 +69,7 @@ public abstract class JsonTreeCreateScriptTest extends ScriptTest {
   @ScriptVariable(name="input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldBeIdempotent() {
 
-    SpinJsonTreeNode json = script.getVariable("json");
+    SpinJsonJacksonTreeNode json = script.getVariable("json");
     assertThat(json).isNotNull();
 
   }

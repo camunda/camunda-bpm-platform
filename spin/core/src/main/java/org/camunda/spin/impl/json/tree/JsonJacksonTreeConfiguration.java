@@ -1,28 +1,28 @@
-package org.camunda.spin.json.tree;
+package org.camunda.spin.impl.json.tree;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class JsonTreeConfiguration implements JsonTreeConfigurable<JsonTreeConfiguration> {
+public class JsonJacksonTreeConfiguration implements JsonJacksonTreeConfigurable<JsonJacksonTreeConfiguration> {
 
   public static final String ALLOW_NUMERIC_LEADING_ZEROS = "allowNumericLeadingZeros";
   
   protected Map<String, Object> configuration;
 
-  public JsonTreeConfiguration() {
+  public JsonJacksonTreeConfiguration() {
     this.configuration = new HashMap<String, Object>();
   }
   
-  public JsonTreeConfiguration(Map<String, Object> configuration) {
+  public JsonJacksonTreeConfiguration(Map<String, Object> configuration) {
     this.configuration = configuration;
   }
   
-  public JsonTreeConfiguration config(String key, Object value) {
+  public JsonJacksonTreeConfiguration config(String key, Object value) {
     configuration.put(key, value);
     return this;
   }
 
-  public JsonTreeConfiguration config(Map<String, Object> config) {
+  public JsonJacksonTreeConfiguration config(Map<String, Object> config) {
     configuration.putAll(config);
     return this;
   }
@@ -43,7 +43,7 @@ public class JsonTreeConfiguration implements JsonTreeConfigurable<JsonTreeConfi
     return (Boolean) getValue(ALLOW_NUMERIC_LEADING_ZEROS, Boolean.FALSE);
   }
 
-  public JsonTreeConfiguration allowNumericLeadingZeros(Boolean value) {
+  public JsonJacksonTreeConfiguration allowNumericLeadingZeros(Boolean value) {
     configuration.put(ALLOW_NUMERIC_LEADING_ZEROS, value);
     return this;
   }

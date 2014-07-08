@@ -13,8 +13,8 @@
 package org.camunda.spin.logging;
 
 import org.camunda.commons.logging.BaseLogger;
+import org.camunda.spin.impl.json.tree.JsonJacksonTreeLogger;
 import org.camunda.spin.impl.xml.dom.XmlDomLogger;
-import org.camunda.spin.json.tree.JsonTreeLogger;
 import org.camunda.spin.test.SpinTestLogger;
 
 /**
@@ -28,5 +28,5 @@ public abstract class SpinLogger extends BaseLogger {
   public final static SpinCoreLogger CORE_LOGGER = BaseLogger.createLogger(SpinCoreLogger.class, PROJECT_CODE, "org.camunda.spin", "01");
   public final static SpinTestLogger TEST_LOGGER = BaseLogger.createLogger(SpinTestLogger.class, PROJECT_CODE, "org.camunda.spin.test", "02");
   public final static XmlDomLogger XML_DOM_LOGGER = BaseLogger.createLogger(XmlDomLogger.class, PROJECT_CODE, "org.camunda.spin.xml", "03");
-  public final static JsonTreeLogger JSON_TREE_LOGGER = BaseLogger.createLogger(JsonTreeLogger.class, PROJECT_CODE, "org.camunda.spin.json", "04");
+  public final static JsonJacksonTreeLogger JSON_TREE_LOGGER = BaseLogger.createLogger(JsonJacksonTreeLogger.class, PROJECT_CODE, "org.camunda.spin.json", "04");
 }

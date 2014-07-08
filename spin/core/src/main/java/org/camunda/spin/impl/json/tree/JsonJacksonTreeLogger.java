@@ -10,12 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.json.tree;
+package org.camunda.spin.impl.json.tree;
 
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 
-public class JsonTreeLogger extends SpinLogger {
+public class JsonJacksonTreeLogger extends SpinLogger {
 
   public SpinJsonDataFormatException unableToParseInput(Exception e) {
     return new SpinJsonDataFormatException(exceptionMessage("001", "Unable to parse input into json node"), e);

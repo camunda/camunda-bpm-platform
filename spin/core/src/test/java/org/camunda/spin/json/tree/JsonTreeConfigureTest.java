@@ -10,6 +10,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.spin.impl.json.tree.JsonJacksonTreeConfiguration;
+import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
+import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormatInstance;
 import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
@@ -35,7 +38,7 @@ public class JsonTreeConfigureTest {
     assertThat(json).isNotNull();
     
     Map<String, Object> config = new HashMap<String, Object>();
-    config.put(JsonTreeConfiguration.ALLOW_NUMERIC_LEADING_ZEROS, Boolean.TRUE);
+    config.put(JsonJacksonTreeConfiguration.ALLOW_NUMERIC_LEADING_ZEROS, Boolean.TRUE);
     json = JSON(EXAMPLE_JSON, config);
     assertThat(json).isNotNull();
   }
@@ -61,20 +64,20 @@ public class JsonTreeConfigureTest {
     
     input = IoUtil.stringAsInputStream(EXAMPLE_JSON);
     Map<String, Object> config = new HashMap<String, Object>();
-    config.put(JsonTreeConfiguration.ALLOW_NUMERIC_LEADING_ZEROS, Boolean.TRUE);
+    config.put(JsonJacksonTreeConfiguration.ALLOW_NUMERIC_LEADING_ZEROS, Boolean.TRUE);
     json = JSON(input, config);
     assertThat(json).isNotNull();
   }
   
   @Test
   public void shouldCreateNewInstanceOnConfiguration() {
-    JsonTreeDataFormat jsonDataFormat = new JsonTreeDataFormat();
-    JsonTreeDataFormatInstance jsonDataFormatInstance = jsonDataFormat.newInstance().config("aKey", "aValue");
+    JsonJacksonTreeDataFormat jsonDataFormat = new JsonJacksonTreeDataFormat();
+    JsonJacksonTreeDataFormatInstance jsonDataFormatInstance = jsonDataFormat.newInstance().config("aKey", "aValue");
     
     assertThat(jsonDataFormat.getConfiguration().getValue("aKey")).isNull();
     assertThat(jsonDataFormatInstance.getValue("aKey").equals("aValue"));
     
-    JsonTreeDataFormatInstance nextReturnedDataFormatInstance = jsonDataFormatInstance.config("anotherKey", "anotherValue");
+    JsonJacksonTreeDataFormatInstance nextReturnedDataFormatInstance = jsonDataFormatInstance.config("anotherKey", "anotherValue");
     assertThat(nextReturnedDataFormatInstance).isSameAs(jsonDataFormatInstance);
     assertThat(jsonDataFormatInstance.getValue("aKey").equals("aValue"));
     assertThat(jsonDataFormatInstance.getValue("anotherKey").equals("anotherValue"));

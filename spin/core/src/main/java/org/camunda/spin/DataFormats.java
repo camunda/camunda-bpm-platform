@@ -15,10 +15,10 @@ package org.camunda.spin;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
+import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormatInstance;
 import org.camunda.spin.impl.xml.dom.XmlDomDataFormat;
 import org.camunda.spin.impl.xml.dom.XmlDomDataFormatInstance;
-import org.camunda.spin.json.tree.JsonTreeDataFormat;
-import org.camunda.spin.json.tree.JsonTreeDataFormatInstance;
 import org.camunda.spin.spi.DataFormat;
 
 /**
@@ -45,12 +45,12 @@ public class DataFormats {
     return XmlDomDataFormat.INSTANCE.newInstance();
   }
   
-  public static JsonTreeDataFormat jsonTreeFormat() {
-    return JsonTreeDataFormat.INSTANCE;
+  public static JsonJacksonTreeDataFormat jsonTreeFormat() {
+    return JsonJacksonTreeDataFormat.INSTANCE;
   }
   
-  public static JsonTreeDataFormatInstance jsonTree() {
-    return JsonTreeDataFormat.INSTANCE.newInstance();
+  public static JsonJacksonTreeDataFormatInstance jsonTree() {
+    return JsonJacksonTreeDataFormat.INSTANCE.newInstance();
   }
 
 }

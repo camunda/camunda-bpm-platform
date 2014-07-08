@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.json.tree;
+package org.camunda.spin.impl.json.tree;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,13 +23,13 @@ import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class JsonTreeDataFormatReader implements DataFormatReader {
+public class JsonJacksonTreeDataFormatReader implements DataFormatReader {
 
-  private static final JsonTreeLogger JSON_LOGGER = SpinLogger.JSON_TREE_LOGGER;
+  private static final JsonJacksonTreeLogger JSON_LOGGER = SpinLogger.JSON_TREE_LOGGER;
   
-  protected JsonTreeDataFormatInstance format;
+  protected JsonJacksonTreeDataFormatInstance format;
   
-  public JsonTreeDataFormatReader(JsonTreeDataFormatInstance format) {
+  public JsonJacksonTreeDataFormatReader(JsonJacksonTreeDataFormatInstance format) {
     this.format = format;
   }
   

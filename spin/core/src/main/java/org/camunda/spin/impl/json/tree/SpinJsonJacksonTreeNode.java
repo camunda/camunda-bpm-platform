@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.json.tree;
+package org.camunda.spin.impl.json.tree;
 
 import java.io.OutputStream;
 import java.io.Writer;
@@ -24,11 +24,11 @@ import com.fasterxml.jackson.databind.JsonNode;
  * 
  * @author Thorben Lindhauer
  */
-public class SpinJsonTreeNode extends SpinJsonNode {
+public class SpinJsonJacksonTreeNode extends SpinJsonNode {
 
   protected final JsonNode jsonNode;
   
-  public SpinJsonTreeNode(JsonNode jsonNode) {
+  public SpinJsonJacksonTreeNode(JsonNode jsonNode) {
     this.jsonNode = jsonNode;
   }
   
