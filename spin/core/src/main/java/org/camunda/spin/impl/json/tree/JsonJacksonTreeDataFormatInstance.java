@@ -19,6 +19,9 @@ import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormatInstance;
 import org.camunda.spin.spi.DataFormatReader;
 
+/**
+ * @author Thorben Lindhauer
+ */
 public class JsonJacksonTreeDataFormatInstance implements DataFormatInstance<SpinJsonNode>, 
   JsonJacksonTreeConfigurable<JsonJacksonTreeDataFormatInstance> {
 

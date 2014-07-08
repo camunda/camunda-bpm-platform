@@ -15,6 +15,9 @@ package org.camunda.spin.impl.json.tree;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 
+/**
+ * @author Thorben Lindhauer
+ */
 public class JsonJacksonTreeLogger extends SpinLogger {
 
   public SpinJsonDataFormatException unableToParseInput(Exception e) {

@@ -14,6 +14,9 @@ package org.camunda.spin.spi;
 
 import java.util.Map;
 
+/**
+ * @author Thorben Lindhauer
+ */
 public interface Configurable<R extends Configurable<R>> {
 
   R config(String key, Object value);

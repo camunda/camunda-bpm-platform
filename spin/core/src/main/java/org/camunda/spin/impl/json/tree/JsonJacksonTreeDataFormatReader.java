@@ -23,6 +23,9 @@ import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * @author Thorben Lindhauer
+ */
 public class JsonJacksonTreeDataFormatReader implements DataFormatReader {
 
   private static final JsonJacksonTreeLogger JSON_LOGGER = SpinLogger.JSON_TREE_LOGGER;

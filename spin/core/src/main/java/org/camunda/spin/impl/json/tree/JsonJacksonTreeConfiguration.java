@@ -15,6 +15,9 @@ package org.camunda.spin.impl.json.tree;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Thorben Lindhauer
+ */
 public class JsonJacksonTreeConfiguration implements JsonJacksonTreeConfigurable<JsonJacksonTreeConfiguration> {
 
   public static final String ALLOW_COMMENTS = "allowComments";

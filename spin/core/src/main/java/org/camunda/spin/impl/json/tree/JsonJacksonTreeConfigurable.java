@@ -14,6 +14,11 @@ package org.camunda.spin.impl.json.tree;
 
 import org.camunda.spin.spi.Configurable;
 
+/**
+ * Provides Jackson's parser configuration options.
+ * 
+ * @author Thorben Lindhauer
+ */
 public interface JsonJacksonTreeConfigurable<R extends Configurable<R>> extends Configurable<R> {
 
   Boolean allowsNumericLeadingZeros();

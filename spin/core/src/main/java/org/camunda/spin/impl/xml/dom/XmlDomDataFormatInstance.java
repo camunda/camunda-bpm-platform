@@ -17,6 +17,9 @@ import org.camunda.spin.spi.DataFormatInstance;
 import org.camunda.spin.spi.DataFormatReader;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 
+/**
+ * @author Thorben Lindhauer
+ */
 public class XmlDomDataFormatInstance implements DataFormatInstance<SpinXmlTreeElement> {
 
   public XmlDomDataFormat dataFormat;

@@ -14,6 +14,9 @@ package org.camunda.spin.spi;
 
 import org.camunda.spin.Spin;
 
+/**
+ * @author Thorben Lindhauer
+ */
 public interface DataFormatInstance<T extends Spin<?>> {
 
   DataFormat<T> getDataFormat();
