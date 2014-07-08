@@ -89,4 +89,9 @@ public class SimpleVariableStore implements CoreVariableStore {
     ((SimpleVariableInstance)variableInstance).value = null;
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public Map<String, CoreVariableInstance> getVariableInstances() {
+    return (Map) variables;
+  }
+
 }

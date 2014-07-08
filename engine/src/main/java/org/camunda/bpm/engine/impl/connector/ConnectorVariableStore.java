@@ -95,4 +95,9 @@ public class ConnectorVariableStore implements CoreVariableStore {
     return variables;
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public Map<String, CoreVariableInstance> getVariableInstances() {
+    return (Map) variables;
+  }
+
 }

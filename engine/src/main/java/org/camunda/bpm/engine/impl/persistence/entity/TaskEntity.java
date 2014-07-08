@@ -919,10 +919,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   public String getParentTaskId() {
     return parentTaskId;
   }
-  public Map<String, VariableInstanceEntity> getVariableInstances() {
-    variableStore.ensureVariableInstancesInitialized();
-    return variableStore.getVariableInstances();
-  }
+
   public int getSuspensionState() {
     return suspensionState;
   }

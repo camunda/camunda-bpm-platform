@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.HasRevision;
@@ -903,8 +904,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
     // update the related process variables
     variableStore.ensureVariableInstancesInitialized();
-    for (VariableInstanceEntity variable: variableStore.getVariableInstances().values()) {
-      variable.setExecutionId(replacedBy.getId());
+    for (CoreVariableInstance variable: variableStore.getVariableInstances().values()) {
+      ((VariableInstanceEntity) variable).setExecutionId(replacedBy.getId());
     }
 
     // TODO: fire UPDATE activity instance events with new execution?
@@ -965,7 +966,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   public void fireHistoricVariableInstanceCreateEvents() {
     // this method is called by the start context and batch-fires create events for all variable instances
-    Map<String, VariableInstanceEntity> variableInstances = variableStore.getVariableInstances();
+    Map<String, VariableInstanceEntity> variableInstances = variableStore.getVariableInstancesWithoutInitialization();
     if(variableInstances != null) {
       for (Entry<String, VariableInstanceEntity> variable : variableInstances.entrySet()) {
         variableStore.fireHistoricVariableInstanceCreate(variable.getValue(), this);
@@ -1250,7 +1251,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     if(incidents == null && !BitMaskUtil.isBitOn(cachedEntityState, INCIDENT_STATE_BIT)) {
       incidents = new ArrayList<IncidentEntity>();
     }
-    if(variableStore.getVariableInstances() == null && !BitMaskUtil.isBitOn(cachedEntityState, VARIABLES_STATE_BIT)) {
+    if(variableStore.getVariableInstancesWithoutInitialization() == null && !BitMaskUtil.isBitOn(cachedEntityState, VARIABLES_STATE_BIT)) {
       variableStore.setVariableInstances(new HashMap<String, VariableInstanceEntity>());
     }
     shouldQueryForSubprocessInstance = BitMaskUtil.isBitOn(cachedEntityState, SUB_PROCESS_INSTANCE_STATE_BIT);
@@ -1258,7 +1259,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   public int getCachedEntityState() {
     cachedEntityState = 0;
-    Map<String, VariableInstanceEntity> variableInstances = variableStore.getVariableInstances();
+    Map<String, VariableInstanceEntity> variableInstances = variableStore.getVariableInstancesWithoutInitialization();
 
     // Only mark a flag as false when the list is not-null and empty. If null, we can't be sure there are no entries in it since
     // the list hasn't been initialized/queried yet.

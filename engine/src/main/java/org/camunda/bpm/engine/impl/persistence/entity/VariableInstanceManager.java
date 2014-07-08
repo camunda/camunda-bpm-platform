@@ -43,10 +43,10 @@ public class VariableInstanceManager extends AbstractManager {
   }
 
   public void deleteVariableInstanceByTask(TaskEntity task) {
-    Map<String, VariableInstanceEntity> variableInstances = task.getVariableInstances();
+    Map<String, VariableInstance> variableInstances = task.getVariableInstancesLocal();
     if (variableInstances!=null) {
-      for (VariableInstanceEntity variableInstance: variableInstances.values()) {
-        variableInstance.delete();
+      for (VariableInstance variableInstance: variableInstances.values()) {
+        ((VariableInstanceEntity) variableInstance).delete();
       }
     }
   }

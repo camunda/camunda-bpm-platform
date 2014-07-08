@@ -12,12 +12,19 @@
  */
 package org.camunda.bpm.engine.impl.core.variable;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
-
-import java.io.Serializable;
-import java.util.*;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 
 /**
  * @author Daniel Meyer
@@ -38,6 +45,35 @@ public abstract class CoreVariableScope implements Serializable, VariableScope {
 
   public Map<String, Object> getVariables() {
     return collectVariables(new HashMap<String, Object>());
+  }
+
+  public Map<String, VariableInstance> getVariableInstances() {
+    return collectVariableInstances(new HashMap<String, VariableInstance>(), null);
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public Map<String, VariableInstance> getVariableInstancesLocal() {
+    CoreVariableStore variableStore = getVariableStore();
+    return new HashMap<String, VariableInstance>((Map) variableStore.getVariableInstances());
+  }
+
+  public Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames) {
+    return collectVariableInstances(new HashMap<String, VariableInstance>(), variableNames);
+  }
+
+  public Map<String, VariableInstance> collectVariableInstances(Map<String, VariableInstance> variables, Collection<String> variableNames) {
+    Map<String, VariableInstance> variableInstances = getVariableInstancesLocal();
+    for (VariableInstance variable : variableInstances.values()) {
+      if(!variables.containsKey(variable.getName())
+         && (variableNames == null || variableNames.contains(variable.getName()))) {
+        variables.put(variable.getName(), variable);
+      }
+    }
+    CoreVariableScope parentScope = getParentVariableScope();
+    if(parentScope != null && (variableNames == null || !variables.keySet().equals(variableNames))) {
+      parentScope.collectVariableInstances(variables, variableNames);
+    }
+    return variables;
   }
 
   protected Map<String, Object> collectVariables(HashMap<String, Object> variables) {

@@ -115,7 +115,7 @@ public class DefaultFormHandler implements FormHandler {
     String defaultValue = formField.attribute("defaultValue");
     if(defaultValue != null) {
       Expression defaultValueExpression = expressionManager.createExpression(defaultValue);
-      formFieldHandler.setDefaultValue(defaultValueExpression);
+      formFieldHandler.setDefaultValueExpression(defaultValueExpression);
     }
 
     formFieldHandlers.add(formFieldHandler);

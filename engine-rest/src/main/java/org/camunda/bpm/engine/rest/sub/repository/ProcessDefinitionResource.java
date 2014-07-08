@@ -26,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.rest.dto.FormVariablesDto;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
@@ -81,4 +82,8 @@ public interface ProcessDefinitionResource {
   @Consumes(MediaType.APPLICATION_JSON)
   void updateSuspensionState(ProcessDefinitionSuspensionStateDto dto);
 
+  @GET
+  @Path("/form-variables")
+  @Produces(MediaType.APPLICATION_JSON)
+  FormVariablesDto getFormVariables(@QueryParam("variableNames") String variableNames);
 }

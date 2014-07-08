@@ -1351,4 +1351,11 @@ public abstract class MockProvider {
 
     return mock;
   }
+
+  public static Map<String, VariableInstance> createMockFormVariables() {
+    Map<String, VariableInstance> mock = new HashMap<String, VariableInstance>();
+    VariableInstance variableInstanceMock = createMockVariableInstance();
+    mock.put(variableInstanceMock.getName(), variableInstanceMock);
+    return mock;
+  }
 }

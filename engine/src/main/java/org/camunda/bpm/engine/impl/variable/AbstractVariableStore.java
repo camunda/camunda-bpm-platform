@@ -13,8 +13,15 @@
 
 package org.camunda.bpm.engine.impl.variable;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
@@ -25,8 +32,6 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Sebastian Menski
@@ -52,8 +57,10 @@ public abstract class AbstractVariableStore implements Serializable, CoreVariabl
     }
   }
 
-  public Map<String, VariableInstanceEntity> getVariableInstances() {
-    return variableInstances;
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public Map<String, CoreVariableInstance> getVariableInstances() {
+    ensureVariableInstancesInitialized();
+    return (Map) variableInstances;
   }
 
   public void setVariableInstances(Map<String, VariableInstanceEntity> variableInstances) {

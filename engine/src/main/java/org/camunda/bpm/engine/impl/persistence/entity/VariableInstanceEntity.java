@@ -60,7 +60,7 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
   protected String errorMessage;
 
   // Default constructor for SQL mapping
-  protected VariableInstanceEntity() {
+  public VariableInstanceEntity() {
   }
 
   public static VariableInstanceEntity createAndInsert(String name, VariableType type, Object value) {

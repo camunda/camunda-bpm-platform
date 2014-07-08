@@ -89,14 +89,14 @@ public class FormDataTest extends ProcessEngineTestCase {
     assertNotNull(longField);
     assertEquals("long", longField.getTypeName());
     assertNotNull(longField.getType());
-    assertEquals("1", longField.getDefaultValue());
+    assertEquals(Long.valueOf(1l), longField.getDefaultValue());
 
     // validate boolean field
     FormField booleanField = formFields.get(2);
     assertNotNull(booleanField);
     assertEquals("boolean", booleanField.getTypeName());
     assertNotNull(booleanField.getType());
-    assertEquals("true", booleanField.getDefaultValue());
+    assertEquals(Boolean.valueOf(true), booleanField.getDefaultValue());
 
     // validate date field
     FormField dateField = formFields.get(3);

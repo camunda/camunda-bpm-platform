@@ -49,6 +49,7 @@ import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
@@ -64,6 +65,7 @@ import java.util.*;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
+import com.jayway.restassured.response.ResponseBody;
 
 public abstract class AbstractTaskRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -81,6 +83,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   protected static final String TASK_FORM_URL = SINGLE_TASK_URL + "/form";
   protected static final String RENDERED_FORM_URL = SINGLE_TASK_URL + "/rendered-form";
   protected static final String SUBMIT_FORM_URL = SINGLE_TASK_URL + "/submit-form";
+
+  protected static final String FORM_VARIABLES_URL = SINGLE_TASK_URL + "/form-variables";
 
   protected static final String SINGLE_TASK_ADD_COMMENT_URL = SINGLE_TASK_URL + "/comment/create";
   protected static final String SINGLE_TASK_COMMENTS_URL = SINGLE_TASK_URL + "/comment";
@@ -158,6 +162,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(processEngine.getFormService()).thenReturn(formServiceMock);
     TaskFormData mockFormData = MockProvider.createMockTaskFormData();
     when(formServiceMock.getTaskFormData(anyString())).thenReturn(mockFormData);
+
+    Map<String, VariableInstance> variablesMock = MockProvider.createMockFormVariables();
+    when(formServiceMock.getTaskFormVariables(eq(EXAMPLE_TASK_ID), Matchers.<Collection<String>>any())).thenReturn(variablesMock);
 
     repositoryServiceMock = mock(RepositoryService.class);
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
@@ -475,6 +482,34 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .body("type", equalTo(RestException.class.getSimpleName()))
         .body("message", equalTo("Cannot submit task form " + EXAMPLE_TASK_ID + ": expected exception"))
       .when().post(SUBMIT_FORM_URL);
+  }
+
+  @Test
+  public void testGetStartFormVariables() {
+
+    ResponseBody body = given().pathParam("id", EXAMPLE_TASK_ID)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".id", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID))
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".name", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME))
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".type", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TYPE))
+      .when().get(FORM_VARIABLES_URL)
+      .body();
+
+    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, null);
+  }
+
+  @Test
+  public void testGetStartFormVariablesVarNames() {
+
+    Response response = given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .queryParam("variableNames", "a,b,c")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+    .when().get(FORM_VARIABLES_URL);
+
+    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, Arrays.asList(new String[]{"a","b","c"}));
   }
 
   @Test

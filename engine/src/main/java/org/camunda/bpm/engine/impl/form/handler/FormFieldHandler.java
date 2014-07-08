@@ -36,7 +36,7 @@ public class FormFieldHandler {
   protected String id;
   protected Expression label;
   protected AbstractFormFieldType type;
-  protected Expression defaultValue;
+  protected Expression defaultValueExpression;
   protected Map<String, String> properties = new HashMap<String, String>();
   protected List<FormFieldValidationConstraintHandler> validationHandlers = new ArrayList<FormFieldValidationConstraintHandler>();
 
@@ -56,9 +56,14 @@ public class FormFieldHandler {
     // set type
     formField.setType(type);
 
-    // set default value (evauate expression)
-    if(defaultValue != null) {
-      formField.setDefaultValue(defaultValue.getValue(variableScope));
+    // set default value (evaluate expression)
+    if(defaultValueExpression != null) {
+      Object defaultValue = defaultValueExpression.getValue(variableScope);
+      if(defaultValue != null) {
+        formField.setDefaultValue(type.convertFormValueToModelValue(defaultValue));
+      } else {
+        formField.setDefaultValue(null);
+      }
     }
 
     // properties
@@ -90,8 +95,8 @@ public class FormFieldHandler {
       } else {
         modelValue = propertyValue;
       }
-    } else if (defaultValue != null) {
-      final Object expressionValue = defaultValue.getValue(execution);
+    } else if (defaultValueExpression != null) {
+      final Object expressionValue = defaultValueExpression.getValue(execution);
       if (type != null && expressionValue != null) {
         modelValue = type.convertFormValueToModelValue(expressionValue.toString());
       } else if (expressionValue != null) {
@@ -145,12 +150,12 @@ public class FormFieldHandler {
     return type;
   }
 
-  public Expression getDefaultValue() {
-    return defaultValue;
+  public Expression getDefaultValueExpression() {
+    return defaultValueExpression;
   }
 
-  public void setDefaultValue(Expression defaultValue) {
-    this.defaultValue = defaultValue;
+  public void setDefaultValueExpression(Expression defaultValue) {
+    this.defaultValueExpression = defaultValue;
   }
 
   public List<FormFieldValidationConstraintHandler> getValidationHandlers() {

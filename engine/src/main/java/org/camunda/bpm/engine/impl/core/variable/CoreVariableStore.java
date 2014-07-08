@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.core.variable;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -40,5 +41,7 @@ public interface CoreVariableStore {
   CoreVariableInstance createVariableInstance(String variableName, Object value, CoreVariableScope sourceActivityExecution);
 
   void clearForNewValue(CoreVariableInstance variableInstance, Object newValue);
+
+  Map<String, CoreVariableInstance> getVariableInstances();
 
 }

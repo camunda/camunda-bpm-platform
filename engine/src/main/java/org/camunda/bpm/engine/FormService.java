@@ -13,12 +13,14 @@
 
 package org.camunda.bpm.engine;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 
@@ -96,6 +98,44 @@ public interface FormService {
    * @param properties
    */
   void submitTaskForm(String taskId, Map<String, Object> properties);
+
+  /**
+   * Retrieves a list of all variables for rendering a start from. The method takes into account
+   * FormData specified for the start event. This allows defining default values and validators for form fields.
+   *
+   * @param processDefinitionId the id of the process definition for which the start form should be retreived.
+   * @return a map of VariableInstances.
+   */
+  Map<String, VariableInstance> getStartFormVariables(String processDefinitionId);
+
+  /**
+   * Retrieves a list of requested variables for rendering a start from. The method takes into account
+   * FormData specified for the start event. This allows defining default values and validators for form fields.
+   *
+   * @param processDefinitionId the id of the process definition for which the start form should be retreived.
+   * @param formVariables a Collection of the names of the variables to retrieve.
+   * @return a map of VariableInstances.
+   */
+  Map<String, VariableInstance> getStartFormVariables(String processDefinitionId, Collection<String> formVariables);
+
+  /**
+   * Retrieves a list of requested variables for rendering a task form. The method takes into account
+   * FormData specified for the task. This allows defining default values and validators for form fields.
+   *
+   * @param taskId the id of the task for which the variables should be retreived.
+   * @return a map of VariableInstances.
+   */
+  Map<String, VariableInstance> getTaskFormVariables(String taskId);
+
+  /**
+   * Retrieves a list of requested variables for rendering a task form. The method takes into account
+   * FormData specified for the task. This allows defining default values and validators for form fields.
+   *
+   * @param taskId the id of the task for which the variables should be retreived.
+   * @param formVariables a Collection of the names of the variables to retreive. Allows restricting the set of retreived variables.
+   * @return a map of VariableInstances.
+   */
+  Map<String, VariableInstance> getTaskFormVariables(String taskId, Collection<String> formVariables);
 
   /**
    * Retrieves a user defined reference to a start form.

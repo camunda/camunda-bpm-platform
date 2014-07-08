@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Daniel Meyer
@@ -43,4 +44,9 @@ public class ExecutionEntityVariableStore extends AbstractVariableStore {
   protected boolean isAutoFireHistoryEvents() {
     return executionEntity.isAutoFireHistoryEvents();
   }
+
+  public Map<String, VariableInstanceEntity> getVariableInstancesWithoutInitialization() {
+    return variableInstances;
+  }
+
 }

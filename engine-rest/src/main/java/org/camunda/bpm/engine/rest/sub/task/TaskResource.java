@@ -12,11 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.sub.task;
 
+import org.camunda.bpm.engine.rest.dto.FormVariablesDto;
 import org.camunda.bpm.engine.rest.dto.task.*;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+
 import java.util.List;
 
 public interface TaskResource {
@@ -92,6 +94,11 @@ public interface TaskResource {
 
   @Path("/localVariables")
   VariableResource getLocalVariables();
+
+  @GET
+  @Path("/form-variables")
+  @Produces(MediaType.APPLICATION_JSON)
+  FormVariablesDto getFormVariables(@QueryParam("variableNames") String variableNames);
 
 }
 
