@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
@@ -105,6 +107,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   /** super execution, not-null if this execution is part of a subprocess */
   protected transient ExecutionEntity superExecution;
 
+  /** super case execution, not-null if this execution is part of a case execution */
+  protected transient CaseExecutionEntity superCaseExecution;
+
   /** reference to a subprocessinstance, not-null if currently subprocess is started from this execution */
   protected transient ExecutionEntity subProcessInstance;
 
@@ -179,6 +184,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements
    */
   protected String superExecutionId;
 
+  /**
+   * persisted reference to the super case execution of this execution
+   *
+   * @See {@link #getSuperCaseExecution()}
+   * @see #setSuperCaseExecution(ExecutionEntity)
+   */
+  protected String superCaseExecutionId;
+
   protected boolean forcedUpdate;
 
   public ExecutionEntity() {
@@ -226,6 +239,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     return createSubProcessInstance(processDefinition, null);
   }
 
+  @SuppressWarnings("unchecked")
   public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
     ExecutionEntity subProcessInstance = newExecution();
 
@@ -238,6 +252,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     // Initialize the new execution
     subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
     subProcessInstance.setProcessInstance(subProcessInstance);
+
+    subProcessInstance.setCaseInstanceId(getCaseInstanceId());
 
     // create event subscriptions for the current scope
     for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(subProcessInstance.getScopeActivity())) {
@@ -282,8 +298,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
     Context
       .getCommandContext()
-      .getDbSqlSession()
-      .insert(newExecution);
+      .getExecutionManager()
+      .insertExecution(newExecution);
 
     return newExecution;
   }
@@ -472,14 +488,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     return executions;
   }
 
-  @SuppressWarnings("unchecked")
   protected void ensureExecutionsInitialized() {
     if (executions==null) {
       if(isExecutionTreePrefetchEnabled()) {
         ensureExecutionTreeInitialized();
 
       } else {
-        this.executions = (List) Context
+        this.executions = Context
           .getCommandContext()
           .getExecutionManager()
           .findChildExecutionsByParentExecutionId(id);
@@ -712,6 +727,42 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     }
   }
 
+  // super case executions ///////////////////////////////////////////////////
+
+  public String getSuperCaseExecutionId() {
+    return superCaseExecutionId;
+  }
+
+  public void setSuperCaseExecutionId(String superCaseExecutionId) {
+    this.superCaseExecutionId = superCaseExecutionId;
+  }
+
+  public CaseExecutionEntity getSuperCaseExecution() {
+    ensureSuperCaseExecutionInitialized();
+    return superCaseExecution;
+  }
+
+  public void setSuperCaseExecution(CmmnExecution superCaseExecution) {
+    this.superCaseExecution = (CaseExecutionEntity) superCaseExecution;
+
+    if (superCaseExecution != null) {
+      this.superCaseExecutionId = superCaseExecution.getId();
+      this.caseInstanceId = superCaseExecution.getCaseInstanceId();
+    } else {
+      this.superCaseExecutionId = null;
+      this.caseInstanceId = null;
+    }
+  }
+
+  protected void ensureSuperCaseExecutionInitialized() {
+    if (superCaseExecution == null && superCaseExecutionId != null) {
+      superCaseExecution = Context
+        .getCommandContext()
+        .getCaseExecutionManager()
+        .findCaseExecutionById(superCaseExecutionId);
+    }
+  }
+
   // customized persistence behavior /////////////////////////////////////////
 
   public void remove() {
@@ -803,7 +854,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     return replacedBy;
   }
 
-  @SuppressWarnings("unchecked")
   public void setReplacedBy(PvmExecutionImpl replacedBy) {
     this.replacedBy = (ExecutionEntity) replacedBy;
 
@@ -816,7 +866,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
       task.setExecution(this.replacedBy);
 
       // update the related local task variables
-      List<VariableInstanceEntity> variables = (List) commandContext
+      List<VariableInstanceEntity> variables = commandContext
         .getVariableInstanceManager()
         .findVariableInstancesByTaskId(task.getId());
 
@@ -859,7 +909,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     super.setReplacedBy(replacedBy);
   }
 
-  @SuppressWarnings("unchecked")
   public void replace(PvmExecutionImpl execution) {
     ExecutionEntity replacedExecution = (ExecutionEntity) execution;
 
@@ -871,7 +920,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
       task.setExecution(this);
 
       // update the related local task variables
-      List<VariableInstanceEntity> variables = (List) commandContext
+      List<VariableInstanceEntity> variables = commandContext
         .getVariableInstanceManager()
         .findVariableInstancesByTaskId(task.getId());
 
@@ -982,6 +1031,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     persistentState.put("isEventScope", this.isEventScope);
     persistentState.put("parentId", parentId);
     persistentState.put("superExecution", this.superExecutionId);
+    persistentState.put("superCaseExecutionId", this.superCaseExecutionId);
+    persistentState.put("caseInstanceId", this.caseInstanceId);
     if (forcedUpdate) {
       persistentState.put("forcedUpdate", Boolean.TRUE);
     }

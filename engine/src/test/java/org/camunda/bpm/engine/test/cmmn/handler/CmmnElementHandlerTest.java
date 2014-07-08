@@ -18,6 +18,7 @@ import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CmmnModelElementInstance;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
+import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.junit.Before;
 
 /**
@@ -47,6 +48,10 @@ public abstract class CmmnElementHandlerTest {
     element.setAttributeValue("id", id, true);
     parentElement.addChildElement(element);
     return element;
+  }
+
+  protected ExtensionElements addExtensionElements(CmmnModelElementInstance parentElement) {
+    return createElement(parentElement, null, ExtensionElements.class);
   }
 
 }

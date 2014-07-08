@@ -7,8 +7,20 @@
   <!-- CASE EXECUTION INSERT -->
 
   <insert id="insertCaseExecution" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity">
-    insert into ${prefix}ACT_RU_CASE_EXECUTION (ID_, CASE_INST_ID_, BUSINESS_KEY_, CASE_DEF_ID_, ACT_ID_, PARENT_ID_, CURRENT_STATE_, PREV_STATE_, REV_)
-    values (
+    insert into ${prefix}ACT_RU_CASE_EXECUTION
+    (
+      ID_,
+      CASE_INST_ID_,
+      BUSINESS_KEY_,
+      CASE_DEF_ID_,
+      ACT_ID_,
+      PARENT_ID_,
+      CURRENT_STATE_,
+      PREV_STATE_,
+      REV_
+    )
+    values
+    (
       #{id, jdbcType=VARCHAR},
       #{caseInstanceId, jdbcType=VARCHAR},
       #{businessKey, jdbcType=VARCHAR},
@@ -48,8 +60,8 @@
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
-    <result property="state" column="CURRENT_STATE_" jdbcType="INTEGER"/>
-    <result property="previous" column="PREVIOUS_STATE_" jdbcType="INTEGER"/>
+    <result property="state" column="CURRENT_STATE_" jdbcType="INTEGER" />
+    <result property="previous" column="PREV_STATE_" jdbcType="INTEGER" />
   </resultMap>
 
   <!-- CASE EXECUTION SELECT -->

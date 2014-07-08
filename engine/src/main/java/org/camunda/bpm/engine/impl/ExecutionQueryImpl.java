@@ -47,6 +47,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   // Not used by end-users, but needed for dynamic ibatis query
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
+  protected String caseInstanceId;
   private String businessKey;
 
   public ExecutionQueryImpl() {

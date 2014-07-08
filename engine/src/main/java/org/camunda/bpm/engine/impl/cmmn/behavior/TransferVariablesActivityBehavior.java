@@ -10,18 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.cmmn.operation;
+package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.TaskActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class TaskWaitState extends TaskActivityBehavior {
+public interface TransferVariablesActivityBehavior extends CmmnActivityBehavior {
 
-  protected void performStart(CmmnActivityExecution execution) {
-  }
+  public void transferVariables(VariableScope from, VariableScope to);
 
 }

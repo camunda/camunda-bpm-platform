@@ -26,7 +26,10 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
@@ -41,6 +44,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   private static final long serialVersionUID = 1L;
 
+
   // current position /////////////////////////////////////////////////////////
 
   /** the case instance.  this is the root of the execution tree.
@@ -52,6 +56,9 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   /** nested executions */
   protected List<CaseExecutionEntity> caseExecutions;
+
+  /** reference to a sub process instance, not-null if currently subprocess is started from this execution */
+  protected transient ExecutionEntity subProcessInstance;
 
   // associated entities /////////////////////////////////////////////////////
 
@@ -246,6 +253,36 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
       .insertCaseExecution(newCaseExecution);
 
     return newCaseExecution;
+  }
+
+  // sub process instance ///////////////////////////////////////////////////
+
+  public ExecutionEntity getSubProcessInstance() {
+    ensureSubProcessInstanceInitialized();
+    return subProcessInstance;
+  }
+
+  public void setSubProcessInstance(PvmExecutionImpl subProcessInstance) {
+    this.subProcessInstance = (ExecutionEntity) subProcessInstance;
+  }
+
+  public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition) {
+    ExecutionEntity subProcessInstance = (ExecutionEntity) processDefinition.createProcessInstance();
+
+    // manage bidirectional super-subprocess relation
+    subProcessInstance.setSuperCaseExecution(this);
+    setSubProcessInstance(subProcessInstance);
+
+    return subProcessInstance;
+  }
+
+  protected void ensureSubProcessInstanceInitialized() {
+    if (subProcessInstance == null) {
+      subProcessInstance = Context
+        .getCommandContext()
+        .getExecutionManager()
+        .findSubProcessInstanceBySuperCaseExecutionId(id);
+    }
   }
 
   // variables //////////////////////////////////////////////////////////////

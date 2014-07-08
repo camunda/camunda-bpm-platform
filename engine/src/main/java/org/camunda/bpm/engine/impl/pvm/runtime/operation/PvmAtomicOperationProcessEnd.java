@@ -18,6 +18,9 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.cmmn.behavior.TransferVariablesActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -45,7 +48,10 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
     super.eventNotificationsCompleted(execution);
 
     PvmExecutionImpl superExecution = execution.getSuperExecution();
+    CmmnActivityExecution superCaseExecution = execution.getSuperCaseExecution();
+
     SubProcessActivityBehavior subProcessActivityBehavior = null;
+    TransferVariablesActivityBehavior transferVariablesBehavior = null;
 
     // copy variables before destroying the ended sub process instance
     if (superExecution!=null) {
@@ -53,6 +59,18 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
       subProcessActivityBehavior = (SubProcessActivityBehavior) activity.getActivityBehavior();
       try {
         subProcessActivityBehavior.completing(superExecution, execution);
+      } catch (RuntimeException e) {
+          log.log(Level.SEVERE, "Error while completing sub process of execution " + execution, e);
+          throw e;
+      } catch (Exception e) {
+          log.log(Level.SEVERE, "Error while completing sub process of execution " + execution, e);
+          throw new ProcessEngineException("Error while completing sub process of execution " + execution, e);
+      }
+    } else if (superCaseExecution != null) {
+      CmmnActivity activity = superCaseExecution.getActivity();
+      transferVariablesBehavior = (TransferVariablesActivityBehavior) activity.getActivityBehavior();
+      try {
+        transferVariablesBehavior.transferVariables(execution, superCaseExecution);
       } catch (RuntimeException e) {
           log.log(Level.SEVERE, "Error while completing sub process of execution " + execution, e);
           throw e;
@@ -77,6 +95,8 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
           log.log(Level.SEVERE, "Error while completing sub process of execution " + execution, e);
           throw new ProcessEngineException("Error while completing sub process of execution " + execution, e);
       }
+    } else if (superCaseExecution != null) {
+      superCaseExecution.complete();
     }
   }
 

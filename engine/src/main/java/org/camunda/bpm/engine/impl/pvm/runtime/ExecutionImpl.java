@@ -12,9 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.BpmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
+import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStore;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -24,13 +33,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 
 /**
@@ -67,6 +69,9 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   /** reference to a subprocessinstance, not-null if currently subprocess is started from this execution */
   protected ExecutionImpl subProcessInstance;
+
+  /** super case execution, not-null if this execution is part of a case execution */
+  protected CaseExecutionImpl superCaseExecution;
 
   protected ExecutionImpl replacedBy;
 
@@ -175,6 +180,16 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   public void setSubProcessInstance(PvmExecutionImpl subProcessInstance) {
     this.subProcessInstance = (ExecutionImpl) subProcessInstance;
+  }
+
+  // super case execution /////////////////////////////////////////////////////
+
+  public CaseExecutionImpl getSuperCaseExecution() {
+    return superCaseExecution;
+  }
+
+  public void setSuperCaseExecution(CmmnExecution superCaseExecution) {
+    this.superCaseExecution = (CaseExecutionImpl) superCaseExecution;
   }
 
   // process definition ///////////////////////////////////////////////////////

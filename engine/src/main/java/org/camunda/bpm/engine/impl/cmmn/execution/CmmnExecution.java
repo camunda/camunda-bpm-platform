@@ -52,6 +52,8 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  * @author Roman Smirnov
@@ -98,6 +100,14 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
    }
    return null;
   }
+
+  // sub process instance ////////////////////////////////////////////////////
+
+  public abstract PvmExecutionImpl getSubProcessInstance();
+
+  public abstract void setSubProcessInstance(PvmExecutionImpl subProcessInstance);
+
+  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition);
 
   // business key ////////////////////////////////////////////////////////////
 
@@ -259,8 +269,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return previousState;
   }
 
-  public void setPrevious(int previousState) {
-    this.previousState = currentState;
+  public void setPrevious(int previous) {
+    this.previousState = previous;
   }
 
   // state transition ///////////////////////////////////////////

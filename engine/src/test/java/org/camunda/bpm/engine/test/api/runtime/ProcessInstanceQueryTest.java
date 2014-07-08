@@ -1329,4 +1329,51 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(processInstance.getId(), processInstanceList.get(0).getId());
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+  public void testQueryByCaseInstanceId() {
+    String caseInstanceId = caseService
+      .withCaseDefinitionByKey("oneProcessTaskCase")
+      .create()
+      .getId();
+
+    String processTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_ProcessTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(processTaskId)
+      .manualStart();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    query.caseInstanceId(caseInstanceId);
+
+    assertEquals(1, query.count());
+
+    List<ProcessInstance> result = query.list();
+    assertEquals(1, result.size());
+
+    ProcessInstance processInstance = result.get(0);
+    assertEquals(caseInstanceId, processInstance.getCaseInstanceId());
+  }
+
+  public void testQueryByInvalidCaseInstanceId() {
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    query.caseInstanceId("invalid");
+
+    assertEquals(0, query.count());
+
+    try {
+      query.caseInstanceId(null);
+      fail("The passed case instance should not be null.");
+    } catch (Exception e) {}
+
+  }
+
 }

@@ -12,34 +12,96 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
+import java.util.Map;
+
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cmd.ActivateProcessInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class ProcessTaskActivityBehavior extends TaskActivityBehavior {
+public class ProcessTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavior {
 
-  public void started(CmmnActivityExecution execution) throws Exception {
-    // TODO: implement the following steps:
+  protected void triggerCallableElement(CmmnActivityExecution execution, Map<String, Object> variables, String businessKey) {
+    String processDefinitionKey = getDefinitionKey(execution);
 
-    // 1. Step: start process instance to the given id and add
-    // parameters (maybe the starting of a new process instance
-    // should happen async!?)
+    DeploymentCache deploymentCache = Context
+      .getProcessEngineConfiguration()
+      .getDeploymentCache();
 
-    // 2. Step: If "isBlocking == false" -> complete this case execution
+    ProcessDefinitionImpl processDefinition = null;
+
+    if (isLatestBinding()) {
+      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
+
+    } else if (isDeploymentBinding()) {
+      String deploymentId = getDeploymentId(execution);
+      processDefinition = deploymentCache.findDeployedProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
+
+    } else if (isVersionBinding()) {
+      Integer version = getVersion(execution);
+
+      processDefinition = deploymentCache.findDeployedProcessDefinitionByKeyAndVersion(processDefinitionKey, version);
+    }
+
+    PvmProcessInstance caseInstance = execution.createSubProcessInstance(processDefinition);
+    caseInstance.start(businessKey, variables);
+  }
+
+  protected void manualCompleting(CmmnActivityExecution execution) {
+    ExecutionEntity subProcessInstance = getSubProcessInstance(execution);
+
+    if (subProcessInstance != null) {
+      throw new ProcessEngineException("It is not possible to complete a process task manually, because the called process instance is still active.");
+    }
+  }
+
+  protected void terminating(CmmnActivityExecution execution) {
+    ExecutionEntity subProcessInstance = getSubProcessInstance(execution);
+
+    if (subProcessInstance != null) {
+      Context
+        .getCommandContext()
+        .getExecutionManager()
+        .deleteProcessInstance(subProcessInstance.getId(), "terminated");
+    }
+  }
+
+  protected void suspending(CmmnActivityExecution execution) {
+    ExecutionEntity subProcessInstance = getSubProcessInstance(execution);
+
+    CommandContext commandContext = Context.getCommandContext();
+
+    new SuspendProcessInstanceCmd(subProcessInstance.getId(), null, null).execute(commandContext);
 
   }
 
-  public void onCompletion(CmmnActivityExecution execution) {
-    // if "isBlocking == false" then there is nothing to check,
-    // but if "isBlocking == true" then we have to check,
-    // whether the started process instance is finished.
+  protected void resuming(CmmnActivityExecution execution) {
+    ExecutionEntity subProcessInstance = getSubProcessInstance(execution);
+
+    CommandContext commandContext = Context.getCommandContext();
+
+    new ActivateProcessInstanceCmd(subProcessInstance.getId(), null, null).execute(commandContext);
+
   }
 
+  protected ExecutionEntity getSubProcessInstance(CmmnActivityExecution execution) {
+    String id = execution.getId();
+    ExecutionEntity subProcessInstance = Context
+        .getCommandContext()
+        .getExecutionManager()
+        .findSubProcessInstanceBySuperCaseExecutionId(id);
 
-  public void completed(CmmnActivityExecution execution) {
-    // get defined parameters from process instance to case instance
+    return subProcessInstance;
   }
 
 }

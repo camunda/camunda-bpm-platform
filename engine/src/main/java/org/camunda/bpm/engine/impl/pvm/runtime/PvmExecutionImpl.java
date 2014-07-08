@@ -12,9 +12,20 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
-import org.camunda.bpm.engine.impl.pvm.*;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
+import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -23,12 +34,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Daniel Meyer
@@ -64,6 +69,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   /** the unique id of the current activity instance */
   protected String activityInstanceId;
+
+  /** the id of a case associated with this execution */
+  protected String caseInstanceId;
 
   // cascade deletion ////////////////////////////////////////////////////////
 
@@ -528,6 +536,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public abstract void setProcessInstance(PvmExecutionImpl pvmExecutionImpl);
 
+  // case instance id /////////////////////////////////////////////////////////
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
   // activity /////////////////////////////////////////////////////////////////
 
   /** ensures initialization and returns the activity */
@@ -650,6 +668,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public abstract PvmExecutionImpl getSubProcessInstance();
 
   public abstract void setSubProcessInstance(PvmExecutionImpl subProcessInstance);
+
+  // super case execution /////////////////////////////////////////////////////
+
+  public abstract CmmnExecution getSuperCaseExecution();
+
+  public abstract void setSuperCaseExecution(CmmnExecution superCaseExecution);
 
   // scopes ///////////////////////////////////////////////////////////////////
 

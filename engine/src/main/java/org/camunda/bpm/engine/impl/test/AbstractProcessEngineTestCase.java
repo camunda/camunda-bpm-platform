@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.LogUtil.ThreadLogMode;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Assert;
@@ -194,6 +195,18 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
     if (processInstance!=null) {
       throw new AssertionFailedError("Expected finished process instance '"+processInstanceId+"' but it was still in the db");
+    }
+  }
+
+  public void assertCaseEnded(final String caseInstanceId) {
+    CaseInstance caseInstance = processEngine
+      .getCaseService()
+      .createCaseInstanceQuery()
+      .caseInstanceId(caseInstanceId)
+      .singleResult();
+
+    if (caseInstance!=null) {
+      throw new AssertionFailedError("Expected finished case instance '"+caseInstanceId+"' but it was still in the db");
     }
   }
 

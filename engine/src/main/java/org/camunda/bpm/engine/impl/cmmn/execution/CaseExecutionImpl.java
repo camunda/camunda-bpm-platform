@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.cmmn.execution;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.CmmnModelExecutionContext;
@@ -23,6 +22,9 @@ import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStore;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
@@ -34,8 +36,6 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private static Logger log = Logger.getLogger(CaseExecutionImpl.class.getName());
-
   // current position /////////////////////////////////////////////////////////
 
   protected List<CaseExecutionImpl> caseExecutions;
@@ -43,6 +43,8 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   protected CaseExecutionImpl caseInstance;
 
   protected CaseExecutionImpl parent;
+
+  protected ExecutionImpl subProcessInstance;
 
   // variables ////////////////////////////////////////////////////////////////
 
@@ -104,6 +106,25 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
     this.caseInstance = (CaseExecutionImpl) caseInstance;
   }
 
+  // sub process instance ////////////////////////////////////////////////////////
+
+  public ExecutionImpl getSubProcessInstance() {
+    return subProcessInstance;
+  }
+
+  public void setSubProcessInstance(PvmExecutionImpl subProcessInstance) {
+    this.subProcessInstance = (ExecutionImpl) subProcessInstance;
+  }
+
+  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition) {
+    ExecutionImpl subProcessInstance = (ExecutionImpl) processDefinition.createProcessInstance();
+
+    // manage bidirectional super-subprocess relation
+    subProcessInstance.setSuperCaseExecution(this);
+    setSubProcessInstance(subProcessInstance);
+
+    return subProcessInstance;
+  }
 
   // new case executions /////////////////////////////////////////////////////////
 

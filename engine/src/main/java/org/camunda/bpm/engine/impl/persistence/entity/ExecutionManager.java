@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -22,15 +26,15 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 
 /**
  * @author Tom Baeyens
  */
 public class ExecutionManager extends AbstractManager {
+
+  public void insertExecution(ExecutionEntity execution) {
+    getDbSqlSession().insert(execution);
+  }
 
   @SuppressWarnings("unchecked")
   public void deleteProcessInstancesByProcessDefinition(String processDefinitionId, String deleteReason, boolean cascade) {
@@ -77,6 +81,10 @@ public class ExecutionManager extends AbstractManager {
 
   public ExecutionEntity findSubProcessInstanceBySuperExecutionId(String superExecutionId) {
     return (ExecutionEntity) getDbSqlSession().selectOne("selectSubProcessInstanceBySuperExecutionId", superExecutionId);
+  }
+
+  public ExecutionEntity findSubProcessInstanceBySuperCaseExecutionId(String superCaseExecutionId) {
+    return (ExecutionEntity) getDbSqlSession().selectOne("selectSubProcessInstanceBySuperCaseExecutionId", superCaseExecutionId);
   }
 
   @SuppressWarnings("unchecked")
@@ -152,7 +160,6 @@ public class ExecutionManager extends AbstractManager {
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbSqlSession().update("updateExecutionSuspensionStateByParameters", parameters);
-
   }
 
 }
