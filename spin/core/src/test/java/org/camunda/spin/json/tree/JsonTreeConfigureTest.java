@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.spin.DataFormats.jsonTree;
 import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.Spin.S;
+import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JACKSON_CONFIGURATION_JSON;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -16,70 +17,95 @@ import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormatInstance;
 import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
+import org.junit.Before;
 import org.junit.Test;
 
 public class JsonTreeConfigureTest {
 
-  protected final static String EXAMPLE_JSON = "{\"number\": 001}";
+  private JsonJacksonTreeDataFormatInstance dataFormatInstance;
+  private Map<String, Object> configurationMap;
+  
+  @Before
+  public void setUp() {
+    dataFormatInstance = 
+        jsonTree()
+            .allowNumericLeadingZeros(Boolean.TRUE)
+            .allowBackslashEscapingAnyCharacter(Boolean.TRUE)
+            .allowComments(Boolean.TRUE)
+            .allowNonNumericNumbers(Boolean.TRUE)
+            .allowQuotedFieldNames(Boolean.TRUE)
+            .allowSingleQuotes(Boolean.TRUE);
+    
+    configurationMap = new HashMap<String, Object>();
+    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, Boolean.TRUE);
+    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_COMMENTS, Boolean.TRUE);
+    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_NON_NUMERIC_NUMBERS, Boolean.TRUE);
+    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_NUMERIC_LEADING_ZEROS, Boolean.TRUE);
+    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_SINGLE_QUOTES, Boolean.TRUE);
+    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_UNQUOTED_FIELD_NAMES, Boolean.TRUE);
+  }
+  
   
   @Test
   public void shouldApplyConfigurationOnCreation() {
     try {
-      S(EXAMPLE_JSON, jsonTree());
+      S(EXAMPLE_JACKSON_CONFIGURATION_JSON, jsonTree());
       fail("Expected SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException e) {
       // happy path
     }
     
-    SpinJsonNode json = S(EXAMPLE_JSON, jsonTree().allowNumericLeadingZeros(Boolean.TRUE));
+    SpinJsonNode json = S(EXAMPLE_JACKSON_CONFIGURATION_JSON, dataFormatInstance);
     assertThat(json).isNotNull();
     
-    json = JSON(EXAMPLE_JSON, jsonTree().allowNumericLeadingZeros(Boolean.TRUE));
+    json = JSON(EXAMPLE_JACKSON_CONFIGURATION_JSON, dataFormatInstance);
     assertThat(json).isNotNull();
     
-    Map<String, Object> config = new HashMap<String, Object>();
-    config.put(JsonJacksonTreeConfiguration.ALLOW_NUMERIC_LEADING_ZEROS, Boolean.TRUE);
-    json = JSON(EXAMPLE_JSON, config);
+    json = JSON(EXAMPLE_JACKSON_CONFIGURATION_JSON, configurationMap);
     assertThat(json).isNotNull();
   }
   
   @Test
   public void shouldApplyConfigurationOnCreationFromInputStream() {
-    InputStream input = IoUtil.stringAsInputStream(EXAMPLE_JSON);
+    InputStream input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_CONFIGURATION_JSON);
     
     try {
-      S(input, jsonTree().allowNumericLeadingZeros(Boolean.FALSE));
+      S(input, jsonTree());
       fail("Expected SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException e) {
       // happy path
     }
     
-    input = IoUtil.stringAsInputStream(EXAMPLE_JSON);
-    SpinJsonNode json = S(input, jsonTree().allowNumericLeadingZeros(Boolean.TRUE));
+    input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_CONFIGURATION_JSON);
+    SpinJsonNode json = S(input, dataFormatInstance);
     assertThat(json).isNotNull();
     
-    input = IoUtil.stringAsInputStream(EXAMPLE_JSON);
-    json = JSON(input, jsonTree().allowNumericLeadingZeros(Boolean.TRUE));
+    input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_CONFIGURATION_JSON);
+    json = JSON(input, dataFormatInstance);
     assertThat(json).isNotNull();
     
-    input = IoUtil.stringAsInputStream(EXAMPLE_JSON);
-    Map<String, Object> config = new HashMap<String, Object>();
-    config.put(JsonJacksonTreeConfiguration.ALLOW_NUMERIC_LEADING_ZEROS, Boolean.TRUE);
-    json = JSON(input, config);
+    input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_CONFIGURATION_JSON);
+    json = JSON(input, configurationMap);
     assertThat(json).isNotNull();
   }
   
   @Test
   public void shouldCreateNewInstanceOnConfiguration() {
     JsonJacksonTreeDataFormat jsonDataFormat = new JsonJacksonTreeDataFormat();
-    JsonJacksonTreeDataFormatInstance jsonDataFormatInstance = jsonDataFormat.newInstance().config("aKey", "aValue");
+    jsonDataFormat.getConfiguration().config("aKey", "aValue");
     
-    assertThat(jsonDataFormat.getConfiguration().getValue("aKey")).isNull();
-    assertThat(jsonDataFormatInstance.getValue("aKey").equals("aValue"));
+    JsonJacksonTreeDataFormatInstance jsonDataFormatInstance = 
+        jsonDataFormat.newInstance().config("anotherKey", "anotherValue");
     
-    JsonJacksonTreeDataFormatInstance nextReturnedDataFormatInstance = jsonDataFormatInstance.config("anotherKey", "anotherValue");
-    assertThat(nextReturnedDataFormatInstance).isSameAs(jsonDataFormatInstance);
+    assertThat(jsonDataFormat.getConfiguration().getValue("aKey")).isEqualTo("aValue");
+    assertThat(jsonDataFormat.getConfiguration().getValue("anotherKey")).isNull();
+    
     assertThat(jsonDataFormatInstance.getValue("aKey").equals("aValue"));
     assertThat(jsonDataFormatInstance.getValue("anotherKey").equals("anotherValue"));
+    
+    JsonJacksonTreeDataFormatInstance nextReturnedDataFormatInstance = 
+        jsonDataFormatInstance.config("aThirdKey", "aThirdValue");
+    assertThat(nextReturnedDataFormatInstance).isSameAs(jsonDataFormatInstance);
+    assertThat(jsonDataFormatInstance.getValue("aThirdKey").equals("aThirdValue"));
   }
 }

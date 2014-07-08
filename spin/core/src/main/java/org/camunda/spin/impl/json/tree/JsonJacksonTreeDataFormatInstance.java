@@ -59,4 +59,49 @@ public class JsonJacksonTreeDataFormatInstance implements DataFormatInstance<Spi
     return new JsonJacksonTreeDataFormatReader(this);
   }
 
+  public Boolean allowsComments() {
+    return configuration.allowsComments();
+  }
+
+  public JsonJacksonTreeDataFormatInstance allowComments(Boolean value) {
+    configuration.allowComments(value);
+    return this;
+  }
+
+  public Boolean allowsUnquotedFieldNames() {
+    return configuration.allowsUnquotedFieldNames();
+  }
+
+  public JsonJacksonTreeDataFormatInstance allowQuotedFieldNames(Boolean value) {
+    configuration.allowQuotedFieldNames(value);
+    return this;
+  }
+
+  public Boolean allowsSingleQuotes() {
+    return configuration.allowsSingleQuotes();
+  }
+
+  public JsonJacksonTreeDataFormatInstance allowSingleQuotes(Boolean value) {
+    configuration.allowSingleQuotes(value);
+    return this;
+  }
+
+  public Boolean allowsBackslashEscapingAnyCharacter() {
+    return configuration.allowsBackslashEscapingAnyCharacter();
+  }
+
+  public JsonJacksonTreeDataFormatInstance allowBackslashEscapingAnyCharacter(Boolean value) {
+    configuration.allowBackslashEscapingAnyCharacter(value);
+    return this;
+  }
+
+  public Boolean allowsNonNumericNumbers() {
+    return configuration.allowsNonNumericNumbers();
+  }
+
+  public JsonJacksonTreeDataFormatInstance allowNonNumericNumbers(Boolean value) {
+    configuration.allowNonNumericNumbers(value);
+    return this;
+  }
+
 }

@@ -40,8 +40,8 @@ public class JsonJacksonTreeDataFormatReader implements DataFormatReader {
   }
 
   public Object readInput(InputStream input) {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(Feature.ALLOW_NUMERIC_LEADING_ZEROS, format.allowsNumericLeadingZeros());
+    ObjectMapper mapper = createObjectMapper(format);
+    
     try {
       return mapper.readTree(input);
     } catch (JsonProcessingException e) {
@@ -49,6 +49,19 @@ public class JsonJacksonTreeDataFormatReader implements DataFormatReader {
     } catch (IOException e) {
       throw JSON_LOGGER.unableToParseInput(e);
     }
+  }
+  
+  protected ObjectMapper createObjectMapper(JsonJacksonTreeDataFormatInstance dataFormatInstance) {
+    ObjectMapper mapper = new ObjectMapper();
+    
+    mapper.configure(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, format.allowsBackslashEscapingAnyCharacter());
+    mapper.configure(Feature.ALLOW_COMMENTS, format.allowsComments());
+    mapper.configure(Feature.ALLOW_NON_NUMERIC_NUMBERS, format.allowsNonNumericNumbers());
+    mapper.configure(Feature.ALLOW_NUMERIC_LEADING_ZEROS, format.allowsNumericLeadingZeros());
+    mapper.configure(Feature.ALLOW_SINGLE_QUOTES, format.allowsSingleQuotes());
+    mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, format.allowsUnquotedFieldNames());
+    
+    return mapper;
   }
 
 }

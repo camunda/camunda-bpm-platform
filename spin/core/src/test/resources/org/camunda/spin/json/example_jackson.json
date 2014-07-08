@@ -1,0 +1,7 @@
+{
+  "number": 001,
+  // a comment
+  'a single quote key': '\'non-standard escapes\'',
+  "number2": NaN,
+  anUnquotedFieldName: "a Value"
+}
