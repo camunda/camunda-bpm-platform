@@ -63,9 +63,13 @@
   <delete id="deleteUserOperationLogEntriesByProcessInstanceId">
     delete from ${prefix}ACT_HI_OP_LOG where PROC_INST_ID_ = #{id}
   </delete>
-  
+
   <delete id="deleteUserOperationLogEntriesByCaseInstanceId">
     delete from ${prefix}ACT_HI_OP_LOG where CASE_INST_ID_ = #{id}
+  </delete>
+
+  <delete id="deleteUserOperationLogEntriesByCaseDefinitionId">
+    delete from ${prefix}ACT_HI_OP_LOG where CASE_DEF_ID_ = #{id}
   </delete>
 
   <delete id="deleteUserOperationLogEntriesByTaskId">

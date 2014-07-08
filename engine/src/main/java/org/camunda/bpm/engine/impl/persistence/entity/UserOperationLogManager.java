@@ -56,6 +56,10 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     getDbSqlSession().delete("deleteUserOperationLogEntriesByCaseInstanceId", caseInstanceId);
   }
 
+  public void deleteOperationLogEntriesByCaseDefinitionId(String caseInstanceId) {
+    getDbSqlSession().delete("deleteUserOperationLogEntriesByCaseDefinitionId", caseInstanceId);
+  }
+
   public void deleteOperationLogEntriesByTaskId(String taskId) {
     getDbSqlSession().delete("deleteUserOperationLogEntriesByTaskId", taskId);
   }
