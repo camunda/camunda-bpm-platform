@@ -142,12 +142,14 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
     String returnedDefinitionId = from(content).getString("[0].definitionId");
     String returnedBusinessKey = from(content).getString("[0].businessKey");
     Boolean returnedIsSuspended = from(content).getBoolean("[0].suspended");
+    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED, returnedIsEnded);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, returnedBusinessKey);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED, returnedIsSuspended);
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
   }
 
   @Test
@@ -187,6 +189,7 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_INSTANCE_QUERY_URL);
 
+    verify(mockedQuery).caseInstanceId(queryParameters.get("caseInstanceId"));
     verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));
@@ -215,6 +218,7 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
     parameters.put("incidentMessage", "incMessage");
     parameters.put("incidentMessageLike", "incMessageLike");
     parameters.put("incidentType", "incType");
+    parameters.put("caseInstanceId", "aCaseInstanceId");
 
     return parameters;
   }
@@ -376,6 +380,7 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
       .expect().statusCode(Status.OK.getStatusCode())
       .when().post(PROCESS_INSTANCE_QUERY_URL);
 
+    verify(mockedQuery).caseInstanceId(queryParameters.get("caseInstanceId"));
     verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));

@@ -45,6 +45,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
 
   private String processDefinitionKey;
   private String businessKey;
+  private String caseInstanceId;
   private String processDefinitionId;
   private String superProcessInstance;
   private String subProcessInstance;
@@ -83,6 +84,11 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   @CamundaQueryParam("businessKey")
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
+  }
+
+  @CamundaQueryParam("caseInstanceId")
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
   }
 
   @CamundaQueryParam("processDefinitionId")
@@ -156,6 +162,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (businessKey != null) {
       query.processInstanceBusinessKey(businessKey);
+    }
+    if (caseInstanceId != null) {
+      query.caseInstanceId(caseInstanceId);
     }
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
