@@ -6,7 +6,6 @@ drop index ACT_RU_CASE_EXECUTION.ACT_IDX_CASE_EXEC_PARENT;
 drop index ACT_RU_VARIABLE.ACT_IDX_VARIABLE_CASE_EXEC;
 drop index ACT_RU_VARIABLE.ACT_IDX_VARIABLE_CASE_INST;
 drop index ACT_RU_TASK.ACT_IDX_TASK_CASE_EXEC;
-drop index ACT_RU_TASK.ACT_IDX_TASK_CASE_INST;
 drop index ACT_RU_TASK.ACT_IDX_TASK_CASE_DEF_ID;
 
 alter table ACT_RU_CASE_EXECUTION
@@ -26,9 +25,6 @@ alter table ACT_RU_VARIABLE
 
 alter table ACT_RU_TASK
     drop constraint ACT_FK_TASK_CASE_EXE;
-
-alter table ACT_RU_TASK
-    drop constraint ACT_FK_TASK_CASE_INST;
 
 alter table ACT_RU_TASK
     drop constraint ACT_FK_TASK_CASE_DEF;

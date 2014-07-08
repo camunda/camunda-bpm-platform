@@ -19,9 +19,6 @@ alter table ACT_RU_TASK
     drop foreign key ACT_FK_TASK_CASE_EXE;
 
 alter table ACT_RU_TASK
-    drop foreign key ACT_FK_TASK_CASE_INST;
-
-alter table ACT_RU_TASK
     drop foreign key ACT_FK_TASK_CASE_DEF;
 
 -- indexes for concurrency problems - https://app.camunda.com/jira/browse/CAM-1646 --
@@ -30,7 +27,6 @@ drop index ACT_IDX_CASE_EXEC_PARENT;
 drop index ACT_IDX_VARIABLE_CASE_EXEC;
 drop index ACT_IDX_VARIABLE_CASE_INST;
 drop index ACT_IDX_TASK_CASE_EXEC;
-drop index ACT_IDX_TASK_CASE_INST;
 drop index ACT_IDX_TASK_CASE_DEF_ID;
 
 drop table ACT_RE_CASE_DEF;

@@ -74,12 +74,6 @@ alter table ACT_RU_TASK
     foreign key (CASE_EXECUTION_ID_)
     references ACT_RU_CASE_EXECUTION(ID_);
 
-create index ACT_IDX_TASK_CASE_INST on ACT_RU_TASK(CASE_INST_ID_);
-alter table ACT_RU_TASK
-    add constraint ACT_FK_TASK_CASE_INST
-    foreign key (CASE_INST_ID_)
-    references ACT_RU_CASE_EXECUTION(ID_);
-
 create index ACT_IDX_TASK_CASE_DEF_ID on ACT_RU_TASK(CASE_DEF_ID_);
 alter table ACT_RU_TASK
   add constraint ACT_FK_TASK_CASE_DEF

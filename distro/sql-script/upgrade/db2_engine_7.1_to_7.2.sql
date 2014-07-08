@@ -35,6 +35,12 @@ ALTER TABLE ACT_RU_TASK
 
 ALTER TABLE ACT_RU_TASK
   ADD CASE_DEF_ID_ varchar(64);
+
+ALTER TABLE ACT_RU_EXECUTION
+  ADD SUPER_CASE_EXEC_ varchar(64);
+
+ALTER TABLE ACT_RU_EXECUTION
+  ADD CASE_INST_ID_ varchar(64);
   
 ALTER TABLE ACT_HI_OP_LOG
   ADD CASE_EXECUTION_ID_ varchar(64);
@@ -113,11 +119,6 @@ alter table ACT_RU_VARIABLE
 alter table ACT_RU_TASK
     add constraint ACT_FK_TASK_CASE_EXE
     foreign key (CASE_EXECUTION_ID_)
-    references ACT_RU_CASE_EXECUTION(ID_);
-
-alter table ACT_RU_TASK
-    add constraint ACT_FK_TASK_CASE_INST
-    foreign key (CASE_INST_ID_)
     references ACT_RU_CASE_EXECUTION(ID_);
 
 alter table ACT_RU_TASK

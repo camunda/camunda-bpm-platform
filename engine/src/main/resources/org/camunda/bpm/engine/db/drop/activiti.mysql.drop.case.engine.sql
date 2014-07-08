@@ -19,9 +19,6 @@ alter table ACT_RU_TASK
     drop foreign key ACT_FK_TASK_CASE_EXE;
 
 alter table ACT_RU_TASK
-    drop foreign key ACT_FK_TASK_CASE_INST;
-
-alter table ACT_RU_TASK
     drop foreign key ACT_FK_TASK_CASE_DEF;
 
 drop table if exists ACT_RE_CASE_DEF;

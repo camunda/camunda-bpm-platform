@@ -42,6 +42,8 @@ create table ACT_RU_EXECUTION (
     PARENT_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
     SUPER_EXEC_ nvarchar(64),
+    SUPER_CASE_EXEC_ nvarchar(64),
+    CASE_INST_ID_ nvarchar(64),
     ACT_ID_ nvarchar(255),
     ACT_INST_ID_ nvarchar(64),
     IS_ACTIVE_ tinyint,

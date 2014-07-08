@@ -69,11 +69,6 @@ alter table ACT_RU_TASK
     references ACT_RU_CASE_EXECUTION;
 
 alter table ACT_RU_TASK
-    add constraint ACT_FK_TASK_CASE_INST
-    foreign key (CASE_INST_ID_)
-    references ACT_RU_CASE_EXECUTION;
-
-alter table ACT_RU_TASK
   add constraint ACT_FK_TASK_CASE_DEF
   foreign key (CASE_DEF_ID_)
   references ACT_RE_CASE_DEF;
