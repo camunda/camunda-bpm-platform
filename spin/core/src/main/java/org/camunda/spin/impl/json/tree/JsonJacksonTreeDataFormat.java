@@ -12,16 +12,18 @@
  */
 package org.camunda.spin.impl.json.tree;
 
+import java.util.Map;
+
 import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.spi.Configurable;
 import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.spi.DataFormatReader;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Thorben Lindhauer
  */
-public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode> {
+public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, JsonJacksonTreeConfigurable<JsonJacksonTreeDataFormat> {
 
   public static final JsonJacksonTreeDataFormat INSTANCE = new JsonJacksonTreeDataFormat();
   
@@ -46,12 +48,93 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode> {
   // configuration
 
 
-  public JsonJacksonTreeDataFormatInstance newInstance() {
-    return new JsonJacksonTreeDataFormatInstance(configuration.getConfiguration(), this);
+  public JsonJacksonTreeDataFormat newInstance() {
+    JsonJacksonTreeDataFormat instance = new JsonJacksonTreeDataFormat();
+    instance.configuration = 
+        new JsonJacksonTreeConfiguration(configuration);
+    
+    return instance;
   }
 
-  public Configurable<?> getConfiguration() {
-    return configuration;
+
+  public JsonJacksonTreeDataFormat config(String key, Object value) {
+    configuration.config(key, value);
+    return this;
+  }
+  
+  public JsonJacksonTreeDataFormat config(Map<String, Object> config) {
+    configuration.config(config);
+    return this;
+  }
+
+  public Object getValue(String key) {
+    return configuration.getValue(key);
+  }
+
+  public Object getValue(String key, Object defaultValue) {
+    return configuration.getValue(key, defaultValue);
+  }
+
+  public Boolean allowsNumericLeadingZeros() {
+    return configuration.allowsNumericLeadingZeros();
+  }
+
+  public JsonJacksonTreeDataFormat allowNumericLeadingZeros(Boolean value) {
+    configuration.allowNumericLeadingZeros(value);
+    return this;
+  }
+
+  public Map<String, Object> getConfiguration() {
+    return configuration.getConfiguration();
+  }
+  
+  public DataFormatReader getReader() {
+    return new JsonJacksonTreeDataFormatReader(this);
+  }
+
+  public Boolean allowsComments() {
+    return configuration.allowsComments();
+  }
+
+  public JsonJacksonTreeDataFormat allowComments(Boolean value) {
+    configuration.allowComments(value);
+    return this;
+  }
+
+  public Boolean allowsUnquotedFieldNames() {
+    return configuration.allowsUnquotedFieldNames();
+  }
+
+  public JsonJacksonTreeDataFormat allowQuotedFieldNames(Boolean value) {
+    configuration.allowQuotedFieldNames(value);
+    return this;
+  }
+
+  public Boolean allowsSingleQuotes() {
+    return configuration.allowsSingleQuotes();
+  }
+
+  public JsonJacksonTreeDataFormat allowSingleQuotes(Boolean value) {
+    configuration.allowSingleQuotes(value);
+    return this;
+  }
+
+  public Boolean allowsBackslashEscapingAnyCharacter() {
+    return configuration.allowsBackslashEscapingAnyCharacter();
+  }
+
+  public JsonJacksonTreeDataFormat allowBackslashEscapingAnyCharacter(Boolean value) {
+    configuration.allowBackslashEscapingAnyCharacter(value);
+    return this;
+  }
+
+  public Boolean allowsNonNumericNumbers() {
+    return configuration.allowsNonNumericNumbers();
+  }
+
+  public JsonJacksonTreeDataFormat allowNonNumericNumbers(Boolean value) {
+    configuration.allowNonNumericNumbers(value);
+    return this;
   }
 
 }

@@ -16,9 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
-import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormatInstance;
 import org.camunda.spin.impl.xml.dom.XmlDomDataFormat;
-import org.camunda.spin.impl.xml.dom.XmlDomDataFormatInstance;
 import org.camunda.spin.spi.DataFormat;
 
 /**
@@ -41,7 +39,7 @@ public class DataFormats {
     return XmlDomDataFormat.INSTANCE;
   }
   
-  public static XmlDomDataFormatInstance xmlDom() {
+  public static XmlDomDataFormat xmlDom() {
     return XmlDomDataFormat.INSTANCE.newInstance();
   }
   
@@ -49,7 +47,7 @@ public class DataFormats {
     return JsonJacksonTreeDataFormat.INSTANCE;
   }
   
-  public static JsonJacksonTreeDataFormatInstance jsonTree() {
+  public static JsonJacksonTreeDataFormat jsonTree() {
     return JsonJacksonTreeDataFormat.INSTANCE.newInstance();
   }
 

@@ -30,9 +30,9 @@ public class JsonJacksonTreeDataFormatReader implements DataFormatReader {
 
   private static final JsonJacksonTreeLogger JSON_LOGGER = SpinLogger.JSON_TREE_LOGGER;
   
-  protected JsonJacksonTreeDataFormatInstance format;
+  protected JsonJacksonTreeDataFormat format;
   
-  public JsonJacksonTreeDataFormatReader(JsonJacksonTreeDataFormatInstance format) {
+  public JsonJacksonTreeDataFormatReader(JsonJacksonTreeDataFormat format) {
     this.format = format;
   }
   
@@ -54,7 +54,7 @@ public class JsonJacksonTreeDataFormatReader implements DataFormatReader {
     }
   }
   
-  protected ObjectMapper createObjectMapper(JsonJacksonTreeDataFormatInstance dataFormatInstance) {
+  protected ObjectMapper createObjectMapper(JsonJacksonTreeDataFormat format) {
     ObjectMapper mapper = new ObjectMapper();
     
     mapper.configure(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, format.allowsBackslashEscapingAnyCharacter());

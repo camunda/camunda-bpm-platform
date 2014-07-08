@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.camunda.spin.impl.json.tree.JsonJacksonTreeConfiguration;
 import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
-import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormatInstance;
 import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
@@ -34,7 +33,7 @@ import org.junit.Test;
 
 public class JsonTreeConfigureTest {
 
-  private JsonJacksonTreeDataFormatInstance dataFormatInstance;
+  private JsonJacksonTreeDataFormat dataFormatInstance;
   private Map<String, Object> configurationMap;
   
   @Before
@@ -104,18 +103,18 @@ public class JsonTreeConfigureTest {
   @Test
   public void shouldCreateNewInstanceOnConfiguration() {
     JsonJacksonTreeDataFormat jsonDataFormat = new JsonJacksonTreeDataFormat();
-    jsonDataFormat.getConfiguration().config("aKey", "aValue");
+    jsonDataFormat.config("aKey", "aValue");
     
-    JsonJacksonTreeDataFormatInstance jsonDataFormatInstance = 
+    JsonJacksonTreeDataFormat jsonDataFormatInstance = 
         jsonDataFormat.newInstance().config("anotherKey", "anotherValue");
     
-    assertThat(jsonDataFormat.getConfiguration().getValue("aKey")).isEqualTo("aValue");
-    assertThat(jsonDataFormat.getConfiguration().getValue("anotherKey")).isNull();
+    assertThat(jsonDataFormat.getValue("aKey")).isEqualTo("aValue");
+    assertThat(jsonDataFormat.getValue("anotherKey")).isNull();
     
     assertThat(jsonDataFormatInstance.getValue("aKey").equals("aValue"));
     assertThat(jsonDataFormatInstance.getValue("anotherKey").equals("anotherValue"));
     
-    JsonJacksonTreeDataFormatInstance nextReturnedDataFormatInstance = 
+    JsonJacksonTreeDataFormat nextReturnedDataFormatInstance = 
         jsonDataFormatInstance.config("aThirdKey", "aThirdValue");
     assertThat(nextReturnedDataFormatInstance).isSameAs(jsonDataFormatInstance);
     assertThat(jsonDataFormatInstance.getValue("aThirdKey").equals("aThirdValue"));

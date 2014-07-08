@@ -33,8 +33,8 @@ public class JsonJacksonTreeConfiguration implements JsonJacksonTreeConfigurable
     this.configuration = new HashMap<String, Object>();
   }
   
-  public JsonJacksonTreeConfiguration(Map<String, Object> configuration) {
-    this.configuration = configuration;
+  public JsonJacksonTreeConfiguration(JsonJacksonTreeConfiguration other) {
+    this.configuration = new HashMap<String, Object>(other.configuration);
   }
   
   public JsonJacksonTreeConfiguration config(String key, Object value) {

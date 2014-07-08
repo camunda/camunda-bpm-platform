@@ -27,7 +27,7 @@ public interface DataFormat<T extends Spin<?>> {
 
   String getName();
   
-  DataFormatInstance<T> newInstance();
+  DataFormat<T> newInstance();
   
-  Configurable<?> getConfiguration();
+  DataFormatReader getReader();
 }

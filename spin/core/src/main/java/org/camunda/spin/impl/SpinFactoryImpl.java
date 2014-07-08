@@ -24,7 +24,6 @@ import org.camunda.spin.SpinFactory;
 import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.spi.DataFormat;
-import org.camunda.spin.spi.DataFormatInstance;
 import org.camunda.spin.spi.DataFormatReader;
 import org.camunda.spin.spi.SpinDataFormatException;
 
@@ -64,11 +63,10 @@ public class SpinFactoryImpl extends SpinFactory {
     PushbackInputStream backUpStream = new PushbackInputStream(parameter, READ_SIZE);
     byte[] firstBytes = IoUtil.readFirstBytes(backUpStream, READ_SIZE);
     
-    DataFormatInstance<T> matchingDataFormat = null;
+    DataFormat<T> matchingDataFormat = null;
     for (DataFormat<?> format : DataFormats.AVAILABLE_FORMATS) {
-      DataFormatInstance<?> instance = format.newInstance();
-      if (instance.getReader().canRead(firstBytes)) {
-        matchingDataFormat = (DataFormatInstance<T>) instance;
+      if (format.getReader().canRead(firstBytes)) {
+        matchingDataFormat = (DataFormat<T>) format;
       }
     }
     
@@ -90,26 +88,26 @@ public class SpinFactoryImpl extends SpinFactory {
    * @throws SpinDataFormatException in case the parameter cannot be read using this data format
    * @throws IllegalArgumentException in case the parameter is null or dd:
    */
-  public <T extends Spin<?>> T createSpin(T parameter, DataFormatInstance<T> format) {
+  public <T extends Spin<?>> T createSpin(T parameter, DataFormat<T> format) {
 
     ensureParameterNotNull(parameter);
     
     return parameter;
   }
 
-  public <T extends Spin<?>> T createSpin(String parameter, DataFormatInstance<T> format) {
+  public <T extends Spin<?>> T createSpin(String parameter, DataFormat<T> format) {
     ensureParameterNotNull(parameter);
     
     InputStream input = stringAsInputStream(parameter);
     return createSpin(input, format);
   }
 
-  public <T extends Spin<?>> T createSpin(InputStream parameter, DataFormatInstance<T> format) {
+  public <T extends Spin<?>> T createSpin(InputStream parameter, DataFormat<T> format) {
     ensureParameterNotNull(parameter);
     
     DataFormatReader reader = format.getReader();
     Object dataFormatInput = reader.readInput(parameter);
-    return format.getDataFormat().createWrapperInstance(dataFormatInput);
+    return format.createWrapperInstance(dataFormatInput);
   }
   
   protected void ensureParameterNotNull(Object parameter) {
