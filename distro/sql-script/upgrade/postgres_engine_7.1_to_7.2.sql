@@ -68,6 +68,7 @@ create table ACT_RU_CASE_EXECUTION (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
     CASE_INST_ID_ varchar(64),
+    SUPER_CASE_EXEC_ varchar(64),
     BUSINESS_KEY_ varchar(255),
     PARENT_ID_ varchar(64),
     CASE_DEF_ID_ varchar(64),
@@ -103,6 +104,12 @@ alter table ACT_RU_CASE_EXECUTION
     add constraint ACT_FK_CASE_EXE_CASE_DEF
     foreign key (CASE_DEF_ID_)
     references ACT_RE_CASE_DEF(ID_);
+
+create index ACT_IDX_CASE_EXE_SUPER on ACT_RU_CASE_EXECUTION(SUPER_CASE_EXEC_);
+alter table ACT_RU_CASE_EXECUTION
+    add constraint ACT_FK_CASE_EXE_SUPER
+    foreign key (SUPER_CASE_EXEC_)
+    references ACT_RU_CASE_EXECUTION(ID_);
 
 -- create foreign key constraints on ACT_RU_VARIABLE --
 create index ACT_IDX_VAR_CASE_EXE on ACT_RU_VARIABLE(CASE_EXECUTION_ID_);
