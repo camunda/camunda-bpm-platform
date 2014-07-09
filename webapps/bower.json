@@ -38,6 +38,7 @@
     "angular-bootstrap": "0.11.0",
     "angular-route": "1.2.16",
     "angular-animate": "1.2.16",
+    "camunda-bpm-form": "./node_modules/camunda-bpm-sdk-js/dist/camunda-embedded-forms.js",
     "camunda-bpm-sdk-js": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk.js",
     "camunda-bpm-sdk-js-mock": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk-mock.js"
   },
@@ -50,7 +51,6 @@
     "requirejs-text": "2.0.12"
   },
   "resolutions": {
-    "angular": "1.2.16",
     "jquery": "2.1.1"
   }
 }

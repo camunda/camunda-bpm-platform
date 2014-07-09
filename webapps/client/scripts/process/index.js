@@ -15,8 +15,9 @@ define([
 
 
   processModule.controller('processStartModalFormCtrl', [
-          '$scope', '$q', 'camAPI', 'camTasklistNotifier',
-  function($scope,   $q,   camAPI,   camTasklistNotifier) {
+          '$scope', '$q', 'camAPI', 'CamForm', 'camTasklistNotifier',
+  function($scope,   $q,   camAPI,   CamForm,   camTasklistNotifier) {
+    var $ = angular.element;
 
     var ProcessDefinition = camAPI.resource('process-definition');
 
@@ -141,8 +142,38 @@ define([
 
     $scope.getStartForm = function(startingProcess) {
       $scope.startingProcess = startingProcess;
-      $scope.variables = [];
-      $scope.addVariable();
+      $scope.loadingProcesses = true;
+
+      ProcessDefinition.startForm({
+        id: startingProcess.id
+      }, function(err, result) {
+        $scope.loadingProcesses = false;
+
+        if (err) {
+          camTasklistNotifier.add(err);
+          throw err;
+        }
+
+        var parts = result.key.split('embedded:');
+        if (parts.length > 1) {
+          var formUrl = parts.pop().replace('app:', result.contextPath);
+
+          console.info('Found formUrl', formUrl);
+
+          var form = new CamForm({
+            processDefinitionId: startingProcess.id,
+            containerElement: $('.starting-process'),
+            service: camAPI,
+            formUrl: formUrl
+          });
+        }
+        else {
+          // generic form
+        }
+      });
+      // $scope.variables = [];
+      // $scope.addVariable();
+
     };
 
 

@@ -7,9 +7,9 @@ module.exports = function(config) {
 
     assets: {
       files: [
-        config.clientDir +'/{fonts,images}/**/*',
-        config.clientDir +'/index.html',
-        config.clientDir +'/favicon.ico'
+        '<%= pkg.gruntConfig.clientDir %>/{fonts,images}/**/*',
+        '<%= pkg.gruntConfig.clientDir %>/index.html',
+        '<%= pkg.gruntConfig.clientDir %>/favicon.ico'
       ],
       tasks: [
         'newer:copy:assets'
@@ -18,8 +18,8 @@ module.exports = function(config) {
 
     styles: {
       files: [
-        config.clientDir +'/styles/**/*.{css,less}',
-        config.clientDir +'/scripts/*/*.{css,less}'
+        '<%= pkg.gruntConfig.clientDir %>/styles/**/*.{css,less}',
+        '<%= pkg.gruntConfig.clientDir %>/scripts/*/*.{css,less}'
       ],
       tasks: [
         'less'
@@ -29,7 +29,7 @@ module.exports = function(config) {
     scripts: {
       files: [
         'grunt/config/requirejs.js',
-        config.clientDir +'/scripts/**/*.{js,html}'
+        '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html}'
       ],
       tasks: [
         'newer:jshint:scripts',
@@ -43,8 +43,9 @@ module.exports = function(config) {
         'node_modules/camunda-bpm-sdk-js/dist/**/*.js'
       ],
       tasks: [
+        'bower',
         'copy:sdk',
-        'requirejs:scripts'
+        'requirejs'
       ]
     },
 
@@ -80,7 +81,7 @@ module.exports = function(config) {
     },
 
     served: {
-      files: ['<%= buildTarget %>/**/*.{js,css,jpg,png,webp,eot,svg,ttf,otf,woff}'],
+      files: ['<%= buildTarget %>/**/*.{html,js,css,jpg,png,webp,eot,svg,ttf,otf,woff}'],
       options: {
         livereload: config.livereloadPort || false
       }

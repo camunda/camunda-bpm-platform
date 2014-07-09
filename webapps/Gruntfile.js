@@ -36,7 +36,7 @@ module.exports = function(grunt) {
 
     less:             require('camunda-commons-ui/grunt/config/less')(config),
 
-    copy:             require('camunda-commons-ui/grunt/config/copy')(config),
+    copy:             require('./grunt/config/copy')(config),
 
     watch:            require('./grunt/config/watch')(config),
 

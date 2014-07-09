@@ -23,6 +23,8 @@ define(function() {
       'camunda-tasklist-ui':        'scripts',
 
 
+      'camunda-bpm-form':           'bower_components/camunda-bpm-form/index',
+
       'camunda-bpm-sdk':            'bower_components/camunda-bpm-sdk-js/index',
       'camunda-bpm-sdk-mock':       'bower_components/camunda-bpm-sdk-js-mock/index'
     },

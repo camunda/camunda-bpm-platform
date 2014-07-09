@@ -1,9 +1,11 @@
 'use strict';
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 
-define(['angular', 'camunda-bpm-sdk', 'camunda-bpm-sdk-mock'],
-function(angular,   CamSDK,            MockClient) {
+define(['angular', 'camunda-bpm-sdk', 'camunda-bpm-form', 'camunda-bpm-sdk-mock'],
+function(angular,   CamSDK,            CamForm,            MockClient) {
   var apiModule = angular.module('cam.tasklist.client', []);
+
+  apiModule.value('CamForm', CamForm);
 
   apiModule.value('HttpClient', CamSDK);
 
@@ -18,7 +20,7 @@ function(angular,   CamSDK,            MockClient) {
       this._wrapped = new Client(config);
     }
 
-    angular.forEach(['post', 'get', 'put', 'del'], function(name) {
+    angular.forEach(['post', 'get', 'load', 'put', 'del'], function(name) {
       AngularClient.prototype[name] = function(path, options) {
         if (!options.done) {
           return;
@@ -63,6 +65,9 @@ function(angular,   CamSDK,            MockClient) {
     return new CamSDK(conf);
   }]);
 
+  // apiModule.factory('camForm', ['CamForm', function(CamEmbeddedForm) {
+  //   return
+  // }]);
 
   return apiModule;
 });
