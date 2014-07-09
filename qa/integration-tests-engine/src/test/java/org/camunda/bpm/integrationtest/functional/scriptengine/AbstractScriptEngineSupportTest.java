@@ -29,7 +29,7 @@ import static org.junit.Assert.assertNotNull;
  * @author Sebastian Menski
  */
 @RunWith(Arquillian.class)
-public abstract class ScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTest {
+public abstract class AbstractScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTest {
 
   public static final String PROCESS_ID = "testProcess";
   public static final String EXAMPLE_SCRIPT = "execution.setVariable('foo', S('<bar/>').name())";
