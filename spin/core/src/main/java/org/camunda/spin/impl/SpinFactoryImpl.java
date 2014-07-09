@@ -16,12 +16,11 @@ import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
 
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
-import org.camunda.spin.impl.util.IoUtil;
+import org.camunda.spin.impl.util.RewindableInputStream;
 import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
@@ -36,7 +35,7 @@ public class SpinFactoryImpl extends SpinFactory {
 
   private final static SpinCoreLogger LOG = SpinCoreLogger.CORE_LOGGER;
   
-  private final static int READ_SIZE = 16;
+  private final static int READ_SIZE = 256;
 
   /**
    *
@@ -60,27 +59,27 @@ public class SpinFactoryImpl extends SpinFactory {
   public <T extends Spin<?>> T createSpin(InputStream parameter) {
     ensureParameterNotNull(parameter);
     
-    PushbackInputStream backUpStream = new PushbackInputStream(parameter, READ_SIZE);
-    byte[] firstBytes = IoUtil.readFirstBytes(backUpStream, READ_SIZE);
+    RewindableInputStream rewindableStream = new RewindableInputStream(parameter, READ_SIZE);
     
     DataFormat<T> matchingDataFormat = null;
     for (DataFormat<?> format : DataFormats.AVAILABLE_FORMATS) {
-      if (format.getReader().canRead(firstBytes)) {
+      if (format.getReader().canRead(rewindableStream)) {
         matchingDataFormat = (DataFormat<T>) format;
       }
+      
+      try {
+        rewindableStream.rewind();
+      } catch (IOException e) {
+        throw LOG.unableToReadInputStream(e);
+      }
+      
     }
     
     if (matchingDataFormat == null) {
       throw LOG.unrecognizableDataFormatException();
     }
     
-    try {
-      backUpStream.unread(firstBytes);
-    } catch (IOException e) {
-      throw LOG.unableToReadInputStream(e);
-    }
-    
-    return createSpin(backUpStream, matchingDataFormat);
+    return createSpin(rewindableStream, matchingDataFormat);
   }
 
   /**

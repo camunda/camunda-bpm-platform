@@ -14,14 +14,14 @@ package org.camunda.spin.impl.xml.dom;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.camunda.spin.logging.SpinLogger;
-import org.camunda.spin.spi.DataFormatReader;
+import org.camunda.spin.spi.TextBasedDataFormatReader;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -29,16 +29,10 @@ import org.xml.sax.SAXException;
  * @author Daniel Meyer
  *
  */
-public class XmlDomDataFormatReader implements DataFormatReader {
+public class XmlDomDataFormatReader extends TextBasedDataFormatReader {
 
   private static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
-
-  public boolean canRead(byte[] firstBytes) {
-    
-    String firstCharacters = new String(firstBytes, Charset.forName("UTF-8")).trim();
-    
-    return firstCharacters.startsWith("<");
-  }
+  private static final Pattern INPUT_MATCHING_PATTERN = Pattern.compile("\\A(\\s)*<");
 
   public Element readInput(InputStream input) {
 
@@ -103,6 +97,10 @@ public class XmlDomDataFormatReader implements DataFormatReader {
     documentBuilderFactory.setIgnoringElementContentWhitespace(false);
     LOG.documentBuilderFactoryConfiguration("ignoringElementContentWhitespace", "false");
 
+  }
+
+  protected Pattern getInputDetectionPattern() {
+    return INPUT_MATCHING_PATTERN;
   }
 
 }

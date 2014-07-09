@@ -14,10 +14,10 @@ package org.camunda.spin.impl.json.tree;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.util.regex.Pattern;
 
 import org.camunda.spin.logging.SpinLogger;
-import org.camunda.spin.spi.DataFormatReader;
+import org.camunda.spin.spi.TextBasedDataFormatReader;
 
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,20 +26,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Thorben Lindhauer
  */
-public class JsonJacksonTreeDataFormatReader implements DataFormatReader {
+public class JsonJacksonTreeDataFormatReader extends TextBasedDataFormatReader {
 
   private static final JsonJacksonTreeLogger JSON_LOGGER = SpinLogger.JSON_TREE_LOGGER;
+  private static final Pattern INPUT_MATCHING_PATTERN = Pattern.compile("\\A(\\s)*[{\\[]");
   
   protected JsonJacksonTreeDataFormat format;
   
   public JsonJacksonTreeDataFormatReader(JsonJacksonTreeDataFormat format) {
     this.format = format;
-  }
-  
-  public boolean canRead(byte[] firstBytes) {
-    String firstCharacters = new String(firstBytes, Charset.forName("UTF-8")).trim();
-    
-    return firstCharacters.startsWith("{") || firstCharacters.startsWith("[");
   }
 
   public Object readInput(InputStream input) {
@@ -65,6 +60,10 @@ public class JsonJacksonTreeDataFormatReader implements DataFormatReader {
     mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, format.allowsUnquotedFieldNames());
     
     return mapper;
+  }
+
+  protected Pattern getInputDetectionPattern() {
+    return INPUT_MATCHING_PATTERN;
   }
 
 }

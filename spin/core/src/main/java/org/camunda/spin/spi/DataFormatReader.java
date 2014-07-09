@@ -14,6 +14,8 @@ package org.camunda.spin.spi;
 
 import java.io.InputStream;
 
+import org.camunda.spin.impl.util.RewindableInputStream;
+
 /**
  * @author Daniel Meyer
  * @author Sebastian Menski
@@ -22,12 +24,14 @@ import java.io.InputStream;
 public interface DataFormatReader {
 
   /**
-   * Returns true if this reader estimates to be able to consume the input data
+   * Returns true if this reader estimates to be able to consume the input data.
+   * Implementations should not read more than 
+   * {@link RewindableInputStream#getRewindBufferSize()} bytes.
    *
-   * @param firstBytes first bytes of an input
+   * @param input stream that can be safely read from to detect a data format
    * @return true if this reader is able to consume the input
    */
-  boolean canRead(byte[] firstBytes);
+  boolean canRead(RewindableInputStream input);
 
   /**
    * Read (or parse) an input stream into this data-formats input structure. An Xml-Based data format may return an

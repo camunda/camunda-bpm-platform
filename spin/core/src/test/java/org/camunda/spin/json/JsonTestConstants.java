@@ -20,6 +20,8 @@ public class JsonTestConstants {
   
   public final static String EXAMPLE_JSON = IoUtil.readFileAsString(EXAMPLE_JSON_FILE_NAME);
   
+  public final static String EXAMPLE_JSON_COLLECTION = "[" + EXAMPLE_JSON + "]";
+  
   public final static String EXAMPLE_INVALID_JSON = "{\"invalid\":";
   
   public final static String EXAMPLE_EMPTY_STRING = "";
