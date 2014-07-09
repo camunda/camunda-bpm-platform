@@ -58,6 +58,7 @@
     <version.camunda.commons>1.0.0</version.camunda.commons>
     <version.camunda.connect>1.0.0-alpha1</version.camunda.connect>
     <version.camunda.spin>1.0.0-alpha1</version.camunda.spin>
+    <version.camunda.template-engines>1.0.0-alpha1</version.camunda.template-engines>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
@@ -543,8 +544,20 @@
       </dependency>
 
       <dependency>
+        <groupId>org.freemarker</groupId>
+        <artifactId>freemarker</artifactId>
+        <version>2.3.20</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.velocity</groupId>
+        <artifactId>velocity</artifactId>
+        <version>1.7</version>
+      </dependency>
+
+      <dependency>
         <!--
-            make sure everybody uses the same commons version 
+            make sure everybody uses the same commons version
         -->
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
@@ -563,6 +576,18 @@
         <groupId>org.camunda.spin</groupId>
         <artifactId>camunda-spin-all</artifactId>
         <version>${version.camunda.spin}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.camunda.template-engines</groupId>
+        <artifactId>camunda-template-engines-freemarker</artifactId>
+        <version>${version.camunda.template-engines}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.camunda.template-engines</groupId>
+        <artifactId>camunda-template-engines-velocity</artifactId>
+        <version>${version.camunda.template-engines}</version>
       </dependency>
 
     </dependencies>

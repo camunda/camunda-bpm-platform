@@ -1,0 +1,10 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.template-engines.camunda-template-engines-velocity">
+  <resources>
+    <resource-root path="camunda-template-engines-velocity-1.0.0-alpha1.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" />
+    <module name="org.apache.velocity" />
+  </dependencies>
+</module>

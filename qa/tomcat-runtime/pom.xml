@@ -71,6 +71,18 @@
       <scope>runtime</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.camunda.template-engines</groupId>
+      <artifactId>camunda-template-engines-freemarker</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.template-engines</groupId>
+      <artifactId>camunda-template-engines-velocity</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
   </dependencies>
 
   <profiles>
