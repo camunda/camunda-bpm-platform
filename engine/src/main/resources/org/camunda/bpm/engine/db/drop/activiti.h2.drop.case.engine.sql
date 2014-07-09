@@ -10,9 +10,6 @@ alter table ACT_RU_CASE_EXECUTION
     drop constraint ACT_FK_CASE_EXE_PARENT;
 
 alter table ACT_RU_CASE_EXECUTION
-    drop constraint ACT_FK_CASE_EXE_SUPER;
-
-alter table ACT_RU_CASE_EXECUTION
     drop constraint ACT_FK_CASE_EXE_CASE_DEF;
 
 alter table ACT_RU_VARIABLE

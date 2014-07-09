@@ -100,11 +100,6 @@ alter table ACT_RU_CASE_EXECUTION
     foreign key (CASE_DEF_ID_)
     references ACT_RE_CASE_DEF(ID_);
 
-alter table ACT_RU_CASE_EXECUTION
-    add constraint ACT_FK_CASE_EXE_SUPER
-    foreign key (SUPER_CASE_EXEC_)
-    references ACT_RU_CASE_EXECUTION(ID_);
-
 -- create foreign key constraints on ACT_RU_VARIABLE --
 alter table ACT_RU_VARIABLE
     add constraint ACT_FK_VAR_CASE_EXE
@@ -130,7 +125,6 @@ alter table ACT_RU_TASK
 -- indexes for concurrency problems - https://app.camunda.com/jira/browse/CAM-1646 --
 create index ACT_IDX_CASE_EXEC_CASE on ACT_RU_CASE_EXECUTION(CASE_DEF_ID_);
 create index ACT_IDX_CASE_EXEC_PARENT on ACT_RU_CASE_EXECUTION(PARENT_ID_);
-create index ACT_IDX_CASE_EXEC_SUPER on ACT_RU_CASE_EXECUTION(SUPER_CASE_EXEC_);
 create index ACT_IDX_VARIABLE_CASE_EXEC on ACT_RU_VARIABLE(CASE_EXECUTION_ID_);
 create index ACT_IDX_VARIABLE_CASE_INST on ACT_RU_VARIABLE(CASE_INST_ID_);
 create index ACT_IDX_TASK_CASE_EXEC on ACT_RU_TASK(CASE_EXECUTION_ID_);

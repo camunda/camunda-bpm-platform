@@ -3,7 +3,6 @@ drop index ACT_RU_CASE_EXECUTION.ACT_IDX_CASE_EXEC_BUSKEY;
 -- indexes for concurrency problems - https://app.camunda.com/jira/browse/CAM-1646 --
 drop index ACT_RU_CASE_EXECUTION.ACT_IDX_CASE_EXEC_CASE;
 drop index ACT_RU_CASE_EXECUTION.ACT_IDX_CASE_EXEC_PARENT;
-drop index ACT_RU_CASE_EXECUTION.ACT_IDX_CASE_EXEC_SUPER;
 drop index ACT_RU_VARIABLE.ACT_IDX_VARIABLE_CASE_EXEC;
 drop index ACT_RU_VARIABLE.ACT_IDX_VARIABLE_CASE_INST;
 drop index ACT_RU_TASK.ACT_IDX_TASK_CASE_EXEC;
@@ -14,9 +13,6 @@ alter table ACT_RU_CASE_EXECUTION
 
 alter table ACT_RU_CASE_EXECUTION
     drop constraint ACT_FK_CASE_EXE_PARENT;
-
-alter table ACT_RU_CASE_EXECUTION
-    drop constraint ACT_FK_CASE_EXE_SUPER;
 
 alter table ACT_RU_CASE_EXECUTION
     drop constraint ACT_FK_CASE_EXE_CASE_DEF;

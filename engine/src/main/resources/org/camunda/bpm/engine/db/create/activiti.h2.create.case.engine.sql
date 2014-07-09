@@ -52,11 +52,6 @@ alter table ACT_RU_CASE_EXECUTION
     foreign key (CASE_DEF_ID_)
     references ACT_RE_CASE_DEF;
 
-alter table ACT_RU_CASE_EXECUTION
-    add constraint ACT_FK_CASE_EXE_SUPER
-    foreign key (SUPER_CASE_EXEC_)
-    references ACT_RU_CASE_EXECUTION;
-
 -- create foreign key constraints on ACT_RU_VARIABLE --
 alter table ACT_RU_VARIABLE
     add constraint ACT_FK_VAR_CASE_EXE
