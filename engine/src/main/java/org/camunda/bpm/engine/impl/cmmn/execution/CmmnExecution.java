@@ -109,6 +109,18 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition);
 
+  // sub-/super- case instance ////////////////////////////////////////////////////
+
+  public abstract CmmnExecution getSubCaseInstance();
+
+  public abstract void setSubCaseInstance(CmmnExecution subCaseInstance);
+
+  public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition);
+
+  public abstract CmmnExecution getSuperCaseExecution();
+
+  public abstract void setSuperCaseExecution(CmmnExecution superCaseExecution);
+
   // business key ////////////////////////////////////////////////////////////
 
   public String getCaseBusinessKey() {

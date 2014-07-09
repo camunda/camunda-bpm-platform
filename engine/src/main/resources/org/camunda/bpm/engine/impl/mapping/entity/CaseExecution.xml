@@ -15,6 +15,7 @@
       CASE_DEF_ID_,
       ACT_ID_,
       PARENT_ID_,
+      SUPER_CASE_EXEC_,
       CURRENT_STATE_,
       PREV_STATE_,
       REV_
@@ -27,6 +28,7 @@
       #{caseDefinitionId, jdbcType=VARCHAR},
       #{activityId, jdbcType=VARCHAR},
       #{parentId, jdbcType=VARCHAR},
+      #{superCaseExecutionId, jdbcType=VARCHAR},
       #{state, jdbcType=INTEGER},
       #{previous, jdbcType=INTEGER},
       1
@@ -60,6 +62,7 @@
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
+    <result property="superCaseExecutionId" column="SUPER_CASE_EXEC_" jdbcType="VARCHAR" />
     <result property="state" column="CURRENT_STATE_" jdbcType="INTEGER" />
     <result property="previous" column="PREV_STATE_" jdbcType="INTEGER" />
   </resultMap>
@@ -79,6 +82,11 @@
     select ID_
     from ${prefix}ACT_RU_CASE_EXECUTION
     where CASE_DEF_ID_ = #{parameter} and PARENT_ID_ is null
+  </select>
+
+  <select id="selectSubCaseInstanceBySuperCaseExecutionId" parameterType="string" resultMap="caseExecutionResultMap">
+    select * from ${prefix}ACT_RU_CASE_EXECUTION
+    where SUPER_CASE_EXEC_ = #{id}
   </select>
 
   <select id="selectCaseExecutionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionQueryImpl" resultMap="caseExecutionResultMap">

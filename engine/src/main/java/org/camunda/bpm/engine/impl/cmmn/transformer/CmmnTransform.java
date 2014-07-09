@@ -35,6 +35,7 @@ import org.camunda.bpm.model.cmmn.CmmnModelException;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
@@ -204,6 +205,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
       planItemTransformer = getPlanItemHandler(HumanTask.class);
     } else if (definition instanceof ProcessTask) {
       planItemTransformer = getPlanItemHandler(ProcessTask.class);
+    } else if (definition instanceof CaseTask) {
+      planItemTransformer = getPlanItemHandler(CaseTask.class);
     } else if (definition instanceof Task) {
       planItemTransformer = getPlanItemHandler(Task.class);
     } else if (definition instanceof Stage) {

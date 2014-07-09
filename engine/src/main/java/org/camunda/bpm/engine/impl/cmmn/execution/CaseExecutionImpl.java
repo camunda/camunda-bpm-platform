@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.CmmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStore;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -45,6 +46,10 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   protected CaseExecutionImpl parent;
 
   protected ExecutionImpl subProcessInstance;
+
+  protected CaseExecutionImpl subCaseInstance;
+
+  protected CaseExecutionImpl superCaseExecution;
 
   // variables ////////////////////////////////////////////////////////////////
 
@@ -124,6 +129,34 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
     setSubProcessInstance(subProcessInstance);
 
     return subProcessInstance;
+  }
+
+  // sub-/super- case instance ////////////////////////////////////////////////////
+
+  public CaseExecutionImpl getSubCaseInstance() {
+    return subCaseInstance;
+  }
+
+  public void setSubCaseInstance(CmmnExecution subCaseInstance) {
+    this.subCaseInstance = (CaseExecutionImpl) subCaseInstance;
+  }
+
+  public CaseExecutionImpl createSubCaseInstance(CmmnCaseDefinition caseDefinition) {
+    CaseExecutionImpl caseInstance = (CaseExecutionImpl) caseDefinition.createCaseInstance();
+
+    // manage bidirectional super-sub-case-instances relation
+    subCaseInstance.setSuperCaseExecution(this);
+    setSubCaseInstance(subCaseInstance);
+
+    return caseInstance;
+  }
+
+  public CaseExecutionImpl getSuperCaseExecution() {
+    return superCaseExecution;
+  }
+
+  public void setSuperCaseExecution(CmmnExecution superCaseExecution) {
+    this.superCaseExecution = (CaseExecutionImpl) superCaseExecution;
   }
 
   // new case executions /////////////////////////////////////////////////////////

@@ -25,11 +25,11 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElement;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElementParameter;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CaseTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.ProcessTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.cmmn.handler.CaseTaskPlanItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
-import org.camunda.bpm.engine.impl.cmmn.handler.ProcessTaskPlanItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.mapping.value.ConstantValueProvider;
@@ -37,9 +37,9 @@ import org.camunda.bpm.engine.impl.core.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
+import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
-import org.camunda.bpm.model.cmmn.instance.ProcessTask;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaIn;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaOut;
 import org.junit.Before;
@@ -49,19 +49,19 @@ import org.junit.Test;
  * @author Roman Smirnov
  *
  */
-public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
+public class CaseTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
-  protected ProcessTask processTask;
+  protected CaseTask caseTask;
   protected PlanItem planItem;
-  protected ProcessTaskPlanItemHandler handler = new ProcessTaskPlanItemHandler();
+  protected CaseTaskPlanItemHandler handler = new CaseTaskPlanItemHandler();
   protected CmmnHandlerContext context;
 
   @Before
   public void setUp() {
-    processTask = createElement(casePlanModel, "aProcessTask", ProcessTask.class);
+    caseTask = createElement(casePlanModel, "aCaseTask", CaseTask.class);
 
-    planItem = createElement(casePlanModel, "PI_aProcessTask", PlanItem.class);
-    planItem.setDefinition(processTask);
+    planItem = createElement(casePlanModel, "PI_aCaseTask", PlanItem.class);
+    planItem.setDefinition(caseTask);
 
     context = new CmmnHandlerContext();
 
@@ -74,11 +74,11 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   }
 
   @Test
-  public void testProcessTaskActivityName() {
+  public void testCaseTaskActivityName() {
     // given:
-    // the processTask has a name "A ProcessTask"
-    String name = "A ProcessTask";
-    processTask.setName(name);
+    // the caseTask has a name "A CaseTask"
+    String name = "A CaseTask";
+    caseTask.setName(name);
 
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
@@ -90,9 +90,9 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testPlanItemActivityName() {
     // given:
-    // the processTask has a name "A CaseTask"
-    String processTaskName = "A ProcessTask";
-    processTask.setName(processTaskName);
+    // the caseTask has a name "A CaseTask"
+    String name = "A CaseTask";
+    caseTask.setName(name);
 
     // the planItem has an own name "My LocalName"
     String planItemName = "My LocalName";
@@ -102,7 +102,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    assertNotEquals(processTaskName, activity.getName());
+    assertNotEquals(name, activity.getName());
     assertEquals(planItemName, activity.getName());
   }
 
@@ -115,12 +115,12 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
     CmmnActivityBehavior behavior = activity.getActivityBehavior();
-    assertTrue(behavior instanceof ProcessTaskActivityBehavior);
+    assertTrue(behavior instanceof CaseTaskActivityBehavior);
   }
 
   @Test
   public void testIsBlockingEqualsTrueProperty() {
-    // given: a processTask with isBlocking = true (defaultValue)
+    // given: a caseTask with isBlocking = true (defaultValue)
 
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
@@ -133,8 +133,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testIsBlockingEqualsFalseProperty() {
     // given:
-    // a processTask with isBlocking = false
-    processTask.setIsBlocking(false);
+    // a caseTask with isBlocking = false
+    caseTask.setIsBlocking(false);
 
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
@@ -179,117 +179,117 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
     // there exists a callableElement
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
 
     assertNotNull(behavior.getCallableElement());
   }
 
   @Test
-  public void testProcessRefConstant() {
+  public void testCaseRefConstant() {
     // given:
-    String processRef = "aProcessToCall";
-    processTask.setProcess(processRef);
+    String caseRef = "aCaseToCall";
+    caseTask.setCase(caseRef);
 
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
-    ParameterValueProvider processRefValueProvider = callableElement.getDefinitionKeyValueProvider();
-    assertNotNull(processRefValueProvider);
+    ParameterValueProvider caseRefValueProvider = callableElement.getDefinitionKeyValueProvider();
+    assertNotNull(caseRefValueProvider);
 
-    assertTrue(processRefValueProvider instanceof ConstantValueProvider);
-    ConstantValueProvider valueProvider = (ConstantValueProvider) processRefValueProvider;
-    assertEquals(processRef, valueProvider.getValue(null));
+    assertTrue(caseRefValueProvider instanceof ConstantValueProvider);
+    ConstantValueProvider valueProvider = (ConstantValueProvider) caseRefValueProvider;
+    assertEquals(caseRef, valueProvider.getValue(null));
   }
 
   @Test
-  public void testProcessRefExpression() {
+  public void testCaseRefExpression() {
     // given:
-    String processRef = "${aProcessToCall}";
-    processTask.setProcess(processRef);
+    String caseRef = "${aCaseToCall}";
+    caseTask.setCase(caseRef);
 
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
-    ParameterValueProvider processRefValueProvider = callableElement.getDefinitionKeyValueProvider();
-    assertNotNull(processRefValueProvider);
+    ParameterValueProvider caseRefValueProvider = callableElement.getDefinitionKeyValueProvider();
+    assertNotNull(caseRefValueProvider);
 
-    assertTrue(processRefValueProvider instanceof ElValueProvider);
-    ElValueProvider valueProvider = (ElValueProvider) processRefValueProvider;
-    assertEquals(processRef, valueProvider.getExpression().getExpressionText());
+    assertTrue(caseRefValueProvider instanceof ElValueProvider);
+    ElValueProvider valueProvider = (ElValueProvider) caseRefValueProvider;
+    assertEquals(caseRef, valueProvider.getExpression().getExpressionText());
   }
 
   @Test
   public void testBinding() {
     // given:
-    CallableElementBinding processBinding = CallableElementBinding.LATEST;
-    processTask.setCamundaProcessBinding(processBinding.getValue());
+    CallableElementBinding caseBinding = CallableElementBinding.LATEST;
+    caseTask.setCamundaCaseBinding(caseBinding.getValue());
 
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     CallableElementBinding binding = callableElement.getBinding();
     assertNotNull(binding);
-    assertEquals(processBinding, binding);
+    assertEquals(caseBinding, binding);
   }
 
   @Test
   public void testVersionConstant() {
     // given:
-    String processVersion = "2";
-    processTask.setCamundaProcessVersion(processVersion);
+    String caseVersion = "2";
+    caseTask.setCamundaCaseVersion(caseVersion);
 
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
-    ParameterValueProvider processVersionValueProvider = callableElement.getVersionValueProvider();
-    assertNotNull(processVersionValueProvider);
+    ParameterValueProvider caseVersionValueProvider = callableElement.getVersionValueProvider();
+    assertNotNull(caseVersionValueProvider);
 
-    assertTrue(processVersionValueProvider instanceof ConstantValueProvider);
-    assertEquals(processVersion, processVersionValueProvider.getValue(null));
+    assertTrue(caseVersionValueProvider instanceof ConstantValueProvider);
+    assertEquals(caseVersion, caseVersionValueProvider.getValue(null));
   }
 
   @Test
   public void testVersionExpression() {
     // given:
-    String processVersion = "${aVersion}";
-    processTask.setCamundaProcessVersion(processVersion);
+    String caseVersion = "${aVersion}";
+    caseTask.setCamundaCaseVersion(caseVersion);
 
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
-    ParameterValueProvider processVersionValueProvider = callableElement.getVersionValueProvider();
-    assertNotNull(processVersionValueProvider);
+    ParameterValueProvider caseVersionValueProvider = callableElement.getVersionValueProvider();
+    assertNotNull(caseVersionValueProvider);
 
-    assertTrue(processVersionValueProvider instanceof ElValueProvider);
-    ElValueProvider valueProvider = (ElValueProvider) processVersionValueProvider;
-    assertEquals(processVersion, valueProvider.getExpression().getExpressionText());
+    assertTrue(caseVersionValueProvider instanceof ElValueProvider);
+    ElValueProvider valueProvider = (ElValueProvider) caseVersionValueProvider;
+    assertEquals(caseVersion, valueProvider.getExpression().getExpressionText());
   }
 
   @Test
   public void testBusinessKeyConstant() {
     // given:
     String businessKey = "myBusinessKey";
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaIn businessKeyElement = createElement(extensionElements, null, CamundaIn.class);
     businessKeyElement.setCamundaBusinessKey(businessKey);
 
@@ -297,7 +297,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     ParameterValueProvider businessKeyValueProvider = callableElement.getBusinessKeyValueProvider();
@@ -311,7 +311,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testBusinessKeyExpression() {
     // given:
     String businessKey = "${myBusinessKey}";
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaIn businessKeyElement = createElement(extensionElements, null, CamundaIn.class);
     businessKeyElement.setCamundaBusinessKey(businessKey);
 
@@ -319,7 +319,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     ParameterValueProvider businessKeyValueProvider = callableElement.getBusinessKeyValueProvider();
@@ -333,7 +333,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testInputs() {
     // given:
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaIn variablesElement = createElement(extensionElements, null, CamundaIn.class);
     variablesElement.setCamundaVariables("all");
     CamundaIn sourceElement = createElement(extensionElements, null, CamundaIn.class);
@@ -346,7 +346,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
 
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     List<CallableElementParameter> inputs = callableElement.getInputs();
@@ -358,7 +358,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testInputVariables() {
     // given:
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaIn variablesElement = createElement(extensionElements, null, CamundaIn.class);
     variablesElement.setCamundaVariables("all");
 
@@ -367,7 +367,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
 
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getInputs().get(0);
 
@@ -379,7 +379,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testInputSource() {
     // given:
     String source = "a";
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaIn sourceElement = createElement(extensionElements, null, CamundaIn.class);
     sourceElement.setCamundaSource(source);
 
@@ -387,7 +387,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getInputs().get(0);
 
@@ -405,7 +405,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testInputSourceExpression() {
     // given:
     String source = "${a}";
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaIn sourceElement = createElement(extensionElements, null, CamundaIn.class);
     sourceElement.setCamundaSourceExpression(source);
 
@@ -413,7 +413,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getInputs().get(0);
 
@@ -432,7 +432,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testInputTarget() {
     // given:
     String target = "b";
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaIn sourceElement = createElement(extensionElements, null, CamundaIn.class);
     sourceElement.setCamundaTarget(target);
 
@@ -440,7 +440,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getInputs().get(0);
 
@@ -453,7 +453,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testOutputs() {
     // given:
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaOut variablesElement = createElement(extensionElements, null, CamundaOut.class);
     variablesElement.setCamundaVariables("all");
     CamundaOut sourceElement = createElement(extensionElements, null, CamundaOut.class);
@@ -466,7 +466,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
 
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     List<CallableElementParameter> outputs = callableElement.getOutputs();
@@ -478,7 +478,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testOutputVariables() {
     // given:
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaOut variablesElement = createElement(extensionElements, null, CamundaOut.class);
     variablesElement.setCamundaVariables("all");
 
@@ -487,7 +487,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
 
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getOutputs().get(0);
 
@@ -499,7 +499,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testOutputSource() {
     // given:
     String source = "a";
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaOut sourceElement = createElement(extensionElements, null, CamundaOut.class);
     sourceElement.setCamundaSource(source);
 
@@ -507,7 +507,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getOutputs().get(0);
 
@@ -525,7 +525,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testOutputSourceExpression() {
     // given:
     String source = "${a}";
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaOut sourceElement = createElement(extensionElements, null, CamundaOut.class);
     sourceElement.setCamundaSourceExpression(source);
 
@@ -533,7 +533,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getOutputs().get(0);
 
@@ -552,7 +552,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testOutputTarget() {
     // given:
     String target = "b";
-    ExtensionElements extensionElements = addExtensionElements(processTask);
+    ExtensionElements extensionElements = addExtensionElements(caseTask);
     CamundaOut sourceElement = createElement(extensionElements, null, CamundaOut.class);
     sourceElement.setCamundaTarget(target);
 
@@ -560,7 +560,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    CaseTaskActivityBehavior behavior = (CaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getOutputs().get(0);
 

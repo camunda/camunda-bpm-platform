@@ -5,10 +5,12 @@
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   targetNamespace="Examples">
   <case id="oneCaseTaskCase" name="One Case Task Case">
-  
+
     <casePlanModel id="CasePlanModel_1">
       <planItem id="PI_CaseTask_1" definitionRef="CaseTask_1" />
-      <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskCase" />
+      <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
+      <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskProcess" />
+      <humanTask id="HumanTask_1" name="A Human Task" />
     </casePlanModel>
   </case>
   

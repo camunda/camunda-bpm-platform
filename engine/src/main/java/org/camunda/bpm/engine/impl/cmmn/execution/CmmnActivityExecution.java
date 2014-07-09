@@ -17,6 +17,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -559,5 +560,15 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * @param processDefinition The {@link PvmProcessDefinition} of the subprocess.
    */
   PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition);
+
+  /**
+   * <p>Creates a new sub case instance.</p>
+   *
+   * <p><code>This</code> case execution will be the super case execution of the
+   * created sub case instance.</p>
+   *
+   * @param caseDefinition The {@link CmmnCaseDefinition} of the subprocess.
+   */
+  CmmnCaseInstance createSubCaseInstance(CmmnCaseDefinition caseDefinition);
 
 }

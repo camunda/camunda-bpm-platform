@@ -213,11 +213,14 @@ public interface CaseExecutionCommandBuilder {
    *
    * <p>According to CMMN 1.0 specification the state <code>ACTIVE</code> means,
    * that the with the case execution related {@link Stage} or {@link Task} is
-   * executing in this state.</p>
-   *
-   * <p>In case of {@link Task} a new {@link org.camunda.bpm.engine.task.Task user task}
-   * can be executed. And in case of a {@link Stage} the contained planned items will
-   * be created.</p>
+   * executing in this state:
+   *   <ul>
+   *     <li>{@link Task}: the {@link Task task} will be completed immediately</li>
+   *     <li>{@link HumanTask}: a new {@link org.camunda.bpm.engine.task.Task user task} will be instantiated</li>
+   *     <li>{@link ProcessTask}: a new {@link ProcessInstance process instance} will be instantiated</li>
+   *     <li>{@link CaseTask}: a new {@link CaseInstance case instance} will be instantiated</li>
+   *   </ul>
+   * </p>
    *
    * @throws ProcessEngineException this exception will be thrown
    *  <ul>

@@ -8,7 +8,12 @@
   
     <casePlanModel id="CasePlanModel_1">
       <planItem id="PI_CaseTask_1" definitionRef="CaseTask_1" />
-      <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskCase" />
+      <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskCase">
+        <extensionElements>
+          <camunda:out source="aVariable" target="myVariable" />
+          <camunda:out source="anotherVariable" target="myAnotherVariable" />
+        </extensionElements>
+      </caseTask>
     </casePlanModel>
   </case>
   

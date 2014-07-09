@@ -72,7 +72,7 @@ public class ProcessTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavi
       Context
         .getCommandContext()
         .getExecutionManager()
-        .deleteProcessInstance(subProcessInstance.getId(), "terminated");
+        .deleteProcessInstance(subProcessInstance.getId(), "process task terminated");
     }
   }
 

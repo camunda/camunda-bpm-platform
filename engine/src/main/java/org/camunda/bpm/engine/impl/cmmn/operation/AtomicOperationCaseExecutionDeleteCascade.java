@@ -42,11 +42,15 @@ public class AtomicOperationCaseExecutionDeleteCascade implements CmmnAtomicOper
       firstLeaf.getSubProcessInstance().deleteCascade("case instance deleted");
     }
 
+    if (firstLeaf.getSubCaseInstance()!=null) {
+      firstLeaf.getSubCaseInstance().deleteCascade();
+    }
+
     firstLeaf.remove();
 
     CmmnExecution parent = firstLeaf.getParent();
     if (parent != null) {
-      parent.performOperation(CASE_EXECUTION_DELETE_CASCADE);
+      parent.deleteCascade();
     }
   }
 

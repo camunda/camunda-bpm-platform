@@ -5,10 +5,15 @@
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   targetNamespace="Examples">
   <case id="oneCaseTaskCase" name="One Case Task Case">
-  
+
     <casePlanModel id="CasePlanModel_1">
       <planItem id="PI_CaseTask_1" definitionRef="CaseTask_1" />
-      <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskCase" />
+      <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskCase">
+        <extensionElements>
+          <camunda:in source="${aVariable}" target="aVariable" />
+          <camunda:in source="${anotherVariable + 1}" target="anotherVariable" />
+        </extensionElements>
+      </caseTask>
     </casePlanModel>
   </case>
   

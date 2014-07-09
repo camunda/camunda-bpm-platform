@@ -553,7 +553,7 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn"})
-  public void testCompleteAnEnabledHumanTask() {
+  public void testCompleteAnEnabledProcessTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK_KEY).getId();

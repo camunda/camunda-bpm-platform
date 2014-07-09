@@ -8,7 +8,7 @@
   
     <casePlanModel id="CasePlanModel_1">
       <planItem id="PI_CaseTask_1" definitionRef="CaseTask_1" />
-      <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskCase" />
+      <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskCase" isBlocking="false" />
     </casePlanModel>
   </case>
   

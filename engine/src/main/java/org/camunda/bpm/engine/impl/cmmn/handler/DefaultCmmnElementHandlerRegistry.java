@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
@@ -41,6 +42,7 @@ public class DefaultCmmnElementHandlerRegistry {
   protected TaskPlanItemHandler taskPlanItemHandler = new TaskPlanItemHandler();
   protected HumanTaskPlanItemHandler humanTaskPlanItemHandler = new HumanTaskPlanItemHandler();
   protected ProcessTaskPlanItemHandler processTaskPlanItemHandler = new ProcessTaskPlanItemHandler();
+  protected CaseTaskPlanItemHandler caseTaskPlanItemHandler = new CaseTaskPlanItemHandler();
 
   protected StageDiscretionaryItemHandler stageDiscretionaryItemHandler = new StageDiscretionaryItemHandler();
   protected HumanTaskDiscretionaryItemHandler humanTaskDiscretionaryItemHandler = new HumanTaskDiscretionaryItemHandler();
@@ -60,6 +62,7 @@ public class DefaultCmmnElementHandlerRegistry {
     planItemElementHandlers.put(Task.class, taskPlanItemHandler);
     planItemElementHandlers.put(HumanTask.class, humanTaskPlanItemHandler);
     planItemElementHandlers.put(ProcessTask.class, processTaskPlanItemHandler);
+    planItemElementHandlers.put(CaseTask.class, caseTaskPlanItemHandler);
 
     // init discretionary element handler
     discretionaryElementHandlers = new HashMap<Class<? extends PlanItemDefinition>, DiscretionaryItemHandler>();

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -60,6 +61,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   /** reference to a sub process instance, not-null if currently subprocess is started from this execution */
   protected transient ExecutionEntity subProcessInstance;
 
+  protected transient CaseExecutionEntity subCaseInstance;
+
+  protected transient CaseExecutionEntity superCaseExecution;
+
   // associated entities /////////////////////////////////////////////////////
 
   protected CaseExecutionEntityVariableStore variableStore = new CaseExecutionEntityVariableStore(this);
@@ -72,6 +77,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected String activityName;
   protected String caseInstanceId;
   protected String parentId;
+  protected String superCaseExecutionId;
 
   // case definition ///////////////////////////////////////////////////////////
 
@@ -285,6 +291,68 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     }
   }
 
+  // sub-/super- case instance ////////////////////////////////////////////////////
+
+  public CaseExecutionEntity getSubCaseInstance() {
+    ensureSubCaseInstanceInitialized();
+    return subCaseInstance;
+  }
+
+  public void setSubCaseInstance(CmmnExecution subCaseInstance) {
+    this.subCaseInstance = (CaseExecutionEntity) subCaseInstance;
+  }
+
+  public CaseExecutionEntity createSubCaseInstance(CmmnCaseDefinition caseDefinition) {
+    CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance();
+
+    // manage bidirectional super-sub-case-instances relation
+    subCaseInstance.setSuperCaseExecution(this);
+    setSubCaseInstance(subCaseInstance);
+
+    return subCaseInstance;
+  }
+
+  protected void ensureSubCaseInstanceInitialized() {
+    if (subCaseInstance == null) {
+      subCaseInstance = Context
+        .getCommandContext()
+        .getCaseExecutionManager()
+        .findSubCaseInstanceBySuperCaseExecutionId(id);
+    }
+  }
+
+  public String getSuperCaseExecutionId() {
+    return superCaseExecutionId;
+  }
+
+  public void setSuperCaseExecutionId(String superCaseExecutionId) {
+    this.superCaseExecutionId = superCaseExecutionId;
+  }
+
+  public CmmnExecution getSuperCaseExecution() {
+    ensureSuperCaseExecutionInitialized();
+    return superCaseExecution;
+  }
+
+  public void setSuperCaseExecution(CmmnExecution superCaseExecution) {
+    this.superCaseExecution = (CaseExecutionEntity) superCaseExecution;
+
+    if (superCaseExecution != null) {
+      this.superCaseExecutionId = superCaseExecution.getId();
+    } else {
+      this.superCaseExecutionId = null;
+    }
+  }
+
+  protected void ensureSuperCaseExecutionInitialized() {
+    if (superCaseExecution == null && superCaseExecutionId != null) {
+      superCaseExecution = Context
+        .getCommandContext()
+        .getCaseExecutionManager()
+        .findCaseExecutionById(superCaseExecutionId);
+    }
+  }
+
   // variables //////////////////////////////////////////////////////////////
 
   protected CoreVariableStore getVariableStore() {
@@ -324,10 +392,23 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
     variableStore.removeVariablesWithoutFiringEvents();
 
+    removeTask();
+
     // finally delete this execution
     Context.getCommandContext()
       .getCaseExecutionManager()
       .deleteCaseExecution(this);
+  }
+
+  protected void removeTask() {
+    TaskEntity task = Context
+        .getCommandContext()
+        .getTaskManager()
+        .findTaskByCaseExecutionId(getId());
+
+    if (task != null) {
+      task.delete(TaskEntity.DELETE_REASON_DELETED, false);
+    }
   }
 
   // persistence /////////////////////////////////////////////////////////
