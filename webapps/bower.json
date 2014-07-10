@@ -38,7 +38,7 @@
     "angular-bootstrap": "0.11.0",
     "angular-route": "1.2.16",
     "angular-animate": "1.2.16",
-    "camunda-bpm-form": "./node_modules/camunda-bpm-sdk-js/dist/camunda-embedded-forms.js",
+    "camunda-bpm-forms": "./node_modules/camunda-bpm-sdk-js/dist/camunda-embedded-forms.js",
     "camunda-bpm-sdk-js": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk.js",
     "camunda-bpm-sdk-js-mock": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk-mock.js"
   },

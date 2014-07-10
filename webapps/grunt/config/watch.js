@@ -18,6 +18,7 @@ module.exports = function(config) {
 
     styles: {
       files: [
+        // 'grunt/config/less.js',
         '<%= pkg.gruntConfig.clientDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.clientDir %>/scripts/*/*.{css,less}'
       ],
@@ -28,30 +29,29 @@ module.exports = function(config) {
 
     scripts: {
       files: [
-        'grunt/config/requirejs.js',
+        // 'grunt/config/require.js',
         '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html}'
       ],
       tasks: [
         'newer:jshint:scripts',
-        // 'requirejs:dependencies',
         'requirejs:scripts'
       ]
     },
 
     sdk: {
       files: [
+        // 'grunt/config/require.js',
         'node_modules/camunda-bpm-sdk-js/dist/**/*.js'
       ],
       tasks: [
-        'bower',
         'copy:sdk',
-        'requirejs'
+        'requirejs:dependencies'
       ]
     },
 
     unitTest: {
       files: [
-        'grunt/config/jasmine_node.js',
+        // 'grunt/config/jasmine_node.js',
         'test/unit/**/*Spec.js'
       ],
       tasks: [
@@ -61,7 +61,7 @@ module.exports = function(config) {
 
     integrationTest: {
       files: [
-        'grunt/config/karma.js',
+        // 'grunt/config/karma.js',
         'test/integration/main.js',
         'test/integration/**/*Spec.js'
       ],
@@ -72,7 +72,7 @@ module.exports = function(config) {
 
     e2eTest: {
       files: [
-        'grunt/config/protractor.js',
+        // 'grunt/config/protractor.js',
         'test/e2e/**/*Spec.js'
       ],
       tasks: [
@@ -81,7 +81,7 @@ module.exports = function(config) {
     },
 
     served: {
-      files: ['<%= buildTarget %>/**/*.{html,js,css,jpg,png,webp,eot,svg,ttf,otf,woff}'],
+      files: ['<%= buildTarget %>/**/*'],
       options: {
         livereload: config.livereloadPort || false
       }

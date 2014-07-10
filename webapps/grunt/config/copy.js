@@ -42,6 +42,7 @@ module.exports = function(config) {
 
 
   function copyReplace(content, srcpath) {
+
     content = productionRemove(content, srcpath);
     content = appConf(content, srcpath);
     content = livereloadPort(content, srcpath);
@@ -50,7 +51,8 @@ module.exports = function(config) {
 
   return {
     options: {},
-    assets: {
+
+    index: {
       options: {
         process: copyReplace
       },
@@ -59,8 +61,20 @@ module.exports = function(config) {
           expand: true,
           cwd: '<%= pkg.gruntConfig.clientDir %>',
           src: [
-            '*.{ico,txt}',
             'index.html'
+          ],
+          dest: '<%= buildTarget %>/',
+        }
+      ]
+    },
+
+    assets: {
+      files: [
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.clientDir %>',
+          src: [
+            '*.{ico,txt}'
           ],
           dest: '<%= buildTarget %>/',
         },
@@ -84,10 +98,11 @@ module.exports = function(config) {
         }
       ]
     },
+
     sdk: {
       files: [
         {
-          src: 'node_modules/camunda-bpm-sdk-js/dist/camunda-embedded-form.js',
+          src: 'node_modules/camunda-bpm-sdk-js/dist/camunda-embedded-forms.js',
           dest: '<%= pkg.gruntConfig.clientDir %>/bower_components/camunda-bpm-form/index.js'
         },
         {
