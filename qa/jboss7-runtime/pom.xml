@@ -69,12 +69,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.camunda.template-engines</groupId>
-      <artifactId>camunda-template-engines-velocity</artifactId>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
