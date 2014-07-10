@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "camunda-cockpit-ui",
   "version": "7.2.0-SNAPSHOT",
   "homepage": "http://camunda.org/",
@@ -7,7 +8,18 @@
     "Nico Rehwaldt <nico.rehwaldt@camunda.com>",
     "Valentin Vago <valentin.vago@camunda.com>"
   ],
-  "private": true,
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "camunda",
+    "bpm",
+    "camunda bpm",
+    "cockpit"
+  ],
+  "license": "Apache-2.0",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -16,27 +28,30 @@
     "tests"
   ],
   "dependencies": {
+    "angular": "~1.2.16",
+    "angular-animate": "~1.2.16",
+    "angular-bootstrap": "~0.11.0",
+    "angular-cookies": "~1.2.16",
     "angular-data-depend": "camunda/angular-data-depend",
+    "angular-resource": "~1.2.16",
+    "angular-route": "~1.2.16",
+    "angular-sanitize": "~1.2.16",
+    "angular-ui": "~0.4.0",
     "better-dom": "1.6.6",
     "better-placeholder-polyfill": "1.1.1",
+    "bootstrap": "~3.1.1",
+    "camunda-bpm-forms": "./node_modules/camunda-bpm-sdk-js/dist/camunda-embedded-forms.js",
+    "camunda-bpm-sdk-js": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk.js",
+    "camunda-bpm-sdk-js-mock": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk-mock.js",
     "camunda-bpmn.js": "camunda/camunda-bpmn.js",
     "camunda-commons-ui": "camunda/camunda-commons-ui",
+    "jquery": "~2.1.1",
     "jquery-mousewheel": "https://raw.github.com/brandonaaron/jquery-mousewheel/09bb82c73c5650812e36dfd27d605d64d3ed32b8/jquery.mousewheel.js",
     "jquery-overscroll-fixed": "https://raw.github.com/azoff/overscroll/1579345a5d7cf2601a290e64d04aaa2a22449cac/src/jquery.overscroll.js",
-    "requirejs-angular-define": "camunda/requirejs-angular-define",
-    "requirejs": "http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js",
-    "requirejs-domready": "http://cdnjs.cloudflare.com/ajax/libs/require-domReady/2.0.1/domReady.min.js",
-    "bootstrap": "~3.1.1",
-    "angular": "~1.2.16",
-    "jquery": "~2.1.0",
     "jquery.ui": "~1.10.4",
-    "angular-ui": "~0.4.0",
-    "angular-resource": "~1.2.16",
-    "angular-sanitize": "~1.2.16",
-    "angular-cookies": "~1.2.16",
-    "angular-bootstrap": "~0.11.0",
-    "angular-route": "~1.2.16",
-    "angular-animate": "~1.2.16"
+    "requirejs": "http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js",
+    "requirejs-angular-define": "camunda/requirejs-angular-define",
+    "requirejs-domready": "http://cdnjs.cloudflare.com/ajax/libs/require-domReady/2.0.1/domReady.min.js"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.16",

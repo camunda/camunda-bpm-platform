@@ -64,7 +64,7 @@ define([], function() {
 
         search.push(key + '=' + encodeURIComponent(currentSearch[key]));
       }
-      
+
     }
 
     return redirectUrl + (search.length ? '?' + search.join('&') : '');

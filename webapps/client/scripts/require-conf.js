@@ -66,33 +66,35 @@
    */
   conf.urlArgs = ''/* cache-busting +'bust=' + CACHE_BUSTER /* */;
 
+  var vendor = '../assets/vendor';
+
   /**
    * Keys are module names and values are paths or URLs.
    * {@link http://requirejs.org/docs/api.html#config-paths|See the require.js docs for **paths** configuration}
    * @type {Object.<string, string>}
    */
   conf.paths = {
-    'ngDefine':              'bower_components/requirejs-angular-define/src/ngDefine',
-    'ngParse':               'bower_components/requirejs-angular-define/src/ngParse',
-    'domReady':              'bower_components/requirejs-domready/index',
-    'jquery-mousewheel':     'bower_components/jquery-mousewheel/index',
-    'jquery-overscroll':     'bower_components/jquery-overscroll-fixed/index',
+    'ngDefine':              vendor +'/requirejs-angular-define/src/ngDefine',
+    'ngParse':               vendor +'/requirejs-angular-define/src/ngParse',
+    'domReady':              vendor +'/requirejs-domready/index',
+    'jquery-mousewheel':     vendor +'/jquery-mousewheel/index',
+    'jquery-overscroll':     vendor +'/jquery-overscroll-fixed/index',
 
-    'jquery':                'bower_components/jquery/dist/jquery',
-    'bootstrap':             'bower_components/bootstrap/di../bootstrap',
-    'bootstrap-part':        'bower_components/bootstrap/js',
-    'angular':               'bower_components/angular/angular',
-    'angular-resource':      'bower_components/angular-resource/angular-resource',
-    'angular-route':         'bower_components/angular-route/angular-route',
-    'angular-animate':       'bower_components/angular-animate/angular-animate',
-    'angular-sanitize':      'bower_components/angular-sanitize/angular-sanitize',
-    'angular-ui':            'bower_components/angular-ui/build/angular-ui',
-    'angular-bootstrap':     'bower_components/angular-bootstrap/ui-bootstrap-tpls',
-    'jquery-ui':             'bower_components/jquery.ui',
+    'jquery':                vendor +'/jquery/dist/jquery',
+    'bootstrap':             vendor +'/bootstrap/di../bootstrap',
+    'bootstrap-part':        vendor +'/bootstrap/js',
+    'angular':               vendor +'/angular/angular',
+    'angular-resource':      vendor +'/angular-resource/angular-resource',
+    'angular-route':         vendor +'/angular-route/angular-route',
+    'angular-animate':       vendor +'/angular-animate/angular-animate',
+    'angular-sanitize':      vendor +'/angular-sanitize/angular-sanitize',
+    'angular-ui':            vendor +'/angular-ui/build/angular-ui',
+    'angular-bootstrap':     vendor +'/angular-bootstrap/ui-bootstrap-tpls',
+    'jquery-ui':             vendor +'/jquery.ui',
 
-    'angular-data-depend':   'bower_components/angular-data-depend/src/dataDepend',
+    'angular-data-depend':   vendor +'/angular-data-depend/src/dataDepend',
 
-    'camunda-commons-ui':    'bower_components/camunda-commons-ui/lib'
+    'camunda-commons-ui':    vendor +'/camunda-commons-ui/lib'
   };
 
   /**
@@ -149,15 +151,15 @@
     },
     {
       name: 'bpmn',
-      location : './bower_components/camunda-bpmn.js/src/bpmn'
+      location : './'+ vendor +'/camunda-bpmn.js/src/bpmn'
     },
     {
       name: 'dojo',
-      location : './vendor/dojo'
+      location : './'+ vendor +'/dojo'
     },
     {
       name: 'dojox',
-      location : './vendor/dojox'
+      location : './'+ vendor +'/dojox'
     }
   ];
 

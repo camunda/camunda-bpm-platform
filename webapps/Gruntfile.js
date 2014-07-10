@@ -47,7 +47,7 @@ module.exports = function(grunt) {
     // with the watch tasks, the value get lost...
     // so, it's fine for the "dist" build mode
     // who will override the value but only run once
-    buildTarget:      config.devTarget,
+    buildTarget:      grunt.option('target') || config.devTarget,
 
     pkg:              pkg,
 
@@ -65,7 +65,7 @@ module.exports = function(grunt) {
 
     less:             require('camunda-commons-ui/grunt/config/less')(config),
 
-    copy:             require('camunda-commons-ui/grunt/config/copy')(config),
+    copy:             require('./grunt/config/copy')(config),
 
     watch:            require('./grunt/config/watch')(config),
 
@@ -77,7 +77,7 @@ module.exports = function(grunt) {
 
     changelog:        require('camunda-commons-ui/grunt/config/changelog')(config),
 
-    clean:            ['doc', 'dist', '.tmp']
+    clean:            require('camunda-commons-ui/grunt/config/clean')(config)
   });
 
 
@@ -89,7 +89,13 @@ module.exports = function(grunt) {
     ];
 
     grunt.config.data.copy[smthRandom] = {
+      options: {
+        process: function(content, srcpath) {
+          var processing = (grunt.config.get('buildTarget') !== 'dist' ? 'dev' : 'dist') +'FileProcessing';
 
+          return (require('./grunt/config/copy')[processing]).call(grunt, content, srcpath);
+        }
+      },
       files: [
         {
           expand: true,
@@ -126,8 +132,8 @@ module.exports = function(grunt) {
 
     var tasks = [
       'clean',
-      'jshint',
-      'jsdoc',
+//       'jshint',
+//       'jsdoc',
       'bower',
       'copy',
       'less',
@@ -147,7 +153,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('auto-build', [
     'build:dev',
-    'connect',
+    // 'connect',
     'watch'
   ]);
 
