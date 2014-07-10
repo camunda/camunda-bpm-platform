@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.cmmn.processtask;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -91,7 +92,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     // when
     caseService
       .withCaseExecution(processTaskId)
-      .setVariable("oneTaskProcess", "oneTaskProcess")
+      .setVariable("process", "oneTaskProcess")
       .manualStart();
 
     // then
@@ -134,7 +135,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     // when
     caseService
       .withCaseExecution(processTaskId)
-      .setVariable("oneTaskProcess", "oneTaskProcess")
+      .setVariable("process", "oneTaskProcess")
       .manualStart();
 
     // then
@@ -601,6 +602,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
       .withCaseExecution(processTaskId)
       .setVariable("aVariable", "abc")
       .setVariable("anotherVariable", 999)
+      .setVariable("aThirdVariable", "def")
       .manualStart();
 
     // then
@@ -613,6 +615,9 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .processInstanceIdIn(processInstance.getId())
         .list();
+    
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
@@ -651,6 +656,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
       .withCaseExecution(processTaskId)
       .setVariable("aVariable", "abc")
       .setVariable("anotherVariable", 999)
+      .setVariable("aThirdVariable", "def")
       .manualStart();
 
     // then
@@ -663,6 +669,9 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .processInstanceIdIn(processInstance.getId())
         .list();
+    
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
@@ -712,14 +721,13 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .processInstanceIdIn(processInstance.getId())
         .list();
 
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
+    
     for (VariableInstance variable : variables) {
       String name = variable.getName();
-
-      if ("aVariable".equals(name)) {
-        assertEquals("aVariable", name);
-      } else if ("anotherVariable".equals(name)) {
-        assertEquals("anotherVariable", name);
-      } else {
+      
+      if (!"aVariable".equals(name) && !"anotherVariable".equals(name)) {
         fail("Found an unexpected variable: '"+name+"'");
       }
 
@@ -762,6 +770,9 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .processInstanceIdIn(processInstance.getId())
         .list();
+    
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
@@ -770,7 +781,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         assertEquals("abc", variable.getValue());
       } else if ("anotherVariable".equals(name)) {
         assertEquals("anotherVariable", name);
-        assertEquals((long)1000, variable.getValue());
+        assertEquals((long) 1000, variable.getValue());
       } else {
         fail("Found an unexpected variable: '"+name+"'");
       }
@@ -812,6 +823,9 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .processInstanceIdIn(processInstance.getId())
         .list();
+    
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
@@ -850,7 +864,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .manualStart();
       fail("It should not be possible to start a process instance.");
-    } catch (Exception e) {}
+    } catch (ProcessEngineException e) {}
 
     // complete //////////////////////////////////////////////////////////
 
@@ -912,6 +926,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     runtimeService.setVariable(processInstanceId, "aVariable", "abc");
     runtimeService.setVariable(processInstanceId, "anotherVariable", 999);
+    runtimeService.setVariable(processInstanceId, "aThirdVariable", "def");
 
     String taskId = queryTask().getId();
 
@@ -925,6 +940,9 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .caseInstanceIdIn(caseInstanceId)
         .list();
 
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
+    
     for (VariableInstance variable : variables) {
       String name = variable.getName();
       if ("aVariable".equals(name)) {
@@ -976,6 +994,9 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId)
         .list();
+    
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
@@ -1025,14 +1046,13 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId)
         .list();
+    
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
-      if ("aVariable".equals(name)) {
-        assertEquals("aVariable", name);
-      } else if ("anotherVariable".equals(name)) {
-        assertEquals("anotherVariable", name);
-      } else {
+      if (!"aVariable".equals(name) && !"anotherVariable".equals(name)) {
         fail("Found an unexpected variable: '"+name+"'");
       }
 
@@ -1077,6 +1097,9 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId)
         .list();
+    
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
@@ -1129,6 +1152,9 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId)
         .list();
+    
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
