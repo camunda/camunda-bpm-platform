@@ -154,17 +154,18 @@ define([
           throw err;
         }
 
-        var parts = result.key.split('embedded:');
-        if (parts.length > 1) {
-          var formUrl = parts.pop().replace('app:', result.contextPath);
+        if (result.key) {
+          var parts = result.key.split('embedded:');
 
-          console.info('Found formUrl', formUrl);
+          var formUrl = parts.length > 1 ?
+            parts.pop().replace('app:', result.contextPath) :
+            result.key;
 
           var form = new CamForm({
-            processDefinitionId: startingProcess.id,
-            containerElement: $('.starting-process'),
-            service: camAPI,
-            formUrl: formUrl
+            processDefinitionId:  startingProcess.id,
+            containerElement:     $('.start-form-container'),
+            service:              camAPI,
+            formUrl:              formUrl
           });
         }
         else {
@@ -173,7 +174,6 @@ define([
       });
       // $scope.variables = [];
       // $scope.addVariable();
-
     };
 
 

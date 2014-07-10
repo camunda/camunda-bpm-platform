@@ -1,8 +1,8 @@
 'use strict';
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 
-define(['angular', 'camunda-bpm-sdk', 'camunda-bpm-form', 'camunda-bpm-sdk-mock'],
-function(angular,   CamSDK,            CamForm,            MockClient) {
+define(['angular', 'camunda-bpm-sdk', 'camunda-bpm-forms', 'camunda-bpm-sdk-mock'],
+function(angular,   CamSDK,            CamForm,             MockClient) {
   var apiModule = angular.module('cam.tasklist.client', []);
 
   apiModule.value('CamForm', CamForm);
