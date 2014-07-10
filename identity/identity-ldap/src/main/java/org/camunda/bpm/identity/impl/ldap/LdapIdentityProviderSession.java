@@ -289,7 +289,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
     // add additional filters from query
     if(query.getId() != null) {
-      addFilter(ldapConfiguration.getUserIdAttribute(), query.getId(), search);
+      addFilter(ldapConfiguration.getUserIdAttribute(), escapeLDAPSearchFilter(query.getId()), search);
     }
     if(query.getEmail() != null) {
       addFilter(ldapConfiguration.getUserEmailAttribute(), query.getEmail(), search);
