@@ -16,7 +16,9 @@ module.exports = function(config) {
     'angular-bootstrap',
     'angular-route',
     'angular-animate',
-    'angular-moment'
+    'angular-moment',
+    'camunda-bpm-forms',
+    'camunda-bpm-sdk'
   ];
 
   _.extend(rjsConf.paths, {
@@ -48,7 +50,7 @@ module.exports = function(config) {
         on the plugin, may or may not have something inlined in the
         module bundle.
         */
-        console.info('onModuleBundleComplete', data.path+':\n\n'+data.included.join('\n') +'\n');
+        grunt.verbose.writeln('onModuleBundleComplete', data.path+':\n\n'+data.included.join('\n') +'\n');
 
         // // add a timestamp to the sourcemap URL to prevent caching
         // fs.readFile(data.path, {encoding: 'utf8'}, function(err, content) {
@@ -65,9 +67,7 @@ module.exports = function(config) {
         create: true,
         name: '<%= pkg.name %>-deps',
         out: '<%= buildTarget %>/scripts/deps.js',
-        include: deps.concat([
-          'camunda-tasklist-ui/require-conf'
-        ])
+        include: deps
       }
     },
 
@@ -75,9 +75,7 @@ module.exports = function(config) {
       options: {
         name: 'camunda-tasklist-ui',
         out: '<%= buildTarget %>/scripts/<%= pkg.name %>.js',
-        exclude: deps.concat([
-          'camunda-tasklist-ui/require-conf'
-        ]),
+        exclude: deps,
         include: rjsConf.shim['camunda-tasklist-ui']
       }
     }

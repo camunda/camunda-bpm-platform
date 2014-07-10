@@ -48,7 +48,7 @@ module.exports = function(grunt) {
 
     changelog:        require('camunda-commons-ui/grunt/config/changelog')(config),
 
-    clean:            ['doc', 'dist', '.tmp']
+    clean:            require('camunda-commons-ui/grunt/config/clean')(config)
   });
 
 
