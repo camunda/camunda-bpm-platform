@@ -1235,7 +1235,6 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     caseService
       .withCaseExecution(processTaskId)
-      // set variables local
       .setVariable("aVariable", "xyz")
       .setVariable("anotherVariable", 123)
       .manualStart();
@@ -1257,6 +1256,9 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId)
         .list();
+    
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
@@ -1299,7 +1301,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .complete();
       fail("It should not be possible to complete a process task, while the process instance is running.");
-    } catch (Exception e) {}
+    } catch (ProcessEngineException e) {}
 
 
     // complete ////////////////////////////////////////////////////////
@@ -1549,10 +1551,10 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testNotBlockingProcessTask.cmmn",
+      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testNonBlockingProcessTask.cmmn",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
-  public void testNotBlockingProcessTask() {
+  public void testNonBlockingProcessTask() {
     // given
     String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
@@ -1623,10 +1625,10 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testNotBlockingProcessTaskAndProcessInstanceCompletesInOneGo.cmmn",
+      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testNonBlockingProcessTaskAndProcessInstanceCompletesInOneGo.cmmn",
       "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testProcessInstanceCompletesInOneGo.bpmn20.xml"
     })
-  public void testNotBlockingProcessTaskAndProcessInstanceCompletesInOneGo() {
+  public void testNonBlockingProcessTaskAndProcessInstanceCompletesInOneGo() {
     // given
     String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
