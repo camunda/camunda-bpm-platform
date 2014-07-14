@@ -11,14 +11,15 @@
     "livereloadPort": 9091,
     "clientDir": "client",
     "prodTarget": "dist",
-    "devTarget":  "dist/app/cockpit"
+    "devTarget": "dist/app/cockpit"
   },
   "devDependencies": {
     "async": "~0.2.10",
     "bower": "~1.2.8",
+    "camunda-commons-ui": "git+ssh://git@github.com:camunda/camunda-commons-ui",
     "grunt": "~0.4.0",
-    "grunt-cli": "~0.1.0",
     "grunt-bower-task": "~0.3.4",
+    "grunt-cli": "~0.1.0",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-copy": "~0.5.0",
@@ -31,6 +32,7 @@
     "grunt-mkdir": "^0.1.1",
     "grunt-newer": "~0.6.1",
     "grunt-open": "~0.2.0",
+    "grunt-seleniuminstall": "git://github.com/camunda-third-party/grunt-seleniuminstall",
     "karma": "0.11.14",
     "karma-chrome-launcher": "~0.1.0",
     "karma-firefox-launcher": "~0.1.0",
@@ -45,7 +47,6 @@
     "requirejs": "~2.1.0",
     "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define.git",
     "time-grunt": "~0.2.1",
-    "camunda-commons-ui": "git+ssh://git@github.com:camunda/camunda-commons-ui",
     "underscore": "~1.5.2"
   }
 }
