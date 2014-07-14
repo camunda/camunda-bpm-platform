@@ -4,14 +4,15 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.camunda.bpm.webapp</groupId>
   <artifactId>camunda-webapp-root</artifactId>
+  <version>7.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - webapp - root</name>
 
-  <!-- camunda BPM parent -->
+  <!-- camunda BPM parent release pom -->
   <parent>
-    <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-parent</artifactId>
-    <version>7.2.0-SNAPSHOT</version>
+    <groupId>org.camunda</groupId>
+    <artifactId>camunda-release-parent</artifactId>
+    <version>2.2</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
@@ -49,7 +50,8 @@
     </profile>
   </profiles>
 
-  <properties>
+  <properties> 
+    <version.tomcat>7.0.50</version.tomcat>
     <tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
     <tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
     <tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
@@ -59,6 +61,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
       <dependency>
         <groupId>org.camunda.bpm.webapp</groupId>
         <artifactId>camunda-webapp-core</artifactId>
