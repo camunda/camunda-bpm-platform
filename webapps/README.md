@@ -11,6 +11,49 @@ The structure is as follows:
 * `distro/{container}` - projects that produce camunda web application for the different bpm platform containers
 
 
+
+```sh
+git clone git@github.com:camunda/camunda-bpm-sdk-js.git
+git clone git@github.com:camunda/camunda-tasklist-ui.git
+git clone git@github.com:camunda/camunda-cockpit-ui.git
+git clone git@github.com:camunda/camunda-commons-ui.git
+git clone git@github.com:camunda/camunda-cockpit-plugin-base.git
+git clone git@github.com:camunda/camunda-bpm-webapp.git
+```
+
+
+### cockpit terminal
+From the `camunda-cockpit-ui` directory
+```sh
+LIVERELOAD_PORT=8082 grunt auto-build -target=dist/app/cockpit
+```
+
+
+### tasklist terminal
+From the `camunda-tasklist-ui` directory
+```sh
+LIVERELOAD_PORT=8081 grunt auto-build -target=dist/app/tasklist
+```
+
+
+### webapp terminal
+From the `camunda-bpm-webapp` directory
+```sh
+// might (or not) be needed
+cd ../camunda-cockpit-plugin-base
+mvn clean install
+cd ../camunda-bpm-webapp
+```
+
+```sh
+cd webapp
+mvn clean install jetty:run -Pdevelop
+```
+
+
+
+
+
 Plugins
 -------
 

@@ -1,0 +1,23 @@
+{
+  "private": true,
+  "name": "camunda-bpm-webapp",
+  "version": "7.2.0-SNAPSHOT",
+  "description": "Webapp for camunda BPM platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/camunda/camunda-bpm-webapp.git"
+  },
+  "keywords": [
+    "camunda"
+  ],
+  "author": "Daniel Meyer <daniel.meyer@camunda.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/camunda/camunda-bpm-webapp/issues"
+  },
+  "homepage": "https://github.com/camunda/camunda-bpm-webapp"
+}
