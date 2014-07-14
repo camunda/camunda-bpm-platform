@@ -849,6 +849,61 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     assertCaseEnded(caseInstanceId);
 
   }
+  
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testInputOverlapping.cmmn",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+  public void testInputOverlapping() {
+    // specifics should override "all"
+    // given
+    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
+
+    // when
+    caseService
+      .withCaseExecution(processTaskId)
+      .setVariable("aVariable", "abc")
+      .setVariable("anotherVariable", 999)
+      .manualStart();
+
+    // then
+
+    // there exists a process instance
+    ProcessInstance processInstance = queryProcessInstance();
+    assertNotNull(processInstance);
+
+    List<VariableInstance> variables = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId())
+        .list();
+    
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
+
+    for (VariableInstance variable : variables) {
+      String name = variable.getName();
+      if ("aVariable".equals(name)) {
+        assertEquals("aVariable", name);
+        assertEquals("abc", variable.getValue());
+      } else if ("anotherVariable".equals(name)) {
+        assertEquals("anotherVariable", name);
+        assertEquals((long) 1000, variable.getValue());
+      } else {
+        fail("Found an unexpected variable: '"+name+"'");
+      }
+    }
+
+    // complete ////////////////////////////////////////////////////////
+
+    taskService.complete(queryTask().getId());
+    assertProcessEnded(processInstance.getId());
+
+    closeCaseInstance(caseInstanceId);
+    assertCaseEnded(caseInstanceId);
+    
+  }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn"
@@ -1164,6 +1219,61 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
       } else if ("anotherVariable".equals(name)) {
         assertEquals("anotherVariable", name);
         assertEquals(999, variable.getValue());
+      } else {
+        fail("Found an unexpected variable: '"+name+"'");
+      }
+    }
+
+    // complete ////////////////////////////////////////////////////////
+
+    assertProcessEnded(processInstanceId);
+
+    closeCaseInstance(caseInstanceId);
+    assertCaseEnded(caseInstanceId);
+
+  }
+  
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testOutputOverlapping.cmmn",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+  public void testOutputOverlapping() {
+    // given
+    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
+
+    caseService
+      .withCaseExecution(processTaskId)
+      .manualStart();
+
+    String processInstanceId = queryProcessInstance().getId();
+
+    String taskId = queryTask().getId();
+
+    runtimeService.setVariable(processInstanceId, "aVariable", "abc");
+    runtimeService.setVariable(processInstanceId, "anotherVariable", 999);
+
+    // when
+    // should also complete process instance
+    taskService.complete(taskId);
+
+    // then
+    List<VariableInstance> variables = runtimeService
+        .createVariableInstanceQuery()
+        .caseInstanceIdIn(caseInstanceId)
+        .list();
+    
+    assertEquals(2, variables.size());
+    assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
+
+    for (VariableInstance variable : variables) {
+      String name = variable.getName();
+      if ("aVariable".equals(name)) {
+        assertEquals("aVariable", name);
+        assertEquals("abc", variable.getValue());
+      } else if ("anotherVariable".equals(name)) {
+        assertEquals("anotherVariable", name);
+        assertEquals((long) 1000, variable.getValue());
       } else {
         fail("Found an unexpected variable: '"+name+"'");
       }
