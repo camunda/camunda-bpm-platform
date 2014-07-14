@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "./node_modules/grunt-cli/bin/grunt jasmine_node",
-    "dist": "./node_modules/grunt-cli/bin/grunt build:prod"
+    "dist": "./node_modules/bower/bin/bower install && ./node_modules/grunt-cli/bin/grunt build:prod"
   },
   "gruntConfig": {
     "connectPort": 9090,
@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "async": "~0.2.10",
-    "bower": "~1.2.8",
+    "bower": "~1.3.6",
     "camunda-commons-ui": "git+ssh://git@github.com:camunda/camunda-commons-ui",
     "grunt": "~0.4.0",
     "grunt-bower-task": "~0.3.4",
