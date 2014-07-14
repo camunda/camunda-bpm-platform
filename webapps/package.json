@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "amdefine": "~0.1.0",
+    "bower": "~1.3.6",
     "cheerio": "~0.16.0",
     "fixturer": "camunda-third-party/fixturer",
     "grunt": "~0.4.5",
