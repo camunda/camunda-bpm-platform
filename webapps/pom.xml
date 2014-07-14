@@ -40,7 +40,7 @@
             <configuration>
               <tasks>
                 <mkdir dir="${basedir}/target/" />
-                <zip destfile="${basedir}/target/dist.zip" basedir="${basedir}/../dist/" />
+                <zip destfile="${basedir}/target/dist.zip" basedir="${basedir}/dist/" />
               </tasks>
             </configuration>
           </execution>
