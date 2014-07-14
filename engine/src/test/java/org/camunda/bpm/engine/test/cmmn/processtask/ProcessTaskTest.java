@@ -1448,18 +1448,17 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = queryProcessInstance();
     assertNull(processInstance);
 
-    // when
-    // not it should be possible to complete process task
-    caseService
-      .withCaseExecution(processTaskId)
-      .complete();
-
-    // then
-    CaseExecution processTask = queryCaseExecutionByActivityId(PROCESS_TASK);
-    assertNull(processTask);
+    try {
+      // when
+      caseService
+        .withCaseExecution(processTaskId)
+        .complete();
+      fail("It should not be possible to complete a process task");
+    } catch (Exception e) {}
 
     // complete ////////////////////////////////////////////////////////
 
+    terminate(caseInstanceId);
     closeCaseInstance(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
@@ -1484,9 +1483,9 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     // then
 
-    // the process instance has also been terminated
-    ProcessInstance processInstance =queryProcessInstance();
-    assertNull(processInstance);
+    // the process instance is still running
+    ProcessInstance processInstance = queryProcessInstance();
+    assertNotNull(processInstance);
 
     // complete ////////////////////////////////////////////////////////
 
@@ -1527,10 +1526,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    caseService
-      .withCaseExecution(processTaskId)
-      .complete();
-
+    terminate(caseInstanceId);
     closeCaseInstance(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
@@ -1555,25 +1551,21 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     // then
     ProcessInstance processInstance = queryProcessInstance();
-
     assertNotNull(processInstance);
-
-    assertTrue(processInstance.isSuspended());
+    assertFalse(processInstance.isSuspended());
 
     Task task = queryTask();
-
     assertNotNull(task);
-
-    assertTrue(task.isSuspended());
-
+    assertFalse(task.isSuspended());
 
     // complete ////////////////////////////////////////////////////////
 
     resume(processTaskId);
-    terminate(processTaskId);
-
+    terminate(caseInstanceId);
     closeCaseInstance(caseInstanceId);
     assertCaseEnded(caseInstanceId);
+
+    taskService.complete(task.getId());
 
   }
 
@@ -1637,7 +1629,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     assertFalse(processTask.isActive());
 
     ProcessInstance processInstance = queryProcessInstance();
-    assertTrue(processInstance.isSuspended());
+    assertFalse(processInstance.isSuspended());
 
     // when
     resume(processTaskId);

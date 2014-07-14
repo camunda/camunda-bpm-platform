@@ -15,13 +15,9 @@ package org.camunda.bpm.engine.impl.cmmn.behavior;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cmd.ActivateProcessInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
@@ -57,51 +53,13 @@ public class ProcessTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavi
     caseInstance.start(businessKey, variables);
   }
 
-  protected void manualCompleting(CmmnActivityExecution execution) {
-    ExecutionEntity subProcessInstance = getSubProcessInstance(execution);
-
-    if (subProcessInstance != null) {
-      throw new ProcessEngineException("It is not possible to complete a process task manually, because the called process instance is still active.");
-    }
-  }
-
-  protected void terminating(CmmnActivityExecution execution) {
-    ExecutionEntity subProcessInstance = getSubProcessInstance(execution);
-
-    if (subProcessInstance != null) {
-      Context
-        .getCommandContext()
-        .getExecutionManager()
-        .deleteProcessInstance(subProcessInstance.getId(), "process task terminated");
-    }
-  }
-
-  protected void suspending(CmmnActivityExecution execution) {
-    ExecutionEntity subProcessInstance = getSubProcessInstance(execution);
-
-    CommandContext commandContext = Context.getCommandContext();
-
-    new SuspendProcessInstanceCmd(subProcessInstance.getId(), null, null).execute(commandContext);
-
-  }
-
-  protected void resuming(CmmnActivityExecution execution) {
-    ExecutionEntity subProcessInstance = getSubProcessInstance(execution);
-
-    CommandContext commandContext = Context.getCommandContext();
-
-    new ActivateProcessInstanceCmd(subProcessInstance.getId(), null, null).execute(commandContext);
-
-  }
-
-  protected ExecutionEntity getSubProcessInstance(CmmnActivityExecution execution) {
-    String id = execution.getId();
-    ExecutionEntity subProcessInstance = Context
-        .getCommandContext()
-        .getExecutionManager()
-        .findSubProcessInstanceBySuperCaseExecutionId(id);
-
-    return subProcessInstance;
+  public void onManualCompletion(CmmnActivityExecution execution) {
+    // Throw always an exception!
+    // It should not be possible to complete a process
+    // task manually. If the called process instance has
+    // been completed, the associated process task will
+    // be notified to complete automatically.
+    throw new ProcessEngineException("It is not possible to complete a process task manually.");
   }
 
 }

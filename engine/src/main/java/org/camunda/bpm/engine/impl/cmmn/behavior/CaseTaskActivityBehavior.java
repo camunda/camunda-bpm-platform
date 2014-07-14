@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.cmmn.behavior;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
@@ -52,36 +51,13 @@ public class CaseTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavior 
     caseInstance.create(businessKey, variables);
   }
 
-  protected void manualCompleting(CmmnActivityExecution execution) {
-    CaseExecutionEntity subCaseInstance = getSubCaseInstance(execution);
-
-    if (subCaseInstance != null) {
-      throw new ProcessEngineException("It is not possible to complete a case task manually, because the called case instance is not closed.");
-    }
-  }
-
-  protected void terminating(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("This method has not been implemented yet.");
-  }
-
-  protected void suspending(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("This method has not been implemented yet.");
-  }
-
-  protected void resuming(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("This method has not been implemented yet.");
-  }
-
-  protected CaseExecutionEntity getSubCaseInstance(CmmnActivityExecution execution) {
-    String id = execution.getId();
-
-    CaseExecutionEntity subCaseInstance = Context
-        .getCommandContext()
-        .getCaseExecutionManager()
-        .findSubCaseInstanceBySuperCaseExecutionId(id);
-
-    return subCaseInstance;
-
+  public void onManualCompletion(CmmnActivityExecution execution) {
+    // Throw always an exception!
+    // It should not be possible to complete a case task
+    // manually. If the called case instance has been
+    // completed, the associated case task will be
+    // notified to complete automatically.
+    throw new ProcessEngineException("It is not possible to complete a case task manually.");
   }
 
 }

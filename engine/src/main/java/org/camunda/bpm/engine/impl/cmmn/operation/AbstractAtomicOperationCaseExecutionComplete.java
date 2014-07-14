@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CompositeActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.behavior.TransferVariablesActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 
@@ -57,6 +58,15 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
   protected void eventNotificationsCompleted(CmmnExecution execution) {
     if (!execution.isCaseInstanceExecution()) {
       execution.remove();
+    } else {
+      CmmnExecution superCaseExecution = execution.getSuperCaseExecution();
+      TransferVariablesActivityBehavior behavior = null;
+
+      if (superCaseExecution != null) {
+        behavior = (TransferVariablesActivityBehavior) getActivityBehavior(superCaseExecution);
+        behavior.transferVariables(execution, superCaseExecution);
+        superCaseExecution.complete();
+      }
     }
 
     CmmnExecution parent = execution.getParent();

@@ -66,6 +66,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -104,6 +105,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
   }
@@ -141,6 +143,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
   }
@@ -193,6 +196,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -252,6 +256,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -311,6 +316,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -373,6 +379,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -435,6 +442,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -475,6 +483,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -514,6 +523,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -545,6 +555,9 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .caseInstanceIdIn(subCaseInstance.getId())
         .list();
 
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
+
     for (VariableInstance variable : variables) {
       String name = variable.getName();
       if ("aVariable".equals(name)) {
@@ -564,6 +577,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -595,6 +609,9 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .caseInstanceIdIn(subCaseInstance.getId())
         .list();
 
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
+
     for (VariableInstance variable : variables) {
       String name = variable.getName();
       if ("myVariable".equals(name)) {
@@ -614,6 +631,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -643,6 +661,9 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .caseInstanceIdIn(subCaseInstance.getId())
         .list();
 
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
+
     for (VariableInstance variable : variables) {
       String name = variable.getName();
 
@@ -663,6 +684,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
   }
@@ -693,6 +715,9 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .caseInstanceIdIn(subCaseInstance.getId())
         .list();
 
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
+
     for (VariableInstance variable : variables) {
       String name = variable.getName();
       if ("aVariable".equals(name)) {
@@ -712,6 +737,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
   }
@@ -742,6 +768,9 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .caseInstanceIdIn(subCaseInstance.getId())
         .list();
 
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
+
     for (VariableInstance variable : variables) {
       String name = variable.getName();
       if ("aVariable".equals(name)) {
@@ -761,6 +790,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -795,7 +825,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
-  public void testCloseSimpleCase() {
+  public void testCompleteSimpleCase() {
     // given
     String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
@@ -811,21 +841,20 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
       .withCaseExecution(humanTaskId)
       .manualStart();
 
+    // when
     caseService
       .withCaseExecution(humanTaskId)
       .complete();
 
-    // when
-    caseService
-      .withCaseExecution(subCaseInstanceId)
-      .close();
-
     // then
 
-    CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
-    assertNull(subCaseInstance);
+    CaseExecution caseTask = queryCaseExecutionByActivityId("PI_CaseTask_1");
+    assertNull(caseTask);
 
     // complete ////////////////////////////////////////////////////////
+
+    closeCaseInstance(subCaseInstanceId);
+    assertCaseEnded(subCaseInstanceId);
 
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
@@ -873,6 +902,9 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(superCaseInstanceId)
         .list();
+
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
@@ -936,6 +968,9 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .caseInstanceIdIn(superCaseInstanceId)
         .list();
 
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
+
     for (VariableInstance variable : variables) {
       String name = variable.getName();
       if ("myVariable".equals(name)) {
@@ -990,6 +1025,9 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(superCaseInstanceId)
         .list();
+
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
@@ -1053,6 +1091,9 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .caseInstanceIdIn(superCaseInstanceId)
         .list();
 
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
+
     for (VariableInstance variable : variables) {
       String name = variable.getName();
       if ("aVariable".equals(name)) {
@@ -1114,7 +1155,9 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(superCaseInstanceId)
         .list();
+
     assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
@@ -1237,7 +1280,9 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(superCaseInstanceId)
         .list();
+
     assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
 
     for (VariableInstance variable : variables) {
       String name = variable.getName();
@@ -1288,6 +1333,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -1306,13 +1352,14 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
       .withCaseExecution(caseTaskId)
       .manualStart();
 
-    try {
-      // when
-      terminate(caseTaskId);
-      fail("The termination of a case task is not implemented yet.");
-    } catch (Exception e) {
+    CaseInstance subCaseInstance = queryOneTaskCaseInstance();
+    assertTrue(subCaseInstance.isActive());
 
-    }
+    // when
+    terminate(caseTaskId);
+
+    subCaseInstance = queryOneTaskCaseInstance();
+    assertTrue(subCaseInstance.isActive());
 
     // complete ////////////////////////////////////////////////////////
 
@@ -1358,6 +1405,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -1376,13 +1424,14 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
       .withCaseExecution(caseTaskId)
       .manualStart();
 
-    try {
-      // when
-      suspend(caseTaskId);
-      fail("The suspension of a case task is not implemented yet.");
-    } catch (Exception e) {
+    CaseInstance subCaseInstance = queryOneTaskCaseInstance();
+    assertTrue(subCaseInstance.isActive());
 
-    }
+    // when
+    suspend(caseTaskId);
+
+    subCaseInstance = queryOneTaskCaseInstance();
+    assertTrue(subCaseInstance.isActive());
 
     // complete ////////////////////////////////////////////////////////
 
@@ -1391,6 +1440,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
+    terminate(superCaseInstanceId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -1428,6 +1478,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
@@ -1446,13 +1497,20 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
       .withCaseExecution(caseTaskId)
       .manualStart();
 
-    try {
-      // when
-      resume(caseTaskId);
-      fail("The resume of a case task is not implemented yet.");
-    } catch (Exception e) {
+    suspend(caseTaskId);
 
-    }
+    CaseInstance subCaseInstance = queryOneTaskCaseInstance();
+    assertTrue(subCaseInstance.isActive());
+
+    // when
+    resume(caseTaskId);
+
+    // then
+    CaseExecution caseTask = queryCaseExecutionByActivityId(CASE_TASK);
+    assertTrue(caseTask.isActive());
+
+    subCaseInstance = queryOneTaskCaseInstance();
+    assertTrue(subCaseInstance.isActive());
 
     // complete ////////////////////////////////////////////////////////
 
@@ -1461,6 +1519,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     closeCaseInstance(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
+    terminate(caseTaskId);
     closeCaseInstance(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
