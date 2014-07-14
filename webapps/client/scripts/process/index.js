@@ -74,7 +74,7 @@ define([
 
 
     $scope.selected = function($item, $model, $label) {
-      $scope.startingProcess = $item;
+      $scope.getStartForm($item);
     };
 
 
@@ -204,7 +204,7 @@ define([
       var vars = {};
 
       angular.forEach($scope.variables, function(val) {
-        if (val.name[0] !== '$') {
+        if (val.name[0] !== '$' && val.name) {
           vars[val.name] = {type: val.type, value: val.value};
         }
       });
@@ -213,8 +213,6 @@ define([
         key: $scope.startingProcess.key,
         variables: vars
       }, function(err, res) {
-        console.info('start process', err, res);
-
         if (err) {
           camTasklistNotifier.add(err);
           throw err;
