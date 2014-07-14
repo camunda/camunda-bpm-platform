@@ -1491,6 +1491,11 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     closeCaseInstance(caseInstanceId);
     assertCaseEnded(caseInstanceId);
+    
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+    
+    assertProcessEnded(processInstance.getId());
 
   }
 
