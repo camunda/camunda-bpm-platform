@@ -12,13 +12,12 @@
  */
 package org.camunda.spin.impl.json.tree;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
-
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Thorben Lindhauer
@@ -67,12 +66,21 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
     return this;
   }
 
+  public JsonJacksonTreeDataFormat config(Feature feature, Object value) {
+    configuration.config(feature, value);
+    return this;
+  }
+
   public Object getValue(String key) {
     return configuration.getValue(key);
   }
 
   public Object getValue(String key, Object defaultValue) {
     return configuration.getValue(key, defaultValue);
+  }
+
+  public Boolean getValue(Feature feature) {
+    return configuration.getValue(feature);
   }
 
   public Boolean allowsNumericLeadingZeros() {
@@ -98,6 +106,15 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
 
   public JsonJacksonTreeDataFormat allowComments(Boolean value) {
     configuration.allowComments(value);
+    return this;
+  }
+
+  public Boolean allowYamlComments() {
+    return configuration.allowYamlComments();
+  }
+
+  public JsonJacksonTreeDataFormat allowYamlComments(Boolean value) {
+    configuration.allowYamlComments(value);
     return this;
   }
 

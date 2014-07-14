@@ -23,4 +23,8 @@ public class JsonJacksonTreeLogger extends SpinLogger {
   public SpinJsonDataFormatException unableToParseInput(Exception e) {
     return new SpinJsonDataFormatException(exceptionMessage("001", "Unable to parse input into json node"), e);
   }
+
+  public void unableToFind(String mess) {
+    logInfo("002", "Unable {}", mess);
+  }
 }

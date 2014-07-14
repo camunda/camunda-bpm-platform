@@ -12,6 +12,7 @@
  */
 package org.camunda.spin.impl.json.tree;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import org.camunda.spin.spi.Configurable;
 
 /**
@@ -21,6 +22,10 @@ import org.camunda.spin.spi.Configurable;
  */
 public interface JsonJacksonTreeConfigurable<R extends Configurable<R>> extends Configurable<R> {
 
+  R config(Feature feature, Object value);
+
+  Boolean getValue(Feature feature);
+
   Boolean allowsNumericLeadingZeros();
   
   R allowNumericLeadingZeros(Boolean value);
@@ -28,7 +33,11 @@ public interface JsonJacksonTreeConfigurable<R extends Configurable<R>> extends 
   Boolean allowsComments();
   
   R allowComments(Boolean value);
-  
+
+  Boolean allowYamlComments();
+
+  R allowYamlComments(Boolean value);
+
   Boolean allowsUnquotedFieldNames();
   
   R allowQuotedFieldNames(Boolean value);

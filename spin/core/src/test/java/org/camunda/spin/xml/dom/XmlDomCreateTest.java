@@ -12,21 +12,18 @@
  */
 package org.camunda.spin.xml.dom;
 
+import java.io.InputStream;
+import org.camunda.spin.spi.SpinDataFormatException;
+import org.camunda.spin.xml.tree.SpinXmlTreeElement;
+import org.junit.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.spin.DataFormats.xmlDom;
 import static org.camunda.spin.Spin.S;
 import static org.camunda.spin.Spin.XML;
 import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
-import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_EMPTY_STRING;
-import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_INVALID_XML;
-import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML;
-
-import java.io.InputStream;
-
-import org.camunda.spin.spi.SpinDataFormatException;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
-import org.junit.Test;
+import static org.camunda.spin.xml.XmlTestConstants.*;
 
 /**
  * @author Daniel Meyer

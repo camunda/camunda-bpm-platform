@@ -51,14 +51,11 @@ public class JsonJacksonTreeDataFormatReader extends TextBasedDataFormatReader {
   
   protected ObjectMapper createObjectMapper(JsonJacksonTreeDataFormat format) {
     ObjectMapper mapper = new ObjectMapper();
-    
-    mapper.configure(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, format.allowsBackslashEscapingAnyCharacter());
-    mapper.configure(Feature.ALLOW_COMMENTS, format.allowsComments());
-    mapper.configure(Feature.ALLOW_NON_NUMERIC_NUMBERS, format.allowsNonNumericNumbers());
-    mapper.configure(Feature.ALLOW_NUMERIC_LEADING_ZEROS, format.allowsNumericLeadingZeros());
-    mapper.configure(Feature.ALLOW_SINGLE_QUOTES, format.allowsSingleQuotes());
-    mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, format.allowsUnquotedFieldNames());
-    
+
+    for (Feature feature : Feature.values()) {
+      mapper.configure(feature, format.getValue(feature));
+    }
+
     return mapper;
   }
 

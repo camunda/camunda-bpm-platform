@@ -12,6 +12,7 @@
  */
 package org.camunda.spin.impl.json.tree;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,13 +21,6 @@ import java.util.Map;
  */
 public class JsonJacksonTreeConfiguration implements JsonJacksonTreeConfigurable<JsonJacksonTreeConfiguration> {
 
-  public static final String ALLOW_COMMENTS = "allowComments";
-  public static final String ALLOW_UNQUOTED_FIELD_NAMES = "allowUnquotedFieldNames";
-  public static final String ALLOW_SINGLE_QUOTES = "allowSingleQuotes";
-  public static final String ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER = "allowBackslashEscapingAnyCharacter";
-  public static final String ALLOW_NUMERIC_LEADING_ZEROS = "allowNumericLeadingZeros";
-  public static final String ALLOW_NON_NUMERIC_NUMBERS = "allowNonNumericNumbers";
-  
   protected Map<String, Object> configuration;
 
   public JsonJacksonTreeConfiguration() {
@@ -47,6 +41,10 @@ public class JsonJacksonTreeConfiguration implements JsonJacksonTreeConfigurable
     return this;
   }
 
+  public JsonJacksonTreeConfiguration config(Feature feature, Object value) {
+    return config(feature.name(), value);
+  }
+
   public Object getValue(String key) {
     return configuration.get(key);
   }
@@ -59,13 +57,22 @@ public class JsonJacksonTreeConfiguration implements JsonJacksonTreeConfigurable
     return configuration.get(key);
   }
 
+  public Boolean getValue(Feature feature) {
+    Boolean value = (Boolean) configuration.get(feature.name());
+    if (value == null) {
+      return feature.enabledByDefault();
+    }
+    else {
+      return value;
+    }
+  }
+
   public Boolean allowsNumericLeadingZeros() {
-    return (Boolean) getValue(ALLOW_NUMERIC_LEADING_ZEROS, Boolean.FALSE);
+    return getValue(Feature.ALLOW_NUMERIC_LEADING_ZEROS);
   }
 
   public JsonJacksonTreeConfiguration allowNumericLeadingZeros(Boolean value) {
-    configuration.put(ALLOW_NUMERIC_LEADING_ZEROS, value);
-    return this;
+    return config(Feature.ALLOW_NUMERIC_LEADING_ZEROS, value);
   }
 
   public Map<String, Object> getConfiguration() {
@@ -73,49 +80,51 @@ public class JsonJacksonTreeConfiguration implements JsonJacksonTreeConfigurable
   }
 
   public Boolean allowsComments() {
-    return (Boolean) getValue(ALLOW_COMMENTS, Boolean.FALSE);
+    return getValue(Feature.ALLOW_COMMENTS);
   }
 
   public JsonJacksonTreeConfiguration allowComments(Boolean value) {
-    configuration.put(ALLOW_COMMENTS, value);
-    return this;
+    return config(Feature.ALLOW_COMMENTS, value);
+  }
+
+  public Boolean allowYamlComments() {
+    return getValue(Feature.ALLOW_YAML_COMMENTS);
+  }
+
+  public JsonJacksonTreeConfiguration allowYamlComments(Boolean value) {
+    return config(Feature.ALLOW_YAML_COMMENTS, value);
   }
 
   public Boolean allowsUnquotedFieldNames() {
-    return (Boolean) getValue(ALLOW_UNQUOTED_FIELD_NAMES, Boolean.FALSE);
+    return getValue(Feature.ALLOW_UNQUOTED_FIELD_NAMES);
   }
 
   public JsonJacksonTreeConfiguration allowQuotedFieldNames(Boolean value) {
-    configuration.put(ALLOW_UNQUOTED_FIELD_NAMES, value);
-    return this;
+    return config(Feature.ALLOW_UNQUOTED_FIELD_NAMES, value);
   }
 
   public Boolean allowsSingleQuotes() {
-    return (Boolean) getValue(ALLOW_SINGLE_QUOTES, Boolean.FALSE);
+    return getValue(Feature.ALLOW_SINGLE_QUOTES);
   }
 
   public JsonJacksonTreeConfiguration allowSingleQuotes(Boolean value) {
-    configuration.put(ALLOW_SINGLE_QUOTES, value);
-    return this;
+    return config(Feature.ALLOW_SINGLE_QUOTES, value);
   }
 
   public Boolean allowsBackslashEscapingAnyCharacter() {
-    return (Boolean) getValue(ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, Boolean.FALSE);
+    return getValue(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER);
   }
 
   public JsonJacksonTreeConfiguration allowBackslashEscapingAnyCharacter(Boolean value) {
-    configuration.put(ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, value);
-    return this;
+    return config(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, value);
   }
 
   public Boolean allowsNonNumericNumbers() {
-    return (Boolean) getValue(ALLOW_NON_NUMERIC_NUMBERS, Boolean.FALSE);
+    return getValue(Feature.ALLOW_NON_NUMERIC_NUMBERS);
   }
 
   public JsonJacksonTreeConfiguration allowNonNumericNumbers(Boolean value) {
-    configuration.put(ALLOW_NON_NUMERIC_NUMBERS, value);
-    return this;
+    return config(Feature.ALLOW_NON_NUMERIC_NUMBERS, value);
   }
-  
-  
+
 }

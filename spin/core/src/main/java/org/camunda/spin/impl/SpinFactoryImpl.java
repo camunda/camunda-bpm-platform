@@ -55,7 +55,8 @@ public class SpinFactoryImpl extends SpinFactory {
     InputStream input = stringAsInputStream(parameter);
     return createSpin(input);
   }
-  
+
+  @SuppressWarnings("unchecked")
   public <T extends Spin<?>> T createSpin(InputStream parameter) {
     ensureNotNull("parameter", parameter);
 

@@ -12,24 +12,23 @@
  */
 package org.camunda.spin.json.tree;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.spin.DataFormats.jsonTree;
-import static org.camunda.spin.Spin.JSON;
-import static org.camunda.spin.Spin.S;
-import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JACKSON_CONFIGURATION_JSON;
-
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.camunda.spin.impl.json.tree.JsonJacksonTreeConfiguration;
 import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
 import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.spin.DataFormats.jsonTree;
+import static org.camunda.spin.Spin.JSON;
+import static org.camunda.spin.Spin.S;
+import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JACKSON_CONFIGURATION_JSON;
 
 public class JsonTreeConfigureTest {
 
@@ -40,20 +39,22 @@ public class JsonTreeConfigureTest {
   public void setUp() {
     dataFormatInstance = 
         jsonTree()
-            .allowNumericLeadingZeros(Boolean.TRUE)
-            .allowBackslashEscapingAnyCharacter(Boolean.TRUE)
-            .allowComments(Boolean.TRUE)
-            .allowNonNumericNumbers(Boolean.TRUE)
-            .allowQuotedFieldNames(Boolean.TRUE)
-            .allowSingleQuotes(Boolean.TRUE);
+          .allowNumericLeadingZeros(Boolean.TRUE)
+          .allowBackslashEscapingAnyCharacter(Boolean.TRUE)
+          .allowComments(Boolean.TRUE)
+          .allowYamlComments(Boolean.TRUE)
+          .allowNonNumericNumbers(Boolean.TRUE)
+          .allowQuotedFieldNames(Boolean.TRUE)
+          .allowSingleQuotes(Boolean.TRUE);
     
     configurationMap = new HashMap<String, Object>();
-    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, Boolean.TRUE);
-    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_COMMENTS, Boolean.TRUE);
-    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_NON_NUMERIC_NUMBERS, Boolean.TRUE);
-    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_NUMERIC_LEADING_ZEROS, Boolean.TRUE);
-    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_SINGLE_QUOTES, Boolean.TRUE);
-    configurationMap.put(JsonJacksonTreeConfiguration.ALLOW_UNQUOTED_FIELD_NAMES, Boolean.TRUE);
+    configurationMap.put(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER.name(), Boolean.TRUE);
+    configurationMap.put(Feature.ALLOW_COMMENTS.name(), Boolean.TRUE);
+    configurationMap.put(Feature.ALLOW_YAML_COMMENTS.name(), Boolean.TRUE);
+    configurationMap.put(Feature.ALLOW_NON_NUMERIC_NUMBERS.name(), Boolean.TRUE);
+    configurationMap.put(Feature.ALLOW_NUMERIC_LEADING_ZEROS.name(), Boolean.TRUE);
+    configurationMap.put(Feature.ALLOW_SINGLE_QUOTES.name(), Boolean.TRUE);
+    configurationMap.put(Feature.ALLOW_UNQUOTED_FIELD_NAMES.name(), Boolean.TRUE);
   }
   
   
