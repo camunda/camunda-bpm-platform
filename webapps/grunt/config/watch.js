@@ -18,7 +18,7 @@ module.exports = function(config) {
 
     styles: {
       files: [
-        // 'grunt/config/less.js',
+        // 'node_modules/camunda-commons-ui/grunt/config/less.js',
         '<%= pkg.gruntConfig.clientDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.clientDir %>/scripts/*/*.{css,less}'
       ],
@@ -29,7 +29,8 @@ module.exports = function(config) {
 
     scripts: {
       files: [
-        // 'grunt/config/require.js',
+        'grunt/config/require.js',
+        'node_modules/camunda-bpm-sdk-js/dist/**/*.js',
         '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html}'
       ],
       tasks: [
@@ -38,16 +39,16 @@ module.exports = function(config) {
       ]
     },
 
-    sdk: {
-      files: [
-        // 'grunt/config/require.js',
-        'node_modules/camunda-bpm-sdk-js/dist/**/*.js'
-      ],
-      tasks: [
-        'copy:sdk',
-        'requirejs:dependencies'
-      ]
-    },
+    // sdk: {
+    //   files: [
+    //     // 'grunt/config/require.js',
+    //     'node_modules/camunda-bpm-sdk-js/dist/**/*.js'
+    //   ],
+    //   tasks: [
+    //     'copy:sdk',
+    //     'requirejs:dependencies'
+    //   ]
+    // },
 
     unitTest: {
       files: [
