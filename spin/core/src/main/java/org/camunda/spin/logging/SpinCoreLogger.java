@@ -49,10 +49,6 @@ public class SpinCoreLogger extends SpinLogger {
     return fileNotFoundException(filename, null);
   }
 
-  public IllegalArgumentException unsupportedNullInputParameter() {
-    return new IllegalArgumentException(exceptionMessage("005", "Unsupported input: input is 'null'"));
-  }
-
   public SpinRuntimeException unableToReadInputStream(Exception e) {
     return new SpinRuntimeException(exceptionMessage("006", "Unable to read input stream"), e);
   }

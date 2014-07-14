@@ -12,11 +12,8 @@
  */
 package org.camunda.spin.impl;
 
-import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
-
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
@@ -25,6 +22,9 @@ import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
 import org.camunda.spin.spi.SpinDataFormatException;
+
+import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
+import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 
 /**
  * @author Daniel Meyer
@@ -44,21 +44,21 @@ public class SpinFactoryImpl extends SpinFactory {
    */
 
   public <T extends Spin<?>> T createSpin(T parameter) {
-    ensureParameterNotNull(parameter);
+    ensureNotNull("parameter", parameter);
     
     return parameter;
   }
   
   public <T extends Spin<?>> T createSpin(String parameter) {
-    ensureParameterNotNull(parameter);
-    
+    ensureNotNull("parameter", parameter);
+
     InputStream input = stringAsInputStream(parameter);
     return createSpin(input);
   }
   
   public <T extends Spin<?>> T createSpin(InputStream parameter) {
-    ensureParameterNotNull(parameter);
-    
+    ensureNotNull("parameter", parameter);
+
     RewindableInputStream rewindableStream = new RewindableInputStream(parameter, READ_SIZE);
     
     DataFormat<T> matchingDataFormat = null;
@@ -88,31 +88,24 @@ public class SpinFactoryImpl extends SpinFactory {
    * @throws IllegalArgumentException in case the parameter is null or dd:
    */
   public <T extends Spin<?>> T createSpin(T parameter, DataFormat<T> format) {
+    ensureNotNull("parameter", parameter);
 
-    ensureParameterNotNull(parameter);
-    
     return parameter;
   }
 
   public <T extends Spin<?>> T createSpin(String parameter, DataFormat<T> format) {
-    ensureParameterNotNull(parameter);
-    
+    ensureNotNull("parameter", parameter);
+
     InputStream input = stringAsInputStream(parameter);
     return createSpin(input, format);
   }
 
   public <T extends Spin<?>> T createSpin(InputStream parameter, DataFormat<T> format) {
-    ensureParameterNotNull(parameter);
-    
+    ensureNotNull("parameter", parameter);
+
     DataFormatReader reader = format.getReader();
     Object dataFormatInput = reader.readInput(parameter);
     return format.createWrapperInstance(dataFormatInput);
-  }
-  
-  protected void ensureParameterNotNull(Object parameter) {
-    if(parameter == null) {
-      throw LOG.unsupportedNullInputParameter();
-    }
   }
 
 }
