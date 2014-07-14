@@ -13,12 +13,14 @@ module.exports = function(config) {
     'jquery',
     'angular',
     'moment',
+
+    'camunda-bpm-forms',
+    'camunda-bpm-sdk',
+
     'angular-bootstrap',
     'angular-route',
     'angular-animate',
-    'angular-moment',
-    'camunda-bpm-forms',
-    'camunda-bpm-sdk'
+    'angular-moment'
   ];
 
   _.extend(rjsConf.paths, {

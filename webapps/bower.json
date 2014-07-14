@@ -28,19 +28,19 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "~3.1.1",
-    "hyperagent": "*",
     "angular": "1.2.16",
-    "jquery": "2.1.1",
-    "angular-ui-bootstrap": "0.11.0",
-    "angular-moment": "0.7.0",
-    "requirejs-domready": "2.0.1",
-    "angular-bootstrap": "0.11.0",
-    "angular-route": "1.2.16",
     "angular-animate": "1.2.16",
+    "angular-bootstrap": "0.11.0",
+    "angular-moment": "0.7.0",
+    "angular-route": "1.2.16",
+    "angular-ui-bootstrap": "0.11.0",
+    "bootstrap": "~3.1.1",
     "camunda-bpm-forms": "./node_modules/camunda-bpm-sdk-js/dist/camunda-embedded-forms.js",
     "camunda-bpm-sdk-js": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk.js",
-    "camunda-bpm-sdk-js-mock": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk-mock.js"
+    "camunda-bpm-sdk-js-mock": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk-mock.js",
+    "hyperagent": "*",
+    "jquery": "2.1.1",
+    "requirejs-domready": "2.0.1"
   },
   "devDependencies": {
     "jquery-mockjax": "1.5.3",
@@ -51,6 +51,7 @@
     "requirejs-text": "2.0.12"
   },
   "resolutions": {
+    "angular": "1.2.16",
     "jquery": "2.1.1"
   }
 }

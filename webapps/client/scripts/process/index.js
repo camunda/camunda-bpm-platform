@@ -74,7 +74,7 @@ define([
 
 
     $scope.selected = function($item, $model, $label) {
-      $scope.startingProcess = $item;
+      $scope.getStartForm($item);
     };
 
 
@@ -154,18 +154,21 @@ define([
           throw err;
         }
 
-        var parts = result.key.split('embedded:');
-        if (parts.length > 1) {
-          var formUrl = parts.pop().replace('app:', result.contextPath);
+        if (result.key) {
+          var parts = result.key.split('embedded:');
 
-          console.info('Found formUrl', formUrl);
+          var formUrl = parts.length > 1 ?
+            parts.pop().replace('app:', result.contextPath) :
+            result.key;
 
           var form = new CamForm({
-            processDefinitionId: startingProcess.id,
-            containerElement: $('.starting-process'),
-            service: camAPI,
-            formUrl: formUrl
+            processDefinitionId:  startingProcess.id,
+            containerElement:     $('.start-form-container'),
+            service:              camAPI,
+            formUrl:              formUrl
           });
+
+          $scope.startingProcess._form = form;
         }
         else {
           // generic form
@@ -173,7 +176,6 @@ define([
       });
       // $scope.variables = [];
       // $scope.addVariable();
-
     };
 
 
@@ -202,19 +204,21 @@ define([
       }
 
       var vars = {};
-
-      angular.forEach($scope.variables, function(val) {
-        if (val.name[0] !== '$') {
-          vars[val.name] = {type: val.type, value: val.value};
-        }
-      });
+      if (!$scope.startingProcess._form) {
+        angular.forEach($scope.variables, function(val) {
+          if (val.name[0] !== '$' && val.name) {
+            vars[val.name] = {type: val.type, value: val.value};
+          }
+        });
+      }
+      else {
+        vars = $scope.startingProcess._form.variableManager.variables;
+      }
 
       ProcessDefinition.submit({
         key: $scope.startingProcess.key,
         variables: vars
       }, function(err, res) {
-        console.info('start process', err, res);
-
         if (err) {
           camTasklistNotifier.add(err);
           throw err;
@@ -226,19 +230,6 @@ define([
         });
         close(res);
       });
-      // camAPI.start($scope.startingProcess.key, {
-      //   data: {
-      //     variables: vars
-      //   }
-      // }).then(function(result) {
-      //   camTasklistNotifier.add({
-      //     type: 'success',
-      //     text: 'The process has been started.'
-      //   });
-      //   close(result);
-      // }, function(err) {
-      //   camTasklistNotifier.add(err);
-      // });
     };
   }]);
 
