@@ -167,6 +167,8 @@ define([
             service:              camAPI,
             formUrl:              formUrl
           });
+
+          $scope.startingProcess._form = form;
         }
         else {
           // generic form
@@ -202,12 +204,16 @@ define([
       }
 
       var vars = {};
-
-      angular.forEach($scope.variables, function(val) {
-        if (val.name[0] !== '$' && val.name) {
-          vars[val.name] = {type: val.type, value: val.value};
-        }
-      });
+      if (!$scope.startingProcess._form) {
+        angular.forEach($scope.variables, function(val) {
+          if (val.name[0] !== '$' && val.name) {
+            vars[val.name] = {type: val.type, value: val.value};
+          }
+        });
+      }
+      else {
+        vars = $scope.startingProcess._form.variableManager.variables;
+      }
 
       ProcessDefinition.submit({
         key: $scope.startingProcess.key,
@@ -224,19 +230,6 @@ define([
         });
         close(res);
       });
-      // camAPI.start($scope.startingProcess.key, {
-      //   data: {
-      //     variables: vars
-      //   }
-      // }).then(function(result) {
-      //   camTasklistNotifier.add({
-      //     type: 'success',
-      //     text: 'The process has been started.'
-      //   });
-      //   close(result);
-      // }, function(err) {
-      //   camTasklistNotifier.add(err);
-      // });
     };
   }]);
 

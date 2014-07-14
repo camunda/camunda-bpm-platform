@@ -59,6 +59,17 @@ define('camunda-tasklist-ui', [
         })
 
 
+        // // Would be great to be able to start processes with a URL
+        // .when('/process/:processDefinitionId/start', {
+        //   template: tasklistTemplate,
+        //   controller: 'processStartCtrl'
+        // })
+        // .when('/process/key/:processDefinitionKey/start', {
+        //   template: tasklistTemplate,
+        //   controller: 'processStartCtrl'
+        // })
+
+
         .when('/login', {
           template: tasklistTemplate,
           controller: 'userLoginCtrl'
