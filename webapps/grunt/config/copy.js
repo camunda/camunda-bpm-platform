@@ -139,7 +139,7 @@ module.exports = function(config) {
           src:  [
             '{fonts,images}/**/*.*'
           ],
-          dest: '<%= buildTarget %>/../assets/vendor'
+          dest: '<%= buildTarget %>/assets/vendor'
         },
 
         // dojo & dojox
@@ -149,7 +149,7 @@ module.exports = function(config) {
           src:  [
             '**/*.*'
           ],
-          dest: '<%= buildTarget %>/../assets/vendor'
+          dest: '<%= buildTarget %>/assets/vendor'
         },
 
         // requirejs
@@ -157,7 +157,7 @@ module.exports = function(config) {
           // src: '<%= pkg.gruntConfig.clientDir %>/scripts/assets/vendor/requirejs/index.js',
           // dest: '<%= buildTarget %>/assets/vendor/requirejs/require.js'
           src: '<%= pkg.gruntConfig.clientDir %>/bower_components/requirejs/index.js',
-          dest: '<%= buildTarget %>/../assets/vendor/requirejs/require.js'
+          dest: '<%= buildTarget %>/assets/vendor/requirejs/require.js'
         },
 
         // others
@@ -173,7 +173,7 @@ module.exports = function(config) {
             '!requirejs/**/*',
             '**/*.{js,css,jpg,png,gif,html,eot,ttf,svg,woff,htc}'
           ],
-          dest: '<%= buildTarget %>/../assets/vendor'
+          dest: '<%= buildTarget %>/assets/vendor'
         }
       ]
     },
