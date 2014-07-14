@@ -66,7 +66,7 @@
    */
   conf.urlArgs = ''/* cache-busting +'bust=' + CACHE_BUSTER /* */;
 
-  var vendor = '../assets/vendor';
+  var vendor = 'assets/vendor';
 
   /**
    * Keys are module names and values are paths or URLs.
