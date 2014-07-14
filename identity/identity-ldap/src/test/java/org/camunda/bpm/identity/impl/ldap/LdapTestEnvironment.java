@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -83,25 +84,42 @@ public class LdapTestEnvironment {
     }
 
     createGroup("office-berlin");
-    String dnRoman = createUser("roman", "office-berlin", "Roman", "Smirnov", "roman@camunda.org");
-    String dnRobert = createUser("robert", "office-berlin", "Robert", "Gimbel", "robert@camunda.org");
-    String dnDaniel = createUser("daniel", "office-berlin", "Daniel", "Meyer", "daniel@camunda.org");
+    String dnRoman = createUserUid("roman", "office-berlin", "Roman", "Smirnov", "roman@camunda.org");
+    String dnRobert = createUserUid("robert", "office-berlin", "Robert", "Gimbel", "robert@camunda.org");
+    String dnDaniel = createUserUid("daniel", "office-berlin", "Daniel", "Meyer", "daniel@camunda.org");
 
     createGroup("office-london");
-    String dnOscar = createUser("oscar", "office-london", "Oscar", "The Crouch", "oscar@camunda.org");
-    String dnMonster = createUser("monster", "office-london", "Cookie", "Monster", "monster@camunda.org");
+    String dnOscar = createUserUid("oscar", "office-london", "Oscar", "The Crouch", "oscar@camunda.org");
+    String dnMonster = createUserUid("monster", "office-london", "Cookie", "Monster", "monster@camunda.org");
     
     createGroup("office-home");
-    String dnRuecker = createUser("ruecker", "office-home", "Bernd", "Ruecker", "ruecker@camunda.org");
+    String dnRuecker = createUserUid("ruecker", "office-home", "Bernd", "Ruecker", "ruecker@camunda.org");
 
+    createGroup("office-external");
+    String dnFozzie = createUserCN("fozzie", "office-external", "Bear", "Fozzie", "fozzie@camunda.org");
+    
     createRole("management", dnRuecker, dnRobert, dnDaniel);
     createRole("development", dnRoman, dnDaniel, dnOscar);
     createRole("consulting", dnRuecker);
     createRole("sales", dnRuecker, dnMonster);
+    createRole("external", dnFozzie);
   }
 
-  protected String createUser(String user, String group, String firstname, String lastname, String email) throws Exception {
+  protected String createUserUid(String user, String group, String firstname, String lastname, String email) throws Exception {
     LdapDN dn = new LdapDN("uid="+user+",ou="+group+",o=camunda,c=org");
+    createUser(user, firstname, lastname, email, dn);
+    return dn.toNormName();
+  }
+
+  protected String createUserCN(String user, String group, String firstname, String lastname, String email) throws Exception {
+    LdapDN dn = new LdapDN("cn="+lastname + "\\," + firstname +",ou="+group+",o=camunda,c=org");
+    createUser(user, firstname, lastname, email, dn);
+    return dn.toNormName();
+  }
+
+  private void createUser(String user, String firstname, String lastname,
+      String email, LdapDN dn) throws Exception, NamingException,
+      UnsupportedEncodingException {
     if (!service.getAdminSession().exists(dn)) {
       ServerEntry entry = service.newEntry(dn);
       entry.add("objectClass", "top", "person", "inetOrgPerson"); //, "extensibleObject"); //make extensible to allow for the "memberOf" field
@@ -113,9 +131,8 @@ public class LdapTestEnvironment {
       service.getAdminSession().add(entry);
       System.out.println("created entry: " + dn.toNormName());
     }
-    return dn.toNormName();
   }
-
+  
   protected void createGroup(String name) throws InvalidNameException, Exception, NamingException {
     LdapDN dn = new LdapDN("ou=" + name + ",o=camunda,c=org");
     if (!service.getAdminSession().exists(dn)) {
