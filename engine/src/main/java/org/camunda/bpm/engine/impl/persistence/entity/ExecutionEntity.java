@@ -199,7 +199,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
   public ExecutionEntity(ActivityImpl activityImpl) {
-    this.processInstanceStartContext = new HistoryAwareStartContext(activityImpl);
+    if (activityImpl != null) {
+      this.processInstanceStartContext = new HistoryAwareStartContext(activityImpl);
+    }
   }
 
   public ExecutionEntity createExecution() {
@@ -209,7 +211,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
   public ExecutionEntity createExecution(boolean initializeExecutionStartContext) {
     // create the new child execution
-    ExecutionEntity createdExecution = newExecution();
+    ExecutionEntity createdExecution = newExecution(null);
 
     // manage the bidirectional parent-child relation
     ensureExecutionsInitialized();
@@ -241,7 +243,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   @SuppressWarnings("unchecked")
   public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
-    ExecutionEntity subProcessInstance = newExecution();
+    ExecutionEntity subProcessInstance = newExecution((ActivityImpl) processDefinition.getInitial());
 
     shouldQueryForSubprocessInstance = true;
 
@@ -291,8 +293,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     return subProcessInstance;
   }
 
-  protected ExecutionEntity newExecution() {
-    ExecutionEntity newExecution = new ExecutionEntity();
+  protected ExecutionEntity newExecution(ActivityImpl activity) {
+    ExecutionEntity newExecution = new ExecutionEntity(activity);
 
     initializeAssociations(newExecution);
 

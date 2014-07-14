@@ -222,6 +222,19 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableId(variable.get(0).getId()).count());
 
   }
+  
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testCallSubProcessSettingVariableOnStart.bpmn20.xml",
+      "org/camunda/bpm/engine/test/history/subProcessSetVariableOnStart.bpmn20.xml"
+  })
+  public void testCallSubProcessSettingVariableOnStart() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSubProcess");
+    assertProcessEnded(processInstance.getId());
+    
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().count());
+    
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("aVariable", "aValue").count());
+  }
 
   @Deployment(resources={
           "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
