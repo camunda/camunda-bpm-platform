@@ -4,12 +4,13 @@
     <groupId>org.camunda.bpm.webapp</groupId>
     <artifactId>camunda-webapp-root</artifactId>
     <version>7.2.0-SNAPSHOT</version>
+    <relativePath>../..</relativePath>
   </parent>
-  
+
   <artifactId>camunda-webapp-glassfish</artifactId>
   <packaging>war</packaging>
   <name>camunda BPM - webapp - Glassfish</name>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm.webapp</groupId>
