@@ -28,9 +28,7 @@ import org.camunda.spin.logging.SpinCoreLogger;
 public abstract class TextBasedDataFormatReader implements DataFormatReader {
 
   private final static SpinCoreLogger LOG = SpinCoreLogger.CORE_LOGGER;
-  
-  protected static final int MAXIMUM_CHARACTER_BYTE_SIZE = 4;
-  
+
   public boolean canRead(RewindableInputStream input) {
     int inputSize = input.getCurrentRewindableCapacity();
     
@@ -44,9 +42,8 @@ public abstract class TextBasedDataFormatReader implements DataFormatReader {
     
     
     Pattern pattern = getInputDetectionPattern();
-    boolean inputMatches = pattern.matcher(new String(firstBytes, Charset.forName("UTF-8"))).find();
-    
-    return inputMatches;
+
+    return pattern.matcher(new String(firstBytes, Charset.forName("UTF-8"))).find();
   }
   
   protected abstract Pattern getInputDetectionPattern();
