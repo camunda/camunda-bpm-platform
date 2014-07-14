@@ -26,7 +26,7 @@
 
     <resources>
       <resource>
-        <directory>../webapp/src/main/runtime/glassfish/resources</directory>
+        <directory>../../webapp/src/main/runtime/glassfish/resources</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
@@ -44,7 +44,7 @@
           </archive>
           <webResources>
             <resource>
-              <directory>../webapp/src/main/runtime/glassfish/webapp</directory>
+              <directory>../../webapp/src/main/runtime/glassfish/webapp</directory>
             </resource>
           </webResources>
         </configuration>

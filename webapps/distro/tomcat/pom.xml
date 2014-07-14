@@ -30,7 +30,7 @@
 
     <resources>
       <resource>
-        <directory>../webapp/src/main/runtime/tomcat/resources</directory>
+        <directory>../../webapp/src/main/runtime/tomcat/resources</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
@@ -42,7 +42,7 @@
         <configuration>
           <webResources>
             <resource>
-              <directory>../webapp/src/main/runtime/tomcat/webapp</directory>
+              <directory>../../webapp/src/main/runtime/tomcat/webapp</directory>
             </resource>
           </webResources>
         </configuration>
