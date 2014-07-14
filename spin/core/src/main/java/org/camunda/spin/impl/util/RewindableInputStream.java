@@ -15,6 +15,8 @@ package org.camunda.spin.impl.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import org.camunda.spin.logging.SpinCoreLogger;
+import org.camunda.spin.logging.SpinLogger;
 
 /**
  * Caches the initial bytes that are read from the supplied {@link InputStream} and 
@@ -24,6 +26,8 @@ import java.io.PushbackInputStream;
  * @author Thorben Lindhauer
  */
 public class RewindableInputStream extends InputStream {
+
+  private final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
   protected PushbackInputStream wrappedStream;
   
@@ -108,7 +112,7 @@ public class RewindableInputStream extends InputStream {
    */
   public void rewind() throws IOException {
     if (!rewindable) {
-      throw new IOException("Cannot rewind: rewind buffering limit exceeded");
+      throw LOG.unableToRewindInputStream();
     }
     
     wrappedStream.unread(buffer, 0, pos);

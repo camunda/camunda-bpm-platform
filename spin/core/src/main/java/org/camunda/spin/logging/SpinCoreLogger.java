@@ -12,6 +12,7 @@
  */
 package org.camunda.spin.logging;
 
+import java.io.IOException;
 import org.camunda.spin.SpinFileNotFoundException;
 import org.camunda.spin.SpinRuntimeException;
 import org.camunda.spin.SpinScriptException;
@@ -81,4 +82,7 @@ public class SpinCoreLogger extends SpinLogger {
     return new SpinScriptException(exceptionMessage("012", "No script script env found for script language '{}' at path '{}'", scriptLanguage, path));
   }
 
+  public IOException unableToRewindInputStream() {
+    return new IOException(exceptionMessage("013", "Unable to rewind input stream: rewind buffering limit exceeded"));
+  }
 }
