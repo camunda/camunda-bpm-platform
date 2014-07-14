@@ -402,4 +402,44 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     assertEquals(aFormKey, formKeyExpression.getExpressionText());
   }
 
+  @Test
+  public void testHumanTaskDescription() {
+    // given
+    String description = "A description";
+    humanTask.setDescription(description);
+
+    // when
+    CmmnActivity activity = handler.handleElement(planItem, context);
+
+    // then
+    HumanTaskActivityBehavior behavior = (HumanTaskActivityBehavior) activity.getActivityBehavior();
+    TaskDefinition taskDefinition = behavior.getTaskDefinition();
+
+    Expression descriptionExpression = taskDefinition.getDescriptionExpression();
+    assertNotNull(descriptionExpression);
+    assertEquals(description, descriptionExpression.getExpressionText());
+  }
+
+  @Test
+  public void testPlanItemDescription() {
+    // given
+    String description = "A description";
+    humanTask.setDescription(description);
+
+    // the planItem has an own description
+    String localDescription = "My Local Description";
+    planItem.setDescription(localDescription);
+
+    // when
+    CmmnActivity activity = handler.handleElement(planItem, context);
+
+    // then
+    HumanTaskActivityBehavior behavior = (HumanTaskActivityBehavior) activity.getActivityBehavior();
+    TaskDefinition taskDefinition = behavior.getTaskDefinition();
+
+    Expression descriptionExpression = taskDefinition.getDescriptionExpression();
+    assertNotNull(descriptionExpression);
+    assertEquals(localDescription, descriptionExpression.getExpressionText());
+  }
+
 }

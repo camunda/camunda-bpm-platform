@@ -97,10 +97,11 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
     initializeTaskDefinitionCandidateGroups(planItem, taskDefinition, context);
     // formKey
     initializeTaskDefinitionFormKey(planItem, taskDefinition, context);
+    // description
+    initializeTaskDescription(planItem, taskDefinition, context);
 
     return taskDefinition;
   }
-
 
   protected void initializeTaskDefinitionName(PlanItem planItem, TaskDefinition taskDefinition, CmmnHandlerContext context) {
     String name = planItem.getName();
@@ -187,6 +188,15 @@ public class HumanTaskPlanItemHandler extends TaskPlanItemHandler {
       ExpressionManager expressionManager = context.getExpressionManager();
       Expression priorityExpression = expressionManager.createExpression(priority);
       taskDefinition.setPriorityExpression(priorityExpression);
+    }
+  }
+
+  protected void initializeTaskDescription(PlanItem planItem, TaskDefinition taskDefinition, CmmnHandlerContext context) {
+    String description = getDesciption(planItem);
+    if (description != null && ! description.isEmpty()) {
+      ExpressionManager expressionManager = context.getExpressionManager();
+      Expression descriptionExpression = expressionManager.createExpression(description);
+      taskDefinition.setDescriptionExpression(descriptionExpression);
     }
   }
 

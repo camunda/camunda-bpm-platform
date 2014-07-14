@@ -138,4 +138,15 @@ public abstract class PlanItemHandler extends CmmnElementHandler<PlanItem> {
     return planItem.getDefinition();
   }
 
+  protected String getDesciption(PlanItem planItem) {
+    String description = planItem.getDescription();
+
+    if (description == null) {
+      PlanItemDefinition definition = getDefinition(planItem);
+      description = definition.getDescription();
+    }
+
+    return description;
+  }
+
 }
