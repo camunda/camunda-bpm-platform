@@ -12,11 +12,10 @@
  */
 package org.camunda.spin.impl.util;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.InputStream;
-
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class IoUtilTest {
 
@@ -28,7 +27,9 @@ public class IoUtilTest {
     InputStream inputStream = IoUtil.stringAsInputStream(input);
     
     byte[] firstBytes = IoUtil.readFirstBytes(inputStream, INPUT_STREAM_BYTE_LIMIT);
+
     assertThat(new String(firstBytes, IoUtil.ENCODING_CHARSET)).isEqualTo(input.substring(0, INPUT_STREAM_BYTE_LIMIT));
+    assertThat(firstBytes).hasSize(INPUT_STREAM_BYTE_LIMIT);
   }
   
   @Test
@@ -40,6 +41,25 @@ public class IoUtilTest {
     
     // ä is two bytes in utf-8
     assertThat(new String(firstBytes, IoUtil.ENCODING_CHARSET)).isEqualTo(input.substring(0, INPUT_STREAM_BYTE_LIMIT - 1));
+    assertThat(firstBytes).hasSize(INPUT_STREAM_BYTE_LIMIT);
+  }
+
+  @Test
+  public void testReadFirstBytesOfEmptyInputStream() {
+    InputStream inputStream = IoUtil.stringAsInputStream("");
+
+    byte[] firstBytes = IoUtil.readFirstBytes(inputStream, INPUT_STREAM_BYTE_LIMIT);
+
+    assertThat(firstBytes).hasSize(0);
+  }
+
+  @Test
+  public void testReadFirstBytesOfSmallInputStream() {
+    InputStream inputStream = IoUtil.stringAsInputStream("a");
+
+    byte[] firstBytes = IoUtil.readFirstBytes(inputStream, INPUT_STREAM_BYTE_LIMIT);
+
+    assertThat(firstBytes).hasSize(1);
   }
   
 }
