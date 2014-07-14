@@ -139,7 +139,7 @@ module.exports = function(config) {
           src:  [
             '{fonts,images}/**/*.*'
           ],
-          dest: '<%= buildTarget %>/assets/vendor'
+          dest: '<%= buildTarget %>/assets'
         },
 
         // dojo & dojox
