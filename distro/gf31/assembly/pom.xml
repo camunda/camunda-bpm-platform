@@ -139,6 +139,16 @@
     	<type>rar</type>
     </dependency>
 
+    <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.template-engines</groupId>
+      <artifactId>camunda-template-engines-freemarker</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>
