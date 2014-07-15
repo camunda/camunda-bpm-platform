@@ -89,7 +89,7 @@
           <extensions>true</extensions>
           <configuration>
             <instructions>
-              <Export-Package>org.camunda.templateengines.engine*</Export-Package>
+              <Export-Package>org.camunda.templateengines*</Export-Package>
             </instructions>
           </configuration>
         </plugin>
