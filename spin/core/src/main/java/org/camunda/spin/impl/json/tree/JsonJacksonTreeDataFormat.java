@@ -19,8 +19,11 @@ import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * @author Thorben Lindhauer
+ * @author Stefan Hentschel
  */
 public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, JsonJacksonTreeConfigurable<JsonJacksonTreeDataFormat> {
 
@@ -37,7 +40,7 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
   }
 
   public SpinJsonNode createWrapperInstance(Object parameter) {
-    return new SpinJsonJacksonTreeNode((JsonNode) parameter);
+    return new SpinJsonJacksonTreeNode((JsonNode) parameter, this);
   }
 
   public String getName() {

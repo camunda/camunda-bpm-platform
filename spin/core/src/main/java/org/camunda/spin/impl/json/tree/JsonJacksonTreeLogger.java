@@ -12,6 +12,7 @@
  */
 package org.camunda.spin.impl.json.tree;
 
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 
@@ -26,5 +27,16 @@ public class JsonJacksonTreeLogger extends SpinLogger {
 
   public void unableToFind(String mess) {
     logInfo("002", "Unable {}", mess);
+  }
+
+  /**
+   * Exception handler if we are unable to parse a json value into a java representation
+   *
+   * @param expectedType Name of the expected Type
+   * @param type Type of the json node
+   * @return SpinJsonDataFormatException
+   */
+  public SpinJsonDataFormatException unableToParseValue(String expectedType, JsonNodeType type) {
+    return new SpinJsonDataFormatException(exceptionMessage("003", "Expected '{}', got '{}'", expectedType, type.toString()));
   }
 }

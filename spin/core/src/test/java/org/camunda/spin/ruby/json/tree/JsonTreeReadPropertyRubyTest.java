@@ -10,30 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.json;
+package org.camunda.spin.ruby.json.tree;
 
-import org.camunda.spin.Spin;
-import org.camunda.spin.SpinList;
-
-import java.util.ArrayList;
+import org.camunda.spin.json.tree.JsonTreeReadPropertyScriptTest;
+import org.camunda.spin.test.ScriptEngine;
 
 /**
- * A json node.
- * 
  * @author Thorben Lindhauer
- * @author Stefan Hentschel
+ *
  */
-public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
+@ScriptEngine("ruby")
+public class JsonTreeReadPropertyRubyTest extends JsonTreeReadPropertyScriptTest {
 
-  public abstract SpinJsonNode prop(String name);
-
-  public abstract Boolean boolValue();
-
-  public abstract Number numberValue();
-
-  public abstract String value();
-
-  public abstract SpinList elements();
-
-  public abstract ArrayList<String> fieldNames();
 }
