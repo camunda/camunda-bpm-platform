@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.cmmn.casetask;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -543,6 +544,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
       .withCaseExecution(caseTaskId)
       .setVariable("aVariable", "abc")
       .setVariable("anotherVariable", 999)
+      .setVariable("aThirdVariable", "def")
       .manualStart();
 
     // then
@@ -810,7 +812,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .manualStart();
       fail("It should not be possible to start a case instance.");
-    } catch (Exception e) {}
+    } catch (ProcessEngineException e) {}
 
     // complete //////////////////////////////////////////////////////////
 
@@ -880,6 +882,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
       .withCaseExecution(subCaseInstanceId)
       .setVariable("aVariable", "abc")
       .setVariable("anotherVariable", 999)
+      .setVariable("aThirdVariable", "def")
       .execute();
 
     String humanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
@@ -1323,7 +1326,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .complete();
       fail("It should not be possible to complete a case task, while the case instance is active.");
-    } catch (Exception e) {}
+    } catch (ProcessEngineException e) {}
 
 
     // complete ////////////////////////////////////////////////////////
