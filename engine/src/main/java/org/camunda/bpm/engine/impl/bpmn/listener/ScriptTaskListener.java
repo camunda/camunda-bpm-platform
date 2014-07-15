@@ -15,50 +15,25 @@ package org.camunda.bpm.engine.impl.bpmn.listener;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
-import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
-import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 
 public class ScriptTaskListener implements TaskListener {
-	private Expression script;
 
-	private Expression language = null;
+  protected final ExecutableScript script;
 
-	private Expression resultVariable = null;
+  public ScriptTaskListener(ExecutableScript script) {
+    this.script = script;
+  }
 
 	public void notify(DelegateTask delegateTask) {
-		if (script == null) {
-			throw new IllegalArgumentException("The field 'script' should be set on the TaskListener");
-		}
-
-		if (language == null) {
-			throw new IllegalArgumentException("The field 'language' should be set on the TaskListener");
-		}
-
-		ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    ScriptingEnvironment scriptEnv = processEngineConfiguration.getScriptingEnvironment();
-    ScriptFactory scriptFactory = processEngineConfiguration.getScriptFactory();
-    ExecutableScript executableScript = scriptFactory.createScript(script.getExpressionText(), language.getExpressionText());
-
-    Object result = scriptEnv.execute(executableScript, delegateTask);
-
-		if (resultVariable != null) {
-			delegateTask.setVariable(resultVariable.getExpressionText(), result);
-		}
+    Context.getProcessEngineConfiguration()
+      .getScriptingEnvironment()
+      .execute(script, delegateTask);
 	}
 
-	public void setScript(Expression script) {
-		this.script = script;
-	}
+  public ExecutableScript getScript() {
+    return script;
+  }
 
-	public void setLanguage(Expression language) {
-		this.language = language;
-	}
-
-	public void setResultVariable(Expression resultVariable) {
-		this.resultVariable = resultVariable;
-	}
 }

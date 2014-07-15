@@ -70,6 +70,7 @@ import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ScriptExecutionListener;
+import org.camunda.bpm.engine.impl.bpmn.listener.ScriptTaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.mapping.InputParameter;
 import org.camunda.bpm.engine.impl.core.mapping.IoMapping;
@@ -2256,6 +2257,7 @@ public class BpmnParse extends Parse {
     String className = taskListenerElement.attribute("class");
     String expression = taskListenerElement.attribute("expression");
     String delegateExpression = taskListenerElement.attribute("delegateExpression");
+    Element scriptElement = taskListenerElement.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "script");
 
     if (className != null) {
       taskListener = new ClassDelegate(className, parseFieldDeclarations(taskListenerElement));
@@ -2263,8 +2265,14 @@ public class BpmnParse extends Parse {
       taskListener = new ExpressionTaskListener(expressionManager.createExpression(expression));
     } else if (delegateExpression != null) {
       taskListener = new DelegateExpressionTaskListener(expressionManager.createExpression(delegateExpression), parseFieldDeclarations(taskListenerElement));
+    }
+    else if (scriptElement != null) {
+      ExecutableScript executableScript = parseCamundaScript(scriptElement);
+      if (executableScript != null) {
+        taskListener = new ScriptTaskListener(executableScript);
+      }
     } else {
-      addError("Element 'class', 'expression' or 'delegateExpression' is mandatory on taskListener", taskListenerElement);
+      addError("Element 'class', 'expression', 'delegateExpression' or 'script' is mandatory on taskListener", taskListenerElement);
     }
     return taskListener;
   }
