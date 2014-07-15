@@ -163,7 +163,6 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     try {
       enumeration = initialContext.search(baseDn, groupSearchFilter, ldapConfiguration.getSearchControls());
 
-      List<User> userList = new ArrayList<User>();
       List<String> userDnList = new ArrayList<String>();
 
       // first find group
@@ -173,22 +172,18 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         NamingEnumeration<?> allMembers = memberAttribute.getAll();
 
         // iterate group members
-        while (allMembers.hasMoreElements() && userList.size() < query.getMaxResults()) {
+        while (allMembers.hasMoreElements() && userDnList.size() < query.getMaxResults()) {
           userDnList.add((String) allMembers.nextElement());
         }
 
       }
 
-      String queriedUserId  = query.getId();
-      String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
+      List<User> userList = new ArrayList<User>();
       for (String userDn : userDnList) {
-        String userId = userDn.substring(userDn.indexOf("=")+1, userDn.indexOf(","));
-        if(queriedUserId == null) {
-          query.userId(userId);
-        }
-        if(queriedUserId == null || queriedUserId.equals(userId)) {
-          userList.addAll(findUsersWithoutGroupId(query, userBaseDn));
-        }
+          List<User> users = findUsersWithoutGroupId(query, userDn);
+          if (users.size() > 0) {
+            userList.add(users.get(0));
+          }
       }
 
       return userList;
