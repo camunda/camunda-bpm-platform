@@ -102,16 +102,10 @@ module.exports = function(config) {
     sdk: {
       files: [
         {
-          src: 'node_modules/camunda-bpm-sdk-js/dist/camunda-embedded-forms.js',
-          dest: '<%= pkg.gruntConfig.clientDir %>/bower_components/camunda-bpm-form/index.js'
-        },
-        {
-          src: 'node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk.js',
-          dest: '<%= pkg.gruntConfig.clientDir %>/bower_components/camunda-bpm-sdk-js/index.js'
-        },
-        {
-          src: 'node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk-mock.js',
-          dest: '<%= pkg.gruntConfig.clientDir %>/bower_components/camunda-bpm-sdk-js-mock/index.js'
+          expand: true,
+          cwd: 'node_modules/camunda-bpm-sdk-js/dist',
+          src: ['**/*.js'],
+          dest: '<%= pkg.gruntConfig.clientDir %>/vendor/'
         }
       ]
     }
