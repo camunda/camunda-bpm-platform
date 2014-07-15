@@ -15,15 +15,6 @@
   </parent>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <!-- create distribution zip -->
       <plugin>
@@ -39,8 +30,23 @@
             <inherited>false</inherited>
             <configuration>
               <tasks>
+
+                <!-- run node build -->
+                <exec executable="npm">
+                  <arg value="install"/>
+                </exec>
+                <exec executable="npm">
+                  <arg value="run-script"/>
+                  <arg value="test"/>
+                </exec>
+                <exec executable="npm">
+                  <arg value="run-script"/>
+                  <arg value="dist"/>
+                </exec>
+
+                <!-- package zip -->
                 <mkdir dir="${basedir}/target/" />
-                <zip destfile="${basedir}/target/dist.zip" basedir="${basedir}/dist/" />
+                <zip destfile="${basedir}/target/dist.zip" basedir="dist/" />
               </tasks>
             </configuration>
           </execution>
