@@ -15,10 +15,12 @@ package org.camunda.templateengines;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+
 import javax.script.*;
 
 /**
@@ -54,7 +56,7 @@ public class FreeMarkerScriptEngine extends AbstractScriptEngine implements Comp
       template.process(bindings, writer);
       writer.flush();
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new ScriptException(e);
     }
 
     return writer.toString();

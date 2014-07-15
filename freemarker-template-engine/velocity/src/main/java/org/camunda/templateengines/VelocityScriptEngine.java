@@ -17,7 +17,9 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+
 import javax.script.*;
+
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
@@ -53,7 +55,7 @@ public class VelocityScriptEngine extends AbstractScriptEngine {
       velocityEngine.evaluate(new VelocityContext(bindings), writer, filename, script);
       writer.flush();
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new ScriptException(e);
     }
 
     return writer.toString();

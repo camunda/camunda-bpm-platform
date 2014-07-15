@@ -13,16 +13,23 @@
 
 package org.camunda.templateengines.engine;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import java.util.Arrays;
 import java.util.Collection;
-import javax.script.*;
+
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+
 import org.camunda.templateengines.engine.util.Greeter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Sebastian Menski
@@ -126,6 +133,17 @@ public class VelocityScriptEngineTest {
     bindings.put("who", "world");
     expected = "Hello world!";
     template = "#define($block)Hello $who!#end$block";
+  }
+  
+  @Test
+  public void testFailingEvaluation() {
+    try {
+      String invalidTemplate = "#set()";
+      evaluate(invalidTemplate);
+      fail("Expected a ScriptException");
+    } catch (ScriptException e) {
+      // happy path
+    }
   }
 
 }

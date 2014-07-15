@@ -15,7 +15,9 @@ package org.camunda.templateengines.engine;
 
 import java.util.Arrays;
 import java.util.Collection;
+
 import javax.script.*;
+
 import org.camunda.templateengines.engine.util.Greeter;
 import org.junit.After;
 import org.junit.Before;
@@ -23,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * @author Sebastian Menski
@@ -117,6 +120,17 @@ public class FreeMarkerScriptEngineTest {
     bindings.put("who", "world");
     expected = "Hello world!";
     template = "<#macro block>Hello ${who}!</#macro><@block/>";
+  }
+  
+  @Test
+  public void testFailingEvaluation() {
+    try {
+      String invalidTemplate = "${}";
+      evaluate(invalidTemplate);
+      fail("Expected a ScriptException");
+    } catch (ScriptException e) {
+      // happy path
+    }
   }
 
 }
