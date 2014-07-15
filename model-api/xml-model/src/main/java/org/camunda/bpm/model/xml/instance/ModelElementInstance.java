@@ -155,11 +155,11 @@ public interface ModelElementInstance {
   /**
    * Returns a child element with the given name or 'null' if no such element exists
    *
-   * @param elementName the local name of the element
-   * @param namespaceUri the namespace of the element
+   * @param namespaceUri the local name of the element
+   * @param elementName the namespace of the element
    * @return the child element or null.
    */
-  ModelElementInstance getUniqueChildElementByNameNs(String elementName, String namespaceUri);
+  ModelElementInstance getUniqueChildElementByNameNs(String namespaceUri, String elementName);
 
   /**
    * Returns a child element with the given type
