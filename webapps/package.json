@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "./node_modules/grunt-cli/bin/grunt jasmine_node",
-    "dist": "./node_modules/grunt-cli/bin/grunt build:prod"
+    "dist": "./node_modules/bower/bin/bower install && ./node_modules/grunt-cli/bin/grunt build:prod"
   },
   "gruntConfig": {
     "connectPort": 9090,
