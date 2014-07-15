@@ -83,6 +83,7 @@ import org.camunda.bpm.engine.impl.core.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
+import org.camunda.bpm.engine.impl.el.ScriptCondition;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
@@ -3034,6 +3035,9 @@ public class BpmnParse extends Parse {
     if (conditionExprElement != null) {
       String expression = conditionExprElement.getText().trim();
       String type = conditionExprElement.attributeNS(BpmnParser.XSI_NS, "type");
+      String language = conditionExprElement.attribute("language");
+      String resource = conditionExprElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resource");
+
       if (type != null) {
         String value = type.contains(":") ? resolveName(type) : BpmnParser.BPMN20_NS + ":" + type;
         if (!value.equals(ATTRIBUTEVALUE_T_FORMAL_EXPRESSION)) {
@@ -3041,9 +3045,18 @@ public class BpmnParse extends Parse {
         }
       }
 
-      Condition expressionCondition = new UelExpressionCondition(expressionManager.createExpression(expression));
+      Condition condition = null;
+      if (language == null) {
+        condition = new UelExpressionCondition(expressionManager.createExpression(expression));
+      }
+      else {
+        ExecutableScript script = parseScriptDefinition(language, resource, expression);
+        if (script != null) {
+          condition = new ScriptCondition(script);
+        }
+      }
       seqFlow.setProperty(PROPERTYNAME_CONDITION_TEXT, expression);
-      seqFlow.setProperty(PROPERTYNAME_CONDITION, expressionCondition);
+      seqFlow.setProperty(PROPERTYNAME_CONDITION, condition);
     }
   }
 
@@ -3535,16 +3548,21 @@ public class BpmnParse extends Parse {
     }
     else {
       String scriptResource = scriptElement.attribute("resource");
-      if (scriptResource != null && !scriptResource.isEmpty()) {
-        // script resource
-        return parseScriptResource(scriptResource, scriptLanguage);
+      String scriptSource = scriptElement.getText();
+      return parseScriptDefinition(scriptLanguage, scriptResource, scriptSource);
+    }
+  }
+
+  public ExecutableScript parseScriptDefinition(String language, String resource, String source) {
+    if (language != null) {
+      if (resource != null && !resource.isEmpty()) {
+        return parseScriptResource(resource, language);
       }
-      else {
-        // script source
-        String scriptSource = scriptElement.getText();
-        return parseScriptSource(scriptSource, scriptLanguage);
+      else if(source != null) {
+        return parseScriptSource(source, language);
       }
     }
+    return null;
   }
 
 }
