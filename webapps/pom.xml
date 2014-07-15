@@ -30,6 +30,21 @@
             <inherited>false</inherited>
             <configuration>
               <tasks>
+
+                <!-- run node build -->
+                <exec executable="npm">
+                  <arg value="install"/>
+                </exec>
+                <exec executable="npm">
+                  <arg value="run-script"/>
+                  <arg value="test"/>
+                </exec>
+                <exec executable="npm">
+                  <arg value="run-script"/>
+                  <arg value="dist"/>
+                </exec>
+
+                <!-- package zip -->
                 <mkdir dir="${basedir}/target/" />
                 <zip destfile="${basedir}/target/dist.zip" basedir="dist/" />
               </tasks>
