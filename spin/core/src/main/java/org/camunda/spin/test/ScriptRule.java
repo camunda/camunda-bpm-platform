@@ -13,6 +13,15 @@
 
 package org.camunda.spin.test;
 
+import java.io.File;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+
 import org.camunda.spin.SpinScriptException;
 import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.logging.SpinLogger;
@@ -21,15 +30,6 @@ import org.junit.ClassRule;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A jUnit4 {@link TestRule} to load and execute a script. To
@@ -75,6 +75,11 @@ public class ScriptRule implements TestRule {
 
     script = getScript(description);
     collectScriptVariables(description);
+    if (scriptEngine.getFactory().getLanguageName().equalsIgnoreCase("ruby")) {
+      // set magic property to remove all internal variables of the ruby scripting engine
+      // otherwise global variables will live forever
+      variables.put("org.jruby.embed.clear.variables", true);
+    }
     boolean execute = isExecuteScript(description);
     if (execute) {
       executeScript();
@@ -188,7 +193,7 @@ public class ScriptRule implements TestRule {
       try {
         String environment = SpinScriptEnv.get(scriptEngine.getFactory().getLanguageName());
 
-        SimpleBindings bindings = new SimpleBindings(variables);
+        Bindings bindings = new SimpleBindings(variables);
         LOG.executeScriptWithScriptEngine(scriptPath, scriptEngine.getFactory().getEngineName());
         scriptEngine.eval(environment, bindings);
         scriptEngine.eval(script, bindings);

@@ -15,7 +15,6 @@ package org.camunda.spin.test;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
