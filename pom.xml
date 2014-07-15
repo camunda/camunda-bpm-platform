@@ -36,7 +36,6 @@
         
         <module>webapps/h2-webapp</module>
         <module>webapps/cycle</module>
-        <module>webapps/camunda-webapp</module>
         
         <module>javaee/ejb-service</module>
         <module>javaee/ejb-client</module>
@@ -69,8 +68,6 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>webapps/camunda-webapp</module>
-
         <module>distro/jbossas7</module>
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
@@ -79,16 +76,16 @@
         <module>bom</module>
       </modules>
     </profile>
-    
+
     <profile>
       <!-- profile for running process-engine unit tests in QA -->
       <id>check-engine</id>
       <modules>
         <module>engine</module>
         <module>engine-cdi</module>
-        <module>engine-spring</module>          
+        <module>engine-spring</module>
         <module>engine-rest</module>
-  
+
         <module>parent</module>
         <module>bom</module>
       </modules>
@@ -98,8 +95,7 @@
       <id>check-webapps</id>
       <modules>
         <module>webapps/cycle</module>
-        <module>webapps/camunda-webapp</module>
-  
+
         <module>parent</module>
         <module>bom</module>
       </modules>
@@ -115,8 +111,6 @@
         <module>javaee/ejb-client</module>
 
         <module>identity/identity-ldap</module>
-
-        <module>webapps/camunda-webapp</module>
 
         <module>parent</module>
         <module>bom</module>
