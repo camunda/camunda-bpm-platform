@@ -11,10 +11,10 @@
           <camunda:script scriptFormat="groovy" resource="org/camunda/bpm/engine/test/examples/bpmn/tasklistener/taskListener.groovy" />
         </camunda:taskListener>
         <camunda:taskListener event="assignment">
-          <camunda:script scriptFormat="groovy" resource="org/camunda/bpm/engine/test/examples/bpmn/tasklistener/taskListener.groovy" />
+          <camunda:script scriptFormat="groovy" resource="classpath://org/camunda/bpm/engine/test/examples/bpmn/tasklistener/taskListener.groovy" />
         </camunda:taskListener>
         <camunda:taskListener event="complete">
-          <camunda:script scriptFormat="groovy" resource="org/camunda/bpm/engine/test/examples/bpmn/tasklistener/taskListener.groovy" />
+          <camunda:script scriptFormat="groovy" resource="deployment://org/camunda/bpm/engine/test/examples/bpmn/tasklistener/taskListener.groovy" />
         </camunda:taskListener>
       </extensionElements>
     </userTask>

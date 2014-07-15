@@ -18,6 +18,11 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 
+/**
+ * A {@link TaskListener} which invokes a {@link ExecutableScript} when notified.
+ *
+ * @author Sebastian Menski
+ */
 public class ScriptTaskListener implements TaskListener {
 
   protected final ExecutableScript script;
