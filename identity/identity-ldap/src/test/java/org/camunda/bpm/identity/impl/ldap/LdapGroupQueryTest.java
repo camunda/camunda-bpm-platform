@@ -25,8 +25,8 @@ public class LdapGroupQueryTest extends LdapIdentityProviderTest {
 
   public void testQueryNoFilter() {
     List<Group> groupList = identityService.createGroupQuery().list();
-
-    assertEquals(4, groupList.size());
+    
+    assertEquals(5, groupList.size());
   }
 
   public void testFilterByGroupId() {
