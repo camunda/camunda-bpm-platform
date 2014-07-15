@@ -49,7 +49,7 @@ define(['angular'], function(angular) {
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/setup', {
-      templateUrl: require.toUrl('./app/admin/pages/setup.html'),
+      templateUrl: require.toUrl('./pages/setup.html'),
       controller: Controller
     });
   }];

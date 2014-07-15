@@ -99,7 +99,7 @@ define(['angular'], function(angular) {
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/groups/:groupId', {
-      templateUrl: require.toUrl('./app/admin/pages/groupEdit.html'),
+      templateUrl: require.toUrl('./pages/groupEdit.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,

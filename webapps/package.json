@@ -1,0 +1,52 @@
+{
+  "name": "camunda-admin-ui",
+  "version": "7.2.0-SNAPSHOT",
+  "private": true,
+  "scripts": {
+    "test": "./node_modules/grunt-cli/bin/grunt jasmine_node",
+    "dist": "./node_modules/grunt-cli/bin/grunt build:prod"
+  },
+  "gruntConfig": {
+    "connectPort": 9090,
+    "livereloadPort": 9092,
+    "clientDir": "client",
+    "prodTarget": "dist",
+    "devTarget": "dist/app/admin"
+  },
+  "devDependencies": {
+    "async": "~0.2.10",
+    "bower": "~1.3.7",
+    "camunda-commons-ui": "git+ssh://git@github.com:camunda/camunda-commons-ui",
+    "grunt": "~0.4.0",
+    "grunt-bower-task": "~0.3.4",
+    "grunt-cli": "~0.1.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-less": "~0.9.0",
+    "grunt-contrib-requirejs": "*",
+    "grunt-contrib-watch": "~0.5.0",
+    "grunt-jsdoc": "~0.5.0",
+    "grunt-karma": "0.7.2",
+    "grunt-mkdir": "^0.1.1",
+    "grunt-newer": "~0.6.1",
+    "grunt-open": "~0.2.0",
+    "grunt-seleniuminstall": "git://github.com/camunda-third-party/grunt-seleniuminstall",
+    "karma": "0.11.14",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-firefox-launcher": "~0.1.0",
+    "karma-html2js-preprocessor": "~0.1.0",
+    "karma-ie-launcher": "~0.1.0",
+    "karma-jasmine": "~0.1.0",
+    "karma-ng-scenario": "~0.1.0",
+    "karma-phantomjs-launcher": "~0.1.0",
+    "karma-requirejs": "~0.2.0",
+    "karma-script-launcher": "~0.1.0",
+    "load-grunt-tasks": "~0.2.0",
+    "requirejs": "~2.1.0",
+    "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define.git",
+    "time-grunt": "~0.2.1",
+    "underscore": "~1.5.2"
+  }
+}

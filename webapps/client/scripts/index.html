@@ -13,7 +13,7 @@
     <base href="$BASE" admin-api="$APP_ROOT/api/admin/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
 
     <!-- Styles -->
-    <link href="$APP_ROOT/assets/css/admin/loader.css?bust=CACHE_BUSTER" rel="stylesheet" />
+    <link href="$APP_ROOT/app/admin/styles/styles.css?bust=CACHE_BUSTER" rel="stylesheet" />
 
     <!-- Favicon -->
     <link href="$APP_ROOT/assets/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
@@ -28,8 +28,7 @@
         <link href="$APP_ROOT/assets/vendor/better-dom/dist/better-dom-legacy.htc" rel="htc"/>
         <script src="$APP_ROOT/assets/vendor/better-dom/dist/better-dom-legacy.js"></script>
     <![endif]-->
-
-    <script src="$APP_ROOT/assets/vendor/requirejs/require.js"></script>
+    <script src="$APP_ROOT/app/admin/assets/vendor/requirejs/index.js"></script>
 
     <script src="$APP_ROOT/app/admin/admin-bootstrap.js?bust=CACHE_BUSTER"></script>
   </head>
@@ -72,8 +71,8 @@
           Powered by <a href="http://camunda.org">camunda BPM</a> / <span class="version">v${project.version}</span>
         </div>
       </footer>
-    </div>
-    <script src="$APP_ROOT/assets/vendor/better-dom/dist/better-dom.js"></script>
-    <script src="$APP_ROOT/assets/vendor/better-placeholder-polyfill/dist/better-placeholder-polyfill.js"></script>
+    </div> 
+    <script src="$APP_ROOT/app/admin/assets/vendor/better-dom/dist/better-dom.js"></script>
+    <script src="$APP_ROOT/app/admin/assets/vendor/better-placeholder-polyfill/dist/better-placeholder-polyfill.js"></script>
   </body>
 </html>

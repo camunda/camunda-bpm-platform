@@ -16,7 +16,7 @@
    * @name admin
    */
   var adminCore = [
-    'module:cockpit.plugin:cockpit-plugin',
+    'module:cockpit.plugin:camunda-commons-ui/plugin/main',
     'module:admin.pages:./pages/main',
     'module:admin.directives:./directives/main',
     'module:admin.filters:./filters/main',
@@ -24,11 +24,10 @@
     'module:admin.resources:./resources/main'];
 
   var commons = [
-    'module:camunda.common.directives:camunda-common/directives/main',
-    'module:camunda.common.extensions:camunda-common/extensions/main',
-    'module:camunda.common.resources:camunda-common/resources/main',
-    'module:camunda.common.services:camunda-common/services/main',
-    'module:camunda.common.pages:camunda-common/pages/main' ];
+    'module:camunda.common.directives:camunda-commons-ui/directives/main',
+    'module:camunda.common.extensions:camunda-commons-ui/extensions/main',
+    'module:camunda.common.services:camunda-commons-ui/services/main',
+    'module:camunda.common.pages:camunda-commons-ui/pages/main' ];
 
   var plugins = window.PLUGIN_DEPENDENCIES || [];
 

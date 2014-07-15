@@ -24,7 +24,7 @@ define(['angular'], function(angular) {
 
   var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
     $routeProvider.when('/users', {
-      templateUrl: require.toUrl('./app/admin/pages/users.html'),
+      templateUrl: require.toUrl('./pages/users.html'),
       controller: Controller,
       resolve: {
         authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,

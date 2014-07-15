@@ -1,0 +1,4 @@
+{
+  "directory": "client/bower_components",
+  "storage":{ "packages":".bower_packages" }
+}
