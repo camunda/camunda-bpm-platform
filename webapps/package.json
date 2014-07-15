@@ -25,8 +25,8 @@
   },
   "homepage": "https://github.com/camunda/camunda-tasklist-ui",
   "gruntConfig": {
-    "connectPort": 7070,
-    "livereloadPort": 7071,
+    "connectPort": 8010,
+    "livereloadPort": 8011,
     "clientDir": "client",
     "prodTarget": "dist",
     "devTarget":  "dist/app/tasklist"
