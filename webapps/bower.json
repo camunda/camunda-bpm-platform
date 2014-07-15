@@ -35,9 +35,6 @@
     "angular-route": "1.2.16",
     "angular-ui-bootstrap": "0.11.0",
     "bootstrap": "~3.1.1",
-    "camunda-bpm-forms": "./node_modules/camunda-bpm-sdk-js/dist/camunda-embedded-forms.js",
-    "camunda-bpm-sdk-js": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk.js",
-    "camunda-bpm-sdk-js-mock": "./node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk-mock.js",
     "hyperagent": "*",
     "jquery": "2.1.1",
     "requirejs-domready": "2.0.1"

@@ -23,10 +23,9 @@ define(function() {
       'camunda-tasklist-ui':        'scripts',
 
 
-      'camunda-bpm-forms':          'bower_components/camunda-bpm-forms/index',
-
-      'camunda-bpm-sdk':            'bower_components/camunda-bpm-sdk-js/index',
-      'camunda-bpm-sdk-mock':       'bower_components/camunda-bpm-sdk-js-mock/index'
+      'camunda-bpm-forms':          'vendor/camunda-embedded-forms',
+      'camunda-bpm-sdk':            'vendor/camunda-bpm-sdk',
+      'camunda-bpm-sdk-mock':       'vendor/camunda-bpm-sdk-mock'
     },
 
     shim: {
