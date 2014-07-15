@@ -1,3 +1,63 @@
-<!-- # CE - src/main/webapp/develop/invoice/start.html -->
-<code>Yo!</code>
-<!-- # CE - src/main/webapp/develop/invoice/start.html -->
+<form cam-form role="form">
+  <div class="form-group">
+    <label for="firstname">First name</label>
+    <input cam-variable-name="firstname"
+           type="text"
+           class="form-control"
+           id="firstname">
+  </div>
+  <div class="form-group">
+    <label for="lastname">Last name</label>
+    <input cam-variable-name="lastname"
+           value="Pustermann"
+           type="text"
+           class="form-control"
+           id="lastname">
+  </div>
+
+  <div class="form-group">
+    <label for="stringVar">A string</label>
+    <input cam-variable-name="stringVar"
+           type="text"
+           class="form-control"
+           id="stringVar">
+  </div>
+
+  <div class="form-group">
+    <label for="longStringVar">A longer string</label>
+    <textarea cam-variable-name="longStringVar"
+              cols="30"
+              rows="10"
+              class="form-control"
+              id="longStringVar"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="singleChoiceSelect">1 choice</label>
+    <select cam-variable-name="singleChoiceSelect"
+            class="form-control"
+            id="singleChoiceSelect">
+      <option> - None - </option>
+      <option value="val1">Value 1</option>
+      <option value="val2">Value 2</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="multipleChoicesSelect">Multple choices</label>
+    <select cam-variable-name="multipleChoicesSelect"
+            class="form-control"
+            id="multipleChoicesSelect"
+            multiple>
+      <option value="val1">Value 1</option>
+      <option value="val2">Value 2</option>
+    </select>
+  </div>
+
+  <!--
+  <div>
+    <button type="button">Cancel</button>
+    <button type="submit">Submit</button>
+  </div>
+  -->
+</form>

@@ -85,6 +85,26 @@
     </userTask>
     <sequenceFlow id="sequenceFlow_178" isImmediate="true" sourceRef="assignApprover" targetRef="approveInvoice"/>
     <startEvent id="StartEvent_1" camunda:formKey="embedded:app:/develop/invoice/start.html" name="Start Event">
+      <extensionElements>
+        <camunda:formData>
+            <camunda:formField
+                id="firstname" label="Firstname" defaultValue="Max" type="string">
+                <camunda:validation>
+                   <camunda:constraint name="maxlength" config="25" />
+                   <camunda:constraint name="required" />
+                </camunda:validation>
+            </camunda:formField>
+            <camunda:formField
+                id="lastname" label="Lastname" defaultValue="Mustermann" type="string">
+                <camunda:validation>
+                   <camunda:constraint name="maxlength" config="25" />
+                   <camunda:constraint name="required" />
+                </camunda:validation>
+            </camunda:formField>
+            <camunda:formField
+                id="dateOfBirth" label="Date of Birth" type="date" />
+        </camunda:formData>
+      </extensionElements>
       <outgoing>SequenceFlow_2</outgoing>
     </startEvent>
     <sequenceFlow id="SequenceFlow_2" name="" sourceRef="StartEvent_1" targetRef="assignApprover"/>
