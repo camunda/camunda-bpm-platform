@@ -7,8 +7,8 @@
     "dist": "./node_modules/bower/bin/bower install && ./node_modules/grunt-cli/bin/grunt build:prod"
   },
   "gruntConfig": {
-    "connectPort": 9090,
-    "livereloadPort": 9091,
+    "connectPort": 8030,
+    "livereloadPort": 8031,
     "clientDir": "client",
     "prodTarget": "dist",
     "devTarget": "dist/app/cockpit"
