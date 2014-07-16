@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -615,7 +616,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .processInstanceIdIn(processInstance.getId())
         .list();
-    
+
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
@@ -669,7 +670,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .processInstanceIdIn(processInstance.getId())
         .list();
-    
+
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
@@ -723,10 +724,10 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
-    
+
     for (VariableInstance variable : variables) {
       String name = variable.getName();
-      
+
       if (!"aVariable".equals(name) && !"anotherVariable".equals(name)) {
         fail("Found an unexpected variable: '"+name+"'");
       }
@@ -770,7 +771,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .processInstanceIdIn(processInstance.getId())
         .list();
-    
+
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
@@ -823,7 +824,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .processInstanceIdIn(processInstance.getId())
         .list();
-    
+
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
@@ -849,7 +850,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     assertCaseEnded(caseInstanceId);
 
   }
-  
+
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testInputOverlapping.cmmn",
@@ -878,7 +879,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .processInstanceIdIn(processInstance.getId())
         .list();
-    
+
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
@@ -902,7 +903,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     closeCaseInstance(caseInstanceId);
     assertCaseEnded(caseInstanceId);
-    
+
   }
 
   @Deployment(resources = {
@@ -997,7 +998,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
-    
+
     for (VariableInstance variable : variables) {
       String name = variable.getName();
       if ("aVariable".equals(name)) {
@@ -1049,7 +1050,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId)
         .list();
-    
+
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
@@ -1101,7 +1102,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId)
         .list();
-    
+
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
@@ -1152,7 +1153,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId)
         .list();
-    
+
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
@@ -1207,7 +1208,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId)
         .list();
-    
+
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
@@ -1232,7 +1233,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     assertCaseEnded(caseInstanceId);
 
   }
-  
+
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testOutputOverlapping.cmmn",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
@@ -1262,7 +1263,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId)
         .list();
-    
+
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
@@ -1366,7 +1367,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId)
         .list();
-    
+
     assertEquals(2, variables.size());
     assertFalse(variables.get(0).getName().equals(variables.get(1).getName()));
 
@@ -1760,6 +1761,34 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
+    closeCaseInstance(caseInstanceId);
+    assertCaseEnded(caseInstanceId);
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testStartProcessInstanceAsync.cmmn",
+      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testStartProcessInstanceAsync.bpmn20.xml"
+    })
+  public void testStartProcessInstanceAsync() {
+    // given
+    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
+
+    // when
+    caseService
+      .withCaseExecution(processTaskId)
+      .manualStart();
+
+    // then
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    ProcessInstance processInstance = queryProcessInstance();
+    assertNotNull(processInstance);
+
+    // complete ////////////////////////////////////////////////////////
+
+    managementService.executeJob(job.getId());
     closeCaseInstance(caseInstanceId);
     assertCaseEnded(caseInstanceId);
   }
