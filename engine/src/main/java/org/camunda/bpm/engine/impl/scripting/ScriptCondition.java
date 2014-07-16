@@ -11,12 +11,11 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.impl.el;
+package org.camunda.bpm.engine.impl.scripting;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
