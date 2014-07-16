@@ -12,6 +12,8 @@
  */
 package org.camunda.spin.impl.json.tree;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -23,7 +25,11 @@ import org.camunda.spin.impl.SpinListImpl;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.logging.SpinLogger;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Wrapper for a Jackson Json Tree Node. 
  * 
@@ -57,20 +63,44 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   }
 
   public OutputStream toStream() {
-    // TODO Auto-generated method stub
-    return null;
+    OutputStream out = new ByteArrayOutputStream();
+    return writeToStream(out);
   }
 
   public <S extends OutputStream> S writeToStream(S outputStream) {
-    // TODO Auto-generated method stub
-    return null;
+    ObjectMapper mapper = dataFormat.getConfiguredObjectMapper();
+    JsonFactory factory = mapper.getFactory();
+    
+    try {
+      JsonGenerator generator = factory.createGenerator(outputStream);
+      mapper.writeTree(generator, jsonNode);
+    } catch (IOException e) {
+      throw LOG.unableToWriteJsonNode(e);
+    }
+    
+    return outputStream;
   }
 
   public <W extends Writer> W writeToWriter(W writer) {
-    // TODO Auto-generated method stub
-    return null;
+    ObjectMapper mapper = dataFormat.getConfiguredObjectMapper();
+    JsonFactory factory = mapper.getFactory();
+    
+    try {
+      JsonGenerator generator = factory.createGenerator(writer);
+      mapper.writeTree(generator, jsonNode);
+    } catch (IOException e) {
+      throw LOG.unableToWriteJsonNode(e);
+    }
+    
+    return writer;
   }
 
+  /**
+   * fetches a property by name
+   *
+   * @param name Name of the property
+   * @return property SpinJsonNode representation of the property
+   */
   public SpinJsonNode prop(String name) {
     // FIXME: should throw exception if propertie does not exist
     // FIXME: should throw exception if name is null
