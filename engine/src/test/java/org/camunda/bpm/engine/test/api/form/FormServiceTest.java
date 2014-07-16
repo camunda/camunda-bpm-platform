@@ -568,7 +568,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     processVars.put("initialBooleanVariable", true);
     processVars.put("initialLongVariable", 1l);
 
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", processVars);
+    runtimeService.startProcessInstanceByKey("testProcess", processVars);
 
     Task task = taskService.createTaskQuery().singleResult();
     Map<String, VariableInstance> variables = formService.getTaskFormVariables(task.getId());
@@ -608,12 +608,19 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(2l, variable.getValue());
     assertEquals("long", variable.getTypeName());
 
-    // get restricted set of variables:
+    // get restricted set of variables (form field):
     variables = formService.getTaskFormVariables(task.getId(), Arrays.asList("someString"));
     assertEquals(1, variables.size());
     variable = variables.get("someString");
     assertEquals("initialValue", variable.getValue());
     assertEquals("string", variable.getTypeName());
+
+    // get restricted set of variables (process variable):
+    variables = formService.getTaskFormVariables(task.getId(), Arrays.asList("initialBooleanVariable"));
+    assertEquals(1, variables.size());
+    variable = variables.get("initialBooleanVariable");
+    assertEquals(true, variable.getValue());
+    assertEquals("boolean", variable.getTypeName());
 
     // request non-existing variable
     variables = formService.getTaskFormVariables(task.getId(), Arrays.asList("non-existing!"));

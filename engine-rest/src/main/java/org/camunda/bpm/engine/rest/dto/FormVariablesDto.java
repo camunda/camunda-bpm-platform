@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
  */
 public class FormVariablesDto extends TreeMap<String, VariableInstanceDto> implements Map<String, VariableInstanceDto> {
 
+  private static final long serialVersionUID = 1L;
+
   public static FormVariablesDto fromVariableInstanceMap(Map<String, VariableInstance> formVariables) {
     FormVariablesDto formVariablesDto = new FormVariablesDto();
     for (VariableInstance variableInstance : formVariables.values()) {

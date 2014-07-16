@@ -14,7 +14,12 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_USER_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstance;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -22,10 +27,25 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
@@ -34,7 +54,12 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.engine.*;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -50,7 +75,12 @@ import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstance;
-import org.camunda.bpm.engine.task.*;
+import org.camunda.bpm.engine.task.Attachment;
+import org.camunda.bpm.engine.task.Comment;
+import org.camunda.bpm.engine.task.IdentityLink;
+import org.camunda.bpm.engine.task.IdentityLinkType;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.fest.assertions.Assertions;
@@ -59,13 +89,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
-import com.jayway.restassured.response.ResponseBody;
 
 public abstract class AbstractTaskRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -485,9 +511,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testGetStartFormVariables() {
+  public void testGetTaskFormVariables() {
 
-    ResponseBody body = given().pathParam("id", EXAMPLE_TASK_ID)
+    given().pathParam("id", EXAMPLE_TASK_ID)
       .then().expect()
         .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
         .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".id", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID))
@@ -500,9 +526,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testGetStartFormVariablesVarNames() {
+  public void testGetTaskFormVariablesVarNames() {
 
-    Response response = given()
+    given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .queryParam("variableNames", "a,b,c")
     .then().expect()

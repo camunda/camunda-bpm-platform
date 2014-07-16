@@ -9,7 +9,11 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -53,7 +57,6 @@ import org.mockito.Matchers;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
-import com.jayway.restassured.response.ResponseBody;
 
 public abstract class AbstractProcessDefinitionRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -73,7 +76,6 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   protected static final String SUBMIT_FORM_URL = SINGLE_PROCESS_DEFINITION_URL + "/submit-form";
   protected static final String SUBMIT_FORM_BY_KEY_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/submit-form";
   protected static final String START_FORM_VARIABLES_URL = SINGLE_PROCESS_DEFINITION_URL + "/form-variables";
-  protected static final String START_FORM_VARIABLES_BY_KEY_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/form-variables";
 
   protected static final String SINGLE_PROCESS_DEFINITION_SUSPENDED_URL = SINGLE_PROCESS_DEFINITION_URL + "/suspended";
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_SUSPENDED_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/suspended";
@@ -551,7 +553,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   @Test
   public void testGetStartFormVariables() {
 
-    ResponseBody body = given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+    given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
       .then().expect()
         .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
         .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".id", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID))
@@ -566,7 +568,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   @Test
   public void testGetStartFormVariablesVarNames() {
 
-    Response response = given()
+    given()
       .pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
       .queryParam("variableNames", "a,b,c")
     .then().expect()

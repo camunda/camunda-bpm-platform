@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.api.form;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
 import org.camunda.bpm.engine.form.TaskFormData;
-import org.camunda.bpm.engine.impl.form.type.DateFormType;
 import org.camunda.bpm.engine.impl.form.type.EnumFormType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -103,7 +104,12 @@ public class FormDataTest extends ProcessEngineTestCase {
     assertNotNull(dateField);
     assertEquals("date", dateField.getTypeName());
     assertNotNull(dateField.getType());
-    DateFormType dateFormType = (DateFormType) dateField.getType();
+    Date dateValue = (Date) dateField.getDefaultValue();
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(dateValue);
+    assertEquals(10, calendar.get(Calendar.DAY_OF_MONTH));
+    assertEquals(Calendar.JANUARY, calendar.get(Calendar.MONTH));
+    assertEquals(2013, calendar.get(Calendar.YEAR));
 
     // validate enum field
     FormField enumField = formFields.get(4);

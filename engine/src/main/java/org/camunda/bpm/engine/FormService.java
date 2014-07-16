@@ -101,38 +101,54 @@ public interface FormService {
 
   /**
    * Retrieves a list of all variables for rendering a start from. The method takes into account
-   * FormData specified for the start event. This allows defining default values and validators for form fields.
+   * FormData specified for the start event. This allows defining default values for form fields.
    *
-   * @param processDefinitionId the id of the process definition for which the start form should be retreived.
+   * @param processDefinitionId the id of the process definition for which the start form should be retrieved.
    * @return a map of VariableInstances.
    */
   Map<String, VariableInstance> getStartFormVariables(String processDefinitionId);
 
   /**
    * Retrieves a list of requested variables for rendering a start from. The method takes into account
-   * FormData specified for the start event. This allows defining default values and validators for form fields.
+   * FormData specified for the start event. This allows defining default values for form fields.
    *
-   * @param processDefinitionId the id of the process definition for which the start form should be retreived.
-   * @param formVariables a Collection of the names of the variables to retrieve.
+   * @param processDefinitionId the id of the process definition for which the start form should be retrieved.
+   * @param formVariables a Collection of the names of the variables to retrieve. Allows restricting the set of retrieved variables.
    * @return a map of VariableInstances.
    */
   Map<String, VariableInstance> getStartFormVariables(String processDefinitionId, Collection<String> formVariables);
 
   /**
-   * Retrieves a list of requested variables for rendering a task form. The method takes into account
-   * FormData specified for the task. This allows defining default values and validators for form fields.
+   * <p>Retrieves a list of all variables for rendering a task form. In addition to the task variables and process variables,
+   * the method takes into account FormData specified for the task. This allows defining default values for form fields.</p>
    *
-   * @param taskId the id of the task for which the variables should be retreived.
+   * <p>A variable is resolved in the following order:
+   * <ul>
+   *   <li>First, the method collects all form fields and creates variable instances for the form fields.</li>
+   *   <li>Next, the task variables are collected.</li>
+   *   <li>Next, process variables from the parent scopes of the task are collected, until the process instance scope is reached.</li>
+   * </ul>
+   * </p>
+   *
+   * @param taskId the id of the task for which the variables should be retrieved.
    * @return a map of VariableInstances.
    */
   Map<String, VariableInstance> getTaskFormVariables(String taskId);
 
   /**
-   * Retrieves a list of requested variables for rendering a task form. The method takes into account
-   * FormData specified for the task. This allows defining default values and validators for form fields.
+   * <p>Retrieves a list of requested variables for rendering a task form. In addition to the task variables and process variables,
+   * the method takes into account FormData specified for the task. This allows defining default values for form fields.</p>
    *
-   * @param taskId the id of the task for which the variables should be retreived.
-   * @param formVariables a Collection of the names of the variables to retreive. Allows restricting the set of retreived variables.
+   * <p>A variable is resolved in the following order:
+   * <ul>
+   *   <li>First, the method collects all form fields and creates variable instances for the form fields.</li>
+   *   <li>Next, the task variables are collected.</li>
+   *   <li>Next, process variables from the parent scopes of the task are collected, until the process instance scope is reached.</li>
+   * </ul>
+   * </p>
+   *
+   * @param taskId the id of the task for which the variables should be retrieved.
+   * @param formVariables a Collection of the names of the variables to retrieve. Allows restricting the set of retrieved variables.
    * @return a map of VariableInstances.
    */
   Map<String, VariableInstance> getTaskFormVariables(String taskId, Collection<String> formVariables);
