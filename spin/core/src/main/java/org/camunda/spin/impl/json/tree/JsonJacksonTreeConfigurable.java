@@ -12,8 +12,10 @@
  */
 package org.camunda.spin.impl.json.tree;
 
-import com.fasterxml.jackson.core.JsonParser.Feature;
 import org.camunda.spin.spi.Configurable;
+
+import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Provides Jackson's parser configuration options.
@@ -22,6 +24,8 @@ import org.camunda.spin.spi.Configurable;
  */
 public interface JsonJacksonTreeConfigurable<R extends Configurable<R>> extends Configurable<R> {
 
+  ObjectMapper getConfiguredObjectMapper();
+  
   R config(Feature feature, Object value);
 
   Boolean getValue(Feature feature);

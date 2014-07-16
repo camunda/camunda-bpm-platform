@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.TextBasedDataFormatReader;
 
-import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,7 +37,7 @@ public class JsonJacksonTreeDataFormatReader extends TextBasedDataFormatReader {
   }
 
   public Object readInput(InputStream input) {
-    ObjectMapper mapper = createObjectMapper(format);
+    ObjectMapper mapper = format.getConfiguredObjectMapper();
     
     try {
       return mapper.readTree(input);
@@ -47,16 +46,6 @@ public class JsonJacksonTreeDataFormatReader extends TextBasedDataFormatReader {
     } catch (IOException e) {
       throw JSON_LOGGER.unableToParseInput(e);
     }
-  }
-  
-  protected ObjectMapper createObjectMapper(JsonJacksonTreeDataFormat format) {
-    ObjectMapper mapper = new ObjectMapper();
-
-    for (Feature feature : Feature.values()) {
-      mapper.configure(feature, format.getValue(feature));
-    }
-
-    return mapper;
   }
 
   protected Pattern getInputDetectionPattern() {

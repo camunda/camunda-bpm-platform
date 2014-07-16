@@ -12,36 +12,71 @@
  */
 package org.camunda.spin.impl.json.tree;
 
-import com.fasterxml.jackson.core.JsonParser.Feature;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
+ * Wraps the configuration of Jackson's {@link ObjectMapper}. Caches an instance of {@link ObjectMapper}
+ * as long as configuration does not change 
+ * (cf. <a href="http://wiki.fasterxml.com/JacksonFAQThreadSafety">Jackson docs</a>).
+ * 
  * @author Thorben Lindhauer
  */
 public class JsonJacksonTreeConfiguration implements JsonJacksonTreeConfigurable<JsonJacksonTreeConfiguration> {
 
   protected Map<String, Object> configuration;
+  protected ObjectMapper objectMapper;
 
   public JsonJacksonTreeConfiguration() {
-    this.configuration = new HashMap<String, Object>();
+    this.configuration = Collections.synchronizedMap(new HashMap<String, Object>());
   }
   
   public JsonJacksonTreeConfiguration(JsonJacksonTreeConfiguration other) {
-    this.configuration = new HashMap<String, Object>(other.configuration);
+    this.configuration = Collections.synchronizedMap(
+        new HashMap<String, Object>(other.configuration));
+    this.objectMapper = other.objectMapper;
+  }
+
+  public ObjectMapper getConfiguredObjectMapper() {
+    if (objectMapper == null) {
+      synchronized(this) {
+        if (objectMapper == null) {
+          objectMapper = new ObjectMapper();
+          applyTo(objectMapper);
+        }
+      }
+    }
+    
+    return objectMapper;
   }
   
-  public JsonJacksonTreeConfiguration config(String key, Object value) {
+  protected void applyTo(ObjectMapper mapper) {
+    for (JsonParser.Feature feature : JsonParser.Feature.values()) {
+      mapper.configure(feature, getValue(feature));
+    }
+  }
+  
+  public synchronized JsonJacksonTreeConfiguration config(String key, Object value) {
     configuration.put(key, value);
+    resetObjectMapper();
     return this;
   }
 
-  public JsonJacksonTreeConfiguration config(Map<String, Object> config) {
+  public synchronized JsonJacksonTreeConfiguration config(Map<String, Object> config) {
     configuration.putAll(config);
+    resetObjectMapper();
     return this;
   }
-
-  public JsonJacksonTreeConfiguration config(Feature feature, Object value) {
+  
+  protected void resetObjectMapper() {
+    objectMapper = null;
+  }
+  
+  public JsonJacksonTreeConfiguration config(JsonParser.Feature feature, Object value) {
     return config(feature.name(), value);
   }
 
@@ -57,7 +92,7 @@ public class JsonJacksonTreeConfiguration implements JsonJacksonTreeConfigurable
     return configuration.get(key);
   }
 
-  public Boolean getValue(Feature feature) {
+  public Boolean getValue(JsonParser.Feature feature) {
     Boolean value = (Boolean) configuration.get(feature.name());
     if (value == null) {
       return feature.enabledByDefault();
@@ -68,11 +103,11 @@ public class JsonJacksonTreeConfiguration implements JsonJacksonTreeConfigurable
   }
 
   public Boolean allowsNumericLeadingZeros() {
-    return getValue(Feature.ALLOW_NUMERIC_LEADING_ZEROS);
+    return getValue(JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS);
   }
 
   public JsonJacksonTreeConfiguration allowNumericLeadingZeros(Boolean value) {
-    return config(Feature.ALLOW_NUMERIC_LEADING_ZEROS, value);
+    return config(JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS, value);
   }
 
   public Map<String, Object> getConfiguration() {
@@ -80,51 +115,51 @@ public class JsonJacksonTreeConfiguration implements JsonJacksonTreeConfigurable
   }
 
   public Boolean allowsComments() {
-    return getValue(Feature.ALLOW_COMMENTS);
+    return getValue(JsonParser.Feature.ALLOW_COMMENTS);
   }
 
   public JsonJacksonTreeConfiguration allowComments(Boolean value) {
-    return config(Feature.ALLOW_COMMENTS, value);
+    return config(JsonParser.Feature.ALLOW_COMMENTS, value);
   }
 
   public Boolean allowYamlComments() {
-    return getValue(Feature.ALLOW_YAML_COMMENTS);
+    return getValue(JsonParser.Feature.ALLOW_YAML_COMMENTS);
   }
 
   public JsonJacksonTreeConfiguration allowYamlComments(Boolean value) {
-    return config(Feature.ALLOW_YAML_COMMENTS, value);
+    return config(JsonParser.Feature.ALLOW_YAML_COMMENTS, value);
   }
 
   public Boolean allowsUnquotedFieldNames() {
-    return getValue(Feature.ALLOW_UNQUOTED_FIELD_NAMES);
+    return getValue(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
   }
 
   public JsonJacksonTreeConfiguration allowQuotedFieldNames(Boolean value) {
-    return config(Feature.ALLOW_UNQUOTED_FIELD_NAMES, value);
+    return config(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, value);
   }
 
   public Boolean allowsSingleQuotes() {
-    return getValue(Feature.ALLOW_SINGLE_QUOTES);
+    return getValue(JsonParser.Feature.ALLOW_SINGLE_QUOTES);
   }
 
   public JsonJacksonTreeConfiguration allowSingleQuotes(Boolean value) {
-    return config(Feature.ALLOW_SINGLE_QUOTES, value);
+    return config(JsonParser.Feature.ALLOW_SINGLE_QUOTES, value);
   }
 
   public Boolean allowsBackslashEscapingAnyCharacter() {
-    return getValue(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER);
+    return getValue(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER);
   }
 
   public JsonJacksonTreeConfiguration allowBackslashEscapingAnyCharacter(Boolean value) {
-    return config(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, value);
+    return config(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, value);
   }
 
   public Boolean allowsNonNumericNumbers() {
-    return getValue(Feature.ALLOW_NON_NUMERIC_NUMBERS);
+    return getValue(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS);
   }
 
   public JsonJacksonTreeConfiguration allowNonNumericNumbers(Boolean value) {
-    return config(Feature.ALLOW_NON_NUMERIC_NUMBERS, value);
+    return config(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, value);
   }
 
 }

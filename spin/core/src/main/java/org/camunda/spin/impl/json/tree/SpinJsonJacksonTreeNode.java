@@ -18,13 +18,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.SpinListImpl;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.logging.SpinLogger;
 
+import com.fasterxml.jackson.databind.JsonNode;
 /**
  * Wrapper for a Jackson Json Tree Node. 
  * 

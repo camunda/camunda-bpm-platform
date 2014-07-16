@@ -12,10 +12,17 @@
  */
 package org.camunda.spin.json.tree;
 
-import com.fasterxml.jackson.core.JsonParser.Feature;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.spin.DataFormats.jsonTree;
+import static org.camunda.spin.Spin.JSON;
+import static org.camunda.spin.Spin.S;
+import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JACKSON_CONFIGURATION_JSON;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
 import org.camunda.spin.impl.util.IoUtil;
 import org.camunda.spin.json.SpinJsonNode;
@@ -23,12 +30,8 @@ import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.spin.DataFormats.jsonTree;
-import static org.camunda.spin.Spin.JSON;
-import static org.camunda.spin.Spin.S;
-import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JACKSON_CONFIGURATION_JSON;
+import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonTreeConfigureTest {
 
@@ -112,12 +115,35 @@ public class JsonTreeConfigureTest {
     assertThat(jsonDataFormat.getValue("aKey")).isEqualTo("aValue");
     assertThat(jsonDataFormat.getValue("anotherKey")).isNull();
     
-    assertThat(jsonDataFormatInstance.getValue("aKey").equals("aValue"));
-    assertThat(jsonDataFormatInstance.getValue("anotherKey").equals("anotherValue"));
+    assertThat(jsonDataFormatInstance.getValue("aKey")).isEqualTo("aValue");
+    assertThat(jsonDataFormatInstance.getValue("anotherKey")).isEqualTo("anotherValue");
     
     JsonJacksonTreeDataFormat nextReturnedDataFormatInstance = 
         jsonDataFormatInstance.config("aThirdKey", "aThirdValue");
     assertThat(nextReturnedDataFormatInstance).isSameAs(jsonDataFormatInstance);
-    assertThat(jsonDataFormatInstance.getValue("aThirdKey").equals("aThirdValue"));
+    assertThat(jsonDataFormatInstance.getValue("aThirdKey")).isEqualTo("aThirdValue");
+  }
+  
+  @Test
+  public void shouldCacheObjectMapper() {
+    // object mapper should be cached when configuration does not change
+    ObjectMapper objectMapper1 = dataFormatInstance.getConfiguredObjectMapper();
+    ObjectMapper objectMapper2 = dataFormatInstance.getConfiguredObjectMapper();
+    
+    assertThat(objectMapper1).isSameAs(objectMapper2);
+    
+    // changing the configuration should create a new object mapper
+    dataFormatInstance.allowBackslashEscapingAnyCharacter(Boolean.FALSE);
+    
+    ObjectMapper objectMapper3 = dataFormatInstance.getConfiguredObjectMapper();
+    
+    assertThat(objectMapper3).isNotSameAs(objectMapper2);
+    
+    // a new format should use the same mapper as long as it is not configured
+    JsonJacksonTreeDataFormat newFormat = dataFormatInstance.newInstance();
+    
+    ObjectMapper objectMapper4 = newFormat.getConfiguredObjectMapper();
+    
+    assertThat(objectMapper4).isSameAs(objectMapper3);
   }
 }

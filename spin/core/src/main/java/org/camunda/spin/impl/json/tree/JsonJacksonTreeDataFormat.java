@@ -14,13 +14,13 @@ package org.camunda.spin.impl.json.tree;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Thorben Lindhauer
  * @author Stefan Hentschel
@@ -58,6 +58,9 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
     return instance;
   }
 
+  public ObjectMapper getConfiguredObjectMapper() {
+    return configuration.getConfiguredObjectMapper();
+  }
 
   public JsonJacksonTreeDataFormat config(String key, Object value) {
     configuration.config(key, value);
@@ -69,7 +72,7 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
     return this;
   }
 
-  public JsonJacksonTreeDataFormat config(Feature feature, Object value) {
+  public JsonJacksonTreeDataFormat config(JsonParser.Feature feature, Object value) {
     configuration.config(feature, value);
     return this;
   }
@@ -82,7 +85,7 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
     return configuration.getValue(key, defaultValue);
   }
 
-  public Boolean getValue(Feature feature) {
+  public Boolean getValue(JsonParser.Feature feature) {
     return configuration.getValue(feature);
   }
 
@@ -156,5 +159,4 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
     configuration.allowNonNumericNumbers(value);
     return this;
   }
-
 }
