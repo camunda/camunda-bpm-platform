@@ -92,7 +92,7 @@
                   <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                 </copy>
 
-                <delete dir="target/modules/org/camunda/bpm" /> 
+                <delete dir="target/modules/org/camunda/bpm" />
 
                 <!-- copy all files again, but this only matches fox files and this treatment makes is maven 2/3 compatible => timestamped snapshot -->
                 <copy todir="target/modules" flatten="false">
@@ -126,7 +126,7 @@
                     </chainedmapper>
                   </mapper>
                 </copy>
-                
+
 
                 <copy todir="target/modules" flatten="false">
                   <fileset dir="src/main/modules" />
@@ -145,6 +145,10 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.camunda.connect@" value="${version.camunda.connect}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.camunda.template-engines@" value="${version.camunda.template-engines}">
                   <include name="**/module.xml" />
                 </replace>
 
@@ -167,7 +171,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>joda-time</groupId>
-                  <artifactId>joda-time</artifactId>                  
+                  <artifactId>joda-time</artifactId>
                   <outputDirectory>${project.build.directory}/modules/org/joda/time/2.1/</outputDirectory>
                 </artifactItem>
               </artifactItems>
