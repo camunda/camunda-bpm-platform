@@ -156,10 +156,19 @@ define([
 
         if (result.key) {
           var parts = result.key.split('embedded:');
+          var ctx = result.contextPath;
+          var formUrl;
 
-          var formUrl = parts.length > 1 ?
-            parts.pop().replace('app:', result.contextPath) :
-            result.key;
+          if (parts.length > 1) {
+            formUrl = parts.pop();
+            // ensure a trailing slash
+            ctx = ctx + (ctx.slice(-1) !== '/' ? '/' : '');
+            // formUrl = formUrl[0] === '/' ? formUrl.slice(1) : formUrl;
+            formUrl = formUrl.replace('app:', ctx);
+          }
+          else {
+            formUrl = result.key;
+          }
 
           var form = new CamForm({
             processDefinitionId:  startingProcess.id,
@@ -203,22 +212,7 @@ define([
         return false;
       }
 
-      var vars = {};
-      if (!$scope.startingProcess._form) {
-        angular.forEach($scope.variables, function(val) {
-          if (val.name[0] !== '$' && val.name) {
-            vars[val.name] = {type: val.type, value: val.value};
-          }
-        });
-      }
-      else {
-        vars = $scope.startingProcess._form.variableManager.variables;
-      }
-
-      ProcessDefinition.submit({
-        key: $scope.startingProcess.key,
-        variables: vars
-      }, function(err, res) {
+      function submitCb(err, res) {
         if (err) {
           camTasklistNotifier.add(err);
           throw err;
@@ -229,7 +223,24 @@ define([
           text: 'The process has been started.'
         });
         close(res);
-      });
+      }
+
+      var vars = {};
+      if (!$scope.startingProcess._form) {
+        angular.forEach($scope.variables, function(val) {
+          if (val.name[0] !== '$' && val.name) {
+            vars[val.name] = {type: val.type, value: val.value};
+          }
+        });
+
+        ProcessDefinition.submit({
+          key: $scope.startingProcess.key,
+          variables: vars
+        }, submitCb);
+      }
+      else {
+        $scope.startingProcess._form.submit(submitCb);
+      }
     };
   }]);
 
