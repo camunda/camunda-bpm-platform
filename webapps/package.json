@@ -4,10 +4,6 @@
   "version": "7.2.0-SNAPSHOT",
   "description": "A web based interface for camunda BPM platform tasks.",
   "main": "client/scripts/index.js",
-  "scripts": {
-    "test": "./node_modules/grunt-cli/bin/grunt jasmine_node",
-    "dist": "./node_modules/bower/bin/bower install && ./node_modules/grunt-cli/bin/grunt build:prod"
-  },
   "repository": {
     "type": "git",
     "url": "git://github.com/camunda/camunda-tasklist-ui.git"
