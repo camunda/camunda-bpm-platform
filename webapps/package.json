@@ -2,10 +2,6 @@
   "name": "camunda-admin-ui",
   "version": "7.2.0-SNAPSHOT",
   "private": true,
-  "scripts": {
-    "test": "",
-    "dist": "./node_modules/bower/bin/bower install && ./node_modules/grunt-cli/bin/grunt build:prod"
-  },
   "gruntConfig": {
     "connectPort": 9090,
     "livereloadPort": 9092,
