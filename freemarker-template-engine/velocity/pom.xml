@@ -5,7 +5,7 @@
   <parent>
     <artifactId>camunda-template-engines-parent</artifactId>
     <groupId>org.camunda.template-engines</groupId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-template-engines-velocity</artifactId>
