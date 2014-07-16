@@ -3,4 +3,4 @@ childNode = node.prop("orderDetails")
 
 property = childNode.prop("article")
 
-value = property.value()
+value = property.stringValue()

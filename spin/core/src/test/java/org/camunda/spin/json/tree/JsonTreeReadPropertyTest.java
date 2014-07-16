@@ -12,13 +12,14 @@
  */
 package org.camunda.spin.json.tree;
 
-import java.util.List;
-
 import org.camunda.spin.SpinList;
 import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.json.SpinJsonTreePropertyException;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -37,9 +38,6 @@ public class JsonTreeReadPropertyTest {
     jsonNode = JSON(EXAMPLE_JSON);
   }
 
-  // FIXME: test missing for null property name and non existing property
-  // FIXME: test missing for non container property elements() call
-
   @Test
   public void shouldReadProperty() {
     assertThat(jsonNode).isNotNull();
@@ -49,11 +47,116 @@ public class JsonTreeReadPropertyTest {
   }
 
   @Test
+  public void shouldCheckStringValue() {
+    SpinJsonNode property = jsonNode.prop("order");
+    SpinJsonNode property2 = jsonNode.prop("id");
+    SpinJsonNode property3 = jsonNode.prop("customers");
+    SpinJsonNode property4 = jsonNode.prop("orderDetails");
+    SpinJsonNode property5 = jsonNode.prop("active");
+
+    assertThat(property.isString()).isEqualTo(true);
+    assertThat(property2.isString()).isEqualTo(false);
+    assertThat(property3.isString()).isEqualTo(false);
+    assertThat(property4.isString()).isEqualTo(false);
+    assertThat(property5.isString()).isEqualTo(false);
+  }
+
+  @Test
+  public void shouldCheckNumberValue() {
+      SpinJsonNode property = jsonNode.prop("order");
+      SpinJsonNode property2 = jsonNode.prop("id");
+      SpinJsonNode property3 = jsonNode.prop("customers");
+      SpinJsonNode property4 = jsonNode.prop("orderDetails");
+      SpinJsonNode property5 = jsonNode.prop("active");
+
+      assertThat(property.isNumber()).isEqualTo(false);
+      assertThat(property2.isNumber()).isEqualTo(true);
+      assertThat(property3.isNumber()).isEqualTo(false);
+      assertThat(property4.isNumber()).isEqualTo(false);
+      assertThat(property5.isNumber()).isEqualTo(false);
+  }
+
+  @Test
+  public void shouldCheckBooleanValue() {
+    SpinJsonNode property = jsonNode.prop("order");
+    SpinJsonNode property2 = jsonNode.prop("id");
+    SpinJsonNode property3 = jsonNode.prop("customers");
+    SpinJsonNode property4 = jsonNode.prop("orderDetails");
+    SpinJsonNode property5 = jsonNode.prop("active");
+
+    assertThat(property.isBoolean()).isEqualTo(false);
+    assertThat(property2.isBoolean()).isEqualTo(false);
+    assertThat(property3.isBoolean()).isEqualTo(false);
+    assertThat(property4.isBoolean()).isEqualTo(false);
+    assertThat(property5.isBoolean()).isEqualTo(true);
+  }
+
+  @Test
+  public void shouldCheckArrayValue() {
+    SpinJsonNode property = jsonNode.prop("order");
+    SpinJsonNode property2 = jsonNode.prop("id");
+    SpinJsonNode property3 = jsonNode.prop("customers");
+    SpinJsonNode property4 = jsonNode.prop("orderDetails");
+    SpinJsonNode property5 = jsonNode.prop("active");
+
+    assertThat(property.isArray()).isEqualTo(false);
+    assertThat(property2.isArray()).isEqualTo(false);
+    assertThat(property3.isArray()).isEqualTo(true);
+    assertThat(property4.isArray()).isEqualTo(false);
+    assertThat(property5.isArray()).isEqualTo(false);
+  }
+
+  @Test
+  public void shouldCheckObjectValue() {
+    SpinJsonNode property = jsonNode.prop("order");
+
+    assertThat(property.value()).isInstanceOf(Object.class);
+    assertThat((String) property.value()).isEqualTo("order1");
+  }
+
+  @Test
+  public void shouldFailToCheckObject() {
+    SpinJsonNode property = jsonNode.prop("orderDetails");
+    SpinJsonNode property2 = jsonNode.prop("customers");
+
+    try {
+      property.value();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      property2.value();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void shouldFailToReadProperty() {
+    try {
+      jsonNode.prop("42");
+      fail("Expected SpinJsonTreePropertyException");
+    } catch(SpinJsonTreePropertyException e) {
+      // expected
+    }
+
+    try {
+      jsonNode.prop(null);
+      fail("Exptected IllegalArgumentException");
+    } catch(IllegalArgumentException e) {
+      // expected
+    }
+  }
+
+  @Test
   public void shouldReadTextValue() {
     SpinJsonNode property = jsonNode.prop("order");
     assertThat(property).isNotNull();
 
-    String value = property.value();
+    String value = property.stringValue();
 
     assertThat(value)
       .isNotNull()
@@ -91,7 +194,7 @@ public class JsonTreeReadPropertyTest {
     }
 
     try {
-      property2.value();
+      property2.stringValue();
       fail("Expected SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException e) {
       // expected
@@ -141,8 +244,8 @@ public class JsonTreeReadPropertyTest {
 
     SpinJsonNode node1 = list.get(0);
     SpinJsonNode node2 = list.get(1);
-    assertThat(node1.value()).isEqualTo("euro");
-    assertThat(node2.value()).isEqualTo("dollar");
+    assertThat(node1.stringValue()).isEqualTo("euro");
+    assertThat(node2.stringValue()).isEqualTo("dollar");
   }
 
   @Test
@@ -157,8 +260,19 @@ public class JsonTreeReadPropertyTest {
     SpinJsonNode customer1 = node1.prop("name");
     SpinJsonNode customer2 = node2.prop("name");
 
-    assertThat(customer1.value()).isEqualTo("Kermit");
-    assertThat(customer2.value()).isEqualTo("Waldo");
+    assertThat(customer1.stringValue()).isEqualTo("Kermit");
+    assertThat(customer2.stringValue()).isEqualTo("Waldo");
+  }
+
+  @Test
+  public void shouldFailToReadObjectInNonArray() {
+    try {
+      SpinJsonNode property = jsonNode.prop("order");
+      property.elements();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
   }
 
   @Test

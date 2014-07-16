@@ -13,7 +13,7 @@
 package org.camunda.spin.impl.json.tree;
 
 import com.fasterxml.jackson.databind.node.JsonNodeType;
-
+import org.camunda.spin.json.SpinJsonTreePropertyException;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 
@@ -43,5 +43,9 @@ public class JsonJacksonTreeLogger extends SpinLogger {
   
   public SpinJsonDataFormatException unableToWriteJsonNode(Exception cause) {
     return new SpinJsonDataFormatException(exceptionMessage("004", "Unable to write json node"), cause);
+  }
+
+  public SpinJsonTreePropertyException unableToFindProperty(String propertyName) {
+    return new SpinJsonTreePropertyException(exceptionMessage("005", "Unable to find '{}'", propertyName));
   }
 }

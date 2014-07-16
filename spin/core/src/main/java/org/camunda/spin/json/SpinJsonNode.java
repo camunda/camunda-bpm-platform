@@ -12,10 +12,10 @@
  */
 package org.camunda.spin.json;
 
-import java.util.List;
-
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinList;
+
+import java.util.List;
 
 /**
  * A json node.
@@ -25,15 +25,20 @@ import org.camunda.spin.SpinList;
  */
 public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
 
-  // FIXME: add isBoolean, isValue, isObject, isContainer etc. methods
-
   /**
-   * fetches a property by name
+   * fetch a property by name
    *
    * @param name Name of the property
    * @return property SpinJsonNode representation of the property
    */
   public abstract SpinJsonNode prop(String name);
+
+  /**
+   * check if the given property contains a boolean value
+   *
+   * @return Boolean
+   */
+  public abstract Boolean isBoolean();
 
   /**
    * fetch boolean value of a property
@@ -43,6 +48,13 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
   public abstract Boolean boolValue();
 
   /**
+   * check if the given property contains a number value
+   *
+   * @return Boolean
+   */
+  public abstract Boolean isNumber();
+
+  /**
    * fetch number value of a property
    *
    * @return propertyValue value of type Number
@@ -50,12 +62,39 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
   public abstract Number numberValue();
 
   /**
-   * FIXME: should return value and add method stringValue() for String value
+   * check if the given property contains a String value
+   *
+   * @return Boolean
+   */
+  public abstract Boolean isString();
+
+  /**
    * fetch string value of a property
    *
    * @return propertyValue value of type String
    */
-  public abstract String value();
+  public abstract String stringValue();
+
+  /**
+   * check if the given property is a value node
+   *
+   * @return Boolean
+   */
+  public abstract Boolean isValue();
+
+  /**
+   * fetch value of a property as Object
+   *
+   * @return propertyValue value of type Object
+   */
+  public abstract Object value();
+
+  /**
+   * check if property is an array
+   *
+   * @return Boolean
+   */
+  public abstract Boolean isArray();
 
   /**
    * fetch data for json array

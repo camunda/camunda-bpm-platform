@@ -14,6 +14,8 @@ package org.camunda.spin.json.tree;
 
 import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.json.SpinJsonTreePropertyException;
+import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.camunda.spin.test.Script;
 import org.camunda.spin.test.ScriptTest;
 import org.camunda.spin.test.ScriptVariable;
@@ -43,6 +45,168 @@ public abstract class JsonTreeReadPropertyScriptTest extends ScriptTest {
     assertThat(property).isNotNull();
     assertThat(value).isEqualTo("order1");
   }
+
+  @Test
+  @Script(
+    name = "JsonTreeReadPropertyTest.shouldCheckStringValue",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    }
+  )
+  public void shouldCheckStringValue() {
+    Boolean value1 = script.getVariable("value1");
+    Boolean value2 = script.getVariable("value2");
+    Boolean value3 = script.getVariable("value3");
+    Boolean value4 = script.getVariable("value4");
+    Boolean value5 = script.getVariable("value5");
+
+    assertThat(value1).isEqualTo(true);
+    assertThat(value2).isEqualTo(false);
+    assertThat(value3).isEqualTo(false);
+    assertThat(value4).isEqualTo(false);
+    assertThat(value5).isEqualTo(false);
+  }
+
+  @Test
+  @Script(
+    name = "JsonTreeReadPropertyTest.shouldCheckNumberValue",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    }
+  )
+  public void shouldCheckNumberValue() {
+    Boolean value1 = script.getVariable("value1");
+    Boolean value2 = script.getVariable("value2");
+    Boolean value3 = script.getVariable("value3");
+    Boolean value4 = script.getVariable("value4");
+    Boolean value5 = script.getVariable("value5");
+
+    assertThat(value1).isEqualTo(false);
+    assertThat(value2).isEqualTo(true);
+    assertThat(value3).isEqualTo(false);
+    assertThat(value4).isEqualTo(false);
+    assertThat(value5).isEqualTo(false);
+  }
+
+  @Test
+  @Script(
+    name = "JsonTreeReadPropertyTest.shouldCheckBooleanValue",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    }
+  )
+  public void shouldCheckBooleanValue() {
+    Boolean value1 = script.getVariable("value1");
+    Boolean value2 = script.getVariable("value2");
+    Boolean value3 = script.getVariable("value3");
+    Boolean value4 = script.getVariable("value4");
+    Boolean value5 = script.getVariable("value5");
+
+    assertThat(value1).isEqualTo(false);
+    assertThat(value2).isEqualTo(false);
+    assertThat(value3).isEqualTo(false);
+    assertThat(value4).isEqualTo(false);
+    assertThat(value5).isEqualTo(true);
+  }
+
+  @Test
+  @Script(
+    name = "JsonTreeReadPropertyTest.shouldCheckArrayValue",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    }
+  )
+  public void shouldCheckArrayValue() {
+    Boolean value1 = script.getVariable("value1");
+    Boolean value2 = script.getVariable("value2");
+    Boolean value3 = script.getVariable("value3");
+    Boolean value4 = script.getVariable("value4");
+    Boolean value5 = script.getVariable("value5");
+
+    assertThat(value1).isEqualTo(false);
+    assertThat(value2).isEqualTo(false);
+    assertThat(value3).isEqualTo(true);
+    assertThat(value4).isEqualTo(false);
+    assertThat(value5).isEqualTo(false);
+  }
+
+  @Test
+  @Script(
+    name = "JsonTreeReadPropertyTest.shouldCheckObjectValue",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    }
+  )
+  public void shouldCheckObjectValue() {
+    Object value = script.getVariable("value");
+
+    assertThat((String) value).isEqualTo("order1");
+  }
+
+  /**
+   * One for array
+   * @throws Throwable
+   */
+  @Test( expected = SpinJsonDataFormatException.class)
+  @Script(
+    name="JsonTreeReadPropertyTest.shouldFailToCheckObject",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    },
+    execute = false
+  )
+  public void shouldFailToCheckObject() throws Throwable{
+    failingWithException();
+  }
+
+  /**
+   * One for child node
+   * @throws Throwable
+   */
+  @Test(expected = SpinJsonDataFormatException.class)
+  @Script(
+    name="JsonTreeReadPropertyTest.shouldFailToCheckObject2",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    },
+    execute = false
+  )
+  public void shouldFailToCheckObject2() throws Throwable{
+    failingWithException();
+  }
+
+  /**
+   * One for not existent property
+   * @throws Throwable
+   */
+  @Test(expected = SpinJsonTreePropertyException.class)
+  @Script(
+    name="JsonTreeReadPropertyTest.shouldFailToReadProperty",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    },
+    execute = false
+  )
+  public void shouldFailToReadProperty() throws Throwable{
+    failingWithException();
+  }
+
+  /**
+   * One for property argument equals null
+   * @throws Throwable
+   */
+  @Test(expected = IllegalArgumentException.class)
+  @Script(
+    name="JsonTreeReadPropertyTest.shouldFailToReadProperty2",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    },
+    execute = false
+  )
+  public void shouldFailToReadProperty2() throws Throwable{
+    failingWithException();
+  }
+
 
   @Test
   @Script(
@@ -80,12 +244,48 @@ public abstract class JsonTreeReadPropertyScriptTest extends ScriptTest {
     assertThat(value3).isEqualTo(32000.45);
   }
 
+  @Test(expected = SpinJsonDataFormatException.class)
+   @Script(
+     name = "JsonTreeReadPropertyTest.shouldFailToReadNumberValue",
+     variables = {
+       @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+     },
+     execute = false
+   )
+   public void shouldFailToReadNumberValue() throws Throwable {
+    failingWithException();
+  }
+
+  @Test(expected = SpinJsonDataFormatException.class)
+  @Script(
+    name = "JsonTreeReadPropertyTest.shouldFailToReadBooleanValue",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    },
+    execute = false
+  )
+  public void shouldFailToReadBooleanValue() throws Throwable {
+    failingWithException();
+  }
+
+  @Test(expected = SpinJsonDataFormatException.class)
+  @Script(
+    name = "JsonTreeReadPropertyTest.shouldFailToReadStringValue",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    },
+    execute = false
+  )
+  public void shouldFailToReadStringValue() throws Throwable {
+    failingWithException();
+  }
+
   @Test
   @Script(
-      name = "JsonTreeReadPropertyTest.shouldReadBooleanValue",
-      variables = {
-          @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
-      }
+    name = "JsonTreeReadPropertyTest.shouldReadBooleanValue",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    }
   )
   public void shouldReadBooleanValue() {
     Boolean value1 = script.getVariable("value1");
@@ -168,6 +368,18 @@ public abstract class JsonTreeReadPropertyScriptTest extends ScriptTest {
     assertThat(value3).isEqualTo("orderDetails");
   }
 
+  @Test(expected = SpinJsonDataFormatException.class)
+  @Script(
+    name = "JsonTreeReadPropertyTest.shouldFailToReadObjectInNonArray",
+    variables = {
+      @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+    },
+    execute = false
+  )
+  public void shouldFailToReadObjectInNonArray() throws Throwable{
+    failingWithException();
+  }
+
   @Test
   @Script(
       name = "JsonTreeReadPropertyTest.shouldBeSameAsJavaValue",
@@ -184,7 +396,7 @@ public abstract class JsonTreeReadPropertyScriptTest extends ScriptTest {
     SpinJsonNode property2 = childNode.prop("price");
     SpinJsonNode property3 = node.prop("active");
 
-    String javaVariable1 = property1.value();
+    String javaVariable1 = property1.stringValue();
     Number javaVariable2 = property2.numberValue();
     Boolean javaVariable3 = property3.boolValue();
 

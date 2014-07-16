@@ -8,6 +8,6 @@ property1 = node.prop("order");
 property2 = customerNode.prop("name");
 property3 = childNode2.prop("article");
 
-value1 = property1.value();
-value2 = property2.value();
-value3 = property3.value();
+value1 = property1.stringValue();
+value2 = property2.stringValue();
+value3 = property3.stringValue();

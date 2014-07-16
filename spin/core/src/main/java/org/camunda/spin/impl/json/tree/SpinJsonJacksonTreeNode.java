@@ -14,16 +14,19 @@ package org.camunda.spin.impl.json.tree;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.camunda.spin.SpinList;
+import org.camunda.spin.impl.SpinListImpl;
+import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.logging.SpinLogger;
+
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.camunda.spin.SpinList;
-import org.camunda.spin.impl.SpinListImpl;
-import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.logging.SpinLogger;
+import static org.camunda.spin.impl.util.SpinEnsure.*;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -95,17 +98,18 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     return writer;
   }
 
-  /**
-   * fetches a property by name
-   *
-   * @param name Name of the property
-   * @return property SpinJsonNode representation of the property
-   */
   public SpinJsonNode prop(String name) {
-    // FIXME: should throw exception if propertie does not exist
-    // FIXME: should throw exception if name is null
-    JsonNode property = jsonNode.get(name);
-    return dataFormat.createWrapperInstance(property);
+    ensureNotNull("name", name);
+    if(jsonNode.has(name)) {
+      JsonNode property = jsonNode.get(name);
+      return dataFormat.createWrapperInstance(property);
+    } else {
+      throw LOG.unableToFindProperty(name);
+    }
+  }
+
+  public Boolean isBoolean() {
+    return jsonNode.isBoolean();
   }
 
   public Boolean boolValue() {
@@ -116,6 +120,10 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     }
   }
 
+  public Boolean isNumber() {
+    return jsonNode.isNumber();
+  }
+
   public Number numberValue() {
     if(jsonNode.isNumber()) {
       return jsonNode.numberValue();
@@ -124,7 +132,11 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     }
   }
 
-  public String value() {
+  public Boolean isString() {
+    return jsonNode.isTextual();
+  }
+
+  public String stringValue() {
     if(jsonNode.isTextual()) {
       return jsonNode.textValue();
     } else {
@@ -132,25 +144,56 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     }
   }
 
-  public SpinList<SpinJsonNode> elements() {
-    // FIXME: should throw exception if the property is no container
-    Iterator<JsonNode> iterator = jsonNode.elements();
-    SpinList<SpinJsonNode> list = new SpinListImpl<SpinJsonNode>();
-    while(iterator.hasNext()) {
-      SpinJsonNode node = dataFormat.createWrapperInstance(iterator.next());
-      list.add(node);
+  public Boolean isValue() {
+    return jsonNode.isValueNode();
+  }
+
+  public Object value() {
+    if(jsonNode.isBoolean()) {
+      return jsonNode.booleanValue();
     }
 
-    return list;
+    if(jsonNode.isNumber()) {
+      return jsonNode.numberValue();
+    }
+
+    if(jsonNode.isTextual()) {
+      return jsonNode.textValue();
+    }
+
+    throw LOG.unableToParseValue("String/Number/Boolean", jsonNode.getNodeType());
+  }
+
+  public Boolean isArray() {
+    return jsonNode.isArray();
+  }
+
+  public SpinList<SpinJsonNode> elements() {
+    if(jsonNode.isArray()) {
+      Iterator<JsonNode> iterator = jsonNode.elements();
+      SpinList<SpinJsonNode> list = new SpinListImpl<SpinJsonNode>();
+      while(iterator.hasNext()) {
+        SpinJsonNode node = dataFormat.createWrapperInstance(iterator.next());
+        list.add(node);
+      }
+
+      return list;
+    } else {
+      throw LOG.unableToParseValue(SpinList.class.getSimpleName(), jsonNode.getNodeType());
+    }
   }
 
   public List<String> fieldNames() {
-    Iterator<String> iterator = jsonNode.fieldNames();
-    List<String> list = new ArrayList<String>();
-    while(iterator.hasNext()) {
-      list.add(iterator.next());
-    }
+    if(jsonNode.isContainerNode()) {
+      Iterator<String> iterator = jsonNode.fieldNames();
+      List<String> list = new ArrayList<String>();
+      while(iterator.hasNext()) {
+        list.add(iterator.next());
+      }
 
-    return list;
+      return list;
+    } else {
+      throw LOG.unableToParseValue("Array/Object", jsonNode.getNodeType());
+    }
   }
 }
