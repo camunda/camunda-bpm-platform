@@ -168,12 +168,19 @@
               <directory>${web.resources.override}</directory>
             </resource>
             <resource>
+              <filtering>false</filtering>
+              <directory>target/webapp</directory>
+              <excludes>
+                <exclude>**/*.html</exclude>
+              </excludes>
+            </resource>
+            <resource>
               <filtering>true</filtering>
               <directory>target/webapp</directory>
               <!-- no filtering for favicon because linux destroys images through carriage return -->
-              <excludes>
-                <exclude>assets/img/favicon.ico</exclude>
-              </excludes>
+              <includes>
+                <include>**/*.html</include>
+              </includes>
             </resource>
           </webResources>
           <archive>
