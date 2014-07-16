@@ -12,16 +12,18 @@
  */
 package org.camunda.spin.impl.json.tree;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.camunda.spin.SpinList;
-import org.camunda.spin.impl.SpinListImpl;
-import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.logging.SpinLogger;
-
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import org.camunda.spin.SpinList;
+import org.camunda.spin.impl.SpinListImpl;
+import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.logging.SpinLogger;
 
 /**
  * Wrapper for a Jackson Json Tree Node. 
@@ -37,9 +39,9 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   protected final JsonJacksonTreeDataFormat dataFormat;
 
   
-  public SpinJsonJacksonTreeNode(JsonNode jsonNode, JsonJacksonTreeDataFormat format) {
+  public SpinJsonJacksonTreeNode(JsonNode jsonNode, JsonJacksonTreeDataFormat dataFormat) {
     this.jsonNode = jsonNode;
-    this.dataFormat = format;
+    this.dataFormat = dataFormat;
   }
   
   public String getDataFormatName() {
@@ -51,6 +53,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   }
 
   public String toString() {
+    // FIXME: should return the string of the wrapped json node
     return jsonNode.toString();
   }
 
@@ -69,22 +72,13 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     return null;
   }
 
-  /**
-   * fetches a property by name
-   *
-   * @param name Name of the property
-   * @return property SpinJsonNode representation of the property
-   */
   public SpinJsonNode prop(String name) {
+    // FIXME: should throw exception if propertie does not exist
+    // FIXME: should throw exception if name is null
     JsonNode property = jsonNode.get(name);
     return dataFormat.createWrapperInstance(property);
   }
 
-  /**
-   * fetch boolean value of a property
-   *
-   * @return propertyValue value of type Boolean
-   */
   public Boolean boolValue() {
     if(jsonNode.isBoolean()) {
       return jsonNode.booleanValue();
@@ -93,11 +87,6 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     }
   }
 
-  /**
-   * fetch number value of a property
-   *
-   * @return propertyValue value of type Number
-   */
   public Number numberValue() {
     if(jsonNode.isNumber()) {
       return jsonNode.numberValue();
@@ -106,11 +95,6 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     }
   }
 
-  /**
-   * fetch string value of a property
-   *
-   * @return propertyValue value of type String
-   */
   public String value() {
     if(jsonNode.isTextual()) {
       return jsonNode.textValue();
@@ -119,12 +103,8 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     }
   }
 
-  /**
-   * fetch data for json array
-   *
-   * @return list list of child nodes
-   */
-  public SpinList elements() {
+  public SpinList<SpinJsonNode> elements() {
+    // FIXME: should throw exception if the property is no container
     Iterator<JsonNode> iterator = jsonNode.elements();
     SpinList<SpinJsonNode> list = new SpinListImpl<SpinJsonNode>();
     while(iterator.hasNext()) {
@@ -132,17 +112,12 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
       list.add(node);
     }
 
-    return (SpinList) list;
+    return list;
   }
 
-  /**
-   * fetch a list of field names for all child nodes of a node
-   *
-   * @return list list of field names
-   */
-  public ArrayList<String> fieldNames() {
+  public List<String> fieldNames() {
     Iterator<String> iterator = jsonNode.fieldNames();
-    ArrayList<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<String>();
     while(iterator.hasNext()) {
       list.add(iterator.next());
     }

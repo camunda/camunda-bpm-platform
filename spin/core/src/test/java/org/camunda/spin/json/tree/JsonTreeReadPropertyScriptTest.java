@@ -39,8 +39,8 @@ public abstract class JsonTreeReadPropertyScriptTest extends ScriptTest {
   public void shouldReadProperty() {
     SpinJsonNode property = script.getVariable("property");
     String value = script.getVariable("value");
+
     assertThat(property).isNotNull();
-    assertThat(property).isInstanceOf(SpinJsonNode.class);
     assertThat(value).isEqualTo("order1");
   }
 

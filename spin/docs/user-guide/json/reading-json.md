@@ -55,84 +55,9 @@ following example demonstrates how to read Json in Javascript:
 ```javascript
 var customer = S('{"customer": "Kermit"}');
 ```
-
-## Reading Json Properties
-
-To fetch properties from the Json tree you can use `.prop("name")`. This will return the property as
-SpinJsonNode and you can use this to get the value of the property as the following examples will
-demonstrate:
-
-in Java:
-```java
-import static org.camunda.spin.Spin.*;
-
-SpinJsonNode json = JSON("{\"customer\": \"Kermit\"}");
-SpinJsonNode customerProperty = json.prop("customer");
-String customerName = customerProperty.value();
-```
-
-in Javascript:
-```javascript
-var json = S('{"customer": "Kermit"}');
-var customerProperty = json.prop("customer");
-var customerName = customerProperty.value();
-```
-
-### The different value types
-
-With `.value()` you will fetch a String representation of the value. There are also:
- 
-  * `.numberValue()` - will fetch a number representation of the value or throws an exception if the value is not a number
-  * `.boolValue()` - will fetch a boolean representation of the value or throws an exception if the value is not a bool
-  
-### Fetch array of data
-  
-You can also fetch a list of items if your property is an array of data.
-
-in Java:
-```java
-import static org.camunda.spin.Spin.*;
-
-SpinJsonNode json = JSON("{\"customer\": \[\"Kermit\", \"Waldo\"\]}");
-SpinJsonNode customerProperty = json.prop("customer");
-SpinList customers = customerProperty.elements();
-SpinJsonNode customer = customers.get(0);
-String customerName = customer.value();
-```
-
-in Javascript:
-```javascript
-var json = S('{"customer": ["Kermit", "Waldo"]}');
-var customerProperty = json.prop("customer");
-var customers = customerProperty.elements();
-var customer = customers.get(0)
-var customerName = customer.value();
-```
-
-### Fetch field names
-
-Spin allows us to use the `.fieldNames()` method to fetch the names of all child nodes and properties in a node.
-The following example shows you how to use `.fieldNames()` in Java and Javascript.
-
-in Java:
-```java
-import static org.camunda.spin.Spin.*;
-
-SpinJsonNode json = JSON("{\"customer\": \[\"Kermit\", \"Waldo\"\]}");
-ArrayList fieldNames = json.fieldNames();
-String fieldName1 = fieldNames.get(0)
-```
-
-in Javascript:
-```javascript
-var json = S('{"customer": ["Kermit", "Waldo"]}');
-var fieldNames = json.fieldNames();
-var fieldName1 = fieldNames.get(0)
-```
-
 ## Configuring Json Import
 
-Whenever the json data format is explicitly declared, i.e. by using `JSON(..., jsonTree())` 
+Whenever the json data format is explicitly declared, i.e. by using `JSON(..., jsonTree())`
 or `S(..., jsonTree())`, configuration to the Jackson parser can be passed. This can be either done by using
 a fluent API or by providing a map of configuration parameters.
 
@@ -195,5 +120,81 @@ The following explanations are supported:
 </table>
 
 See the Jackson [JsonParser.Feature][jackson-parser-features] documentation for an explanation of the options.
+
+
+## Reading Json Properties
+
+To fetch properties from the Json tree you can use `.prop("name")`. This will return the property as
+SpinJsonNode and you can use this to get the value of the property as the following examples will
+demonstrate:
+
+in Java:
+```java
+import static org.camunda.spin.Spin.*;
+
+SpinJsonNode json = JSON("{\"customer\": \"Kermit\"}");
+SpinJsonNode customerProperty = json.prop("customer");
+String customerName = customerProperty.value();
+```
+
+in Javascript:
+```javascript
+var json = S('{"customer": "Kermit"}');
+var customerProperty = json.prop("customer");
+var customerName = customerProperty.value();
+```
+
+### The different value types
+
+With `.value()` you will fetch a String representation of the value. There are also:
+
+  * `.numberValue()` - will fetch a number representation of the value or throws an exception if the value is not a number
+  * `.boolValue()` - will fetch a boolean representation of the value or throws an exception if the value is not a bool
+
+### Fetch array of data
+
+You can also fetch a list of items if your property is an array of data.
+
+in Java:
+```java
+import static org.camunda.spin.Spin.*;
+
+SpinJsonNode json = JSON("{\"customer\": \[\"Kermit\", \"Waldo\"\]}");
+SpinJsonNode customerProperty = json.prop("customer");
+SpinList customers = customerProperty.elements();
+SpinJsonNode customer = customers.get(0);
+String customerName = customer.value();
+```
+
+in Javascript:
+```javascript
+var json = S('{"customer": ["Kermit", "Waldo"]}');
+var customerProperty = json.prop("customer");
+var customers = customerProperty.elements();
+var customer = customers.get(0)
+var customerName = customer.value();
+```
+
+### Fetch field names
+
+Spin allows us to use the `.fieldNames()` method to fetch the names of all child nodes and properties in a node.
+The following example shows you how to use `.fieldNames()` in Java and Javascript.
+
+in Java:
+```java
+import static org.camunda.spin.Spin.*;
+
+SpinJsonNode json = JSON("{\"customer\": \[\"Kermit\", \"Waldo\"\]}");
+ArrayList fieldNames = json.fieldNames();
+String fieldName1 = fieldNames.get(0)
+```
+
+in Javascript:
+```javascript
+var json = S('{"customer": ["Kermit", "Waldo"]}');
+var fieldNames = json.fieldNames();
+var fieldName1 = fieldNames.get(0)
+```
+
 
 [jackson-parser-features]: https://fasterxml.github.io/jackson-core/javadoc/2.3.0/com/fasterxml/jackson/core/JsonParser.Feature.html

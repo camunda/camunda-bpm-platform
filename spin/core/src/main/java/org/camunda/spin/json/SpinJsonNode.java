@@ -12,10 +12,10 @@
  */
 package org.camunda.spin.json;
 
+import java.util.List;
+
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinList;
-
-import java.util.ArrayList;
 
 /**
  * A json node.
@@ -25,15 +25,50 @@ import java.util.ArrayList;
  */
 public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
 
+  // FIXME: add isBoolean, isValue, isObject, isContainer etc. methods
+
+  /**
+   * fetches a property by name
+   *
+   * @param name Name of the property
+   * @return property SpinJsonNode representation of the property
+   */
   public abstract SpinJsonNode prop(String name);
 
+  /**
+   * fetch boolean value of a property
+   *
+   * @return propertyValue value of type Boolean
+   */
   public abstract Boolean boolValue();
 
+  /**
+   * fetch number value of a property
+   *
+   * @return propertyValue value of type Number
+   */
   public abstract Number numberValue();
 
+  /**
+   * FIXME: should return value and add method stringValue() for String value
+   * fetch string value of a property
+   *
+   * @return propertyValue value of type String
+   */
   public abstract String value();
 
-  public abstract SpinList elements();
+  /**
+   * fetch data for json array
+   *
+   * @return list list of child nodes
+   */
+  public abstract SpinList<SpinJsonNode> elements();
 
-  public abstract ArrayList<String> fieldNames();
+  /**
+   * fetch a list of field names for all child nodes of a node
+   *
+   * @return list list of field names
+   */
+  public abstract List<String> fieldNames();
+
 }

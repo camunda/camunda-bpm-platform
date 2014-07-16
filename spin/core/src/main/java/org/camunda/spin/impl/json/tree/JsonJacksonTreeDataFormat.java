@@ -12,14 +12,14 @@
  */
 package org.camunda.spin.impl.json.tree;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Map;
+
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Thorben Lindhauer
