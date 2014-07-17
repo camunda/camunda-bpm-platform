@@ -12,10 +12,11 @@
  */
 package org.camunda.spin.json;
 
+import java.util.List;
+
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinList;
-
-import java.util.List;
+import org.camunda.spin.spi.SpinDataFormatException;
 
 /**
  * A json node.
@@ -26,87 +27,108 @@ import java.util.List;
 public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
 
   /**
-   * fetch a property by name
+   * Check if this node is an object node.
    *
-   * @param name Name of the property
-   * @return property SpinJsonNode representation of the property
+   * @return true if the node is an object, false otherwise
+   */
+  public abstract boolean isObject();
+
+  /**
+   * Check if this node has a property with the given name.
+   *
+   * @param name the name of the property
+   * @return true if this node has a property with this name, false otherwise
+   */
+  public abstract boolean hasProp(String name);
+
+  /**
+   * Get the property of this node with the given name.
+   *
+   * @param name the name of the property
+   * @return {@link SpinJsonNode} representation of the property
    */
   public abstract SpinJsonNode prop(String name);
 
   /**
-   * check if the given property contains a boolean value
+   * Check if this node is a boolean value.
    *
-   * @return Boolean
+   * @return true if this node is a boolean value, false otherwise
    */
   public abstract Boolean isBoolean();
 
   /**
-   * fetch boolean value of a property
+   * Get this node as a boolean value.
    *
-   * @return propertyValue value of type Boolean
+   * @return the boolean value of this node
+   * @throws SpinDataFormatException if this node is not a boolean value
    */
   public abstract Boolean boolValue();
 
   /**
-   * check if the given property contains a number value
+   * Check if this node is a number value.
    *
-   * @return Boolean
+   * @return true if this node is a number value, false otherwise
    */
   public abstract Boolean isNumber();
 
   /**
-   * fetch number value of a property
+   * Get this node as a number value.
    *
-   * @return propertyValue value of type Number
+   * @return the number value of this node
+   * @throws SpinDataFormatException if this node is not a number value
    */
   public abstract Number numberValue();
 
   /**
-   * check if the given property contains a String value
+   * Check if this node is a string value.
    *
-   * @return Boolean
+   * @return true if this node is a string value, false otherwise
    */
   public abstract Boolean isString();
 
   /**
-   * fetch string value of a property
+   * Get this node as a number value.
    *
-   * @return propertyValue value of type String
+   * @return the string value of this node
+   * @throws SpinDataFormatException if this node is not a string value
    */
   public abstract String stringValue();
 
   /**
-   * check if the given property is a value node
+   * Check if this node is a value.
    *
-   * @return Boolean
+   * @return true if this node is a value, false otherwise
    */
   public abstract Boolean isValue();
 
   /**
-   * fetch value of a property as Object
+   * Get this node as a number value.
    *
-   * @return propertyValue value of type Object
+   * @return the string value of this node
+   * @throws SpinDataFormatException if this node is not a string value
    */
   public abstract Object value();
 
   /**
-   * check if property is an array
+   * Check if this node is a array value.
    *
-   * @return Boolean
+   * @return true if this node is a array value, false otherwise
    */
   public abstract Boolean isArray();
 
   /**
-   * fetch data for json array
+   * Get this node as list.
    *
-   * @return list list of child nodes
+   * @return the list value of this node
+   * @throws SpinDataFormatException if this node is not a array value
    */
   public abstract SpinList<SpinJsonNode> elements();
 
   /**
-   * fetch a list of field names for all child nodes of a node
+   * Get the field names of this node (i.e. the property names).
    *
-   * @return list list of field names
+   * @return the list of field names
+   * @throws SpinDataFormatException if this node is not a array value
    */
   public abstract List<String> fieldNames();
 

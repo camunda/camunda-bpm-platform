@@ -14,24 +14,23 @@ package org.camunda.spin.impl.json.tree;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import com.fasterxml.jackson.databind.JsonNode;
-import org.camunda.spin.SpinList;
-import org.camunda.spin.impl.SpinListImpl;
-import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.logging.SpinLogger;
-
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.camunda.spin.impl.util.SpinEnsure.*;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.camunda.spin.SpinList;
+import org.camunda.spin.impl.SpinListImpl;
+import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.logging.SpinLogger;
+
+import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 
 /**
  * Wrapper for a Jackson Json Tree Node. 
@@ -61,7 +60,6 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   }
 
   public String toString() {
-    // FIXME: should return the string of the wrapped json node
     return jsonNode.toString();
   }
 
@@ -96,6 +94,14 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     }
     
     return writer;
+  }
+
+  public boolean isObject() {
+    return jsonNode.isObject();
+  }
+
+  public boolean hasProp(String name) {
+    return jsonNode.has(name);
   }
 
   public SpinJsonNode prop(String name) {

@@ -15,11 +15,10 @@ package org.camunda.spin.json.tree;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.json.SpinJsonTreePropertyException;
+import org.camunda.spin.spi.SpinDataFormatException;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -31,11 +30,34 @@ import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
  */
 public class JsonTreeReadPropertyTest {
 
-  private SpinJsonNode jsonNode;
+  protected SpinJsonNode jsonNode;
+  protected SpinJsonNode order;
+  protected SpinJsonNode dueUntil;
+  protected SpinJsonNode id;
+  protected SpinJsonNode customers;
+  protected SpinJsonNode orderDetails;
+  protected SpinJsonNode active;
 
   @Before
   public void readJson() {
     jsonNode = JSON(EXAMPLE_JSON);
+    order = jsonNode.prop("order");
+    dueUntil = jsonNode.prop("dueUntil");
+    id = jsonNode.prop("id");
+    customers = jsonNode.prop("customers");
+    orderDetails = jsonNode.prop("orderDetails");
+    active = jsonNode.prop("active");
+  }
+
+  @Test
+  public void checkForProperty() {
+    assertThat(jsonNode.hasProp("order")).isTrue();
+    assertThat(order.hasProp("order")).isFalse();
+    assertThat(dueUntil.hasProp("order")).isFalse();
+    assertThat(id.hasProp("order")).isFalse();
+    assertThat(customers.hasProp("order")).isFalse();
+    assertThat(orderDetails.hasProp("price")).isTrue();
+    assertThat(active.hasProp("order")).isFalse();
   }
 
   @Test
@@ -47,97 +69,23 @@ public class JsonTreeReadPropertyTest {
   }
 
   @Test
-  public void shouldCheckStringValue() {
-    SpinJsonNode property = jsonNode.prop("order");
-    SpinJsonNode property2 = jsonNode.prop("id");
-    SpinJsonNode property3 = jsonNode.prop("customers");
-    SpinJsonNode property4 = jsonNode.prop("orderDetails");
-    SpinJsonNode property5 = jsonNode.prop("active");
-
-    assertThat(property.isString()).isEqualTo(true);
-    assertThat(property2.isString()).isEqualTo(false);
-    assertThat(property3.isString()).isEqualTo(false);
-    assertThat(property4.isString()).isEqualTo(false);
-    assertThat(property5.isString()).isEqualTo(false);
-  }
-
-  @Test
-  public void shouldCheckNumberValue() {
-      SpinJsonNode property = jsonNode.prop("order");
-      SpinJsonNode property2 = jsonNode.prop("id");
-      SpinJsonNode property3 = jsonNode.prop("customers");
-      SpinJsonNode property4 = jsonNode.prop("orderDetails");
-      SpinJsonNode property5 = jsonNode.prop("active");
-
-      assertThat(property.isNumber()).isEqualTo(false);
-      assertThat(property2.isNumber()).isEqualTo(true);
-      assertThat(property3.isNumber()).isEqualTo(false);
-      assertThat(property4.isNumber()).isEqualTo(false);
-      assertThat(property5.isNumber()).isEqualTo(false);
-  }
-
-  @Test
-  public void shouldCheckBooleanValue() {
-    SpinJsonNode property = jsonNode.prop("order");
-    SpinJsonNode property2 = jsonNode.prop("id");
-    SpinJsonNode property3 = jsonNode.prop("customers");
-    SpinJsonNode property4 = jsonNode.prop("orderDetails");
-    SpinJsonNode property5 = jsonNode.prop("active");
-
-    assertThat(property.isBoolean()).isEqualTo(false);
-    assertThat(property2.isBoolean()).isEqualTo(false);
-    assertThat(property3.isBoolean()).isEqualTo(false);
-    assertThat(property4.isBoolean()).isEqualTo(false);
-    assertThat(property5.isBoolean()).isEqualTo(true);
-  }
-
-  @Test
-  public void shouldCheckArrayValue() {
-    SpinJsonNode property = jsonNode.prop("order");
-    SpinJsonNode property2 = jsonNode.prop("id");
-    SpinJsonNode property3 = jsonNode.prop("customers");
-    SpinJsonNode property4 = jsonNode.prop("orderDetails");
-    SpinJsonNode property5 = jsonNode.prop("active");
-
-    assertThat(property.isArray()).isEqualTo(false);
-    assertThat(property2.isArray()).isEqualTo(false);
-    assertThat(property3.isArray()).isEqualTo(true);
-    assertThat(property4.isArray()).isEqualTo(false);
-    assertThat(property5.isArray()).isEqualTo(false);
-  }
-
-  @Test
-  public void shouldCheckObjectValue() {
-    SpinJsonNode property = jsonNode.prop("order");
-
-    assertThat(property.value()).isInstanceOf(Object.class);
-    assertThat((String) property.value()).isEqualTo("order1");
-  }
-
-  @Test
-  public void shouldFailToCheckObject() {
-    SpinJsonNode property = jsonNode.prop("orderDetails");
-    SpinJsonNode property2 = jsonNode.prop("customers");
-
+  public void shouldFailToReadNonProperty() {
     try {
-      property.value();
-      fail("Expected SpinJsonDataFormatException");
-    } catch(SpinJsonDataFormatException e) {
+      jsonNode.prop("nonExisting");
+      fail("Expected SpinJsonTreePropertyException");
+    } catch(SpinJsonTreePropertyException e) {
       // expected
     }
 
     try {
-      property2.value();
-      fail("Expected SpinJsonDataFormatException");
-    } catch(SpinJsonDataFormatException e) {
+      order.prop("nonExisting");
+      fail("Expected SpinJsonTreePropertyException");
+    } catch(SpinJsonTreePropertyException e) {
       // expected
     }
-  }
 
-  @Test
-  public void shouldFailToReadProperty() {
     try {
-      jsonNode.prop("42");
+      customers.prop("nonExisting");
       fail("Expected SpinJsonTreePropertyException");
     } catch(SpinJsonTreePropertyException e) {
       // expected
@@ -145,141 +93,310 @@ public class JsonTreeReadPropertyTest {
 
     try {
       jsonNode.prop(null);
-      fail("Exptected IllegalArgumentException");
+      fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
     }
-  }
-
-  @Test
-  public void shouldReadTextValue() {
-    SpinJsonNode property = jsonNode.prop("order");
-    assertThat(property).isNotNull();
-
-    String value = property.stringValue();
-
-    assertThat(value)
-      .isNotNull()
-      .isEqualTo("order1");
-
-  }
-
-  @Test
-  public void shouldReadNumberValue() {
-    SpinJsonNode property = jsonNode.prop("dueUntil");
-    SpinJsonNode property2 = jsonNode.prop("id");
-
-    Number value = property.numberValue();
-    Number value2 = property2.numberValue();
-
-    assertThat(value)
-      .isNotNull()
-      .isEqualTo(20150112);
-    assertThat(value2)
-      .isNotNull()
-      .isEqualTo(1234567890987654321L);
-  }
-
-  @Test
-  public void shouldGetReadException() {
-    SpinJsonNode property = jsonNode.prop("dueUntil");
-    SpinJsonNode property2 = jsonNode.prop("active");
-    SpinJsonNode property3 = jsonNode.prop("order");
 
     try {
-      property.boolValue();
-      fail("Expected SpinJsonDataFormatException");
-    } catch (SpinJsonDataFormatException e) {
+      order.prop("null");
+      fail("Expected SpinJsonTreePropertyException");
+    } catch(SpinJsonTreePropertyException e) {
       // expected
     }
 
     try {
-      property2.stringValue();
-      fail("Expected SpinJsonDataFormatException");
-    } catch (SpinJsonDataFormatException e) {
-      // expected
-    }
-
-    try {
-      property3.numberValue();
-      fail("Expected SpinJsonDataFormatException");
-    } catch (SpinJsonDataFormatException e) {
+      customers.prop("null");
+      fail("Expected SpinJsonTreePropertyException");
+    } catch(SpinJsonTreePropertyException e) {
       // expected
     }
   }
 
   @Test
-  public void shouldReadBooleanValue() {
-    SpinJsonNode property = jsonNode.prop("active");
-
-    Boolean value = property.boolValue();
-
-    assertThat(value)
-      .isNotNull()
-      .isEqualTo(true);
+  public void checkForObjectValue() {
+    assertThat(jsonNode.isObject()).isTrue();
+    assertThat(order.isObject()).isFalse();
+    assertThat(dueUntil.isObject()).isFalse();
+    assertThat(id.isObject()).isFalse();
+    assertThat(customers.isObject()).isFalse();
+    assertThat(orderDetails.isObject()).isTrue();
+    assertThat(active.isObject()).isFalse();
   }
 
   @Test
-  public void shouldReadChildNode() {
-    SpinJsonNode childNode = jsonNode.prop("orderDetails");
-
-    assertThat(childNode).isNotNull();
+  public void shouldReadObjectProperty() {
+    assertThat(jsonNode.prop("order")).isNotNull();
+    assertThat(orderDetails.prop("article")).isNotNull();
   }
 
   @Test
-  public void shouldReadChildNodeProperty() {
-    // Object Node
-    SpinJsonNode childNode = jsonNode.prop("orderDetails");
-    SpinJsonNode property = childNode.prop("roundedPrice");
-    Number propertyValue = property.numberValue();
-
-    assertThat(property).isNotNull();
-    assertThat(propertyValue)
-      .isNotNull()
-      .isEqualTo(32000);
-
-    // Array Node
-    SpinJsonNode childNode2 = childNode.prop("currencies");
-    SpinList<SpinJsonNode> list = childNode2.elements();
-
-    SpinJsonNode node1 = list.get(0);
-    SpinJsonNode node2 = list.get(1);
-    assertThat(node1.stringValue()).isEqualTo("euro");
-    assertThat(node2.stringValue()).isEqualTo("dollar");
-  }
-
-  @Test
-  public void shouldReadObjectInArrayChildNode() {
-    // Object Node
-    SpinJsonNode childNode = jsonNode.prop("customers");
-    SpinList<SpinJsonNode> list = childNode.elements();
-
-    SpinJsonNode node1 = list.get(0);
-    SpinJsonNode node2 = list.get(1);
-
-    SpinJsonNode customer1 = node1.prop("name");
-    SpinJsonNode customer2 = node2.prop("name");
-
-    assertThat(customer1.stringValue()).isEqualTo("Kermit");
-    assertThat(customer2.stringValue()).isEqualTo("Waldo");
-  }
-
-  @Test
-  public void shouldFailToReadObjectInNonArray() {
+  public void shouldFailToReadNonObject() {
     try {
-      SpinJsonNode property = jsonNode.prop("order");
-      property.elements();
+      jsonNode.prop("order").prop("nonExisting");
+      fail("Expected SpinJsonTreePropertyException");
+    } catch(SpinJsonTreePropertyException e) {
+      // expected
+    }
+
+    try {
+      orderDetails.prop("roundedPrice").prop("nonExisting");
+      fail("Expected SpinJsonTreePropertyException");
+    } catch(SpinJsonTreePropertyException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void checkForStringValue() {
+    assertThat(jsonNode.isString()).isFalse();
+    assertThat(order.isString()).isTrue();
+    assertThat(dueUntil.isString()).isFalse();
+    assertThat(id.isString()).isFalse();
+    assertThat(customers.isString()).isFalse();
+    assertThat(orderDetails.isString()).isFalse();
+    assertThat(active.isString()).isFalse();
+  }
+
+  @Test
+  public void shouldReadStringValue() {
+    assertThat(order.stringValue()).isEqualTo("order1");
+    assertThat(orderDetails.prop("article").stringValue()).isEqualTo("camundaBPM");
+    assertThat(customers.elements().get(0).prop("name").stringValue()).isEqualTo("Kermit");
+  }
+
+  @Test
+  public void shouldFailToReadNonStringValue() {
+    try {
+      jsonNode.stringValue();
       fail("Expected SpinJsonDataFormatException");
     } catch(SpinJsonDataFormatException e) {
       // expected
     }
+
+    try {
+      dueUntil.stringValue();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      orderDetails.prop("currencies").stringValue();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
   }
 
   @Test
-  public void shouldReadListOfNodes() {
-    List<String> names = jsonNode.fieldNames();
+  public void checkForNumberValue() {
+    assertThat(jsonNode.isNumber()).isFalse();
+    assertThat(order.isNumber()).isFalse();
+    assertThat(dueUntil.isNumber()).isTrue();
+    assertThat(id.isNumber()).isTrue();
+    assertThat(customers.isNumber()).isFalse();
+    assertThat(orderDetails.isNumber()).isFalse();
+    assertThat(active.isNumber()).isFalse();
+  }
 
-    assertThat(names).contains("order", "dueUntil", "orderDetails");
+  @Test
+  public void shouldReadNumberValue() {
+    assertThat(dueUntil.numberValue()).isEqualTo(20150112);
+    assertThat(id.numberValue()).isEqualTo(1234567890987654321L);
+  }
+
+  @Test
+  public void shouldFailToReadNonNumberValue() {
+    try {
+      jsonNode.numberValue();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      order.numberValue();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      customers.numberValue();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void checkForBooleanValue() {
+    assertThat(jsonNode.isBoolean()).isFalse();
+    assertThat(order.isBoolean()).isFalse();
+    assertThat(dueUntil.isBoolean()).isFalse();
+    assertThat(id.isBoolean()).isFalse();
+    assertThat(customers.isBoolean()).isFalse();
+    assertThat(orderDetails.isBoolean()).isFalse();
+    assertThat(active.isBoolean()).isTrue();
+  }
+
+  @Test
+  public void shouldReadBooleanValue() {
+    assertThat(active.boolValue()).isTrue();
+    assertThat(orderDetails.prop("paid").boolValue()).isFalse();
+  }
+
+  @Test
+  public void shouldFailToReadNonBooleanValue() {
+    try {
+      jsonNode.boolValue();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      order.boolValue();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      customers.boolValue();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void checkForValue() {
+    assertThat(jsonNode.isValue()).isFalse();
+    assertThat(order.isValue()).isTrue();
+    assertThat(dueUntil.isValue()).isTrue();
+    assertThat(id.isValue()).isTrue();
+    assertThat(customers.isValue()).isFalse();
+    assertThat(orderDetails.isValue()).isFalse();
+    assertThat(active.isValue()).isTrue();
+  }
+
+  @Test
+  public void shouldReadValue() {
+    assertThat(order.value())
+      .isInstanceOf(String.class)
+      .isEqualTo("order1");
+
+    assertThat(dueUntil.value())
+      .isInstanceOf(Number.class)
+      .isEqualTo(20150112);
+
+    assertThat(active.value())
+      .isInstanceOf(Boolean.class)
+      .isEqualTo(true);
+  }
+
+  @Test
+  public void shouldFailToReadNonValue() {
+    try {
+      jsonNode.value();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      customers.value();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      orderDetails.value();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void checkForArrayValue() {
+    assertThat(jsonNode.isArray()).isFalse();
+    assertThat(order.isArray()).isFalse();
+    assertThat(dueUntil.isArray()).isFalse();
+    assertThat(id.isArray()).isFalse();
+    assertThat(customers.isArray()).isTrue();
+    assertThat(orderDetails.isArray()).isFalse();
+    assertThat(active.isArray()).isFalse();
+  }
+
+  @Test
+  public void shouldReadArrayValue() {
+    SpinList<SpinJsonNode> customerElements = customers.elements();
+    SpinList<SpinJsonNode> currenciesElements = orderDetails.prop("currencies").elements();
+
+    assertThat(customerElements).hasSize(3);
+    assertThat(currenciesElements).hasSize(2);
+
+    assertThat(customerElements.get(0).prop("name").stringValue()).isEqualTo("Kermit");
+    assertThat(currenciesElements.get(0).stringValue()).isEqualTo("euro");
+  }
+
+  @Test
+  public void shouldFailToReadNonArrayValue() {
+    try {
+      jsonNode.elements();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      order.elements();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      id.elements();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void shouldReadFieldNames() {
+    assertThat(jsonNode.fieldNames()).contains("order", "dueUntil", "id", "customers", "orderDetails", "active");
+    assertThat(customers.fieldNames()).isEmpty();
+    assertThat(orderDetails.fieldNames()).contains("article", "price", "roundedPrice", "currencies", "paid");
+  }
+
+  @Test
+  public void shouldFailToReadNonFieldNames() {
+    try {
+      order.fieldNames();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      dueUntil.fieldNames();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinJsonDataFormatException e) {
+      // expected
+    }
+
+    try {
+      active.fieldNames();
+      fail("Expected SpinJsonDataFormatException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
   }
 
 }

@@ -23,7 +23,8 @@
     "currencies": [
       "euro",
       "dollar"
-    ]
+    ],
+    "paid": false
   },
   "active": true
 }
