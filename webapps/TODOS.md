@@ -10,6 +10,8 @@ The "_real_" issue queue for this project is the
  - [ ] favicon rendering (probably related to the number of bytes sent)
  - [ ] fonts rendering in IE (mime type / headers /redirection)
  - [ ] fonts rendering in firefox (headers)
+ - [ ] wrong document encoding
+ - [ ] mocking failed
  - [x] problem with "mocks" build
  - __Process start form__
    - [ ] text rendering in process variable type select (only some backends)
