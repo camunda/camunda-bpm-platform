@@ -19,6 +19,12 @@ import org.camunda.spin.spi.AbstractConfiguration;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Provides a fluent API to configure Jackson's json writing options implementing the options of
+ * {@link JsonGenerator.Feature}.
+ * 
+ * @author Thorben Lindhauer
+ */
 public class JsonJacksonGeneratorConfiguration extends AbstractConfiguration<JsonJacksonGeneratorConfiguration> implements JsonJacksonTreeConfigurable {
 
   protected JsonJacksonTreeDataFormat dataFormat;

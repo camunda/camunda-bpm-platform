@@ -19,6 +19,12 @@ import org.camunda.spin.spi.AbstractConfiguration;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Provides a fluent API to configure Jackson's json parsing options implementing the options of
+ * {@link JsonParser.Feature}.
+ * 
+ * @author Thorben Lindhauer
+ */
 public class JsonJacksonParserConfiguration extends AbstractConfiguration<JsonJacksonParserConfiguration>  implements JsonJacksonTreeConfigurable {
 
   private JsonJacksonTreeDataFormat dataFormat;

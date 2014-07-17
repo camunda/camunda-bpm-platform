@@ -15,7 +15,7 @@ package org.camunda.spin.impl.json.tree;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Provides Jackson's parser configuration options.
+ * Provides entry points to Jackson-specific configuration objects.
  * 
  * @author Thorben Lindhauer
  */
