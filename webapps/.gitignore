@@ -18,4 +18,4 @@ dependency-reduced-pom.xml
 *.sublime-workspace
 *.h2.db
 *.lock.db
-
+node_modules
