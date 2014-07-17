@@ -55,72 +55,6 @@ following example demonstrates how to read Json in Javascript:
 ```javascript
 var customer = S('{"customer": "Kermit"}');
 ```
-## Configuring Json Import
-
-Whenever the json data format is explicitly declared, i.e. by using `JSON(..., jsonTree())`
-or `S(..., jsonTree())`, configuration to the Jackson parser can be passed. This can be either done by using
-a fluent API or by providing a map of configuration parameters.
-
-### Examples:
-
-Configuring the jackson parser to allow leading zeros for numbers works as follows in Java:
-
-```java
-import static org.camunda.spin.Spin.*;
-
-SpinJsonNode json = S("{\"age\": 042}", jsonTree().allowNumericLeadingZeros(true));
-```
-
-The data format can also be configured using a map, which comes in handy in scripting environments. The following
-example uses Javascript:
-
-```javascript
-var customer = S('{"age": 042}', jsonTree().config({allowNumericLeadingZeros: true}));
-```
-
-A more concise equivalent:
-
-```javascript
-var customer = JSON('{"age": 042}', {allowNumericLeadingZeros: true});
-```
-
-### Configuration Options:
-
-The following explanations are supported:
-
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Type</th>
-  </tr>
-  <tr>
-    <td>allowComments</td>
-    <td>Boolean</td>
-  </tr>
-  <tr>
-    <td>allowUnquotedFieldNames</td>
-    <td>Boolean</td>
-  </tr>
-  <tr>
-    <td>allowSingleQuotes</td>
-    <td>Boolean</td>
-  </tr>
-  <tr>
-    <td>allowBackslashEscapingAnyCharacter</td>
-    <td>Boolean</td>
-  </tr>
-  <tr>
-    <td>allowNumericLeadingZeros</td>
-    <td>Boolean</td>
-  </tr>
-  <tr>
-    <td>allowNonNumericNumbers</td>
-    <td>Boolean</td>
-  </tr>
-</table>
-
-See the Jackson [JsonParser.Feature][jackson-parser-features] documentation for an explanation of the options.
-
 
 ## Reading Json Properties
 
@@ -196,5 +130,3 @@ var fieldNames = json.fieldNames();
 var fieldName1 = fieldNames.get(0)
 ```
 
-
-[jackson-parser-features]: https://fasterxml.github.io/jackson-core/javadoc/2.3.0/com/fasterxml/jackson/core/JsonParser.Feature.html
