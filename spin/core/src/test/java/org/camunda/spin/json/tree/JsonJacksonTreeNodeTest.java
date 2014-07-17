@@ -14,6 +14,7 @@ package org.camunda.spin.json.tree;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.spin.DataFormats.jsonTree;
 import static org.camunda.spin.Spin.S;
 import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
@@ -42,6 +43,20 @@ public class JsonJacksonTreeNodeTest {
   @Test
   public void canWriteToString() {
     assertThatJson(jsonNode.toString()).isEqualTo(EXAMPLE_JSON);
+  }
+  
+  /**
+   * This ensures that Jackson's toString() is not used internally as it does not apply
+   * configuration.
+   */
+  @Test
+  public void canWriteToStringWithConfiguration() {
+    String input = "{\"prop\" : \"ä\"}";
+    
+    String result = JSON(input, jsonTree().writer().escapeNonAscii(Boolean.TRUE).done())
+      .toString();
+    
+    assertThat(result).isEqualTo("{\"prop\":\"\\u00E4\"}");
   }
 
   @Test
@@ -73,4 +88,5 @@ public class JsonJacksonTreeNodeTest {
     SpinJsonNode json = JSON(inputStream);
     assertThat(json).isNotNull();
   }
+  
 }

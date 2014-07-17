@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.spin.DataFormats.jsonTree;
 import static org.camunda.spin.Spin.JSON;
 
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,34 +35,30 @@ public class JsonTreeConfigureWriterTest {
   public void shouldEscapeNonAscii() {
     String input = "{\"prop\" : \"ä\"}";
     
-    StringWriter writer = new StringWriter();
-    JSON(input, jsonTree().writer().escapeNonAscii(Boolean.TRUE).done())
-      .writeToWriter(writer);
+    String json = JSON(input, jsonTree().writer().escapeNonAscii(Boolean.TRUE).done())
+      .toString();
     
-    assertThat(writer.toString()).isEqualTo("{\"prop\":\"\\u00E4\"}");
+    assertThat(json).isEqualTo("{\"prop\":\"\\u00E4\"}");
     
-    writer = new StringWriter();
     Map<String, Object> config = newMap(JsonGenerator.Feature.ESCAPE_NON_ASCII.name(), Boolean.TRUE);
-    JSON(input, jsonTree().writer().config(config).done()).writeToWriter(writer);
+    json = JSON(input, jsonTree().writer().config(config).done()).toString();
     
-    assertThat(writer.toString()).isEqualTo("{\"prop\":\"\\u00E4\"}");
+    assertThat(json).isEqualTo("{\"prop\":\"\\u00E4\"}");
   }
   
   @Test
   public void shouldNotQuoteFieldNames() {
     String input = "{\"prop\" : \"value\"}";
     
-    StringWriter writer = new StringWriter();
-    JSON(input, jsonTree().writer().quoteFieldNames(Boolean.FALSE).done())
-      .writeToWriter(writer);
+    String json = JSON(input, jsonTree().writer().quoteFieldNames(Boolean.FALSE).done())
+      .toString();
     
-    assertThat(writer.toString()).isEqualTo("{prop:\"value\"}");
+    assertThat(json).isEqualTo("{prop:\"value\"}");
     
-    writer = new StringWriter();
     Map<String, Object> config = newMap(JsonGenerator.Feature.QUOTE_FIELD_NAMES.name(), Boolean.FALSE);
-    JSON(input, jsonTree().writer().config(config).done()).writeToWriter(writer);
+    json = JSON(input, jsonTree().writer().config(config).done()).toString();
     
-    assertThat(writer.toString()).isEqualTo("{prop:\"value\"}");
+    assertThat(json).isEqualTo("{prop:\"value\"}");
   }
   
   @Ignore
@@ -71,48 +66,43 @@ public class JsonTreeConfigureWriterTest {
   public void shouldNotQuoteNonNumericNumbers() {
     String input = "{}";
     
-    StringWriter writer = new StringWriter();
-    JSON(input, jsonTree().writer().quoteNonNumericNumbers(Boolean.FALSE).done())
+    String json = JSON(input, jsonTree().writer().quoteNonNumericNumbers(Boolean.FALSE).done())
     // TODO set a property of the object to infinity as soon as implemented
-      .writeToWriter(writer);
+      .toString();
     
-    assertThat(writer.toString()).isEqualTo("{\"prop\":Inf}");
+    assertThat(json).isEqualTo("{\"prop\":Inf}");
     
-    writer = new StringWriter();
     Map<String, Object> config = 
         newMap(JsonGenerator.Feature.QUOTE_NON_NUMERIC_NUMBERS.name(), Boolean.FALSE);
-    JSON(input, jsonTree().writer().config(config).done()).writeToWriter(writer);
+    json = JSON(input, jsonTree().writer().config(config).done()).toString();
     
-    assertThat(writer.toString()).isEqualTo("{\"prop\":Inf}");
+    assertThat(json).isEqualTo("{\"prop\":Inf}");
   }
   
   @Test
   public void shouldWriteNumbersAsStrings() {
     String input = "{\"prop\" : 123}";
     
-    StringWriter writer = new StringWriter();
-    JSON(input, jsonTree().writer().writeNumbersAsString(Boolean.TRUE).done())
-      .writeToWriter(writer);
+    String json = JSON(input, jsonTree().writer().writeNumbersAsString(Boolean.TRUE).done())
+      .toString();
     
-    assertThat(writer.toString()).isEqualTo("{\"prop\":\"123\"}");
+    assertThat(json).isEqualTo("{\"prop\":\"123\"}");
     
-    writer = new StringWriter();
     Map<String, Object> config = 
         newMap(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS.name(), Boolean.TRUE);
-    JSON(input, jsonTree().writer().config(config).done()).writeToWriter(writer);
+    json = JSON(input, jsonTree().writer().config(config).done()).toString();
     
-    assertThat(writer.toString()).isEqualTo("{\"prop\":\"123\"}");
+    assertThat(json).isEqualTo("{\"prop\":\"123\"}");
   }
   
   @Test
   public void shouldWriteWithNullConfig() {
     String input = "{\"prop\" : 123}";
     
-    StringWriter writer = new StringWriter();
-    JSON(input, jsonTree().writer().config(null).done())
-      .writeToWriter(writer);
+    String json = JSON(input, jsonTree().writer().config(null).done())
+      .toString();
     
-    assertThat(writer.toString()).isEqualTo("{\"prop\":123}");
+    assertThat(json).isEqualTo("{\"prop\":123}");
   }
   
   @Test

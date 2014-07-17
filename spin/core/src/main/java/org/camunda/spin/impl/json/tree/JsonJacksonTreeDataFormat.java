@@ -18,7 +18,15 @@ import org.camunda.spin.spi.DataFormatReader;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
+ * Spin data format that can wrap Json content and uses 
+ * <a href="http://wiki.fasterxml.com/JacksonHome">Jackson</a> as its implementation.
+ * Caches an instance of {@link ObjectMapper} as long as configuration does not change
+ * according to the advice given in the 
+ * <a href="http://wiki.fasterxml.com/JacksonBestPracticesPerformance">Jackson documentation</a>.
+ * 
+ * 
  * @author Thorben Lindhauer
  * @author Stefan Hentschel
  */

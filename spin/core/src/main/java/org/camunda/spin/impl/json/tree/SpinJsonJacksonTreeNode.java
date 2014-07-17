@@ -17,6 +17,7 @@ import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -60,7 +61,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   }
 
   public String toString() {
-    return jsonNode.toString();
+    return writeToWriter(new StringWriter()).toString();
   }
 
   public OutputStream toStream() {
