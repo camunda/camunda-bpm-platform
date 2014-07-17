@@ -12,27 +12,27 @@
  */
 package org.camunda.spin.impl.json.tree;
 
-import java.util.Map;
-
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Thorben Lindhauer
  * @author Stefan Hentschel
  */
-public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, JsonJacksonTreeConfigurable<JsonJacksonTreeDataFormat> {
+public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, JsonJacksonTreeConfigurable {
 
   public static final JsonJacksonTreeDataFormat INSTANCE = new JsonJacksonTreeDataFormat();
   
-  protected JsonJacksonTreeConfiguration configuration;
+  protected JsonJacksonParserConfiguration parserConfiguration;
+  protected JsonJacksonGeneratorConfiguration generatorConfiguration;
+  protected ObjectMapper cachedObjectMapper;
   
   public JsonJacksonTreeDataFormat() {
-    this.configuration = new JsonJacksonTreeConfiguration();
+    this.parserConfiguration = new JsonJacksonParserConfiguration(this);
+    this.generatorConfiguration = new JsonJacksonGeneratorConfiguration(this);
   }
   
   public Class<? extends SpinJsonNode> getWrapperType() {
@@ -48,115 +48,52 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
   }
   
   // configuration
-
-
   public JsonJacksonTreeDataFormat newInstance() {
     JsonJacksonTreeDataFormat instance = new JsonJacksonTreeDataFormat();
-    instance.configuration = 
-        new JsonJacksonTreeConfiguration(configuration);
+    instance.cachedObjectMapper = cachedObjectMapper;
+    instance.parserConfiguration = 
+        new JsonJacksonParserConfiguration(instance, parserConfiguration);
+    instance.generatorConfiguration = 
+        new JsonJacksonGeneratorConfiguration(instance, generatorConfiguration);
     
     return instance;
-  }
-
-  public ObjectMapper getConfiguredObjectMapper() {
-    return configuration.getConfiguredObjectMapper();
-  }
-
-  public JsonJacksonTreeDataFormat config(String key, Object value) {
-    configuration.config(key, value);
-    return this;
-  }
-  
-  public JsonJacksonTreeDataFormat config(Map<String, Object> config) {
-    configuration.config(config);
-    return this;
-  }
-
-  public JsonJacksonTreeDataFormat config(JsonParser.Feature feature, Object value) {
-    configuration.config(feature, value);
-    return this;
-  }
-
-  public Object getValue(String key) {
-    return configuration.getValue(key);
-  }
-
-  public Object getValue(String key, Object defaultValue) {
-    return configuration.getValue(key, defaultValue);
-  }
-
-  public Boolean getValue(JsonParser.Feature feature) {
-    return configuration.getValue(feature);
-  }
-
-  public Boolean allowsNumericLeadingZeros() {
-    return configuration.allowsNumericLeadingZeros();
-  }
-
-  public JsonJacksonTreeDataFormat allowNumericLeadingZeros(Boolean value) {
-    configuration.allowNumericLeadingZeros(value);
-    return this;
-  }
-
-  public Map<String, Object> getConfiguration() {
-    return configuration.getConfiguration();
   }
   
   public DataFormatReader getReader() {
     return new JsonJacksonTreeDataFormatReader(this);
   }
 
-  public Boolean allowsComments() {
-    return configuration.allowsComments();
+  public JsonJacksonParserConfiguration reader() {
+    return parserConfiguration;
   }
 
-  public JsonJacksonTreeDataFormat allowComments(Boolean value) {
-    configuration.allowComments(value);
+  public JsonJacksonGeneratorConfiguration writer() {
+    return generatorConfiguration;
+  }
+
+  public JsonJacksonTreeDataFormat done() {
     return this;
   }
 
-  public Boolean allowYamlComments() {
-    return configuration.allowYamlComments();
+  public void applyTo(ObjectMapper mapper) {
+    parserConfiguration.applyTo(mapper);
+    generatorConfiguration.applyTo(mapper);
   }
-
-  public JsonJacksonTreeDataFormat allowYamlComments(Boolean value) {
-    configuration.allowYamlComments(value);
-    return this;
+  
+  public ObjectMapper getConfiguredObjectMapper() {
+    if (cachedObjectMapper == null) {
+      synchronized(this) {
+        if (cachedObjectMapper == null) {
+          cachedObjectMapper = new ObjectMapper();
+          applyTo(cachedObjectMapper);
+        }
+      }
+    }
+    
+    return cachedObjectMapper;
   }
-
-  public Boolean allowsUnquotedFieldNames() {
-    return configuration.allowsUnquotedFieldNames();
-  }
-
-  public JsonJacksonTreeDataFormat allowQuotedFieldNames(Boolean value) {
-    configuration.allowQuotedFieldNames(value);
-    return this;
-  }
-
-  public Boolean allowsSingleQuotes() {
-    return configuration.allowsSingleQuotes();
-  }
-
-  public JsonJacksonTreeDataFormat allowSingleQuotes(Boolean value) {
-    configuration.allowSingleQuotes(value);
-    return this;
-  }
-
-  public Boolean allowsBackslashEscapingAnyCharacter() {
-    return configuration.allowsBackslashEscapingAnyCharacter();
-  }
-
-  public JsonJacksonTreeDataFormat allowBackslashEscapingAnyCharacter(Boolean value) {
-    configuration.allowBackslashEscapingAnyCharacter(value);
-    return this;
-  }
-
-  public Boolean allowsNonNumericNumbers() {
-    return configuration.allowsNonNumericNumbers();
-  }
-
-  public JsonJacksonTreeDataFormat allowNonNumericNumbers(Boolean value) {
-    configuration.allowNonNumericNumbers(value);
-    return this;
+  
+  public synchronized void invalidateCachedObjectMapper() {
+    cachedObjectMapper = null;
   }
 }

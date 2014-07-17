@@ -29,7 +29,7 @@ public class JsonTestConstants {
   /**
    * A json file that can only be parsed when configuring Jackson correctly.
    */
-  public final static String EXAMPLE_JACKSON_CONFIGURATION_JSON_FILE_NAME = "org/camunda/spin/json/example_jackson.json";
+  public final static String EXAMPLE_JACKSON_READ_CONFIGURATION_JSON_FILE_NAME = "org/camunda/spin/json/example_jackson.json";
   
-  public final static String EXAMPLE_JACKSON_CONFIGURATION_JSON = IoUtil.readFileAsString(EXAMPLE_JACKSON_CONFIGURATION_JSON_FILE_NAME);
+  public final static String EXAMPLE_JACKSON_READ_CONFIGURATION_JSON = IoUtil.readFileAsString(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON_FILE_NAME);
 }

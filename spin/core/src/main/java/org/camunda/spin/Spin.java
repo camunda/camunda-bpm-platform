@@ -186,8 +186,15 @@ public abstract class Spin<T extends Spin<?>> {
   * @throws SpinDataFormatException in case the input cannot be read as JSON
   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
   */
-  public static SpinJsonNode JSON(InputStream input, Map<String, Object> configuration) {
-    DataFormat<SpinJsonNode> configuredFormat = DataFormats.jsonTree().config(configuration);
+  public static SpinJsonNode JSON(InputStream input, Map<String, Object> readerConfiguration, 
+      Map<String, Object> writerConfiguration) {
+    
+    DataFormat<SpinJsonNode> configuredFormat = 
+        DataFormats.jsonTree()
+          .reader().config(readerConfiguration)
+          .writer().config(writerConfiguration)
+        .done();
+    
     return SPIN_FACTORY.createSpin(input, configuredFormat);
   }
   
@@ -225,8 +232,15 @@ public abstract class Spin<T extends Spin<?>> {
   * @throws SpinDataFormatException in case the input cannot be read as JSON
   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
   */
-  public static SpinJsonNode JSON(String input, Map<String, Object> configuration) {
-    DataFormat<SpinJsonNode> configuredFormat = DataFormats.jsonTree().config(configuration);
+  public static SpinJsonNode JSON(String input, Map<String, Object> readerConfiguration, 
+      Map<String, Object> writerConfiguration) {
+    
+    DataFormat<SpinJsonNode> configuredFormat = 
+        DataFormats.jsonTree()
+          .reader().config(readerConfiguration)
+          .writer().config(writerConfiguration)
+        .done();
+    
     return SPIN_FACTORY.createSpin(input, configuredFormat);
   }
 

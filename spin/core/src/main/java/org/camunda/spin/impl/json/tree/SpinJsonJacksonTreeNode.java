@@ -12,6 +12,8 @@
  */
 package org.camunda.spin.impl.json.tree;
 
+import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,8 +31,6 @@ import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.SpinListImpl;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.logging.SpinLogger;
-
-import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 
 /**
  * Wrapper for a Jackson Json Tree Node. 

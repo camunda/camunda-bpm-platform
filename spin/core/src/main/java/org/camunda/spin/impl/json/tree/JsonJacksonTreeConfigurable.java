@@ -12,9 +12,6 @@
  */
 package org.camunda.spin.impl.json.tree;
 
-import org.camunda.spin.spi.Configurable;
-
-import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -22,39 +19,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * @author Thorben Lindhauer
  */
-public interface JsonJacksonTreeConfigurable<R extends Configurable<R>> extends Configurable<R> {
+public interface JsonJacksonTreeConfigurable {
 
-  ObjectMapper getConfiguredObjectMapper();
+  JsonJacksonParserConfiguration reader();
   
-  R config(Feature feature, Object value);
-
-  Boolean getValue(Feature feature);
-
-  Boolean allowsNumericLeadingZeros();
+  JsonJacksonGeneratorConfiguration writer();
   
-  R allowNumericLeadingZeros(Boolean value);
+  JsonJacksonTreeDataFormat done();
   
-  Boolean allowsComments();
+  void applyTo(ObjectMapper mapper);
   
-  R allowComments(Boolean value);
-
-  Boolean allowYamlComments();
-
-  R allowYamlComments(Boolean value);
-
-  Boolean allowsUnquotedFieldNames();
-  
-  R allowQuotedFieldNames(Boolean value);
-  
-  Boolean allowsSingleQuotes();
-  
-  R allowSingleQuotes(Boolean value);
-  
-  Boolean allowsBackslashEscapingAnyCharacter();
-  
-  R allowBackslashEscapingAnyCharacter(Boolean value);
-  
-  Boolean allowsNonNumericNumbers();
-  
-  R allowNonNumericNumbers(Boolean value);
 }
