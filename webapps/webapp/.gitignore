@@ -3,6 +3,7 @@
 .externalToolBuilders
 projectFilesBackup
 test-results.xml
+develop.conf.js
 /node_modules
 /node
 /bower_components
