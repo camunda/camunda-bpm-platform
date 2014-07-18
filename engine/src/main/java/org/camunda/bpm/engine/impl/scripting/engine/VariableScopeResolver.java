@@ -13,8 +13,9 @@
 package org.camunda.bpm.engine.impl.scripting.engine;
 
 import java.util.Set;
-import org.camunda.bpm.engine.ProcessEngineException;
+
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.connector.ConnectorVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
@@ -31,7 +32,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 public class VariableScopeResolver implements Resolver {
 
   protected VariableScope variableScope;
-  protected String variableScopeKey = "execution";
+  protected String variableScopeKey = "scope";
 
   public VariableScopeResolver(VariableScope variableScope) {
     ensureNotNull("variableScope", variableScope);
@@ -39,8 +40,8 @@ public class VariableScopeResolver implements Resolver {
       variableScopeKey = "execution";
     } else if (variableScope instanceof TaskEntity) {
       variableScopeKey = "task";
-    } else {
-      throw new ProcessEngineException("unsupported variable scope type: " + variableScope.getClass().getName());
+    } else if (variableScope instanceof ConnectorVariableScope) {
+      variableScopeKey = "connector";
     }
     this.variableScope = variableScope;
   }

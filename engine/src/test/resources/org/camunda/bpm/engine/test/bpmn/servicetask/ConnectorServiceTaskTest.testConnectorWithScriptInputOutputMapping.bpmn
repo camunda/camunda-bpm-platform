@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://activiti.org/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_KvS8sPBXEeOtYvXzz5ksgw" exporter="camunda modeler" exporterVersion="2.5.0" targetNamespace="http://activiti.org/bpmn">
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="startEvent" />
+    <serviceTask id="serviceTask">
+      <extensionElements>
+        <camunda:connector>
+          <camunda:connectorId>testConnector</camunda:connectorId>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="in">
+              <camunda:script scriptFormat="groovy">
+                // test if execution is available
+                y = execution.getVariable('x')
+                y + y
+              </camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="out">
+              <camunda:script scriptFormat="groovy">
+                // test if connector is available
+                y = connector.getVariable('x')
+                y + y + y
+              </camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+        </camunda:connector>
+        </extensionElements>
+    </serviceTask>
+    <receiveTask id="receiveTask" />
+    <endEvent id="endEvent" />
+
+    <sequenceFlow sourceRef="startEvent" targetRef="serviceTask" />
+    <sequenceFlow sourceRef="serviceTask" targetRef="receiveTask" />
+    <sequenceFlow sourceRef="receiveTask" targetRef="endEvent" />
+  </process>
+</definitions>

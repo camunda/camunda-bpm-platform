@@ -62,4 +62,22 @@ public class ConnectorServiceTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(SoapHttpConnector.class, processEngineConfiguration.getConnectors().getConnector(SoapHttpConnector.ID));
   }
 
+  @Deployment
+  public void testConnectorWithScriptInputOutputMapping() {
+    int x = 3;
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("x", x);
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    // validate input parameter
+    Object in = TestConnector.requestParameters.get("in");
+    assertNotNull(in);
+    assertEquals(2 * x, in);
+
+    // validate output parameter
+    VariableInstance out = runtimeService.createVariableInstanceQuery().variableName("out").singleResult();
+    assertNotNull(out);
+    assertEquals(3 * x, out.getValue());
+  }
+
 }
