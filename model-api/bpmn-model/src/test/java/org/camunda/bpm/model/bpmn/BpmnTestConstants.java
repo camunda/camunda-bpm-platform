@@ -29,6 +29,7 @@ public final class BpmnTestConstants {
   public static final String USER_TASK_ID = "userTask";
   public static final String SERVICE_TASK_ID = "serviceTask";
   public static final String SEND_TASK_ID = "sendTask";
+  public static final String SCRIPT_TASK_ID = "scriptTask";
   public static final String SEQUENCE_FLOW_ID = "sequenceFlow";
   public static final String MESSAGE_FLOW_ID = "messageFlow";
   public static final String DATA_INPUT_ASSOCIATION_ID = "dataInputAssociation";

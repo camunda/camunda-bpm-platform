@@ -41,6 +41,7 @@ public class ScriptTaskImpl extends TaskImpl implements ScriptTask {
   /** camunda extensions */
 
   protected static Attribute<String> camundaResultVariableAttribute;
+  protected static Attribute<String> camundaResourceAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ScriptTask.class, BPMN_ELEMENT_SCRIPT_TASK)
@@ -63,6 +64,10 @@ public class ScriptTaskImpl extends TaskImpl implements ScriptTask {
     /** camunda extensions */
 
     camundaResultVariableAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_RESULT_VARIABLE)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaResourceAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_RESOURCE)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -102,6 +107,14 @@ public class ScriptTaskImpl extends TaskImpl implements ScriptTask {
 
   public void setCamundaResultVariable(String camundaResultVariable) {
     camundaResultVariableAttribute.setValue(this, camundaResultVariable);
+  }
+
+  public String getCamundaResource() {
+    return camundaResourceAttribute.getValue(this);
+  }
+
+  public void setCamundaResource(String camundaResource) {
+    camundaResourceAttribute.setValue(this, camundaResource);
   }
 
 }

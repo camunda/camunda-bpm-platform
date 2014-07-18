@@ -37,7 +37,8 @@ public class ScriptTaskTest extends BpmnModelElementInstanceTest {
     return Arrays.asList(
       new AttributeAssumption("scriptFormat"),
       /** camunda extensions */
-      new AttributeAssumption(CAMUNDA_NS, "resultVariable")
+      new AttributeAssumption(CAMUNDA_NS, "resultVariable"),
+      new AttributeAssumption(CAMUNDA_NS, "resource")
     );
   }
 }

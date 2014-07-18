@@ -13,36 +13,21 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
-import org.camunda.bpm.model.bpmn.builder.SequenceFlowBuilder;
-import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
-
 /**
- * The BPMN sequenceFlow element
+ * The BPMN conditionExpression element of the BPMN tSequenceFlow type
  *
  * @author Sebastian Menski
  */
-public interface SequenceFlow extends FlowElement {
+public interface ConditionExpression extends FormalExpression {
 
-  SequenceFlowBuilder builder();
+  String getType();
 
-  FlowNode getSource();
+  void setType(String type);
 
-  void setSource(FlowNode source);
+  /** camunda extensions */
 
-  FlowNode getTarget();
+  String getCamundaResource();
 
-  void setTarget(FlowNode target);
-
-  boolean isImmediate();
-
-  void setImmediate(boolean isImmediate);
-
-  ConditionExpression getConditionExpression();
-
-  void setConditionExpression(ConditionExpression conditionExpression);
-
-  void removeConditionExpression();
-
-  BpmnEdge getDiagramElement();
+  void setCamundaResource(String camundaResource);
 
 }

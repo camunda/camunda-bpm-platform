@@ -13,23 +13,50 @@
 
 package org.camunda.bpm.model.bpmn.builder;
 
+import java.io.IOException;
+
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.GatewayDirection;
-import org.camunda.bpm.model.bpmn.instance.*;
+import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
+import org.camunda.bpm.model.bpmn.instance.CallActivity;
+import org.camunda.bpm.model.bpmn.instance.Definitions;
+import org.camunda.bpm.model.bpmn.instance.Event;
+import org.camunda.bpm.model.bpmn.instance.FlowNode;
+import org.camunda.bpm.model.bpmn.instance.Gateway;
 import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.bpmn.instance.ScriptTask;
+import org.camunda.bpm.model.bpmn.instance.SendTask;
+import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
+import org.camunda.bpm.model.bpmn.instance.ServiceTask;
+import org.camunda.bpm.model.bpmn.instance.StartEvent;
+import org.camunda.bpm.model.bpmn.instance.SubProcess;
+import org.camunda.bpm.model.bpmn.instance.Task;
+import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.*;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CALL_ACTIVITY_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SERVICE_TASK_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.START_EVENT_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SUB_PROCESS_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TASK_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CLASS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DELEGATE_EXPRESSION_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DUE_DATE_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXPRESSION_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 
 /**
@@ -460,11 +487,13 @@ public class ProcessBuilderTest {
       .startEvent()
       .scriptTask(TASK_ID)
         .camundaResultVariable(TEST_STRING_API)
+        .camundaResource(TEST_STRING_API)
       .endEvent()
       .done();
 
     ScriptTask scriptTask = modelInstance.getModelElementById(TASK_ID);
     assertThat(scriptTask.getCamundaResultVariable()).isEqualTo(TEST_STRING_API);
+    assertThat(scriptTask.getCamundaResource()).isEqualTo(TEST_STRING_API);
   }
 
   @Test

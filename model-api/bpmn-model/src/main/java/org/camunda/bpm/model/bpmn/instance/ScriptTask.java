@@ -37,4 +37,9 @@ public interface ScriptTask extends Task {
   String getCamundaResultVariable();
 
   void setCamundaResultVariable(String camundaResultVariable);
+
+  String getCamundaResource();
+
+  void setCamundaResource(String camundaResource);
+
 }

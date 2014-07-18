@@ -20,6 +20,9 @@ package org.camunda.bpm.model.bpmn.impl;
  */
 public final class BpmnModelConstants {
 
+  /** The XSI namespace */
+  public static final String XSI_NS = "http://www.w3.org/2001/XMLSchema-instance";
+
   /** The BPMN 2.0 namespace */
   public static final String BPMN20_NS = "http://www.omg.org/spec/BPMN/20100524/MODEL";
 
@@ -248,6 +251,12 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ELEMENT_VALUE = "value";
 
   // attributes //////////////////////////////////////
+
+  /** XSI attributes **/
+
+  public static final String XSI_ATTRIBUTE_TYPE = "type";
+
+  /** BPMN attributes **/
 
   public static final String BPMN_ATTRIBUTE_EXPORTER = "exporter";
   public static final String BPMN_ATTRIBUTE_EXPORTER_VERSION = "exporterVersion";

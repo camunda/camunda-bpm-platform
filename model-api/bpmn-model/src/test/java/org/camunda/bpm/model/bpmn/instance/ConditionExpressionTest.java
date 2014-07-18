@@ -11,12 +11,13 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.model.bpmn.impl.instance;
+package org.camunda.bpm.model.bpmn.instance;
 
-import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstanceTest;
-import org.camunda.bpm.model.bpmn.instance.Expression;
-
+import java.util.Arrays;
 import java.util.Collection;
+
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.XSI_NS;
 
 /**
  * @author Sebastian Menski
@@ -24,7 +25,7 @@ import java.util.Collection;
 public class ConditionExpressionTest extends BpmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(Expression.class, false);
+    return new TypeAssumption(FormalExpression.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
@@ -32,6 +33,9 @@ public class ConditionExpressionTest extends BpmnModelElementInstanceTest {
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return null;
+    return Arrays.asList(
+      new AttributeAssumption(XSI_NS, "type", false, false, "tFormalExpression"),
+      new AttributeAssumption(CAMUNDA_NS, "resource")
+    );
   }
 }

@@ -21,6 +21,7 @@ import org.camunda.bpm.model.bpmn.instance.Expression;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ParallelGateway;
 import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.bpmn.instance.ScriptTask;
 import org.camunda.bpm.model.bpmn.instance.SendTask;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
@@ -49,6 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CALL_ACTIVITY_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.END_EVENT_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.PROCESS_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SCRIPT_TASK_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SEND_TASK_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SEQUENCE_FLOW_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SERVICE_TASK_ID;
@@ -94,6 +96,7 @@ public class CamundaExtensionsTest {
   private UserTask userTask;
   private ServiceTask serviceTask;
   private SendTask sendTask;
+  private ScriptTask scriptTask;
   private CallActivity callActivity;
   private EndEvent endEvent;
   private MessageEventDefinition messageEventDefinition;
@@ -108,6 +111,7 @@ public class CamundaExtensionsTest {
     userTask = modelInstance.getModelElementById(USER_TASK_ID);
     serviceTask = modelInstance.getModelElementById(SERVICE_TASK_ID);
     sendTask = modelInstance.getModelElementById(SEND_TASK_ID);
+    scriptTask = modelInstance.getModelElementById(SCRIPT_TASK_ID);
     callActivity = modelInstance.getModelElementById(CALL_ACTIVITY_ID);
     endEvent = modelInstance.getModelElementById(END_EVENT_ID);
     messageEventDefinition = (MessageEventDefinition) endEvent.getEventDefinitions().iterator().next();
@@ -587,6 +591,12 @@ public class CamundaExtensionsTest {
     userTask.setCamundaCandidateUsersList(Collections.<String>emptyList());
     assertThat(userTask.getCamundaCandidateUsers()).isNull();
     assertThat(userTask.getCamundaCandidateUsersList()).isEmpty();
+  }
+
+  @Test
+  public void testScriptResource() {
+    assertThat(scriptTask.getScriptFormat()).isEqualTo("groovy");
+    assertThat(scriptTask.getCamundaResource()).isEqualTo("test.groovy");
   }
 
 

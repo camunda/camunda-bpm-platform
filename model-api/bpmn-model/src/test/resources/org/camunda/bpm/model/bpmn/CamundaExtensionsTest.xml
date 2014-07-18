@@ -90,6 +90,8 @@
       </extensionElements>
     </sendTask>
 
+    <scriptTask id="scriptTask" scriptFormat="groovy" camunda:resource="test.groovy" />
+
     <callActivity id="callActivity" camunda:calledElementBinding="test" camunda:calledElementVersion="test">
       <extensionElements>
         <camunda:in source="test" sourceExpression="${test}" variables="test" businessKey="${test}" target="test"/>

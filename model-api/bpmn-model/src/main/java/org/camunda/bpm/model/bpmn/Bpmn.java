@@ -285,7 +285,7 @@ public class Bpmn {
     ConditionImpl.registerType(bpmnModelBuilder);
     ConditionalEventDefinitionImpl.registerType(bpmnModelBuilder);
     ComplexGatewayImpl.registerType(bpmnModelBuilder);
-    ConditionExpression.registerType(bpmnModelBuilder);
+    ConditionExpressionImpl.registerType(bpmnModelBuilder);
     ConversationAssociationImpl.registerType(bpmnModelBuilder);
     ConversationImpl.registerType(bpmnModelBuilder);
     ConversationLinkImpl.registerType(bpmnModelBuilder);
