@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,7 +34,9 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
+import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
@@ -70,8 +74,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 /**
  * @author Tom Baeyens
  * @author Agim Emruli
@@ -86,7 +88,6 @@ public class CommandContext {
   protected Map<Class< ? >, SessionFactory> sessionFactories;
   protected Map<Class< ? >, Session> sessions = new HashMap<Class< ? >, Session>();
   protected Throwable exception = null;
-  protected LinkedList<AtomicOperation> nextOperations = new LinkedList<AtomicOperation>();
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
 
@@ -108,7 +109,7 @@ public class CommandContext {
 
     ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);
 
-    if(requiresContextSwitch(executionOperation, targetProcessApplication)) {
+    if(requiresContextSwitch(targetProcessApplication)) {
 
       Context.executeWithinProcessApplication(new Callable<Void>() {
         public Void call() throws Exception {
@@ -119,33 +120,54 @@ public class CommandContext {
       }, targetProcessApplication);
 
     } else {
-      nextOperations.add(executionOperation);
-      if (nextOperations.size()==1) {
-        try {
-          Context.setExecutionContext(execution);
-          while (!nextOperations.isEmpty()) {
-            AtomicOperation currentOperation = nextOperations.removeFirst();
-            if (log.isLoggable(Level.FINEST)) {
-              log.finest("AtomicOperation: " + currentOperation + " on " + this);
-            }
-            currentOperation.execute(execution);
-          }
-        } finally {
-          Context.removeExecutionContext();
+      try {
+        Context.setExecutionContext(execution);
+        if (log.isLoggable(Level.FINEST)) {
+          log.finest("AtomicOperation: " + executionOperation + " on " + this);
         }
+        executionOperation.execute(execution);
+      } finally {
+        Context.removeExecutionContext();
       }
-
     }
 
   }
 
-  protected ProcessApplicationReference getTargetProcessApplication(ExecutionEntity execution) {
+  public void performOperation(final CmmnAtomicOperation executionOperation, final CaseExecutionEntity execution) {
+    ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);
 
+    if(requiresContextSwitch(targetProcessApplication)) {
+
+      Context.executeWithinProcessApplication(new Callable<Void>() {
+        public Void call() throws Exception {
+          performOperation(executionOperation, execution);
+          return null;
+        }
+
+      }, targetProcessApplication);
+
+    } else {
+      try {
+        Context.setExecutionContext(execution);
+        if (log.isLoggable(Level.FINEST)) {
+          log.finest("AtomicOperation: " + executionOperation + " on " + this);
+        }
+        executionOperation.execute(execution);
+      } finally {
+        Context.removeExecutionContext();
+      }
+    }
+  }
+
+  protected ProcessApplicationReference getTargetProcessApplication(ExecutionEntity execution) {
     return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
   }
 
-  protected boolean requiresContextSwitch(final AtomicOperation executionOperation, ProcessApplicationReference processApplicationReference) {
+  protected ProcessApplicationReference getTargetProcessApplication(CaseExecutionEntity execution) {
+    return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
+  }
 
+  protected boolean requiresContextSwitch(ProcessApplicationReference processApplicationReference) {
     return ProcessApplicationContextUtil.requiresContextSwitch(processApplicationReference);
   }
 

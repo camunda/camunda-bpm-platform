@@ -10,38 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.context;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-
 
 /**
- * An {@link ExecutionEntity} execution context. Provides access to the process instance and the deployment.
- *
- * @deprecated since 7.2: use {@link BpmnExecutionContext}
- *
- * @author Tom Baeyens
  * @author Roman Smirnov
  * @author Daniel Meyer
+ *
  */
-@Deprecated
-public class ExecutionContext extends CoreExecutionContext<ExecutionEntity> {
+public class BpmnExecutionContext extends ExecutionContext {
 
-  public ExecutionContext(ExecutionEntity execution) {
+  public BpmnExecutionContext(ExecutionEntity execution) {
     super(execution);
   }
 
-  public ExecutionEntity getProcessInstance() {
-    return execution.getProcessInstance();
-  }
-
-  public ProcessDefinitionEntity getProcessDefinition() {
-    return (ProcessDefinitionEntity) execution.getProcessDefinition();
-  }
-
-  protected String getDeploymentId() {
-    return getProcessDefinition().getDeploymentId();
-  }
 }

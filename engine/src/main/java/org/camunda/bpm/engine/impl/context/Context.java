@@ -23,6 +23,8 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -38,7 +40,7 @@ public class Context {
 
   protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
   protected static ThreadLocal<Stack<ProcessEngineConfigurationImpl>> processEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<ProcessEngineConfigurationImpl>>();
-  protected static ThreadLocal<Stack<ExecutionContext>> executionContextStackThreadLocal = new ThreadLocal<Stack<ExecutionContext>>();
+  protected static ThreadLocal<Stack<CoreExecutionContext<? extends CoreExecution>>> executionContextStackThreadLocal = new ThreadLocal<Stack<CoreExecutionContext<? extends CoreExecution>>>();
   protected static ThreadLocal<JobExecutorContext> jobExecutorContextThreadLocal = new ThreadLocal<JobExecutorContext>();
   protected static ThreadLocal<Stack<ProcessApplicationReference>> processApplicationContext = new ThreadLocal<Stack<ProcessApplicationReference>>();
 
@@ -74,8 +76,24 @@ public class Context {
     getStack(processEngineConfigurationStackThreadLocal).pop();
   }
 
+  /**
+   * @deprecated since 7.2, use {@link #getBpmnExecutionContext()}
+   */
+  @Deprecated
   public static ExecutionContext getExecutionContext() {
-    Stack<ExecutionContext> stack = getStack(executionContextStackThreadLocal);
+    return getBpmnExecutionContext();
+  }
+
+  public static BpmnExecutionContext getBpmnExecutionContext() {
+    return (BpmnExecutionContext) getCoreExecutionContext();
+  }
+
+  public static CaseExecutionContext getCaseExecutionContext() {
+    return (CaseExecutionContext) getCoreExecutionContext();
+  }
+
+  public static CoreExecutionContext<? extends CoreExecution> getCoreExecutionContext() {
+    Stack<CoreExecutionContext<? extends CoreExecution>> stack = getStack(executionContextStackThreadLocal);
     if(stack == null || stack.isEmpty()) {
       return null;
     } else {
@@ -83,8 +101,13 @@ public class Context {
     }
   }
 
+
   public static void setExecutionContext(ExecutionEntity execution) {
-    getStack(executionContextStackThreadLocal).push(new ExecutionContext(execution));
+    getStack(executionContextStackThreadLocal).push(new BpmnExecutionContext(execution));
+  }
+
+  public static void setExecutionContext(CaseExecutionEntity execution) {
+    getStack(executionContextStackThreadLocal).push(new CaseExecutionContext(execution));
   }
 
   public static void removeExecutionContext() {

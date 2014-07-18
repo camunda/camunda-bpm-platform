@@ -22,7 +22,10 @@ import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
+import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
@@ -466,6 +469,16 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     return Context
         .getProcessEngineConfiguration()
         .getProcessEngine();
+  }
+
+  public <T extends CoreExecution> void performOperation(CoreAtomicOperation<T> operation) {
+    Context.getCommandContext()
+      .performOperation((CmmnAtomicOperation) operation, this);
+  }
+
+  public <T extends CoreExecution> void performOperationSync(CoreAtomicOperation<T> operation) {
+    Context.getCommandContext()
+      .performOperation((CmmnAtomicOperation) operation, this);
   }
 
 }
