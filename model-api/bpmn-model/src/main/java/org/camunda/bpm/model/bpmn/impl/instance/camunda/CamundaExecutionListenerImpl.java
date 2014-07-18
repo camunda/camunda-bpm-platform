@@ -13,19 +13,26 @@
 
 package org.camunda.bpm.model.bpmn.impl.instance.camunda;
 
+import java.util.Collection;
+
 import org.camunda.bpm.model.bpmn.impl.instance.BpmnModelElementInstanceImpl;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaField;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaScript;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
+import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
-import java.util.Collection;
-
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.*;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CLASS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_DELEGATE_EXPRESSION;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_EVENT;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_EXPRESSION;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ELEMENT_EXECUTION_LISTENER;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
 /**
@@ -40,6 +47,7 @@ public class CamundaExecutionListenerImpl extends BpmnModelElementInstanceImpl i
   protected static Attribute<String> camundaExpressionAttribute;
   protected static Attribute<String> camundaDelegateExpressionAttribute;
   protected static ChildElementCollection<CamundaField> camundaFieldCollection;
+  protected static ChildElement<CamundaScript> camundaScriptChild;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CamundaExecutionListener.class, CAMUNDA_ELEMENT_EXECUTION_LISTENER)
@@ -69,6 +77,9 @@ public class CamundaExecutionListenerImpl extends BpmnModelElementInstanceImpl i
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
     camundaFieldCollection = sequenceBuilder.elementCollection(CamundaField.class)
+      .build();
+
+    camundaScriptChild = sequenceBuilder.element(CamundaScript.class)
       .build();
 
     typeBuilder.build();
@@ -112,6 +123,14 @@ public class CamundaExecutionListenerImpl extends BpmnModelElementInstanceImpl i
 
   public Collection<CamundaField> getCamundaFields() {
     return camundaFieldCollection.get(this);
+  }
+
+  public CamundaScript getCamundaScript() {
+    return camundaScriptChild.getChild(this);
+  }
+
+  public void setCamundaScript(CamundaScript camundaScript) {
+    camundaScriptChild.setChild(this, camundaScript);
   }
 
 }

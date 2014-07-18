@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
+import java.util.Collection;
+
 import org.camunda.bpm.model.bpmn.util.GetBpmnModelElementTypeRule;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelInstance;
@@ -27,8 +29,6 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.w3c.dom.DOMException;
-
-import java.util.Collection;
 
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 import static org.camunda.bpm.model.xml.test.assertions.ModelAssertions.assertThat;
@@ -228,6 +228,7 @@ public abstract class BpmnModelElementInstanceTest {
       assertThatType().hasNoChildElements();
     }
     else {
+      assertThat(modelElementType.getChildElementTypes().size()).isEqualTo(childElementAssumptions.size());
       for (ChildElementAssumption assumption : childElementAssumptions) {
         assertThatType().hasChildElements(assumption.childElementType);
         if (assumption.namespaceUri != null) {

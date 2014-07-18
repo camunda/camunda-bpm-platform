@@ -13,17 +13,73 @@
 
 package org.camunda.bpm.model.bpmn;
 
-import org.camunda.bpm.model.bpmn.instance.*;
+import java.util.Collections;
+
+import org.camunda.bpm.model.bpmn.instance.CallActivity;
+import org.camunda.bpm.model.bpmn.instance.EndEvent;
+import org.camunda.bpm.model.bpmn.instance.Expression;
+import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.ParallelGateway;
 import org.camunda.bpm.model.bpmn.instance.Process;
-import org.camunda.bpm.model.bpmn.instance.camunda.*;
+import org.camunda.bpm.model.bpmn.instance.SendTask;
+import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
+import org.camunda.bpm.model.bpmn.instance.ServiceTask;
+import org.camunda.bpm.model.bpmn.instance.StartEvent;
+import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaConstraint;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaField;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormProperty;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaPotentialStarter;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaScript;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaValue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.*;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CALL_ACTIVITY_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.END_EVENT_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.PROCESS_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SEND_TASK_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SEQUENCE_FLOW_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SERVICE_TASK_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.START_EVENT_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CLASS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CLASS_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DELEGATE_EXPRESSION_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DELEGATE_EXPRESSION_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DUE_DATE_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DUE_DATE_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXECUTION_EVENT_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXECUTION_EVENT_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXPRESSION_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXPRESSION_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_TASK_EVENT_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_TASK_EVENT_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_TYPE_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_TYPE_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 /**
@@ -34,6 +90,7 @@ public class CamundaExtensionsTest {
   private BpmnModelInstance modelInstance;
   private Process process;
   private StartEvent startEvent;
+  private SequenceFlow sequenceFlow;
   private UserTask userTask;
   private ServiceTask serviceTask;
   private SendTask sendTask;
@@ -47,6 +104,7 @@ public class CamundaExtensionsTest {
     modelInstance = Bpmn.readModelFromStream(getClass().getResourceAsStream(getClass().getSimpleName() + ".xml"));
     process = modelInstance.getModelElementById(PROCESS_ID);
     startEvent = modelInstance.getModelElementById(START_EVENT_ID);
+    sequenceFlow = modelInstance.getModelElementById(SEQUENCE_FLOW_ID);
     userTask = modelInstance.getModelElementById(USER_TASK_ID);
     serviceTask = modelInstance.getModelElementById(SERVICE_TASK_ID);
     sendTask = modelInstance.getModelElementById(SEND_TASK_ID);
@@ -261,6 +319,26 @@ public class CamundaExtensionsTest {
   }
 
   @Test
+  public void testCamundaScriptExecutionListener() {
+    CamundaExecutionListener sequenceFlowListener = sequenceFlow.getExtensionElements().getElementsQuery().filterByType(CamundaExecutionListener.class).singleResult();
+
+    CamundaScript script = sequenceFlowListener.getCamundaScript();
+    assertThat(script.getCamundaScriptFormat()).isEqualTo("groovy");
+    assertThat(script.getCamundaResource()).isNull();
+    assertThat(script.getTextContent()).isEqualTo("println 'Hello World'");
+
+    CamundaScript newScript = modelInstance.newInstance(CamundaScript.class);
+    newScript.setCamundaScriptFormat("groovy");
+    newScript.setCamundaResource("test.groovy");
+    sequenceFlowListener.setCamundaScript(newScript);
+
+    script = sequenceFlowListener.getCamundaScript();
+    assertThat(script.getCamundaScriptFormat()).isEqualTo("groovy");
+    assertThat(script.getCamundaResource()).isEqualTo("test.groovy");
+    assertThat(script.getTextContent()).isEmpty();
+  }
+
+  @Test
   public void testFailedJobRetryTimeCycleExtension() {
     CamundaFailedJobRetryTimeCycle timeCycle = sendTask.getExtensionElements().getElementsQuery().filterByType(CamundaFailedJobRetryTimeCycle.class).singleResult();
     assertThat(timeCycle.getTextContent()).isEqualTo(TEST_STRING_XML);
@@ -416,7 +494,7 @@ public class CamundaExtensionsTest {
 
   @Test
   public void testTaskListener() {
-    CamundaTaskListener taskListener = userTask.getExtensionElements().getElementsQuery().filterByType(CamundaTaskListener.class).singleResult();
+    CamundaTaskListener taskListener = userTask.getExtensionElements().getElementsQuery().filterByType(CamundaTaskListener.class).list().get(0);
     assertThat(taskListener.getCamundaEvent()).isEqualTo(TEST_TASK_EVENT_XML);
     assertThat(taskListener.getCamundaClass()).isEqualTo(TEST_CLASS_XML);
     assertThat(taskListener.getCamundaExpression()).isEqualTo(TEST_EXPRESSION_XML);
@@ -433,6 +511,26 @@ public class CamundaExtensionsTest {
     CamundaField field = taskListener.getCamundaFields().iterator().next();
     assertThat(field.getCamundaName()).isEqualTo(TEST_STRING_XML);
     assertThat(field.getCamundaString().getTextContent()).isEqualTo(TEST_STRING_XML);
+  }
+
+  @Test
+  public void testCamundaScriptTaskListener() {
+    CamundaTaskListener taskListener = userTask.getExtensionElements().getElementsQuery().filterByType(CamundaTaskListener.class).list().get(1);
+
+    CamundaScript script = taskListener.getCamundaScript();
+    assertThat(script.getCamundaScriptFormat()).isEqualTo("groovy");
+    assertThat(script.getCamundaResource()).isEqualTo("test.groovy");
+    assertThat(script.getTextContent()).isEmpty();
+
+    CamundaScript newScript = modelInstance.newInstance(CamundaScript.class);
+    newScript.setCamundaScriptFormat("groovy");
+    newScript.setTextContent("println 'Hello World'");
+    taskListener.setCamundaScript(newScript);
+
+    script = taskListener.getCamundaScript();
+    assertThat(script.getCamundaScriptFormat()).isEqualTo("groovy");
+    assertThat(script.getCamundaResource()).isNull();
+    assertThat(script.getTextContent()).isEqualTo("println 'Hello World'");
   }
 
   @Test

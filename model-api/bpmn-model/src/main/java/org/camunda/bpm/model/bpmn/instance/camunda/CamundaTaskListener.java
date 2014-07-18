@@ -42,4 +42,8 @@ public interface CamundaTaskListener extends BpmnModelElementInstance {
 
   Collection<CamundaField> getCamundaFields();
 
+  CamundaScript getCamundaScript();
+
+  void setCamundaScript(CamundaScript camundaScript);
+
 }

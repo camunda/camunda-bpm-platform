@@ -28,6 +28,14 @@
       </extensionElements>
     </startEvent>
 
+    <sequenceFlow id="sequenceFlow" sourceRef="startEvent" targetRef="userTask">
+      <extensionElements>
+        <camunda:executionListener>
+          <camunda:script scriptFormat="groovy">println 'Hello World'</camunda:script>
+        </camunda:executionListener>
+      </extensionElements>
+    </sequenceFlow>
+
     <userTask id="userTask"
         camunda:assignee="test"
         camunda:async="true"
@@ -43,6 +51,9 @@
           <camunda:field name="test">
             <camunda:string>test</camunda:string>
           </camunda:field>
+        </camunda:taskListener>
+        <camunda:taskListener>
+          <camunda:script scriptFormat="groovy" resource="test.groovy" />
         </camunda:taskListener>
         <camunda:formData>
           <camunda:formField id="test" label="test" type="test" datePattern="test" defaultValue="test">

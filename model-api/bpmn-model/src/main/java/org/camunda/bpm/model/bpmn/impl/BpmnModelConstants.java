@@ -241,6 +241,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ELEMENT_POTENTIAL_STARTER = "potentialStarter";
   public static final String CAMUNDA_ELEMENT_PROPERTIES = "properties";
   public static final String CAMUNDA_ELEMENT_PROPERTY = "property";
+  public static final String CAMUNDA_ELEMENT_SCRIPT = "script";
   public static final String CAMUNDA_ELEMENT_STRING = "string";
   public static final String CAMUNDA_ELEMENT_TASK_LISTENER = "taskListener";
   public static final String CAMUNDA_ELEMENT_VALIDATION = "validation";
@@ -385,7 +386,9 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_PRIORITY = "priority";
   public static final String CAMUNDA_ATTRIBUTE_READABLE = "readable";
   public static final String CAMUNDA_ATTRIBUTE_REQUIRED = "required";
+  public static final String CAMUNDA_ATTRIBUTE_RESOURCE = "resource";
   public static final String CAMUNDA_ATTRIBUTE_RESULT_VARIABLE = "resultVariable";
+  public static final String CAMUNDA_ATTRIBUTE_SCRIPT_FORMAT = "scriptFormat";
   public static final String CAMUNDA_ATTRIBUTE_SOURCE = "source";
   public static final String CAMUNDA_ATTRIBUTE_SOURCE_EXPRESSION = "sourceExpression";
   public static final String CAMUNDA_ATTRIBUTE_STRING_VALUE = "stringValue";

@@ -13,36 +13,21 @@
 
 package org.camunda.bpm.model.bpmn.instance.camunda;
 
-import java.util.Collection;
-
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 
 /**
- * The BPMN executionListener camunda extension element
+ * The BPMN script camunda extension element
  *
  * @author Sebastian Menski
  */
-public interface CamundaExecutionListener extends BpmnModelElementInstance {
+public interface CamundaScript extends BpmnModelElementInstance {
 
-  String getCamundaEvent();
+  String getCamundaScriptFormat();
 
-  void setCamundaEvent(String camundaEvent);
+  void setCamundaScriptFormat(String camundaScriptFormat);
 
-  String getCamundaClass();
+  String getCamundaResource();
 
-  void setCamundaClass(String camundaClass);
+  void setCamundaResource(String camundaResource);
 
-  String getCamundaExpression();
-
-  void setCamundaExpression(String camundaExpression);
-
-  String getCamundaDelegateExpression();
-
-  void setCamundaDelegateExpression(String camundaDelegateExpression);
-
-  Collection<CamundaField> getCamundaFields();
-
-  CamundaScript getCamundaScript();
-
-  void setCamundaScript(CamundaScript camundaScript);
 }

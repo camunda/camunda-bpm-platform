@@ -20,28 +20,21 @@ import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstanceTest;
 
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
-/**
- * @author Sebastian Menski
- */
-public class CamundaExecutionListenerTest extends BpmnModelElementInstanceTest {
+public class CamundaScriptTest extends BpmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
     return new TypeAssumption(CAMUNDA_NS, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
-    return Arrays.asList(
-      new ChildElementAssumption(CAMUNDA_NS, CamundaField.class),
-      new ChildElementAssumption(CAMUNDA_NS, CamundaScript.class, 0, 1)
-    );
+    return null;
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption(CAMUNDA_NS, "event"),
-      new AttributeAssumption(CAMUNDA_NS, "class"),
-      new AttributeAssumption(CAMUNDA_NS, "expression"),
-      new AttributeAssumption(CAMUNDA_NS, "delegateExpression")
+      new AttributeAssumption("scriptFormat", false, true),
+      new AttributeAssumption("resource")
     );
   }
+
 }
