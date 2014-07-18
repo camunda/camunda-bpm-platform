@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.engine.test.bpmn.callactivity;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -30,10 +34,6 @@ import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -350,6 +350,26 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     catch (ProcessEngineException e) {
       fail("No exception expected");
     }
+  }
+
+  /**
+   * Test case for handing over a null process variables to a sub process
+   */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutput.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml" })
+  public void testSubProcessWithNullDataInputOutput() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("superVariable", null);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput", vars);
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    assertEquals("Task in subprocess", task.getName());
+
+    assertNull(taskService.getVariable(task.getId(), "subVariable"));
+    assertNull(runtimeService.getVariable(processInstance.getId(), "subVariable"));
   }
 
   private void deployAndExpectException(BpmnModelInstance modelInstance) {

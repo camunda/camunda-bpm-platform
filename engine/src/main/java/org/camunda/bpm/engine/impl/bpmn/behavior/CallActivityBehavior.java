@@ -122,12 +122,14 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     Map<String, Object> callActivityVariables = new HashMap<String, Object>();
 
     for (DataAssociation dataInputAssociation : dataInputAssociations) {
-      Object value = null;
+      Object value;
 
       if (dataInputAssociation.getBusinessKeyExpression() != null) {
+        // set business key
         businessKey = (String) dataInputAssociation.getBusinessKeyExpression().getValue(execution);
       }
       else if (dataInputAssociation.getVariables() != null) {
+        // set all variables
         Map<String, Object> variables = execution.getVariables();
         if (variables != null && !variables.isEmpty()) {
           Set<String> variableKeys = variables.keySet();
@@ -136,14 +138,14 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
           }
         }
       }
-      else if (dataInputAssociation.getSourceExpression()!=null) {
-        value = dataInputAssociation.getSourceExpression().getValue(execution);
-      }
       else {
-        value = execution.getVariable(dataInputAssociation.getSource());
-      }
+        // set single variable
+        if (dataInputAssociation.getSourceExpression() != null) {
+          value = dataInputAssociation.getSourceExpression().getValue(execution);
+        } else {
+          value = execution.getVariable(dataInputAssociation.getSource());
+        }
 
-      if (value != null) {
         callActivityVariables.put(dataInputAssociation.getTarget(), value);
       }
     }

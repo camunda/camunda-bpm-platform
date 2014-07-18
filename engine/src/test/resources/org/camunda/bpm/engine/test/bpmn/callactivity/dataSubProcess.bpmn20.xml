@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:activiti="http://activiti.org/bpmn"
+             targetNamespace="Examples">
+
+  <process id="simpleSubProcess">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="theTask" />
+
+    <serviceTask id="theTask" activiti:expression="${subVariable == null}" />
+
+    <sequenceFlow sourceRef="theTask" targetRef="wait" />
+
+    <userTask id="wait" name="Task in subprocess" />
+
+    <sequenceFlow sourceRef="wait" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

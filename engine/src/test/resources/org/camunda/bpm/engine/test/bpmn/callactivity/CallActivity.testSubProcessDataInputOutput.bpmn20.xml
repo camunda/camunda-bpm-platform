@@ -13,6 +13,7 @@
     <callActivity id="callSubProcess" calledElement="simpleSubProcess" >
 	  <extensionElements>
 	    <activiti:in source="superVariable" target="subVariable" />
+      <activiti:in sourceExpression="${superVariable}" target="sub2Variable" />
 	    <activiti:out source="subVariable" target="superVariable" />
 	  </extensionElements>
       <!--
