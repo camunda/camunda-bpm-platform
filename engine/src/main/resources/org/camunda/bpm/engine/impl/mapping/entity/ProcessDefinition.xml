@@ -99,6 +99,13 @@
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
+      <if test="ids != null &amp;&amp; ids.length > 0">
+        and RES.ID_ in
+        <foreach item="item" index="index" collection="ids"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="category != null">
         and RES.CATEGORY_ = #{category}
       </if>

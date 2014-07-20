@@ -22,6 +22,8 @@ import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
+import org.camunda.bpm.engine.rest.hal.task.HalTask;
+import org.camunda.bpm.engine.rest.hal.task.HalTaskList;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.camunda.bpm.engine.rest.sub.task.impl.TaskResourceImpl;
 import org.camunda.bpm.engine.task.Task;
@@ -44,17 +46,33 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   @Override
+  public HalTaskList getHalTasks(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+    TaskQueryDto queryDto = new TaskQueryDto(uriInfo.getQueryParameters());
+
+    ProcessEngine engine = getProcessEngine();
+    TaskQuery query = queryDto.toQuery(engine);
+
+    // get list of tasks
+    List<Task> matchingTasks = executeTaskQuery(firstResult, maxResults, query);
+
+    // get total count
+    long count = query.count();
+
+    HalTaskList list = HalTaskList.fromTaskList(matchingTasks, count)
+        .embedd(HalTask.REL_ASSIGNEE, engine)
+        .embedd(HalTask.REL_OWNER, engine)
+        .embedd(HalTask.REL_PROCESS_DEFINITION, engine);
+
+    return list;
+  }
+
+  @Override
   public List<TaskDto> queryTasks(TaskQueryDto queryDto, Integer firstResult,
       Integer maxResults) {
     ProcessEngine engine = getProcessEngine();
     TaskQuery query = queryDto.toQuery(engine);
 
-    List<Task> matchingTasks;
-    if (firstResult != null || maxResults != null) {
-      matchingTasks = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingTasks = query.list();
-    }
+    List<Task> matchingTasks = executeTaskQuery(firstResult, maxResults, query);
 
     List<TaskDto> tasks = new ArrayList<TaskDto>();
     for (Task task : matchingTasks) {
@@ -65,7 +83,17 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
     return tasks;
   }
 
-  private List<Task> executePaginatedQuery(TaskQuery query, Integer firstResult, Integer maxResults) {
+  protected List<Task> executeTaskQuery(Integer firstResult, Integer maxResults, TaskQuery query) {
+    List<Task> matchingTasks;
+    if (firstResult != null || maxResults != null) {
+      matchingTasks = executePaginatedQuery(query, firstResult, maxResults);
+    } else {
+      matchingTasks = query.list();
+    }
+    return matchingTasks;
+  }
+
+  protected List<Task> executePaginatedQuery(TaskQuery query, Integer firstResult, Integer maxResults) {
     if (firstResult == null) {
       firstResult = 0;
     }

@@ -1,6 +1,5 @@
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
@@ -19,9 +18,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -62,6 +67,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
   public void testEmptyQuery() {
     String queryKey = "";
     given().queryParam("name", queryKey)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
   }
@@ -69,6 +75,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
   @Test
   public void testInvalidDateParameter() {
     given().queryParams("due", "anInvalidDate")
+      .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Cannot set query parameter 'due' to value 'anInvalidDate'"))
@@ -78,6 +85,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
   @Test
   public void testSortByParameterOnly() {
     given().queryParam("sortBy", "dueDate")
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
@@ -98,6 +106,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     String queryName = "name";
 
     Response response = given().queryParam("name", queryName)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
 
@@ -128,6 +137,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
     String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
+    boolean returnedSuspensionState = from(content).getBoolean("[0].suspended");
 
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_NAME, returnedTaskName);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_ID, returnedId);
@@ -147,12 +157,140 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, returnedCaseDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, returnedCaseExecutionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE, returnedSuspensionState);
 
   }
 
   @Test
+  public void testSimpleHalTaskQuery() {
+    String queryName = "name";
+
+    // setup user query mock
+    List<User> mockUsers = MockProvider.createMockUsers();
+    UserQuery sampleUserQuery = mock(UserQuery.class);
+    when(sampleUserQuery.listPage(0, 1)).thenReturn(mockUsers);
+    when(sampleUserQuery.userIdIn(new String[] {MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME})).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.userIdIn(new String[] {MockProvider.EXAMPLE_TASK_OWNER})).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.count()).thenReturn(1l);
+    when(processEngine.getIdentityService().createUserQuery()).thenReturn(sampleUserQuery);
+
+    // setup process definition query mock
+    List<ProcessDefinition> mockDefinitions = MockProvider.createMockDefinitions();
+    ProcessDefinitionQuery sampleProcessDefinitionQuery = mock(ProcessDefinitionQuery.class);
+    when(sampleProcessDefinitionQuery.listPage(0, 1)).thenReturn(mockDefinitions);
+    when(sampleProcessDefinitionQuery.processDefinitionIdIn(new String[] {MockProvider.EXAMPLE_PROCESS_DEFINITION_ID})).thenReturn(sampleProcessDefinitionQuery);
+    when(sampleProcessDefinitionQuery.count()).thenReturn(1l);
+    when(processEngine.getRepositoryService().createProcessDefinitionQuery()).thenReturn(sampleProcessDefinitionQuery);
+
+    Response response = given().queryParam("name", queryName)
+      .header("accept", Hal.MEDIA_TYPE_HAL)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .contentType(Hal.MEDIA_TYPE_HAL)
+      .when().get(TASK_QUERY_URL);
+
+    InOrder inOrder = inOrder(mockQuery);
+    inOrder.verify(mockQuery).taskName(queryName);
+    inOrder.verify(mockQuery).list();
+
+    // validate embedded tasks
+    String content = response.asString();
+    List<Map<String,Object>> instances = from(content).getList("_embedded.tasks");
+    Assert.assertEquals("There should be one task returned.", 1, instances.size());
+    Assert.assertNotNull("The returned task should not be null.", instances.get(0));
+
+    Map<String, Object> taskObject = instances.get(0);
+
+    String returnedTaskName = (String) taskObject.get("name");
+    String returnedId = (String) taskObject.get("id");
+    String returendAssignee = (String) taskObject.get("assignee");
+    String returnedCreateTime = (String) taskObject.get("created");
+    String returnedDueDate = (String) taskObject.get("due");
+    String returnedFollowUpDate = (String) taskObject.get("followUp");
+    String returnedDelegationState = (String) taskObject.get("delegationState");
+    String returnedDescription = (String) taskObject.get("description");
+    String returnedExecutionId = (String) taskObject.get("executionId");
+    String returnedOwner = (String) taskObject.get("owner");
+    String returnedParentTaskId = (String) taskObject.get("parentTaskId");
+    int returnedPriority = (Integer) taskObject.get("priority");
+    String returnedProcessDefinitionId = (String) taskObject.get("processDefinitionId");
+    String returnedProcessInstanceId = (String) taskObject.get("processInstanceId");
+    String returnedTaskDefinitionKey = (String) taskObject.get("taskDefinitionKey");
+    String returnedCaseDefinitionId = (String) taskObject.get("caseDefinitionId");
+    String returnedCaseInstanceId = (String) taskObject.get("caseInstanceId");
+    String returnedCaseExecutionId = (String) taskObject.get("caseExecutionId");
+    boolean returnedSuspensionState = (Boolean) taskObject.get("suspended");
+
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_NAME, returnedTaskName);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_ID, returnedId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME, returendAssignee);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_CREATE_TIME, returnedCreateTime);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DUE_DATE, returnedDueDate);
+    Assert.assertEquals(MockProvider.EXAMPLE_FOLLOW_UP_DATE, returnedFollowUpDate);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DELEGATION_STATE.toString(), returnedDelegationState);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DESCRIPTION, returnedDescription);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_EXECUTION_ID, returnedExecutionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_OWNER, returnedOwner);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID, returnedParentTaskId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_PRIORITY, returnedPriority);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DEFINITION_KEY, returnedTaskDefinitionKey);
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, returnedCaseDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, returnedCaseExecutionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE, returnedSuspensionState);
+
+    // validate the task count
+    Assert.assertEquals(1l, from(content).getLong("count"));
+
+    // validate links
+    Map<String,Object> selfReference = from(content).getMap("_links.self");
+    Assert.assertNotNull(selfReference);
+    Assert.assertEquals("/task", selfReference.get("href"));
+
+    // validate embedded assignees:
+    List<Map<String,Object>> embeddedAssignees = from(content).getList("_embedded.assignee");
+    Assert.assertEquals("There should be one assignee returned.", 1, embeddedAssignees.size());
+    Map<String, Object> embeddedAssignee = embeddedAssignees.get(0);
+    Assert.assertNotNull("The returned assignee should not be null.", embeddedAssignee);
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_ID, embeddedAssignee.get("id"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, embeddedAssignee.get("firstName"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, embeddedAssignee.get("lastName"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_EMAIL, embeddedAssignee.get("email"));
+
+    // validate embedded owners:
+    List<Map<String,Object>> embeddedOwners = from(content).getList("_embedded.owner");
+    Assert.assertEquals("There should be one owner returned.", 1, embeddedOwners.size());
+    Map<String, Object> embeddedOwner = embeddedOwners.get(0);
+    Assert.assertNotNull("The returned owner should not be null.", embeddedOwner);
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_ID, embeddedOwner.get("id"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, embeddedOwner.get("firstName"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, embeddedOwner.get("lastName"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_EMAIL, embeddedOwner.get("email"));
+
+    // validate embedded processDefinitions:
+    List<Map<String,Object>> embeddedDefinitions = from(content).getList("_embedded.processDefinition");
+    Assert.assertEquals("There should be one processDefinition returned.", 1, embeddedDefinitions.size());
+    Map<String, Object> embeddedProcessDefinition = embeddedDefinitions.get(0);
+    Assert.assertNotNull("The returned processDefinition should not be null.", embeddedProcessDefinition);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, embeddedProcessDefinition.get("id"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, embeddedProcessDefinition.get("key"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY, embeddedProcessDefinition.get("category"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME, embeddedProcessDefinition.get("name"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DESCRIPTION, embeddedProcessDefinition.get("description"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION, embeddedProcessDefinition.get("version"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME, embeddedProcessDefinition.get("resource"));
+    Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_ID, embeddedProcessDefinition.get("deploymentId"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME, embeddedProcessDefinition.get("diagram"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED, embeddedProcessDefinition.get("suspended"));
+  }
+
+  @Test
   public void testNoParametersQuery() {
-    expect().statusCode(Status.OK.getStatusCode()).when().get(TASK_QUERY_URL);
+    given()
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect().statusCode(Status.OK.getStatusCode())
+    .when().get(TASK_QUERY_URL);
 
     verify(mockQuery).list();
     verifyNoMoreInteractions(mockQuery);
@@ -170,6 +308,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
       .queryParams(stringQueryParameters)
       .queryParams(intQueryParameters)
       .queryParam("activityInstanceIdIn", activityInstanceIds)
+      .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
 
@@ -295,6 +434,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     Map<String, String> queryParameters = getDateParameters();
 
     given().queryParams(queryParameters)
+      .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
 
@@ -331,6 +471,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     String queryParam = candidateGroups.get(0) + "," + candidateGroups.get(1);
 
     given().queryParams("candidateGroups", queryParam)
+      .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
 
@@ -340,12 +481,14 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
   @Test
   public void testDelegationState() {
     given().queryParams("delegationState", "PENDING")
+      .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
 
     verify(mockQuery).taskDelegationState(DelegationState.PENDING);
 
     given().queryParams("delegationState", "RESOLVED")
+    .header("accept", MediaType.APPLICATION_JSON)
     .expect().statusCode(Status.OK.getStatusCode())
     .when().get(TASK_QUERY_URL);
 
@@ -355,6 +498,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
   @Test
   public void testLowerCaseDelegationStateParam() {
     given().queryParams("delegationState", "resolved")
+    .header("accept", MediaType.APPLICATION_JSON)
     .expect().statusCode(Status.OK.getStatusCode())
     .when().get(TASK_QUERY_URL);
 
@@ -477,6 +621,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
   private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
     given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(expectedStatus.getStatusCode())
       .when().get(TASK_QUERY_URL);
   }
@@ -487,6 +632,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     int firstResult = 0;
     int maxResults = 10;
     given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
 
@@ -502,6 +648,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("taskVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -515,6 +662,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("taskVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -528,6 +676,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("taskVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -541,6 +690,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("taskVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -554,6 +704,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("taskVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -567,6 +718,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("taskVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -580,6 +732,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("taskVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -598,6 +751,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("processVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -611,6 +765,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("processVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -624,6 +779,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("processVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -637,6 +793,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("processVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -650,6 +807,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("processVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -663,6 +821,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("processVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -676,6 +835,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("processVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -694,6 +854,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("caseInstanceVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -707,6 +868,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("caseInstanceVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -720,6 +882,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("caseInstanceVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -733,6 +896,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("caseInstanceVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -746,6 +910,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("caseInstanceVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -759,6 +924,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("caseInstanceVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -772,6 +938,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .queryParam("caseInstanceVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -794,6 +961,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     String queryValue = variableParameter1 + "," + variableParameter2;
 
     given().queryParam("taskVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
 
@@ -826,6 +994,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     json.put("taskVariables", variables);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(TASK_QUERY_URL);
 
@@ -847,6 +1016,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     String queryValue = variableParameter1 + "," + variableParameter2;
 
     given().queryParam("processVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
 
@@ -879,6 +1049,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     json.put("processVariables", variables);
 
     given()
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
     .then()
@@ -904,6 +1075,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     String queryValue = variableParameter1 + "," + variableParameter2;
 
     given().queryParam("caseInstanceVariables", queryValue)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
 
@@ -937,6 +1109,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
       .body(json)
     .then()
       .expect()
@@ -967,6 +1140,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     queryParameters.put("candidateGroups", candidateGroups);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(queryParameters)
+      .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().post(TASK_QUERY_URL);
 
@@ -983,9 +1157,13 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
   @Test
   public void testQueryCount() {
-    expect().statusCode(Status.OK.getStatusCode())
+    given()
+        .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
       .body("count", equalTo(1))
-      .when().get(TASK_COUNT_QUERY_URL);
+      .when()
+        .get(TASK_COUNT_QUERY_URL);
 
     verify(mockQuery).count();
   }
@@ -993,6 +1171,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
   @Test
   public void testQueryCountForPost() {
     given().contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+    .header("accept", MediaType.APPLICATION_JSON)
     .expect().statusCode(Status.OK.getStatusCode())
       .body("count", equalTo(1))
       .when().post(TASK_COUNT_QUERY_URL);

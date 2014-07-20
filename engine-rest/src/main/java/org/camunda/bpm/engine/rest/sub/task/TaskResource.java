@@ -12,20 +12,36 @@
  */
 package org.camunda.bpm.engine.rest.sub.task;
 
-import org.camunda.bpm.engine.rest.dto.FormVariablesDto;
-import org.camunda.bpm.engine.rest.dto.task.*;
-import org.camunda.bpm.engine.rest.sub.VariableResource;
+import java.util.List;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import java.util.List;
+import org.camunda.bpm.engine.rest.dto.FormVariablesDto;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
+import org.camunda.bpm.engine.rest.dto.task.FormDto;
+import org.camunda.bpm.engine.rest.dto.task.IdentityLinkDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskDto;
+import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
+import org.camunda.bpm.engine.rest.hal.task.HalTask;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
+
+import static org.camunda.bpm.engine.rest.hal.Hal.MEDIA_TYPE_HAL;
 
 public interface TaskResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   TaskDto getTask();
+
+  @GET
+  @Produces(MEDIA_TYPE_HAL)
+  HalTask getHalTask();
 
   @GET
   @Path("/form")

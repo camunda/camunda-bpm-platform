@@ -463,4 +463,31 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  public void testQueryByProcessDefinitionIds() {
+
+    // empty list
+    assertTrue(repositoryService.createProcessDefinitionQuery().processDefinitionIdIn("a", "b").list().isEmpty());
+
+
+    // collect all ids
+    List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().list();
+    String[] ids = new String[list.size()];
+    for (int i = 0; i < ids.length; i++) {
+      ids[i] = list.get(i).getId();
+    }
+
+    List<ProcessDefinition> idInList = repositoryService.createProcessDefinitionQuery().processDefinitionIdIn(ids).list();
+    for (ProcessDefinition processDefinition : idInList) {
+      boolean found = false;
+      for (ProcessDefinition otherProcessDefinition : list) {
+        if(otherProcessDefinition.getId().equals(processDefinition.getId())) {
+          found = true; break;
+        }
+      }
+      if(!found) {
+        fail("Expected to find process definition "+processDefinition);
+      }
+    }
+  }
+
 }

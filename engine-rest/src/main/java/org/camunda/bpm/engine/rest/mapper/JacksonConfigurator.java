@@ -19,12 +19,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
+import org.camunda.bpm.engine.rest.hal.Hal;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 
 @Provider
-@Produces(MediaType.APPLICATION_JSON)
+@Produces({MediaType.APPLICATION_JSON, Hal.MEDIA_TYPE_HAL})
 public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
   ObjectMapper mapper;

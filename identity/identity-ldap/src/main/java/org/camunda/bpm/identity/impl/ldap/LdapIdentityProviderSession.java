@@ -285,6 +285,14 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     if(query.getId() != null) {
       addFilter(ldapConfiguration.getUserIdAttribute(), escapeLDAPSearchFilter(query.getId()), search);
     }
+    if(query.getIds() != null && query.getIds().length > 0) {
+      // wrap ids in OR statement
+      search.write("(|");
+      for (String userId : query.getIds()) {
+        addFilter(ldapConfiguration.getUserIdAttribute(), escapeLDAPSearchFilter(userId), search);
+      }
+      search.write(")");
+    }
     if(query.getEmail() != null) {
       addFilter(ldapConfiguration.getUserEmailAttribute(), query.getEmail(), search);
     }
@@ -558,8 +566,8 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
           case ')':
             sb.append("\\29");
             break;
-          case '\u0000': 
-            sb.append("\\00"); 
+          case '\u0000':
+            sb.append("\\00");
             break;
           default:
             sb.append(curChar);

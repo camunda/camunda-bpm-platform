@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,16 +14,16 @@ package org.camunda.bpm.engine.rest.dto.identity;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 
 /**
- * 
+ *
  * @author Daniel Meyer
  */
 public class UserQueryDto extends AbstractQueryDto<UserQuery> {
@@ -32,7 +32,7 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
   private static final String SORT_BY_USER_FIRSTNAME_VALUE = "firstName";
   private static final String SORT_BY_USER_LASTNAME_VALUE = "lastName";
   private static final String SORT_BY_USER_EMAIL_VALUE = "email";
-  
+
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
@@ -41,8 +41,9 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_USER_LASTNAME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_USER_EMAIL_VALUE);
   }
-  
+
   protected String id;
+  protected String[] idIn;
   protected String firstName;
   protected String firstNameLike;
   protected String lastName;
@@ -51,11 +52,11 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
   protected String emailLike;
   protected String memberOfGroup;
   protected String potentialStarter;
-    
+
   public UserQueryDto() {
-    
+
   }
-  
+
   public UserQueryDto(MultivaluedMap<String, String> queryParameters) {
     super(queryParameters);
   }
@@ -64,7 +65,12 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
   public void setId(String userId) {
     this.id = userId;
   }
-  
+
+  @CamundaQueryParam(value = "idIn", converter = StringArrayConverter.class)
+  public void setIdIn(String[] ids) {
+    this.idIn = ids;
+  }
+
   @CamundaQueryParam("firstName")
   public void setFirstName(String userFirstName) {
     this.firstName = userFirstName;
@@ -89,17 +95,17 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
   public void setEmailLike(String userEmailLike) {
     this.emailLike = userEmailLike;
   }
-  
+
   @CamundaQueryParam("memberOfGroup")
   public void setMemberOfGroup(String memberOfGroup) {
     this.memberOfGroup = memberOfGroup;
   }
-  
+
   @CamundaQueryParam("potentialStarter")
   public void setPotentialStarter(String potentialStarter) {
     this.potentialStarter = potentialStarter;
   }
-  
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -114,6 +120,9 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
   protected void applyFilters(UserQuery query) {
     if (id != null) {
       query.userId(id);
+    }
+    if(idIn != null) {
+      query.userIdIn(idIn);
     }
     if (firstName != null) {
       query.userFirstName(firstName);
@@ -140,7 +149,7 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
       query.potentialStarter(potentialStarter);
     }
   }
-  
+
   @Override
   protected void applySortingOptions(UserQuery query) {
     if (sortBy != null) {
@@ -154,7 +163,7 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
         query.orderByUserEmail();
       }
     }
-    
+
     if (sortOrder != null) {
       if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
         query.asc();
@@ -163,5 +172,5 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
       }
     }
   }
-  
+
 }

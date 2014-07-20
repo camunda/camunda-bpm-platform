@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,10 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
+import org.camunda.bpm.engine.rest.hal.task.HalTaskList;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
+
+import static org.camunda.bpm.engine.rest.hal.Hal.*;
 
 @Path(TaskRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -38,10 +41,15 @@ public interface TaskRestService {
 
   @Path("/{id}")
   TaskResource getTask(@PathParam("id") String id);
-  
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   List<TaskDto> getTasks(@Context UriInfo uriInfo,
+      @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+
+  @GET
+  @Produces(MEDIA_TYPE_HAL)
+  HalTaskList getHalTasks(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   /**

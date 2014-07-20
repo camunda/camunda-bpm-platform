@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
+import org.camunda.bpm.engine.rest.hal.JacksonHalJsonProvider;
 import org.camunda.bpm.engine.rest.impl.history.HistoryRestServiceImpl;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.engine.rest.mapper.MultipartPayloadProvider;
@@ -65,6 +66,7 @@ public class CamundaRestResources {
     CONFIGURATION_CLASSES.add(ProcessEngineExceptionHandler.class);
     CONFIGURATION_CLASSES.add(RestExceptionHandler.class);
     CONFIGURATION_CLASSES.add(MultipartPayloadProvider.class);
+    CONFIGURATION_CLASSES.add(JacksonHalJsonProvider.class);
   }
 
   /**

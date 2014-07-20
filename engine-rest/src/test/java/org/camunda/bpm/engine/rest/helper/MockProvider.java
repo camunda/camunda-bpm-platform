@@ -108,6 +108,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_PARENT_TASK_ID = "aParentId";
   public static final int EXAMPLE_TASK_PRIORITY = 42;
   public static final String EXAMPLE_TASK_DEFINITION_KEY = "aTaskDefinitionKey";
+  public static final boolean EXAMPLE_TASK_SUSPENSION_STATE = false;
 
   // task comment
   public static final String EXAMPLE_TASK_COMMENT_ID = "aTaskCommentId";

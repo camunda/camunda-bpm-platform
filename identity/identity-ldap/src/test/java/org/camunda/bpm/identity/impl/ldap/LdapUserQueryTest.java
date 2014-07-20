@@ -42,6 +42,20 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
     assertNull(user);
   }
 
+  public void testFilterByUserIdIn() {
+    List<User> users = identityService.createUserQuery().userIdIn("oscar", "monster").list();
+    assertNotNull(users);
+    assertEquals(2, users.size());
+
+    users = identityService.createUserQuery().userIdIn("oscar", "monster", "daniel").list();
+    assertNotNull(users);
+    assertEquals(3, users.size());
+
+    users = identityService.createUserQuery().userIdIn("oscar", "monster", "daniel", "non-existing").list();
+    assertNotNull(users);
+    assertEquals(3, users.size());
+  }
+
   public void testFilterByFirstname() {
     User user = identityService.createUserQuery().userFirstName("Oscar").singleResult();
     assertNotNull(user);

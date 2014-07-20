@@ -2,19 +2,9 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_DESCRIPTION;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_NAME;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_TYPE;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_URL;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_FULL_MESSAGE;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_TIME;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_USER_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstance;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.*;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -63,13 +53,17 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -253,6 +247,62 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .body("processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
       .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .body("taskDefinitionKey", equalTo(MockProvider.EXAMPLE_TASK_DEFINITION_KEY))
+      .body("suspended", equalTo(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE))
+      .when().get(SINGLE_TASK_URL);
+  }
+
+  @Test
+  public void testGetSingleTaskHal() {
+
+    // setup user query mock
+    List<User> mockUsers = MockProvider.createMockUsers();
+    UserQuery sampleUserQuery = mock(UserQuery.class);
+    when(sampleUserQuery.listPage(0, 1)).thenReturn(mockUsers);
+    when(sampleUserQuery.userIdIn(new String[] {MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME})).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.userIdIn(new String[] {MockProvider.EXAMPLE_TASK_OWNER})).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.count()).thenReturn(1l);
+    when(processEngine.getIdentityService().createUserQuery()).thenReturn(sampleUserQuery);
+
+    // setup process definition query mock
+    List<ProcessDefinition> mockDefinitions = MockProvider.createMockDefinitions();
+    ProcessDefinitionQuery sampleProcessDefinitionQuery = mock(ProcessDefinitionQuery.class);
+    when(sampleProcessDefinitionQuery.listPage(0, 1)).thenReturn(mockDefinitions);
+    when(sampleProcessDefinitionQuery.processDefinitionIdIn(new String[] {MockProvider.EXAMPLE_PROCESS_DEFINITION_ID})).thenReturn(sampleProcessDefinitionQuery);
+    when(sampleProcessDefinitionQuery.count()).thenReturn(1l);
+    when(processEngine.getRepositoryService().createProcessDefinitionQuery()).thenReturn(sampleProcessDefinitionQuery);
+
+    given()
+      .header("accept", Hal.MEDIA_TYPE_HAL)
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("id", equalTo(EXAMPLE_TASK_ID))
+      .body("name", equalTo(MockProvider.EXAMPLE_TASK_NAME))
+      .body("assignee", equalTo(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME))
+      .body("created", equalTo(MockProvider.EXAMPLE_TASK_CREATE_TIME))
+      .body("due", equalTo(MockProvider.EXAMPLE_TASK_DUE_DATE))
+      .body("delegationState", equalTo(MockProvider.EXAMPLE_TASK_DELEGATION_STATE.toString()))
+      .body("description", equalTo(MockProvider.EXAMPLE_TASK_DESCRIPTION))
+      .body("executionId", equalTo(MockProvider.EXAMPLE_TASK_EXECUTION_ID))
+      .body("owner", equalTo(MockProvider.EXAMPLE_TASK_OWNER))
+      .body("parentTaskId", equalTo(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID))
+      .body("priority", equalTo(MockProvider.EXAMPLE_TASK_PRIORITY))
+      .body("processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("taskDefinitionKey", equalTo(MockProvider.EXAMPLE_TASK_DEFINITION_KEY))
+      .body("suspended", equalTo(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE))
+
+      // links
+      .body("_links.assignee.href", endsWith(EXAMPLE_TASK_ASSIGNEE_NAME))
+      .body("_links.caseDefinition.href", endsWith(EXAMPLE_CASE_DEFINITION_ID))
+      .body("_links.caseExecution.href", endsWith(EXAMPLE_CASE_EXECUTION_ID))
+      .body("_links.caseInstance.href", endsWith(EXAMPLE_CASE_INSTANCE_ID))
+      .body("_links.execution.href", endsWith(EXAMPLE_TASK_EXECUTION_ID))
+      .body("_links.owner.href", endsWith(EXAMPLE_TASK_OWNER))
+      .body("_links.parentTask.href", endsWith(EXAMPLE_TASK_PARENT_TASK_ID))
+      .body("_links.processDefinition.href", endsWith(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .body("_links.processInstance.href", endsWith(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("_links.self.href", endsWith(EXAMPLE_TASK_ID))
+
       .when().get(SINGLE_TASK_URL);
   }
 

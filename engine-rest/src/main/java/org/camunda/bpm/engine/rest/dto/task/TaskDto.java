@@ -37,6 +37,7 @@ public class TaskDto {
   private String caseExecutionId;
   private String caseInstanceId;
   private String caseDefinitionId;
+  private boolean suspended;
 
   public String getId() {
     return id;
@@ -110,6 +111,10 @@ public class TaskDto {
     return caseInstanceId;
   }
 
+  public boolean isSuspended() {
+    return suspended;
+  }
+
   public static TaskDto fromTask(Task task) {
     TaskDto dto = new TaskDto();
     dto.id = task.getId();
@@ -130,6 +135,7 @@ public class TaskDto {
     dto.caseDefinitionId = task.getCaseDefinitionId();
     dto.caseExecutionId = task.getCaseExecutionId();
     dto.caseInstanceId = task.getCaseInstanceId();
+    dto.suspended = task.isSuspended();
     return dto;
   }
 }

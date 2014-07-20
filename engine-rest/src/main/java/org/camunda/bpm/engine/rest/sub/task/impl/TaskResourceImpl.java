@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.task.*;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.hal.task.HalTask;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskAttachmentResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskCommentResource;
@@ -128,6 +129,16 @@ public class TaskResourceImpl implements TaskResource {
     }
 
     return TaskDto.fromTask(task);
+  }
+
+  @Override
+  public HalTask getHalTask() {
+    Task task = getTaskById(taskId);
+    if (task == null) {
+      throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
+    }
+
+    return HalTask.fromTask(task);
   }
 
   @Override

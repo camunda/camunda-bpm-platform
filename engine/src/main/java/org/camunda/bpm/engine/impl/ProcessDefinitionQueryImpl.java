@@ -36,6 +36,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   private static final long serialVersionUID = 1L;
   protected String id;
+  protected String[] ids;
   protected String category;
   protected String categoryLike;
   protected String name;
@@ -71,6 +72,11 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   public ProcessDefinitionQueryImpl processDefinitionId(String processDefinitionId) {
     this.id = processDefinitionId;
+    return this;
+  }
+
+  public ProcessDefinitionQueryImpl processDefinitionIdIn(String... ids) {
+    this.ids = ids;
     return this;
   }
 
@@ -252,6 +258,9 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
   public String getId() {
     return id;
+  }
+  public String[] getIds() {
+    return ids;
   }
   public String getName() {
     return name;
