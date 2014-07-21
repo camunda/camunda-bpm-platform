@@ -120,7 +120,7 @@ cd ../camunda-bpm-webapp
 
 ```sh
 cd webapp
-mvn clean install jetty:run -Pdevelop
+mvn clean install jetty:run -Pdevelop,livereload
 ```
 The webapps are then available pointing a browser at [http://localhost:8080](http://localhost:8080)
 
