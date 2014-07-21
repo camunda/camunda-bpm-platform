@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.application.impl;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +48,20 @@ public class ServletProcessApplicationDeployer implements ServletContainerInitia
       // skip deployments that do not carry a PA
       return;
       
-    } else if(c.size() > 1) {
+    }
+
+    if (c.contains(ProcessApplication.class)) {
+      // this is a workaround for a bug in WebSphere-8.5 who
+      // ships the annotation itself as part of the discovered classes.
+
+      // copy into a fresh Set as we don't know if the original Set is mutable or immutable.
+      c = new HashSet<Class<?>>(c);
+
+      // and now remove the annotation itself.
+      c.remove(ProcessApplication.class);
+    }
+
+    if(c.size() > 1) {
       // a deployment must only contain a single PA
       String msg = getLogMultiplePas(c, ctx);      
       LOGGER.log(Level.SEVERE, msg);
