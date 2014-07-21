@@ -1,6 +1,6 @@
 /* global ngDefine: false */
 ngDefine('cockpit.resources', [
-  'module:camunda.common.services.uri:camunda-commons-ui/services/uri',
+  'camunda-commons-ui/util/index',
   './processDefinitionResource',
   './incidentResource',
   './processInstanceResource',

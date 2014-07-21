@@ -3,7 +3,7 @@ ngDefine('cockpit.pages.processDefinition', [
   'angular',
   'cockpit/util/routeUtil',
   'module:dataDepend:angular-data-depend',
-  'module:camunda.common.services:camunda-commons-ui/services/main'
+  'module:cam.commons:camunda-commons-ui'
 ], function(module, angular) {
   'use strict';
 
@@ -645,5 +645,6 @@ ngDefine('cockpit.pages.processDefinition', [
   module
     .controller('ProcessDefinitionFilterController', ProcessDefinitionFilterController)
     .config(RouteConfig)
-    .config(ViewConfig);
+    .config(ViewConfig)
+  ;
 });

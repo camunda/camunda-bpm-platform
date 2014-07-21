@@ -21,7 +21,7 @@ function distFileProcessing(content, srcpath) {
 
 function devFileProcessing(content, srcpath) {
   /* jshint validthis: true */
-  var liveReloadPort = this.config.get('app.liveReloadPort');
+  var liveReloadPort = this.config.get('pkg.gruntConfig.livereloadPort');
   /* jshint validthis: false */
 
   if (requireConfExp.test(srcpath)) {
@@ -48,12 +48,6 @@ module.exports = function(config) {
         }
       },
       files: [
-        // {
-        //   expand: true,
-        //   cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/WEB-INF',
-        //   src: ['*'],
-        //   dest: '<%= buildTarget %>/WEB-INF'
-        // },
         {
           expand: true,
           cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
@@ -63,24 +57,6 @@ module.exports = function(config) {
             '{app,plugin,develop,common}/**/*.{js,html}'
           ],
           dest: '<%= buildTarget %>/'
-        },
-        // {
-        //   expand: true,
-        //   cwd: 'node_modules/camunda-tasklist-ui/dist/',
-        //   src: ['**'],
-        //   dest: '<%= buildTarget %>/app/tasklist/default/'
-        // },
-        // {
-        //   expand: true,
-        //   cwd: 'node_modules/camunda-tasklist-ui/dist/',
-        //   src: ['index.html'],
-        //   dest: '<%= buildTarget %>/app/tasklist/'
-        // },
-        {
-          expand: true,
-          cwd: 'node_modules/camunda-tasklist-ui/dist/',
-          src: ['**'],
-          dest: '<%= buildTarget %>/app/tasklist/'
         },
         {
           expand: true,
@@ -171,6 +147,7 @@ module.exports = function(config) {
             // 'img/**/*',
             // 'vendor/**/*.{js,css,jpg,png,gif,html,eot,ttf,svg,woff,htc}'
             '!requirejs/**/*',
+            '!jquery.ui/{demos,external,tests,themes}/**/*',
             '**/*.{js,css,jpg,png,gif,html,eot,ttf,svg,woff,htc}'
           ],
           dest: '<%= buildTarget %>/assets/vendor'

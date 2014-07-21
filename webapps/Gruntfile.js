@@ -1,4 +1,4 @@
-/* global process: false, require: false, module: false, __dirname: false */
+/* global require: false */
 'use strict';
 
 /**
@@ -7,28 +7,6 @@
   @author Valentin Vago <valentin.vago@camunda.com>
   @author Nico Rehwaldt  <nico.rehwaldt@camunda.com>
  */
-
-var fs = require('fs');
-var _ = require('underscore');
-
-var commentLineExp =  /^[\s]*<!-- (\/|#) (CE|EE)/;
-var requireConfExp =  /require-conf.js$/;
-
-function distFileProcessing(content, srcpath) {
-  // removes the template comments
-  content = content
-            .split('\n').filter(function(line) {
-              return !commentLineExp.test(line);
-            }).join('\n');
-
-  var date = new Date();
-  var cacheBuster = [date.getFullYear(), date.getMonth(), date.getDate()].join('-');
-  content = content
-            .replace(/\/\* cache-busting /, '/* cache-busting */')
-            .replace(/CACHE_BUSTER/g, requireConfExp.test(srcpath) ? '\''+ cacheBuster +'\'' : cacheBuster);
-
-  return content;
-}
 
 module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
@@ -99,6 +77,15 @@ module.exports = function(grunt) {
       files: [
         {
           expand: true,
+          cwd: '<%= pkg.gruntConfig.clientDir %>/bower_components/camunda-commons-ui/',
+          src: [
+            'lib/**/*.*',
+            'lib/*.*'
+          ],
+          dest: '<%= buildTarget %>/assets/vendor/camunda-commons-ui/',
+        },
+        {
+          expand: true,
           cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
           src: [
             '**/*.*',
@@ -128,13 +115,13 @@ module.exports = function(grunt) {
     mode = mode || 'prod';
 
     grunt.config.data.buildTarget = (mode === 'prod' ? config.prodTarget : config.devTarget);
-    grunt.log.subhead('Will build the project in "'+ mode +'" mode and place it in "'+ grunt.config('buildTarget') +'"');
+    grunt.log.subhead('Will build the "'+ pkg.name +'" project in "'+ mode +'" mode and place it in "'+ grunt.config('buildTarget') +'"');
     if (mode === 'dev') {
       grunt.log.writeln('Will serve on port "'+
-        config.connectPort
-        +'" and liverreload available on port "'+
-        config.livereloadPort
-        +'"');
+        config.connectPort +
+        '" and liverreload available on port "'+
+        config.livereloadPort +
+        '"');
     }
 
     var tasks = [

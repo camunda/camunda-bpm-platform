@@ -3,6 +3,7 @@ ngDefine('cockpit.pages.processInstance', [
   'require',
   'angular',
   'cockpit/util/routeUtil',
+  'module:cam.commons:camunda-commons-ui',
   'module:dataDepend:angular-data-depend'
 ], function(module, require, angular) {
   'use strict';
@@ -664,5 +665,6 @@ ngDefine('cockpit.pages.processInstance', [
 
   module
     .config(RouteConfig)
-    .config(ViewConfig);
+    .config(ViewConfig)
+  ;
 });
