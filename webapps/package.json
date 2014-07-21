@@ -24,6 +24,7 @@
     "grunt-parallel": "~0.3.1",
     "grunt": "~0.4.5",
     "load-grunt-tasks": "~0.6.0",
-    "time-grunt": "~0.4.0"
+    "time-grunt": "~0.4.0",
+    "protractor": "~1.0.0-rc6"
   }
 }
