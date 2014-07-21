@@ -31,7 +31,7 @@ public interface DataFormat<T extends Spin<?>> {
   
   DataFormatReader getReader();
   
-  String getCanonicalTypeString(Object object);
+  String getCanonicalTypeName(Object object);
   
-  
+  void addTypeDetector(TypeDetector typeDetector);
 }

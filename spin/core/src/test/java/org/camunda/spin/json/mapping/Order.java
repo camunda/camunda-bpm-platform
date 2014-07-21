@@ -20,7 +20,7 @@ public class Order {
   private String order;
   private int dueUntil;
   private boolean active;
-  private List<Customer> customers;
+  private List<RegularCustomer> customers;
   private OrderDetails orderDetails;
   
   public long getId() {
@@ -47,10 +47,10 @@ public class Order {
   public void setActive(boolean active) {
     this.active = active;
   }
-  public List<Customer> getCustomers() {
+  public List<RegularCustomer> getCustomers() {
     return customers;
   }
-  public void setCustomers(List<Customer> customers) {
+  public void setCustomers(List<RegularCustomer> customers) {
     this.customers = customers;
   }
   public OrderDetails getOrderDetails() {

@@ -10,11 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.json.mapping;
+package org.camunda.spin.impl.json.tree.type;
 
-public interface Customer {
+import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
+import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.spi.TypeDetector;
 
-  String getName();
-  
-  int getContractStartDate();
+public abstract class AbstractJsonJacksonTypeDetector implements TypeDetector {
+
+  public boolean appliesTo(DataFormat<?> dataFormat) {
+    return dataFormat instanceof JsonJacksonTreeDataFormat;
+  }
 }

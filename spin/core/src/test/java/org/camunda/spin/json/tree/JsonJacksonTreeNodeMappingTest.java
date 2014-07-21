@@ -23,12 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.spin.json.SpinJsonTreeNodeException;
-import org.camunda.spin.json.mapping.Customer;
+import org.camunda.spin.json.mapping.RegularCustomer;
 import org.camunda.spin.json.mapping.Order;
 import org.camunda.spin.json.mapping.OrderDetails;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
@@ -43,7 +44,7 @@ public class JsonJacksonTreeNodeMappingTest {
   @Test
   public void shouldFailMappingToMismatchingClass() {
     try {
-      JSON(EXAMPLE_JSON).mapTo(Customer.class);
+      JSON(EXAMPLE_JSON).mapTo(RegularCustomer.class);
       fail("Expected SpinJsonTreeNodeException");
     } catch (SpinJsonTreeNodeException e) {
       // happy path
@@ -57,7 +58,7 @@ public class JsonJacksonTreeNodeMappingTest {
   }
   
   @Test
-  public void shouldMapListByCanonicalString() {
+  public void shouldMapListByCanonicalString() throws JsonProcessingException {
     JavaType desiredType = 
         TypeFactory.defaultInstance().constructCollectionType(ArrayList.class, Order.class);
     
@@ -89,7 +90,7 @@ public class JsonJacksonTreeNodeMappingTest {
     assertThat(orderDetails.getPrice()).isBetween(32000.44449, 32000.45001);
     assertThat(orderDetails.getRoundedPrice()).isEqualTo(32000);
     
-    List<Customer> customers = order.getCustomers();
+    List<RegularCustomer> customers = order.getCustomers();
     assertThat(customers).isNotNull();
     assertThat(customers.size()).isEqualTo(3);
     
@@ -99,4 +100,6 @@ public class JsonJacksonTreeNodeMappingTest {
         tuple("Waldo", 1320325322),
         tuple("Johnny", 1286110922));
   }
+  
+  // TODO should work with type information in source json
 }

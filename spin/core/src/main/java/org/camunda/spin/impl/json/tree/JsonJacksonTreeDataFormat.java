@@ -12,10 +12,18 @@
  */
 package org.camunda.spin.impl.json.tree;
 
+import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.camunda.spin.impl.json.tree.type.DefaultJsonJacksonTypeDetector;
+import org.camunda.spin.impl.json.tree.type.ListJsonJacksonTypeDetector;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
+import org.camunda.spin.spi.TypeDetector;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -41,10 +49,14 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
   protected JsonJacksonParserConfiguration parserConfiguration;
   protected JsonJacksonGeneratorConfiguration generatorConfiguration;
   protected ObjectMapper cachedObjectMapper;
+  protected List<TypeDetector> typeDetectors;
   
   public JsonJacksonTreeDataFormat() {
     this.parserConfiguration = new JsonJacksonParserConfiguration(this);
     this.generatorConfiguration = new JsonJacksonGeneratorConfiguration(this);
+    typeDetectors = new ArrayList<TypeDetector>();
+    typeDetectors.add(new ListJsonJacksonTypeDetector());
+    typeDetectors.add(new DefaultJsonJacksonTypeDetector());
   }
   
   public Class<? extends SpinJsonNode> getWrapperType() {
@@ -67,6 +79,7 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
         new JsonJacksonParserConfiguration(instance, parserConfiguration);
     instance.generatorConfiguration = 
         new JsonJacksonGeneratorConfiguration(instance, generatorConfiguration);
+    instance.typeDetectors = new ArrayList<TypeDetector>(typeDetectors);
     
     return instance;
   }
@@ -109,8 +122,16 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
     cachedObjectMapper = null;
   }
 
-  public String getCanonicalTypeString(Object object) {
-    throw new UnsupportedOperationException("not implemented");
+  public String getCanonicalTypeName(Object object) {
+    ensureNotNull("object", object);
+    
+    for (TypeDetector typeDetector : typeDetectors) {
+      if (typeDetector.appliesTo(this) && typeDetector.canHandle(object)) {
+        return typeDetector.detectType(object);
+      }
+    }
+    
+    throw LOG.unableToDetectCanonicalType(object);
   }
   
   public JavaType constructJavaTypeFromCanonicalString(String canonicalString) {
@@ -119,5 +140,9 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
     } catch (IllegalArgumentException e) {
       throw LOG.unableToConstructJavaType(canonicalString, e);
     }
+  }
+
+  public void addTypeDetector(TypeDetector typeDetector) {
+    typeDetectors.add(0, typeDetector);
   }
 }

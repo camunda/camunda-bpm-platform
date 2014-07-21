@@ -10,11 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.json.mapping;
+package org.camunda.spin.impl.json.tree.type;
 
-public interface Customer {
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
-  String getName();
-  
-  int getContractStartDate();
+public class DefaultJsonJacksonTypeDetector extends AbstractJsonJacksonTypeDetector {
+
+  public boolean canHandle(Object object) {
+    return true;
+  }
+
+  public String detectType(Object object) {
+    Class<?> type = object.getClass();
+    return TypeFactory.defaultInstance().constructType(type).toCanonical();
+  }
+
 }

@@ -69,4 +69,8 @@ public class JsonJacksonTreeLogger extends SpinLogger {
     return new SpinJsonDataFormatException(
         exceptionMessage("007", "Cannot construct java type from string '{}'", fromString), cause);
   }
+  
+  public SpinJsonDataFormatException unableToDetectCanonicalType(Object parameter) {
+    return new SpinJsonDataFormatException(exceptionMessage("008", "Cannot detect canonical data type for parameter '{}'", parameter));
+  }
 }

@@ -10,11 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.json.mapping;
+package org.camunda.spin.spi;
 
-public interface Customer {
+/**
+ * Detects the canonical type string of a supplied object
+ * 
+ * @author Thorben Lindhauer
+ */
+public interface TypeDetector {
 
-  String getName();
+  boolean appliesTo(DataFormat<?> dataFormat);
   
-  int getContractStartDate();
+  boolean canHandle(Object object);
+  
+  String detectType(Object object);
 }

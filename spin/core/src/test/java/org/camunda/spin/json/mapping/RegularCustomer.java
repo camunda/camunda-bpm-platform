@@ -12,9 +12,23 @@
  */
 package org.camunda.spin.json.mapping;
 
-public interface Customer {
 
-  String getName();
+public class RegularCustomer implements Customer {
+
+  private String name;
+  private int contractStartDate;
   
-  int getContractStartDate();
+  public String getName() {
+    return name;
+  }
+  public void setName(String name) {
+    this.name = name;
+  }
+  public int getContractStartDate() {
+    return contractStartDate;
+  }
+  public void setContractStartDate(int contractStartDate) {
+    this.contractStartDate = contractStartDate;
+  }
+  
 }
