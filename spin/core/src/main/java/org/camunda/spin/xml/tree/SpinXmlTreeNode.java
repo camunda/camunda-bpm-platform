@@ -44,5 +44,13 @@ public abstract class SpinXmlTreeNode<T extends SpinXmlTreeNode<?>> extends Spin
    * @return true if the node has the same namespace
    */
   public abstract boolean hasNamespace(String namespace);
-
+  
+  public <C> C mapTo(Class<C> type) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+  
+  public <C> C mapTo(String type) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+  
 }

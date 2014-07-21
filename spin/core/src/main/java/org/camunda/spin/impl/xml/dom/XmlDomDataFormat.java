@@ -60,5 +60,9 @@ public class XmlDomDataFormat implements DataFormat<SpinXmlTreeElement> {
     return new XmlDomDataFormatReader();
   }
 
+  public String getCanonicalTypeString(Object object) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
 
 }

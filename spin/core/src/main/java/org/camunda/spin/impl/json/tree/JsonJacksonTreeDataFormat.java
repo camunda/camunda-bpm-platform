@@ -13,11 +13,14 @@
 package org.camunda.spin.impl.json.tree;
 
 import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
  * Spin data format that can wrap Json content and uses 
@@ -33,6 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, JsonJacksonTreeConfigurable {
 
   public static final JsonJacksonTreeDataFormat INSTANCE = new JsonJacksonTreeDataFormat();
+  private static final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
   
   protected JsonJacksonParserConfiguration parserConfiguration;
   protected JsonJacksonGeneratorConfiguration generatorConfiguration;
@@ -103,5 +107,17 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
   
   public synchronized void invalidateCachedObjectMapper() {
     cachedObjectMapper = null;
+  }
+
+  public String getCanonicalTypeString(Object object) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+  
+  public JavaType constructJavaTypeFromCanonicalString(String canonicalString) {
+    try {
+      return TypeFactory.defaultInstance().constructFromCanonical(canonicalString);
+    } catch (IllegalArgumentException e) {
+      throw LOG.unableToConstructJavaType(canonicalString, e);
+    }
   }
 }

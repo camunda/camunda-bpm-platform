@@ -12,10 +12,14 @@
  */
 package org.camunda.spin.impl.json.tree;
 
-import com.fasterxml.jackson.databind.node.JsonNodeType;
+import org.camunda.spin.json.SpinJsonTreeNodeException;
 import org.camunda.spin.json.SpinJsonTreePropertyException;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 /**
  * @author Thorben Lindhauer
@@ -47,5 +51,22 @@ public class JsonJacksonTreeLogger extends SpinLogger {
 
   public SpinJsonTreePropertyException unableToFindProperty(String propertyName) {
     return new SpinJsonTreePropertyException(exceptionMessage("005", "Unable to find '{}'", propertyName));
+  }
+  
+  public SpinJsonTreeNodeException unableToDeserialize(JsonNode jsonNode, Class<?> type, Exception cause) {
+    return new SpinJsonTreeNodeException(
+        exceptionMessage("006", "Cannot deserialize '{}...' to java type '{}'", 
+            jsonNode.toString().substring(0, 10), type.getSimpleName()), cause);
+  }
+  
+  public SpinJsonTreeNodeException unableToDeserialize(JsonNode jsonNode, JavaType type, Exception cause) {
+    return new SpinJsonTreeNodeException(
+        exceptionMessage("006", "Cannot deserialize '{}...' to java type '{}'", 
+            jsonNode.toString().substring(0, 10), type), cause);
+  }
+  
+  public SpinJsonDataFormatException unableToConstructJavaType(String fromString, Exception cause) {
+    return new SpinJsonDataFormatException(
+        exceptionMessage("007", "Cannot construct java type from string '{}'", fromString), cause);
   }
 }

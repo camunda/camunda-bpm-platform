@@ -10,28 +10,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.spi;
+package org.camunda.spin.json.mapping;
 
-import org.camunda.spin.Spin;
 
-/**
- *
- * @author Sebastian Menski
- * @author Daniel Meyer
- */
-public interface DataFormat<T extends Spin<?>> {
+public class Customer {
 
-  Class<? extends T> getWrapperType();
-
-  T createWrapperInstance(Object parameter);
-
-  String getName();
+  private String name;
+  private int contractStartDate;
   
-  DataFormat<T> newInstance();
-  
-  DataFormatReader getReader();
-  
-  String getCanonicalTypeString(Object object);
-  
+  public String getName() {
+    return name;
+  }
+  public void setName(String name) {
+    this.name = name;
+  }
+  public int getContractStartDate() {
+    return contractStartDate;
+  }
+  public void setContractStartDate(int contractStartDate) {
+    this.contractStartDate = contractStartDate;
+  }
   
 }

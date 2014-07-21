@@ -288,5 +288,22 @@ public abstract class Spin<T extends Spin<?>> {
    * @return the Writer after the object was written
    */
   public abstract <W extends Writer> W writeToWriter(W writer);
-
+  
+  /**
+   * Maps the wrapped object to an instance of a java class.
+   * 
+   * @param type
+   * @return
+   */
+  public abstract <C> C mapTo(Class<C> type);
+  
+  /**
+   * Maps the wrapped object to a java object.
+   * The object is determined based on the configuration string
+   * which is data format specific.
+   * 
+   * @param type
+   * @return
+   */
+  public abstract <C> C mapTo(String type);
 }

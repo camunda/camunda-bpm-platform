@@ -23,15 +23,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.SpinListImpl;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.logging.SpinLogger;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
  * Wrapper for a Jackson Json Tree Node. 
@@ -41,7 +43,7 @@ import org.camunda.spin.logging.SpinLogger;
  */
 public class SpinJsonJacksonTreeNode extends SpinJsonNode {
 
-  private final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
+  private static final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
 
   protected final JsonNode jsonNode;
   protected final JsonJacksonTreeDataFormat dataFormat;
@@ -201,6 +203,26 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
       return list;
     } else {
       throw LOG.unableToParseValue("Array/Object", jsonNode.getNodeType());
+    }
+  }
+
+  public <C> C mapTo(Class<C> type) {
+    JavaType javaType = TypeFactory.defaultInstance().constructType(type);
+    return (C) mapTo(javaType);
+    
+  }
+
+  public <C> C mapTo(String type) {
+    JavaType javaType = dataFormat.constructJavaTypeFromCanonicalString(type);
+    return (C) mapTo(javaType);
+  }
+  
+  public Object mapTo(JavaType type) {
+    ObjectMapper mapper = dataFormat.getConfiguredObjectMapper();
+    try {
+      return mapper.readValue(mapper.treeAsTokens(jsonNode), type);
+    } catch (IOException e) {
+      throw LOG.unableToDeserialize(jsonNode, type, e);
     }
   }
 }
