@@ -31,6 +31,7 @@ import java.util.Locale;
 
 import org.camunda.bpm.container.impl.jboss.service.MscRuntimeContainerJobExecutor;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
+import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.RuntimeContainerJobExecutor;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -41,31 +42,32 @@ import org.jboss.as.controller.descriptions.DescriptionProvider;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
 
 /**
  * Provides the description and the implementation of the job-acquisition#add operation.
- * 
+ *
  */
 public class JobAcquisitionAdd extends AbstractAddStepHandler implements DescriptionProvider {
-    
+
   public static final JobAcquisitionAdd INSTANCE = new JobAcquisitionAdd();
 
   public ModelNode getModelDescription(Locale locale) {
     ModelNode node = new ModelNode();
     node.get(DESCRIPTION).set("Adds a job acquisition");
     node.get(OPERATION_NAME).set(ADD);
-    
+
     node.get(REQUEST_PROPERTIES, NAME, DESCRIPTION).set("Name of job acquisition thread");
     node.get(REQUEST_PROPERTIES, NAME, TYPE).set(ModelType.STRING);
     node.get(REQUEST_PROPERTIES, NAME, REQUIRED).set(true);
-    
+
     node.get(REQUEST_PROPERTIES, ACQUISITION_STRATEGY, DESCRIPTION).set("Job acquisition strategy");
     node.get(REQUEST_PROPERTIES, ACQUISITION_STRATEGY, TYPE).set(ModelType.STRING);
     node.get(REQUEST_PROPERTIES, ACQUISITION_STRATEGY, REQUIRED).set(false);
-        
+
     node.get(REQUEST_PROPERTIES, PROPERTIES, DESCRIPTION).set("Additional properties");
     node.get(REQUEST_PROPERTIES, PROPERTIES, TYPE).set(ModelType.OBJECT);
     node.get(REQUEST_PROPERTIES, PROPERTIES, VALUE_TYPE).set(ModelType.LIST);
@@ -81,13 +83,13 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler implements Descrip
       name = operation.get(NAME).asString();
     }
     model.get(NAME).set(name);
-    
+
     String acquisitionStrategy = "SEQUENTIAL";
     if (operation.hasDefined(ACQUISITION_STRATEGY)) {
       acquisitionStrategy = operation.get(ACQUISITION_STRATEGY).asString();
     }
     model.get(ACQUISITION_STRATEGY).set(acquisitionStrategy);
-        
+
     // retrieve all properties
     ModelNode properties = new ModelNode();
     if (operation.hasDefined(PROPERTIES)) {
@@ -95,16 +97,28 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler implements Descrip
     }
     model.get(PROPERTIES).set(properties);
   }
-  
+
   @Override
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model,
           ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
           throws OperationFailedException {
-       
+
     String acquisitionName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
-    
+
     MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = new MscRuntimeContainerJobExecutor();
-  
+
+    if (model.hasDefined(PROPERTIES)) {
+
+      List<Property> properties = model.get(PROPERTIES).asPropertyList();
+
+      for (Property property : properties) {
+        String name = property.getName();
+        String value = property.getValue().asString();
+        PropertyHelper.applyProperty(mscRuntimeContainerJobExecutor, name, value);
+      }
+
+    }
+
     // start new service for job executor
     ServiceController<RuntimeContainerJobExecutor> serviceController = context.getServiceTarget().addService(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName), mscRuntimeContainerJobExecutor)
       .addDependency(ServiceNames.forMscRuntimeContainerDelegate())
@@ -112,9 +126,9 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler implements Descrip
       .addListener(verificationHandler)
       .setInitialMode(Mode.ACTIVE)
       .install();
-    
+
     newControllers.add(serviceController);
-    
+
   }
 
 }
