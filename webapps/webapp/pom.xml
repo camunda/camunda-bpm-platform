@@ -18,10 +18,12 @@
     <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
     <java.resources.override>src/main/runtime/default/resources</java.resources.override>
     <properties.override>src/main/runtime/default/config.properties</properties.override>
-    
-    <frontend.development.cockpit.path>../../camunda-cockpit-ui/dist</frontend.development.cockpit.path>
-    <frontend.development.tasklist.path>../../camunda-tasklist-ui/dist</frontend.development.tasklist.path>
-    <frontend.development.admin.path>../../camunda-admin-ui/dist</frontend.development.admin.path>
+
+    <frontend.app.path>${project.build.directory}/webapp/</frontend.app.path>
+
+    <frontend.development.cockpit.path>${frontend.app.path}</frontend.development.cockpit.path>
+    <frontend.development.tasklist.path>${frontend.app.path}</frontend.development.tasklist.path>
+    <frontend.development.admin.path>${frontend.app.path}</frontend.development.admin.path>
 
     <exec.shell>bash</exec.shell>
     <exec.arg>-c</exec.arg>
@@ -327,6 +329,15 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+
+    <profile>
+      <id>livereload</id>
+      <properties>
+        <frontend.development.tasklist.path>../../camunda-tasklist-ui/dist</frontend.development.tasklist.path>
+        <frontend.development.admin.path>../../camunda-admin-ui/dist</frontend.development.admin.path>
+        <frontend.development.cockpit.path>../../camunda-cockpit-ui/dist</frontend.development.cockpit.path>
+      </properties>
     </profile>
 
     <profile>
