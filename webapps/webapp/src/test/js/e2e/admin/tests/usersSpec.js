@@ -149,7 +149,7 @@ describe('users page - ', function() {
 
     it('should log out', function() {
 
-      usersPage.logoutWebapp();
+      usersPage.logout();
     });
 
   });

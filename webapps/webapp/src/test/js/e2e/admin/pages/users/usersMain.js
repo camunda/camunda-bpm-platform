@@ -23,11 +23,11 @@ module.exports = Base.extend({
 	},
 
   selectUserByEditLink: function(item) {
-    this.userList().get(item).findElement(by.linkText('Edit')).click();
+    this.userList().get(item).element(by.linkText('Edit')).click();
   },
 
   selectUserByNameLink: function(item) {
-    this.userList().get(item).findElement(by.binding('{{user.firstName}} {{user.lastName}}')).click();
+    this.userList().get(item).element(by.binding('{{user.firstName}} {{user.lastName}}')).click();
   }
 
 });

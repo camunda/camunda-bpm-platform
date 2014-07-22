@@ -15,7 +15,7 @@ module.exports = Base.extend({
   },
 
   editGroupButton: function(item) {
-    return this.groupList().get(item).findElement(by.linkText('Edit'));
+    return this.groupList().get(item).element(by.linkText('Edit'));
   }
 
 });
