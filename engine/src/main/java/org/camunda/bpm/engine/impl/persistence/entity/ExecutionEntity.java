@@ -966,10 +966,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   public void fireHistoricVariableInstanceCreateEvents() {
     // this method is called by the start context and batch-fires create events for all variable instances
-    Map<String, VariableInstanceEntity> variableInstances = variableStore.getVariableInstancesWithoutInitialization();
+    Map<String, CoreVariableInstance> variableInstances = variableStore.getVariableInstances();
     if(variableInstances != null) {
-      for (Entry<String, VariableInstanceEntity> variable : variableInstances.entrySet()) {
-        variableStore.fireHistoricVariableInstanceCreate(variable.getValue(), this);
+      for (Entry<String, CoreVariableInstance> variable : variableInstances.entrySet()) {
+        variableStore.fireHistoricVariableInstanceCreate((VariableInstanceEntity) variable.getValue(), this);
       }
     }
   }
@@ -1310,7 +1310,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   public ProcessInstanceStartContext getProcessInstanceStartContext() {
     if(isProcessInstanceExecution()) {
       if(processInstanceStartContext == null) {
-        processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
+
+        ActivityImpl activity = getActivity();
+        processInstanceStartContext = new HistoryAwareStartContext(activity);
+
       }
     }
     return processInstanceStartContext;

@@ -13,14 +13,14 @@
 
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
-
-import java.util.List;
 
 
 /**
@@ -41,6 +41,14 @@ public class PvmAtomicOperationProcessStart extends AbstractPvmEventAtomicOperat
 
   protected String getEventName() {
     return ExecutionListener.EVENTNAME_START;
+  }
+
+  protected PvmExecutionImpl eventNotificationsStarted(PvmExecutionImpl execution) {
+    // Note: the following method call initializes the property
+    // "processInstanceStartContext" on the given execution.
+    // Do not remove it!
+    execution.getProcessInstanceStartContext();
+    return execution;
   }
 
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
