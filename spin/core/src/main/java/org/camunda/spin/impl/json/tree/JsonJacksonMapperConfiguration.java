@@ -39,6 +39,9 @@ public class JsonJacksonMapperConfiguration
   public JsonJacksonMapperConfiguration(JsonJacksonTreeDataFormat dataFormat, 
       JsonJacksonMapperConfiguration mapperConfiguration) {
     super(dataFormat, mapperConfiguration);
+    this.typing = mapperConfiguration.typing;
+    this.as = mapperConfiguration.as;
+    this.dateFormat = mapperConfiguration.dateFormat;
   }
   
   public JsonJacksonMapperConfiguration enableDefaultTyping(ObjectMapper.DefaultTyping typing, JsonTypeInfo.As as) {
@@ -47,6 +50,14 @@ public class JsonJacksonMapperConfiguration
     this.typing = typing;
     this.as = as;
     return this;
+  }
+  
+  public ObjectMapper.DefaultTyping getDefaultTyping() {
+    return typing;
+  }
+  
+  public JsonTypeInfo.As getDefaultTypingFormat() {
+    return as;
   }
 
   public void applyTo(ObjectMapper mapper) {
@@ -84,6 +95,17 @@ public class JsonJacksonMapperConfiguration
     
     this.dateFormat = dateFormat;
     return this;
+  }
+  
+  public DateFormat getDateFormat() {
+    return dateFormat;
+  }
+
+  public void disableDefaultTyping() {
+    dataFormat.invalidateCachedObjectMapper();
+    this.typing = null;
+    this.as = null;
+    
   }
 
 }

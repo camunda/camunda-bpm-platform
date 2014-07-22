@@ -77,7 +77,7 @@ public class JsonJacksonTreeNodeMappingTest {
       // happy path
     }
   }
-  
+
   protected void assertIsExampleOrder(Order order) {
     assertThat(order.getId()).isEqualTo(1234567890987654321L);
     assertThat(order.getOrder()).isEqualTo("order1");
@@ -101,5 +101,4 @@ public class JsonJacksonTreeNodeMappingTest {
         tuple("Johnny", 1286110922));
   }
   
-  // TODO should work with type information in source json
 }

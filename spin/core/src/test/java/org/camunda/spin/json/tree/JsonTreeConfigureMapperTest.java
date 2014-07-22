@@ -60,6 +60,24 @@ public class JsonTreeConfigureMapperTest {
     assertThat(customer.getName()).isEqualTo("Kermit");
     assertThat(customer.getContractStartDate()).isEqualTo(20130505);
   }
+
+  @Test
+  public void shouldDisableDefaultTyping() {
+    JsonJacksonTreeDataFormat dataFormat = 
+        jsonTree().mapper().enableDefaultTyping(DefaultTyping.NON_FINAL, As.PROPERTY).done();
+    
+    try {
+      JSON(EXAMPLE_JSON, dataFormat).mapTo(Order.class);
+      fail("Expected SpinJsonTreeNodeException");
+    } catch (SpinJsonTreeNodeException e) {
+      // happy path
+    }
+    
+    dataFormat.mapper().disableDefaultTyping();
+    
+    Order order = JSON(EXAMPLE_JSON, dataFormat).mapTo(Order.class);
+    assertThat(order).isNotNull();
+  }
   
   @Test
   public void shouldConfigDeserializationByMap() {
@@ -100,8 +118,12 @@ public class JsonTreeConfigureMapperTest {
   
   @Test
   public void shouldPassConfigurationToNewInstance() {
+    DateFormat dateFormat = new SimpleDateFormat();
+    
     JsonJacksonTreeDataFormat jsonDataFormat = new JsonJacksonTreeDataFormat();
     jsonDataFormat.mapper().config("aKey", "aValue");
+    jsonDataFormat.mapper().dateFormat(dateFormat);
+    jsonDataFormat.mapper().enableDefaultTyping(DefaultTyping.JAVA_LANG_OBJECT, As.PROPERTY);
     
     JsonJacksonTreeDataFormat jsonDataFormatInstance = 
         jsonDataFormat.newInstance().mapper().config("anotherKey", "anotherValue").done();
@@ -111,6 +133,10 @@ public class JsonTreeConfigureMapperTest {
     
     assertThat(jsonDataFormatInstance.mapper().getValue("aKey")).isEqualTo("aValue");
     assertThat(jsonDataFormatInstance.mapper().getValue("anotherKey")).isEqualTo("anotherValue");
+    
+    assertThat(jsonDataFormatInstance.mapper().getDateFormat()).isSameAs(dateFormat);
+    assertThat(jsonDataFormatInstance.mapper().getDefaultTyping()).isEqualTo(DefaultTyping.JAVA_LANG_OBJECT);
+    assertThat(jsonDataFormatInstance.mapper().getDefaultTypingFormat()).isEqualTo(As.PROPERTY);
   }
   
   protected Map<String, Object> newMap(String key, Object value) {
