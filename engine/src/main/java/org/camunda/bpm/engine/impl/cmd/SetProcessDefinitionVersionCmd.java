@@ -28,8 +28,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEnt
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
@@ -126,15 +126,23 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
 
   protected void validateAndSwitchVersionOfExecution(CommandContext commandContext, ExecutionEntity execution, ProcessDefinitionEntity newProcessDefinition) {
     // check that the new process definition version contains the current activity
-    if (execution.getActivity() != null && !newProcessDefinition.contains(execution.getActivity())) {
-      throw new ProcessEngineException(
-        "The new process definition " +
-        "(key = '" + newProcessDefinition.getKey() + "') " +
-        "does not contain the current activity " +
-        "(id = '" + execution.getActivity().getId() + "') " +
-        "of the process instance " +
-        "(id = '" + processInstanceId + "').");
-    }
+    if (execution.getActivity() != null) {
+      String activityId = execution.getActivity().getId();
+      ActivityImpl newActivity = newProcessDefinition.findActivity(activityId);
+
+      if (newActivity == null) {
+        throw new ProcessEngineException(
+          "The new process definition " +
+          "(key = '" + newProcessDefinition.getKey() + "') " +
+          "does not contain the current activity " +
+          "(id = '" + activityId + "') " +
+          "of the process instance " +
+          "(id = '" + processInstanceId + "').");
+        }
+
+        // clear cached activity so that outgoing transitions are refreshed
+        execution.setActivity(newActivity);
+      }
 
     // switch the process instance to the new process definition version
     execution.setProcessDefinition(newProcessDefinition);

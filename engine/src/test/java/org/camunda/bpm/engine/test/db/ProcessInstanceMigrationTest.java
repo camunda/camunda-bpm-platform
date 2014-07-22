@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -41,6 +42,9 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
   private static final String TEST_PROCESS_CALL_ACTIVITY = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.withCallActivity.bpmn20.xml";
   private static final String TEST_PROCESS_USER_TASK_V1 = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithTask.bpmn20.xml";
   private static final String TEST_PROCESS_USER_TASK_V2 = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithTaskV2.bpmn20.xml";
+  
+  private static final String TEST_PROCESS_SERVICE_TASK_V1 = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithServiceTask.bpmn20.xml";
+  private static final String TEST_PROCESS_SERVICE_TASK_V2 = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithServiceTaskV2.bpmn20.xml";
 
   public void testSetProcessDefinitionVersionEmptyArguments() {
     try {
@@ -302,6 +306,29 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
     catch (Exception ex) {
      ex.printStackTrace(); 
     }
+  }
+  
+  @Deployment(resources = TEST_PROCESS_SERVICE_TASK_V1)
+  public void testSetProcessDefinitionVersionWithFollowUpTask() {
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+    
+    String secondDeploymentId = 
+        repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_SERVICE_TASK_V2).deploy().getId();
+    
+    runtimeService.startProcessInstanceById(processDefinitionId);
+    
+    // execute job that triggers the migrating service task 
+    Job migrationJob = managementService.createJobQuery().singleResult();
+    assertNotNull(migrationJob);
+    
+    managementService.executeJob(migrationJob.getId());
+    
+    Task followUpTask = taskService.createTaskQuery().singleResult();
+    
+    assertNotNull("Should have migrated to the new version and immediately executed the correct follow-up activity", 
+        followUpTask);
+    
+    repositoryService.deleteDeployment(secondDeploymentId, true);
   }
   
 }
