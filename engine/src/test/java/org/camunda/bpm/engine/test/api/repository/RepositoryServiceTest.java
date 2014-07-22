@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.api.repository;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -24,6 +25,7 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -75,6 +77,26 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     } catch (RuntimeException ae) {
       // Exception expected when deleting deployment with running process
     }
+  }
+
+  public void testDeleteDeploymentSkipCustomListeners() {
+    String deploymentId = repositoryService.createDeployment()
+      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/RepositoryServiceTest.testDeleteProcessInstanceSkipCustomListeners.bpmn20.xml")
+      .deploy()
+      .getId();
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // if we do not skip the custom listeners, deleting the deployment fails
+    try {
+      repositoryService.deleteDeployment(deploymentId, true, false);
+      fail("exception expected");
+    }catch(Exception e) {
+      // expected
+    }
+
+    repositoryService.deleteDeployment(deploymentId, true, true);
+
   }
 
   public void testDeleteDeploymentNullDeploymentId() {

@@ -34,7 +34,7 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
   public void execute(T execution) {
 
     CoreActivity scope = getScope(execution);
-    List<DelegateListener<? extends BaseDelegateExecution>> listeners = scope.getListeners(getEventName());
+    List<DelegateListener<? extends BaseDelegateExecution>> listeners = getListeners(scope, execution);
     int listenerIndex = execution.getListenerIndex();
 
     if(listenerIndex == 0) {
@@ -68,6 +68,14 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
     } else {
       eventNotificationsCompleted(execution);
 
+    }
+  }
+
+  protected List<DelegateListener<? extends BaseDelegateExecution>> getListeners(CoreActivity scope, T execution) {
+    if(execution.isSkipCustomListeners()) {
+      return scope.getBuiltInListeners(getEventName());
+    } else {
+      return scope.getListeners(getEventName());
     }
   }
 

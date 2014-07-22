@@ -75,15 +75,19 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public void deleteDeployment(String deploymentId) {
-    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, false));
+    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, false, false));
   }
 
   public void deleteDeploymentCascade(String deploymentId) {
-    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, true));
+    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, true, false));
   }
 
   public void deleteDeployment(String deploymentId, boolean cascade) {
-    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade));
+    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade, false));
+  }
+
+  public void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners) {
+    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade, skipCustomListeners));
   }
 
   public ProcessDefinitionQuery createProcessDefinitionQuery() {

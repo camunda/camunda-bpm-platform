@@ -224,9 +224,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void deleteCascade(String deleteReason) {
+    deleteCascade(deleteReason, false);
+  }
+
+  public void deleteCascade(String deleteReason, boolean skipCustomListeners) {
     this.deleteReason = deleteReason;
     this.deleteRoot = true;
     this.isEnded = true;
+    this.skipCustomListeners = skipCustomListeners;
     performOperation(PvmAtomicOperation.DELETE_CASCADE);
   }
 

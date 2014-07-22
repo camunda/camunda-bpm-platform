@@ -35,6 +35,11 @@ public abstract class CoreModelElement implements Serializable {
   protected String id;
   protected String name;
   protected Map<String, Object> properties;
+
+  /** contains built-in listeners */
+  protected Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> builtInListeners = new HashMap<String, List<DelegateListener<? extends BaseDelegateExecution>>>();
+
+  /** contains all listeners (built-in + user-provided) */
   protected Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> listeners = new HashMap<String, List<DelegateListener<? extends BaseDelegateExecution>>>();
 
   public CoreModelElement(String id) {
@@ -92,15 +97,36 @@ public abstract class CoreModelElement implements Serializable {
     return Collections.emptyList();
   }
 
+  public List<DelegateListener<? extends BaseDelegateExecution>> getBuiltInListeners(String eventName) {
+    List<DelegateListener<? extends BaseDelegateExecution>> listenerList = getBuiltInListeners().get(eventName);
+    if (listenerList != null) {
+      return listenerList;
+    }
+    return Collections.emptyList();
+  }
+
   public void addListener(String eventName, DelegateListener<? extends BaseDelegateExecution> listener) {
     addListener(eventName, listener, -1);
   }
 
+  public void addBuiltInListener(String eventName, DelegateListener<? extends BaseDelegateExecution> listener) {
+    addBuiltInListener(eventName, listener, -1);
+  }
+
+  public void addBuiltInListener(String eventName, DelegateListener<? extends BaseDelegateExecution> listener, int index) {
+    addListenerToMap(listeners, eventName, listener, index);
+    addListenerToMap(builtInListeners, eventName, listener, index);
+  }
+
   public void addListener(String eventName, DelegateListener<? extends BaseDelegateExecution> listener, int index) {
-    List<DelegateListener<? extends BaseDelegateExecution>> listeners = this.listeners.get(eventName);
+    addListenerToMap(listeners, eventName, listener, index);
+  }
+
+  private void addListenerToMap(Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> listenerMap, String eventName, DelegateListener<? extends BaseDelegateExecution> listener, int index) {
+    List<DelegateListener<? extends BaseDelegateExecution>> listeners = listenerMap.get(eventName);
     if (listeners == null) {
       listeners = new ArrayList<DelegateListener<? extends BaseDelegateExecution>>();
-      this.listeners.put(eventName, listeners);
+      listenerMap.put(eventName, listeners);
     }
     if (index < 0) {
       listeners.add(listener);
@@ -111,6 +137,11 @@ public abstract class CoreModelElement implements Serializable {
 
   public Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> getListeners() {
     return listeners;
+  }
+
+
+  public Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> getBuiltInListeners() {
+    return builtInListeners;
   }
 
 }

@@ -28,10 +28,16 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
   }
 
   public void execute(PvmExecutionImpl execution) {
-     PvmExecutionImpl firstLeaf = findFirstLeaf(execution);
+    PvmExecutionImpl firstLeaf = findFirstLeaf(execution);
+
+    // propagate skipCustomListeners property
+    PvmExecutionImpl deleteRoot = getDeleteRoot(execution);
+    if(deleteRoot != null) {
+      firstLeaf.setSkipCustomListeners(deleteRoot.isSkipCustomListeners());
+    }
 
     if (firstLeaf.getSubProcessInstance()!=null) {
-      firstLeaf.getSubProcessInstance().deleteCascade(execution.getDeleteReason());
+      firstLeaf.getSubProcessInstance().deleteCascade(execution.getDeleteReason(), firstLeaf.isSkipCustomListeners());
     }
 
     firstLeaf.performOperation(DELETE_CASCADE_FIRE_ACTIVITY_END);
@@ -43,6 +49,16 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
       return findFirstLeaf(executions.get(0));
     }
     return execution;
+  }
+
+  protected PvmExecutionImpl getDeleteRoot(PvmExecutionImpl execution) {
+    if(execution == null) {
+      return null;
+    } else if(execution.isDeleteRoot()) {
+      return execution;
+    } else {
+      return getDeleteRoot(execution.getParent());
+    }
   }
 
   public String getCanonicalName() {

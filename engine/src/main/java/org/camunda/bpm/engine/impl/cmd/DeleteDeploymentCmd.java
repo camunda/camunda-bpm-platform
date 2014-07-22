@@ -36,9 +36,12 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
   protected String deploymentId;
   protected boolean cascade;
 
-  public DeleteDeploymentCmd(String deploymentId, boolean cascade) {
+  protected boolean skipCustomListeners;
+
+  public DeleteDeploymentCmd(String deploymentId, boolean cascade, boolean skipCustomListeners) {
     this.deploymentId = deploymentId;
     this.cascade = cascade;
+    this.skipCustomListeners = skipCustomListeners;
   }
 
   public Void execute(CommandContext commandContext) {
@@ -46,7 +49,7 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
 
     commandContext
       .getDeploymentManager()
-      .deleteDeployment(deploymentId, cascade);
+      .deleteDeployment(deploymentId, cascade, skipCustomListeners);
 
     DeleteDeploymentFailListener listener = new DeleteDeploymentFailListener(deploymentId);
 

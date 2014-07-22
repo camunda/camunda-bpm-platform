@@ -48,6 +48,10 @@ public class DeploymentManager extends AbstractManager {
   }
 
   public void deleteDeployment(String deploymentId, boolean cascade) {
+    deleteDeployment(deploymentId, cascade, false);
+  }
+
+  public void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners) {
     List<ProcessDefinition> processDefinitions = getDbSqlSession()
             .createProcessDefinitionQuery()
             .deploymentId(deploymentId)
@@ -60,7 +64,7 @@ public class DeploymentManager extends AbstractManager {
         String processDefinitionId = processDefinition.getId();
 
         getProcessInstanceManager()
-          .deleteProcessInstancesByProcessDefinition(processDefinitionId, "deleted deployment", cascade);
+          .deleteProcessInstancesByProcessDefinition(processDefinitionId, "deleted deployment", cascade, skipCustomListeners);
 
       }
     }

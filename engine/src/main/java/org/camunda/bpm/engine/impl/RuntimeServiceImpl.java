@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl;
 
 import java.util.*;
+
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.impl.cmd.*;
@@ -59,7 +60,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason) {
-    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason));
+    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason, false));
+  }
+
+  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners) {
+    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason, skipCustomListeners));
   }
 
   public ExecutionQuery createExecutionQuery() {
@@ -165,7 +170,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public void signal(String executionId) {
     commandExecutor.execute(new SignalCmd(executionId, null, null, null));
   }
-  
+
   public void signal(String executionId, String signalName, Object signalData, Map<String, Object> processVariables) {
     commandExecutor.execute(new SignalCmd(executionId, signalName, signalData, processVariables));
   }

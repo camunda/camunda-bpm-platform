@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine;
 
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.*;
@@ -246,6 +247,15 @@ public interface RuntimeService {
    * @throws BadUserRequestException when no process instance is found with the given id or id is null.
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason);
+
+  /** Delete an existing runtime process instance.
+   * @param processInstanceId id of process instance to delete, cannot be null.
+   * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
+   * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
+   * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
+   * @throws BadUserRequestException when no process instance is found with the given id or id is null.
+   */
+  void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners);
 
   /** Finds the activity ids for all executions that are waiting in activities.
    * This is a list because a single activity can be active multiple times.

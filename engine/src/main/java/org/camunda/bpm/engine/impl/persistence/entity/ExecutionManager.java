@@ -37,12 +37,12 @@ public class ExecutionManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public void deleteProcessInstancesByProcessDefinition(String processDefinitionId, String deleteReason, boolean cascade) {
+  public void deleteProcessInstancesByProcessDefinition(String processDefinitionId, String deleteReason, boolean cascade, boolean skipCustomListeners) {
     List<String> processInstanceIds = getDbSqlSession()
       .selectList("selectProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
 
     for (String processInstanceId: processInstanceIds) {
-      deleteProcessInstance(processInstanceId, deleteReason, cascade);
+      deleteProcessInstance(processInstanceId, deleteReason, cascade, skipCustomListeners);
     }
 
     if (cascade) {
@@ -54,10 +54,10 @@ public class ExecutionManager extends AbstractManager {
   }
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason) {
-    deleteProcessInstance(processInstanceId, deleteReason, false);
+    deleteProcessInstance(processInstanceId, deleteReason, false, false);
   }
 
-  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade) {
+  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade, boolean skipCustomListeners) {
     ExecutionEntity execution = findExecutionById(processInstanceId);
 
     if(execution == null) {
@@ -70,7 +70,7 @@ public class ExecutionManager extends AbstractManager {
       .deleteTasksByProcessInstanceId(processInstanceId, deleteReason, cascade);
 
     // delete the execution BEFORE we delete the history, otherwise we will produce orphan HistoricVariableInstance instances
-    execution.deleteCascade(deleteReason);
+    execution.deleteCascade(deleteReason, skipCustomListeners);
 
     if (cascade) {
       commandContext

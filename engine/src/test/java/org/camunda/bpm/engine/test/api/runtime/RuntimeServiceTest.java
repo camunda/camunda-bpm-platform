@@ -16,8 +16,10 @@ package org.camunda.bpm.engine.test.api.runtime;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
@@ -131,6 +133,91 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
               .singleResult();
 
       assertEquals(deleteReason, historicTaskInstance.getDeleteReason());
+    }
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteProcessInstanceSkipCustomListenersEnsureHistoryWritten() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // if we skip the custom listeners,
+    runtimeService.deleteProcessInstance(processInstance.getId(), null, true);
+
+    // buit-in listeners are still invoked and thus history is written
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
+      // verify that all historic activity instances are ended
+      List<HistoricActivityInstance> hais = historyService.createHistoricActivityInstanceQuery().list();
+      for (HistoricActivityInstance hai : hais) {
+        assertNotNull(hai.getEndTime());
+      }
+    }
+  }
+
+  @Deployment
+  public void testDeleteProcessInstanceSkipCustomListeners() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // if we do not skip the custom listeners,
+    runtimeService.deleteProcessInstance(processInstance.getId(), null, false);
+
+    // the custom listener is invoked
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
+      HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
+        .processInstanceId(processInstance.getId())
+        .variableName("invoked")
+        .singleResult();
+      assertNotNull(variableInstance);
+      assertEquals(true, variableInstance.getValue());
+    }
+
+    processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // if we DO skip the custom listeners,
+    runtimeService.deleteProcessInstance(processInstance.getId(), null, true);
+
+    // the custom listener are not invoked
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
+      HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
+        .processInstanceId(processInstance.getId())
+        .variableName("invoked")
+        .singleResult();
+      assertNull(variableInstance);
+    }
+  }
+
+  @Deployment
+  public void testDeleteProcessInstanceSkipCustomListenersScope() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // if we do not skip the custom listeners,
+    runtimeService.deleteProcessInstance(processInstance.getId(), null, false);
+
+    // the custom listener is invoked
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
+      HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
+        .processInstanceId(processInstance.getId())
+        .variableName("invoked")
+        .singleResult();
+      assertNotNull(variableInstance);
+      assertEquals(true, variableInstance.getValue());
+    }
+
+    processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // if we DO skip the custom listeners,
+    runtimeService.deleteProcessInstance(processInstance.getId(), null, true);
+
+    // the custom listener are not invoked
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
+      HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
+        .processInstanceId(processInstance.getId())
+        .variableName("invoked")
+        .singleResult();
+      assertNull(variableInstance);
     }
   }
 

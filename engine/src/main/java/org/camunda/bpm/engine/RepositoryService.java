@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -70,6 +71,16 @@ public interface RepositoryService {
    * @param deploymentId id of the deployment, cannot be null.
    */
   void deleteDeployment(String deploymentId, boolean cascade);
+
+  /**
+   * Deletes the given deployment and cascade deletion to process instances,
+   * history process instances and jobs.
+   * @param deploymentId id of the deployment, cannot be null.
+   * @param cascate if set to true, all process instances (incuding) history are deleted
+   * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
+   * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
+   */
+  void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners);
 
   /**
    * Retrieves a list of deployment resource names for the given deployment,
