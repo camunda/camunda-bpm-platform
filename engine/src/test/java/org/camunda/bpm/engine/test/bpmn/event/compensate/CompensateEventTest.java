@@ -334,4 +334,10 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment
+  public void FAILING_testExecutionListeners() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    assertTrue((Boolean) runtimeService.getVariable(processInstance.getId(), "end"));
+  }
+
 }
