@@ -13,6 +13,7 @@
 package org.camunda.bpm.container.impl.jmx.deployment;
 
 import java.util.Map;
+
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.deployment.util.DeployedProcessArchive;
@@ -22,6 +23,7 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
 
 /**
  * <p>Deployment operation step responsible for performing the undeployment of a
@@ -61,10 +63,15 @@ public class UndeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     // delete the deployment if not disabled
     if (PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {
       if (processEngine != null) {
-        processEngine.getRepositoryService().deleteDeployment(deployedProcessArchive.getPrimaryDeploymentId(), true);
+        // always cascade & skip custom listeners
+        deleteDeployment(deployedProcessArchive.getPrimaryDeploymentId(), processEngine.getRepositoryService());
       }
     }
 
+  }
+
+  protected void deleteDeployment(String deploymentId, RepositoryService repositoryService) {
+    repositoryService.deleteDeployment(deploymentId, true, true);
   }
 
 }

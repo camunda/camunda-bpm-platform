@@ -208,7 +208,8 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     if(deployment != null && PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {
       try {
         LOGGER.info("Deleting cascade deployment with name '"+deployment.getName()+"/"+deployment.getId()+"'.");
-        processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        // always cascade & skip custom listeners
+        processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true, true);
 
       } catch (Exception e) {
         LOGGER.log(Level.WARNING, "Exception while deleting process engine deployment", e);
