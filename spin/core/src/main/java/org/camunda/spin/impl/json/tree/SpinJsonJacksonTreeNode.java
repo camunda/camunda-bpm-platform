@@ -26,6 +26,7 @@ import java.util.List;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.SpinListImpl;
 import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.json.SpinJsonTreeNodeException;
 import org.camunda.spin.logging.SpinLogger;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -206,18 +207,37 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     }
   }
 
+  /**
+   * Maps the json represented by this object to a java object of the given type.
+   * 
+   * @throws SpinJsonTreeNodeException if the json representation cannot be mapped to the specified type
+   */
   public <C> C mapTo(Class<C> type) {
     JavaType javaType = TypeFactory.defaultInstance().constructType(type);
-    return (C) mapTo(javaType);
-    
+    C result = mapTo(javaType);
+    return result;
   }
 
+  /**
+   * Maps the json represented by this object to a java object of the given type.
+   * Argument is to be supplied in Jackson's canonical type string format 
+   * (see {@link JavaType#toCanonical()}).
+   * 
+   * @throws SpinJsonTreeNodeException if the json representation cannot be mapped to the specified type
+   * @throws SpinJsonDataFormatException if the parameter does not match a valid type
+   */
   public <C> C mapTo(String type) {
     JavaType javaType = dataFormat.constructJavaTypeFromCanonicalString(type);
-    return (C) mapTo(javaType);
+    C result = mapTo(javaType);
+    return result;
   }
   
-  public Object mapTo(JavaType type) {
+  /**
+   * Maps the json represented by this object to a java object of the given type.
+   * 
+   * @throws SpinJsonTreeNodeException if the json representation cannot be mapped to the specified type
+   */
+  public <C> C mapTo(JavaType type) {
     ObjectMapper mapper = dataFormat.getConfiguredObjectMapper();
     try {
       return mapper.readValue(mapper.treeAsTokens(jsonNode), type);

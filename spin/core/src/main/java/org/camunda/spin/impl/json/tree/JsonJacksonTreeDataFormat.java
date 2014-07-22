@@ -48,12 +48,15 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
   
   protected JsonJacksonParserConfiguration parserConfiguration;
   protected JsonJacksonGeneratorConfiguration generatorConfiguration;
+  protected JsonJacksonMapperConfiguration mapperConfiguration;
   protected ObjectMapper cachedObjectMapper;
   protected List<TypeDetector> typeDetectors;
   
   public JsonJacksonTreeDataFormat() {
     this.parserConfiguration = new JsonJacksonParserConfiguration(this);
     this.generatorConfiguration = new JsonJacksonGeneratorConfiguration(this);
+    this.mapperConfiguration = new JsonJacksonMapperConfiguration(this);
+    
     typeDetectors = new ArrayList<TypeDetector>();
     typeDetectors.add(new ListJsonJacksonTypeDetector());
     typeDetectors.add(new DefaultJsonJacksonTypeDetector());
@@ -74,11 +77,16 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
   // configuration
   public JsonJacksonTreeDataFormat newInstance() {
     JsonJacksonTreeDataFormat instance = new JsonJacksonTreeDataFormat();
+    
     instance.cachedObjectMapper = cachedObjectMapper;
+    
     instance.parserConfiguration = 
         new JsonJacksonParserConfiguration(instance, parserConfiguration);
     instance.generatorConfiguration = 
         new JsonJacksonGeneratorConfiguration(instance, generatorConfiguration);
+    instance.mapperConfiguration =
+        new JsonJacksonMapperConfiguration(instance, mapperConfiguration);
+    
     instance.typeDetectors = new ArrayList<TypeDetector>(typeDetectors);
     
     return instance;
@@ -95,6 +103,10 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
   public JsonJacksonGeneratorConfiguration writer() {
     return generatorConfiguration;
   }
+  
+  public JsonJacksonMapperConfiguration mapper() {
+    return mapperConfiguration;
+  }
 
   public JsonJacksonTreeDataFormat done() {
     return this;
@@ -103,6 +115,7 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
   public void applyTo(ObjectMapper mapper) {
     parserConfiguration.applyTo(mapper);
     generatorConfiguration.applyTo(mapper);
+    mapperConfiguration.applyTo(mapper);
   }
   
   public ObjectMapper getConfiguredObjectMapper() {
@@ -122,6 +135,12 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
     cachedObjectMapper = null;
   }
 
+  /**
+   * Identifies the canonical type of an object heuristically.
+   * 
+   * @return the canonical type identifier of the object's class
+   * according to Jackson's type format (see {@link TypeFactory#constructFromCanonical(String)})
+   */
   public String getCanonicalTypeName(Object object) {
     ensureNotNull("object", object);
     
@@ -134,6 +153,14 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
     throw LOG.unableToDetectCanonicalType(object);
   }
   
+  /**
+   * Constructs a {@link JavaType} object based on the parameter, which
+   * has to follow Jackson's canonical type string format.
+   * 
+   * @param canonicalString
+   * @return
+   * @throws SpinJsonDataFormatException if no type can be constructed from the given parameter
+   */
   public JavaType constructJavaTypeFromCanonicalString(String canonicalString) {
     try {
       return TypeFactory.defaultInstance().constructFromCanonical(canonicalString);

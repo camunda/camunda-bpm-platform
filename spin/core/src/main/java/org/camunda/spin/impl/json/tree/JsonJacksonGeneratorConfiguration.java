@@ -12,10 +12,6 @@
  */
 package org.camunda.spin.impl.json.tree;
 
-import java.util.Map;
-
-import org.camunda.spin.spi.AbstractConfiguration;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,44 +21,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * @author Thorben Lindhauer
  */
-public class JsonJacksonGeneratorConfiguration extends AbstractConfiguration<JsonJacksonGeneratorConfiguration> implements JsonJacksonTreeConfigurable {
+public class JsonJacksonGeneratorConfiguration 
+  extends AbstractJsonJacksonDataFormatConfiguration<JsonJacksonGeneratorConfiguration> 
+  implements JsonJacksonTreeConfigurable {
 
-  protected JsonJacksonTreeDataFormat dataFormat;
-  
   public JsonJacksonGeneratorConfiguration(JsonJacksonTreeDataFormat dataFormat) {
-    this.dataFormat = dataFormat;
+    super(dataFormat);
   }
   
   public JsonJacksonGeneratorConfiguration(JsonJacksonTreeDataFormat dataFormat, 
       JsonJacksonGeneratorConfiguration generatorConfiguration) {
-    super(generatorConfiguration);
-    this.dataFormat = dataFormat;
-  }
-
-  public JsonJacksonParserConfiguration reader() {
-    return dataFormat.reader();
-  }
-
-  public JsonJacksonGeneratorConfiguration writer() {
-    return dataFormat.writer();
-  }
-
-  public JsonJacksonTreeDataFormat done() {
-    return dataFormat;
+    super(dataFormat, generatorConfiguration);
   }
 
   protected JsonJacksonGeneratorConfiguration thisConfiguration() {
     return this;
-  }
-  
-  public JsonJacksonGeneratorConfiguration config(Map<String, Object> config) {
-    dataFormat.invalidateCachedObjectMapper();
-    return super.config(config);
-  }
-  
-  public JsonJacksonGeneratorConfiguration config(String key, Object value) {
-    dataFormat.invalidateCachedObjectMapper();
-    return super.config(key, value);
   }
   
   public JsonJacksonGeneratorConfiguration config(JsonGenerator.Feature feature, Object value) {
@@ -116,4 +89,5 @@ public class JsonJacksonGeneratorConfiguration extends AbstractConfiguration<Jso
   public Boolean writesNumbersAsString() {
     return getValue(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS);
   }
+
 }

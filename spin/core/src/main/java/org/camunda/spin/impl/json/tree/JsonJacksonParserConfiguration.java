@@ -14,8 +14,6 @@ package org.camunda.spin.impl.json.tree;
 
 import java.util.Map;
 
-import org.camunda.spin.spi.AbstractConfiguration;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,44 +23,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * @author Thorben Lindhauer
  */
-public class JsonJacksonParserConfiguration extends AbstractConfiguration<JsonJacksonParserConfiguration>  implements JsonJacksonTreeConfigurable {
+public class JsonJacksonParserConfiguration 
+  extends AbstractJsonJacksonDataFormatConfiguration<JsonJacksonParserConfiguration>  
+  implements JsonJacksonTreeConfigurable {
 
-  private JsonJacksonTreeDataFormat dataFormat;
+  protected JsonJacksonTreeDataFormat dataFormat;
   
   public JsonJacksonParserConfiguration(JsonJacksonTreeDataFormat dataFormat) {
-    this.dataFormat = dataFormat;
+    super(dataFormat);
   }
   
   public JsonJacksonParserConfiguration(JsonJacksonTreeDataFormat dataFormat, 
       JsonJacksonParserConfiguration configuration) {
-    super(configuration);
-    this.dataFormat = dataFormat;
-  }
-
-  public JsonJacksonParserConfiguration reader() {
-    return this;
-  }
-
-  public JsonJacksonGeneratorConfiguration writer() {
-    return dataFormat.writer();
-  }
-
-  public JsonJacksonTreeDataFormat done() {
-    return dataFormat;
+    super(dataFormat, configuration);
   }
 
   protected JsonJacksonParserConfiguration thisConfiguration() {
     return this;
-  }
-  
-  public JsonJacksonParserConfiguration config(Map<String, Object> config) {
-    dataFormat.invalidateCachedObjectMapper();
-    return super.config(config);
-  }
-  
-  public JsonJacksonParserConfiguration config(String key, Object value) {
-    dataFormat.invalidateCachedObjectMapper();
-    return super.config(key, value);
   }
   
   public JsonJacksonParserConfiguration config(JsonParser.Feature feature, Object value) {

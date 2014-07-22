@@ -107,7 +107,7 @@ public class JsonTreeConfigureReaderTest {
   }
   
   @Test
-  public void shouldCreateNewInstanceOnConfiguration() {
+  public void shouldPassConfigurationToNewInstance() {
     JsonJacksonTreeDataFormat jsonDataFormat = new JsonJacksonTreeDataFormat();
     jsonDataFormat.reader().config("aKey", "aValue");
     

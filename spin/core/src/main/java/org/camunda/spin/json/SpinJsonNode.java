@@ -131,5 +131,4 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    * @throws SpinDataFormatException if this node is not a array value
    */
   public abstract List<String> fieldNames();
-
 }

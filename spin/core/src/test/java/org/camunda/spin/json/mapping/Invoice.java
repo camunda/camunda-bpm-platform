@@ -10,25 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.impl.json.tree;
+package org.camunda.spin.json.mapping;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+public class Invoice {
 
-/**
- * Provides entry points to Jackson-specific configuration objects.
- * 
- * @author Thorben Lindhauer
- */
-public interface JsonJacksonTreeConfigurable {
-
-  JsonJacksonParserConfiguration reader();
+  private int amount;
+  private Customer customer;
   
-  JsonJacksonGeneratorConfiguration writer();
-  
-  JsonJacksonMapperConfiguration mapper();
-  
-  JsonJacksonTreeDataFormat done();
-  
-  void applyTo(ObjectMapper mapper);
-  
+  public int getAmount() {
+    return amount;
+  }
+  public void setAmount(int amount) {
+    this.amount = amount;
+  }
+  public Customer getCustomer() {
+    return customer;
+  }
+  public void setCustomer(Customer customer) {
+    this.customer = customer;
+  }
 }

@@ -32,4 +32,9 @@ public class JsonTestConstants {
   public final static String EXAMPLE_JACKSON_READ_CONFIGURATION_JSON_FILE_NAME = "org/camunda/spin/json/example_jackson.json";
   
   public final static String EXAMPLE_JACKSON_READ_CONFIGURATION_JSON = IoUtil.readFileAsString(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON_FILE_NAME);
+  
+  public final static String EXAMPLE_JACKSON_TYPE_JSON_FILE_NAME = "org/camunda/spin/json/example_jackson_types.json";
+  
+  public final static String EXAMPLE_JACKSON_TYPE_JSON = IoUtil.readFileAsString(EXAMPLE_JACKSON_TYPE_JSON_FILE_NAME);
+
 }

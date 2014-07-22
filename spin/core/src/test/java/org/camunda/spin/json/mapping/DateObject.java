@@ -10,25 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.impl.json.tree;
+package org.camunda.spin.json.mapping;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Date;
 
-/**
- * Provides entry points to Jackson-specific configuration objects.
- * 
- * @author Thorben Lindhauer
- */
-public interface JsonJacksonTreeConfigurable {
+public class DateObject {
 
-  JsonJacksonParserConfiguration reader();
-  
-  JsonJacksonGeneratorConfiguration writer();
-  
-  JsonJacksonMapperConfiguration mapper();
-  
-  JsonJacksonTreeDataFormat done();
-  
-  void applyTo(ObjectMapper mapper);
-  
+  private Date date;
+
+  public Date getDate() {
+    return date;
+  }
+
+  public void setDate(Date date) {
+    this.date = date;
+  }
 }

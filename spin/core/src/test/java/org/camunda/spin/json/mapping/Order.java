@@ -18,7 +18,7 @@ public class Order {
 
   private long id;
   private String order;
-  private int dueUntil;
+  private Object dueUntil;
   private boolean active;
   private List<RegularCustomer> customers;
   private OrderDetails orderDetails;
@@ -35,10 +35,10 @@ public class Order {
   public void setOrder(String order) {
     this.order = order;
   }
-  public int getDueUntil() {
+  public Object getDueUntil() {
     return dueUntil;
   }
-  public void setDueUntil(int dueUntil) {
+  public void setDueUntil(Object dueUntil) {
     this.dueUntil = dueUntil;
   }
   public boolean isActive() {
