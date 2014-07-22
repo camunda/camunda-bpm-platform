@@ -126,15 +126,24 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
 
   protected void validateAndSwitchVersionOfExecution(CommandContext commandContext, ExecutionEntity execution, ProcessDefinitionEntity newProcessDefinition) {
     // check that the new process definition version contains the current activity
-    if (execution.getActivity() != null && !newProcessDefinition.contains(execution.getActivity())) {
-      throw new ProcessEngineException(
-        "The new process definition " +
-        "(key = '" + newProcessDefinition.getKey() + "') " +
-        "does not contain the current activity " +
-        "(id = '" + execution.getActivity().getId() + "') " +
-        "of the process instance " +
-        "(id = '" + processInstanceId + "').");
-    }
+    // check that the new process definition version contains the current activity
+    if (execution.getActivity() != null) {
+        final String activityId = execution.getActivity().getId();
+        final ActivityImpl newActivity = newProcessDefinition.findActivity(activityId);
+
+        if (newActivity == null) {
+            throw new ProcessEngineException(
+              "The new process definition " +
+              "(key = '" + newProcessDefinition.getKey() + "') " +
+              "does not contain the current activity " +
+              "(id = '" + activityId + "') " +
+              "of the process instance " +
+              "(id = '" + processInstanceId + "').");
+            }
+
+            // clear cached activity so that outgoing transitions are refreshed
+            execution.setActivity(newActivity);
+        }
 
     // switch the process instance to the new process definition version
     execution.setProcessDefinition(newProcessDefinition);
