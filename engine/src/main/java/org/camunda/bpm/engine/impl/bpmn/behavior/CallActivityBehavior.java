@@ -161,21 +161,23 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     for (DataAssociation dataOutputAssociation : dataOutputAssociations) {
       Object value = null;
         if (dataOutputAssociation.getVariables() != null) {
+          // set all variables
           Map<String, Object> variables = subProcessInstance.getVariables();
           if (variables != null && !variables.isEmpty()) {
             execution.setVariables(variables);
           }
-        }
-        else if (dataOutputAssociation.getSourceExpression()!=null) {
-          value = dataOutputAssociation.getSourceExpression().getValue(subProcessInstance);
-        }
-        else {
-          value = subProcessInstance.getVariable(dataOutputAssociation.getSource());
-        }
+        } else {
+          // set single variable
+          if (dataOutputAssociation.getSourceExpression()!=null) {
+            value = dataOutputAssociation.getSourceExpression().getValue(subProcessInstance);
 
-        if (value != null) {
+          } else {
+            value = subProcessInstance.getVariable(dataOutputAssociation.getSource());
+          }
+
           execution.setVariable(dataOutputAssociation.getTarget(), value);
         }
+
     }
   }
 
