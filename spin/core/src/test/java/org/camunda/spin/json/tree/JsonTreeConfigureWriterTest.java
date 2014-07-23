@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -61,22 +60,21 @@ public class JsonTreeConfigureWriterTest {
     assertThat(json).isEqualTo("{prop:\"value\"}");
   }
   
-  @Ignore
   @Test
   public void shouldNotQuoteNonNumericNumbers() {
     String input = "{}";
     
     String json = JSON(input, jsonTree().writer().quoteNonNumericNumbers(Boolean.FALSE).done())
-    // TODO set a property of the object to infinity as soon as implemented
-      .toString();
+        .prop("prop", Double.POSITIVE_INFINITY).toString();
     
-    assertThat(json).isEqualTo("{\"prop\":Inf}");
+    assertThat(json).isEqualTo("{\"prop\":Infinity}");
     
     Map<String, Object> config = 
         newMap(JsonGenerator.Feature.QUOTE_NON_NUMERIC_NUMBERS.name(), Boolean.FALSE);
-    json = JSON(input, jsonTree().writer().config(config).done()).toString();
+    json = JSON(input, jsonTree().writer().config(config).done())
+        .prop("prop", Double.POSITIVE_INFINITY).toString();
     
-    assertThat(json).isEqualTo("{\"prop\":Inf}");
+    assertThat(json).isEqualTo("{\"prop\":Infinity}");
   }
   
   @Test
