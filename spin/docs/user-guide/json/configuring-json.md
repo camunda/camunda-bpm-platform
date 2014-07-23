@@ -43,8 +43,9 @@ var customer = JSON('{"age": 042}', {ALLOW_NON_NUMERIC_NUMBERS: true}, {QUOTE_FI
 
 ## Configuration Options
 
-All of Jackson's [parsing][jackson-parser-features] and [writing][jackson-generator-features] configuration options are supported by Spin. When providing a configuration in form of a map, the keys are the same as the names of the Jackson enum values. In the example above, the key `ALLOW_NON_NUMERIC_NUMBERS` corresponds to the enum value `com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS`.
+All of Jackson's [parsing][jackson-parser-features], [writing][jackson-generator-features] and [deserialization][jackson-deserialization-features] configuration options are supported by Spin. When providing a configuration in form of a map, the keys are the same as the names of the Jackson enum values. In the example above, the key `ALLOW_NON_NUMERIC_NUMBERS` corresponds to the enum value `com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS`.
 
 [jackson-wiki]: http://wiki.fasterxml.com/JacksonHome
 [jackson-parser-features]: https://fasterxml.github.io/jackson-core/javadoc/2.3.0/com/fasterxml/jackson/core/JsonParser.Feature.html
 [jackson-generator-features]: https://fasterxml.github.io/jackson-core/javadoc/2.3.0/com/fasterxml/jackson/core/JsonGenerator.Feature.html
+[jackson-deserialization-features]: https://fasterxml.github.io/jackson-databind/javadoc/2.3.0/com/fasterxml/jackson/databind/DeserializationFeature.html
