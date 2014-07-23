@@ -12,11 +12,12 @@
  */
 package org.camunda.spin.json;
 
-import java.util.List;
-
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.spi.SpinDataFormatException;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * A json node.
@@ -48,6 +49,69 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    * @return {@link SpinJsonNode} representation of the property
    */
   public abstract SpinJsonNode prop(String name);
+
+  /**
+   * Set a new String property in this node.
+   *
+   * @param name the name of the new property
+   * @param newProperty the new String property
+   * @return {@link SpinJsonNode} representation of the property
+   */
+  public abstract SpinJsonNode prop(String name, String newProperty);
+
+  /**
+   * Set a new Number property in this node.
+   *
+   * @param name the name of the new property
+   * @param newProperty the new Number property
+   * @return {@link SpinJsonNode} representation of the property
+   */
+  public abstract SpinJsonNode prop(String name, Number newProperty);
+
+  /**
+   * Set a new int property in this node.
+   *
+   * @param name the name of the new property
+   * @param newProperty the new int property
+   * @return {@link SpinJsonNode} representation of the property
+   */
+  public abstract SpinJsonNode prop(String name, int newProperty);
+
+  /**
+   * Set a new Boolean property in this node.
+   *
+   * @param name the name of the new property
+   * @param newProperty the new Boolean property
+   * @return {@link SpinJsonNode} representation of the property
+   */
+  public abstract SpinJsonNode prop(String name, Boolean newProperty);
+
+  /**
+   * Set a new List property in this node.
+   *
+   * @param name the name of the new property
+   * @param newProperty the new List property
+   * @return {@link SpinJsonNode} representation of the property
+   */
+  public abstract SpinJsonNode prop(String name, List<Object> newProperty);
+
+  /**
+   * Set a new Map property in this node.
+   *
+   * @param name the name of the new property
+   * @param newProperty the new Map property
+   * @return {@link SpinJsonNode} representation of the property
+   */
+  public abstract SpinJsonNode prop(String name, Map<String, Object> newProperty);
+
+  /**
+   * Set a new SpinJsonNode Object property in this node.
+   *
+   * @param name the name of the new property
+   * @param newProperty the new SpinJsonNode Object property
+   * @return {@link SpinJsonNode} representation of the property
+   */
+  public abstract SpinJsonNode prop(String name, SpinJsonNode newProperty);
 
   /**
    * Check if this node is a boolean value.

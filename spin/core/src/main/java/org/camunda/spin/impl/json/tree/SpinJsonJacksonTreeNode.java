@@ -12,29 +12,31 @@
  */
 package org.camunda.spin.impl.json.tree;
 
-import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.SpinListImpl;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.json.SpinJsonTreeNodeException;
 import org.camunda.spin.logging.SpinLogger;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
+
+
+
+
 
 /**
  * Wrapper for a Jackson Json Tree Node. 
@@ -44,7 +46,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
  */
 public class SpinJsonJacksonTreeNode extends SpinJsonNode {
 
-  private static final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
+  private final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
 
   protected final JsonNode jsonNode;
   protected final JsonJacksonTreeDataFormat dataFormat;
@@ -100,6 +102,73 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     return writer;
   }
 
+  @SuppressWarnings("unchecked")
+  protected JsonNode createJsonNode(Object parameter) {
+    if(parameter instanceof String) {
+      return createJsonNode((String) parameter);
+
+    } else if(parameter instanceof Integer) {
+      return createJsonNode((Integer) parameter);
+
+    } else if(parameter instanceof Boolean) {
+      return createJsonNode((Boolean) parameter);
+
+    } else if(parameter instanceof Float) {
+      return createJsonNode((Float) parameter);
+
+    } else if(parameter instanceof Long) {
+      return createJsonNode((Long) parameter);
+
+    } else if(parameter instanceof Number) {
+      return createJsonNode(((Number) parameter).floatValue());
+
+    } else if(parameter instanceof List) {
+      return createJsonNode((List<Object>) parameter);
+
+    } else if(parameter instanceof Map) {
+      return createJsonNode((Map<String, Object>) parameter);
+
+    } else {
+      throw LOG.unableToCreateNode(parameter.getClass().getTypeName());
+    }
+  }
+
+  protected JsonNode createJsonNode(String parameter) {
+    return dataFormat.getConfiguredObjectMapper().getNodeFactory().textNode(parameter);
+  }
+
+  protected JsonNode createJsonNode(Integer parameter) {
+    return dataFormat.getConfiguredObjectMapper().getNodeFactory().numberNode(parameter);
+  }
+
+  protected JsonNode createJsonNode(Float parameter) {
+    return dataFormat.getConfiguredObjectMapper().getNodeFactory().numberNode(parameter);
+  }
+
+  protected JsonNode createJsonNode(Long parameter) {
+    return dataFormat.getConfiguredObjectMapper().getNodeFactory().numberNode(parameter);
+  }
+
+  protected JsonNode createJsonNode(Boolean parameter) {
+    return dataFormat.getConfiguredObjectMapper().getNodeFactory().booleanNode(parameter);
+  }
+
+  protected JsonNode createJsonNode(List<Object> parameter) {
+    ArrayNode node = dataFormat.getConfiguredObjectMapper().getNodeFactory().arrayNode();
+    for(Object entry : parameter) {
+      node.add(createJsonNode(entry));
+    }
+    return node;
+  }
+
+  protected JsonNode createJsonNode(Map<String, Object> parameter) {
+    ObjectNode node = dataFormat.getConfiguredObjectMapper().getNodeFactory().objectNode();
+    for (Map.Entry<String, Object> entry : parameter.entrySet()) {
+      node.put(entry.getKey(), createJsonNode(entry.getValue()));
+    }
+    return node;
+  }
+
   public boolean isObject() {
     return jsonNode.isObject();
   }
@@ -116,6 +185,80 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     } else {
       throw LOG.unableToFindProperty(name);
     }
+  }
+
+  public SpinJsonNode prop(String name, String newProperty) {
+    ObjectNode node = (ObjectNode) jsonNode;
+
+    node.put(name, newProperty);
+
+    return dataFormat.createWrapperInstance(node);
+  }
+
+  public SpinJsonNode prop(String name, Number newProperty) {
+    ObjectNode node = (ObjectNode) jsonNode;
+
+    // Numbers magic because Jackson has no native .put(Number value)
+    if(newProperty instanceof Long) {
+      node.put(name, newProperty.longValue());
+    } else if(newProperty instanceof Integer) {
+      node.put(name, newProperty.intValue());
+    } else if(newProperty instanceof Float) {
+        node.put(name, newProperty.floatValue());
+    } else {
+      // convert any other sub class of Number into Float
+      node.put(name, newProperty.floatValue());
+    }
+
+    return dataFormat.createWrapperInstance(node);
+  }
+
+  public SpinJsonNode prop(String name, int newProperty) {
+    return prop(name, (Number) newProperty);
+  }
+
+  public SpinJsonNode prop(String name, float newProperty) {
+    return prop(name, (Number) newProperty);
+  }
+
+  public SpinJsonNode prop(String name, long newProperty) {
+    return prop(name, (Number) newProperty);
+  }
+
+  public SpinJsonNode prop(String name, boolean newProperty) {
+    return prop(name, (Boolean) newProperty);
+  }
+
+  public SpinJsonNode prop(String name, Boolean newProperty) {
+    ObjectNode node = (ObjectNode) jsonNode;
+
+    node.put(name, createJsonNode(newProperty));
+
+    return dataFormat.createWrapperInstance(node);
+  }
+
+  public SpinJsonNode prop(String name, List<Object> newProperty) {
+    ObjectNode node = (ObjectNode) jsonNode;
+
+    node.put(name, createJsonNode(newProperty));
+
+    return dataFormat.createWrapperInstance(node);
+  }
+
+  public SpinJsonNode prop(String name, Map<String, Object> newProperty) {
+    ObjectNode node = (ObjectNode) jsonNode;
+
+    node.put(name, createJsonNode(newProperty));
+
+    return dataFormat.createWrapperInstance(node);
+  }
+
+  public SpinJsonNode prop(String name, SpinJsonNode newProperty) {
+    ObjectNode node = (ObjectNode) jsonNode;
+
+    node.put(name, (JsonNode) newProperty.unwrap());
+
+    return dataFormat.createWrapperInstance(node);
   }
 
   public Boolean isBoolean() {

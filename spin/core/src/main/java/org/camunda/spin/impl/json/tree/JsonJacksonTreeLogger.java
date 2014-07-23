@@ -30,10 +30,6 @@ public class JsonJacksonTreeLogger extends SpinLogger {
     return new SpinJsonDataFormatException(exceptionMessage("001", "Unable to parse input into json node"), e);
   }
 
-  public void unableToFind(String mess) {
-    logInfo("002", "Unable {}", mess);
-  }
-
   /**
    * Exception handler if we are unable to parse a json value into a java representation
    *
@@ -42,15 +38,19 @@ public class JsonJacksonTreeLogger extends SpinLogger {
    * @return SpinJsonDataFormatException
    */
   public SpinJsonDataFormatException unableToParseValue(String expectedType, JsonNodeType type) {
-    return new SpinJsonDataFormatException(exceptionMessage("003", "Expected '{}', got '{}'", expectedType, type.toString()));
+    return new SpinJsonDataFormatException(exceptionMessage("002", "Expected '{}', got '{}'", expectedType, type.toString()));
   }
   
   public SpinJsonDataFormatException unableToWriteJsonNode(Exception cause) {
-    return new SpinJsonDataFormatException(exceptionMessage("004", "Unable to write json node"), cause);
+    return new SpinJsonDataFormatException(exceptionMessage("003", "Unable to write json node"), cause);
   }
 
   public SpinJsonTreePropertyException unableToFindProperty(String propertyName) {
-    return new SpinJsonTreePropertyException(exceptionMessage("005", "Unable to find '{}'", propertyName));
+    return new SpinJsonTreePropertyException(exceptionMessage("004", "Unable to find '{}'", propertyName));
+  }
+
+  public SpinJsonTreePropertyException unableToCreateNode(String objectType) {
+    return new SpinJsonTreePropertyException(exceptionMessage("005", "Unable to create node for object of type '{}'", objectType));
   }
   
   public SpinJsonTreeNodeException unableToDeserialize(JsonNode jsonNode, Class<?> type, Exception cause) {

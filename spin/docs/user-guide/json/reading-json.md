@@ -130,3 +130,57 @@ var fieldNames = json.fieldNames();
 var fieldName1 = fieldNames.get(0)
 ```
 
+## Set Json Properties
+
+To set a property you can use the `.prop("name", object)` method. This allows you to set one of the following 5 simple types:
+
+  * String - Example: `.prop("name", "Waldo")`
+  * Integer - Example: `.prop("age", 42)`
+  * Long - Example: `.prop("period", 4200000000)`
+  * Float - Example: `.prop("price", 42.00)`
+  * Boolean - Example: `.prop("active", true)`
+  
+or one of the 2 following container types:
+
+  * Array - Could contain a number of simple and container types
+  Example in Java:
+  ```java
+  import static org.camunda.spin.Spin.*;
+  
+  SpinJsonNode json = JSON("{\"customer\": \[\"Kermit\", \"Waldo\"\]}");
+  ArrayList<Object> list = new ArrayList<Object>();
+  list.add("new entry");
+  list.add("new entry2");
+  json.prop("new_array", list);
+  ```
+  
+  Example in Javascript:
+  ```javascript
+  var json = S('{"customer": ["Kermit", "Waldo"]}');
+  var list = ["new entry", "new entry2"];
+  json.prop("new_array", list);    
+  ```
+  
+  * Object - Could contain a number of simple and container types
+  Example in Java:
+  ```java
+  import static org.camunda.spin.Spin.*;
+    
+  SpinJsonNode json = JSON("{\"customer\": \[\"Kermit\", \"Waldo\"\]}");
+  Map<String, Object> object = new HashMap<String, Object>();
+  object.put("new_entry", 42);
+  object.put("new_entry2", "Yeah!");
+  json.prop("new_object", object);
+  ```
+    
+  Example in Javascript:
+  ```javascript
+  var json = S('{"customer": ["Kermit", "Waldo"]}');
+  var object = {
+    "new_entry": 1, 
+    "new_entry2": "Yeah!"
+  };
+  json.prop("new_array", object);    
+  ```
+
+[jackson-parser-features]: https://fasterxml.github.io/jackson-core/javadoc/2.3.0/com/fasterxml/jackson/core/JsonParser.Feature.html
