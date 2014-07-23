@@ -14,11 +14,7 @@
       <sequenceFlow sourceRef="innerStart" targetRef="theTask" />
       <userTask id="theTask" name="my task">
         <extensionElements>
-          <camunda:executionListener event="end">
-            <camunda:script scriptFormat="groovy">
-              execution.setVariable("invoked", true)
-            </camunda:script>
-          </camunda:executionListener>
+          <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.util.TestExecutionListener"/>
         </extensionElements>
       </userTask>
     </subProcess>

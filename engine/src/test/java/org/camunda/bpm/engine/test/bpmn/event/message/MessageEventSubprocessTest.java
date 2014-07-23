@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener;
+import org.camunda.bpm.engine.test.util.TestExecutionListener;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     try {
       super.tearDown();
     } finally {
-      TestExecutionListener.collectedEvents.clear();
+      TestExecutionListener.reset();
     }
   }
 

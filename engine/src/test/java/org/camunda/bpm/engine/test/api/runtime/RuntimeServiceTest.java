@@ -13,13 +13,18 @@
 
 package org.camunda.bpm.engine.test.api.runtime;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
@@ -31,8 +36,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-
-import java.util.*;
+import org.camunda.bpm.engine.test.util.TestExecutionListener;
 
 
 /**
@@ -162,30 +166,17 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
     // if we do not skip the custom listeners,
     runtimeService.deleteProcessInstance(processInstance.getId(), null, false);
-
     // the custom listener is invoked
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
-      HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .variableName("invoked")
-        .singleResult();
-      assertNotNull(variableInstance);
-      assertEquals(true, variableInstance.getValue());
-    }
+    assertTrue(TestExecutionListener.collectedEvents.size() == 1);
+    TestExecutionListener.reset();
 
     processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
     // if we DO skip the custom listeners,
     runtimeService.deleteProcessInstance(processInstance.getId(), null, true);
-
-    // the custom listener are not invoked
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
-      HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .variableName("invoked")
-        .singleResult();
-      assertNull(variableInstance);
-    }
+    // the custom listener is not invoked
+    assertTrue(TestExecutionListener.collectedEvents.size() == 0);
+    TestExecutionListener.reset();
   }
 
   @Deployment
@@ -194,31 +185,18 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
     // if we do not skip the custom listeners,
+    TestExecutionListener.reset();
     runtimeService.deleteProcessInstance(processInstance.getId(), null, false);
-
     // the custom listener is invoked
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
-      HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .variableName("invoked")
-        .singleResult();
-      assertNotNull(variableInstance);
-      assertEquals(true, variableInstance.getValue());
-    }
+    assertTrue(TestExecutionListener.collectedEvents.size() == 1);
 
     processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
     // if we DO skip the custom listeners,
+    TestExecutionListener.reset();
     runtimeService.deleteProcessInstance(processInstance.getId(), null, true);
-
-    // the custom listener are not invoked
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
-      HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .variableName("invoked")
-        .singleResult();
-      assertNull(variableInstance);
-    }
+    // the custom listener is not invoked
+    assertTrue(TestExecutionListener.collectedEvents.size() == 0);
   }
 
   @Deployment(resources={

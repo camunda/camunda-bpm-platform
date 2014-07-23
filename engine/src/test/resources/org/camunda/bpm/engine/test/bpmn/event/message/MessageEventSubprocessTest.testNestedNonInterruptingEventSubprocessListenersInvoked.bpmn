@@ -6,21 +6,21 @@
       <bpmn2:outgoing>SequenceFlow_6</bpmn2:outgoing>
       <bpmn2:subProcess id="eventSubProcess" triggeredByEvent="true">
         <bpmn2:extensionElements>
-          <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="start"/>
-          <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="end"/>
+          <camunda:executionListener class="org.camunda.bpm.engine.test.util.TestExecutionListener" event="start"/>
+          <camunda:executionListener class="org.camunda.bpm.engine.test.util.TestExecutionListener" event="end"/>
         </bpmn2:extensionElements>
         <bpmn2:startEvent id="startEventInSubProcess" isInterrupting="false">
           <bpmn2:extensionElements>
-            <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="start"/>
-            <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="end"/>
+            <camunda:executionListener class="org.camunda.bpm.engine.test.util.TestExecutionListener" event="start"/>
+            <camunda:executionListener class="org.camunda.bpm.engine.test.util.TestExecutionListener" event="end"/>
           </bpmn2:extensionElements>
           <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
           <bpmn2:messageEventDefinition id="_MessageEventDefinition_2" messageRef="Message_1"/>
         </bpmn2:startEvent>
         <bpmn2:userTask id="taskInEventSubProcess" name="Task In Event Subprocess">
           <bpmn2:extensionElements>
-            <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="start"/>
-            <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="end"/>
+            <camunda:executionListener class="org.camunda.bpm.engine.test.util.TestExecutionListener" event="start"/>
+            <camunda:executionListener class="org.camunda.bpm.engine.test.util.TestExecutionListener" event="end"/>
           </bpmn2:extensionElements>
           <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
           <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
@@ -40,8 +40,8 @@
       </bpmn2:endEvent>
       <bpmn2:userTask id="taskInMainFlow" name="task in main flow">
         <bpmn2:extensionElements>
-          <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="end"/>
-          <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="start"/>
+          <camunda:executionListener class="org.camunda.bpm.engine.test.util.TestExecutionListener" event="end"/>
+          <camunda:executionListener class="org.camunda.bpm.engine.test.util.TestExecutionListener" event="start"/>
         </bpmn2:extensionElements>
         <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
         <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.bpmn.event.message.util;
+package org.camunda.bpm.engine.test.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +23,15 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
  */
 public class TestExecutionListener implements ExecutionListener {
 
-  public final static List<String> collectedEvents = new ArrayList<String>();
+  public static List<String> collectedEvents = new ArrayList<String>();
 
   public void notify(DelegateExecution execution) throws Exception {
     String counterKey = execution.getCurrentActivityId() + "-" +execution.getEventName();
     collectedEvents.add(counterKey);
   }
-
+  
+  public static void reset() {
+    collectedEvents.clear();
+  }
+  
 }

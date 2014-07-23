@@ -23,10 +23,11 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.TestExecutionListener;
 
 /**
  * @author Frederik Heremans
@@ -80,22 +81,26 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testDeleteDeploymentSkipCustomListeners() {
-    String deploymentId = repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/RepositoryServiceTest.testDeleteProcessInstanceSkipCustomListeners.bpmn20.xml")
-      .deploy()
-      .getId();
+    DeploymentBuilder deploymentBuilder = 
+        repositoryService
+          .createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/api/repository/RepositoryServiceTest.testDeleteProcessInstanceSkipCustomListeners.bpmn20.xml");
+    
+    String deploymentId = deploymentBuilder.deploy().getId();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    runtimeService.startProcessInstanceByKey("testProcess");
 
-    // if we do not skip the custom listeners, deleting the deployment fails
-    try {
-      repositoryService.deleteDeployment(deploymentId, true, false);
-      fail("exception expected");
-    }catch(Exception e) {
-      // expected
-    }
+    repositoryService.deleteDeployment(deploymentId, true, false);
+    assertTrue(TestExecutionListener.collectedEvents.size() == 1);
+    TestExecutionListener.reset();
+    
+    deploymentId = deploymentBuilder.deploy().getId();
 
+    runtimeService.startProcessInstanceByKey("testProcess");
+    
     repositoryService.deleteDeployment(deploymentId, true, true);
+    assertTrue(TestExecutionListener.collectedEvents.size() == 0);
+    TestExecutionListener.reset();
 
   }
 

@@ -76,7 +76,7 @@ public interface RepositoryService {
    * Deletes the given deployment and cascade deletion to process instances,
    * history process instances and jobs.
    * @param deploymentId id of the deployment, cannot be null.
-   * @param cascate if set to true, all process instances (incuding) history are deleted
+   * @param cascade if set to true, all process instances (incuding) history are deleted
    * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
    * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
    */
