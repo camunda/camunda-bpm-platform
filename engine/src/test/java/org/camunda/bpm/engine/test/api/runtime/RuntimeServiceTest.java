@@ -185,18 +185,18 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
     // if we do not skip the custom listeners,
-    TestExecutionListener.reset();
     runtimeService.deleteProcessInstance(processInstance.getId(), null, false);
     // the custom listener is invoked
     assertTrue(TestExecutionListener.collectedEvents.size() == 1);
+    TestExecutionListener.reset();
 
     processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
     // if we DO skip the custom listeners,
-    TestExecutionListener.reset();
     runtimeService.deleteProcessInstance(processInstance.getId(), null, true);
     // the custom listener is not invoked
     assertTrue(TestExecutionListener.collectedEvents.size() == 0);
+    TestExecutionListener.reset();
   }
 
   @Deployment(resources={
