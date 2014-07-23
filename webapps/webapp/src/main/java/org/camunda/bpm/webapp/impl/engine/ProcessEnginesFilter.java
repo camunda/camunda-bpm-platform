@@ -81,12 +81,6 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
         return;
       }
 
-      /** temporary hack until tasklist has multi-engine support */
-      String requestUrl = request.getRequestURL().toString();
-      if("tasklist".equals(appName) && requestUrl.contains("default/")) {
-          response.sendRedirect(requestUrl.replace("default/", ""));
-          return;
-      }
     }
 
     chain.doFilter(request, response);
@@ -177,14 +171,8 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   protected void serveIndexPage(String appName, String engineName, String contextPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
     String data = getWebResourceContents("/app/" + appName + "/index.html");
 
-    if("tasklist".equals(appName)) {
-      /** temporary hack until tasklist has multi-engine support */
-      data = data.replace("base href=\"/\"", String.format("base href=\"%s/app/%s/%s/\"", contextPath, appName, engineName));
-
-    } else {
-      data = data.replace(APP_ROOT_PLACEHOLDER, contextPath)
-                 .replace(BASE_PLACEHOLDER, String.format("%s/app/%s/%s/", contextPath, appName, engineName));
-    }
+    data = data.replace(APP_ROOT_PLACEHOLDER, contextPath)
+               .replace(BASE_PLACEHOLDER, String.format("%s/app/%s/%s/", contextPath, appName, engineName));
 
     response.setContentLength(data.getBytes("UTF-8").length);
     response.setContentType("text/html");
