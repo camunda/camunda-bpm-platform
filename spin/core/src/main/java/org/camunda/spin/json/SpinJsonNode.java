@@ -55,7 +55,7 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    *
    * @param name the name of the new property
    * @param newProperty the new String property
-   * @return {@link SpinJsonNode} representation of the property
+   * @return {@link SpinJsonNode} representation of the current node
    */
   public abstract SpinJsonNode prop(String name, String newProperty);
 
@@ -64,7 +64,7 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    *
    * @param name the name of the new property
    * @param newProperty the new Number property
-   * @return {@link SpinJsonNode} representation of the property
+   * @return {@link SpinJsonNode} representation of the current node
    */
   public abstract SpinJsonNode prop(String name, Number newProperty);
 
@@ -73,7 +73,7 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    *
    * @param name the name of the new property
    * @param newProperty the new int property
-   * @return {@link SpinJsonNode} representation of the property
+   * @return {@link SpinJsonNode} representation of the current node
    */
   public abstract SpinJsonNode prop(String name, int newProperty);
 
@@ -82,7 +82,7 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    *
    * @param name the name of the new property
    * @param newProperty the new Boolean property
-   * @return {@link SpinJsonNode} representation of the property
+   * @return {@link SpinJsonNode} representation of the current node
    */
   public abstract SpinJsonNode prop(String name, Boolean newProperty);
 
@@ -91,7 +91,7 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    *
    * @param name the name of the new property
    * @param newProperty the new List property
-   * @return {@link SpinJsonNode} representation of the property
+   * @return {@link SpinJsonNode} representation of the current node
    */
   public abstract SpinJsonNode prop(String name, List<Object> newProperty);
 
@@ -100,7 +100,7 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    *
    * @param name the name of the new property
    * @param newProperty the new Map property
-   * @return {@link SpinJsonNode} representation of the property
+   * @return {@link SpinJsonNode} representation of the current node
    */
   public abstract SpinJsonNode prop(String name, Map<String, Object> newProperty);
 
@@ -109,9 +109,23 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    *
    * @param name the name of the new property
    * @param newProperty the new SpinJsonNode Object property
-   * @return {@link SpinJsonNode} representation of the property
+   * @return {@link SpinJsonNode} representation of the current node
    */
   public abstract SpinJsonNode prop(String name, SpinJsonNode newProperty);
+
+  /**
+   * Remove a property of the given node by name.
+   * @param name name of the property
+   * @return {@link SpinJsonNode} representation of the current node
+   */
+  public abstract SpinJsonNode deleteProp(String name);
+
+  /**
+   * Removes a number of properties by a given list of names.
+   * @param names list of names
+   * @return {@link SpinJsonNode} representation of the current node
+   */
+  public abstract SpinJsonNode deleteProp(List<String> names);
 
   /**
    * Check if this node is a boolean value.

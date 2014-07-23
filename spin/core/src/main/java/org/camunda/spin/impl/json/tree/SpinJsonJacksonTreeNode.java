@@ -129,7 +129,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
       return createJsonNode((Map<String, Object>) parameter);
 
     } else {
-      throw LOG.unableToCreateNode(parameter.getClass().getTypeName());
+      throw LOG.unableToCreateNode(parameter.getClass().getSimpleName());
     }
   }
 
@@ -258,6 +258,32 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
 
     node.put(name, (JsonNode) newProperty.unwrap());
 
+    return dataFormat.createWrapperInstance(node);
+  }
+
+  public SpinJsonNode deleteProp(String name) {
+    ensureNotNull("name", name);
+
+    if(jsonNode.has(name)) {
+      ObjectNode node = (ObjectNode) jsonNode;
+      node.remove(name);
+      return dataFormat.createWrapperInstance(node);
+    } else {
+      throw LOG.unableToFindProperty(name);
+    }
+  }
+
+  public SpinJsonNode deleteProp(List<String> names) {
+    ensureNotNull("names", names);
+
+    for(String name: names) {
+      if(!jsonNode.has(name)) {
+        throw LOG.unableToFindProperty(name);
+      }
+    }
+
+    ObjectNode node = (ObjectNode) jsonNode;
+    node.remove(names);
     return dataFormat.createWrapperInstance(node);
   }
 

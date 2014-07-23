@@ -183,4 +183,41 @@ or one of the 2 following container types:
   json.prop("new_array", object);    
   ```
 
+## Remove Json Properties
+
+There are 2 ways to remove properties from a json object.
+ 
+  * `.deleteProp("name")` - Removes a property with given name.
+  * `.deleteProp(<List of names>)` - Removes one or more properties with given names.
+  
+For more Details see the following Examples for Javascript and Java.
+
+Java:
+```java
+import static org.camunda.spin.Spin.*;
+    
+SpinJsonNode json = JSON("{\"customer\": \"Kermit\", \"language\": \"en\"]}");
+List<String> listOfNames = new ArrayList<String>();
+listOfNames.add("customer");
+listOfNames.add("language");
+
+// removes only the customer property
+json.deleteProp("customer");
+
+// removes customer and language
+json.deleteProp(list);
+```
+
+Javascript:
+```javascript
+var json = S('{"customer": ["Kermit", "Waldo"], "language": "en"}');
+var list = ["customer", "en"];
+
+// removes only the customer property
+json.deleteProp("customer");
+
+// removes customer and language
+json.deleteProp(list);
+```
+
 [jackson-parser-features]: https://fasterxml.github.io/jackson-core/javadoc/2.3.0/com/fasterxml/jackson/core/JsonParser.Feature.html
