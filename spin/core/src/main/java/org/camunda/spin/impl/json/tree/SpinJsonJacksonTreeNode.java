@@ -39,13 +39,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-
-
-
-
 /**
- * Wrapper for a Jackson Json Tree Node. 
- * 
+ * Wrapper for a Jackson Json Tree Node.
+ *
  * @author Thorben Lindhauer
  * @author Stefan Hentschel
  */
@@ -56,12 +52,12 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   protected final JsonNode jsonNode;
   protected final JsonJacksonTreeDataFormat dataFormat;
 
-  
+
   public SpinJsonJacksonTreeNode(JsonNode jsonNode, JsonJacksonTreeDataFormat dataFormat) {
     this.jsonNode = jsonNode;
     this.dataFormat = dataFormat;
   }
-  
+
   public String getDataFormatName() {
     return dataFormat.getName();
   }
@@ -82,28 +78,28 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   public <S extends OutputStream> S writeToStream(S outputStream) {
     ObjectMapper mapper = dataFormat.getConfiguredObjectMapper();
     JsonFactory factory = mapper.getFactory();
-    
+
     try {
       JsonGenerator generator = factory.createGenerator(outputStream);
       mapper.writeTree(generator, jsonNode);
     } catch (IOException e) {
       throw LOG.unableToWriteJsonNode(e);
     }
-    
+
     return outputStream;
   }
 
   public <W extends Writer> W writeToWriter(W writer) {
     ObjectMapper mapper = dataFormat.getConfiguredObjectMapper();
     JsonFactory factory = mapper.getFactory();
-    
+
     try {
       JsonGenerator generator = factory.createGenerator(writer);
       mapper.writeTree(generator, jsonNode);
     } catch (IOException e) {
       throw LOG.unableToWriteJsonNode(e);
     }
-    
+
     return writer;
   }
 
@@ -383,7 +379,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
 
   /**
    * Maps the json represented by this object to a java object of the given type.
-   * 
+   *
    * @throws SpinJsonTreeNodeException if the json representation cannot be mapped to the specified type
    */
   public <C> C mapTo(Class<C> type) {
@@ -393,9 +389,9 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
 
   /**
    * Maps the json represented by this object to a java object of the given type.
-   * Argument is to be supplied in Jackson's canonical type string format 
+   * Argument is to be supplied in Jackson's canonical type string format
    * (see {@link JavaType#toCanonical()}).
-   * 
+   *
    * @throws SpinJsonTreeNodeException if the json representation cannot be mapped to the specified type
    * @throws SpinJsonDataFormatException if the parameter does not match a valid type
    */
@@ -403,10 +399,10 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     JsonJacksonTreeDataFormatMapper mapper = dataFormat.getMapper();
     return mapper.mapInternalToJava(jsonNode, type);
   }
-  
+
   /**
    * Maps the json represented by this object to a java object of the given type.
-   * 
+   *
    * @throws SpinJsonTreeNodeException if the json representation cannot be mapped to the specified type
    */
   public <C> C mapTo(JavaType type) {

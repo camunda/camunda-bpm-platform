@@ -17,7 +17,15 @@ public class RegularCustomer implements Customer {
 
   private String name;
   private int contractStartDate;
-  
+
+  public RegularCustomer() {
+  }
+
+  public RegularCustomer(String name, int contractStartDate) {
+    this.name = name;
+    this.contractStartDate = contractStartDate;
+  }
+
   public String getName() {
     return name;
   }
@@ -30,5 +38,5 @@ public class RegularCustomer implements Customer {
   public void setContractStartDate(int contractStartDate) {
     this.contractStartDate = contractStartDate;
   }
-  
+
 }

@@ -15,6 +15,6 @@ package org.camunda.spin.json.mapping;
 public interface Customer {
 
   String getName();
-  
+
   int getContractStartDate();
 }

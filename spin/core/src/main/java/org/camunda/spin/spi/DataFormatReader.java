@@ -14,9 +14,12 @@ package org.camunda.spin.spi;
 
 import java.io.InputStream;
 
+import org.camunda.spin.Spin;
 import org.camunda.spin.impl.util.RewindableInputStream;
 
 /**
+ * Reads the internal representation of a {@link Spin} object from its serialized representation.
+ *
  * @author Daniel Meyer
  * @author Sebastian Menski
  *
@@ -25,7 +28,7 @@ public interface DataFormatReader {
 
   /**
    * Returns true if this reader estimates to be able to consume the input data.
-   * Implementations should not read more than 
+   * Implementations should not read more than
    * {@link RewindableInputStream#getRewindBufferSize()} bytes.
    *
    * @param input stream that can be safely read from to detect a data format

@@ -243,6 +243,14 @@ public abstract class Spin<T extends Spin<?>> {
     
     return SPIN_FACTORY.createSpin(input, configuredFormat);
   }
+  
+  public static SpinJsonNode JSON(Object input) {
+    return SPIN_FACTORY.createSpin(input, DataFormats.jsonTree());
+  }
+  
+  public static SpinJsonNode JSON(Object input, DataFormat<SpinJsonNode> format) {
+    return SPIN_FACTORY.createSpin(input, format);
+  }
 
   /**
    * Provides the name of the dataformat used by this spin.

@@ -22,7 +22,7 @@ public class Order {
   private boolean active;
   private List<RegularCustomer> customers;
   private OrderDetails orderDetails;
-  
+
   public long getId() {
     return id;
   }

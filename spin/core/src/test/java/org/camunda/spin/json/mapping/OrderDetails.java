@@ -21,7 +21,7 @@ public class OrderDetails {
   private int roundedPrice;
   private List<String> currencies;
   private boolean paid;
-  
+
   public String getArticle() {
     return article;
   }

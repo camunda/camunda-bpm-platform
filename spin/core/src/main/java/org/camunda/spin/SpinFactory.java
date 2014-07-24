@@ -47,7 +47,9 @@ public abstract class SpinFactory {
   
   public abstract <T extends Spin<?>> T createSpin(String parameter, DataFormat<T> format);
 
-  public abstract <T extends Spin<?>> T createSpin(InputStream parameter, DataFormat<T> format);
+  public abstract <T extends Spin<?> > T createSpin(InputStream parameter, DataFormat<T> format);
+
+  public abstract <T extends Spin<?> > T createSpin(Object parameter, DataFormat<T> format);
 
 
 }

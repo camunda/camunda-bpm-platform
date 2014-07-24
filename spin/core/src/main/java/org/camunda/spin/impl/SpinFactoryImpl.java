@@ -12,19 +12,21 @@
  */
 package org.camunda.spin.impl;
 
+import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
+import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
+
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
 import org.camunda.spin.impl.util.RewindableInputStream;
 import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.spi.DataFormatMapper;
 import org.camunda.spin.spi.DataFormatReader;
 import org.camunda.spin.spi.SpinDataFormatException;
-
-import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
-import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 
 /**
  * @author Daniel Meyer
@@ -34,7 +36,7 @@ import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 public class SpinFactoryImpl extends SpinFactory {
 
   private final static SpinCoreLogger LOG = SpinCoreLogger.CORE_LOGGER;
-  
+
   private final static int READ_SIZE = 256;
 
   /**
@@ -45,10 +47,10 @@ public class SpinFactoryImpl extends SpinFactory {
 
   public <T extends Spin<?>> T createSpin(T parameter) {
     ensureNotNull("parameter", parameter);
-    
+
     return parameter;
   }
-  
+
   public <T extends Spin<?>> T createSpin(String parameter) {
     ensureNotNull("parameter", parameter);
 
@@ -61,25 +63,25 @@ public class SpinFactoryImpl extends SpinFactory {
     ensureNotNull("parameter", parameter);
 
     RewindableInputStream rewindableStream = new RewindableInputStream(parameter, READ_SIZE);
-    
+
     DataFormat<T> matchingDataFormat = null;
     for (DataFormat<?> format : DataFormats.AVAILABLE_FORMATS) {
       if (format.getReader().canRead(rewindableStream)) {
         matchingDataFormat = (DataFormat<T>) format;
       }
-      
+
       try {
         rewindableStream.rewind();
       } catch (IOException e) {
         throw LOG.unableToReadInputStream(e);
       }
-      
+
     }
-    
+
     if (matchingDataFormat == null) {
       throw LOG.unrecognizableDataFormatException();
     }
-    
+
     return createSpin(rewindableStream, matchingDataFormat);
   }
 
@@ -106,6 +108,16 @@ public class SpinFactoryImpl extends SpinFactory {
 
     DataFormatReader reader = format.getReader();
     Object dataFormatInput = reader.readInput(parameter);
+    return format.createWrapperInstance(dataFormatInput);
+  }
+
+  @Override
+  public <T extends Spin<?>> T createSpin(Object parameter, DataFormat<T> format) {
+    ensureNotNull("parameter", parameter);
+
+    DataFormatMapper mapper = format.getMapper();
+    Object dataFormatInput = mapper.mapJavaToInternal(parameter);
+
     return format.createWrapperInstance(dataFormatInput);
   }
 

@@ -40,7 +40,7 @@ public class JsonJacksonTreeLogger extends SpinLogger {
   public SpinJsonDataFormatException unableToParseValue(String expectedType, JsonNodeType type) {
     return new SpinJsonDataFormatException(exceptionMessage("002", "Expected '{}', got '{}'", expectedType, type.toString()));
   }
-  
+
   public SpinJsonDataFormatException unableToWriteJsonNode(Exception cause) {
     return new SpinJsonDataFormatException(exceptionMessage("003", "Unable to write json node"), cause);
   }
@@ -52,25 +52,29 @@ public class JsonJacksonTreeLogger extends SpinLogger {
   public SpinJsonTreePropertyException unableToCreateNode(String objectType) {
     return new SpinJsonTreePropertyException(exceptionMessage("005", "Unable to create node for object of type '{}'", objectType));
   }
-  
+
   public SpinJsonTreeNodeException unableToDeserialize(JsonNode jsonNode, Class<?> type, Exception cause) {
     return new SpinJsonTreeNodeException(
-        exceptionMessage("006", "Cannot deserialize '{}...' to java type '{}'", 
+        exceptionMessage("006", "Cannot deserialize '{}...' to java type '{}'",
             jsonNode.toString().substring(0, 10), type.getSimpleName()), cause);
   }
-  
+
   public SpinJsonTreeNodeException unableToDeserialize(JsonNode jsonNode, JavaType type, Exception cause) {
     return new SpinJsonTreeNodeException(
-        exceptionMessage("006", "Cannot deserialize '{}...' to java type '{}'", 
+        exceptionMessage("006", "Cannot deserialize '{}...' to java type '{}'",
             jsonNode.toString().substring(0, 10), type), cause);
   }
-  
+
   public SpinJsonDataFormatException unableToConstructJavaType(String fromString, Exception cause) {
     return new SpinJsonDataFormatException(
         exceptionMessage("007", "Cannot construct java type from string '{}'", fromString), cause);
   }
-  
+
   public SpinJsonDataFormatException unableToDetectCanonicalType(Object parameter) {
     return new SpinJsonDataFormatException(exceptionMessage("008", "Cannot detect canonical data type for parameter '{}'", parameter));
+  }
+
+  public SpinJsonDataFormatException unableToMapInput(Object input, Exception cause) {
+    return new SpinJsonDataFormatException(exceptionMessage("009", "Unable to map object {} to json node", input), cause);
   }
 }

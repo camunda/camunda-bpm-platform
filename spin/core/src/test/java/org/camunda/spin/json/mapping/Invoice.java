@@ -16,7 +16,7 @@ public class Invoice {
 
   private int amount;
   private Customer customer;
-  
+
   public int getAmount() {
     return amount;
   }
