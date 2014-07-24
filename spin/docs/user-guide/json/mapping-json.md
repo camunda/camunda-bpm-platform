@@ -1,8 +1,8 @@
 # Mapping Json
 
-Spin can deserialize json to java objects by integrating Jackson's mapping features into its fluent API.
+Spin can deserialize json to java objects and serialize java objects to json by integrating Jackson's mapping features into its fluent API.
 
-## Mapping Json to a Java Object:
+## Mapping between Representations:
 
 Assume we have a class `Customer` defined as follows:
 
@@ -21,12 +21,24 @@ public class Customer {
 }
 ```
 
+### Mapping Json to Java:
+
 We can map a json object `{"name" : "Kermit"}` to an instance of `Customer` as follows:
 
 ```java
 import static org.camunda.spin.Spin.JSON;
 
 Customer customer = JSON("{\"customer\": \"Kermit\"}").mapTo(Customer.class);
+```
+
+### Mapping Java to Json:
+
+We can map the `customer` back to json as follows:
+
+```java
+import static org.camunda.spin.Spin.JSON;
+
+String json = JSON(customer).toString();
 ```
 
 ## Mapping to Generic Types:
@@ -94,9 +106,11 @@ Customer customer =
 
 The available parameters correspond to Jackson's `DefaultTyping` and `As` enumerations.
 
-## Date Deserialization
+When mapping such formatted json to java, the same typing configuration can be applied.
 
-Deserializing dates typically requires specifying a certain date format (see [Jackson documentation][jackson-date] for built-in date handling). You can set an instance of `DateFormat` by configuring the json data format:
+## Date Serialization
+
+Serializing and Deserializing dates typically requires specifying a certain date format (see [Jackson documentation][jackson-date] for built-in date handling). You can set an instance of `DateFormat` by configuring the json data format:
 
 ```java
 public class DateContainer {

@@ -220,4 +220,4 @@ json.deleteProp("customer");
 json.deleteProp(list);
 ```
 
-[jackson-parser-features]: https://fasterxml.github.io/jackson-core/javadoc/2.3.0/com/fasterxml/jackson/core/JsonParser.Feature.html
+[jackson-parser-features]: https://fasterxml.github.io/jackson-core/javadoc/2.4/com/fasterxml/jackson/core/JsonParser.Feature.html
