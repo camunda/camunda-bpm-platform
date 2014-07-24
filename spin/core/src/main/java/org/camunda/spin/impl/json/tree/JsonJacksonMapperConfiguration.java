@@ -17,45 +17,46 @@ import java.text.DateFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Provides methods to configure Jackson serialization and deserialization features.
- * 
+ *
  * @author Thorben Lindhauer
  */
-public class JsonJacksonMapperConfiguration 
-  extends AbstractJsonJacksonDataFormatConfiguration<JsonJacksonMapperConfiguration>  
+public class JsonJacksonMapperConfiguration
+  extends AbstractJsonJacksonDataFormatConfiguration<JsonJacksonMapperConfiguration>
   implements JsonJacksonTreeConfigurable {
 
   protected ObjectMapper.DefaultTyping typing;
   protected JsonTypeInfo.As as;
-  
+
   protected DateFormat dateFormat;
-  
+
   public JsonJacksonMapperConfiguration(JsonJacksonTreeDataFormat dataFormat) {
     super(dataFormat);
   }
-  
-  public JsonJacksonMapperConfiguration(JsonJacksonTreeDataFormat dataFormat, 
+
+  public JsonJacksonMapperConfiguration(JsonJacksonTreeDataFormat dataFormat,
       JsonJacksonMapperConfiguration mapperConfiguration) {
     super(dataFormat, mapperConfiguration);
     this.typing = mapperConfiguration.typing;
     this.as = mapperConfiguration.as;
     this.dateFormat = mapperConfiguration.dateFormat;
   }
-  
+
   public JsonJacksonMapperConfiguration enableDefaultTyping(ObjectMapper.DefaultTyping typing, JsonTypeInfo.As as) {
     dataFormat.invalidateCachedObjectMapper();
-    
+
     this.typing = typing;
     this.as = as;
     return this;
   }
-  
+
   public ObjectMapper.DefaultTyping getDefaultTyping() {
     return typing;
   }
-  
+
   public JsonTypeInfo.As getDefaultTypingFormat() {
     return as;
   }
@@ -64,19 +65,37 @@ public class JsonJacksonMapperConfiguration
     if (typing != null && as != null) {
       mapper.enableDefaultTyping(typing, as);
     }
-    
+
     for (DeserializationFeature deserializationFeature : DeserializationFeature.values()) {
       mapper.configure(deserializationFeature, getValue(deserializationFeature));
     }
-    
+
+    for (SerializationFeature serializationFeature : SerializationFeature.values()) {
+      mapper.configure(serializationFeature, getValue(serializationFeature));
+    }
+
     mapper.setDateFormat(dateFormat);
   }
-  
+
   public JsonJacksonMapperConfiguration config(DeserializationFeature feature, Object value) {
     return config(feature.name(), value);
   }
-  
+
   public Boolean getValue(DeserializationFeature feature) {
+    Boolean value = (Boolean) configuration.get(feature.name());
+    if (value == null) {
+      return feature.enabledByDefault();
+    }
+    else {
+      return value;
+    }
+  }
+
+  public JsonJacksonMapperConfiguration config(SerializationFeature feature, Object value) {
+    return config(feature.name(), value);
+  }
+
+  public Boolean getValue(SerializationFeature feature) {
     Boolean value = (Boolean) configuration.get(feature.name());
     if (value == null) {
       return feature.enabledByDefault();
@@ -89,14 +108,14 @@ public class JsonJacksonMapperConfiguration
   protected JsonJacksonMapperConfiguration thisConfiguration() {
     return this;
   }
-  
+
   public JsonJacksonMapperConfiguration dateFormat(DateFormat dateFormat) {
     dataFormat.invalidateCachedObjectMapper();
-    
+
     this.dateFormat = dateFormat;
     return this;
   }
-  
+
   public DateFormat getDateFormat() {
     return dateFormat;
   }
@@ -105,7 +124,7 @@ public class JsonJacksonMapperConfiguration
     dataFormat.invalidateCachedObjectMapper();
     this.typing = null;
     this.as = null;
-    
+
   }
 
 }

@@ -38,10 +38,10 @@ public class JsonTreeConfigureReaderTest {
 
   private JsonJacksonTreeDataFormat dataFormatInstance;
   private Map<String, Object> configurationMap;
-  
+
   @Before
   public void setUp() {
-    dataFormatInstance = 
+    dataFormatInstance =
         jsonTree().reader()
           .allowNumericLeadingZeros(Boolean.TRUE)
           .allowBackslashEscapingAnyCharacter(Boolean.TRUE)
@@ -51,7 +51,7 @@ public class JsonTreeConfigureReaderTest {
           .allowQuotedFieldNames(Boolean.TRUE)
           .allowSingleQuotes(Boolean.TRUE)
           .done();
-    
+
     configurationMap = new HashMap<String, Object>();
     configurationMap.put(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER.name(), Boolean.TRUE);
     configurationMap.put(JsonParser.Feature.ALLOW_COMMENTS.name(), Boolean.TRUE);
@@ -61,8 +61,8 @@ public class JsonTreeConfigureReaderTest {
     configurationMap.put(JsonParser.Feature.ALLOW_SINGLE_QUOTES.name(), Boolean.TRUE);
     configurationMap.put(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES.name(), Boolean.TRUE);
   }
-  
-  
+
+
   @Test
   public void shouldApplyConfigurationOnCreation() {
     try {
@@ -71,87 +71,87 @@ public class JsonTreeConfigureReaderTest {
     } catch (SpinJsonDataFormatException e) {
       // happy path
     }
-    
+
     SpinJsonNode json = S(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON, dataFormatInstance);
     assertThat(json).isNotNull();
-    
+
     json = JSON(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON, dataFormatInstance);
     assertThat(json).isNotNull();
-    
-    json = JSON(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON, configurationMap, null);
+
+    json = JSON(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON, configurationMap, null, null);
     assertThat(json).isNotNull();
   }
-  
+
   @Test
   public void shouldApplyConfigurationOnCreationFromInputStream() {
     InputStream input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
-    
+
     try {
       S(input, jsonTree());
       fail("Expected SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException e) {
       // happy path
     }
-    
+
     input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
     SpinJsonNode json = S(input, dataFormatInstance);
     assertThat(json).isNotNull();
-    
+
     input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
     json = JSON(input, dataFormatInstance);
     assertThat(json).isNotNull();
-    
+
     input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
-    json = JSON(input, configurationMap, null);
+    json = JSON(input, configurationMap, null, null);
     assertThat(json).isNotNull();
   }
-  
+
   @Test
   public void shouldPassConfigurationToNewInstance() {
     JsonJacksonTreeDataFormat jsonDataFormat = new JsonJacksonTreeDataFormat();
     jsonDataFormat.reader().config("aKey", "aValue");
-    
-    JsonJacksonTreeDataFormat jsonDataFormatInstance = 
+
+    JsonJacksonTreeDataFormat jsonDataFormatInstance =
         jsonDataFormat.newInstance().reader().config("anotherKey", "anotherValue").done();
-    
+
     assertThat(jsonDataFormat.reader().getValue("aKey")).isEqualTo("aValue");
     assertThat(jsonDataFormat.reader().getValue("anotherKey")).isNull();
-    
+
     assertThat(jsonDataFormatInstance.reader().getValue("aKey")).isEqualTo("aValue");
     assertThat(jsonDataFormatInstance.reader().getValue("anotherKey")).isEqualTo("anotherValue");
-    
-    JsonJacksonTreeDataFormat nextReturnedDataFormatInstance = 
+
+    JsonJacksonTreeDataFormat nextReturnedDataFormatInstance =
         jsonDataFormatInstance.reader().config("aThirdKey", "aThirdValue").done();
     assertThat(nextReturnedDataFormatInstance).isSameAs(jsonDataFormatInstance);
     assertThat(jsonDataFormatInstance.reader().getValue("aThirdKey")).isEqualTo("aThirdValue");
   }
-  
+
   @Test
   public void shouldCacheObjectMapper() {
     // object mapper should be cached when configuration does not change
     ObjectMapper objectMapper1 = dataFormatInstance.getConfiguredObjectMapper();
     ObjectMapper objectMapper2 = dataFormatInstance.getConfiguredObjectMapper();
-    
+
     assertThat(objectMapper1).isSameAs(objectMapper2);
-    
+
     // changing the configuration should create a new object mapper
     dataFormatInstance.reader().allowBackslashEscapingAnyCharacter(Boolean.FALSE);
-    
+
     ObjectMapper objectMapper3 = dataFormatInstance.getConfiguredObjectMapper();
-    
+
     assertThat(objectMapper3).isNotSameAs(objectMapper2);
-    
+
     // a new format should use the same mapper as long as it is not configured
     JsonJacksonTreeDataFormat newFormat = dataFormatInstance.newInstance();
-    
+
     ObjectMapper objectMapper4 = newFormat.getConfiguredObjectMapper();
-    
+
     assertThat(objectMapper4).isSameAs(objectMapper3);
   }
-  
+
   @Test
   public void shouldReadWithNullConfig() {
-    SpinJsonNode json = JSON(EXAMPLE_JSON, null, null);
+    SpinJsonNode json = JSON(EXAMPLE_JSON, null, null, null);
     assertThat(json).isNotNull();
   }
 }

@@ -85,12 +85,13 @@ public abstract class Spin<T extends Spin<?>> {
   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
   */
   public static SpinJsonNode JSON(Object input, Map<String, Object> readerConfiguration,
-      Map<String, Object> writerConfiguration) {
+      Map<String, Object> writerConfiguration, Map<String, Object> mapperConfiguration) {
 
     DataFormat<SpinJsonNode> configuredFormat =
         DataFormats.jsonTree()
           .reader().config(readerConfiguration)
           .writer().config(writerConfiguration)
+          .mapper().config(mapperConfiguration)
         .done();
 
     return SPIN_FACTORY.createSpin(input, configuredFormat);

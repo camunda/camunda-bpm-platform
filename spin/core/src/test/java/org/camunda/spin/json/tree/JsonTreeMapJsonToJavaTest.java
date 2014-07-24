@@ -49,7 +49,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-public class JsonJacksonMapJsonToJavaTest {
+public class JsonTreeMapJsonToJavaTest {
 
   @Test
   public void shouldMapJsonObjectToJavaObject() {
