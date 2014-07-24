@@ -37,19 +37,24 @@ public abstract class SpinFactory {
     return INSTANCE;
   }
 
-  public abstract <T extends Spin<?>> T createSpin(T parameter);
-  
-  public abstract <T extends Spin<?>> T createSpin(String parameter);
-  
-  public abstract <T extends Spin<?>> T createSpin(InputStream parameter);
+  public abstract <T extends Spin<?>> T createSpin(Object parameter);
 
-  public abstract <T extends Spin<?>> T createSpin(T parameter, DataFormat<T> format);
-  
-  public abstract <T extends Spin<?>> T createSpin(String parameter, DataFormat<T> format);
+  public abstract <T extends Spin<?>> T createSpinFromSpin(T parameter);
 
-  public abstract <T extends Spin<?> > T createSpin(InputStream parameter, DataFormat<T> format);
+  public abstract <T extends Spin<?>> T createSpinFromString(String parameter);
 
-  public abstract <T extends Spin<?> > T createSpin(Object parameter, DataFormat<T> format);
+  public abstract <T extends Spin<?>> T createSpinFromStream(InputStream parameter);
+
+
+  public abstract <T extends Spin<?>> T createSpin(Object parameter, DataFormat<T> format);
+
+  public abstract <T extends Spin<?>> T createSpinFromSpin(T parameter, DataFormat<T> format);
+
+  public abstract <T extends Spin<?>> T createSpinFromString(String parameter, DataFormat<T> format);
+
+  public abstract <T extends Spin<?> > T createSpinFromStream(InputStream parameter, DataFormat<T> format);
+
+  public abstract <T extends Spin<?>> T createSpinFromObject(Object parameter, DataFormat<T> format);
 
 
 }

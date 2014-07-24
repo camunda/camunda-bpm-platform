@@ -47,7 +47,14 @@ public class JsonTreeCreateTest {
     json = S(EXAMPLE_JSON);
     assertThat(json).isNotNull();
   }
-  
+
+  @Test
+  public void shouldCreateObjectDeclaredInput() {
+    Object input = EXAMPLE_JSON;
+    SpinJsonNode jsonNode = JSON(input);
+    assertThat(jsonNode.prop("order")).isNotNull();
+  }
+
   @Test
   public void shouldCreateForInputStream() {
     SpinJsonNode json = JSON(stringAsInputStream(EXAMPLE_JSON));
@@ -67,11 +74,11 @@ public class JsonTreeCreateTest {
     assertThat(json).isEqualTo(S(json, jsonTree()));
     assertThat(json).isEqualTo(S(json));
   }
-  
+
   @Test
   public void shouldFailForNull() {
     SpinJsonNode jsonNode = null;
-    
+
     try {
       JSON(jsonNode);
       fail("Expected IllegalArgumentException");
@@ -92,9 +99,9 @@ public class JsonTreeCreateTest {
     } catch(IllegalArgumentException e) {
       // expected
     }
-    
+
     InputStream inputStream = null;
-    
+
     try {
       JSON(inputStream);
       fail("Expected IllegalArgumentException");
@@ -115,9 +122,9 @@ public class JsonTreeCreateTest {
     } catch(IllegalArgumentException e) {
       // expected
     }
-    
+
     String inputString = null;
-    
+
     try {
       JSON(inputString);
       fail("Expected IllegalArgumentException");

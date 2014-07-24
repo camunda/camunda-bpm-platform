@@ -39,19 +39,54 @@ public class SpinFactoryImpl extends SpinFactory {
 
   private final static int READ_SIZE = 256;
 
+  @SuppressWarnings("unchecked")
+  public <T extends Spin<?>> T createSpin(Object parameter) {
+    ensureNotNull("parameter", parameter);
+
+    if (parameter instanceof String) {
+      return createSpinFromString((String) parameter);
+
+    } else if (parameter instanceof InputStream) {
+      return createSpinFromStream((InputStream) parameter);
+
+    } else if (parameter instanceof Spin) {
+      return createSpinFromSpin((T) parameter);
+
+    } else {
+      throw LOG.unsupportedInputParameter(parameter.getClass());
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Spin<?>> T createSpin(Object parameter, DataFormat<T> format) {
+    ensureNotNull("parameter", parameter);
+
+    if (parameter instanceof String) {
+      return createSpinFromString((String) parameter, format);
+
+    } else if (parameter instanceof InputStream) {
+      return createSpinFromStream((InputStream) parameter, format);
+
+    } else if (parameter instanceof Spin) {
+      return createSpinFromSpin((T) parameter, format);
+
+    } else {
+      return createSpinFromObject(parameter, format);
+    }
+  }
+
   /**
    *
    * @throws SpinDataFormatException in case the parameter cannot be read using this data format
    * @throws IllegalArgumentException in case the parameter is null or dd:
    */
-
-  public <T extends Spin<?>> T createSpin(T parameter) {
+  public <T extends Spin<?>> T createSpinFromSpin(T parameter) {
     ensureNotNull("parameter", parameter);
 
     return parameter;
   }
 
-  public <T extends Spin<?>> T createSpin(String parameter) {
+  public <T extends Spin<?>> T createSpinFromString(String parameter) {
     ensureNotNull("parameter", parameter);
 
     InputStream input = stringAsInputStream(parameter);
@@ -59,7 +94,7 @@ public class SpinFactoryImpl extends SpinFactory {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Spin<?>> T createSpin(InputStream parameter) {
+  public <T extends Spin<?>> T createSpinFromStream(InputStream parameter) {
     ensureNotNull("parameter", parameter);
 
     RewindableInputStream rewindableStream = new RewindableInputStream(parameter, READ_SIZE);
@@ -90,20 +125,20 @@ public class SpinFactoryImpl extends SpinFactory {
    * @throws SpinDataFormatException in case the parameter cannot be read using this data format
    * @throws IllegalArgumentException in case the parameter is null or dd:
    */
-  public <T extends Spin<?>> T createSpin(T parameter, DataFormat<T> format) {
+  public <T extends Spin<?>> T createSpinFromSpin(T parameter, DataFormat<T> format) {
     ensureNotNull("parameter", parameter);
 
     return parameter;
   }
 
-  public <T extends Spin<?>> T createSpin(String parameter, DataFormat<T> format) {
+  public <T extends Spin<?>> T createSpinFromString(String parameter, DataFormat<T> format) {
     ensureNotNull("parameter", parameter);
 
     InputStream input = stringAsInputStream(parameter);
     return createSpin(input, format);
   }
 
-  public <T extends Spin<?>> T createSpin(InputStream parameter, DataFormat<T> format) {
+  public <T extends Spin<?>> T createSpinFromStream(InputStream parameter, DataFormat<T> format) {
     ensureNotNull("parameter", parameter);
 
     DataFormatReader reader = format.getReader();
@@ -111,8 +146,7 @@ public class SpinFactoryImpl extends SpinFactory {
     return format.createWrapperInstance(dataFormatInput);
   }
 
-  @Override
-  public <T extends Spin<?>> T createSpin(Object parameter, DataFormat<T> format) {
+  public <T extends Spin<?>> T createSpinFromObject(Object parameter, DataFormat<T> format) {
     ensureNotNull("parameter", parameter);
 
     DataFormatMapper mapper = format.getMapper();
@@ -120,5 +154,6 @@ public class SpinFactoryImpl extends SpinFactory {
 
     return format.createWrapperInstance(dataFormatInput);
   }
+
 
 }

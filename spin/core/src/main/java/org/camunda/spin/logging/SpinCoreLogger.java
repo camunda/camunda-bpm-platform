@@ -57,11 +57,11 @@ public class SpinCoreLogger extends SpinLogger {
   public SpinDataFormatException wrongDataFormatException(String requestedDataFormat, String givenDataFormat) {
     return new SpinDataFormatException(exceptionMessage("007", "Wrong data format: requested '{}', given '{}'", requestedDataFormat, givenDataFormat));
   }
-  
+
   public SpinDataFormatException unknownDataFormatException(String givenDataFormat) {
     return new SpinDataFormatException(exceptionMessage("008", "Unknown data format: given '{}'", givenDataFormat));
   }
-  
+
   public SpinDataFormatException unrecognizableDataFormatException() {
     return new SpinDataFormatException(exceptionMessage("009", "No matching data format detected"));
   }
