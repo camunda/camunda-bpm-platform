@@ -14,6 +14,7 @@ package org.camunda.spin.impl.xml.dom;
 
 import org.camunda.spin.spi.Configurable;
 import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.spi.DataFormatMapper;
 import org.camunda.spin.spi.DataFormatReader;
 import org.camunda.spin.spi.TypeDetector;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
@@ -59,6 +60,10 @@ public class XmlDomDataFormat implements DataFormat<SpinXmlTreeElement> {
 
   public DataFormatReader getReader() {
     return new XmlDomDataFormatReader();
+  }
+  
+  public DataFormatMapper getMapper() {
+    throw new UnsupportedOperationException("not implemented");
   }
 
   public String getCanonicalTypeName(Object object) {

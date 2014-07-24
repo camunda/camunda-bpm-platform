@@ -23,6 +23,7 @@ import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatReader;
+import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.camunda.spin.spi.TypeDetector;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -94,6 +95,10 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
   
   public DataFormatReader getReader() {
     return new JsonJacksonTreeDataFormatReader(this);
+  }
+  
+  public JsonJacksonTreeDataFormatMapper getMapper() {
+    return new JsonJacksonTreeDataFormatMapper(this);
   }
 
   public JsonJacksonParserConfiguration reader() {

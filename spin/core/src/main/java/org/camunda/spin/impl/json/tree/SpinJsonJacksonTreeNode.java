@@ -12,6 +12,25 @@
  */
 package org.camunda.spin.impl.json.tree;
 
+import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.camunda.spin.SpinList;
+import org.camunda.spin.impl.SpinListImpl;
+import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.json.SpinJsonTreeNodeException;
+import org.camunda.spin.logging.SpinLogger;
+import org.camunda.spin.spi.SpinJsonDataFormatException;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JavaType;
@@ -19,20 +38,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import org.camunda.spin.SpinList;
-import org.camunda.spin.impl.SpinListImpl;
-import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonTreeNodeException;
-import org.camunda.spin.logging.SpinLogger;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 
 
 
@@ -382,9 +387,8 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
    * @throws SpinJsonTreeNodeException if the json representation cannot be mapped to the specified type
    */
   public <C> C mapTo(Class<C> type) {
-    JavaType javaType = TypeFactory.defaultInstance().constructType(type);
-    C result = mapTo(javaType);
-    return result;
+    JsonJacksonTreeDataFormatMapper mapper = dataFormat.getMapper();
+    return mapper.mapInternalToJava(jsonNode, type);
   }
 
   /**
@@ -396,9 +400,8 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
    * @throws SpinJsonDataFormatException if the parameter does not match a valid type
    */
   public <C> C mapTo(String type) {
-    JavaType javaType = dataFormat.constructJavaTypeFromCanonicalString(type);
-    C result = mapTo(javaType);
-    return result;
+    JsonJacksonTreeDataFormatMapper mapper = dataFormat.getMapper();
+    return mapper.mapInternalToJava(jsonNode, type);
   }
   
   /**
@@ -407,11 +410,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
    * @throws SpinJsonTreeNodeException if the json representation cannot be mapped to the specified type
    */
   public <C> C mapTo(JavaType type) {
-    ObjectMapper mapper = dataFormat.getConfiguredObjectMapper();
-    try {
-      return mapper.readValue(mapper.treeAsTokens(jsonNode), type);
-    } catch (IOException e) {
-      throw LOG.unableToDeserialize(jsonNode, type, e);
-    }
+    JsonJacksonTreeDataFormatMapper mapper = dataFormat.getMapper();
+    return mapper.mapInternalToJava(jsonNode, type);
   }
 }
