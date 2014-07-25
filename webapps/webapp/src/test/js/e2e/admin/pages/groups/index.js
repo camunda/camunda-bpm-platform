@@ -1,7 +1,8 @@
+'use strict';
 
-var GroupsPage = require('./groups');
-var EditGroupPage = require('./editGroup');
-var NewGroupPage = require('./newGroup');
+var GroupsPage = require('./groups-dashboard');
+var EditGroupPage = require('./edit');
+var NewGroupPage = require('./new');
 
 module.exports = new GroupsPage();
 module.exports.editGroup = new EditGroupPage();

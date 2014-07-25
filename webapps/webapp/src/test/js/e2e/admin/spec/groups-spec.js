@@ -5,7 +5,7 @@
  * */
 'use strict';
 
-var groupsPage = require('../pages/groups');
+var groupsPage = require('../pages/groupsMenu');
 
 describe('groups page -', function() {
 
@@ -13,9 +13,14 @@ describe('groups page -', function() {
 
     it('should login', function() {
 
+      // when
       groupsPage.navigateToWebapp('Admin');
-
       groupsPage.login('jonny1', 'jonny1');
+      groupsPage.selectNavbarItem('Groups');
+
+      // then
+      groupsPage.isActive();
+      groupsPage.loggedInUser('jonny1');
     });
 
   });
@@ -26,11 +31,14 @@ describe('groups page -', function() {
     beforeEach(function() {
 
       groupsPage.navigateTo();
-
     });
+
 
     it('should validate menu', function() {
 
+      // when
+
+      // then
       expect(groupsPage.pageHeader()).toBe('Groups');
       expect(groupsPage.newGroupButton().isPresent()).toBe(true);
       expect(groupsPage.groupList().count()).toBe(4);
@@ -57,8 +65,12 @@ describe('groups page -', function() {
       groupsPage.newGroup.navigateTo();
     });
 
+
     it('should validate new group menu', function() {
 
+      // then
+
+      // when
       expect(groupsPage.newGroup.createNewGroupButton().isEnabled()).toBe(false);
 
       // when
@@ -146,7 +158,7 @@ describe('groups page -', function() {
 
     it('should log out', function () {
 
-      groupsPage.logoutWebapp();
+      groupsPage.logout();
     });
 
   });

@@ -19,7 +19,7 @@ module.exports = Base.extend({
   },
 
   createNewGroupButton: function () {
-    return element(by.css("button[type='submit']"));
+    return element(by.css('[data-ng-click="createGroup()"]'));
   },
 
   createNewGroup: function (groupID, groupName, groupType) {

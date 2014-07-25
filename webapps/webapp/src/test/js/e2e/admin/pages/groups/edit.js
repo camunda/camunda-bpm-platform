@@ -7,7 +7,7 @@ module.exports = Page.extend({
   url: '/camunda/app/admin/default/#/groups/:group?tab=group',
 
   updateGroupButton: function() {
-    return element(by.css("button[type='submit']"));
+    return element(by.css('[data-ng-click="updateGroup()"]'));
   },
 
   groupName: function() {
@@ -19,7 +19,7 @@ module.exports = Page.extend({
   },
 
   deleteGroupButton: function() {
-    return element(by.css('.btn-danger'));
+    return element(by.css('[data-ng-click="deleteGroup()"]'));
   },
 
   deleteGroupAlert: function() {
