@@ -2,6 +2,7 @@ package org.camunda.bpm.container.impl.metadata;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -68,5 +69,40 @@ public class PropertyHelperTest extends TestCase {
     } catch (Exception e) {
       // happy path
     }
+  }
+  
+  public void testResolvePropertyForExistingProperty() {
+    Properties source = new Properties();
+    source.put("camunda.test.someKey", "1234");
+    String result = PropertyHelper.resolveProperty(source, "${camunda.test.someKey}");
+    Assert.assertEquals("1234", result);
+  }
+  
+  public void testResolvePropertyWhitespaceAndMore() {
+    Properties source = new Properties();
+    source.put("camunda.test.someKey", "1234");
+    String result = PropertyHelper.resolveProperty(source, " -${ camunda.test.someKey }- ");
+    Assert.assertEquals(" -1234- ", result);
+  }  
+
+  public void testResolvePropertyForMultiplePropertes() {
+    Properties source = new Properties();
+    source.put("camunda.test.oneKey", "1234");
+    source.put("camunda.test.anotherKey", "5678");
+    String result = PropertyHelper.resolveProperty(source, "-${ camunda.test.oneKey }-${ camunda.test.anotherKey}-");
+    Assert.assertEquals("-1234-5678-", result);
+  }  
+  
+  public void testResolvePropertyForMissingProperty() {
+    Properties source = new Properties();
+    String result = PropertyHelper.resolveProperty(source, "${camunda.test.someKey}");
+    Assert.assertEquals("", result);
+  }
+  
+  public void testResolvePropertyNoTemplate() {
+    Properties source = new Properties();
+    source.put("camunda.test.someKey", "1234");
+    String result = PropertyHelper.resolveProperty(source, "camunda.test.someKey");
+    Assert.assertEquals("camunda.test.someKey", result);
   }
 }
