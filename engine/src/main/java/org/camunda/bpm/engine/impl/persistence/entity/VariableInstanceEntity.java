@@ -59,6 +59,9 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
 
   protected String errorMessage;
 
+  protected String dataFormatId;
+  protected String configuration;
+
   // Default constructor for SQL mapping
   public VariableInstanceEntity() {
   }
@@ -349,6 +352,27 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
     return errorMessage;
   }
 
+  public String getRawValue() {
+    // TODO: delegate this to the variable type
+    return textValue;
+  }
+
+  public String getDataFormatId() {
+    return dataFormatId;
+  }
+
+  public void setDataFormatId(String dataFormatId) {
+    this.dataFormatId = dataFormatId;
+  }
+
+  public String getConfiguration() {
+    return configuration;
+  }
+
+  public void setConfiguration(String configuration) {
+    this.configuration = configuration;
+  }
+
   public String getVariableScope() {
     if (taskId != null) {
       return taskId;
@@ -380,6 +404,8 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
            + ", byteArrayValue=" + byteArrayValue
            + ", byteArrayValueId=" + byteArrayValueId
            + ", forcedUpdate=" + forcedUpdate
+           + ", dataFormatId=" + dataFormatId
+           + ", configuration=" + configuration
            + "]";
   }
 }

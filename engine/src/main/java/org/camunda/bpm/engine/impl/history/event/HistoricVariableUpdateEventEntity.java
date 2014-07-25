@@ -37,6 +37,9 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
 
   protected String byteArrayId;
 
+  protected String dataFormatId;
+  protected String configuration;
+
   // getter / setters ////////////////////////////
 
   public String getVariableTypeName() {
@@ -81,6 +84,19 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
   public void setByteValue(byte[] byteValue) {
     this.byteValue = byteValue;
   }
+  public String getDataFormatId() {
+    return dataFormatId;
+  }
+  public void setDataFormatId(String dataFormatId) {
+    this.dataFormatId = dataFormatId;
+  }
+  public String getConfiguration() {
+    return configuration;
+  }
+  public void setConfiguration(String configuration) {
+    this.configuration = configuration;
+  }
+
   public int getRevision() {
     return revision;
   }
@@ -127,6 +143,8 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
            + ", processInstanceId=" + processInstanceId
            + ", taskId=" + taskId
            + ", timestamp=" + timestamp
+           + ", dataFormatId=" + dataFormatId
+           + ", configuration=" + configuration
            + "]";
   }
 

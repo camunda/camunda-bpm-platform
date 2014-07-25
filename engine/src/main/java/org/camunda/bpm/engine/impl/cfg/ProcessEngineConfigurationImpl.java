@@ -24,8 +24,10 @@ import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
+
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -122,6 +124,8 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.variable.*;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.spin.DataFormats;
+import org.camunda.spin.spi.DataFormat;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -233,6 +237,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<VariableType> customPreVariableTypes;
   protected List<VariableType> customPostVariableTypes;
   protected VariableTypes variableTypes;
+  protected String defaultSerializationFormat;
 
   protected ExpressionManager expressionManager;
   protected List<String> customScriptingEngineClasses;
@@ -1019,7 +1024,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       variableTypes.addType(new DateType());
       variableTypes.addType(new DoubleType());
       variableTypes.addType(new ByteArrayType());
-      variableTypes.addType(new SerializableType());
+
+      if (defaultSerializationFormat != null) {
+        // TODO look data format by name
+        DataFormat<?> dataFormat = DataFormats.jsonTree();
+        variableTypes.addType(new DefaultSerializationFormatType(dataFormat));
+      } else {
+        variableTypes.addType(new SerializableType());
+      }
+
       if (customPostVariableTypes!=null) {
         for (VariableType customVariableType: customPostVariableTypes) {
           variableTypes.addType(customVariableType);
@@ -2240,5 +2253,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ArtifactFactory getArtifactFactory() {
     return artifactFactory;
+  }
+
+  public String getDefaultSerializationFormat() {
+    return defaultSerializationFormat;
+  }
+
+  public ProcessEngineConfigurationImpl setDefaultSerializationFormat(String defaultSerializationFormat) {
+    this.defaultSerializationFormat = defaultSerializationFormat;
+    return this;
   }
 }

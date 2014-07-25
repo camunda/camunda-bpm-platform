@@ -125,8 +125,6 @@ public abstract class AbstractVariableStore implements Serializable, CoreVariabl
     initializeVariableInstanceBackPointer(variableInstance);
     variableInstances.put(variableName, variableInstance);
 
-    variableInstance.setValue(value);
-
     // fire CREATE event
     if(isAutoFireHistoryEvents()) {
       fireHistoricVariableInstanceCreate(variableInstance, sourceActivityExecution);

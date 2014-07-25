@@ -78,4 +78,15 @@ public interface VariableInstance {
    */
   String getErrorMessage();
 
+  /**
+   * Returns the variable's raw value as it is stored in the database. This is the same
+   * as {@link #getValue()} unless a specific default serialization data format is used.
+   */
+  String getRawValue();
+
+  /**
+   * Returns the identifier of the data format that is used to serialize the variable.
+   */
+  String getDataFormatId();
+
 }

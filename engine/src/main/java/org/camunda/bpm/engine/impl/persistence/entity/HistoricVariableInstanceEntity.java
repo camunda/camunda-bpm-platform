@@ -56,6 +56,9 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   protected String errorMessage;
 
+  protected String dataFormatId;
+  protected String configuration;
+
 
   public HistoricVariableInstanceEntity() {
   }
@@ -325,6 +328,22 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
            + ", textValue2=" + textValue2
            + ", byteArrayId=" + byteArrayId
            + "]";
+  }
+
+  public String getDataFormatId() {
+    return dataFormatId;
+  }
+
+  public void setDataFormatId(String dataFormatId) {
+    this.dataFormatId = dataFormatId;
+  }
+
+  public String getConfiguration() {
+    return configuration;
+  }
+
+  public void setConfiguration(String configuration) {
+    this.configuration = configuration;
   }
 
 }

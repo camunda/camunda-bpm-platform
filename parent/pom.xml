@@ -57,7 +57,7 @@
 
     <version.camunda.commons>1.0.0</version.camunda.commons>
     <version.camunda.connect>1.0.0-alpha1</version.camunda.connect>
-    <version.camunda.spin>1.0.0-alpha1</version.camunda.spin>
+    <version.camunda.spin>1.0.0-SNAPSHOT</version.camunda.spin>
     <version.camunda.template-engines>1.0.0</version.camunda.template-engines>
 
     <!-- OSGi bundles properties -->
@@ -272,6 +272,12 @@
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
         <version>20070829</version>
+      </dependency>
+      <dependency>
+        <groupId>org.skyscreamer</groupId>
+        <artifactId>jsonassert</artifactId>
+        <scope>test</scope>
+        <version>1.2.3</version>
       </dependency>
       <dependency>
         <!-- required for building with JDK 5 -->

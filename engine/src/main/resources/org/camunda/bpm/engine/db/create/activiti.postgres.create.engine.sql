@@ -157,6 +157,8 @@ create table ACT_RU_VARIABLE (
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
     VAR_SCOPE_ varchar(64),
+    DATA_FORMAT_ID_ varchar(255),
+    CONFIGURATION_ varchar(255),
     primary key (ID_)
 );
 
