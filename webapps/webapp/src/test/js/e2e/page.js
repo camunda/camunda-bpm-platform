@@ -53,6 +53,16 @@ Page.prototype.waitForElementToBePresent = function(selector, max) {
       }, max, 'Waiting for element (with selector "'+ selector +'") took too long.');
 };
 
+/* notification */
+Page.prototype.notifications = function() {
+  return element.all(by.repeater('notification in notifications'));
+};
+
+Page.prototype.notification = function() {
+  return this.notifications().first().element(by.binding('notification.message')).getText();
+};
+
+/* header menu */
 Page.prototype.login = function(username, password) {
   username = username || 'jonny1';
   password = password || 'jonny1';
@@ -65,5 +75,20 @@ Page.prototype.login = function(username, password) {
   var submitButton = element(by.css('.btn-primary.btn-large'));
   submitButton.click();
 };
+
+Page.prototype.logout = function() {
+  element(by.css('.navbar [sem-show-user-actions]')).click();
+  element(by.css('.navbar [sem-log-out]')).click();
+};
+
+Page.prototype.loggedInUser = function() {
+  return element(by.css('.navbar [sem-show-user-actions]')).getText();
+};
+
+Page.prototype.switchWebapp = function(appName) {
+  element(by.css('.navbar [sem-show-applications]')).click();
+  element(by.css('.navbar [sem-jump-to-'+ appName + ']')).click();
+};
+
 
 module.exports = Page;

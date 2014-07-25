@@ -2,6 +2,8 @@
 
 var Page = require('../../page');
 
+var navigationSection = element(by.css('[ng-controller="NavigationController"]'));
+
 module.exports = Page.extend({
 
   pageHeader: function() {
@@ -19,17 +21,12 @@ module.exports = Page.extend({
     var itemIndex = index.indexOf(navbarItem) + 1;
 
     if (itemIndex)
-      item = element(by.css('.navbar ul li:nth-child(' + itemIndex + ')'));
+      item = navigationSection.element(by.css('.navbar ul li:nth-child(' + itemIndex + ')'));
     else
-      item = element(by.css('.navbar ul li:nth-child(1)'));
+      item = navigationSection.element(by.css('.navbar ul li:nth-child(1)'));
 
     item.click();
     return item;
-  },
-
-  logout: function() {
-    element(by.css('.navbar [sem-show-user-actions]')).click();
-    element(by.css('.navbar [sem-log-out]')).click();
-  }  
+  }
 
 });
