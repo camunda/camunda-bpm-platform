@@ -171,13 +171,16 @@ public abstract class DeploymentMetadataParse extends Parse {
    * &lt;/properties&gt;
    * </pre>
    * structure into a properties {@link Map}
+   * 
+   * Supports resolution of Ant-style placeholders against system properties. 
    *
    */
   protected void parseProperties(Element element, Map<String, String> properties) {
 
     for (Element childElement : element.elements()) {
       if(PROPERTY.equals(childElement.getTagName())) {
-        properties.put(childElement.attribute(NAME), childElement.getText());
+        String resolved = PropertyHelper.resolveProperty(System.getProperties(), childElement.getText());
+        properties.put(childElement.attribute(NAME), resolved);
       }
     }
 
