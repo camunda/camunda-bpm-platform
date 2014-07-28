@@ -48,7 +48,7 @@ function bonerInstall(project) {
     opts: {
       cwd: __dirname +'/../'+ project
     },
-    cmd: 'bower',
+    cmd: './node_modules/bower/bin/bower',
     args: [
       'install'
     ]
@@ -100,7 +100,7 @@ module.exports = function(grunt) {
           linkFrom('camunda-admin-ui'),
           linkFrom('camunda-cockpit-ui'),
           linkFrom('camunda-tasklist-ui'),
-          linkFrom('camunda-cockpit-plugin-base')
+          // linkFrom('camunda-cockpit-plugin-base')
         ]
       },
 
@@ -109,12 +109,12 @@ module.exports = function(grunt) {
           stream: true
         },
         tasks: [
-          bonerInstall('camunda-bpm-sdk-js'),
-          bonerInstall('camunda-commons-ui'),
+          // bonerInstall('camunda-bpm-sdk-js'),
+          // bonerInstall('camunda-commons-ui'),
           bonerInstall('camunda-admin-ui'),
           bonerInstall('camunda-cockpit-ui'),
           bonerInstall('camunda-tasklist-ui'),
-          bonerInstall('camunda-cockpit-plugin-base')
+          // bonerInstall('camunda-cockpit-plugin-base')
         ]
       },
 
@@ -128,7 +128,7 @@ module.exports = function(grunt) {
           linkTo('camunda-admin-ui'),
           linkTo('camunda-cockpit-ui'),
           linkTo('camunda-tasklist-ui'),
-          linkTo('camunda-cockpit-plugin-base')
+          // linkTo('camunda-cockpit-plugin-base')
         ]
       },
 
@@ -148,11 +148,11 @@ module.exports = function(grunt) {
               'jetty:run',
               '-DskipTests',
               '-Pdevelop,livereload',
-              '-o'
+              //'-o'
             ]
           },
           autoBuild('camunda-bpm-sdk-js', verbose, stack),
-          // // autoBuild('camunda-commons-ui', verbose, stack),
+          // autoBuild('camunda-commons-ui', verbose, stack),
           autoBuild('camunda-admin-ui', verbose, stack),
           autoBuild('camunda-cockpit-ui', verbose, stack),
           autoBuild('camunda-tasklist-ui', verbose, stack)
