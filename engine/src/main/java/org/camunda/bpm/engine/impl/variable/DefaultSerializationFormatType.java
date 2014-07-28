@@ -63,8 +63,6 @@ public class DefaultSerializationFormatType implements VariableType {
 
       valueFields.setDataFormatId(dataFormat.getName());
       valueFields.setConfiguration(dataFormat.getCanonicalTypeName(value));
-
-      valueFields.setCachedValue(value);
     } catch (SpinRuntimeException e) {
       throw new ProcessEngineException("Cannot serialize object of type " + value.getClass() + ": " + value, e);
     }

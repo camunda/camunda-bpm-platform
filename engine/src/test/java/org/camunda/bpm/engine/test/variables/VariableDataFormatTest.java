@@ -20,6 +20,8 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.variable.DefaultSerializationFormatType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -170,6 +172,31 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testVariableValueCaching() {
+    final ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+
+      @Override
+      public Void execute(CommandContext commandContext) {
+        SimpleBean bean = new SimpleBean("a String", 42, true);
+        runtimeService.setVariable(instance.getId(), "simpleBean", bean);
+
+        Object returnedBean = runtimeService.getVariable(instance.getId(), "simpleBean");
+        assertSame(bean, returnedBean);
+
+        return null;
+      }
+    });
+
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+
+    Object returnedBean = variableInstance.getValue();
+    Object theSameReturnedBean = variableInstance.getValue();
+    assertSame(returnedBean, theSameReturnedBean);
+  }
+
   protected void assertListsEqual(List<SimpleBean> expectedBeans, List<SimpleBean> actualBeans) {
     assertEquals(expectedBeans.size(), actualBeans.size());
 
@@ -198,36 +225,4 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     return jsonBuilder.toString();
   }
-
-
-  // TODO: think about VariableInstance#getRawValue: should this return String or Object?
-  // must also be delegated to variable type to return the raw value; what should this be for other formats?
-  // is it a good contract to return different things depending on the variable type?
-  //
-  // also apply to HistoricVariableInstance!
-
-  // TODO: what about async history handlers => Are history events sufficient atm?
-
-  // TODO: test default format configuration by java
-
-  // TODO: test default format configuration by string => should string value config be replaced? probably not;
-  // as a user, I can simply use spin to work with json string
-
-  // TODO: test additional properties (data format id and configuration) are written to history (HistoricVariableInstance as well as HistoricDetail (when variables are updated))
-
-  // TODO: upgrade scripts (RU_VARIABLE and history)
-
-  // TODO: ensure that variable instance query works (getRawValue()) without having the class at hand
-
-  // TODO: test something that involves VariableType#getTypeNameForValue(), i.e. ensure it is meaningful for
-  // default serialization format type
-
-  // TODO: test execution.getVariable(..) as raw value
-
-  // TODO: current impl disables JPAEntityVariableType
-
-  // TODO: expose getConfiguration() in interface VariableInstance?
-
-  // TODO: add dataformatid and configuration to persistent state in
-  // VariableInstanceEntity and HistoricVariableInstanceEntity
 }
