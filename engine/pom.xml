@@ -452,6 +452,7 @@
                 <exclude>**/TaskEventsTest.java</exclude>
                 <exclude>**/OperationLog*.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
+                <exclude>**/HistoricVariableDataFormatTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -481,6 +482,7 @@
                 <exclude>**/OperationLog*.java</exclude>
                 <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
+                <exclude>**/HistoricVariableDataFormatTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

@@ -131,6 +131,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setRevision(variableInstance.getRevision());
     evt.setVariableName(variableInstance.getName());
     evt.setVariableTypeName(variableInstance.getType().getTypeName());
+    evt.setDataFormatId(variableInstance.getDataFormatId());
+    evt.setConfiguration(variableInstance.getConfiguration());
 
     // copy value
     evt.setTextValue(variableInstance.getTextValue());

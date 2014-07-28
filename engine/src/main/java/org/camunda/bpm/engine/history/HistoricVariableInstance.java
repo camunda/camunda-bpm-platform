@@ -58,4 +58,8 @@ public interface HistoricVariableInstance {
    */
   String getErrorMessage();
 
+  String getRawValue();
+
+  String getDataFormatId();
+
 }

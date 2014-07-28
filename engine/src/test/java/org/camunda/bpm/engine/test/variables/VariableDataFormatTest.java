@@ -25,22 +25,27 @@ import org.camunda.bpm.engine.impl.variable.DefaultSerializationFormatType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.spin.DataFormats;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
+
+  protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml";
+
+  protected static final String JSON_FORMAT_NAME = DataFormats.jsonTreeFormat().getName();
 
   @Override
   protected void initializeProcessEngine() {
     ProcessEngineConfigurationImpl engineConfig =
         (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
 
-    engineConfig.setDefaultSerializationFormat("application/json; implementation=tree");
+    engineConfig.setDefaultSerializationFormat(JSON_FORMAT_NAME);
 
     processEngine = engineConfig.buildProcessEngine();
   }
 
-  @Deployment(resources = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml")
+  @Deployment(resources = ONE_TASK_PROCESS)
   public void testSerializationAsJson() throws JSONException {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -57,7 +62,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     assertEquals(returnedBean.getBooleanProperty(), bean.getBooleanProperty());
     assertEquals(returnedBean.getStringProperty(), bean.getStringProperty());
 
-    assertEquals("application/json; implementation=tree", beanVariable.getDataFormatId());
+    assertEquals(JSON_FORMAT_NAME, beanVariable.getDataFormatId());
 
     String persistedValue = beanVariable.getRawValue();
     String expectedJson = bean.toExpectedJsonString();
@@ -65,7 +70,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml")
+  @Deployment(resources = ONE_TASK_PROCESS)
   public void testListSerializationAsJson() throws JSONException {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -85,7 +90,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     assertTrue(returnedBeans instanceof ArrayList);
     assertListsEqual(beans, returnedBeans);
 
-    assertEquals("application/json; implementation=tree", beansVariable.getDataFormatId());
+    assertEquals(JSON_FORMAT_NAME, beansVariable.getDataFormatId());
 
     String persistedValue = beansVariable.getRawValue();
     String expectedJson = toExpectedJsonArray(beans);
@@ -93,7 +98,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml")
+  @Deployment(resources = ONE_TASK_PROCESS)
   public void testFailingSerialization() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -107,7 +112,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml")
+  @Deployment(resources = ONE_TASK_PROCESS)
   public void testFailingDeserialization() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -121,7 +126,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     assertNotNull(variableInstance.getErrorMessage());
   }
 
-  @Deployment(resources = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml")
+  @Deployment(resources = ONE_TASK_PROCESS)
   public void testSettingVariableExceedingTextFieldLength() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -198,6 +203,10 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
   // TODO: think about VariableInstance#getRawValue: should this return String or Object?
   // must also be delegated to variable type to return the raw value; what should this be for other formats?
   // is it a good contract to return different things depending on the variable type?
+  //
+  // also apply to HistoricVariableInstance!
+
+  // TODO: what about async history handlers => Are history events sufficient atm?
 
   // TODO: test default format configuration by java
 
@@ -216,4 +225,9 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
   // TODO: test execution.getVariable(..) as raw value
 
   // TODO: current impl disables JPAEntityVariableType
+
+  // TODO: expose getConfiguration() in interface VariableInstance?
+
+  // TODO: add dataformatid and configuration to persistent state in
+  // VariableInstanceEntity and HistoricVariableInstanceEntity
 }
