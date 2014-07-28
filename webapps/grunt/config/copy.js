@@ -1,5 +1,5 @@
 'use strict';
-
+/* jshint node: true */
 var commentLineExp =  /^[\s]*<!-- (\/|#) (CE|EE)/;
 var requireConfExp =  /require-conf.js$/;
 
@@ -21,7 +21,7 @@ function distFileProcessing(content, srcpath) {
 
 function devFileProcessing(content, srcpath) {
   /* jshint validthis: true */
-  var liveReloadPort = this.config.get('app.liveReloadPort');
+  var liveReloadPort = this.config.get('pkg.gruntConfig.livereloadPort');
   /* jshint validthis: false */
 
   if (requireConfExp.test(srcpath)) {
