@@ -1,15 +1,15 @@
-module.exports = function(config) {
+module.exports = function() {
   'use strict';
   var _ = require('underscore');
-  var fs = require('fs');
   var path = require('path');
-  var grunt = config.grunt;
   var rjsConfPath = path.resolve('./client/scripts/require-conf');
   var rjsConf = require(rjsConfPath);
 
   var deps = [
     'camunda-tasklist-ui/require-conf',
     './../node_modules/requirejs/require',
+    // 'camunda-commons-ui/util',
+    'camunda-commons-ui/auth',
     'jquery',
     'angular',
     'moment',
@@ -21,9 +21,10 @@ module.exports = function(config) {
     'angular-route',
     'angular-animate',
     'angular-moment'
-  ];
+  ];//.concat(rjsConf.shim['camunda-tasklist-ui']);
 
   _.extend(rjsConf.paths, {
+    'camunda-commons-ui': './../node_modules/camunda-commons-ui/lib',
     'require-conf': 'scripts/require-conf'
   });
 
