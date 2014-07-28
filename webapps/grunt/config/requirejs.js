@@ -1,4 +1,4 @@
-module.exports = function() {
+module.exports = function(config) {
   'use strict';
   var _ = require('underscore');
   var path = require('path');
@@ -53,7 +53,7 @@ module.exports = function() {
         on the plugin, may or may not have something inlined in the
         module bundle.
         */
-        grunt.verbose.writeln('onModuleBundleComplete', data.path+':\n\n'+data.included.join('\n') +'\n');
+        config.grunt.verbose.writeln('onModuleBundleComplete', data.path+':\n\n'+data.included.join('\n') +'\n');
 
         // // add a timestamp to the sourcemap URL to prevent caching
         // fs.readFile(data.path, {encoding: 'utf8'}, function(err, content) {
