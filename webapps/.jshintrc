@@ -1,0 +1,11 @@
+{
+  "globals": {
+    "ngDefine": false,
+    "require": false,
+    "define": false,
+    "console": false
+  },
+  "browser": true,
+  "indent": 2,
+  "strict": true
+}
