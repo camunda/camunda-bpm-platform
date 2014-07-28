@@ -56,13 +56,13 @@ module.exports = function(grunt) {
     mode = mode || 'prod';
 
     grunt.config.data.buildTarget = (mode === 'prod' ? config.prodTarget : config.devTarget);
-    grunt.log.subhead('Will build the project in "'+ mode +'" mode and place it in "'+ grunt.config('buildTarget') +'"');
+    grunt.log.subhead('Will build the "'+ pkg.name +'" project in "'+ mode +'" mode and place it in "'+ grunt.config('buildTarget') +'"');
     if (mode === 'dev') {
       grunt.log.writeln('Will serve on port "'+
-        config.connectPort
-        +'" and liverreload available on port "'+
-        config.livereloadPort
-        +'"');
+        config.connectPort +
+        '" and liverreload available on port "'+
+        config.livereloadPort +
+        '"');
     }
 
     var tasks = [
