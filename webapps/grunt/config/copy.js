@@ -48,12 +48,6 @@ module.exports = function(config) {
         }
       },
       files: [
-        // {
-        //   expand: true,
-        //   cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/WEB-INF',
-        //   src: ['*'],
-        //   dest: '<%= buildTarget %>/WEB-INF'
-        // },
         {
           expand: true,
           cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
@@ -63,24 +57,6 @@ module.exports = function(config) {
             '{app,plugin,develop,common}/**/*.{js,html}'
           ],
           dest: '<%= buildTarget %>/'
-        },
-        // {
-        //   expand: true,
-        //   cwd: 'node_modules/camunda-tasklist-ui/dist/',
-        //   src: ['**'],
-        //   dest: '<%= buildTarget %>/app/tasklist/default/'
-        // },
-        // {
-        //   expand: true,
-        //   cwd: 'node_modules/camunda-tasklist-ui/dist/',
-        //   src: ['index.html'],
-        //   dest: '<%= buildTarget %>/app/tasklist/'
-        // },
-        {
-          expand: true,
-          cwd: 'node_modules/camunda-tasklist-ui/dist/',
-          src: ['**'],
-          dest: '<%= buildTarget %>/app/tasklist/'
         },
         {
           expand: true,
@@ -154,9 +130,7 @@ module.exports = function(config) {
 
         // requirejs
         {
-          // src: '<%= pkg.gruntConfig.clientDir %>/scripts/assets/vendor/requirejs/index.js',
-          // dest: '<%= buildTarget %>/assets/vendor/requirejs/require.js'
-          src: '<%= pkg.gruntConfig.clientDir %>/bower_components/requirejs/index.js',
+          src: 'node_modules/requirejs/require.js',
           dest: '<%= buildTarget %>/assets/vendor/requirejs/require.js'
         },
 
@@ -166,11 +140,7 @@ module.exports = function(config) {
           // cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/assets',
           cwd: '<%= pkg.gruntConfig.clientDir %>/bower_components',
           src: [
-            // '!vendor/requirejs/**/*',
-            // 'css/**/*',
-            // 'img/**/*',
-            // 'vendor/**/*.{js,css,jpg,png,gif,html,eot,ttf,svg,woff,htc}'
-            '!requirejs/**/*',
+            '!jquery.ui/{demos,external,tests,themes}/**/*',
             '**/*.{js,css,jpg,png,gif,html,eot,ttf,svg,woff,htc}'
           ],
           dest: '<%= buildTarget %>/assets/vendor'

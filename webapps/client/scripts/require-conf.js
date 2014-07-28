@@ -18,6 +18,7 @@
  */
 (function(factory) {
   'use strict';
+  /*jshint node: true */
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = factory();
   }
@@ -77,6 +78,7 @@
     'ngDefine':              vendor +'/requirejs-angular-define/src/ngDefine',
     'ngParse':               vendor +'/requirejs-angular-define/src/ngParse',
     'domReady':              vendor +'/requirejs-domready/index',
+    'text':                  vendor +'/requirejs-text/text',
 
     'jquery':                vendor +'/jquery/dist/jquery',
     'bootstrap':             vendor +'/bootstrap/di../bootstrap',
@@ -89,6 +91,8 @@
     'angular-ui':            vendor +'/angular-ui/build/angular-ui',
     'angular-bootstrap':     vendor +'/angular-bootstrap/ui-bootstrap-tpls',
     'jquery-ui':             vendor +'/jquery.ui',
+
+    'angular-data-depend':   vendor +'/angular-data-depend/src/dataDepend',
 
     'camunda-commons-ui':    vendor +'/camunda-commons-ui/lib'
   };
@@ -144,6 +148,11 @@
       name: 'admin',
       location: '.',
       main: 'admin'
+    },
+    {
+      name: 'camunda-commons-ui',
+      location: './'+ vendor +'/camunda-commons-ui/lib',
+      main: 'index'
     }
   ];
 

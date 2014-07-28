@@ -17,10 +17,12 @@
 
     require([
       'angular',
+      'angular-route',
       'angular-resource',
       'angular-sanitize',
       'angular-ui',
       'ngDefine',
+      'camunda-commons-ui',
       // 'bootstrap',
       'jquery-ui/ui/jquery.ui.draggable'
     ], function(angular) {
