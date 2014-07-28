@@ -43,7 +43,7 @@ public class HistoricVariableDataFormatTest extends AbstractProcessEngineTestCas
     assertEquals(bean.getIntProperty(), historyValue.getIntProperty());
     assertEquals(bean.getBooleanProperty(), historyValue.getBooleanProperty());
 
-    JSONAssert.assertEquals(bean.toExpectedJsonString(), historicVariable.getRawValue(), true);
+    JSONAssert.assertEquals(bean.toExpectedJsonString(), (String) historicVariable.getRawValue(), true);
   }
 
 }

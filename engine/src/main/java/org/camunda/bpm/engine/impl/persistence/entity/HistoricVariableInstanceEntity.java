@@ -348,8 +348,8 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.configuration = configuration;
   }
 
-  public String getRawValue() {
-    return textValue;
+  public Object getRawValue() {
+    return variableType.getRawValue(this);
   }
 
 }

@@ -58,4 +58,8 @@ public class CustomObjectType implements VariableType {
       return "custom-object";
     }
   }
+
+  public Object getRawValue(ValueFields valueFields) {
+    return getValue(valueFields);
+  }
 }

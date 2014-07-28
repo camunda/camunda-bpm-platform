@@ -58,4 +58,8 @@ public class ShortType implements VariableType {
     // typename independent of value
     return Short.class.getSimpleName();
   }
+
+  public Object getRawValue(ValueFields valueFields) {
+    return valueFields.getLongValue();
+  }
 }

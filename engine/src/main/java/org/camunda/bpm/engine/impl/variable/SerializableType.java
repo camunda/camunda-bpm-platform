@@ -112,6 +112,10 @@ public class SerializableType extends ByteArrayType {
     return "Serializable";
   }
 
+  public Object getRawValue(ValueFields valueFields) {
+    return super.getValue(valueFields);
+  }
+
   protected static class ClassloaderAwareObjectInputStream extends ObjectInputStream {
 
     public ClassloaderAwareObjectInputStream(InputStream in) throws IOException {

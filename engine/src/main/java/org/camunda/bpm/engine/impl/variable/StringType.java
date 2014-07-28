@@ -48,4 +48,8 @@ public class StringType implements VariableType {
     // typename independent of value
     return String.class.getSimpleName();
   }
+
+  public Object getRawValue(ValueFields valueFields) {
+    return getValue(valueFields);
+  }
 }

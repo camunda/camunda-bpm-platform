@@ -48,4 +48,8 @@ public class DoubleType implements VariableType {
     // typename independent of value
     return Double.class.getSimpleName();
   }
+
+  public Object getRawValue(ValueFields valueFields) {
+    return getValue(valueFields);
+  }
 }

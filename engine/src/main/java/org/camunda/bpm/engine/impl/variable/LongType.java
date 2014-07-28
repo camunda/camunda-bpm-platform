@@ -54,4 +54,8 @@ public class LongType implements VariableType {
     // typename independent of value
     return Long.class.getSimpleName();
   }
+
+  public Object getRawValue(ValueFields valueFields) {
+    return getValue(valueFields);
+  }
 }

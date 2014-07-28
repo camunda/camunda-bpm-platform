@@ -62,4 +62,8 @@ public class ByteArrayType implements VariableType {
   public String getTypeNameForValue(Object value) {
     return "Binary";
   }
+
+  public Object getRawValue(ValueFields valueFields) {
+    return getValue(valueFields);
+  }
 }

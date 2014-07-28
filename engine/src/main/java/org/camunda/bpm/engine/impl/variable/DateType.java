@@ -57,4 +57,8 @@ public class DateType implements VariableType {
     // typename independent of value
     return Date.class.getSimpleName();
   }
+
+  public Object getRawValue(ValueFields valueFields) {
+    return valueFields.getLongValue();
+  }
 }

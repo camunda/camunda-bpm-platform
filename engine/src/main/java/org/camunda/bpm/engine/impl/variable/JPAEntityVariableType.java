@@ -87,4 +87,8 @@ public class JPAEntityVariableType implements VariableType {
     }
   }
 
+  public Object getRawValue(ValueFields valueFields) {
+    return valueFields.getTextValue() + ":" + valueFields.getTextValue2();
+  }
+
 }

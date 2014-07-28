@@ -58,4 +58,8 @@ public class IntegerType implements VariableType {
     // typename independent of value
     return Integer.class.getSimpleName();
   }
+
+  public Object getRawValue(ValueFields valueFields) {
+    return valueFields.getLongValue();
+  }
 }

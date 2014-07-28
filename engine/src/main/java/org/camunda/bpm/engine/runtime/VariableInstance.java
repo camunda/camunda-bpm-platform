@@ -80,9 +80,9 @@ public interface VariableInstance {
 
   /**
    * Returns the variable's raw value as it is stored in the database. This is the same
-   * as {@link #getValue()} unless a specific default serialization data format is used.
+   * as {@link #getValue()} but no conversion to the stored type is applied.
    */
-  String getRawValue();
+  Object getRawValue();
 
   /**
    * Returns the identifier of the data format that is used to serialize the variable.

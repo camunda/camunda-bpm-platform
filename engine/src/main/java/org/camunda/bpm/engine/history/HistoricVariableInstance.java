@@ -58,8 +58,15 @@ public interface HistoricVariableInstance {
    */
   String getErrorMessage();
 
-  String getRawValue();
+  /**
+   * Returns the variable's raw value as it is stored in the database. This is the same
+   * as {@link #getValue()} but no conversion to the stored type is applied.
+   */
+  Object getRawValue();
 
+  /**
+   * Returns the identifier of the data format that is used to serialize the variable.
+   */
   String getDataFormatId();
 
 }

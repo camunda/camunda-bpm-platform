@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
+import java.io.UnsupportedEncodingException;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.spin.Spin;
@@ -93,6 +95,23 @@ public class DefaultSerializationFormatType implements VariableType {
           "Cannot deserialize variable '" + valueFields.getName() + "' of format '" +
           valueFields.getDataFormatId() + "' with configuration '" + valueFields.getConfiguration() + "'");
     }
+  }
+
+  public Object getRawValue(ValueFields valueFields) {
+    String value = null;
+
+    if (valueFields.getTextValue() != null) {
+      value = valueFields.getTextValue();
+    } else if (valueFields.getByteArrayValue() != null){
+      try {
+        ByteArrayEntity byteArray = valueFields.getByteArrayValue();
+        value = new String(byteArray.getBytes(), "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+        throw new ProcessEngineException("UTF-8 is not a supported encoding");
+      }
+    }
+
+    return value;
   }
 
 }

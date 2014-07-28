@@ -66,7 +66,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     assertEquals(JSON_FORMAT_NAME, beanVariable.getDataFormatId());
 
-    String persistedValue = beanVariable.getRawValue();
+    String persistedValue = (String) beanVariable.getRawValue();
     String expectedJson = bean.toExpectedJsonString();
     JSONAssert.assertEquals(expectedJson, persistedValue, true);
 
@@ -94,7 +94,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     assertEquals(JSON_FORMAT_NAME, beansVariable.getDataFormatId());
 
-    String persistedValue = beansVariable.getRawValue();
+    String persistedValue = (String) beansVariable.getRawValue();
     String expectedJson = toExpectedJsonArray(beans);
     JSONAssert.assertEquals(expectedJson, persistedValue, true);
 
@@ -129,7 +129,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testSettingVariableExceedingTextFieldLength() {
+  public void testSettingVariableExceedingTextFieldLength() throws JSONException {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     // field TEXT is varchar(4000), i.e. 4000 byte
@@ -156,6 +156,9 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     assertNotNull(returnedBeans);
     assertTrue(returnedBeans instanceof ArrayList);
     assertListsEqual(lengthExceedingBeans, returnedBeans);
+
+    String rawJson = (String) beansVariable.getRawValue();
+    JSONAssert.assertEquals(toExpectedJsonArray(lengthExceedingBeans), rawJson, true);
   }
 
   public void testFailForNonExistingSerializationFormat() {

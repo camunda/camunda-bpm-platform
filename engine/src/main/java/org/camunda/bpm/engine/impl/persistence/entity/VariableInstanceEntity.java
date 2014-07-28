@@ -352,9 +352,8 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
     return errorMessage;
   }
 
-  public String getRawValue() {
-    // TODO: delegate this to the variable type
-    return textValue;
+  public Object getRawValue() {
+    return type.getRawValue(this);
   }
 
   public String getDataFormatId() {
