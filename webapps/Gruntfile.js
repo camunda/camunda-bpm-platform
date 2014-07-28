@@ -147,7 +147,8 @@ module.exports = function(grunt) {
               'install',
               'jetty:run',
               '-DskipTests',
-              '-Pdevelop,livereload'
+              '-Pdevelop,livereload',
+              '-o'
             ]
           },
           autoBuild('camunda-bpm-sdk-js', verbose, stack),
