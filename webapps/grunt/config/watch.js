@@ -18,6 +18,7 @@ module.exports = function(config) {
 
     styles: {
       files: [
+        'node_modules/camunda-*/client/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.clientDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.clientDir %>/scripts/*/*.{css,less}'
       ],
@@ -28,8 +29,7 @@ module.exports = function(config) {
 
     scripts: {
       files: [
-        '<%= pkg.gruntConfig.clientDir %>/node_modules/camunda-*/**/*.{js,html}',
-        '<%= pkg.gruntConfig.clientDir %>/bower_components/camunda-*/**/*.{js,html}',
+        'node_modules/camunda-*/client/scripts/**/*.{js,html}',
         '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html}'
       ],
       tasks: [

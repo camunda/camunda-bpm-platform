@@ -46,7 +46,6 @@
     "jquery-mousewheel": "https://raw.github.com/brandonaaron/jquery-mousewheel/09bb82c73c5650812e36dfd27d605d64d3ed32b8/jquery.mousewheel.js",
     "jquery-overscroll-fixed": "https://raw.github.com/azoff/overscroll/1579345a5d7cf2601a290e64d04aaa2a22449cac/src/jquery.overscroll.js",
     "requirejs-angular-define": "camunda/requirejs-angular-define",
-    "requirejs": "http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.js",
     "requirejs-domready": "http://cdnjs.cloudflare.com/ajax/libs/require-domReady/2.0.1/domReady.min.js",
     "requirejs-text": "~2.0.12",
     "bootstrap": "~3.1.1",

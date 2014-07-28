@@ -130,23 +130,15 @@ module.exports = function(config) {
 
         // requirejs
         {
-          // src: '<%= pkg.gruntConfig.clientDir %>/scripts/assets/vendor/requirejs/index.js',
-          // dest: '<%= buildTarget %>/assets/vendor/requirejs/require.js'
-          src: '<%= pkg.gruntConfig.clientDir %>/bower_components/requirejs/index.js',
+          src: 'node_modules/requirejs/require.js',
           dest: '<%= buildTarget %>/assets/vendor/requirejs/require.js'
         },
 
         // others
         {
           expand: true,
-          // cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/assets',
           cwd: '<%= pkg.gruntConfig.clientDir %>/bower_components',
           src: [
-            // '!vendor/requirejs/**/*',
-            // 'css/**/*',
-            // 'img/**/*',
-            // 'vendor/**/*.{js,css,jpg,png,gif,html,eot,ttf,svg,woff,htc}'
-            '!requirejs/**/*',
             '!jquery.ui/{demos,external,tests,themes}/**/*',
             '**/*.{js,css,jpg,png,gif,html,eot,ttf,svg,woff,htc}'
           ],
