@@ -77,7 +77,7 @@ module.exports = function(grunt) {
       files: [
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/bower_components/camunda-commons-ui/',
+          cwd: 'node_modules/camunda-commons-ui/',
           src: [
             'lib/**/*.*',
             'lib/*.*'
