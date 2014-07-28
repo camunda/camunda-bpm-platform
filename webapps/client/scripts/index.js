@@ -2,9 +2,12 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define('camunda-tasklist-ui', [
-           'camunda-tasklist-ui/require-conf',
-           'camunda-tasklist-ui/utils'
-], function(rjsConf, utils) {
+ 'camunda-tasklist-ui/require-conf',
+ 'camunda-tasklist-ui/utils'
+], function(
+  rjsConf,
+  utils
+) {
   var tasklistConf = typeof window !== 'undefined' ? (window.tasklistConf || {}) : {};
 
   /**
@@ -46,18 +49,62 @@ define('camunda-tasklist-ui', [
 
     tasklistApp = angular.module('cam.tasklist', ngDeps);
 
+    // tasklistApp.provider('Notifications', require('camunda-commons-ui/util/notifications'));
+    tasklistApp.config([
+      'UriProvider',
+    function(
+      UriProvider
+    ) {
+      var $baseTag = $('base');
+
+      function getUri(name) {
+        var uri = $baseTag.attr(name);
+        if (!name) {
+          throw new Error('Uri base for ' + name + ' could not be resolved');
+        }
+
+        return uri;
+      }
+
+      UriProvider.replace(':appName', 'admin');
+      UriProvider.replace('app://', getUri('href'));
+      UriProvider.replace('adminbase://', getUri('app-root') + '/app/admin/');
+      UriProvider.replace('tasklistbase://', getUri('app-root') + '/app/tasklist/');
+      UriProvider.replace('cockpitbase://', getUri('app-root') + '/app/cockpit/');
+      UriProvider.replace('admin://', getUri('admin-api'));
+      UriProvider.replace('plugin://', getUri('admin-api') + 'plugin/');
+      UriProvider.replace('engine://', getUri('engine-api'));
+
+      UriProvider.replace(':engine', [ '$window', function($window) {
+        var uri = $window.location.href;
+
+        var match = uri.match(/\/app\/tasklist\/(\w+)(|\/)/);
+        if (match) {
+          return match[1];
+        } else {
+          throw new Error('no process engine selected');
+        }
+      }]);
+    }]);
 
     tasklistApp.config([
-            '$routeProvider', '$locationProvider',
-    function($routeProvider,   $locationProvider) {
+      '$routeProvider',
+      '$locationProvider',
+      'AuthenticationServiceProvider',
+    function(
+      $routeProvider,
+      $locationProvider,
+      AuthenticationServiceProvider
+    ) {
       var tasklistTemplate = require('text!camunda-tasklist-ui/index.html');
 
       $routeProvider
         .when('/', {
           template: tasklistTemplate,
-          controller: [function() {}]
+          resolve: {
+            authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser
+          }
         })
-
 
         // // Would be great to be able to start processes with a URL
         // .when('/process/:processDefinitionId/start', {
@@ -84,8 +131,10 @@ define('camunda-tasklist-ui', [
 
         .otherwise({
           redirectTo: '/'
-        });
+        })
+      ;
     }]);
+
 
     $(document).ready(function() {
       angular.bootstrap(document, ['cam.tasklist']);

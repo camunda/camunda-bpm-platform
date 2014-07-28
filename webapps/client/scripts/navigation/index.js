@@ -1,90 +1,91 @@
 'use strict';
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
-/* jshint unused: false */
-define(['angular', 'camunda-tasklist-ui/utils', 'text!camunda-tasklist-ui/navigation/navigation.html', 'camunda-tasklist-ui/session'],
-function(angular) {
+
+define([
+  'angular',
+  'camunda-tasklist-ui/utils',
+  'camunda-commons-ui/util/index',
+  'text!camunda-tasklist-ui/navigation/navigation.html',
+], function(
+  angular
+) {
   var navigationModule = angular.module('cam.tasklist.navigation', [
     require('camunda-tasklist-ui/utils').name,
+    require('camunda-commons-ui/util/index').name,
     'ui.bootstrap',
-    'cam.tasklist.user',
-    'cam.tasklist.session'
+    'cam.tasklist.user'
   ]);
 
   navigationModule.directive('camTasklistNavigation', function() {
     return {
       scope: {},
+
+      template: require('text!camunda-tasklist-ui/navigation/navigation.html'),
+
       controller: [
-              '$rootScope', '$scope', '$modal', 'camStorage', 'camSettings', 'camLegacySessionData', 'camTasklistNotifier',
-      function($rootScope,   $scope,   $modal,   camStorage,   camSettings,   camLegacySessionData,   camTasklistNotifier) {
-        var settings = camSettings(navigationModule);
-        var modalInstance;
-        var prevUserId;
+        '$rootScope',
+        '$scope',
+        'Uri',
+      function(
+        $rootScope,
+        $scope,
+        Uri
+      ) {
+        var auth;
 
-        function login(silent) {
-          camLegacySessionData.retrieve()
-          .then(function(data) {
-            $rootScope.user = data;
-
-            $rootScope.user.id = $rootScope.user.id || data.userId;
-
-            camStorage.set('user', $rootScope.user);
-
-            if (modalInstance) {
-              modalInstance.close();
+        function reset() {
+          $scope.links = [
+            {
+              title: '',
+              icon: 'home',
+              links: []
             }
-          }, function(err) {
-            console.info('nopeeee....', err, silent);
-            if (!silent) {
-              camTasklistNotifier.add({
-                type: 'error',
-                text: 'You can not log in with these credentials.'
-              });
-            }
+          ];
 
-            camStorage.remove('user');
-            $rootScope.user = {};
-
-            modalInstance = $modal.open({
-              backdrop:     false,
-              keyboard:     false,
-              windowClass:  'user-login',
-              template:     require('text!camunda-tasklist-ui/user/login.html')
-            });
-          });
+          $scope.username = null;
         }
 
-        $scope.links = settings.links || [];
 
-        $scope.user = $rootScope.user;
+        function refresh() {
+          auth = $rootScope.authentication;
 
-        $rootScope.$watch('user', function() {
-          if ((''+ $rootScope.user.id) === (''+ prevUserId)) {
+          if (!auth || !auth.user) {
+            reset();
             return;
           }
 
-          prevUserId = $rootScope.user.id;
-          $scope.user = $rootScope.user;
+          if ($scope.username === auth.username()) {
+            return;
+          }
 
-          if (prevUserId) {
-            if (modalInstance) {
-              modalInstance.close();
-              modalInstance = null;
+          reset();
+
+          $scope.username = auth.username();
+
+          var appLinks = {
+            admin: {
+              title: 'Admin',
+              href: Uri.appUri('adminbase://:engine/#')
+            },
+            cockpit: {
+              title: 'Cockpit',
+              href: Uri.appUri('cockpitbase://:engine/#')
             }
-          }
-          else if(!modalInstance) {
-            login();
-          }
-        });
+          };
 
-        if (!$scope.user) {
-          $rootScope.user = camStorage.get('user') || {};
+          angular.forEach(appLinks, function(info, appName) {
+            if (auth.user.authorizedApps.indexOf(appName) > -1) {
+              $scope.links[0].links.push(info);
+            }
+          });
         }
 
-        if (!$rootScope.user.id && !modalInstance) {
-          login(true);
-        }
-      }],
-      template: require('text!camunda-tasklist-ui/navigation/navigation.html')
+        // $rootScope.$on('loggedin', refresh);
+        // $rootScope.$on('loggedout', refresh);
+
+        // initializes...
+        refresh();
+      }]
     };
   });
 

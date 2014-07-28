@@ -39,15 +39,15 @@ define([
 
 
   pileModule.factory('camTasklistPileFilterConversion', [
-          'camStorage',
-  function(camStorage) {
+          '$rootScope',
+  function($rootScope) {
     var tokenExp = /(\{[^\}]+\})/g;
 
 
     function tokenReplace(val) {
-      var user = camStorage.get('user');
+      var user = ($rootScope.authentication || {}).user;
       if (val === '{self}') {
-        return user ? user.id : 'anonymous';
+        return user ? user.name : 'anonymous';
       }
 
       if (val === '{now}') {

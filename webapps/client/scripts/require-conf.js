@@ -23,6 +23,9 @@ define(function() {
       'camunda-tasklist-ui':        'scripts',
 
 
+      'camunda-commons-ui':         'vendor/camunda-commons-ui/lib',
+
+
       'camunda-bpm-forms':          'vendor/camunda-embedded-forms',
       'camunda-bpm-sdk':            'vendor/camunda-bpm-sdk',
       'camunda-bpm-sdk-mock':       'vendor/camunda-bpm-sdk-mock'
@@ -46,6 +49,8 @@ define(function() {
                                       'angular-route',
                                       'angular-animate',
 
+                                      'camunda-commons-ui/auth',
+                                      'camunda-commons-ui/util/notifications',
 
                                       'camunda-tasklist-ui/api',
                                       'camunda-tasklist-ui/utils',
@@ -66,6 +71,14 @@ define(function() {
     },
 
     packages: [
+      {
+        name: 'camunda-commons-ui',
+        main: 'index'
+      },
+      {
+        name: 'camunda-commons-ui/auth',
+        main: 'index'
+      },
       {
         name: 'camunda-tasklist-ui',
         main: 'index'

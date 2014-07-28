@@ -2,14 +2,19 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
-           'angular', 'moment',
-           'camunda-tasklist-ui/utils',
-           'camunda-tasklist-ui/api',
-           'angular-bootstrap',
-           'text!camunda-tasklist-ui/task/task.html',
-           'text!camunda-tasklist-ui/task/form.html',
-           'text!camunda-tasklist-ui/task/history.html'
-], function(angular,   moment) {
+  'angular',
+  'moment',
+  'camunda-tasklist-ui/utils',
+  'camunda-tasklist-ui/api',
+  'angular-bootstrap',
+  'text!camunda-tasklist-ui/task/task.html',
+  'text!camunda-tasklist-ui/task/form.html',
+  'text!camunda-tasklist-ui/task/history.html'
+], function(
+  angular,
+  moment
+) {
+
   var taskModule = angular.module('cam.tasklist.task', [
     require('camunda-tasklist-ui/utils').name,
     require('camunda-tasklist-ui/api').name,

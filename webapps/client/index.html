@@ -10,9 +10,10 @@
   <meta name="description" content="camunda Tasklist" />
   <meta name="author" content="camunda services GmbH" />
 
-  <base href="/" />
+  <!--< base href="/" /> -->
+  <base href="$BASE" admin-api="$APP_ROOT/api/admin/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
 
-  <link rel="stylesheet" type="text/css" href="styles/styles.css">
+  <link rel="stylesheet" type="text/css" href="$APP_ROOT/app/tasklist/styles/styles.css">
 
   <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
@@ -43,7 +44,9 @@
     var tasklistConf = {};
   </script>
 
-  <script type="text/javascript" src="scripts/deps.js" data-main="scripts/camunda-tasklist-ui"></script>
+  <script type="text/javascript"
+          src="$APP_ROOT/app/tasklist/scripts/deps.js"
+          data-main="$APP_ROOT/app/tasklist/scripts/camunda-tasklist-ui"></script>
 
   <!-- #production-remove -->
   <script type="text/javascript">
