@@ -1026,9 +1026,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       variableTypes.addType(new ByteArrayType());
 
       if (defaultSerializationFormat != null) {
-        // TODO look data format by name
-        DataFormat<?> dataFormat = DataFormats.jsonTree();
-        variableTypes.addType(new DefaultSerializationFormatType(dataFormat));
+        defaultSerializationFormat = defaultSerializationFormat.trim();
+        Set<DataFormat<?>> availableDataFormats = new HashSet<DataFormat<?>>();
+        availableDataFormats.add(DataFormats.jsonTree());
+
+        for (DataFormat<?> format : availableDataFormats) {
+          if (defaultSerializationFormat.equals(format.getName())) {
+            variableTypes.addType(new DefaultSerializationFormatType(format));
+            return;
+          }
+        }
+
+        throw new ProcessEngineException("Unrecognized default serialization format " + defaultSerializationFormat);
       } else {
         variableTypes.addType(new SerializableType());
       }

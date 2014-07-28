@@ -35,7 +35,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     ProcessEngineConfigurationImpl engineConfig =
         (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
 
-    engineConfig.setDefaultSerializationFormat("application/json");
+    engineConfig.setDefaultSerializationFormat("application/json; implementation=tree");
 
     processEngine = engineConfig.buildProcessEngine();
   }
@@ -151,6 +151,20 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     assertListsEqual(lengthExceedingBeans, returnedBeans);
   }
 
+  public void testFailForNonExistingSerializationFormat() {
+    ProcessEngineConfigurationImpl engineConfig =
+        (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
+
+    engineConfig.setDefaultSerializationFormat("an unknown data format");
+
+    try {
+      engineConfig.buildProcessEngine();
+      fail("Exception expected");
+    } catch (ProcessEngineException e) {
+      // happy path
+    }
+  }
+
   protected void assertListsEqual(List<SimpleBean> expectedBeans, List<SimpleBean> actualBeans) {
     assertEquals(expectedBeans.size(), actualBeans.size());
 
@@ -180,16 +194,10 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     return jsonBuilder.toString();
   }
 
-  // TODO: test var length json that does not fit into database field
-  // should use byte array then (or change to CLOB in db)
 
   // TODO: think about VariableInstance#getRawValue: should this return String or Object?
   // must also be delegated to variable type to return the raw value; what should this be for other formats?
   // is it a good contract to return different things depending on the variable type?
-
-  // TODO: test string encoding?
-
-  // TODO: test that I have to specify the exact name of the data format and not just any name
 
   // TODO: test default format configuration by java
 
