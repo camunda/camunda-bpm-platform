@@ -12,13 +12,15 @@
  */
 package org.camunda.spin.json.tree;
 
-import org.camunda.spin.SpinList;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.json.SpinJsonTreePropertyException;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -128,7 +130,6 @@ public class JsonTreeSetPropertyTest {
     Float value = 42.00F;
 
     Float oldValue = price.numberValue().floatValue();
-    SpinList list = customers.elements();
 
     assertThat(customers.isArray()).isTrue();
     assertThat(price.isNumber());
@@ -161,7 +162,6 @@ public class JsonTreeSetPropertyTest {
     Long value = 4200000000L;
 
     Long oldValue = id.numberValue().longValue();
-    SpinList list = customers.elements();
 
     assertThat(customers.isArray()).isTrue();
     assertThat(id.isNumber());

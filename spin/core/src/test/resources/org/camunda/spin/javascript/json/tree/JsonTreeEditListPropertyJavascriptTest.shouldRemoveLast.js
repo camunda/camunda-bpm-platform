@@ -1,0 +1,9 @@
+var node = JSON(input);
+
+oldSize = node.elements().size();
+oldValue = node.elements().get(oldSize - 1).stringValue();
+
+node.removeLast("test");
+
+newSize = node.elements().size();
+newValue = node.elements().get(newSize - 1).stringValue();

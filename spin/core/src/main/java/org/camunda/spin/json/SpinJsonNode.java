@@ -28,6 +28,24 @@ import java.util.Map;
 public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
 
   /**
+   * Fetches the first index of the searched object in an array.
+   *
+   * @param searchObject Object for which the index should be searched.
+   * @return {@link Integer} index of searchObject or -1 if object not found.
+   * @throws SpinJsonTreeNodeException if the current node is not an array.
+   */
+  public abstract Integer indexOf(Object searchObject);
+
+  /**
+   * Fetches the last index of the searched object in an array.
+   *
+   * @param searchObject Object for which the index should be searched.
+   * @return {@link Integer} index of searchObject or -1 if object not found.
+   * @throws SpinJsonTreeNodeException if the current node is not an array.
+   */
+  public abstract Integer lastIndexOf(Object searchObject);
+
+  /**
    * Check if this node is an object node.
    *
    * @return true if the node is an object, false otherwise
@@ -78,6 +96,33 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
   public abstract SpinJsonNode prop(String name, int newProperty);
 
   /**
+   * Set a new float property in this node.
+   *
+   * @param name the name of the new property
+   * @param newProperty the new float property
+   * @return {@link SpinJsonNode} representation of the current node
+   */
+  public abstract SpinJsonNode prop(String name, float newProperty);
+
+  /**
+   * Set a new long property in this node.
+   *
+   * @param name the name of the new property
+   * @param newProperty the new long property
+   * @return {@link SpinJsonNode} representation of the current node
+   */
+  public abstract SpinJsonNode prop(String name, long newProperty);
+
+  /**
+   * Set a new boolean property in this node.
+   *
+   * @param name the name of the new property
+   * @param newProperty the new boolean property
+   * @return {@link SpinJsonNode} representation of the current node
+   */
+  public abstract SpinJsonNode prop(String name, boolean newProperty);
+
+  /**
    * Set a new Boolean property in this node.
    *
    * @param name the name of the new property
@@ -126,6 +171,67 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    * @return {@link SpinJsonNode} representation of the current node
    */
   public abstract SpinJsonNode deleteProp(List<String> names);
+
+  /**
+   * Appends a object to the end of the current array node
+   * @param property property which should be append
+   * @return {@link SpinJsonNode} representation of the current node
+   */
+  public abstract SpinJsonNode append(Object property);
+
+  /**
+   * Appends an object at a specific point in an array
+   *
+   * @param index Index in current node where the new property should be appended.
+   * @param property Object which should be appended.
+   * @return {@link SpinJsonNode} representation of the current node.
+   * @throws IllegalArgumentException if index is out of bound.
+   */
+  public abstract SpinJsonNode appendAt(int index, Object property);
+
+  /**
+   * Inserts an object BEFORE an specific object in an array
+   *
+   * @param searchObject Object which is searched
+   * @param insertObject Object which will be inserted
+   * @return {@link SpinJsonNode} representation of the current node
+   */
+  public abstract SpinJsonNode insertBefore(Object searchObject, Object insertObject);
+
+  /**
+   * Inserts an object AFTER an specific object in an array
+   *
+   * @param searchObject Object which is searched
+   * @param insertObject Object which will be inserted
+   * @return {@link SpinJsonNode} representation of the current node
+   */
+  public abstract SpinJsonNode insertAfter(Object searchObject, Object insertObject);
+
+  /**
+   * Removes the first appearance of an object from the current array
+   *
+   * @param property object which should be deleted
+   * @return {@link SpinJsonNode} representation of the current node
+   */
+  public abstract SpinJsonNode remove(Object property);
+
+  /**
+   * Removes the last appearance of an object from the current array
+   *
+   * @param property object which should be deleted
+   * @return {@link SpinJsonNode} representation of the current node
+   *
+   */
+  public abstract SpinJsonNode removeLast(Object property);
+
+  /**
+   * removes an object at the specific index of the current array
+   *
+   * @param Index Index of the array
+   * @return {@link SpinJsonNode} representation of the current node
+   * @throws IllegalArgumentException if index is out of bound.
+   */
+  public abstract SpinJsonNode removeAt(Integer Index);
 
   /**
    * Check if this node is a boolean value.

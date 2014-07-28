@@ -220,4 +220,90 @@ json.deleteProp("customer");
 json.deleteProp(list);
 ```
 
+## Work with Json Arrays
+
+Json arrays are a sorted type of a list. So there are some methods to manipulate this list:
+
+  * `.indexOf(<Object>)` - Fetches the index of the FIRST occurrence of the searched object.
+  * `.lastIndexOf(<Object>)` - Fetches the index of the LAST occurrence of the searched object.
+  * `.append(<Object>)` - Appends an object to the end of the list.
+  * `.appendAt(<Index>, <Object>)` - Appends an object at the specific index of the list. 
+  * `.insertBefore(<Search object>, <Object>)` - Inserts an object before the FIRST occurrence of another object.
+  * `.insertAfter(<Search object>, <Object>)` - Inserts an object after the FIRST occurrence of another object.
+  * `.remove(<Object>)` - Removes the FIRST occurrence of the object.
+  * `.removeLast(<Object>)` - Removes the LAST occurrence of the object.
+  * `.removeAt(Index)` - Removes the list entry at the specified index.
+  
+These methods allow us to work with json arrays in a fast way. To show this in an example we will use the following
+Json Object as example:
+
+```json
+{
+  "test-array" : [
+    "testdata1",
+    "testdata2",
+    1,
+    2,
+    true,
+    1,
+    false,
+    1
+  ]
+}
+```
+
+So lets see how we can manipulate this list in some examples.
+
+### Example 1 - Get the index of testdata2 and the last occurrence of '1':
+
+```java
+import static org.camunda.spin.Spin.*;
+
+SpinJsonNode json = JSON("{\"test-array\" : [\"testdata1\",\"testdata2\",1,2,true,1,false,1]}");
+SpinJsonNode list = json.prop("test-array");
+
+Integer i = list.indexOf("testdata2"); // Should be '1'
+Integer j = list.lastIndexOf(1); // Should be '7'
+```
+
+```javascript
+var json = S('{"test-array" : ["testdata1","testdata2",1,2,true,1,false,1]}'');
+va list = json.prop("test-array");
+
+var i = list.indexOf("testdata2"); // should be 1
+var j = list.lastIndexOf(1); // Should be '7'
+```
+
+### Example 2 - Add and Remove data the the list:
+
+```java
+import static org.camunda.spin.Spin.*;
+
+SpinJsonNode json = JSON("{\"test-array\" : [\"testdata1\",\"testdata2\",1,2,true,1,false,1]}");
+SpinJsonNode list = json.prop("test-array");
+
+list.append("test2"); // at the end of the list there should now be "test2"
+list.remove("test2"); // Aaaand now, it is gone ;)
+
+list.appendAt(1, "test3"); // test3 should now be inserted before testdata2
+list.removeAt(1, "test3"); // Aaaand now, it is gone ;)
+
+list.insertBefore(true, "test4"); // now there should be test4 on index 4
+list.insertAfter(true, 5); // So now 5 is on index 6
+```
+
+```javascript
+var json = S('{"test-array" : ["testdata1","testdata2",1,2,true,1,false,1]}');
+var list = json.prop("test-array");
+
+list.append("test2"); // at the end of the list there should now be "test2"
+list.remove("test2"); // Aaaand now, it is gone ;)
+
+list.appendAt(1, "test3"); // test3 should now be inserted before testdata2
+list.removeAt(1, "test3"); // Aaaand now, it is gone ;)
+
+list.insertBefore(true, "test4"); // now there should be test4 on index 4
+list.insertAfter(true, 5); // So now 5 is on index 6
+```
+
 [jackson-parser-features]: https://fasterxml.github.io/jackson-core/javadoc/2.4/com/fasterxml/jackson/core/JsonParser.Feature.html

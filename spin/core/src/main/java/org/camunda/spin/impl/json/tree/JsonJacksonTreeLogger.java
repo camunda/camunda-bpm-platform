@@ -52,13 +52,7 @@ public class JsonJacksonTreeLogger extends SpinLogger {
   public SpinJsonTreePropertyException unableToCreateNode(String objectType) {
     return new SpinJsonTreePropertyException(exceptionMessage("005", "Unable to create node for object of type '{}'", objectType));
   }
-
-  public SpinJsonTreeNodeException unableToDeserialize(JsonNode jsonNode, Class<?> type, Exception cause) {
-    return new SpinJsonTreeNodeException(
-        exceptionMessage("006", "Cannot deserialize '{}...' to java type '{}'",
-            jsonNode.toString().substring(0, 10), type.getSimpleName()), cause);
-  }
-
+  
   public SpinJsonTreeNodeException unableToDeserialize(JsonNode jsonNode, JavaType type, Exception cause) {
     return new SpinJsonTreeNodeException(
         exceptionMessage("006", "Cannot deserialize '{}...' to java type '{}'",
@@ -76,5 +70,17 @@ public class JsonJacksonTreeLogger extends SpinLogger {
 
   public SpinJsonDataFormatException unableToMapInput(Object input, Exception cause) {
     return new SpinJsonDataFormatException(exceptionMessage("009", "Unable to map object {} to json node", input), cause);
+  }
+
+  public SpinJsonTreeNodeException unableToModifyNode(String nodeName) {
+    return new SpinJsonTreeNodeException(exceptionMessage("010", "Uable to modify node of type '{}'. Node is not a list!", nodeName));
+  }
+
+  public SpinJsonTreeNodeException unableToGetIndex(String nodeName) {
+    return new SpinJsonTreeNodeException(exceptionMessage("011", "Uable to get index from '{}'. Node is not a list!", nodeName));
+  }
+
+  public IndexOutOfBoundsException indexOutOfBounds(Integer index, Integer size) {
+    return new IndexOutOfBoundsException(exceptionMessage("012", "Index is out of bound! Index: '{}', Size: '{}'", index, size));
   }
 }

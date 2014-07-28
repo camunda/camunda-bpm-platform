@@ -105,7 +105,10 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
 
   @SuppressWarnings("unchecked")
   protected JsonNode createJsonNode(Object parameter) {
-    if(parameter instanceof String) {
+    if(parameter instanceof SpinJsonNode) {
+      return (JsonNode) ((SpinJsonNode) parameter).unwrap();
+
+    } else if(parameter instanceof String) {
       return createJsonNode((String) parameter);
 
     } else if(parameter instanceof Integer) {
@@ -165,9 +168,82 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   protected JsonNode createJsonNode(Map<String, Object> parameter) {
     ObjectNode node = dataFormat.getConfiguredObjectMapper().getNodeFactory().objectNode();
     for (Map.Entry<String, Object> entry : parameter.entrySet()) {
-      node.put(entry.getKey(), createJsonNode(entry.getValue()));
+      node.set(entry.getKey(), createJsonNode(entry.getValue()));
     }
     return node;
+  }
+
+  /**
+   * fetch correct array index if index is less than 0
+   *
+   * ArrayNode will convert all negative integers into 0...
+   *
+   * @param index wanted index
+   * @return {@link Integer} new index
+   */
+  protected Integer getCorrectIndex(Integer index) {
+    Integer size = jsonNode.size();
+    Integer newIndex = index;
+
+    // reverse walking through the array
+    if(index < 0) {
+      newIndex = size + index;
+    }
+
+    // the negative index would be greater than the size a second time!
+    if(newIndex < 0) {
+      throw LOG.indexOutOfBounds(index, size);
+    }
+
+    // the index is greater as the actual size
+    if(index > size) {
+     throw LOG.indexOutOfBounds(index, size);
+    }
+
+    return newIndex;
+  }
+
+  public Integer indexOf(Object searchObject) {
+    ensureNotNull("searchObject", searchObject);
+    if(this.isArray()) {
+      Integer i = 0;
+      JsonNode node = createJsonNode(searchObject);
+      for (Iterator<JsonNode> nodeIterator = jsonNode.elements(); nodeIterator.hasNext(); i++) {
+        JsonNode n = nodeIterator.next();
+        if (n.equals(node)) {
+          return i;
+        }
+      }
+
+      // when searchObject is not found
+      throw LOG.unableToFindProperty(node.asText());
+    } else {
+      throw LOG.unableToGetIndex(jsonNode.getNodeType().name());
+    }
+  }
+
+  public Integer lastIndexOf(Object searchObject) {
+    ensureNotNull("searchObject", searchObject);
+    if(this.isArray()) {
+      Integer i = 0;
+      Integer j = -1;
+      JsonNode node = createJsonNode(searchObject);
+      for (Iterator<JsonNode> nodeIterator = jsonNode.elements(); nodeIterator.hasNext(); i++) {
+        JsonNode n = nodeIterator.next();
+        if (n.equals(node)) {
+          j = i;
+        }
+      }
+
+      // when searchObject is not found
+      if(j == -1) {
+        throw LOG.unableToFindProperty(node.getNodeType().name());
+      }
+
+      return j;
+    } else {
+      throw LOG.unableToGetIndex(jsonNode.getNodeType().name());
+    }
   }
 
   public boolean isObject() {
@@ -233,7 +309,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   public SpinJsonNode prop(String name, Boolean newProperty) {
     ObjectNode node = (ObjectNode) jsonNode;
 
-    node.put(name, createJsonNode(newProperty));
+    node.put(name, newProperty);
 
     return dataFormat.createWrapperInstance(node);
   }
@@ -241,7 +317,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   public SpinJsonNode prop(String name, List<Object> newProperty) {
     ObjectNode node = (ObjectNode) jsonNode;
 
-    node.put(name, createJsonNode(newProperty));
+    node.set(name, createJsonNode(newProperty));
 
     return dataFormat.createWrapperInstance(node);
   }
@@ -249,7 +325,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   public SpinJsonNode prop(String name, Map<String, Object> newProperty) {
     ObjectNode node = (ObjectNode) jsonNode;
 
-    node.put(name, createJsonNode(newProperty));
+    node.set(name, createJsonNode(newProperty));
 
     return dataFormat.createWrapperInstance(node);
   }
@@ -257,7 +333,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   public SpinJsonNode prop(String name, SpinJsonNode newProperty) {
     ObjectNode node = (ObjectNode) jsonNode;
 
-    node.put(name, (JsonNode) newProperty.unwrap());
+    node.set(name, (JsonNode) newProperty.unwrap());
 
     return dataFormat.createWrapperInstance(node);
   }
@@ -286,6 +362,86 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     ObjectNode node = (ObjectNode) jsonNode;
     node.remove(names);
     return dataFormat.createWrapperInstance(node);
+  }
+
+  public SpinJsonNode append(Object property) {
+    ensureNotNull("property", property);
+    if(jsonNode.isArray()) {
+      ArrayNode node = (ArrayNode) jsonNode;
+
+      node.add(createJsonNode(property));
+
+      return dataFormat.createWrapperInstance(node);
+    } else {
+      throw LOG.unableToModifyNode(jsonNode.getNodeType().name());
+    }
+  }
+
+  public SpinJsonNode appendAt(int index, Object property) {
+    ensureNotNull("index", index);
+    ensureNotNull("property", property);
+
+    if(jsonNode.isArray()) {
+      index = getCorrectIndex(index);
+      ArrayNode node = (ArrayNode) jsonNode;
+
+      node.insert(index, createJsonNode(property));
+
+      return dataFormat.createWrapperInstance(node);
+    } else {
+      throw LOG.unableToModifyNode(jsonNode.getNodeType().name());
+    }
+  }
+
+  public SpinJsonNode insertBefore(Object searchObject, Object insertObject) {
+    ensureNotNull("searchObject", searchObject);
+    ensureNotNull("insertObject", insertObject);
+    if(this.isArray()) {
+      Integer i = indexOf(searchObject);
+
+      if(i > 0) {
+        i = i - 1;
+      }
+
+      return appendAt(i, insertObject);
+
+    } else {
+      throw LOG.unableToCreateNode(jsonNode.getNodeType().name());
+    }
+  }
+
+  public SpinJsonNode insertAfter(Object searchObject, Object insertObject) {
+    ensureNotNull("searchObject", searchObject);
+    ensureNotNull("insertObject", insertObject);
+    if(this.isArray()) {
+      Integer i = indexOf(searchObject);
+
+      return appendAt(i + 1, insertObject);
+
+    } else {
+      throw LOG.unableToCreateNode(jsonNode.getNodeType().name());
+    }
+  }
+
+  public SpinJsonNode remove(Object property) {
+    return removeAt(indexOf(property));
+  }
+
+  public SpinJsonNode removeLast(Object property) {
+    return removeAt(lastIndexOf(property));
+  }
+
+  public SpinJsonNode removeAt(Integer index) {
+    ensureNotNull("index", index);
+    if(this.isArray()) {
+      ArrayNode node = (ArrayNode) jsonNode;
+
+      node.remove(getCorrectIndex(index));
+
+      return dataFormat.createWrapperInstance(node);
+    } else {
+      throw LOG.unableToModifyNode(jsonNode.getNodeType().name());
+    }
   }
 
   public Boolean isBoolean() {
