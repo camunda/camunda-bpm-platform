@@ -1,5 +1,5 @@
 module.exports = function(config) {
-
+  'use strict';
   return {
     options: {
       livereload: false
@@ -7,9 +7,9 @@ module.exports = function(config) {
 
     assets: {
       files: [
-        config.clientDir +'/{fonts,images}/**/*',
-        config.clientDir +'/index.html',
-        config.clientDir +'/favicon.ico'
+        '<%= pkg.gruntConfig.clientDir %>/{fonts,images}/**/*',
+        '<%= pkg.gruntConfig.clientDir %>/index.html',
+        '<%= pkg.gruntConfig.clientDir %>/favicon.ico'
       ],
       tasks: [
         'newer:copy:assets'
@@ -18,8 +18,9 @@ module.exports = function(config) {
 
     styles: {
       files: [
-        config.clientDir +'/styles/**/*.{css,less}',
-        config.clientDir +'/scripts/*/*.{css,less}'
+        'node_modules/camunda-*/client/styles/**/*.{css,less}',
+        '<%= pkg.gruntConfig.clientDir %>/styles/**/*.{css,less}',
+        '<%= pkg.gruntConfig.clientDir %>/scripts/*/*.{css,less}'
       ],
       tasks: [
         'less'
@@ -28,8 +29,8 @@ module.exports = function(config) {
 
     scripts: {
       files: [
-        // 'grunt/config/requirejs.js',
-        config.clientDir +'/scripts/**/*.{js,html}'
+        'node_modules/camunda-*/client/scripts/**/*.{js,html}',
+        '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html}'
       ],
       tasks: [
         // 'newer:jshint:scripts',
@@ -38,15 +39,24 @@ module.exports = function(config) {
       ]
     },
 
-    sdk: {
-      files: [
-        'node_modules/camunda-bpm-sdk-js/dist/**/*.js'
-      ],
-      tasks: [
-        'copy:sdk',
-        'requirejs:scripts'
-      ]
-    },
+    // sdk: {
+    //   files: [
+    //     'node_modules/camunda-bpm-sdk-js/dist/**/*.js'
+    //   ],
+    //   tasks: [
+    //     'copy:sdk',
+    //     'requirejs:scripts'
+    //   ]
+    // },
+
+    // commons: {
+    //   files: [
+    //     'node_modules/camunda-commons/lib/**/*.{js,html}'
+    //   ],
+    //   tasks: [
+    //     'requirejs:scripts'
+    //   ]
+    // },
 
     // unitTest: {
     //   files: [

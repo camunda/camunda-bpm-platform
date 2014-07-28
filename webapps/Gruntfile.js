@@ -1,4 +1,4 @@
-/* global require: false, module: false */
+/* global require: false */
 'use strict';
 
 /**
@@ -77,6 +77,15 @@ module.exports = function(grunt) {
       files: [
         {
           expand: true,
+          cwd: '<%= pkg.gruntConfig.clientDir %>/bower_components/camunda-commons-ui/',
+          src: [
+            'lib/**/*.*',
+            'lib/*.*'
+          ],
+          dest: '<%= buildTarget %>/assets/vendor/camunda-commons-ui/',
+        },
+        {
+          expand: true,
           cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
           src: [
             '**/*.*',
@@ -119,7 +128,7 @@ module.exports = function(grunt) {
       'clean',
 //       'jshint',
 //       'jsdoc',
-      // 'bower',
+      'bower',
       'copy',
       'less',
       // NOTE: the requirejs task is actually
