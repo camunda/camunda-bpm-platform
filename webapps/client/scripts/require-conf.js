@@ -158,6 +158,11 @@
       main: 'index'
     },
     {
+      name: 'camunda-commons-ui/util',
+      location: './'+ vendor +'/camunda-commons-ui/lib/util',
+      main: 'index'
+    },
+    {
       name: 'bpmn',
       location : './'+ vendor +'/camunda-bpmn.js/src/bpmn'
     },
