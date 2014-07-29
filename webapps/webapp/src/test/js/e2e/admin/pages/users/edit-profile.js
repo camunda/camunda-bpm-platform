@@ -1,6 +1,6 @@
 'use strict';
 
-var Page = require('./editUser');
+var Page = require('./edit-base');
 
 var formElement = element(by.css('form[name="editProfileForm"]'));
 
@@ -9,7 +9,7 @@ module.exports = Page.extend({
   url: '/camunda/app/admin/default/#/users/:user?tab=profile',
 
   subHeader: function() {
-    return formElement.element(by.css('.legend')).getText();
+    return formElement.element(by.css('legend')).getText();
   },
 
 	firstName: function() {
@@ -25,7 +25,7 @@ module.exports = Page.extend({
   },
 
   updateProfileButton: function() { 
-  	return formElement.element(by.css("button[type='submit']"));
+  	return formElement.element(by.css('[data-ng-click="updateProfile()"]'));
   },
 
   changeUserProfile: function(firstName, lastName) {

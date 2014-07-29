@@ -5,7 +5,7 @@
  * */
 'use strict';
 
-var groupsPage = require('../pages/groupsMenu');
+var groupsPage = require('../pages/groups');
 
 describe('groups page -', function() {
 
@@ -15,7 +15,7 @@ describe('groups page -', function() {
 
       // when
       groupsPage.navigateToWebapp('Admin');
-      groupsPage.login('jonny1', 'jonny1');
+      groupsPage.login('demo', 'demo');
       groupsPage.selectNavbarItem('Groups');
 
       // then

@@ -1,6 +1,6 @@
 'use strict';
 
-var Page = require('./editUserGroups');
+var Page = require('./edit-groups');
 
 module.exports = Page.extend({
 
@@ -12,7 +12,7 @@ module.exports = Page.extend({
     return element.all(by.repeater('group in availableGroups'));
   },
 
-  addGoupButton: function() {
+  addSelectedGroupButton: function() {
     return element(by.css('[ng-click="createGroupMemberships()"]'));
   },
 
@@ -25,8 +25,8 @@ module.exports = Page.extend({
   },
 
   addGroup: function(item) {
-    this.groupList().get(item).findElement(by.model('group.checked')).click();
-    this.addGoupButton().click();
+    this.groupList().get(item).element(by.model('group.checked')).click();
+    this.addSelectedGroupButton().click();
 
     this.okButton().click();
   }
