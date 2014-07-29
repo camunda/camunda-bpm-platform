@@ -39,7 +39,6 @@ define([
   userModule.controller('userLoginCtrl', [
     '$location',
     '$modal',
-    'AuthenticationService',
   function(
     $location,
     $modal
@@ -54,39 +53,20 @@ define([
    * controller to be used for the /logout route
    */
   userModule.controller('userLogoutCtrl', [
-    '$window',
     '$rootScope',
-    '$cacheFactory',
     'AuthenticationService',
     'Notifications',
-    'Uri',
   function(
-    $window,
     $rootScope,
-    $cacheFactory,
     AuthenticationService,
-    Notifications,
-    Uri
+    Notifications
   ) {
     AuthenticationService
       .logout()
-      .then(function(success) {
-        if (success) {
-          Notifications.add({
-            text: 'You are logged out.'
-          });
-
-          // we make sure none of the request are kept in the cache
-          $cacheFactory.get('$http').removeAll();
-
-          // trigger something for the others
-          // (although it might not make much sense when doing a full page reload)
-          $rootScope.$broadcast('loggedout');
-
-          // for now, it is important not to redirect to "/" but "/login"
-          // in order to trigger a full reloading of the app
-          $window.location.href = Uri.appUri('app://#/login');
-        }
+      .then(function() {
+        Notifications.add({
+          text: 'You are logged out.'
+        });
       });
   }]);
 
@@ -114,24 +94,16 @@ define([
     $scope.ok = function() {
       AuthenticationService
         .login($scope.username, $scope.password)
-        .then(function(success) {
+        .then(function(authentication) {
+          Notifications.addMessage({
+            message: 'You are now logged in.'
+          });
 
-          if (success) {
-            Notifications.addMessage({
-              message: 'You are now logged in.'
-            });
-
-            $scope.user = $rootScope.authentication.user;
-
-            $rootScope.$broadcast('loggedin', $rootScope.authentication.user);
-
-            $scope.$parent.$parent.$close($scope.user.name);
-          }
-          else {
-            Notifications.addError({
-              message: 'Cannot log in with those credentials.'
-            });
-          }
+          $scope.$parent.$parent.$close(authentication);
+        }, function() {
+          Notifications.addError({
+            message: 'Cannot log in with those credentials.'
+          });
         });
     };
 

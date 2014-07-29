@@ -90,20 +90,16 @@ define('camunda-tasklist-ui', [
     tasklistApp.config([
       '$routeProvider',
       '$locationProvider',
-      'AuthenticationServiceProvider',
     function(
       $routeProvider,
-      $locationProvider,
-      AuthenticationServiceProvider
+      $locationProvider
     ) {
       var tasklistTemplate = require('text!camunda-tasklist-ui/index.html');
 
       $routeProvider
         .when('/', {
           template: tasklistTemplate,
-          resolve: {
-            authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser
-          }
+          authentication: 'required'
         })
 
         // // Would be great to be able to start processes with a URL

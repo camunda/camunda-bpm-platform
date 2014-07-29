@@ -49,18 +49,17 @@ define([
         function refresh() {
           auth = $rootScope.authentication;
 
-          if (!auth || !auth.user) {
-            reset();
-            return;
+          if (!auth) {
+            return reset();
           }
 
-          if ($scope.username === auth.username()) {
+          if ($scope.username === auth.name) {
             return;
           }
 
           reset();
 
-          $scope.username = auth.username();
+          $scope.username = auth.name;
 
           var appLinks = {
             admin: {
@@ -74,14 +73,13 @@ define([
           };
 
           angular.forEach(appLinks, function(info, appName) {
-            if (auth.user.authorizedApps.indexOf(appName) > -1) {
+            if (auth.canAccess(appName)) {
               $scope.links[0].links.push(info);
             }
           });
         }
 
-        // $rootScope.$on('loggedin', refresh);
-        // $rootScope.$on('loggedout', refresh);
+        $rootScope.$on('authentication.changed', refresh);
 
         // initializes...
         refresh();

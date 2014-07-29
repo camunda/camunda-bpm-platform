@@ -45,7 +45,7 @@ define([
 
 
     function tokenReplace(val) {
-      var user = ($rootScope.authentication || {}).user;
+      var user = $rootScope.authentication;
       if (val === '{self}') {
         return user ? user.name : 'anonymous';
       }
