@@ -1,19 +1,19 @@
 'use strict';
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
-/* jshint unused: false */
+
 define([
-  'require',
   'angular',
-  'moment',
-  'jquery',
   'camunda-commons-ui/auth',
   'camunda-tasklist-ui/api',
+
+  'camunda-commons-ui/directives/notificationsPanel',
+
   'text!camunda-tasklist-ui/user/login.html'
 ], function(
-  require,
   angular,
-  moment,
-  $
+  auth,
+  api,
+  notificationsPanel
 ) {
 
   /**
@@ -25,27 +25,13 @@ define([
    */
 
   var userModule = angular.module('cam.tasklist.user', [
-    require('camunda-tasklist-ui/api').name,
-    require('camunda-commons-ui/auth').name,
+    auth.name,
+    api.name,
     'ui.bootstrap',
     'cam.form'
   ]);
 
-  /**
-   * Redirects an authenticated user to its destination.
-   * Used in userLoginModalFormCtrl and userLoginCtrl
-   */
-  function redirect($location) {
-    var search = $location.search();
-    if (search) {
-      var destination = decodeURIComponent(search.destination);
-      if (destination) {
-        return $location.url(destination);
-      }
-    }
-
-    $location.url('/');
-  }
+  userModule.directive('notificationsPanel', notificationsPanel);
 
   /**
    * Controller used for the /login route
@@ -56,8 +42,7 @@ define([
     'AuthenticationService',
   function(
     $location,
-    $modal,
-    AuthenticationService
+    $modal
   ) {
     $modal.open({
       windowClass:  'user-login',
@@ -73,21 +58,21 @@ define([
     '$rootScope',
     '$cacheFactory',
     'AuthenticationService',
-    'camTasklistNotifier',
+    'Notifications',
     'Uri',
   function(
     $window,
     $rootScope,
     $cacheFactory,
     AuthenticationService,
-    camTasklistNotifier,
+    Notifications,
     Uri
   ) {
     AuthenticationService
       .logout()
       .then(function(success) {
         if (success) {
-          camTasklistNotifier.add({
+          Notifications.add({
             text: 'You are logged out.'
           });
 
@@ -111,43 +96,41 @@ define([
     '$rootScope',
     '$location',
     'AuthenticationService',
-    'camTasklistNotifier',
+    'Notifications',
   function(
     $scope,
     $rootScope,
     $location,
     AuthenticationService,
-    camTasklistNotifier
+    Notifications
   ) {
     $scope.submitForm = function(htmlForm) {
       return htmlForm.$valid;
     };
 
+    console.info('Notifications', Notifications);
+
     // /camunda/api/admin/auth/user/default/login/cockpit
     $scope.ok = function() {
-      var successMessage = {
-        text: 'You are now logged in.'
-      };
-
-      var errorMessage = {
-        type: 'error',
-        text: 'Can not log in with those credentials.'
-      };
-
       AuthenticationService
         .login($scope.username, $scope.password)
         .then(function(success) {
 
-          camTasklistNotifier.add(success ? successMessage : errorMessage);
-
           if (success) {
+            Notifications.addMessage({
+              message: 'You are now logged in.'
+            });
+
             $scope.user = $rootScope.authentication.user;
 
             $rootScope.$broadcast('loggedin', $rootScope.authentication.user);
 
             $scope.$parent.$parent.$close($scope.user.name);
-
-            redirect($location);
+          }
+          else {
+            Notifications.addError({
+              message: 'Cannot log in with those credentials.'
+            });
           }
         });
     };

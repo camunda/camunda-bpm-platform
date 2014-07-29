@@ -1,0 +1,34 @@
+.notifications-panel {
+  .alert {
+
+  }
+
+  // copied from the cockpit patched bootstrap...
+  .close {
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .2;
+
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    -webkit-appearance: none;
+
+    position: relative;
+    // top: -2px;
+    // right: -21px;
+    line-height: 20px;
+  }
+
+  strong.ng-binding {
+    display: none;
+  }
+
+  .alert-error {
+    .alert-variant(@alert-danger-bg; @alert-danger-border; @alert-danger-text);
+  }
+}

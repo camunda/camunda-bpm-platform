@@ -33,7 +33,8 @@
     "angular-bootstrap": "0.11.0",
     "angular-moment": "0.7.0",
     "angular-route": "1.2.16",
-    "angular-ui-bootstrap": "0.11.0",
+    "angular-translate": "~2.2.0",
+    "angular-sanitize": "~1.2.16",
     "bootstrap": "~3.1.1",
     "hyperagent": "*",
     "jquery": "2.1.1",
@@ -45,9 +46,11 @@
     "underscore.string": "./node_modules/underscore.string/lib/underscore.string.js",
     "fixturer": "./node_modules/fixturer/index.js",
     "node-uuid": "1.4.1",
+    "requirejs-json": "~0.0.3",
     "requirejs-text": "2.0.12"
   },
   "resolutions": {
-    "jquery": "2.1.1"
+    "jquery": "2.1.1",
+    "angular": "1.2.16"
   }
 }

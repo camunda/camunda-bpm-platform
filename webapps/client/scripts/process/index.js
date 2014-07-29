@@ -15,8 +15,8 @@ define([
 
 
   processModule.controller('processStartModalFormCtrl', [
-          '$scope', '$q', 'camAPI', 'CamForm', 'camTasklistNotifier',
-  function($scope,   $q,   camAPI,   CamForm,   camTasklistNotifier) {
+          '$scope', '$q', 'camAPI', 'CamForm', 'Notifications',
+  function($scope,   $q,   camAPI,   CamForm,   Notifications) {
     var $ = angular.element;
 
     var ProcessDefinition = camAPI.resource('process-definition');
@@ -118,7 +118,7 @@ define([
       ProcessDefinition.list(where, function(err, res) {
         $scope.loadingProcesses = false;
         if (err) {
-          camTasklistNotifier.add(err);
+          Notifications.addError(err);
           throw err;
         }
 
@@ -150,7 +150,7 @@ define([
         $scope.loadingProcesses = false;
 
         if (err) {
-          camTasklistNotifier.add(err);
+          Notifications.addError(err);
           throw err;
         }
 
@@ -214,12 +214,11 @@ define([
 
       function submitCb(err, res) {
         if (err) {
-          camTasklistNotifier.add(err);
+          Notifications.addError(err);
           throw err;
         }
 
-        camTasklistNotifier.add({
-          type: 'success',
+        Notifications.addMessage({
           text: 'The process has been started.'
         });
         close(res);
