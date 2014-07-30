@@ -1,6 +1,6 @@
 'use strict';
 
-var Base = require('./newUser');
+var Base = require('./new-base');
 
 module.exports = Base.extend({
 
@@ -8,6 +8,10 @@ module.exports = Base.extend({
 
   createNewAdminButton: function() {
     return element(by.css('.btn.btn-primary'));
+  },
+
+  statusMessage: function() {
+    return element(by.css('.alert')).getText();
   }
 
 });

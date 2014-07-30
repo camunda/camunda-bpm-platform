@@ -15,9 +15,12 @@ describe('admin user -', function() {
 
     it('should login', function() {
 
+      // when
       usersPage.navigateToWebapp('Admin');
-
       usersPage.login('jonny1', 'jonny1');
+
+      // then
+      usersPage.isActive();
     });
 
   });
@@ -35,7 +38,7 @@ describe('admin user -', function() {
     });
 
 
-    it('should remove admin group and log out', function() {
+    it('should remove admin group', function() {
 
       // given
       usersPage.editUserGroups.selectUserNavbarItem('Groups');
@@ -50,12 +53,12 @@ describe('admin user -', function() {
   });
 
 
-  describe('validate intial admin setup', function() {
+  describe('validate initial admin setup', function() {
 
     it('should validate Setup page', function() {
 
       // given
-      usersPage.logoutWebapp();
+      usersPage.logout();
 
       // when
       usersPage.navigateToWebapp('Admin');
@@ -79,7 +82,7 @@ describe('admin user -', function() {
       usersPage.adminUserSetup.createNewAdminButton().click();
 
       // then
-      expect(usersPage.adminUserSetup.Status.statusMessage()).toBe('User created You have created an initial user.');
+      expect(usersPage.adminUserSetup.statusMessage()).toBe('User created You have created an initial user.');
     });
 
 
@@ -147,7 +150,7 @@ describe('admin user -', function() {
 
     it('should log out', function() {
 
-      usersPage.logoutWebapp();
+      usersPage.logout();
     })
 
   });
