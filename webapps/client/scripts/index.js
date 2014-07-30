@@ -133,7 +133,7 @@ define('camunda-tasklist-ui', [
 
 
     $(document).ready(function() {
-      angular.bootstrap(document, ['cam.tasklist']);
+      angular.bootstrap(document, ['cam.tasklist', 'cam.embedded.forms']);
     });
   }
 

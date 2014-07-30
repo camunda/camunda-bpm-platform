@@ -27,9 +27,9 @@ define(function() {
       'camunda-commons-ui':         'vendor/camunda-commons-ui/lib',
 
 
-      'camunda-bpm-forms':          'vendor/camunda-embedded-forms',
-      'camunda-bpm-sdk':            'vendor/camunda-bpm-sdk',
-      'camunda-bpm-sdk-mock':       'vendor/camunda-bpm-sdk-mock'
+      'camunda-bpm-sdk':            'vendor/camunda-bpm-sdk-angular',
+      'camunda-bpm-sdk-mock':       'vendor/camunda-bpm-sdk-mock',
+
     },
 
     shim: {
@@ -39,6 +39,9 @@ define(function() {
                                       exports: 'angular',
                                       deps: ['jquery']
                                     },
+
+      'camunda-bpm-sdk':            ['angular'],
+
       'angular-route':              ['angular'],
       'angular-animate':            ['angular'],
 

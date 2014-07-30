@@ -1,13 +1,20 @@
 'use strict';
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 
-define(['angular', 'camunda-bpm-sdk', 'camunda-bpm-forms', 'camunda-bpm-sdk-mock'],
-function(angular,   CamSDK,            CamForm,             MockClient) {
+define([
+  'angular',
+  'camunda-bpm-sdk',
+  'camunda-bpm-sdk-mock'],
+function(
+  angular,
+  CamSDK,
+  MockClient
+) {
   var apiModule = angular.module('cam.tasklist.client', []);
 
-  apiModule.value('CamForm', CamForm);
+  apiModule.value('HttpClient', CamSDK.Client);
 
-  apiModule.value('HttpClient', CamSDK);
+  apiModule.value('CamForm', CamSDK.Form);
 
   apiModule.value('MockHttpClient', MockClient);
 
@@ -16,7 +23,7 @@ function(angular,   CamSDK,            CamForm,             MockClient) {
   function(MockHttpClient,   $rootScope) {
 
     function AngularClient(config) {
-      var Client = (config.mock === true ? MockHttpClient : CamSDK.HttpClient);
+      var Client = (config.mock === true ? MockHttpClient : CamSDK.Client.HttpClient);
       this._wrapped = new Client(config);
     }
 
@@ -62,7 +69,7 @@ function(angular,   CamSDK,            CamForm,             MockClient) {
       }
     }
 
-    return new CamSDK(conf);
+    return new CamSDK.Client(conf);
   }]);
 
   // apiModule.factory('camForm', ['CamForm', function(CamEmbeddedForm) {

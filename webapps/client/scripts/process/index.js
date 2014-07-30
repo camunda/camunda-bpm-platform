@@ -164,7 +164,7 @@ define([
             // ensure a trailing slash
             ctx = ctx + (ctx.slice(-1) !== '/' ? '/' : '');
             // formUrl = formUrl[0] === '/' ? formUrl.slice(1) : formUrl;
-            formUrl = formUrl.replace('app:', ctx);
+            formUrl = formUrl.replace(/app:(\/?)/, ctx);
           }
           else {
             formUrl = result.key;
@@ -173,7 +173,7 @@ define([
           var form = new CamForm({
             processDefinitionId:  startingProcess.id,
             containerElement:     $('.start-form-container'),
-            service:              camAPI,
+            client:               camAPI,
             formUrl:              formUrl
           });
 
