@@ -28,13 +28,11 @@ define(['angular'], function(angular) {
 
   }];
 
-  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
+  var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/group-create', {
       templateUrl: require.toUrl('./pages/groupCreate.html'),
       controller: Controller,
-      resolve: {
-        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
-      }
+      authentication: 'required'
     });
   }];
 

@@ -4,21 +4,21 @@ define(['angular'], function(angular) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = [   
-    '$scope', 
+  var Controller = [
+    '$scope',
     '$location',
     '$routeParams',
-    'Views',     
-    function($scope, 
-             $location, 
+    'Views',
+    function($scope,
+             $location,
              $routeParams,
-             Views) {      
+             Views) {
 
     $scope.systemSettingsProviders = Views.getProviders({ component: 'admin.system'});
 
     var selectedProviderId = $routeParams.section;
     if(!!selectedProviderId) {
-      $scope.activeSettingsProvier = Views.getProviders({ 
+      $scope.activeSettingsProvier = Views.getProviders({
         component: 'admin.system',
         id: $routeParams.section
       })[0];
@@ -32,13 +32,11 @@ define(['angular'], function(angular) {
 
   }];
 
-  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
+  var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/system', {
       templateUrl: require.toUrl('./pages/system.html'),
       controller: Controller,
-      resolve: {
-        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
-      }
+      authentication: 'required'
     });
   }];
 

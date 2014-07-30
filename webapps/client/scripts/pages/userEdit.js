@@ -4,16 +4,16 @@ define([ 'angular', 'require' ], function(angular, require) {
 
   var module = angular.module('admin.pages');
 
-  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
+  var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/users/:userId', {
       templateUrl: require.toUrl('./pages/userEdit.html'),
       controller: [
-              '$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authenticatedUser',
-      function($scope,   $window,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authenticatedUser) {
+              '$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authentication',
+      function($scope,   $window,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authentication) {
 
         $scope.encodedUserId = $routeParams.userId.replace(/\//g, '%2F');
         $scope.decodedUserId = $routeParams.userId.replace(/%2F/g, '/');
-        $scope.authenticatedUser = authenticatedUser;
+        $scope.authenticatedUser = authentication;
 
         // used to display information about the user
         $scope.profile = null;
@@ -212,9 +212,7 @@ define([ 'angular', 'require' ], function(angular, require) {
         }
 
       }],
-      resolve: {
-        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
-      },
+      authentication: 'required',
       reloadOnSearch: false
     });
   }];

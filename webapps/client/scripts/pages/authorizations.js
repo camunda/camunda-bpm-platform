@@ -3,7 +3,7 @@ define([ 'angular', 'require' ], function(angular, require) {
   'use strict';
   var module = angular.module('admin.pages');
 
-  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
+  var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/authorization', {
       templateUrl: require.toUrl('./pages/authorizations.html'),
       controller: [
@@ -148,9 +148,7 @@ define([ 'angular', 'require' ], function(angular, require) {
         loadAuthorizations();
 
       }],
-      resolve: {
-        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
-      },
+      authentication: 'required',
       reloadOnSearch: false
     });
   }];

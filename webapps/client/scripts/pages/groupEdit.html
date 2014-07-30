@@ -11,19 +11,19 @@
           <ul class="nav nav-list">
             <li ng-class="activeClass('tab=group')">
               <a href="#/groups/{{group.id | escape}}?tab=group">Group</a>
-            </li>                 
-          </ul>          
+            </li>
+          </ul>
         </div>
       </div>
 
       <div class="span9">
 
-        <div ng-show="show('group')"> 
+        <div ng-show="show('group')">
           <div class="box">
-            <p ngm-if="!group">
+            <p ng-if="!group">
               <i class="icon-loading"></i> loading group...
             </p>
-            <form class="form-horizontal" name="editGroupForm" ngm-if="group">
+            <form class="form-horizontal" name="editGroupForm" ng-if="group">
 
               <legend>Group</legend>
 
@@ -38,7 +38,7 @@
               <div class="control-group">
                 <label class="control-label" for="inputType">Group Type</label>
                 <div class="controls">
-                  <input id="inputType" name="groupType" type="text" ng-model="group.type" ng-disabled="!availableOperations.update"></input>                  
+                  <input id="inputType" name="groupType" type="text" ng-model="group.type" ng-disabled="!availableOperations.update"></input>
                 </div>
               </div>
 
@@ -47,7 +47,7 @@
                   <button type="submit" class="btn"  data-ng-disabled="!canSubmit(editGroupForm, 'group')" data-ng-click="updateGroup()">Update Group</button>
                 </div>
               </div>
-           
+
             </form>
           </div>
           <div class="box" ng-show="availableOperations.delete">
@@ -55,15 +55,15 @@
 
               <legend>Delete Group</legend>
               <div class="alert alert-error">
-                <strong>Warning:</strong> deleting a group cannot be undone. 
+                <strong>Warning:</strong> deleting a group cannot be undone.
               </div>
 
               <button type="submit" class="btn btn-danger" data-ng-click="deleteGroup()">Delete Group</button>
-           
-            </form>  
+
+            </form>
           </div>
         </div>
-     
+
       </div>
     </div>
   </section>
