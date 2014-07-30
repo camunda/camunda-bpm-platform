@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -2444,6 +2445,9 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  /**
+   * This tests a currently internal API and may be subject to change
+   */
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testGetRawValues() {
@@ -2475,8 +2479,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("a String Value", getSingleVariable("stringVariable").getRawValue());
   }
 
-  protected VariableInstance getSingleVariable(String name) {
-    return runtimeService.createVariableInstanceQuery().variableName(name).singleResult();
+  protected VariableInstanceEntity getSingleVariable(String name) {
+    return (VariableInstanceEntity) runtimeService.createVariableInstanceQuery().variableName(name).singleResult();
   }
 
   protected byte[] serialize(Object o) {

@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.test.variables;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -36,14 +37,16 @@ public class HistoricVariableDataFormatTest extends AbstractProcessEngineTestCas
     HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
     assertNotNull(historicVariable.getValue());
     assertNull(historicVariable.getErrorMessage());
-    assertEquals(JSON_FORMAT_NAME, historicVariable.getDataFormatId());
 
     SimpleBean historyValue = (SimpleBean) historicVariable.getValue();
     assertEquals(bean.getStringProperty(), historyValue.getStringProperty());
     assertEquals(bean.getIntProperty(), historyValue.getIntProperty());
     assertEquals(bean.getBooleanProperty(), historyValue.getBooleanProperty());
 
-    JSONAssert.assertEquals(bean.toExpectedJsonString(), (String) historicVariable.getRawValue(), true);
+    // currently internal API
+    HistoricVariableInstanceEntity variableEntity = (HistoricVariableInstanceEntity) historicVariable;
+    assertEquals(JSON_FORMAT_NAME, variableEntity.getDataFormatId());
+    JSONAssert.assertEquals(bean.toExpectedJsonString(), (String) variableEntity.getRawValue(), true);
   }
 
 }

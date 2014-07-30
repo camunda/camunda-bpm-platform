@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.variable.DefaultSerializationFormatType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -64,9 +65,11 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     assertEquals(returnedBean.getBooleanProperty(), bean.getBooleanProperty());
     assertEquals(returnedBean.getStringProperty(), bean.getStringProperty());
 
-    assertEquals(JSON_FORMAT_NAME, beanVariable.getDataFormatId());
+    // currently internal API
+    VariableInstanceEntity variableEntity = (VariableInstanceEntity) beanVariable;
+    assertEquals(JSON_FORMAT_NAME, variableEntity.getDataFormatId());
 
-    String persistedValue = (String) beanVariable.getRawValue();
+    String persistedValue = (String) variableEntity.getRawValue();
     String expectedJson = bean.toExpectedJsonString();
     JSONAssert.assertEquals(expectedJson, persistedValue, true);
 
@@ -92,9 +95,11 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     assertTrue(returnedBeans instanceof ArrayList);
     assertListsEqual(beans, returnedBeans);
 
-    assertEquals(JSON_FORMAT_NAME, beansVariable.getDataFormatId());
+    // currently internal API
+    VariableInstanceEntity variableEntity = (VariableInstanceEntity) beansVariable;
+    assertEquals(JSON_FORMAT_NAME, variableEntity.getDataFormatId());
 
-    String persistedValue = (String) beansVariable.getRawValue();
+    String persistedValue = (String) variableEntity.getRawValue();
     String expectedJson = toExpectedJsonArray(beans);
     JSONAssert.assertEquals(expectedJson, persistedValue, true);
 
@@ -157,7 +162,9 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     assertTrue(returnedBeans instanceof ArrayList);
     assertListsEqual(lengthExceedingBeans, returnedBeans);
 
-    String rawJson = (String) beansVariable.getRawValue();
+    // currently internal API
+    VariableInstanceEntity variableEntity = (VariableInstanceEntity) beansVariable;
+    String rawJson = (String) variableEntity.getRawValue();
     JSONAssert.assertEquals(toExpectedJsonArray(lengthExceedingBeans), rawJson, true);
   }
 
