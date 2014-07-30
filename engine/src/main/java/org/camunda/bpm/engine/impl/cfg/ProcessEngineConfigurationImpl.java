@@ -13,14 +13,22 @@
 
 package org.camunda.bpm.engine.impl.cfg;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,7 +75,11 @@ import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
-import org.camunda.bpm.engine.impl.calendar.*;
+import org.camunda.bpm.engine.impl.calendar.BusinessCalendarManager;
+import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
+import org.camunda.bpm.engine.impl.calendar.DueDateBusinessCalendar;
+import org.camunda.bpm.engine.impl.calendar.DurationBusinessCalendar;
+import org.camunda.bpm.engine.impl.calendar.MapBusinessCalendarManager;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
@@ -94,8 +106,20 @@ import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
 import org.camunda.bpm.engine.impl.form.engine.HtmlFormEngine;
 import org.camunda.bpm.engine.impl.form.engine.JuelFormEngine;
-import org.camunda.bpm.engine.impl.form.type.*;
-import org.camunda.bpm.engine.impl.form.validator.*;
+import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
+import org.camunda.bpm.engine.impl.form.type.BooleanFormType;
+import org.camunda.bpm.engine.impl.form.type.DateFormType;
+import org.camunda.bpm.engine.impl.form.type.FormTypes;
+import org.camunda.bpm.engine.impl.form.type.LongFormType;
+import org.camunda.bpm.engine.impl.form.type.StringFormType;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
+import org.camunda.bpm.engine.impl.form.validator.FormValidators;
+import org.camunda.bpm.engine.impl.form.validator.MaxLengthValidator;
+import org.camunda.bpm.engine.impl.form.validator.MaxValidator;
+import org.camunda.bpm.engine.impl.form.validator.MinLengthValidator;
+import org.camunda.bpm.engine.impl.form.validator.MinValidator;
+import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
+import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
@@ -106,28 +130,91 @@ import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
-import org.camunda.bpm.engine.impl.interceptor.*;
-import org.camunda.bpm.engine.impl.jobexecutor.*;
+import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
+import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
+import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.RejectedJobsHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.mail.MailScanner;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
+import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
+import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
+import org.camunda.bpm.engine.impl.persistence.entity.IncidentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
-import org.camunda.bpm.engine.impl.scripting.engine.*;
+import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
+import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 import org.camunda.bpm.engine.impl.spin.ProcessEngineSpinSupport;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
-import org.camunda.bpm.engine.impl.variable.*;
+import org.camunda.bpm.engine.impl.variable.BooleanType;
+import org.camunda.bpm.engine.impl.variable.ByteArrayType;
+import org.camunda.bpm.engine.impl.variable.DateType;
+import org.camunda.bpm.engine.impl.variable.DefaultVariableTypes;
+import org.camunda.bpm.engine.impl.variable.DoubleType;
+import org.camunda.bpm.engine.impl.variable.EntityManagerSession;
+import org.camunda.bpm.engine.impl.variable.EntityManagerSessionFactory;
+import org.camunda.bpm.engine.impl.variable.IntegerType;
+import org.camunda.bpm.engine.impl.variable.JPAEntityVariableType;
+import org.camunda.bpm.engine.impl.variable.LongType;
+import org.camunda.bpm.engine.impl.variable.NullType;
+import org.camunda.bpm.engine.impl.variable.SerializableType;
+import org.camunda.bpm.engine.impl.variable.SerializationVariableTypeResolver;
+import org.camunda.bpm.engine.impl.variable.ShortType;
+import org.camunda.bpm.engine.impl.variable.StringType;
+import org.camunda.bpm.engine.impl.variable.VariableType;
+import org.camunda.bpm.engine.impl.variable.VariableTypes;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
-import org.camunda.spin.DataFormats;
-import org.camunda.spin.spi.DataFormat;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -322,6 +409,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected Connectors connectors;
 
+  protected List<SerializationVariableTypeResolver> serializationTypeResolvers = new ArrayList<SerializationVariableTypeResolver>();
+
   /**
    * The process engine created by this configuration.
    */
@@ -347,7 +436,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initHistoryEventProducer();
     initHistoryEventHandler();
     initExpressionManager();
-    initVariableTypes();
     initBeans();
     initArtifactFactory();
     initFormEngines();
@@ -368,6 +456,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initSqlSessionFactory();
     initIdentityProviderSessionFactory();
     initSessionFactories();
+    initSpin();
+    initVariableTypes();
     initJpa();
     initDelegateInterceptor();
     initEventHandlers();
@@ -378,7 +468,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initPasswordDigest();
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
-    initSpin();
     initConnectors();
 
     invokePostInit();
@@ -1027,17 +1116,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       if (defaultSerializationFormat != null) {
         defaultSerializationFormat = defaultSerializationFormat.trim();
-        Set<DataFormat<?>> availableDataFormats = new HashSet<DataFormat<?>>();
-        availableDataFormats.add(DataFormats.jsonTree());
+        VariableType serializationType = null;
 
-        for (DataFormat<?> format : availableDataFormats) {
-          if (defaultSerializationFormat.equals(format.getName())) {
-            variableTypes.addType(new DefaultSerializationFormatType(format));
-            return;
-          }
+        for (SerializationVariableTypeResolver resolver : serializationTypeResolvers) {
+          serializationType = resolver.getTypeForSerializationFormat(defaultSerializationFormat);
         }
 
-        throw new ProcessEngineException("Unrecognized default serialization format " + defaultSerializationFormat);
+        if (serializationType != null) {
+          variableTypes.addType(serializationType);
+        } else {
+          throw new ProcessEngineException("Cannot find a VariableType that serializes objects"
+              + " for the default format '" + defaultSerializationFormat + "'");
+        }
       } else {
         variableTypes.addType(new SerializableType());
       }
@@ -1128,7 +1218,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       scriptEnvResolvers.add(ProcessEngineSpinSupport.getScriptEnvResolver());
       // add spin el function mapper
       expressionManager.addFunctionMapper(ProcessEngineSpinSupport.getElFunctionMapper());
-
+      // add spin variable type resolver
+      serializationTypeResolvers.add(ProcessEngineSpinSupport.getVariableTypeResolver());
     } else {
       log.info("Spin unavailable: camunda Spin is not found on the classpath.");
 
@@ -2270,6 +2361,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setDefaultSerializationFormat(String defaultSerializationFormat) {
     this.defaultSerializationFormat = defaultSerializationFormat;
+    return this;
+  }
+
+  public List<SerializationVariableTypeResolver> getSerializationTypeResolvers() {
+    return serializationTypeResolvers;
+  }
+
+  public ProcessEngineConfigurationImpl setSerializationTypeResolvers(List<SerializationVariableTypeResolver> serializationTypeResolvers) {
+    this.serializationTypeResolvers = serializationTypeResolvers;
     return this;
   }
 }

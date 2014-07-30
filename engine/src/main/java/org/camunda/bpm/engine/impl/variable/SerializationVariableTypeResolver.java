@@ -10,23 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.scripting.env;
+package org.camunda.bpm.engine.impl.variable;
 
 /**
- * Resolver for environment scripts.
- *
- * @author Daniel Meyer
- *
+ * @author Thorben Lindhauer
  */
-public interface ScriptEnvResolver {
+public interface SerializationVariableTypeResolver {
 
   /**
-   * Resolves a set of environment scripts for a given script language.
-   *
-   * @param the script language to resolve env scripts for.
-   * @return an array of environment script sources or null if this
-   * resolver does not provide any scripts for the given language
+   * Returns a variable type that serializes objects in the specified format
+   * or null if it cannot handle the format.
    */
-  String[] resolve(String language);
-
+  VariableType getTypeForSerializationFormat(String serializationFormat);
 }

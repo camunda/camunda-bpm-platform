@@ -10,27 +10,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.variable;
+package org.camunda.bpm.engine.impl.spin;
 
 import java.io.UnsupportedEncodingException;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.variable.ValueFields;
+import org.camunda.bpm.engine.impl.variable.VariableType;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
 import org.camunda.spin.SpinRuntimeException;
 import org.camunda.spin.spi.DataFormat;
 
-public class DefaultSerializationFormatType implements VariableType {
+public class SpinSerializationType implements VariableType {
 
-  public static final String TYPE_NAME = "defaultSerialization";
+  public static final String TYPE_NAME = "SpinSerialization";
 
   // TODO: is this the best place for this constant?
   protected static final int TEXT_FIELD_LENGTH = 4000;
 
   protected DataFormat<?> dataFormat;
 
-  public DefaultSerializationFormatType(DataFormat<?> dataFormat) {
+  public SpinSerializationType(DataFormat<?> dataFormat) {
     this.dataFormat = dataFormat;
   }
 
@@ -39,8 +41,7 @@ public class DefaultSerializationFormatType implements VariableType {
   }
 
   public String getTypeNameForValue(Object value) {
-    // TODO What's supposed to be here?
-    return null;
+    return dataFormat.getCanonicalTypeName(value);
   }
 
   public boolean isCachable() {
@@ -57,7 +58,7 @@ public class DefaultSerializationFormatType implements VariableType {
 
       String serializedVariable = spin.toString();
 
-      if (serializedVariable.getBytes().length <= 4000) {
+      if (serializedVariable.getBytes().length <= TEXT_FIELD_LENGTH) {
         valueFields.setTextValue(spin.toString());
       } else {
         valueFields.setByteArrayValue(serializedVariable.getBytes());
@@ -68,9 +69,6 @@ public class DefaultSerializationFormatType implements VariableType {
     } catch (SpinRuntimeException e) {
       throw new ProcessEngineException("Cannot serialize object of type " + value.getClass() + ": " + value, e);
     }
-
-
-
   }
 
   public Object getValue(ValueFields valueFields) {

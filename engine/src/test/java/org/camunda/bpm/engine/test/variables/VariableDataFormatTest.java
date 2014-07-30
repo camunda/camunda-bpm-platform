@@ -23,8 +23,8 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.spin.SpinSerializationType;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.variable.DefaultSerializationFormatType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -57,7 +57,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     VariableInstance beanVariable = runtimeService.createVariableInstanceQuery().singleResult();
     assertNotNull(beanVariable);
-    assertEquals(DefaultSerializationFormatType.TYPE_NAME, beanVariable.getTypeName());
+    assertEquals(SpinSerializationType.TYPE_NAME, beanVariable.getTypeName());
 
     SimpleBean returnedBean = (SimpleBean) beanVariable.getValue();
     assertNotNull(returnedBean);
@@ -88,7 +88,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     VariableInstance beansVariable = runtimeService.createVariableInstanceQuery().singleResult();
     assertNotNull(beansVariable);
-    assertEquals(DefaultSerializationFormatType.TYPE_NAME, beansVariable.getTypeName());
+    assertEquals(SpinSerializationType.TYPE_NAME, beansVariable.getTypeName());
 
     List<SimpleBean> returnedBeans = (List<SimpleBean>) beansVariable.getValue();
     assertNotNull(returnedBeans);
@@ -155,7 +155,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     VariableInstance beansVariable = runtimeService.createVariableInstanceQuery().singleResult();
     assertNotNull(beansVariable);
-    assertEquals(DefaultSerializationFormatType.TYPE_NAME, beansVariable.getTypeName());
+    assertEquals(SpinSerializationType.TYPE_NAME, beansVariable.getTypeName());
 
     List<SimpleBean> returnedBeans = (List<SimpleBean>) beansVariable.getValue();
     assertNotNull(returnedBeans);

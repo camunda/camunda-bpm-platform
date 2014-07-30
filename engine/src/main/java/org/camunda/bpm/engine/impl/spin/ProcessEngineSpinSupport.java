@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.ClassLoadingException;
 import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.impl.variable.SerializationVariableTypeResolver;
 
 /**
  * <p>Entry point for the process engine spin support.</p>
@@ -41,6 +42,14 @@ public class ProcessEngineSpinSupport {
    */
   public static ScriptEnvResolver getScriptEnvResolver() {
     return (ScriptEnvResolver) ReflectUtil.instantiate("org.camunda.bpm.engine.impl.spin.SpinScriptEnvResolver");
+  }
+
+  /**
+   * @return the {@link SerializationVariableTypeResolver} providing variable
+   * types that use Spin's data formats for serialization
+   */
+  public static SerializationVariableTypeResolver getVariableTypeResolver() {
+    return (SerializationVariableTypeResolver) ReflectUtil.instantiate("org.camunda.bpm.engine.impl.spin.SpinVariableTypeResolver");
   }
 
   /**
