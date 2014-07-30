@@ -30,10 +30,12 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.impl.variable.IntegerType;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
@@ -994,6 +996,21 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(0, childActivityInstance.getChildActivityInstances().length);
     assertEquals(0, childActivityInstance.getChildTransitionInstances().length);
 
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void FAILING_testChangeVariableType() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    DummySerializable dummy = new DummySerializable();
+    runtimeService.setVariable(instance.getId(), "dummy", dummy);
+
+    runtimeService.setVariable(instance.getId(), "dummy", 47);
+
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertEquals(47, variableInstance.getValue());
+    assertEquals(IntegerType.TYPE_NAME, variableInstance.getTypeName());
   }
 
 
