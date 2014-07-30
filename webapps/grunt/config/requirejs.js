@@ -14,7 +14,6 @@ module.exports = function(config) {
     'angular',
     'moment',
 
-    'camunda-bpm-forms',
     'camunda-bpm-sdk',
 
     'angular-bootstrap',
