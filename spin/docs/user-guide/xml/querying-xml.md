@@ -32,7 +32,7 @@ String xml = "<root><child id=\"child\"><a id=\"a\"/><a id=\"b\"/></child></root
 SpinXmlTreeAttribute attribute = XML(xml).xPath("/root/child/@id").attribute();
 ```
 
-## Querying an element list
+## Querying an attribute list
 
 ```java
 import static org.camunda.spin.Spin.XML;

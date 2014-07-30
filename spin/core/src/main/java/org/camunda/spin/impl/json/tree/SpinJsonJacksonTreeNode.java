@@ -12,32 +12,31 @@
  */
 package org.camunda.spin.impl.json.tree;
 
-import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.camunda.spin.SpinList;
-import org.camunda.spin.impl.SpinListImpl;
-import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonTreeNodeException;
-import org.camunda.spin.logging.SpinLogger;
-import org.camunda.spin.spi.SpinJsonDataFormatException;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.jayway.jsonpath.InvalidPathException;
+import com.jayway.jsonpath.JsonPath;
+import org.camunda.spin.SpinList;
+import org.camunda.spin.impl.SpinListImpl;
+import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.json.SpinJsonTreeNodeException;
+import org.camunda.spin.json.SpinJsonTreePathQuery;
+import org.camunda.spin.logging.SpinLogger;
+import org.camunda.spin.spi.SpinJsonDataFormatException;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 
 /**
  * Wrapper for a Jackson Json Tree Node.
@@ -103,76 +102,6 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     return writer;
   }
 
-  @SuppressWarnings("unchecked")
-  protected JsonNode createJsonNode(Object parameter) {
-    if(parameter instanceof SpinJsonNode) {
-      return (JsonNode) ((SpinJsonNode) parameter).unwrap();
-
-    } else if(parameter instanceof String) {
-      return createJsonNode((String) parameter);
-
-    } else if(parameter instanceof Integer) {
-      return createJsonNode((Integer) parameter);
-
-    } else if(parameter instanceof Boolean) {
-      return createJsonNode((Boolean) parameter);
-
-    } else if(parameter instanceof Float) {
-      return createJsonNode((Float) parameter);
-
-    } else if(parameter instanceof Long) {
-      return createJsonNode((Long) parameter);
-
-    } else if(parameter instanceof Number) {
-      return createJsonNode(((Number) parameter).floatValue());
-
-    } else if(parameter instanceof List) {
-      return createJsonNode((List<Object>) parameter);
-
-    } else if(parameter instanceof Map) {
-      return createJsonNode((Map<String, Object>) parameter);
-
-    } else {
-      throw LOG.unableToCreateNode(parameter.getClass().getSimpleName());
-    }
-  }
-
-  protected JsonNode createJsonNode(String parameter) {
-    return dataFormat.getConfiguredObjectMapper().getNodeFactory().textNode(parameter);
-  }
-
-  protected JsonNode createJsonNode(Integer parameter) {
-    return dataFormat.getConfiguredObjectMapper().getNodeFactory().numberNode(parameter);
-  }
-
-  protected JsonNode createJsonNode(Float parameter) {
-    return dataFormat.getConfiguredObjectMapper().getNodeFactory().numberNode(parameter);
-  }
-
-  protected JsonNode createJsonNode(Long parameter) {
-    return dataFormat.getConfiguredObjectMapper().getNodeFactory().numberNode(parameter);
-  }
-
-  protected JsonNode createJsonNode(Boolean parameter) {
-    return dataFormat.getConfiguredObjectMapper().getNodeFactory().booleanNode(parameter);
-  }
-
-  protected JsonNode createJsonNode(List<Object> parameter) {
-    ArrayNode node = dataFormat.getConfiguredObjectMapper().getNodeFactory().arrayNode();
-    for(Object entry : parameter) {
-      node.add(createJsonNode(entry));
-    }
-    return node;
-  }
-
-  protected JsonNode createJsonNode(Map<String, Object> parameter) {
-    ObjectNode node = dataFormat.getConfiguredObjectMapper().getNodeFactory().objectNode();
-    for (Map.Entry<String, Object> entry : parameter.entrySet()) {
-      node.set(entry.getKey(), createJsonNode(entry.getValue()));
-    }
-    return node;
-  }
-
   /**
    * fetch correct array index if index is less than 0
    *
@@ -207,7 +136,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     ensureNotNull("searchObject", searchObject);
     if(this.isArray()) {
       Integer i = 0;
-      JsonNode node = createJsonNode(searchObject);
+      JsonNode node = dataFormat.createJsonNode(searchObject);
       for (Iterator<JsonNode> nodeIterator = jsonNode.elements(); nodeIterator.hasNext(); i++) {
         JsonNode n = nodeIterator.next();
         if (n.equals(node)) {
@@ -227,7 +156,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     if(this.isArray()) {
       Integer i = 0;
       Integer j = -1;
-      JsonNode node = createJsonNode(searchObject);
+      JsonNode node = dataFormat.createJsonNode(searchObject);
       for (Iterator<JsonNode> nodeIterator = jsonNode.elements(); nodeIterator.hasNext(); i++) {
         JsonNode n = nodeIterator.next();
         if (n.equals(node)) {
@@ -317,7 +246,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   public SpinJsonNode prop(String name, List<Object> newProperty) {
     ObjectNode node = (ObjectNode) jsonNode;
 
-    node.set(name, createJsonNode(newProperty));
+    node.set(name, dataFormat.createJsonNode(newProperty));
 
     return dataFormat.createWrapperInstance(node);
   }
@@ -325,7 +254,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   public SpinJsonNode prop(String name, Map<String, Object> newProperty) {
     ObjectNode node = (ObjectNode) jsonNode;
 
-    node.set(name, createJsonNode(newProperty));
+    node.set(name, dataFormat.createJsonNode(newProperty));
 
     return dataFormat.createWrapperInstance(node);
   }
@@ -369,7 +298,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     if(jsonNode.isArray()) {
       ArrayNode node = (ArrayNode) jsonNode;
 
-      node.add(createJsonNode(property));
+      node.add(dataFormat.createJsonNode(property));
 
       return dataFormat.createWrapperInstance(node);
     } else {
@@ -385,7 +314,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
       index = getCorrectIndex(index);
       ArrayNode node = (ArrayNode) jsonNode;
 
-      node.insert(index, createJsonNode(property));
+      node.insert(index, dataFormat.createJsonNode(property));
 
       return dataFormat.createWrapperInstance(node);
     } else {
@@ -530,6 +459,22 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
       return list;
     } else {
       throw LOG.unableToParseValue("Array/Object", jsonNode.getNodeType());
+    }
+  }
+
+  public JsonNodeType getNodeType() {
+    return jsonNode.getNodeType();
+  }
+
+  public SpinJsonTreePathQuery jsonPath(String expression) {
+    ensureNotNull("expression", expression);
+    try {
+      JsonPath query = JsonPath.compile(expression);
+      return new SpinJsonPathQuery(this, query, dataFormat);
+    } catch(InvalidPathException pex) {
+      throw LOG.unableToCompileJsonPathExpression(expression, pex);
+    } catch(IllegalArgumentException aex) {
+      throw LOG.unableToCompileJsonPathExpression(expression, aex);
     }
   }
 

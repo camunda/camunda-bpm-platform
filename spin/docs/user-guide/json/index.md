@@ -5,7 +5,7 @@ Spin supports various usecases for handling Json:
 * [Reading Json][reading-json]
 * Manipulating Json
 * [Writing Json][writing-json]
-* Querying Json
+* [Querying Json][querying-json]
 * Transforming Json
 * [Mapping between Json and Java representation][mapping-json]
 * [Configuring Json Handling][configuring-json]

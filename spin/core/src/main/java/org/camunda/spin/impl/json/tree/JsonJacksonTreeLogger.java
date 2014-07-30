@@ -12,17 +12,19 @@
  */
 package org.camunda.spin.impl.json.tree;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
+import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.json.SpinJsonTreeNodeException;
+import org.camunda.spin.json.SpinJsonTreePathException;
 import org.camunda.spin.json.SpinJsonTreePropertyException;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
-
 /**
  * @author Thorben Lindhauer
+ * @author Stefan Hentschel
  */
 public class JsonJacksonTreeLogger extends SpinLogger {
 
@@ -69,7 +71,7 @@ public class JsonJacksonTreeLogger extends SpinLogger {
   }
 
   public SpinJsonDataFormatException unableToMapInput(Object input, Exception cause) {
-    return new SpinJsonDataFormatException(exceptionMessage("009", "Unable to map object {} to json node", input), cause);
+    return new SpinJsonDataFormatException(exceptionMessage("009", "Unable to map object '{}' to json node", input), cause);
   }
 
   public SpinJsonTreeNodeException unableToModifyNode(String nodeName) {
@@ -82,5 +84,20 @@ public class JsonJacksonTreeLogger extends SpinLogger {
 
   public IndexOutOfBoundsException indexOutOfBounds(Integer index, Integer size) {
     return new IndexOutOfBoundsException(exceptionMessage("012", "Index is out of bound! Index: '{}', Size: '{}'", index, size));
+  }
+
+  public SpinJsonTreePathException unableToEvaluateJsonPathExpressionOnNode(SpinJsonNode node, Exception cause) {
+    return new SpinJsonTreePathException(
+      exceptionMessage("013", "Unable to evaluate JsonPath expression on element '{}'", node.getClass().getName()), cause);
+  }
+
+  public SpinJsonTreePathException unableToCompileJsonPathExpression(String expression, Exception cause) {
+    return new SpinJsonTreePathException(
+      exceptionMessage("014", "Unable to compile '{}'!", expression), cause);
+  }
+
+  public SpinJsonTreePathException unableToCastJsonPathResultTo(Class<?> castClass, Exception cause) {
+    return new SpinJsonTreePathException(
+      exceptionMessage("015", "Unable to cast JsonPath expression to '{}'", castClass.getName()), cause);
   }
 }

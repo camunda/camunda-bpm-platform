@@ -12,11 +12,12 @@
  */
 package org.camunda.spin.impl.json.tree;
 
-import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.camunda.spin.impl.json.tree.type.DefaultJsonJacksonTypeDetector;
 import org.camunda.spin.impl.json.tree.type.ListJsonJacksonTypeDetector;
 import org.camunda.spin.json.SpinJsonNode;
@@ -26,10 +27,11 @@ import org.camunda.spin.spi.DataFormatReader;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.camunda.spin.spi.TypeDetector;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 
 /**
  * Spin data format that can wrap Json content and uses 
@@ -176,5 +178,75 @@ public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, Json
 
   public void addTypeDetector(TypeDetector typeDetector) {
     typeDetectors.add(0, typeDetector);
+  }
+
+  @SuppressWarnings("unchecked")
+  public JsonNode createJsonNode(Object parameter) {
+    if(parameter instanceof SpinJsonNode) {
+      return (JsonNode) ((SpinJsonNode) parameter).unwrap();
+
+    } else if(parameter instanceof String) {
+      return createJsonNode((String) parameter);
+
+    } else if(parameter instanceof Integer) {
+      return createJsonNode((Integer) parameter);
+
+    } else if(parameter instanceof Boolean) {
+      return createJsonNode((Boolean) parameter);
+
+    } else if(parameter instanceof Float) {
+      return createJsonNode((Float) parameter);
+
+    } else if(parameter instanceof Long) {
+      return createJsonNode((Long) parameter);
+
+    } else if(parameter instanceof Number) {
+      return createJsonNode(((Number) parameter).floatValue());
+
+    } else if(parameter instanceof List) {
+      return createJsonNode((List<Object>) parameter);
+
+    } else if(parameter instanceof Map) {
+      return createJsonNode((Map<String, Object>) parameter);
+
+    } else {
+      throw LOG.unableToCreateNode(parameter.getClass().getSimpleName());
+    }
+  }
+
+  public JsonNode createJsonNode(String parameter) {
+    return getConfiguredObjectMapper().getNodeFactory().textNode(parameter);
+  }
+
+  public JsonNode createJsonNode(Integer parameter) {
+    return getConfiguredObjectMapper().getNodeFactory().numberNode(parameter);
+  }
+
+  public JsonNode createJsonNode(Float parameter) {
+    return getConfiguredObjectMapper().getNodeFactory().numberNode(parameter);
+  }
+
+  public JsonNode createJsonNode(Long parameter) {
+    return getConfiguredObjectMapper().getNodeFactory().numberNode(parameter);
+  }
+
+  public JsonNode createJsonNode(Boolean parameter) {
+    return getConfiguredObjectMapper().getNodeFactory().booleanNode(parameter);
+  }
+
+  public JsonNode createJsonNode(List<Object> parameter) {
+    ArrayNode node = getConfiguredObjectMapper().getNodeFactory().arrayNode();
+    for(Object entry : parameter) {
+      node.add(createJsonNode(entry));
+    }
+    return node;
+  }
+
+  public JsonNode createJsonNode(Map<String, Object> parameter) {
+    ObjectNode node = getConfiguredObjectMapper().getNodeFactory().objectNode();
+    for (Map.Entry<String, Object> entry : parameter.entrySet()) {
+      node.set(entry.getKey(), createJsonNode(entry.getValue()));
+    }
+    return node;
   }
 }
