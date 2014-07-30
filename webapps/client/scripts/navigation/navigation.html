@@ -22,7 +22,7 @@
 
             <li>
               <a tooltip-placement="left"
-                 tooltip="Start a process"
+                 tooltip="{{ 'START_PROCESS' | translate }}"
                  ng-controller="processStartCtrl"
                  ng-click="openProcessStartModal()"
                  href>
@@ -32,7 +32,7 @@
 
             <li class="user-account dropdown">
               <a tooltip-placement="left"
-                 tooltip="Manage your account"
+                 tooltip="{{ 'MANAGE_ACCOUNT' | translate }}"
                  href
                  class="dropdown-toggle"
                  data-toggle="dropdown">
@@ -41,7 +41,7 @@
               </a>
               <ul class="dropdown-menu">
                 <li class="user-profile">
-                  <a ng-href="{{ tasklistbase }}/{{ engine }}/#/users/{{ username }}?tab=profile">
+                  <a ng-href="{{ 'adminbase://' | uri }}/#/users/{{ username }}?tab=profile">
                     My Profile
                   </a>
                 </li>

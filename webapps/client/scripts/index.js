@@ -38,18 +38,17 @@ define('camunda-tasklist-ui', [
     return translated;
   }
 
-
   function loaded() {
     var angular = require('angular');
     var $ = angular.element;
 
     var ngDeps = rj2ngNames(appModules).concat([
+      'pascalprecht.translate',
       'ngRoute'
     ]);
 
     tasklistApp = angular.module('cam.tasklist', ngDeps);
 
-    // tasklistApp.provider('Notifications', require('camunda-commons-ui/util/notifications'));
     tasklistApp.config([
       'UriProvider',
     function(
@@ -90,10 +89,27 @@ define('camunda-tasklist-ui', [
     tasklistApp.config([
       '$routeProvider',
       '$locationProvider',
+      '$translateProvider',
+      'AuthenticationServiceProvider',
     function(
       $routeProvider,
-      $locationProvider
+      $locationProvider,
+      $translateProvider,
+      AuthenticationServiceProvider
     ) {
+
+      // Simply register translation table as object hash
+      $translateProvider
+        .translations('en', require('json!locales/en.json'))
+        .translations('de', require('json!locales/de.json'))
+        .translations('fr', require('json!locales/fr.json'))
+
+        // using the determinePreferredLanguage()
+        // would lead to use something like "en_US"
+        .determinePreferredLanguage()
+        .fallbackLanguage('en')
+      ;
+
       var tasklistTemplate = require('text!camunda-tasklist-ui/index.html');
 
       $routeProvider
@@ -130,7 +146,6 @@ define('camunda-tasklist-ui', [
         })
       ;
     }]);
-
 
     $(document).ready(function() {
       angular.bootstrap(document, ['cam.tasklist', 'cam.embedded.forms']);

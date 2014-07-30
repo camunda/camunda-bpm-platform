@@ -75,12 +75,14 @@ define([
     '$scope',
     '$rootScope',
     '$location',
+    '$translate',
     'AuthenticationService',
     'Notifications',
   function(
     $scope,
     $rootScope,
     $location,
+    $translate,
     AuthenticationService,
     Notifications
   ) {
@@ -88,22 +90,35 @@ define([
       return htmlForm.$valid;
     };
 
-    console.info('Notifications', Notifications);
 
     // /camunda/api/admin/auth/user/default/login/cockpit
     $scope.ok = function() {
       AuthenticationService
         .login($scope.username, $scope.password)
-        .then(function(authentication) {
-          Notifications.addMessage({
-            message: 'You are now logged in.'
-          });
+        .then(function(success) {
 
-          $scope.$parent.$parent.$close(authentication);
-        }, function() {
-          Notifications.addError({
-            message: 'Cannot log in with those credentials.'
-          });
+          if (success) {
+            $translate('LOGGED_IN').then(function(translated) {
+              Notifications.addMessage({
+                message: translated
+              });
+            });
+
+            $scope.user = $rootScope.authentication.user;
+
+            $rootScope.$broadcast('loggedin', $rootScope.authentication.user);
+
+            $scope.$parent.$parent.$close($scope.user.name);
+          }
+          else {
+            $translate('CREDENTIALS_ERROR').then(function(translated) {
+              Notifications.addError({
+                message: translated
+              });
+            }, function() {
+              throw new Error('Look at the bright side of life...');
+            });
+          }
         });
     };
 
