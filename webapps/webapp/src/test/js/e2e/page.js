@@ -72,7 +72,7 @@ Page.prototype.login = function(username, password) {
   element(by.model('username')).sendKeys(username);
   element(by.model('password')).sendKeys(password);
 
-  var submitButton = element(by.css('.btn-primary.btn-large'));
+  var submitButton = element(by.css('[type="submit"]'));
   submitButton.click();
 };
 
