@@ -130,3 +130,16 @@ alter table ACT_RU_TASK
   add constraint ACT_FK_TASK_CASE_DEF
   foreign key (CASE_DEF_ID_)
   references ACT_RE_CASE_DEF(ID_);
+  
+-- add data format configuration fields
+ALTER TABLE ACT_RU_VARIABLE
+  ADD DATA_FORMAT_ID_ varchar(255);
+  
+ALTER TABLE ACT_RU_VARIABLE
+  ADD CONFIGURATION_ varchar(255);
+  
+ALTER TABLE ACT_HI_VARINST
+  ADD DATA_FORMAT_ID_ varchar(255);
+  
+ALTER TABLE ACT_HI_VARINST
+  ADD CONFIGURATION_ varchar(255);
