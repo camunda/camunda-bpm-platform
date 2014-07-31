@@ -37,7 +37,7 @@ public class JsonTreeJsonPathTest {
   }
 
   @Test
-  public void getElementFromJsonPath() {
+  public void shouldGetElementFromJsonPath() {
     SpinJsonNode node = jsonNode.jsonPath("$.orderDetails").element();
 
     assertThat(node.isObject()).isTrue();
@@ -45,36 +45,37 @@ public class JsonTreeJsonPathTest {
   }
 
   @Test
-  public void getElementListFromJsonPath() {
+  public void shouldGetElementListFromJsonPath() {
     SpinList<SpinJsonNode> node = jsonNode.jsonPath("$.customers").elementList();
 
+    assertThat(node).hasSize(3);
     assertThat(node.get(0).isObject()).isTrue();
     assertThat(node.get(0).prop("name").isString()).isTrue();
   }
 
   @Test
-  public void getBooleanFromJsonPath() {
+  public void shouldGetBooleanFromJsonPath() {
     Boolean active = jsonNode.jsonPath("$.active").bool();
 
     assertThat(active).isTrue();
   }
 
   @Test
-  public void getStringFromJsonPath() {
+  public void shouldGetStringFromJsonPath() {
     String order = jsonNode.jsonPath("$.order").string();
 
     assertThat(order).isEqualTo("order1");
   }
 
   @Test
-  public void getNumberFromJsonPath() {
+  public void shouldGetNumberFromJsonPath() {
     Number order = jsonNode.jsonPath("$.id").number();
 
     assertThat(order.longValue()).isEqualTo(1234567890987654321L);
   }
 
   @Test
-  public void getSingleArrayEntry() {
+  public void shouldGetSingleArrayEntry() {
     SpinJsonNode node = jsonNode.jsonPath("$.customers[0]").element();
 
     assertThat(node.isObject());
@@ -83,15 +84,16 @@ public class JsonTreeJsonPathTest {
   }
 
   @Test
-  public void getMultipleArrayEntries() {
+  public void shouldGetMultipleArrayEntries() {
     SpinList<SpinJsonNode> nodeList = jsonNode.jsonPath("$.customers[0:2]").elementList();
 
-    assertThat(nodeList.get(0).prop("name").isString()).isTrue();
-    assertThat(nodeList.get(1).prop("contractStartDate").isNumber()).isTrue();
+    assertThat(nodeList).hasSize(2);
+    assertThat(nodeList.get(0).prop("name").stringValue()).isEqualTo("Kermit");
+    assertThat(nodeList.get(1).prop("name").stringValue()).isEqualTo("Waldo");
   }
 
   @Test
-  public void getFilteredResult() {
+  public void shouldGetFilteredResult() {
     SpinList<SpinJsonNode> nodeList = jsonNode.jsonPath("$.customers[?(@.name == 'Klo')]").elementList();
 
     assertThat(nodeList.size()).isEqualTo(0);
@@ -103,10 +105,12 @@ public class JsonTreeJsonPathTest {
   }
 
   @Test
-  public void getMultipleArrayPropertyValues() {
+  public void shouldGetMultipleArrayPropertyValues() {
     SpinList<SpinJsonNode> nodeList = jsonNode.jsonPath("$.customers[*].name").elementList();
 
+    assertThat(nodeList).hasSize(3);
     assertThat(nodeList.get(0).stringValue()).isEqualTo("Kermit");
+    assertThat(nodeList.get(1).stringValue()).isEqualTo("Waldo");
     assertThat(nodeList.get(2).stringValue()).isEqualTo("Johnny");
   }
 
@@ -130,7 +134,7 @@ public class JsonTreeJsonPathTest {
   @Test
   public void failAccessNonExistentProperty() {
     try {
-      SpinJsonNode node = jsonNode.jsonPath("$.order.test").element();
+      jsonNode.jsonPath("$.order.test").element();
       fail("Expected: SpinJsonDataFormatException");
     } catch(SpinJsonTreePathException ex) {
       // expected

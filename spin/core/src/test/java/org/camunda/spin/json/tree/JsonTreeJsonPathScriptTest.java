@@ -46,6 +46,7 @@ public abstract class JsonTreeJsonPathScriptTest extends ScriptTest {
   public void shouldGetElementListFromJsonPath() {
     SpinList<SpinJsonNode> nodeList = script.getVariable("nodeList");
 
+    assertThat(nodeList).hasSize(3);
     assertThat(nodeList.get(0).isObject()).isTrue();
     assertThat(nodeList.get(0).prop("name").isString()).isTrue();
   }
@@ -94,8 +95,9 @@ public abstract class JsonTreeJsonPathScriptTest extends ScriptTest {
   public void shouldGetMultipleArrayEntries() {
     SpinList<SpinJsonNode> nodeList = script.getVariable("nodeList");
 
-    assertThat(nodeList.get(0).prop("name").isString()).isTrue();
-    assertThat(nodeList.get(1).prop("contractStartDate").isNumber()).isTrue();
+    assertThat(nodeList).hasSize(2);
+    assertThat(nodeList.get(0).prop("name").stringValue()).isEqualTo("Kermit");
+    assertThat(nodeList.get(1).prop("name").stringValue()).isEqualTo("Waldo");
   }
 
   @Test
@@ -118,7 +120,9 @@ public abstract class JsonTreeJsonPathScriptTest extends ScriptTest {
   public void souldGetMultipleArrayPropertyValues() {
     SpinList<SpinJsonNode> nodeList = script.getVariable("nodeList");
 
+    assertThat(nodeList).hasSize(3);
     assertThat(nodeList.get(0).stringValue()).isEqualTo("Kermit");
+    assertThat(nodeList.get(1).stringValue()).isEqualTo("Waldo");
     assertThat(nodeList.get(2).stringValue()).isEqualTo("Johnny");
   }
 
