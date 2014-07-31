@@ -29,12 +29,11 @@ module.exports = function(config) {
 
     scripts: {
       files: [
-        'grunt/config/require.js',
-        // 'node_modules/camunda-bpm-sdk-js/dist/**/*.js',
-        '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html}'
+        '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html,json}'
       ],
       tasks: [
         'newer:jshint:scripts',
+        'localescompile',
         'requirejs:scripts'
       ]
     },
@@ -42,10 +41,13 @@ module.exports = function(config) {
     sdk: {
       files: [
         // 'grunt/config/require.js',
+        'node_modules/camunda-commons-ui/lib/**/*.js',
+        'node_modules/camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
         'node_modules/camunda-bpm-sdk-js/dist/**/*.js'
       ],
       tasks: [
         'copy:sdk',
+        'localescompile',
         'requirejs:scripts',
         'requirejs:dependencies'
       ]

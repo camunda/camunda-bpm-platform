@@ -1,14 +1,18 @@
-module.exports = function(config) {
+module.exports = function() {
   'use strict';
   var _ = require('underscore');
   var path = require('path');
   var rjsConfPath = path.resolve('./client/scripts/require-conf');
   var rjsConf = require(rjsConfPath);
 
+  // NOTE: we use "./../" in this file, because the "working directory"
+  // a.k.a. "basePath" property is actually "./client"
   var deps = [
     'camunda-tasklist-ui/require-conf',
     './../node_modules/requirejs/require',
-    // 'camunda-commons-ui/util',
+    // 'require-conf',
+    // 'require',
+
     'camunda-commons-ui/auth',
     'jquery',
     'angular',
@@ -20,47 +24,38 @@ module.exports = function(config) {
     'angular-route',
     'angular-animate',
     'angular-moment'
-  ];//.concat(rjsConf.shim['camunda-tasklist-ui']);
+  ];
+
 
   _.extend(rjsConf.paths, {
-    'camunda-commons-ui': './../node_modules/camunda-commons-ui/lib',
-    'require-conf': 'scripts/require-conf'
+    'camunda-bpm-sdk-js':   './../node_modules/camunda-bpm-sdk-js/dist',
+    'camunda-commons-ui':   './../node_modules/camunda-commons-ui/lib',
+
+    'require':              './../node_modules/requirejs/require',
+    'require-conf':         './../client/scripts/require-conf',
+
+    // the localescompile task puts the generated files in the build directory
+    // and we want them to be included in the build
+    'locales':              './../<%= buildTarget %>/locales'
   });
+
 
   var rConf = {
     options: {
-      stubModules: ['text'],
+      stubModules: [
+        'json',
+        'text'
+      ],
 
       optimize: '<%= (buildTarget === "dist" ? "uglify2" : "none") %>',
       preserveLicenseComments: false,
       generateSourceMaps: true,
 
       baseUrl: './<%= pkg.gruntConfig.clientDir %>',
-      // baseUrl: config.clientDir,
 
       paths: rjsConf.paths,
       shim: rjsConf.shim,
-      packages: rjsConf.packages,
-
-      onModuleBundleComplete: function (data) {
-        /*
-        data.name: the bundle name.
-        data.path: the bundle path relative to the output directory.
-        data.included: an array of items included in the build bundle.
-        If a file path, it is relative to the output directory. Loader
-        plugin IDs are also included in this array, but depending
-        on the plugin, may or may not have something inlined in the
-        module bundle.
-        */
-        config.grunt.verbose.writeln('onModuleBundleComplete', data.path+':\n\n'+data.included.join('\n') +'\n');
-
-        // // add a timestamp to the sourcemap URL to prevent caching
-        // fs.readFile(data.path, {encoding: 'utf8'}, function(err, content) {
-        //   // console.info('onModuleBundleComplete', data.name, content);
-        //   content = content + '?' + (new Date()).getTime();
-        //   fs.writeFileSync(data.path, content);
-        // });
-      }
+      packages: rjsConf.packages
     },
 
 
