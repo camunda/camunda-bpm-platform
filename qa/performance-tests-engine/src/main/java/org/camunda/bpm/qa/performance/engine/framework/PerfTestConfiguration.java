@@ -12,13 +12,14 @@
  */
 package org.camunda.bpm.qa.performance.engine.framework;
 
+import java.util.Date;
 import java.util.Properties;
 
 
 /**
  * Configuration of a performance test
  *
- * @author Daniel Meyer
+ * @author Daniel Meyer, Ingo Richtsmeier
  *
  */
 public class PerfTestConfiguration {
@@ -29,6 +30,10 @@ public class PerfTestConfiguration {
 
   protected String testWatchers = null;
   protected String historyLevel;
+  
+  protected Date startTime;
+  
+  protected String platform;
 
   public PerfTestConfiguration(Properties properties) {
     numberOfRuns = Integer.parseInt(properties.getProperty("numberOfRuns"));
@@ -75,6 +80,22 @@ public class PerfTestConfiguration {
 
   public void setHistoryLevel(String historyLevel) {
     this.historyLevel = historyLevel;
+  }
+  
+  public Date getStartTime() {
+    return startTime;
+  }
+  
+  public void setStartTime(Date startTime) {
+    this.startTime = startTime;
+  }
+
+  public String getPlatform() {
+    return platform;
+  }
+
+  public void setPlatform(String platform) {
+    this.platform = platform;
   }
 
 }

@@ -29,7 +29,7 @@ public class EmbeddedSubprocessPerformanceTest extends ProcessEnginePerformanceT
   @Test
   @Deployment
   public void sync1Subprocess() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
   }
@@ -37,7 +37,7 @@ public class EmbeddedSubprocessPerformanceTest extends ProcessEnginePerformanceT
   @Test
   @Deployment
   public void sync2Subprocesses() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
   }
@@ -45,7 +45,7 @@ public class EmbeddedSubprocessPerformanceTest extends ProcessEnginePerformanceT
   @Test
   @Deployment
   public void sync3Subprocesses() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
   }
@@ -53,7 +53,7 @@ public class EmbeddedSubprocessPerformanceTest extends ProcessEnginePerformanceT
   @Test
   @Deployment
   public void async1Subprocess() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .step(new SignalExecutionStep(engine, EXECUTION_ID))
     .run();
@@ -62,7 +62,7 @@ public class EmbeddedSubprocessPerformanceTest extends ProcessEnginePerformanceT
   @Test
   @Deployment
   public void async2Subprocesses() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .step(new SignalExecutionStep(engine, EXECUTION_ID))
     .run();
@@ -71,7 +71,7 @@ public class EmbeddedSubprocessPerformanceTest extends ProcessEnginePerformanceT
   @Test
   @Deployment
   public void async3Subprocesses() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .step(new SignalExecutionStep(engine, EXECUTION_ID))
     .run();

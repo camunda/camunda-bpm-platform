@@ -43,7 +43,7 @@ public class VariablesPerformanceTest extends ProcessEnginePerformanceTestCase {
     HashMap<String, Object> variables = new HashMap<String, Object>();
     variables.put(VARIABLE1, "someValue");
 
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process", variables))
     .run();
   }
@@ -64,7 +64,7 @@ public class VariablesPerformanceTest extends ProcessEnginePerformanceTestCase {
     variables.put(VARIABLE9, "someValue");
     variables.put(VARIABLE10, "someValue");
 
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process", variables))
     .run();
   }
@@ -76,7 +76,7 @@ public class VariablesPerformanceTest extends ProcessEnginePerformanceTestCase {
     HashMap<String, Object> variables = new HashMap<String, Object>();
     variables.put(VARIABLE1, "Some Text which is considerably longer than the first one.");
 
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process", variables))
     .run();
   }
@@ -88,7 +88,7 @@ public class VariablesPerformanceTest extends ProcessEnginePerformanceTestCase {
     HashMap<String, Object> variables = new HashMap<String, Object>();
     variables.put(VARIABLE1, 2d);
 
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process", variables))
     .run();
   }
@@ -100,7 +100,7 @@ public class VariablesPerformanceTest extends ProcessEnginePerformanceTestCase {
     HashMap<String, Object> variables = new HashMap<String, Object>();
     variables.put(VARIABLE1, "This string will be saved as a byte array.".getBytes());
 
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process", variables))
     .run();
   }
@@ -121,7 +121,7 @@ public class VariablesPerformanceTest extends ProcessEnginePerformanceTestCase {
     variables.put(VARIABLE9, "This string will be saved as a byte array.".getBytes());
     variables.put(VARIABLE10, "This string will be saved as a byte array.".getBytes());
 
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process", variables))
     .run();
   }
@@ -134,7 +134,7 @@ public class VariablesPerformanceTest extends ProcessEnginePerformanceTestCase {
     byte[] bytes = new byte[5*1024];
     variables.put(VARIABLE1, bytes);
 
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process", variables))
     .run();
   }
