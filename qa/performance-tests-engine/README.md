@@ -65,7 +65,7 @@ configurations over a long period. If you choose a file outside of your target d
 for the next run.
 
 ```Shell
-mvn clean install -Pbenchmark,mysql 
+mvn clean install -Pbenchmark,h2 \ 
                   -DlongTermBenchmarkResultFile=C:\\Arbeit\\camunda\\performanceTests\\longtermResults.csv
 ```
 
