@@ -13,6 +13,7 @@
 package org.camunda.bpm.qa.performance.engine.framework;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -25,7 +26,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
- * @author Daniel Meyer
+ * @author Daniel Meyer, Ingo Richtsmeier
  *
  */
 public class PerfTestRunner {
@@ -78,6 +79,7 @@ public class PerfTestRunner {
         }
       }
     }
+    configuration.setStartTime(new Date(System.currentTimeMillis()));
   }
 
   public Future<PerfTestResults> execute() {

@@ -29,7 +29,7 @@ public class IntermediateCatchPerformanceTest extends ProcessEnginePerformanceTe
   @Test
   @Deployment
   public void singleMessage() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .step(new CorrelateMessageStep(engine, "message", PROCESS_INSTANCE_ID))
     .run();

@@ -29,7 +29,7 @@ public class SequencePerformanceTest extends ProcessEnginePerformanceTestCase {
   @Test
   @Deployment
   public void syncSequence1Step() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
   }
@@ -37,7 +37,7 @@ public class SequencePerformanceTest extends ProcessEnginePerformanceTestCase {
   @Test
   @Deployment
   public void syncSequence5Steps() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
   }
@@ -45,7 +45,7 @@ public class SequencePerformanceTest extends ProcessEnginePerformanceTestCase {
   @Test
   @Deployment
   public void syncSequence15Steps() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
   }
@@ -53,7 +53,7 @@ public class SequencePerformanceTest extends ProcessEnginePerformanceTestCase {
   @Test
   @Deployment
   public void asyncSequence1Step() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .step(new SignalExecutionStep(engine, PROCESS_INSTANCE_ID))
     .run();
@@ -62,7 +62,7 @@ public class SequencePerformanceTest extends ProcessEnginePerformanceTestCase {
   @Test
   @Deployment
   public void asyncSequence5Steps() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .steps(5, new SignalExecutionStep(engine, PROCESS_INSTANCE_ID))
     .run();
@@ -71,7 +71,7 @@ public class SequencePerformanceTest extends ProcessEnginePerformanceTestCase {
   @Test
   @Deployment
   public void asyncSequence15Steps() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .steps(15, new SignalExecutionStep(engine, PROCESS_INSTANCE_ID))
     .run();

@@ -29,7 +29,7 @@ public class UserTaskPerformanceTest extends ProcessEnginePerformanceTestCase {
   @Test
   @Deployment
   public void singleTask() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .step(new CompleteTaskStep(engine, TASK_ID))
     .run();
