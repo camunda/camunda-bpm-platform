@@ -17,6 +17,7 @@ package org.camunda.bpm.engine.test.variables;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -25,9 +26,11 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.spin.SpinSerializationType;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.variable.SerializableType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.runtime.DummySerializable;
 import org.camunda.spin.DataFormats;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -180,6 +183,24 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       // happy path
     }
+  }
+
+  public void testConfigureSerializableFormat() {
+    ProcessEngineConfigurationImpl engineConfig =
+        (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
+
+    ProcessEngine engine = engineConfig.setDefaultSerializationFormat("java serializable").buildProcessEngine();
+    String deploymentId = engine.getRepositoryService().createDeployment()
+        .addClasspathResource(ONE_TASK_PROCESS).deploy().getId();
+
+    ProcessInstance instance = engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
+    engine.getRuntimeService().setVariable(instance.getId(), "serializableVar", new DummySerializable());
+
+    VariableInstance variable = engine.getRuntimeService().createVariableInstanceQuery().singleResult();
+
+    assertEquals(SerializableType.TYPE_NAME, variable.getTypeName());
+
+    engine.getRepositoryService().deleteDeployment(deploymentId, true);
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)

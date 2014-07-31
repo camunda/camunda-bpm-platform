@@ -209,6 +209,7 @@ import org.camunda.bpm.engine.impl.variable.JPAEntityVariableType;
 import org.camunda.bpm.engine.impl.variable.LongType;
 import org.camunda.bpm.engine.impl.variable.NullType;
 import org.camunda.bpm.engine.impl.variable.SerializableType;
+import org.camunda.bpm.engine.impl.variable.SerializableTypeResolver;
 import org.camunda.bpm.engine.impl.variable.SerializationVariableTypeResolver;
 import org.camunda.bpm.engine.impl.variable.ShortType;
 import org.camunda.bpm.engine.impl.variable.StringType;
@@ -457,6 +458,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initIdentityProviderSessionFactory();
     initSessionFactories();
     initSpin();
+    initSerializationTypeResolvers();
     initVariableTypes();
     initJpa();
     initDelegateInterceptor();
@@ -1096,6 +1098,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  protected void initSerializationTypeResolvers() {
+    serializationTypeResolvers.add(new SerializableTypeResolver());
+  }
+
   protected void initVariableTypes() {
     if (variableTypes==null) {
       variableTypes = new DefaultVariableTypes();
@@ -1120,6 +1126,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         for (SerializationVariableTypeResolver resolver : serializationTypeResolvers) {
           serializationType = resolver.getTypeForSerializationFormat(defaultSerializationFormat);
+          if (serializationType != null) {
+            break;
+          }
         }
 
         if (serializationType != null) {
