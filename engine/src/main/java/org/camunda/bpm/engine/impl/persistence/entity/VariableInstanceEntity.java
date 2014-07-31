@@ -116,11 +116,17 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
     if (textValue != null) {
       persistentState.put("textValue", textValue);
     }
+    if (textValue2 != null) {
+      persistentState.put("textValue2", textValue2);
+    }
     if (byteArrayValueId != null) {
       persistentState.put("byteArrayValueId", byteArrayValueId);
     }
     if (forcedUpdate) {
       persistentState.put("forcedUpdate", Boolean.TRUE);
+    }
+    if (dataFormatId != null) {
+      persistentState.put("dataFormatId", dataFormatId);
     }
     return persistentState;
   }
