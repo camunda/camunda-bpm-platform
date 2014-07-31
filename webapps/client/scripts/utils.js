@@ -1,6 +1,6 @@
 'use strict';
-if (typeof define !== 'function') { var define = require('amdefine')(module); }
-/* jshint unused: false */
+
+
 define(['angular'], function(angular) {
 
   /**
@@ -20,7 +20,7 @@ define(['angular'], function(angular) {
    */
   utilsModule.factory('camUID', function() {
     var _counter = 0;
-    return function(prefix) {
+    return function() {
       _counter++;
       return _counter;
     };

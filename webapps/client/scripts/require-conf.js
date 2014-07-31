@@ -1,12 +1,15 @@
 'use strict';
+/* jshint ignore:start */
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
-/* jshint unused: false */
+/* jshint ignore:end */
+
 define(function() {
   var config = {
     baseUrl: './',
 
     paths: {
       'text':                       'bower_components/requirejs-text/text',
+      'json':                       'bower_components/requirejs-json/json',
 
       'angular':                    'bower_components/angular/angular',
       'angular-route':              'bower_components/angular-route/angular-route',
@@ -19,6 +22,7 @@ define(function() {
       'bootstrap':                  'bower_components/bootstrap/js',
       'angular-bootstrap':          'bower_components/angular-bootstrap/ui-bootstrap-tpls',
       'angular-moment':             'bower_components/angular-moment/angular-moment',
+      'angular-translate':          'bower_components/angular-translate/angular-translate',
 
 
       'camunda-tasklist-ui':        'scripts',
@@ -53,8 +57,14 @@ define(function() {
                                       'angular-route',
                                       'angular-animate',
 
+                                      'angular-translate',
+
                                       'camunda-commons-ui/auth',
                                       'camunda-commons-ui/util/notifications',
+
+                                      'camunda-tasklist-ui/config/routes',
+                                      'camunda-tasklist-ui/config/translations',
+                                      'camunda-tasklist-ui/config/uris',
 
                                       'camunda-tasklist-ui/api',
                                       'camunda-tasklist-ui/utils',
@@ -64,13 +74,16 @@ define(function() {
                                       'camunda-tasklist-ui/pile',
                                       'camunda-tasklist-ui/task',
                                       'camunda-tasklist-ui/process',
-                                      'camunda-tasklist-ui/session',
 
                                       'bootstrap/collapse',
                                       'camunda-tasklist-ui/navigation/index',
-                                      'camunda-tasklist-ui/notifier/index',
 
-                                      'text!camunda-tasklist-ui/index.html'
+                                      'camunda-commons-ui/directives/notificationsPanel',
+
+                                      'text!camunda-tasklist-ui/index.html',
+                                      'json!locales/en.json',
+                                      'json!locales/de.json',
+                                      'json!locales/fr.json'
                                     ]
     },
 
@@ -97,10 +110,6 @@ define(function() {
       },
       {
         name: 'camunda-tasklist-ui/process',
-        main: 'index'
-      },
-      {
-        name: 'camunda-tasklist-ui/session',
         main: 'index'
       },
       {

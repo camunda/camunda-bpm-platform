@@ -1,6 +1,6 @@
 'use strict';
-if (typeof define !== 'function') { var define = require('amdefine')(module); }
-/* jshint unused: false */
+
+
 define([
            'angular', 'angular-bootstrap',
            'camunda-tasklist-ui/api',
@@ -15,8 +15,18 @@ define([
 
 
   processModule.controller('processStartModalFormCtrl', [
-          '$scope', '$q', 'camAPI', 'CamForm', 'Notifications',
-  function($scope,   $q,   camAPI,   CamForm,   Notifications) {
+    '$scope',
+    '$q',
+    'camAPI',
+    'CamForm',
+    'Notifications',
+  function(
+    $scope,
+    $q,
+    camAPI,
+    CamForm,
+    Notifications
+  ) {
     var $ = angular.element;
 
     var ProcessDefinition = camAPI.resource('process-definition');
@@ -51,9 +61,9 @@ define([
       cb(result);
     }
 
-    function loadError(err) {
-      $scope.loadingProcesses = false;
-    }
+    // function loadError(err) {
+    //   $scope.loadingProcesses = false;
+    // }
 
     // used by the pagination directive
     $scope.currentPage = 1;
@@ -73,7 +83,7 @@ define([
     $scope.close = close;
 
 
-    $scope.selected = function($item, $model, $label) {
+    $scope.selected = function($item) {
       $scope.getStartForm($item);
     };
 
@@ -207,7 +217,7 @@ define([
     };
 
 
-    $scope.submitForm = function(htmlForm) {
+    $scope.submitForm = function() {
       if (!$scope.startingProcess || !$scope.startingProcess.key) {
         return false;
       }

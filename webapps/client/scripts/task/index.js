@@ -1,18 +1,20 @@
 'use strict';
-if (typeof define !== 'function') { var define = require('amdefine')(module); }
-/* jshint unused: false */
+
+
 define([
   'angular',
   'moment',
+  'camunda-tasklist-ui/task/directives/cam-tasklist-task',
+  'camunda-tasklist-ui/task/directives/cam-tasklist-task-history',
+
   'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api',
-  'angular-bootstrap',
-  'text!camunda-tasklist-ui/task/task.html',
-  'text!camunda-tasklist-ui/task/form.html',
-  'text!camunda-tasklist-ui/task/history.html'
+  'angular-bootstrap'
 ], function(
   angular,
-  moment
+  moment,
+  taskDirective,
+  taskHistoryDirective
 ) {
 
   var taskModule = angular.module('cam.tasklist.task', [
@@ -31,94 +33,46 @@ define([
    * @memberof cam.tasklist
    */
 
-  taskModule.directive('camTasklistTask', [
-          '$modal', '$rootScope', 'camUID',
-  function($modal,   $rootScope,   camUID) {
-    $rootScope.batchActions = {};
-    $rootScope.batchActions.selected = [];
+  taskModule.directive('camTasklistTask', taskDirective);
 
-    return {
-      link: function(scope, element) {
-        scope.task = scope.task || $rootScope.currentTask;
+  taskModule.directive('camTasklistTaskHistory', taskHistoryDirective);
 
-        scope.elUID = camUID();
+  // // should be moved to the form module...
+  // taskModule.directive('camTasklistTaskForm', [
+  //   'camAPI',
+  //   '$rootScope',
+  //   'camUID',
+  // function(
+  //   camAPI,
+  //   $rootScope,
+  //   camUID
+  // ) {
+  //   return {
+  //     link: function(scope) {
+  //       scope.task = scope.task || $rootScope.currentTask;
 
-        element.find('.nav li').eq(0).addClass('active');
-        element.find('.tab-pane').eq(0).addClass('active');
+  //       scope.elUID = camUID();
 
-        $rootScope.$watch('currentTask', function() {
-          if (!$rootScope.currentTask || (scope.task && scope.task.id === $rootScope.currentTask.id)) {
-            return;
-          }
-          scope.task = $rootScope.currentTask;
-          console.info('Current task is now', scope.task);
-        });
-      },
-      template: require('text!camunda-tasklist-ui/task/task.html')
-    };
-  }]);
+  //       scope.labelsWidth = 3;
+  //       scope.fieldsWidth = 12 - scope.labelsWidth;
 
-  // should be moved to the form module...
-  taskModule.directive('camTasklistTaskForm', [
-          'camAPI', '$rootScope', 'camUID',
-  function(camAPI,   $rootScope,   camUID) {
-    return {
-      link: function(scope, element) {
-        scope.task = scope.task || $rootScope.currentTask;
+  //       // scope.$watch('currentTask', function() {
+  //       scope.$on('tasklist.task.current', function() {
+  //         if (
+  //           !$rootScope.currentTask ||
+  //           (scope.task && scope.task.id === $rootScope.currentTask.id)
+  //         ) {
+  //           return;
+  //         }
 
-        scope.elUID = camUID();
-
-        scope.labelsWidth = 3;
-        scope.fieldsWidth = 12 - scope.labelsWidth;
-
-        $rootScope.$watch('currentTask', function() {
-          if (!$rootScope.currentTask || (scope.task && scope.task.id === $rootScope.currentTask.id)) {
-            return;
-          }
-          scope.task = $rootScope.currentTask;
-          console.info('Current task is now, get the form', scope.task);
-          // scope.fields = camTaskFormData();
-        });
-      },
-      template: require('text!camunda-tasklist-ui/task/form.html')
-    };
-  }]);
-
-  taskModule.directive('camTasklistTaskHistory', [
-          'camAPI', '$rootScope',
-  function(camAPI,   $rootScope) {
-    return {
-      link: function(scope, element) {
-        scope.history = [];
-        scope.days = [];
-
-        $rootScope.$on('tasklist.task.current', function() {
-          // scope.history = camTaskHistoryData(null, null);
-          scope.history = [];
-          scope.now = new Date();
-          var days = {};
-          angular.forEach(scope.history, function(event) {
-            var mom = moment(event.timestamp, 'X');
-            var date = mom.format('DD-MMMM-YYYY');
-            var time = mom.format('HH:mm');
-            var parts = date.split('-');
-            days[date] = days[date] || {
-              date: {
-                day: parts[0],
-                month: parts[1],
-                year: parts[2]
-              },
-              events: {}
-            };
-            days[date].events[time] = days[date].events[time] || [];
-            days[date].events[time].push(event);
-          });
-          scope.days = days;
-        });
-      },
-      template: require('text!camunda-tasklist-ui/task/history.html')
-    };
-  }]);
+  //         scope.task = $rootScope.currentTask;
+  //         console.info('Current task is now, get the form', scope.task);
+  //         // scope.fields = camTaskFormData();
+  //       });
+  //     },
+  //     template: require('text!camunda-tasklist-ui/task/form.html')
+  //   };
+  // }]);
 
   return taskModule;
 });

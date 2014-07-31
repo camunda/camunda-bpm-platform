@@ -1,6 +1,6 @@
 'use strict';
-if (typeof define !== 'function') { var define = require('amdefine')(module); }
-/* jshint unused: false */
+
+
 define([
            'angular', 'angular-moment',
            'text!camunda-tasklist-ui/form/inline-field.html',

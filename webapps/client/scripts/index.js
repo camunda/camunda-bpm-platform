@@ -1,15 +1,12 @@
 'use strict';
-if (typeof define !== 'function') { var define = require('amdefine')(module); }
-/* jshint unused: false */
-define('camunda-tasklist-ui', [
- 'camunda-tasklist-ui/require-conf',
- 'camunda-tasklist-ui/utils'
-], function(
-  rjsConf,
-  utils
-) {
-  var tasklistConf = typeof window !== 'undefined' ? (window.tasklistConf || {}) : {};
 
+
+define('camunda-tasklist-ui', [
+  'camunda-tasklist-ui/require-conf',
+  'camunda-tasklist-ui/utils',
+], function(
+  rjsConf
+) {
   /**
    * @namespace cam
    */
@@ -20,12 +17,16 @@ define('camunda-tasklist-ui', [
 
   var tasklistApp;
 
+
   var appModules = rjsConf.shim['camunda-tasklist-ui'];
+
 
   var deps = [
     'angular',
     'text!camunda-tasklist-ui/index.html'
   ].concat(appModules);
+
+
 
   // converts AMD paths to angular module names
   // "camunda-tasklist-ui/pile" will be "cam.tasklist.pile"
@@ -37,6 +38,8 @@ define('camunda-tasklist-ui', [
     }
     return translated;
   }
+
+
 
   function loaded() {
     var angular = require('angular');
@@ -146,7 +149,13 @@ define('camunda-tasklist-ui', [
         })
       ;
     }]);
+
+    var notificationsPanel = require('camunda-commons-ui/directives/notificationsPanel');
+    tasklistApp.directive('notificationsPanel', notificationsPanel);
+
+    tasklistApp.config(require('camunda-tasklist-ui/config/uris'));
     tasklistApp.config(require('camunda-tasklist-ui/config/translations'));
+    tasklistApp.config(require('camunda-tasklist-ui/config/routes'));
 
     $(document).ready(function() {
       angular.bootstrap(document, ['cam.tasklist', 'cam.embedded.forms']);
@@ -159,12 +168,4 @@ define('camunda-tasklist-ui', [
 
   // and load the dependencies
   require(deps, loaded);
-
-  return {
-    deps:       deps,
-    appModules: appModules,
-    loaded:     loaded,
-    rj2ngNames: rj2ngNames,
-    rjsConf:    rjsConf
-  };
 });

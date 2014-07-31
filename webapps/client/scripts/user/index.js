@@ -1,19 +1,16 @@
 'use strict';
-if (typeof define !== 'function') { var define = require('amdefine')(module); }
+
 
 define([
   'angular',
   'camunda-commons-ui/auth',
   'camunda-tasklist-ui/api',
 
-  'camunda-commons-ui/directives/notificationsPanel',
-
   'text!camunda-tasklist-ui/user/login.html'
 ], function(
   angular,
   auth,
-  api,
-  notificationsPanel
+  api
 ) {
 
   /**
@@ -30,8 +27,6 @@ define([
     'ui.bootstrap',
     'cam.form'
   ]);
-
-  userModule.directive('notificationsPanel', notificationsPanel);
 
   /**
    * Controller used for the /login route

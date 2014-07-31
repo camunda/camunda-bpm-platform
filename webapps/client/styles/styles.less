@@ -26,6 +26,9 @@
 @navbar-default-link-active-color:  @navbar-default-color;
 @navbar-default-link-active-bg:     @brand-primary;
 
+@modal-header-bg:                   lighten(@gray-lighter, 3%);
+@modal-footer-bg:                   @modal-header-bg;
+
 @icon-font-path: '../fonts/bootstrap/';
 
 @font-face {
@@ -229,7 +232,6 @@ strong {
 @import "../scripts/pile/styles";
 @import "../scripts/task/styles";
 @import "../scripts/navigation/styles";
-@import "../scripts/notifier/styles";
 
 
 .task-group {
@@ -270,14 +272,15 @@ strong {
 .modal-header,
 .modal-footer {
   margin: 0;
-  background-color: lighten(@gray-lighter, 3%);
 }
 
 .modal-header {
   border-bottom: 1px solid @gray-lighter;
+  background: @modal-header-bg;
 }
 .modal-footer {
   border-top: 1px solid @gray-lighter;
+  background: @modal-footer-bg;
 }
 
 
