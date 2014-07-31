@@ -12,6 +12,8 @@
  */
 package org.camunda.spin.impl.xml.dom;
 
+import org.camunda.spin.logging.SpinCoreLogger;
+import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.Configurable;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatMapper;
@@ -27,6 +29,8 @@ import org.w3c.dom.Element;
  *
  */
 public class XmlDomDataFormat implements DataFormat<SpinXmlTreeElement> {
+
+  protected final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
   public final static XmlDomDataFormat INSTANCE = new XmlDomDataFormat();
 
@@ -63,15 +67,15 @@ public class XmlDomDataFormat implements DataFormat<SpinXmlTreeElement> {
   }
   
   public DataFormatMapper getMapper() {
-    throw new UnsupportedOperationException("not implemented");
+    throw LOG.methodNotImplement("getMapper");
   }
 
   public String getCanonicalTypeName(Object object) {
-    throw new UnsupportedOperationException("not implemented");
+    throw LOG.methodNotImplement("getCanonicalTypeName");
   }
 
   public void addTypeDetector(TypeDetector typeDetector) {
-    throw new UnsupportedOperationException("not implemented");
+    throw LOG.methodNotImplement("addTypeDetector");
   }
 
 }

@@ -85,4 +85,8 @@ public class SpinCoreLogger extends SpinLogger {
   public IOException unableToRewindInputStream() {
     return new IOException(exceptionMessage("013", "Unable to rewind input stream: rewind buffering limit exceeded"));
   }
+
+  public UnsupportedOperationException methodNotImplement(String methodName) {
+    return new UnsupportedOperationException(exceptionMessage("014", "Method '{}' not implemented", methodName));
+  }
 }

@@ -13,6 +13,8 @@
 package org.camunda.spin.xml.tree;
 
 import org.camunda.spin.Spin;
+import org.camunda.spin.logging.SpinCoreLogger;
+import org.camunda.spin.logging.SpinLogger;
 
 /**
  * An element in a tree-oriented XML data format.
@@ -22,6 +24,8 @@ import org.camunda.spin.Spin;
  *
  */
 public abstract class SpinXmlTreeNode<T extends SpinXmlTreeNode<?>> extends Spin<T> {
+
+  protected static final SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
   /**
    * Returns the local name of the node without namespace or prefix.
@@ -46,11 +50,11 @@ public abstract class SpinXmlTreeNode<T extends SpinXmlTreeNode<?>> extends Spin
   public abstract boolean hasNamespace(String namespace);
   
   public <C> C mapTo(Class<C> type) {
-    throw new UnsupportedOperationException("not yet implemented");
+   throw LOG.methodNotImplement("mapTo");
   }
   
   public <C> C mapTo(String type) {
-    throw new UnsupportedOperationException("not yet implemented");
+    throw LOG.methodNotImplement("mapTo");
   }
   
 }
