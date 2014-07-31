@@ -48,9 +48,12 @@ module.exports = function(grunt) {
 
     changelog:        require('camunda-commons-ui/grunt/config/changelog')(config),
 
+    localescompile:   require('camunda-commons-ui/grunt/config/localescompile')(config),
+
     clean:            require('camunda-commons-ui/grunt/config/clean')(config)
   });
 
+  require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);
 
   grunt.registerTask('build', function(mode) {
     mode = mode || 'prod';
@@ -72,6 +75,7 @@ module.exports = function(grunt) {
       'bower',
       'copy',
       'less',
+      'localescompile',
       'requirejs'
     ];
 

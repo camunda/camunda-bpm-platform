@@ -1,12 +1,12 @@
 module.exports = function(config) {
+  'use strict';
   var grunt = config.grunt;
   var productionRemoveExp = /<!-- #production-remove.*\/production-remove -->/igm;
   var prod = grunt.option('target') === 'dist';
 
 
-  function productionRemove(content, srcpath) {
+  function productionRemove(content) {
     if (!prod) { return content; }
-
     grunt.log.writeln('Removing development snippets');
     return content.replace(productionRemoveExp, '');
   }
@@ -28,9 +28,14 @@ module.exports = function(config) {
     var tasklistConf = 'var tasklistConf = '+ JSON.stringify({
       apiUri: '/camunda/api/engine',
       mock: true,
+
       // overrides the settings above
       resources: {
         'process-definition': {
+          mock: false
+        },
+
+        'task': {
           mock: false
         }
       }
@@ -103,9 +108,27 @@ module.exports = function(config) {
       files: [
         {
           expand: true,
+          cwd: 'node_modules/camunda-commons-ui',
+          src: [
+            'lib/**/*.js',
+            'lib/*.js',
+            // 'resources/locales/**/*.json',
+            // 'resources/locales/*.json'
+          ],
+          dest: '<%= buildTarget %>/vendor/camunda-commons-ui'
+        },
+        {
+          expand: true,
           cwd: 'node_modules/camunda-bpm-sdk-js/dist',
           src: ['**/*.js'],
           dest: '<%= pkg.gruntConfig.clientDir %>/vendor/'
+        // },
+        // {
+        //   expand: true,
+        //   cwd: 'node_modules/camunda-bpm-sdk-js/dist',
+        //   src: ['**/*.js'],
+        //   // dest: '<%= pkg.gruntConfig.clientDir %>/vendor/'
+        //   dest: '<%= buildTarget %>/vendor/'
         }
       ]
     }

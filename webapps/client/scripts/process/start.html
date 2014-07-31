@@ -6,7 +6,7 @@
   <div class="modal-header">
     <div class="row">
       <div class="col-xs-6">
-        <h3 class="modal-title">Start a process</h3>
+        <h3 class="modal-title" translate="START_PROCESS">Start a process</h3>
       </div>
 
       <div class="col-xs-6">
@@ -14,8 +14,8 @@
              ng-if="!startingProcess">
           <input type="text"
                  ng-model="searchProcess"
-                 placeholder="Process name"
-                 tooltip="Search by process name, case sensitive."
+                 placeholder="{{ 'PROCESS_NAME' | translate }}"
+                 tooltip="{{ 'SEARCH_PROCESS_BY_NAME' | translate }}"
                  tooltip-placement="left"
                  typeahead="process.name for process in lookupProcess($viewValue)"
                  typeahead-loading="loadingProcesses"
@@ -40,7 +40,7 @@
          class="available-processes">
       <div class="text-help">
         <i class="glyphicon glyphicon-info-sign"></i>
-        Click on the process to start.
+        {{ 'CLICK_PROCESS_TO_START' | translate }}
       </div>
 
       <ul class="processes">
@@ -71,20 +71,20 @@
             <input required
                    type="text"
                    class="form-control"
-                   placeholder="Variable name"
+                   placeholder="{{ 'VARIABLE_NAME' | translate }}"
                    ng-model="variable.name" />
           </div>
 
           <div class="col-xs-3">
             <select required
                     class="form-control"
-                    placeholder="Variable name"
+                    placeholder="{{ 'VARIABLE_TYPE' | translate }}"
                     ng-model="variable.type">
 
-              <option disabled value="">Type</options>
+              <option disabled value="" translate="TYPE">Type</options>
 
               <option ng-repeat="(type, inputType) in variableTypes"
-                      value="{{ type }}">{{ type }}</option>
+                      value="{{ type }}">{{ type | translate }}</option>
             </select>
           </div>
 
@@ -111,7 +111,7 @@
                      required
                      type="{{ variableTypes[variable.type] }}"
                      class="form-control"
-                     placeholder="Value"
+                     placeholder="{{ 'VALUE' | translate }}"
                      ng-model="variable.value" />
             </div>
           </div>
@@ -150,7 +150,8 @@
         <div class="col-xs-4">
           <button class="btn btn-xs btn-link"
                   type="button"
-                  ng-click="close()">Cancel</button>
+                  ng-click="close()"
+                  translate="CANCEL">Cancel</button>
         </div>
       </div>
     </div>
@@ -158,12 +159,14 @@
     <div ng-if="startingProcess">
       <button class="btn btn-xs btn-link"
               type="button"
-              ng-click="showList()">Back</button>
+              ng-click="showList()"
+              translate="BACK">Back</button>
 
       <button class="btn btn-primary"
               type="submit"
               ng-disabled="$invalid"
-              ng-click="startProcess()">Start</button>
+              ng-click="startProcess()"
+              translate="START">Start</button>
     </div>
   </div>
 </form>

@@ -1,0 +1,18 @@
+{
+  "PROCESS_NAME":
+                        "Process name",
+  "SEARCH_PROCESS_BY_NAME":
+                        "Search by process name, case sensitive.",
+  "START_PROCESS":
+                        "Start a process",
+  "CLICK_PROCESS_TO_START":
+                        "Click on the process to start.",
+  "VARIABLE_NAME":
+                        "Variable name",
+  "TYPE":
+                        "Type",
+  "VALUE":
+                        "Value",
+  "VARIABLE_TYPE":
+                        "Variable type"
+}

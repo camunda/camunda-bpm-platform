@@ -1,0 +1,14 @@
+{
+  "LOGGED_IN":
+                        "Vous êtes maintenant authentifié.",
+  "CREDENTIALS_ERROR":
+                        "Impossible de vous authentifier avec ces informations.",
+  "USERNAME":
+                        "Nom d'utilisateur",
+  "PASSWORD":
+                        "Mot de passe",
+  "LOGIN":
+                        "Authentification",
+  "LOGIN_ACTION":
+                        "S'authentifier"
+}

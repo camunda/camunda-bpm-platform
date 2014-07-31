@@ -1,10 +1,10 @@
 <form role="form"
-      name="userLogin"
+      name="signinForm"
       ng-controller="userLoginModalFormCtrl"
-      ng-submit="submitForm(userLogin)">
+      ng-submit="submitForm(signinForm)">
 
   <div class="modal-header">
-    <h3 class="modal-title">camunda Tasklist | Login</h3>
+    <h3 class="modal-title">camunda Tasklist | {{ 'LOGIN' | translate }}</h3>
   </div>
 
   <div class="modal-body">
@@ -14,25 +14,27 @@
         <div notifications-panel class="notifications-panel"></div>
 
         <div class="form-group">
-          <!-- <label for="userLoginInputUsername">User name</label> -->
+          <!-- <label for="signinFormInputUsername">User name</label> -->
           <input required
                  ng-model="username"
                  name="username"
                  type="text"
                  class="form-control"
-                 id="userLoginInputUsername"
-                 placeholder="User name">
+                 id="signinFormInputUsername"
+                 placeholder="{{ 'USERNAME' | translate }}"
+                 auto-fill>
         </div>
 
         <div class="form-group">
-          <!-- <label for="userLoginInputPassword">Password</label> -->
+          <!-- <label for="signinFormInputPassword">Password</label> -->
           <input required
                  ng-model="password"
                  name="password"
                  type="password"
                  class="form-control"
-                 id="userLoginInputPassword"
-                 placeholder="Password">
+                 id="signinFormInputPassword"
+                 placeholder="{{ 'PASSWORD' | translate }}"
+                 auto-fill>
         </div>
 
 
@@ -66,7 +68,8 @@
  -->
     <button class="btn btn-primary"
             type="submit"
-            ng-disabled="userLogin.$invalid"
-            ng-click="ok()">Login</button>
+            ng-disabled="signinForm.$invalid"
+            ng-click="ok()"
+            translate="LOGIN_ACTION">Login</button>
   </div>
 </form>

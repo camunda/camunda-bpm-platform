@@ -146,6 +146,7 @@ define('camunda-tasklist-ui', [
         })
       ;
     }]);
+    tasklistApp.config(require('camunda-tasklist-ui/config/translations'));
 
     $(document).ready(function() {
       angular.bootstrap(document, ['cam.tasklist', 'cam.embedded.forms']);
