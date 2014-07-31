@@ -1,5 +1,5 @@
 module.exports = function(config) {
-
+  'use strict';
   return {
     options: {
       livereload: false
