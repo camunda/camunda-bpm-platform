@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.spin.SpinSerializationType;
+import org.camunda.bpm.engine.impl.spin.SpinVariableTypeResolver;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.variable.SerializableType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.DummySerializable;
 import org.camunda.spin.DataFormats;
+import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -226,6 +228,22 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     Object returnedBean = variableInstance.getValue();
     Object theSameReturnedBean = variableInstance.getValue();
     assertSame(returnedBean, theSameReturnedBean);
+  }
+
+  public void testApplicationOfGlobalConfiguration() throws JSONException {
+    DataFormats.jsonTreeFormat().mapper().config("aKey", "aValue");
+
+    SpinVariableTypeResolver resolver = new SpinVariableTypeResolver();
+    SpinSerializationType variableType = (SpinSerializationType) resolver.getTypeForSerializationFormat(JSON_FORMAT_NAME);
+
+    DataFormats.jsonTreeFormat().mapper().config("aKey", null);
+
+    JsonJacksonTreeDataFormat dataFormat = (JsonJacksonTreeDataFormat) variableType.getDataFormat();
+    assertNotSame("The variable type should not use the global data format instance",
+        DataFormats.jsonTreeFormat(), dataFormat);
+
+    assertEquals("The global configuration should have been applied to the variable type's format",
+        "aValue", dataFormat.mapper().getConfiguration().get("aKey"));
   }
 
   protected void assertListsEqual(List<SimpleBean> expectedBeans, List<SimpleBean> actualBeans) {

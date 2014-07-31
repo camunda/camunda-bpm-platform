@@ -110,4 +110,8 @@ public class SpinSerializationType implements VariableType {
     return value;
   }
 
+  public DataFormat<?> getDataFormat() {
+    return dataFormat;
+  }
+
 }
