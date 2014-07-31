@@ -38,23 +38,23 @@
                 <configuration>
                   <tasks>
                     <!-- run node build -->
-                    <exec executable="cmd">
+                    <exec executable="cmd" failonerror="true">
                       <arg value="/c" />
                       <arg value="npm" />
                       <arg value="install" />
                     </exec>
-                    <exec executable="cmd">
+                    <exec executable="cmd" failonerror="true">
                       <arg value="/c" />
                       <arg value="node_modules\.bin\bower.cmd" />
                       <arg value="install" />
                     </exec>
-                    <exec executable="cmd">
+                    <exec executable="cmd" failonerror="true">
                       <arg value="/c" />
                       <arg value="node_modules\.bin\grunt.cmd" />
                       <arg value="jasmine_node" />
                       <arg value="--color=false" />
                     </exec>
-                    <exec executable="cmd">
+                    <exec executable="cmd" failonerror="true">
                       <arg value="/c" />
                       <arg value="node_modules\.bin\grunt.cmd" />
                       <arg value="build:prod" />
@@ -92,17 +92,17 @@
                 <configuration>
                   <tasks>
                     <!-- run node build -->
-                    <exec executable="npm">
+                    <exec executable="npm" failonerror="true">
                       <arg value="install" />
                     </exec>
-                    <exec executable="./node_modules/bower/bin/bower">
+                    <exec executable="./node_modules/bower/bin/bower" failonerror="true">
                       <arg value="install" />
                     </exec>
-                    <exec executable="./node_modules/grunt-cli/bin/grunt">
+                    <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true">
                       <arg value="jasmine_node" />
                       <arg value="--color=false" />
                     </exec>
-                    <exec executable="./node_modules/grunt-cli/bin/grunt">
+                    <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true">
                       <arg value="build:prod" />
                       <arg value="--color=false" />
                     </exec>
