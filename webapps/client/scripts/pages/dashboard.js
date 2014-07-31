@@ -22,13 +22,11 @@ define(['angular'], function(angular) {
     ].join(' | '));
   }];
 
-  var RouteConfig = [ '$routeProvider', 'AuthenticationServiceProvider', function($routeProvider, AuthenticationServiceProvider) {
+  var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/dashboard', {
       templateUrl: require.toUrl('./pages/dashboard.html'),
       controller: Controller,
-      resolve: {
-        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser
-      }
+      authentication: 'required'
     });
   }];
 

@@ -597,10 +597,8 @@ ngDefine('cockpit.pages.processDefinition', [
 
   var RouteConfig = [
     '$routeProvider',
-    'AuthenticationServiceProvider',
   function(
-    $routeProvider,
-    AuthenticationServiceProvider
+    $routeProvider
   ) {
 
     $routeProvider
@@ -611,8 +609,8 @@ ngDefine('cockpit.pages.processDefinition', [
       templateUrl: require.toUrl('./pages/process-definition.html'),
 
       controller: Controller,
+      authentication: 'required',
       resolve: {
-        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
         processDefinition: [ 'ResourceResolver', 'ProcessDefinitionResource',
           function(ResourceResolver, ProcessDefinitionResource) {
             return ResourceResolver.getByRouteParam('id', {

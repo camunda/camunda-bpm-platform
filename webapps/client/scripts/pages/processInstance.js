@@ -628,8 +628,8 @@ ngDefine('cockpit.pages.processInstance', [
   }]);
 
   var RouteConfig = [
-          '$routeProvider', 'AuthenticationServiceProvider',
-  function($routeProvider,   AuthenticationServiceProvider) {
+          '$routeProvider',
+  function($routeProvider) {
 
     $routeProvider.when('/process-instance/:id', {
       redirectTo: routeUtil.redirectToRuntime
@@ -638,8 +638,8 @@ ngDefine('cockpit.pages.processInstance', [
     $routeProvider.when('/process-instance/:id/runtime', {
       templateUrl: require.toUrl('./pages/process-instance.html'),
       controller: Controller,
+      authentication: 'required',
       resolve: {
-        authenticatedUser: AuthenticationServiceProvider.requireAuthenticatedUser,
         processInstance: [
                 'ResourceResolver', 'ProcessInstanceResource',
         function(ResourceResolver,   ProcessInstanceResource) {
