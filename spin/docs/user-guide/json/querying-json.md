@@ -1,6 +1,6 @@
 # Querying Json
 
-The Json datatype supports querying with the JsonPath query language.
+The Json datatype supports querying with the [JsonPath][json-path] query language.
 
 ## Querying an element
 
@@ -39,7 +39,7 @@ import static org.camunda.spin.Spin.JSON;
 
 String json = "{\"child\": [{\"id\": 1,\"name\": \"Lucy\",\"sex\": \"female\"},{\"id\": 2,\"name\": \"Tracy\",\"sex\": \"female\"}],\"number\": 1,\"boolean\": true}";
 
-Double count = JSON(json).jsonPath("$.number)").number();
+Double count = JSON(json).jsonPath("$.number").number();
 ```
 
 ## Querying a Boolean
@@ -61,5 +61,7 @@ import static org.camunda.spin.Spin.JSON;
 
 String json = "{\"child\": [{\"id\": 1,\"name\": \"Lucy\",\"sex\": \"female\"},{\"id\": 2,\"name\": \"Tracy\",\"sex\": \"female\"}],\"number\": 1,\"boolean\": true}";
 
-Boolean exists = JSON(json).jsonPath("$.child[?(@.sex == 'female').elementList();
+Boolean exists = JSON(json).jsonPath("$.child[?(@.sex == 'female'").elementList();
 ```
+
+[json-path]: http://goessner.net/articles/JsonPath/

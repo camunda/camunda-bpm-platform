@@ -13,5 +13,6 @@ Spin supports various usecases for handling Json:
 
 [reading-json]: reading-json.md
 [writing-json]: writing-json.md
+[querying-json]: querying-json.md
 [mapping-json]: mapping-json.md
 [configuring-json]: configuring-json.md
