@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.spin;
 import java.io.UnsupportedEncodingException;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
@@ -27,9 +28,6 @@ public class SpinSerializationType implements VariableType {
 
   public static final String TYPE_NAME = "SpinSerialization";
 
-  // TODO: is this the best place for this constant?
-  protected static final int TEXT_FIELD_LENGTH = 4000;
-
   protected DataFormat<?> dataFormat;
 
   public SpinSerializationType(DataFormat<?> dataFormat) {
@@ -41,7 +39,7 @@ public class SpinSerializationType implements VariableType {
   }
 
   public String getTypeNameForValue(Object value) {
-    return dataFormat.getCanonicalTypeName(value);
+    return "Object";
   }
 
   public boolean isCachable() {
@@ -58,7 +56,7 @@ public class SpinSerializationType implements VariableType {
 
       String serializedVariable = spin.toString();
 
-      if (serializedVariable.getBytes().length <= TEXT_FIELD_LENGTH) {
+      if (serializedVariable.getBytes().length <= DbSqlSessionFactory.ACT_RU_VARIABLE_TEXT_LENGTH) {
         valueFields.setTextValue(spin.toString());
       } else {
         valueFields.setByteArrayValue(serializedVariable.getBytes());

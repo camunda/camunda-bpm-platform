@@ -29,6 +29,8 @@ import org.camunda.bpm.engine.impl.util.ClassNameUtil;
  */
 public class DbSqlSessionFactory implements SessionFactory {
 
+  public static final int ACT_RU_VARIABLE_TEXT_LENGTH = 4000;
+
   private static final String MSSQL = "mssql";
   private static final String DB2 = "db2";
   private static final String ORACLE = "oracle";
