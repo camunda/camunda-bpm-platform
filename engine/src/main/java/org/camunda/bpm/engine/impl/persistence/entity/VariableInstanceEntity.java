@@ -364,14 +364,6 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
     this.dataFormatId = dataFormatId;
   }
 
-  public String getConfiguration() {
-    return configuration;
-  }
-
-  public void setConfiguration(String configuration) {
-    this.configuration = configuration;
-  }
-
   public String getVariableScope() {
     if (taskId != null) {
       return taskId;

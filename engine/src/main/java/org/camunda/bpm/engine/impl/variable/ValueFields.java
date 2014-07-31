@@ -45,7 +45,4 @@ public interface ValueFields {
   String getDataFormatId();
   void setDataFormatId(String dataFormatId);
 
-  String getConfiguration();
-  void setConfiguration(String configuration);
-
 }

@@ -157,8 +157,7 @@ create table ACT_RU_VARIABLE (
     TEXT_ nvarchar(4000),
     TEXT2_ nvarchar(4000),
     VAR_SCOPE_ nvarchar(64) not null,
-    DATA_FORMAT_ID_ nvarchar(255),
-    CONFIGURATION_ nvarchar(255),
+    DATA_FORMAT_ID_ nvarchar(64),
     primary key (ID_)
 );
 

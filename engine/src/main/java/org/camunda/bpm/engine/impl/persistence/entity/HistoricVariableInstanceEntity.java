@@ -57,7 +57,6 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   protected String errorMessage;
 
   protected String dataFormatId;
-  protected String configuration;
 
 
   public HistoricVariableInstanceEntity() {
@@ -80,7 +79,6 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.textValue = historyEvent.getTextValue();
     this.textValue2 = historyEvent.getTextValue2();
     this.dataFormatId = historyEvent.getDataFormatId();
-    this.configuration = historyEvent.getConfiguration();
 
     deleteByteArrayValue();
     if(historyEvent.getByteValue() != null) {
@@ -338,14 +336,6 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   public void setDataFormatId(String dataFormatId) {
     this.dataFormatId = dataFormatId;
-  }
-
-  public String getConfiguration() {
-    return configuration;
-  }
-
-  public void setConfiguration(String configuration) {
-    this.configuration = configuration;
   }
 
   public Object getRawValue() {

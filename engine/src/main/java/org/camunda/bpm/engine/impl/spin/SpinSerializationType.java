@@ -63,7 +63,7 @@ public class SpinSerializationType implements VariableType {
       }
 
       valueFields.setDataFormatId(dataFormat.getName());
-      valueFields.setConfiguration(dataFormat.getCanonicalTypeName(value));
+      valueFields.setTextValue2(dataFormat.getCanonicalTypeName(value));
     } catch (SpinRuntimeException e) {
       throw new ProcessEngineException("Cannot serialize object of type " + value.getClass() + ": " + value, e);
     }
@@ -83,13 +83,13 @@ public class SpinSerializationType implements VariableType {
       }
 
       Spin<?> spinNode = SpinFactory.getInstance().createSpinFromString(variableValue, dataFormat);
-      Object value = spinNode.mapTo(valueFields.getConfiguration());
+      Object value = spinNode.mapTo(valueFields.getTextValue2());
       return value;
 
     } catch (SpinRuntimeException e) {
       throw new ProcessEngineException(
           "Cannot deserialize variable '" + valueFields.getName() + "' of format '" +
-          valueFields.getDataFormatId() + "' with configuration '" + valueFields.getConfiguration() + "'");
+          valueFields.getDataFormatId() + "' with configuration '" + valueFields.getTextValue2() + "'");
     }
   }
 

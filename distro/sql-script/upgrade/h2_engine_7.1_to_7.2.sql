@@ -126,9 +126,7 @@ alter table ACT_RU_TASK
   
 -- add data format configuration fields
 ALTER TABLE ACT_RU_VARIABLE
-  ADD (DATA_FORMAT_ID_ varchar(255),
-  CONFIGURATION_ varchar(255));
+  ADD DATA_FORMAT_ID_ varchar(64);
   
 ALTER TABLE ACT_HI_VARINST
-  ADD (DATA_FORMAT_ID_ varchar(255),
-  CONFIGURATION_ varchar(255));
+  ADD DATA_FORMAT_ID_ varchar(64);
