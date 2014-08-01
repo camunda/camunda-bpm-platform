@@ -17,8 +17,8 @@
      ng-if="!!totalItems">
   <input type="text"
          ng-model="searchTask"
-         placeholder="Task name"
-         tooltip="Search by task name, case sensitive."
+         placeholder="{{ 'TASK_NAME' | translate }}"
+         tooltip="{{ 'SEARCH_TASK_BY_NAME' | translate }}"
          tooltip-placement="top"
          typeahead="filteredTask.name for filteredTask in lookupTask($viewValue)"
          typeahead-loading="loadingTasks"
@@ -37,11 +37,11 @@
 <div ng-show="loading"
      class="loader">
   <i class="animate-spin glyphicon glyphicon-refresh"></i>
-  Loading...
+  {{ 'LOADING' | translate }}
 </div>
 
 <div ng-hide="loading">
-  <div ng-hide="totalItems" class="no-match">
+  <div ng-hide="totalItems" class="no-match" translate="NO_MATCHING_TASK">
     No task macthing filters found.
   </div>
 
@@ -60,7 +60,7 @@
           </li>
           <li data-toggle="tooltip"
               data-placement="top"
-              title="Follow-up date"
+              title="{{ 'FOLLOW_UP_DATE' | translate }}"
               class="followup-date"
               ng-class="(task.followUp < now ? 'overdue' : '')">
             <span class="glyphicon glyphicon-bell"></span>
@@ -70,7 +70,7 @@
           </li>
           <li data-toggle="tooltip"
               data-placement="top"
-              title="Due date"
+              title="{{ 'DUE_DATE' | translate }}"
               class="due-date"
               ng-class="(task.due < now ? 'overdue' : '')">
             <span class="glyphicon glyphicon-calendar"></span>
@@ -82,7 +82,7 @@
           <!--
           <li data-toggle="tooltip"
               data-placement="top"
-              title="Assignee"
+              title="{{ 'ASSIGNEE' | translate }}"
               class="assignee">
             <span class="glyphicon glyphicon-user"></span>
             <span cam-form-inline-field value="task.assignee">
@@ -91,7 +91,7 @@
           </li>
           <li data-toggle="tooltip"
               data-placement="top"
-              title="Owner"
+              title="{{ 'OWNER' | translate }}"
               class="owner">
             <span class="glyphicon glyphicon-certificate"></span>
             <span cam-form-inline-field value="task.owner">

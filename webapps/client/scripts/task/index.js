@@ -37,42 +37,5 @@ define([
 
   taskModule.directive('camTasklistTaskHistory', taskHistoryDirective);
 
-  // // should be moved to the form module...
-  // taskModule.directive('camTasklistTaskForm', [
-  //   'camAPI',
-  //   '$rootScope',
-  //   'camUID',
-  // function(
-  //   camAPI,
-  //   $rootScope,
-  //   camUID
-  // ) {
-  //   return {
-  //     link: function(scope) {
-  //       scope.task = scope.task || $rootScope.currentTask;
-
-  //       scope.elUID = camUID();
-
-  //       scope.labelsWidth = 3;
-  //       scope.fieldsWidth = 12 - scope.labelsWidth;
-
-  //       // scope.$watch('currentTask', function() {
-  //       scope.$on('tasklist.task.current', function() {
-  //         if (
-  //           !$rootScope.currentTask ||
-  //           (scope.task && scope.task.id === $rootScope.currentTask.id)
-  //         ) {
-  //           return;
-  //         }
-
-  //         scope.task = $rootScope.currentTask;
-  //         console.info('Current task is now, get the form', scope.task);
-  //         // scope.fields = camTaskFormData();
-  //       });
-  //     },
-  //     template: require('text!camunda-tasklist-ui/task/form.html')
-  //   };
-  // }]);
-
   return taskModule;
 });
