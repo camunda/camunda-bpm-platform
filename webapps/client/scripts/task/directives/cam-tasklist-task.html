@@ -1,6 +1,7 @@
 <div ng-hide="!!task && task.name">
   <div class="no-task well">
-    <i class="glyphicon glyphicon-info-sign"></i> Select a task in the list.
+    <i class="glyphicon glyphicon-info-sign"></i>
+    {{ 'SELECT_TASK_IN_LIST' | translate }}
   </div>
 </div>
 <section ng-show="!!task && task.name"
@@ -28,7 +29,7 @@
       <ul class="meta list-inline">
         <li data-toggle="tooltip"
             data-placement="top"
-            title="Follow-up date"
+            title="{{ 'FOLLOW_UP_DATE' | translate }}"
             class="followup-date"
             ng-class="(task.followUp < now ? 'overdue' : '')">
           <span class="glyphicon glyphicon-bell"></span>
@@ -39,7 +40,7 @@
         </li>
         <li data-toggle="tooltip"
             data-placement="top"
-            title="Due date"
+            title="{{ 'DUE_DATE' | translate }}"
             class="due-date"
             ng-class="(task.due < now ? 'overdue' : '')">
           <span class="glyphicon glyphicon-calendar"></span>
@@ -51,7 +52,7 @@
 
         <li data-toggle="tooltip"
             data-placement="top"
-            title="Assignee"
+            title="{{ 'ASSIGNEE' | translate }}"
             class="assignee">
           <span class="glyphicon glyphicon-user"></span>
           <span cam-form-inline-field
@@ -61,7 +62,7 @@
         </li>
         <li data-toggle="tooltip"
             data-placement="top"
-            title="Owner"
+            title="{{ 'OWNER' | translate }}"
             class="owner">
           <span class="glyphicon glyphicon-certificate"></span>
           <span cam-form-inline-field
@@ -76,24 +77,24 @@
   <div class="row tabbed-content">
     <div class="col-xs-12">
       <tabset>
-        <tab heading="Form">
+        <tab heading="{{ 'FORM' | translate }}">
           <div class="tab-pane"
              cam-tasklist-task-form
              task="task"></div>
         </tab>
 
-        <tab heading="Description">
+        <tab heading="{{ 'DESCRIPTION' | translate }}">
           <div class="tab-pane">{{ task.description }}</div>
         </tab>
 
-        <tab heading="History">
+        <tab heading="{{ 'HISTORY' | translate }}">
           <div class="tab-pane"
              cam-tasklist-task-history
              history="history">
           </div>
         </tab>
 
-        <tab heading="Diagram">
+        <tab heading="{{ 'DIAGRAM' | translate }}">
           <div class="tab-pane">TODO</div>
         </tab>
       </tabset>

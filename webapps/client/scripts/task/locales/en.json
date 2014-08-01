@@ -1,1 +1,24 @@
-{}
+{
+  "TASK_NAME":
+        "Task name",
+  "SEARCH_BY_TASK_NAME":
+        "Search by task name, case sensitive.",
+  "FOLLOW_UP_DATE":
+        "Follow-up date",
+  "DUE_DATE":
+        "Due date",
+  "ASSIGNEE":
+        "Assignee",
+  "OWNER":
+        "Owner",
+  "DIAGRAM":
+        "Diagram",
+  "FORM":
+        "Form",
+  "HISTORY":
+        "History",
+  "DESCRIPTION":
+        "Description",
+  "SELECT_TASK_IN_LIST":
+        "Select a task in the list."
+}
