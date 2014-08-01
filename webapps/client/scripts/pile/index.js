@@ -110,8 +110,6 @@ define([
     };
 
     $scope.abort = $modalInstance.dismiss;
-
-    console.info('Hello from the modal instance controller', $modalInstance, $scope);
   }]);
 
 
@@ -130,11 +128,6 @@ define([
         template: require('text!camunda-tasklist-ui/pile/form.html'),
 
         controller: 'pileCreateModalCtrl'
-      // })
-      // .result.then(function(result) {
-      //   console.info('modalInstance created', result);
-      // }, function(reason) {
-      //   console.info('modalInstance aborted', reason);
       });
     };
   }]);
@@ -245,12 +238,14 @@ define([
     '$modal',
     '$rootScope',
     '$timeout',
+    '$q',
     'camTasklistPileFilterConversion',
     'camAPI',
   function(
     $modal,
     $rootScope,
     $timeout,
+    $q,
     camTasklistPileFilterConversion,
     camAPI
   ) {
@@ -263,11 +258,49 @@ define([
 
         scope.now = new Date();
 
-        scope.loading = true;
+        scope.loading = false;
 
         scope.tasks = scope.tasks || [];
 
         scope.pile = scope.pile || $rootScope.currentPile;
+
+        scope.searchTask = '';
+
+
+        scope.lookupTask = function(val) {
+          var deferred = $q.defer();
+
+          scope.loading = true;
+
+          var where = {};
+          angular.forEach(scope.pile.filters, function(pair) {
+            where[pair.key] = camTasklistPileFilterConversion(pair.value);
+          });
+          where.firstResult = (scope.pageNum - 1) * scope.pageSize;
+          where.maxResults = scope.pageSize;
+          where.nameLike = '%'+ val +'%';
+
+          Task.list(where, function(err, res) {
+            scope.loading = false;
+
+            if (err) {
+              return deferred.reject(err);
+            }
+
+            deferred.resolve(res._embedded.tasks);
+          });
+
+          return deferred.promise;
+        };
+
+
+        scope.selectedTask = function($item) {
+          console.info('scope', scope);
+          $rootScope.currentTask = $item;
+          $rootScope.$broadcast('tasklist.task.current');
+          scope.searchTask = '';
+        };
+
 
         function loadItems() {
           scope.loading = true;
@@ -297,18 +330,20 @@ define([
 
 
         scope.focus = function(delta) {
-          console.info('task clicked', delta);
           $rootScope.currentTask = scope.tasks[delta];
           $rootScope.$broadcast('tasklist.task.current');
         };
 
 
-        scope.batchOperationSelect = function() {
-          console.info('selected task', this);
-        };
+        // scope.batchOperationSelect = function() {
+        //   console.info('selected task', this);
+        // };
 
-        $rootScope.$watch('currentPile', function() {
-          if (!$rootScope.currentPile || (scope.pile && (scope.pile.id === $rootScope.currentPile.id))) {
+        scope.$on('tasklist.pile.current', function() {
+          if (
+            !$rootScope.currentPile ||
+            (scope.pile && (scope.pile.id === $rootScope.currentPile.id))
+          ) {
             return;
           }
           scope.pile = $rootScope.currentPile;
