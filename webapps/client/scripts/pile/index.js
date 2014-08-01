@@ -15,15 +15,19 @@ define([
   'require',
   'angular',
   'moment',
+  './directives/cam-tasklist-pile',
+  './directives/cam-tasklist-piles',
+  './directives/cam-tasklist-tasks',
   'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api',
-  'text!camunda-tasklist-ui/pile/form.html',
-  'text!camunda-tasklist-ui/pile/list.html',
-  'text!camunda-tasklist-ui/pile/details.html',
-  'text!camunda-tasklist-ui/pile/tasks.html'
+  'text!./form.html'
 ], function(
   require,
-  angular
+  angular,
+  moment,
+  camTasklistPile,
+  camTasklistPiles,
+  camTasklistPileTasks
 ) {
 
   var pileModule = angular.module('cam.tasklist.pile', [
@@ -125,7 +129,7 @@ define([
 
         size: 'lg',
 
-        template: require('text!camunda-tasklist-ui/pile/form.html'),
+        template: require('text!./form.html'),
 
         controller: 'pileCreateModalCtrl'
       });
@@ -138,222 +142,11 @@ define([
 
 
 
-  pileModule.directive('camTasklistPile', [
-          '$modal', '$rootScope',
-  function($modal,   $rootScope) {
-    return {
-      link: function(scope, element) {
-        scope.focus = function() {
-          element
-            .parent()
-              .find('.task-pile')
-                .removeClass('active')
-          ;
-          element
-            .addClass('active')
-            .find('.task-pile')
-              .addClass('active')
-          ;
+  pileModule.directive('camTasklistPile', camTasklistPile);
 
-          $rootScope.currentPile = scope.pile;
-          $rootScope.$broadcast('tasklist.pile.current');
-        };
+  pileModule.directive('camTasklistPiles', camTasklistPiles);
 
-        // scope.edit = function() {
-        //   modalUID++;
-        //   var pile = this.$parent.pile;
-
-        //   var modalInstance = $modal.open({
-        //     size: 'lg',
-
-        //     controller: [
-        //             '$scope',
-        //     function($scope) {
-        //       $scope.elUID = 'modal'+ modalUID;
-        //       $scope.labelsWidth = 3;
-        //       $scope.fieldsWidth = 9;
-        //       $scope.pile = pile;
-
-        //       $scope.addFilter = function() {
-        //         console.info('add filter');
-        //         $scope.pile.filters.push({
-        //           key: '',
-        //           operator: '',
-        //           value: ''
-        //         });
-        //       };
-
-        //       $scope.ok = function() {
-        //         modalInstance.close($scope.pile);
-        //       };
-
-        //       $scope.abort = function() {
-        //         modalInstance.dismiss('cancel');
-        //       };
-        //     }],
-        //     templateUrl: 'scripts/pile/form.html'
-        //   });
-
-        //   modalInstance.result.then(function (pile) {
-        //     console.info('completed', pile);
-        //   }, function (reason) {
-        //     console.info('rejected', reason);
-        //   });
-        // };
-
-        if (scope.pile && scope.pile.color) {
-          var style = {
-            'background-color': scope.pile.color
-          };
-          element
-            .css(style)
-            .find('.task-pile')
-              .css(style)
-            .find('.info')
-              .css(style)
-          ;
-        }
-      },
-
-      template: require('text!camunda-tasklist-ui/pile/details.html')
-    };
-  }]);
-
-
-
-
-  pileModule.directive('camTasklistPiles', [
-  function(
-  ) {
-    return {
-      template: require('text!camunda-tasklist-ui/pile/list.html')
-      // template: require('text!camunda-tasklist-ui/pile/directives/cam-tasklist-piles.html')
-    };
-  }]);
-
-
-
-
-  pileModule.directive('camTasklistPileTasks', [
-    '$modal',
-    '$rootScope',
-    '$timeout',
-    '$q',
-    'camTasklistPileFilterConversion',
-    'camAPI',
-  function(
-    $modal,
-    $rootScope,
-    $timeout,
-    $q,
-    camTasklistPileFilterConversion,
-    camAPI
-  ) {
-    var Task = camAPI.resource('task');
-    return {
-      link: function(scope) {
-        scope.pageSize = 15;
-        scope.pageNum = 1;
-        scope.totalItems = 0;
-
-        scope.now = new Date();
-
-        scope.loading = false;
-
-        scope.tasks = scope.tasks || [];
-
-        scope.pile = scope.pile || $rootScope.currentPile;
-
-        scope.searchTask = '';
-
-
-        scope.lookupTask = function(val) {
-          var deferred = $q.defer();
-
-          scope.loading = true;
-
-          var where = {};
-          angular.forEach(scope.pile.filters, function(pair) {
-            where[pair.key] = camTasklistPileFilterConversion(pair.value);
-          });
-          where.firstResult = (scope.pageNum - 1) * scope.pageSize;
-          where.maxResults = scope.pageSize;
-          where.nameLike = '%'+ val +'%';
-
-          Task.list(where, function(err, res) {
-            scope.loading = false;
-
-            if (err) {
-              return deferred.reject(err);
-            }
-
-            deferred.resolve(res._embedded.tasks);
-          });
-
-          return deferred.promise;
-        };
-
-
-        scope.selectedTask = function($item) {
-          console.info('scope', scope);
-          $rootScope.currentTask = $item;
-          $rootScope.$broadcast('tasklist.task.current');
-          scope.searchTask = '';
-        };
-
-
-        function loadItems() {
-          scope.loading = true;
-          scope.tasks = [];
-
-          var where = {};
-          angular.forEach(scope.pile.filters, function(pair) {
-            where[pair.key] = camTasklistPileFilterConversion(pair.value);
-          });
-          where.firstResult = (scope.pageNum - 1) * scope.pageSize;
-          where.maxResults = scope.pageSize;
-
-          Task.list(where, function(err, res) {
-            scope.loading = false;
-
-            if (err) {
-              throw err;
-            }
-
-            scope.totalItems = res.count;
-            scope.tasks = res._embedded.tasks;
-          });
-        }
-
-
-        scope.pageChange = loadItems;
-
-
-        scope.focus = function(delta) {
-          $rootScope.currentTask = scope.tasks[delta];
-          $rootScope.$broadcast('tasklist.task.current');
-        };
-
-
-        // scope.batchOperationSelect = function() {
-        //   console.info('selected task', this);
-        // };
-
-        scope.$on('tasklist.pile.current', function() {
-          if (
-            !$rootScope.currentPile ||
-            (scope.pile && (scope.pile.id === $rootScope.currentPile.id))
-          ) {
-            return;
-          }
-          scope.pile = $rootScope.currentPile;
-          loadItems();
-        });
-      },
-
-      template: require('text!camunda-tasklist-ui/pile/tasks.html')
-    };
-  }]);
+  pileModule.directive('camTasklistPileTasks', camTasklistPileTasks);
 
   return pileModule;
 });

@@ -1,0 +1,23 @@
+<div class="task-pile">
+  <h4 class="name"
+      ng-click="focus()">{{ pile.name }}</h4>
+
+  <div class="info">
+    <div ng-if="pile.description"
+         class="description">
+      {{ pile.description }}
+    </div>
+
+    <ul class="filters list-unstyled">
+      <li ng-click="edit()"
+          ng-repeat="filter in pile.filters">
+        <span class="key">{{ filter.key }}</span>:
+
+        <span class="operator"
+              ng-if="filter.operator">{{ filter.operator }}</span>
+
+        <span class="value">{{ filter.value }}</span>
+      </li>
+    </ul>
+  </div>
+</div>
