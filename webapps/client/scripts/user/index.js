@@ -88,33 +88,29 @@ define([
 
     // /camunda/api/admin/auth/user/default/login/cockpit
     $scope.ok = function() {
+      function success() {
+        $translate('LOGGED_IN').then(function(translated) {
+          Notifications.addMessage({
+            message: translated
+          });
+        });
+
+        $scope.$parent.$parent.$close();
+      }
+
+
+      function error() {
+        $translate('CREDENTIALS_ERROR').then(function(translated) {
+          Notifications.addError({
+            message: translated
+          });
+        });
+      }
+
+
       AuthenticationService
         .login($scope.username, $scope.password)
-        .then(function(success) {
-
-          if (success) {
-            $translate('LOGGED_IN').then(function(translated) {
-              Notifications.addMessage({
-                message: translated
-              });
-            });
-
-            $scope.user = $rootScope.authentication.user;
-
-            $rootScope.$broadcast('loggedin', $rootScope.authentication.user);
-
-            $scope.$parent.$parent.$close($scope.user.name);
-          }
-          else {
-            $translate('CREDENTIALS_ERROR').then(function(translated) {
-              Notifications.addError({
-                message: translated
-              });
-            }, function() {
-              throw new Error('Look at the bright side of life...');
-            });
-          }
-        });
+        .then(success, error);
     };
 
 
