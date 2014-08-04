@@ -79,7 +79,7 @@ public class JsonTreeMapJavaToJsonTest {
     DateObject dateObject = new DateObject();
 
     Calendar calendar = dateFormat.getCalendar();
-    calendar.set(2012, 9, 10, 10, 20, 42);
+    calendar.set(2012, Calendar.OCTOBER, 10, 10, 20, 42);
     Date date = calendar.getTime();
     dateObject.setDate(date);
 
