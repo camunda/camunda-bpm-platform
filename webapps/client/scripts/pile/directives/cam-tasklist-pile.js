@@ -13,7 +13,7 @@ define([
   ) {
     return {
       link: function(scope, element) {
-        scope.focus = function() {
+        function setFocus() {
           element
             .parent()
               .find('.task-pile')
@@ -24,10 +24,21 @@ define([
             .find('.task-pile')
               .addClass('active')
           ;
+        }
 
+        scope.focus = function() {
+          setFocus();
           $rootScope.currentPile = scope.pile;
           $rootScope.$broadcast('tasklist.pile.current');
         };
+
+        if ($rootScope.currentPile && scope.pile.id === $rootScope.currentPile.id) {
+          setFocus();
+        }
+
+
+
+
 
         // scope.edit = function() {
         //   modalUID++;
