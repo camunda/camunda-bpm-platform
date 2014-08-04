@@ -36,7 +36,12 @@ public abstract class JsonTreeMapObjectToJsonScriptTest extends ScriptTest {
   @Test
   @Script
   public void shouldMapPrimitives() {
-    SpinJsonNode json = script.getVariable("booleanVar");
+    SpinJsonNode json = script.getVariable("stringVar");
+
+    assertThat(json.isString()).isTrue();
+    assertThat(json.stringValue()).isEqualTo("a String");
+
+    json = script.getVariable("booleanVar");
 
     assertThat(json.isBoolean()).isTrue();
     assertThat(json.boolValue()).isFalse();

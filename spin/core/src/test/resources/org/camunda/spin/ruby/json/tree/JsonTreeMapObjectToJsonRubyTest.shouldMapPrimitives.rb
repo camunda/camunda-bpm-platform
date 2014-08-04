@@ -1,3 +1,5 @@
+$stringVar = JSON('"a String"')
+
 $booleanVar = JSON(false)
 
 $integerVar = JSON(42)

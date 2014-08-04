@@ -1,3 +1,5 @@
+stringVar = JSON('"a String"')
+
 booleanVar = JSON(False)
 
 integerVar = JSON(42)
