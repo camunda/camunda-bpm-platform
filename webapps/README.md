@@ -13,63 +13,7 @@ You just need to (optionally) build the project and serve its `dist` folder.
 
 ## Development
 
-The most convenient way to work on the tasklist development is to have it (linked) in the BPM platform.
-This will allow live reloading from within the platform served web UI (and significantly ease your work). 
-
-__Note:__ you need to have [npm](http://npmjs.org) (the [node.js](http://nodejs.org/) package manager) installed in order to complete the following instructions.
-
-```bash
-# clone the camunda BPM platform project
-git clone git@github.com:camunda/camunda-bpm-platform.git
-
-# clone the camunda tasklist project
-git clone git@github.com:camunda/camunda-tasklist-ui.git
-
-# create a npm link
-cd camunda-tasklist-ui
-npm link
-cd ..
-
-# go in the platform webapp directory
-cd camunda-bpm-platform/webapps/camunda-webapp/webapp
-
-# replace the tasklist module by its link
-rm node_modules/camunda-tasklist-ui
-npm link camunda-tasklist-ui
-
-# build with maven (the default port is 8080) and start serving
-mvn clean jetty:run -Djetty.port=9090 -Pdevelop
-```
-
-Using a __second terminal session__, run the auto-build for the platform
-
-```bash
-# go in the platform webapp directory
-cd camunda-bpm-platform/webapps/camunda-webapp/webapp
-
-# run the automated build, with livereload using port 9091
-LIVERELOAD_PORT=9091 grunt auto-build
-# alternatively, if you do not have grunt-cli installed globally,
-# grunt executable can also be found in node_modules/.bin/grunt
-```
-
-With a __third terminal session__, run the build tools for the tasklist
-
-```bash
-# go in the platform webapp directory
-cd camunda-tasklist-ui
-
-# run the automated build
-grunt auto-build
-```
-
-Now, you should be able to access the tasklist:
-
- - either from within the platform at http://localhost:9090/camunda/app/tasklist/default/
- - or the statically served (served by grunt connect) version: http://localhost:7070
-
-and if you make changes in the content of the tasklist `client` directory, both of the addresses above should reload automatically.
-
+Development on the tasklist UI should be done using the [camunda-bpm-webapp](https://github.com/camunda/camunda-bpm-webapp/). Please refer to the development instructions of that project.
 
 ### Contributing
 
@@ -89,6 +33,7 @@ The supported browsers are:
 
 ## Test
 
+_needs update_
 They are 3 "testing methods" provide for development.
 
 ### Unit tests
@@ -115,7 +60,7 @@ In place of a guide, just follow the formatting of existing code.
 
 ## License
 
-Unless otherwise specified this project is licensed under [Apache License Version 2.0](./LICENSE).
+Unless otherwise specified, this project is licensed under [Apache License Version 2.0](./LICENSE).
 
 ## Authors
 
