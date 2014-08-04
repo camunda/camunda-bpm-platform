@@ -1,6 +1,8 @@
 define([
+  'angular',
   'text!./cam-tasklist-tasks.html'
 ], function(
+  angular,
   template
 ) {
   'use strict';
@@ -36,6 +38,16 @@ define([
 
         scope.searchTask = '';
 
+        scope.sorting = angular.element('[cam-sorting-choices]').scope();
+
+        scope.sorting.$on('sorting.by.change', function(/*info, value*/) {
+          // console.info('sorting.by.change', value);
+          loadItems();
+        });
+        scope.sorting.$on('sorting.order.change', function(/*info, value*/) {
+          // console.info('sorting.order.change', value);
+          loadItems();
+        });
 
         scope.lookupTask = function(val) {
           var deferred = $q.defer();
@@ -82,6 +94,9 @@ define([
           });
           where.firstResult = (scope.pageNum - 1) * scope.pageSize;
           where.maxResults = scope.pageSize;
+
+          where.sortBy = scope.sorting.by;
+          where.sortOrder = scope.sorting.order;
 
           Task.list(where, function(err, res) {
             scope.loading = false;

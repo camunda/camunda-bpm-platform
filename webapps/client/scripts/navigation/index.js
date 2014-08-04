@@ -3,11 +3,13 @@
 define([
   'angular',
   './directives/cam-tasklist-navigation',
+  './directives/cam-sorting-choices',
   'camunda-tasklist-ui/utils',
   'camunda-commons-ui/util/index',
 ], function(
   angular,
-  camTasklistNavigation
+  camTasklistNavigation,
+  camSortingChoices
 ) {
   var navigationModule = angular.module('cam.tasklist.navigation', [
     require('camunda-tasklist-ui/utils').name,
@@ -17,6 +19,7 @@ define([
   ]);
 
   navigationModule.directive('camTasklistNavigation', camTasklistNavigation);
+  navigationModule.directive('camSortingChoices', camSortingChoices);
 
   return navigationModule;
 });

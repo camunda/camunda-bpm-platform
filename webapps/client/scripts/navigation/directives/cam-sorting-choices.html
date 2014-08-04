@@ -1,0 +1,70 @@
+<div class="dropdown">
+  <a href
+     role="button"
+     class="dropdown-toggle"
+     data-toggle="dropdown">
+    {{ 'SORT_BY' | translate }}
+    <span class="sort-by">{{ byLabel | lowercase }}</span>
+  </a>
+
+  <a href
+     title="{{ order | translate }}"
+     class="sort-direction glyphicon glyphicon-chevron-up"
+     ng-class="{'glyphicon-chevron-up': order === 'asc', 'glyphicon-chevron-down': order === 'desc'}"
+     ng-click="changeOrder()"></a>
+
+  <ul class="dropdown-menu dropdown-menu-right"
+      role="menu">
+    <li>
+      <a href
+         sort-by="priority"
+         translate="PRIORITY"
+         ng-click="changeBy('priority')">Creation date</a>
+    </li>
+
+    <li>
+      <a href
+         sort-by="created"
+         translate="CREATION_DATE"
+         ng-click="changeBy('created')">Creation date</a>
+    </li>
+
+    <li>
+      <a href
+         sort-by="dueDate"
+         translate="DUE_DATE"
+         ng-click="changeBy('dueDate')">Due date</a>
+    </li>
+
+    <li>
+      <a href
+         sort-by="followUpDate"
+         translate="FOLLOW_UP_DATE"
+         ng-click="changeBy('followUpDate')">Follow up date</a>
+    </li>
+
+    <li>
+      <a href
+         sort-by="name"
+         translate="TASK_NAME"
+         ng-click="changeBy('name')">Task name</a>
+    </li>
+
+    <li>
+      <a href
+         sort-by="assignee"
+         translate="ASSIGNEE"
+         ng-click="changeBy('assignee')">Assignee</a>
+    </li>
+
+<!--
+    <li>
+      <a href
+         sort-by="owner"
+         translate="OWNER"
+         ng-click="changeBy('owner')">Owner</a>
+    </li>
+-->
+
+  </ul>
+</div>
