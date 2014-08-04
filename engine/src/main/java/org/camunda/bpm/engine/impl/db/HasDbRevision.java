@@ -10,22 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.db;
 
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.Session;
-
-
 /**
- * @author Tom Baeyens
+ * Entities that are using revisions for optimistic locking, need to implement this interface.
+ * 
+ * @author Joram Barrez
  */
-public abstract class AbstractDbSession implements Session {
-
-  protected DbSqlSession dbSqlSession;
-
-  public AbstractDbSession() {
-    this.dbSqlSession = Context.getCommandContext().getSession(DbSqlSession.class);
-  }
+public interface HasDbRevision {
   
+  void setRevision(int revision);
+  int getRevision();
+  int getRevisionNext();
+
 }

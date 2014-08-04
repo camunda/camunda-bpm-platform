@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
@@ -29,14 +29,14 @@ import org.camunda.bpm.engine.task.Event;
  */
 public class CommentManager extends AbstractHistoricManager {
 
-  public void delete(PersistentObject persistentObject) {
+  public void delete(DbEntity dbEntity) {
     checkHistoryEnabled();
-    super.delete(persistentObject);
+    super.delete(dbEntity);
   }
 
-  public void insert(PersistentObject persistentObject) {
+  public void insert(DbEntity dbEntity) {
     checkHistoryEnabled();
-    super.insert(persistentObject);
+    super.insert(dbEntity);
   }
 
   @SuppressWarnings("unchecked")
@@ -58,7 +58,7 @@ public class CommentManager extends AbstractHistoricManager {
 
   public void deleteCommentsByTaskId(String taskId) {
     checkHistoryEnabled();
-    getDbSqlSession().delete("deleteCommentsByTaskId", taskId);
+    getDbSqlSession().delete(CommentEntity.class, "deleteCommentsByTaskId", taskId);
   }
 
   @SuppressWarnings("unchecked")

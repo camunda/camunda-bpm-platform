@@ -39,7 +39,7 @@ public class JobDefinitionManager extends AbstractManager {
   }
 
   public void deleteJobDefinitionsByProcessDefinitionId(String id) {
-    getDbSqlSession().delete("deleteJobDefinitionsByProcessDefinitionId", id);
+    getDbSqlSession().delete(JobDefinitionEntity.class, "deleteJobDefinitionsByProcessDefinitionId", id);
   }
 
   @SuppressWarnings("unchecked")
@@ -55,21 +55,21 @@ public class JobDefinitionManager extends AbstractManager {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateJobDefinitionSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", parameters);
   }
 
   public void updateJobDefinitionSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateJobDefinitionSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", parameters);
   }
 
   public void updateJobDefinitionSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateJobDefinitionSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", parameters);
   }
 
 }

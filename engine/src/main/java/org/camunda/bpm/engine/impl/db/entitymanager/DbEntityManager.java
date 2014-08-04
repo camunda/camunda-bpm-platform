@@ -1,0 +1,233 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.camunda.bpm.engine.impl.db.entitymanager;
+
+import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType.*;
+import static org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState.*;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Logger;
+
+import org.apache.ibatis.session.SqlSession;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.IdGenerator;
+import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
+import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCache;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbBulkOperation;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationManager;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.executor.DbOperationExecutor;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.executor.SqlDbOperationExecutor;
+import org.camunda.bpm.engine.impl.interceptor.Session;
+
+/**
+ *
+ * @author Daniel Meyer
+ *
+ */
+public class DbEntityManager implements Session {
+
+  protected Logger log = Logger.getLogger(DbEntityManager.class.getName());
+
+  protected IdGenerator idGenerator;
+
+  protected DbEntityCache dbEntityCache;
+
+  protected DbOperationManager dbOperationManager;
+
+  protected DbOperationExecutor dbOperationExecutor;
+
+  public DbEntityManager(DbSqlSessionFactory dbSqlSessionFactory, SqlSession sqlSession) {
+    initialize(dbSqlSessionFactory, sqlSession);
+  }
+
+  protected void initialize(DbSqlSessionFactory dbSqlSessionFactory, SqlSession sqlSession) {
+    idGenerator = dbSqlSessionFactory.getIdGenerator();
+    dbEntityCache = new DbEntityCache();
+    dbOperationManager = new DbOperationManager();
+    dbOperationExecutor = new SqlDbOperationExecutor(sqlSession, dbSqlSessionFactory);
+  }
+
+  public void flush() {
+
+    // flush the entity cache
+    flushEntityCache();
+
+    // obtain totally ordered operation list from operation manager
+    List<DbOperation> operationsToFlush = dbOperationManager.calculateFlush();
+    logFlushSummary(operationsToFlush);
+
+    // execute the flush
+    for (DbOperation dbOperation : operationsToFlush) {
+      dbOperationExecutor.execute(dbOperation);
+    }
+
+  }
+
+  /**
+   * Flushes the entity cache:
+   * Depending on the entity state, the required {@link DbOperation} is performed and the cache is updated.
+   */
+  protected void flushEntityCache() {
+    List<CachedDbEntity> cachedEntities = dbEntityCache.getCachedEntities();
+    for (CachedDbEntity cachedDbEntity : cachedEntities) {
+
+      if(cachedDbEntity.getEntityState() == TRANSIENT) {
+        // perform INSERT
+        performEntityOperation(cachedDbEntity, INSERT);
+        // mark PERSISTENT
+        cachedDbEntity.setEntityState(PERSISTENT);
+
+      } else if(cachedDbEntity.isDirty()) {
+        // object is dirty -> perform UPDATE
+        performEntityOperation(cachedDbEntity, UPDATE);
+
+      } else if(cachedDbEntity.getEntityState() == MERGED) {
+        // perform UPDATE
+        performEntityOperation(cachedDbEntity, UPDATE);
+        // mark PERSISTENT
+        cachedDbEntity.setEntityState(PERSISTENT);
+
+      } else if(cachedDbEntity.getEntityState() == DELETED_TRANSIENT) {
+        // remove from cache
+        dbEntityCache.remove(cachedDbEntity);
+
+      } else if(cachedDbEntity.getEntityState() == DELETED_PERSISTENT
+             || cachedDbEntity.getEntityState() == DELETED_MERGED) {
+        // perform DELETE
+        performEntityOperation(cachedDbEntity, DELETE);
+        // remove from cache
+        dbEntityCache.remove(cachedDbEntity);
+
+      }
+
+      // if object is PERSISTENT after flush
+      if(cachedDbEntity.getEntityState() == PERSISTENT) {
+        // make a new copy
+        cachedDbEntity.makeCopy();
+      }
+    }
+  }
+
+  public void insert(DbEntity dbEntity) {
+    // generate Id if not present
+    ensureHasId(dbEntity);
+
+    // put into cache
+    dbEntityCache.putTransient(dbEntity);
+
+  }
+
+  public void merge(DbEntity dbEntity) {
+
+    if(dbEntity.getId() == null) {
+      throw new ProcessEngineException("Cannot merge dbEntity without id" + dbEntity);
+    }
+
+    // NOTE: a proper implementation of merge() would fetch the entity from the database
+    // and merge the state changes. For now, we simply always perform an update.
+    // Supposedly, the "proper" implementation would reduce the number of situations where
+    // optimistic locking results in a conflict.
+
+    dbEntityCache.putMerged(dbEntity);
+  }
+
+  public void delete(DbEntity dbEntity) {
+    dbEntityCache.setDeleted(dbEntity);
+  }
+
+  public void bulkUpdate(Class<? extends DbEntity> entityType, String statement, Object parameter) {
+    performBulkOperation(entityType, statement, parameter, UPDATE_BULK);
+  }
+
+  public void bulkDelete(Class<? extends DbEntity> entityType, String statement, Object parameter) {
+    performBulkOperation(entityType, statement, parameter, DELETE_BULK);
+  }
+
+  protected DbBulkOperation performBulkOperation(Class<? extends DbEntity> entityType, String statement, Object parameter, DbOperationType operationType) {
+    // create operation
+    DbBulkOperation bulkOperation = new DbBulkOperation();
+
+    // configure operation
+    bulkOperation.setOperationType(operationType);
+    bulkOperation.setEntityType(entityType);
+    bulkOperation.setStatement(statement);
+    bulkOperation.setParameter(parameter);
+
+    // schedule operation
+    dbOperationManager.addOperation(bulkOperation);
+    return bulkOperation;
+  }
+
+  protected void performEntityOperation(CachedDbEntity cachedDbEntity, DbOperationType type) {
+    DbEntityOperation dbOperation = new DbEntityOperation();
+    dbOperation.setEntity(cachedDbEntity.getEntity());
+    dbOperation.setOperationType(type);
+    dbOperationManager.addOperation(dbOperation);
+  }
+
+  protected void logFlushSummary(Collection<DbOperation> operations) {
+    log.fine("Flush Summary:");
+    for (DbOperation dbOperation : operations) {
+      log.fine("  " + dbOperation);
+    }
+  }
+
+  public void close() {
+
+  }
+
+  public boolean isDeleted(DbEntity object) {
+    return dbEntityCache.isDeleted(object);
+  }
+
+  protected void ensureHasId(DbEntity dbEntity) {
+    if(dbEntity.getId() == null) {
+      String nextId = idGenerator.getNextId();
+      dbEntity.setId(nextId);
+    }
+  }
+
+
+  // getters / setters /////////////////////////////////
+
+  public DbOperationExecutor getDbOperationExecutor() {
+    return dbOperationExecutor;
+  }
+
+  public void setDbOperationExecutor(DbOperationExecutor executor) {
+    this.dbOperationExecutor = executor;
+  }
+
+  public DbOperationManager getDbOperationManager() {
+    return dbOperationManager;
+  }
+
+  public void setDbOperationManager(DbOperationManager operationManager) {
+    this.dbOperationManager = operationManager;
+  }
+
+  public DbEntityCache getDbEntityCache() {
+    return dbEntityCache;
+  }
+
+  public void setDbEntityCache(DbEntityCache dbEntityCache) {
+    this.dbEntityCache = dbEntityCache;
+  }
+
+}

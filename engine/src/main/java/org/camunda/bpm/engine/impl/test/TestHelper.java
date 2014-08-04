@@ -264,7 +264,7 @@ public abstract class TestHelper {
          if (historyLevelProperty != null) {
            if (processEngineConfiguration.getHistoryLevel() != new Integer(historyLevelProperty.getValue())) {
              historyLevelProperty.setValue(Integer.toString(processEngineConfiguration.getHistoryLevel()));
-             dbSqlSession.update(historyLevelProperty);
+             dbSqlSession.merge(historyLevelProperty);
            }
          } else {
            commandContext.getDbSqlSession().dbCreateHistoryLevel();

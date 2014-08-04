@@ -145,21 +145,21 @@ public class ExecutionManager extends AbstractManager {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateExecutionSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", parameters);
   }
 
   public void updateExecutionSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateExecutionSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", parameters);
   }
 
   public void updateExecutionSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateExecutionSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", parameters);
   }
 
 }

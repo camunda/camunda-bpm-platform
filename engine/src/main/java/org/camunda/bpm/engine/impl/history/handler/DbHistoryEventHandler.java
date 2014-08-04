@@ -66,7 +66,11 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
             historicScopeInstanceEvent.setStartTime(existingEvent.getStartTime());
           }
         }
-        dbSqlSession.update(historyEvent);
+        if(historyEvent.getId() == null) {
+//          dbSqlSession.insert(historyEvent);
+        } else {
+          dbSqlSession.merge(historyEvent);
+        }
       }
     }
   }

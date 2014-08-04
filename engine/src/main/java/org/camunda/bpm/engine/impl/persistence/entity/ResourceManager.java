@@ -30,7 +30,7 @@ public class ResourceManager extends AbstractManager {
   }
 
   public void deleteResourcesByDeploymentId(String deploymentId) {
-    getDbSqlSession().delete("deleteResourcesByDeploymentId", deploymentId);
+    getDbSqlSession().delete(ResourceEntity.class, "deleteResourcesByDeploymentId", deploymentId);
   }
 
   public ResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName) {

@@ -14,8 +14,9 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
@@ -27,7 +28,7 @@ import java.util.*;
 /**
  * @author roman.smirnov
  */
-public class IncidentEntity implements Incident, PersistentObject, HasRevision {
+public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbReferences {
 
   protected int revision;
 
@@ -223,6 +224,19 @@ public class IncidentEntity implements Incident, PersistentObject, HasRevision {
 
       eventHandler.handleEvent(event);
     }
+  }
+
+  public boolean hasReferenceTo(DbEntity entity) {
+    if (entity instanceof IncidentEntity) {
+      IncidentEntity incident = (IncidentEntity) entity;
+      String otherId = incident.getId();
+
+      if(causeIncidentId != null && causeIncidentId.equals(otherId)) {
+        return true;
+      }
+
+    }
+    return false;
   }
 
   public String getId() {

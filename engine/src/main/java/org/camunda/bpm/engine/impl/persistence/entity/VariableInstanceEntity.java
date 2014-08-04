@@ -18,8 +18,8 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
 /**
  * @author Tom Baeyens
  */
-public class VariableInstanceEntity implements CoreVariableInstance, VariableInstance, ValueFields, PersistentObject, HasRevision, Serializable {
+public class VariableInstanceEntity implements CoreVariableInstance, VariableInstance, ValueFields, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -195,7 +195,7 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
       Context
         .getCommandContext()
         .getDbSqlSession()
-        .insertBefore(byteArrayValue, this);
+        .insert(byteArrayValue);
     }
     this.byteArrayValue = byteArrayValue;
     if (byteArrayValue != null) {

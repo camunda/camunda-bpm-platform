@@ -120,7 +120,7 @@ public class DbDeadlockTests extends ConcurrencyTestCase {
         public Void execute(CommandContext commandContext) {
           List<HistoricProcessInstance> list = commandContext.getDbSqlSession().createHistoricProcessInstanceQuery().list();
           for (HistoricProcessInstance historicProcessInstance : list) {
-            commandContext.getDbSqlSession().delete("deleteHistoricProcessInstance", historicProcessInstance.getId());
+            commandContext.getDbSqlSession().delete(HistoricProcessInstanceEventEntity.class, "deleteHistoricProcessInstance", historicProcessInstance.getId());
           }
           return null;
         }

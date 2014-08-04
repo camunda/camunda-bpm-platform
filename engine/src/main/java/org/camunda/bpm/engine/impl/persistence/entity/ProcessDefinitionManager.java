@@ -38,7 +38,7 @@ public class ProcessDefinitionManager extends AbstractManager {
   }
 
   public void deleteProcessDefinitionsByDeploymentId(String deploymentId) {
-    getDbSqlSession().delete("deleteProcessDefinitionsByDeploymentId", deploymentId);
+    getDbSqlSession().delete(ProcessDefinitionEntity.class, "deleteProcessDefinitionsByDeploymentId", deploymentId);
   }
 
   public ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
@@ -102,14 +102,14 @@ public class ProcessDefinitionManager extends AbstractManager {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateProcessDefinitionSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(ProcessDefinitionEntity.class, "updateProcessDefinitionSuspensionStateByParameters", parameters);
   }
 
   public void updateProcessDefinitionSuspensionStateByKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateProcessDefinitionSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(ProcessDefinitionEntity.class, "updateProcessDefinitionSuspensionStateByParameters", parameters);
   }
 
 

@@ -28,8 +28,9 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -45,7 +46,7 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Roman Smirnov
  *
  */
-public class CaseExecutionEntity extends CmmnExecution implements CaseExecution, CaseInstance, PersistentObject, HasRevision {
+public class CaseExecutionEntity extends CmmnExecution implements CaseExecution, CaseInstance, DbEntity, HasDbRevision, HasDbReferences {
 
   private static final long serialVersionUID = 1L;
 
@@ -414,6 +415,26 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   public int getRevisionNext() {
     return revision + 1;
+  }
+  public boolean hasReferenceTo(DbEntity entity) {
+
+    if (entity instanceof CaseExecutionEntity) {
+      CaseExecutionEntity otherEntity = (CaseExecutionEntity) entity;
+      String otherId = otherEntity.getId();
+
+      // parentId
+      if(parentId != null && parentId.equals(otherId)) {
+        return true;
+      }
+
+      // superExecutionId
+      if(superCaseExecutionId != null && superCaseExecutionId.equals(otherId)) {
+        return true;
+      }
+
+    }
+    return false;
+
   }
 
   public Object getPersistentState() {

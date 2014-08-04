@@ -17,14 +17,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 
 
 /**
  * @author Tom Baeyens
  */
-public class GroupEntity implements Group, Serializable, PersistentObject, HasRevision {
+public class GroupEntity implements Group, Serializable, DbEntity, HasDbRevision {
 
   private static final long serialVersionUID = 1L;
 

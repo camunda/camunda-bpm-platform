@@ -36,8 +36,9 @@ import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
@@ -78,8 +79,9 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
 public class ExecutionEntity extends PvmExecutionImpl implements
       Execution,
       ProcessInstance,
-      PersistentObject,
-      HasRevision {
+      DbEntity,
+      HasDbRevision,
+      HasDbReferences {
 
   private static final long serialVersionUID = 1L;
 
@@ -1293,6 +1295,26 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   public void setRevision(int revision) {
     this.revision = revision;
+  }
+
+  public boolean hasReferenceTo(DbEntity entity) {
+    if(entity instanceof ExecutionEntity) {
+      ExecutionEntity executionEntity = (ExecutionEntity) entity;
+      String otherId = executionEntity.getId();
+
+      // parentId
+      if(parentId != null && parentId.equals(otherId)) {
+        return true;
+      }
+
+      // superExecutionId
+      if(superExecutionId != null && superExecutionId.equals(otherId)) {
+        return true;
+      }
+
+    }
+
+    return false;
   }
 
   public int getSuspensionState() {
