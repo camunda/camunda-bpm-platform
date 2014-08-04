@@ -188,7 +188,7 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    * @return {@link SpinJsonNode} representation of the current node.
    * @throws IllegalArgumentException if index is out of bound.
    */
-  public abstract SpinJsonNode appendAt(int index, Object property);
+  public abstract SpinJsonNode insertAt(int index, Object property);
 
   /**
    * Inserts an object BEFORE an specific object in an array

@@ -27,7 +27,7 @@ import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON_FILE_NAME;
  * 1) indexOf
  * 2) lastIndexOf
  * 3) append
- * 4) appendAt
+ * 4) insertAt
  * 5) insertBefore
  * 6) insertAfter
  * 7) remove
@@ -141,47 +141,47 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
     assertThat(value).isEqualTo("Testcustomer");
   }
 
-  // ----------------- 4) appendAt ----------------------
+  // ----------------- 4) insertAt ----------------------
 
   @Test(expected = SpinJsonTreeNodeException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
-  public void shouldFailAppendAtNonArray() throws Throwable {
+  public void shouldFailInsertAtNonArray() throws Throwable {
     failingWithException();
   }
 
   @Test(expected = IndexOutOfBoundsException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
-  public void shouldFailAppendAtWithIndexOutOfBounds() throws Throwable {
+  public void shouldFailInsertAtWithIndexOutOfBounds() throws Throwable {
     failingWithException();
   }
 
   @Test(expected = IndexOutOfBoundsException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
-  public void shouldFailAppendAtWithNegativeIndexOutOfBounds() throws Throwable {
+  public void shouldFailInsertAtWithNegativeIndexOutOfBounds() throws Throwable {
     failingWithException();
   }
 
   @Test(expected = SpinJsonTreeNodeException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
-  public void shouldFailAppendAtWithWrongObject() throws Throwable {
+  public void shouldFailInsertAtWithWrongObject() throws Throwable {
     failingWithException();
   }
 
   @Test(expected = IllegalArgumentException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
-  public void shouldFailAppendAtWithNullObject() throws Throwable {
+  public void shouldFailInsertAtWithNullObject() throws Throwable {
     failingWithException();
   }
 
   @Test
   @Script
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
-  public void shouldAppendAtWithIndex() {
+  public void shouldInsertAtWithIndex() {
     Number oldSize     = script.getVariable("oldSize");
     Number oldPosition = script.getVariable("oldPosition");
     Number newSize     = script.getVariable("newSize");
@@ -197,7 +197,7 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
   @Test
   @Script
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
-  public void shouldAppendAtWithNegativeIndex() {
+  public void shouldInsertAtWithNegativeIndex() {
     Number oldSize     = script.getVariable("oldSize");
     Number oldPosition = script.getVariable("oldPosition");
     Number newSize     = script.getVariable("newSize");

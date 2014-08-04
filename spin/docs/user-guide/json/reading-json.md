@@ -224,12 +224,12 @@ json.deleteProp(list);
 
 ## Work with Json Arrays
 
-Json arrays are a sorted type of a list. So there are some methods to manipulate this list:
+Json arrays represent a list of object. Spin offers the following methods to manipulate this list:
 
   * `.indexOf(<Object>)` - Fetches the index of the FIRST occurrence of the searched object.
   * `.lastIndexOf(<Object>)` - Fetches the index of the LAST occurrence of the searched object.
   * `.append(<Object>)` - Appends an object to the end of the list.
-  * `.appendAt(<Index>, <Object>)` - Appends an object at the specific index of the list. 
+  * `.insertAt(<Index>, <Object>)` - Appends an object at the specific index of the list.
   * `.insertBefore(<Search object>, <Object>)` - Inserts an object before the FIRST occurrence of another object.
   * `.insertAfter(<Search object>, <Object>)` - Inserts an object after the FIRST occurrence of another object.
   * `.remove(<Object>)` - Removes the FIRST occurrence of the object.
@@ -269,8 +269,8 @@ Integer j = list.lastIndexOf(1); // Should be '7'
 ```
 
 ```javascript
-var json = S('{"test-array" : ["testdata1","testdata2",1,2,true,1,false,1]}'');
-va list = json.prop("test-array");
+var json = S('{"test-array" : ["testdata1","testdata2",1,2,true,1,false,1]}');
+var list = json.prop("test-array");
 
 var i = list.indexOf("testdata2"); // should be 1
 var j = list.lastIndexOf(1); // Should be '7'
@@ -287,7 +287,7 @@ SpinJsonNode list = json.prop("test-array");
 list.append("test2"); // at the end of the list there should now be "test2"
 list.remove("test2"); // Aaaand now, it is gone ;)
 
-list.appendAt(1, "test3"); // test3 should now be inserted before testdata2
+list.insertAt(1, "test3"); // test3 should now be inserted before testdata2
 list.removeAt(1, "test3"); // Aaaand now, it is gone ;)
 
 list.insertBefore(true, "test4"); // now there should be test4 on index 4
@@ -301,7 +301,7 @@ var list = json.prop("test-array");
 list.append("test2"); // at the end of the list there should now be "test2"
 list.remove("test2"); // Aaaand now, it is gone ;)
 
-list.appendAt(1, "test3"); // test3 should now be inserted before testdata2
+list.insertAt(1, "test3"); // test3 should now be inserted before testdata2
 list.removeAt(1, "test3"); // Aaaand now, it is gone ;)
 
 list.insertBefore(true, "test4"); // now there should be test4 on index 4

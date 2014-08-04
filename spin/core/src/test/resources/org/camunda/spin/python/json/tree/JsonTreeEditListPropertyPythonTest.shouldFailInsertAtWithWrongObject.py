@@ -3,4 +3,4 @@ class TestObject:
 
 node = JSON(input)
 customers = node.prop("customers")
-customers.appendAt(1, TestObject())
+customers.insertAt(1, TestObject())

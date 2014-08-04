@@ -30,7 +30,7 @@ import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
  * 1) indexOf
  * 2) lastIndexOf
  * 3) append
- * 4) appendAt
+ * 4) insertAt
  * 5) insertBefore
  * 6) insertAfter
  * 7) remove
@@ -174,15 +174,15 @@ public class JsonTreeEditListPropertyTest {
     }
   }
 
-  // ----------------- 4) appendAt ----------------------
+  // ----------------- 4) insertAt ----------------------
 
   @Test
-  public void appendAtWithIndex() {
+  public void insertAtWithIndex() {
     Integer oldSize = currencies.elements().size();
     Integer oldPosition = currencies.indexOf("dollar");
     SpinJsonNode oldNode = currencies.elements().get(1);
 
-    currencies.appendAt(1, "test1");
+    currencies.insertAt(1, "test1");
 
     Integer newSize = currencies.elements().size();
     Integer newPosition = currencies.indexOf("dollar");
@@ -195,9 +195,9 @@ public class JsonTreeEditListPropertyTest {
   }
 
   @Test
-  public void appendAtNonArray() {
+  public void insertAtNonArray() {
     try {
-      jsonNode.appendAt(1, "test");
+      jsonNode.insertAt(1, "test");
       fail("Expected: SpinJsonTreeNodeException");
     } catch(SpinJsonTreeNodeException e) {
       // expected
@@ -205,12 +205,12 @@ public class JsonTreeEditListPropertyTest {
   }
 
   @Test
-  public void appendAtWithNegativeIndex() {
+  public void insertAtWithNegativeIndex() {
     Integer oldSize = currencies.elements().size();
     Integer oldPosition = currencies.indexOf("dollar");
     SpinJsonNode oldNode = currencies.elements().get(0);
 
-    currencies.appendAt(-2, "test1");
+    currencies.insertAt(-2, "test1");
 
     Integer newSize = currencies.elements().size();
     Integer newPosition = currencies.indexOf("dollar");
@@ -223,9 +223,9 @@ public class JsonTreeEditListPropertyTest {
   }
 
   @Test
-  public void appendAtWithIndexOutOfBounds() {
+  public void insertAtWithIndexOutOfBounds() {
     try {
-      currencies.appendAt(6, "string");
+      currencies.insertAt(6, "string");
       fail("Expected: IndexOutOfBoundsException");
     } catch(IndexOutOfBoundsException e) {
       // expected
@@ -233,9 +233,9 @@ public class JsonTreeEditListPropertyTest {
   }
 
   @Test
-  public void appendAtWithNegativeIndexOutOfBounds() {
+  public void insertAtWithNegativeIndexOutOfBounds() {
     try {
-      currencies.appendAt(-6, "string");
+      currencies.insertAt(-6, "string");
       fail("Expected: IndexOutOfBoundsException");
     } catch(IndexOutOfBoundsException e) {
       // expected
@@ -243,9 +243,9 @@ public class JsonTreeEditListPropertyTest {
   }
 
   @Test
-  public void appendAtWithWrongObject() {
+  public void insertAtWithWrongObject() {
     try {
-      currencies.appendAt(1, new Date());
+      currencies.insertAt(1, new Date());
       fail("Expected: SpinJsonTreeNodeException");
     } catch(SpinJsonTreeNodeException e) {
       // expected
@@ -253,9 +253,9 @@ public class JsonTreeEditListPropertyTest {
   }
 
   @Test
-  public void appendAtWithNullObject() {
+  public void insertAtWithNullObject() {
     try {
-      currencies.appendAt(1, null);
+      currencies.insertAt(1, null);
       fail("Expected: IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected

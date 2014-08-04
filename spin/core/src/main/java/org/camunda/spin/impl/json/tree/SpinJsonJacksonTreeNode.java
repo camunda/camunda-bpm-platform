@@ -302,7 +302,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     }
   }
 
-  public SpinJsonNode appendAt(int index, Object property) {
+  public SpinJsonNode insertAt(int index, Object property) {
     ensureNotNull("index", index);
     ensureNotNull("property", property);
 
@@ -328,7 +328,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
         i = i - 1;
       }
 
-      return appendAt(i, insertObject);
+      return insertAt(i, insertObject);
 
     } else {
       throw LOG.unableToCreateNode(jsonNode.getNodeType().name());
@@ -341,7 +341,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     if(this.isArray()) {
       Integer i = indexOf(searchObject);
 
-      return appendAt(i + 1, insertObject);
+      return insertAt(i + 1, insertObject);
 
     } else {
       throw LOG.unableToCreateNode(jsonNode.getNodeType().name());

@@ -75,11 +75,11 @@ public class JsonJacksonTreeLogger extends SpinLogger {
   }
 
   public SpinJsonTreeNodeException unableToModifyNode(String nodeName) {
-    return new SpinJsonTreeNodeException(exceptionMessage("010", "Uable to modify node of type '{}'. Node is not a list!", nodeName));
+    return new SpinJsonTreeNodeException(exceptionMessage("010", "Unable to modify node of type '{}'. Node is not a list!", nodeName));
   }
 
   public SpinJsonTreeNodeException unableToGetIndex(String nodeName) {
-    return new SpinJsonTreeNodeException(exceptionMessage("011", "Uable to get index from '{}'. Node is not a list!", nodeName));
+    return new SpinJsonTreeNodeException(exceptionMessage("011", "Unable to get index from '{}'. Node is not a list!", nodeName));
   }
 
   public IndexOutOfBoundsException indexOutOfBounds(Integer index, Integer size) {
