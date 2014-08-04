@@ -1,7 +1,7 @@
-class testObject:
+class TestObject:
     pass
 
 node = JSON(input)
-list = [testObject()]
+list = [TestObject()]
 
 node.prop("comment", list)

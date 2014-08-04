@@ -1,7 +1,7 @@
-class testObject:
+class TestObject:
     pass
 
 node = JSON(input)
 currencies = node.prop("orderDetails").prop("currencies")
 
-currencies.insertAfter(testObject(), "test")
+currencies.insertAfter(TestObject(), "test")

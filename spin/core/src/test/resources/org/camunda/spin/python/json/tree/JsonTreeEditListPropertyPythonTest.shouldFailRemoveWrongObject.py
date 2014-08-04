@@ -1,7 +1,7 @@
-class testObject:
+class TestObject:
     pass
 
 node = JSON(input)
 customers = node.prop("customers")
 
-customers.remove(testObject())
+customers.remove(TestObject())

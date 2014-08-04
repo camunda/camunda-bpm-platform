@@ -1,10 +1,10 @@
-class testObject:
+class TestObject:
     pass
 
 
 node = JSON(input)
 object = {
-    "date": testObject()
+    "date": TestObject()
 }
 
 node.prop("comment", object)
