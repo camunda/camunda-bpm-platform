@@ -129,10 +129,12 @@ public abstract class JsonTreeSetPropertyScriptTest extends ScriptTest {
     assertThat(newValue.longValue()).isEqualTo(4200000000L);
   }
 
-  /*
-    TODO: debug python script engine
-    The script engine converts a Boolean argument into a Long on a method call.
+  /**
+   * Please note: in jython exists a known issue that Boolean
+   * and boolean values are casted to long if a matching method
+   * is found first. See script source code for workaround.
    */
+  @Test
   @Script
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldSetBooleanProperty() {
@@ -143,10 +145,12 @@ public abstract class JsonTreeSetPropertyScriptTest extends ScriptTest {
     assertThat(value).isFalse();
   }
 
-  /*
-    TODO: debug python script engine
-    The script engine converts a Boolean argument into a Long on a method call.
+  /**
+   * Please note: in jython exists a known issue that Boolean
+   * and boolean values are casted to long if a matching method
+   * is found first. See script source code for workaround.
    */
+  @Test
   @Script
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldReplaceBooleanProperty() {

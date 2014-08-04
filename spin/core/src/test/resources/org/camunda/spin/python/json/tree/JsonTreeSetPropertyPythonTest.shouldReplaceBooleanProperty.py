@@ -3,4 +3,7 @@ node = JSON(input)
 oldValue = node.prop("order").stringValue()
 
 node.prop("order", False)
-newValue = node.prop("order").boolValue()
+
+# Known jython issue. Boolean and boolean values are casted to long
+# if a matching method is found first.
+newValue = bool(node.prop("order").value())
