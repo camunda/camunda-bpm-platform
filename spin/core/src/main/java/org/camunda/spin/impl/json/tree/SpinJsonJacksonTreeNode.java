@@ -283,13 +283,9 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     ensureNotNull("names", names);
 
     for(String name: names) {
-      if(!jsonNode.has(name)) {
-        throw LOG.unableToFindProperty(name);
-      }
+      deleteProp(name);
     }
 
-    ObjectNode node = (ObjectNode) jsonNode;
-    node.remove(names);
     return this;
   }
 

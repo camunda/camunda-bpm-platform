@@ -198,7 +198,7 @@ Java:
 ```java
 import static org.camunda.spin.Spin.*;
     
-SpinJsonNode json = JSON("{\"customer\": \"Kermit\", \"language\": \"en\"]}");
+SpinJsonNode json = JSON("{\"customer\": \"Kermit\", \"language\": \"en\"}");
 List<String> listOfNames = new ArrayList<String>();
 listOfNames.add("customer");
 listOfNames.add("language");
