@@ -73,11 +73,11 @@ public class JsonTreeSetPropertyTest {
     // set new values
     jsonNode.prop("order", value);
     jsonNode.prop("customers", value);
-    String newValue = jsonNode.prop("order").stringValue();
+    SpinJsonNode newValue1 = jsonNode.prop("order");
     SpinJsonNode newValue2 = jsonNode.prop("customers");
 
-    assertThat(newValue).isNotEqualTo(oldValue);
-    assertThat(newValue).isEqualTo(value);
+    assertThat(newValue1.stringValue()).isNotEqualTo(oldValue);
+    assertThat(newValue1.stringValue()).isEqualTo(value);
 
     assertThat(newValue2.isArray()).isFalse();
     assertThat(newValue2.stringValue()).isEqualTo(value);
@@ -108,6 +108,7 @@ public class JsonTreeSetPropertyTest {
     SpinJsonNode newValue2 = jsonNode.prop("customers");
 
     assertThat(newValue1.numberValue()).isNotEqualTo(oldValue);
+    assertThat(newValue1.numberValue()).isEqualTo(value);
 
     assertThat(newValue2.isArray()).isFalse();
     assertThat(newValue2.isNumber()).isTrue();
@@ -141,6 +142,7 @@ public class JsonTreeSetPropertyTest {
     SpinJsonNode newValue2 = jsonNode.prop("customers");
 
     assertThat(newValue1.numberValue()).isNotEqualTo(oldValue);
+    assertThat(newValue1.numberValue()).isEqualTo(value);
 
     assertThat(newValue2.isArray()).isFalse();
     assertThat(newValue2.isNumber()).isTrue();
@@ -173,6 +175,7 @@ public class JsonTreeSetPropertyTest {
     SpinJsonNode newValue2 = jsonNode.prop("customers");
 
     assertThat(newValue1.numberValue()).isNotEqualTo(oldValue);
+    assertThat(newValue1.numberValue()).isEqualTo(value);
 
     assertThat(newValue2.isArray()).isFalse();
     assertThat(newValue2.isNumber()).isTrue();
@@ -193,21 +196,23 @@ public class JsonTreeSetPropertyTest {
     SpinJsonNode active = jsonNode.prop("active");
 
     Boolean oldValue = active.boolValue();
+    Boolean value = !oldValue;
 
     assertThat(customers.isArray()).isTrue();
     assertThat(active.isBoolean());
 
     // set new values
-    jsonNode.prop("active", false);
-    jsonNode.prop("customers", true);
+    jsonNode.prop("active", value);
+    jsonNode.prop("customers", value);
     SpinJsonNode newValue1 = jsonNode.prop("active");
     SpinJsonNode newValue2 = jsonNode.prop("customers");
 
     assertThat(newValue1.boolValue()).isNotEqualTo(oldValue);
+    assertThat(newValue1.boolValue()).isEqualTo(value);
 
     assertThat(newValue2.isArray()).isFalse();
     assertThat(newValue2.isBoolean()).isTrue();
-    assertThat(newValue2.boolValue()).isTrue();
+    assertThat(newValue2.boolValue()).isEqualTo(value);
   }
 
   @Test
@@ -324,8 +329,9 @@ public class JsonTreeSetPropertyTest {
     String json = "{\"agent\":\"Smith\"}";
 
     jsonNode.prop("name", JSON(json));
-    assertThat(jsonNode.prop("name").isObject()).isTrue();
-    assertThat(jsonNode.prop("name").prop("agent").stringValue()).isEqualTo("Smith");
+    SpinJsonNode name = jsonNode.prop("name");
+    assertThat(name.isObject()).isTrue();
+    assertThat(name.prop("agent").stringValue()).isEqualTo("Smith");
   }
 
   @Test
@@ -335,9 +341,10 @@ public class JsonTreeSetPropertyTest {
     assertThat(active.isBoolean()).isTrue();
 
     jsonNode.prop("active", JSON(json));
-    assertThat(jsonNode.prop("active").isBoolean()).isFalse();
-    assertThat(jsonNode.prop("active").isObject()).isTrue();
-    assertThat(jsonNode.prop("active").prop("agent").stringValue()).isEqualTo("Smith");
+    SpinJsonNode active = jsonNode.prop("active");
+    assertThat(active.isBoolean()).isFalse();
+    assertThat(active.isObject()).isTrue();
+    assertThat(active.prop("agent").stringValue()).isEqualTo("Smith");
   }
 
   @Test
@@ -347,7 +354,7 @@ public class JsonTreeSetPropertyTest {
     map.put("date", date);
 
     try {
-      jsonNode.prop("test",map);
+      jsonNode.prop("test", map);
       fail("Expected SpinJsonTreePropertyException");
     } catch(SpinJsonTreePropertyException e) {
       // expected
@@ -361,7 +368,7 @@ public class JsonTreeSetPropertyTest {
     list.add(date);
 
     try {
-      jsonNode.prop("test",list);
+      jsonNode.prop("test", list);
       fail("Expected SpinJsonTreePropertyException");
     } catch(SpinJsonTreePropertyException e) {
       // expected
