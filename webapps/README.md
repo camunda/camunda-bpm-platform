@@ -61,6 +61,33 @@ Optionally you could globally install [grunt](http://gruntjs.com/) (using `npm i
 
 ### Setup
 
+#### Using grunt
+
+They are some grunt tasks aimed to ease the development setup process, __but they can not be considered as stable__ and might do some mess with your NPM linking (at least with the camunda related packages).
+You __need to install grunt globally__ to use that method.
+
+To give it a try:
+
+##### Setup step:
+```sh
+# cd <path to your workspace>
+git clone git@github.com:camunda/camunda-bpm-webapp.git
+cd camunda-bpm-webapp/
+npm install
+grunt setup
+```
+
+##### Working:
+```sh
+# cd <path to your workspace>/camunda-bpm-webapp
+grunt
+```
+
+You can additionally use the --update option (who will refresh the maven dependencies).
+
+
+#### By hands
+
 Depending on your needs, you might want to clone the following repositories:
 
 ```sh
