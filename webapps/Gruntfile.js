@@ -73,6 +73,17 @@ module.exports = function(grunt) {
 
   var verbose = grunt.option('verbose');
   var stack = grunt.option('stack');
+  var webappArgs = [
+    'clean',
+    'install',
+    'jetty:run',
+    '-DskipTests',
+    '-Pdevelop,livereload',
+  ];
+
+  if (!grunt.option('update')) {
+    webappArgs.push('-o');
+  }
 
   grunt.initConfig({
     parallel: {
@@ -142,14 +153,7 @@ module.exports = function(grunt) {
               cwd: path.resolve(__dirname, './webapp')
             },
             cmd: 'mvn',
-            args: [
-              'clean',
-              'install',
-              'jetty:run',
-              '-DskipTests',
-              '-Pdevelop,livereload',
-              //'-o'
-            ]
+            args: webappArgs
           },
           autoBuild('camunda-bpm-sdk-js', verbose, stack),
           // autoBuild('camunda-commons-ui', verbose, stack),
