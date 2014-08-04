@@ -42,12 +42,6 @@
                   <exclude>org.slf4j:*</exclude>
                 </excludes>
               </artifactSet>
-              <relocations>
-                <relocation>
-                  <pattern>com.fasterxml</pattern>
-                  <shadedPattern>spinjar.com.fasterxml</shadedPattern>
-                </relocation>
-              </relocations>
             </configuration>
           </execution>
         </executions>
