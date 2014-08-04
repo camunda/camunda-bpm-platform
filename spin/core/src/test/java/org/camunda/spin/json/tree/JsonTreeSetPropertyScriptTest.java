@@ -216,12 +216,7 @@ public abstract class JsonTreeSetPropertyScriptTest extends ScriptTest {
   public void shouldFailWhileSettingObject() throws Throwable{
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("date", new Date());
-    try {
-      script.execute(variables);
-    }
-    catch (SpinScriptException e) {
-      throw e.getCause().getCause().getCause();
-    }
+    failingWithException(variables);
   }
 
   @Test(expected = SpinJsonTreePropertyException.class)
@@ -230,12 +225,7 @@ public abstract class JsonTreeSetPropertyScriptTest extends ScriptTest {
   public void shouldFailWhileSettingArray() throws Throwable{
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("date", new Date());
-    try {
-      script.execute(variables);
-    }
-    catch (SpinScriptException e) {
-      throw e.getCause().getCause().getCause();
-    }
+    failingWithException(variables);
   }
 
 }
