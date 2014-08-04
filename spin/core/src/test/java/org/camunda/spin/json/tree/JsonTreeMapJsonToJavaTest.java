@@ -130,6 +130,9 @@ public class JsonTreeMapJsonToJavaTest {
 
     order = JSON(EXAMPLE_JSON, jsonTree().mapper().config(configuration).done()).mapTo(Order.class);
     assertThat(order.getDueUntil()).isInstanceOf(BigInteger.class);
+
+    order = JSON(EXAMPLE_JSON, null, null, configuration).mapTo(Order.class);
+    assertThat(order.getDueUntil()).isInstanceOf(BigInteger.class);
   }
 
   @Test
@@ -151,7 +154,7 @@ public class JsonTreeMapJsonToJavaTest {
     assertThat(dateObject).isNotNull();
 
     Calendar calendar = dateFormat.getCalendar();
-    calendar.set(2012, 9, 10, 10, 20, 42);
+    calendar.set(2012, Calendar.OCTOBER, 10, 10, 20, 42);
     Date expectedDate = calendar.getTime();
 
     assertThat(dateObject.getDate()).isEqualToIgnoringMillis(expectedDate);
@@ -164,7 +167,5 @@ public class JsonTreeMapJsonToJavaTest {
 
     return result;
   }
-
-  // TODO test mapping with map configuration on Spin instantiation
 
 }

@@ -13,6 +13,8 @@
 
 package org.camunda.spin.test;
 
+import java.util.Map;
+
 import org.camunda.spin.SpinScriptException;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -39,4 +41,14 @@ public abstract class ScriptTest {
       throw e.getCause().getCause().getCause();
     }
   }
+
+  protected void failingWithException(Map<String, Object> variables) throws Throwable {
+    try {
+      script.execute(variables);
+    }
+    catch (SpinScriptException e) {
+      throw e.getCause().getCause().getCause();
+    }
+  }
+
 }
