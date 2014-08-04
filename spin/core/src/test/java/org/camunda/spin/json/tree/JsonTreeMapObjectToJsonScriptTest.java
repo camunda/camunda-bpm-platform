@@ -14,9 +14,10 @@ package org.camunda.spin.json.tree;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 
+import org.camunda.spin.SpinList;
+import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.test.Script;
 import org.camunda.spin.test.ScriptTest;
 import org.junit.Test;
@@ -30,5 +31,27 @@ public abstract class JsonTreeMapObjectToJsonScriptTest extends ScriptTest {
     String json = script.getVariable("json");
     assertThat(json).isNotNull();
     assertThatJson(json).isEqualTo(EXAMPLE_JSON);
+  }
+
+  @Test
+  @Script
+  public void shouldMapPrimitives() {
+    SpinJsonNode json = script.getVariable("booleanVar");
+
+    assertThat(json.isBoolean()).isTrue();
+    assertThat(json.boolValue()).isFalse();
+
+    json = script.getVariable("integerVar");
+
+    assertThat(json.isNumber()).isTrue();
+    assertThat(json.numberValue()).isEqualTo(42);
+
+    SpinJsonNode jsonList = script.getVariable("listVar");
+
+    assertThat(jsonList.isArray()).isTrue();
+    SpinList<SpinJsonNode> elements = jsonList.elements();
+    assertThat(elements.get(0).stringValue()).isEqualTo("Waldo");
+    assertThat(elements.get(1).stringValue()).isEqualTo("Hugo");
+    assertThat(elements.get(2).stringValue()).isEqualTo("Kermit");
   }
 }

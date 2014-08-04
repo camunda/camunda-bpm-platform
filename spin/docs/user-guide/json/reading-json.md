@@ -21,6 +21,8 @@ import static org.camunda.spin.Spin.*;
 SpinJsonNode json = JSON("{\"customer\": \"Kermit\"}");
 ```
 
+String values that represent Json primitive values can also be read. For example, `JSON("true")` returns a `SpinJsonNode` that represents the boolean value `true`.
+
 ## Reading Json from an InputStream:
 
 Spin also supports reading Json directly from a `java.io.InputStream`:

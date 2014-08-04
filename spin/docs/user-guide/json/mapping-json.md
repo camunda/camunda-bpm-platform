@@ -41,6 +41,8 @@ import static org.camunda.spin.Spin.JSON;
 String json = JSON(customer).toString();
 ```
 
+You can also map Java primitives like boolean or number values to the corresponding json values. For example, `JSON(true)` maps to the json constant of the boolean value `true`. Note however, that String values are not converted but are interpreted as Json input (see [Reading Json][reading-json]). For example, `JSON("a String")` raises an exception because `"a String"` lacks additional escaped quotes and is no valid Json. Nevertheless, a list of String values is properly converted to a json array of String values.
+
 ## Mapping to Generic Types:
 
 Assume we have a list of customers that we would declare as `List<Customer>` in Java. For mapping a json array `[{"name" : "Kermit"}, {"name" : "Hugo"}]` to such a list, calling `mapTo(ArrayList.class)` is not sufficient as Jackson cannot tell of which type the array's elements are. This case can be handled by providing `mapTo` with a canonical type string, following Jackson's conventions:
@@ -145,3 +147,4 @@ DateContainer dateObject =
 
 [jackson-polymorphy]: http://wiki.fasterxml.com/JacksonPolymorphicDeserialization
 [jackson-date]: http://wiki.fasterxml.com/JacksonFAQDateHandling
+[reading-json]: reading-json.md

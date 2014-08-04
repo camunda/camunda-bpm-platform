@@ -24,11 +24,15 @@ import static org.camunda.spin.json.JsonTestConstants.createExampleOrder;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.camunda.spin.SpinList;
+import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.json.mapping.DateObject;
 import org.camunda.spin.json.mapping.EmptyBean;
 import org.camunda.spin.json.mapping.Invoice;
@@ -49,6 +53,41 @@ public class JsonTreeMapJavaToJsonTest {
     String json = JSON(exampleOrder).toString();
 
     assertThatJson(json).isEqualTo(EXAMPLE_JSON);
+  }
+
+  @Test
+  public void shouldMapListToJson() {
+    List<String> names = new ArrayList<String>();
+    names.add("Waldo");
+    names.add("Hugo");
+    names.add("Kermit");
+
+    String json = JSON(names).toString();
+
+    String expectedJson = "[\"Waldo\", \"Hugo\", \"Kermit\"]";
+    assertThatJson(json).isEqualTo(expectedJson);
+  }
+
+  @Test
+  public void shouldMapArrayToJson() {
+    String[] names = new String[] { "Waldo", "Hugo", "Kermit" };
+
+    String json = JSON(names).toString();
+
+    String expectedJson = "[\"Waldo\", \"Hugo\", \"Kermit\"]";
+    assertThatJson(json).isEqualTo(expectedJson);
+  }
+
+  @Test
+  public void shouldMapMapToJson() {
+    Map<String, Object> javaMap = new HashMap<String, Object>();
+    javaMap.put("aKey", "aValue");
+    javaMap.put("anotherKey", 42);
+
+    String json = JSON(javaMap).toString();
+
+    String expectedJson = "{\"aKey\" : \"aValue\", \"anotherKey\" : 42}";
+    assertThatJson(json).isEqualTo(expectedJson);
   }
 
   @Test
@@ -108,6 +147,39 @@ public class JsonTreeMapJavaToJsonTest {
 
     json = JSON(bean, null, null, configuration).toString();
     assertThat(json).isEqualTo("{}");
+  }
+
+  @Test
+  public void shouldMapPrimitiveBooleanToJson() {
+    SpinJsonNode node = JSON(true);
+    assertThat(node.isBoolean()).isTrue();
+    assertThat(node.isValue()).isTrue();
+    assertThat(node.boolValue()).isTrue();
+  }
+
+  @Test
+  public void shouldMapPrimitiveNumberToJson() {
+    SpinJsonNode node = JSON(42);
+    assertThat(node.isNumber()).isTrue();
+    assertThat(node.isValue()).isTrue();
+    assertThat(node.numberValue()).isEqualTo(42);
+  }
+
+
+  @Test
+  public void shouldMapListOfPrimitiveStrings() {
+    List<String> inputList = new ArrayList<String>();
+    inputList.add("Waldo");
+    inputList.add("Hugo");
+    inputList.add("Kermit");
+
+    SpinJsonNode node = JSON(inputList);
+    assertThat(node.isArray()).isTrue();
+
+    SpinList<SpinJsonNode> elements = node.elements();
+    assertThat(elements.get(0).stringValue()).isEqualTo("Waldo");
+    assertThat(elements.get(1).stringValue()).isEqualTo("Hugo");
+    assertThat(elements.get(2).stringValue()).isEqualTo("Kermit");
   }
 
   protected Map<String, Object> newMap(String key, Object value) {

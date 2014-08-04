@@ -242,4 +242,38 @@ public class JsonTreeCreateTest {
       // expected
     }
   }
+
+  @Test
+  public void shouldCreateForBoolean() {
+    SpinJsonNode node = JSON("false");
+    assertThat(node.isBoolean()).isTrue();
+    assertThat(node.isValue()).isTrue();
+    assertThat(node.boolValue()).isFalse();
+  }
+
+  @Test
+  public void shouldCreateForNumber() {
+    SpinJsonNode node = JSON("42");
+    assertThat(node.isNumber()).isTrue();
+    assertThat(node.isValue()).isTrue();
+    assertThat(node.numberValue()).isEqualTo(42);
+  }
+
+  @Test
+  public void shouldCreateForPrimitiveString() {
+    SpinJsonNode node = JSON("\"a String\"");
+    assertThat(node.isString()).isTrue();
+    assertThat(node.isValue()).isTrue();
+    assertThat(node.stringValue()).isEqualTo("a String");
+  }
+
+  @Test
+  public void shouldFailForUnescapedString() {
+    try {
+      JSON("a String");
+      fail("expected exception");
+    } catch (SpinDataFormatException e) {
+      // expected
+    }
+  }
 }
