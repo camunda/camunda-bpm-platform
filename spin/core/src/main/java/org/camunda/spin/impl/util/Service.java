@@ -33,7 +33,7 @@ import org.camunda.spin.logging.SpinLogger;
  */
 public class Service {
 
-  private final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
+  private static final SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
   /**
    * Returns the service provider for the given interface. This method allows passing

@@ -46,7 +46,7 @@ import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
  */
 public class SpinJsonJacksonTreeNode extends SpinJsonNode {
 
-  private final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
+  private static final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
 
   protected final JsonNode jsonNode;
   protected final JsonJacksonTreeDataFormat dataFormat;

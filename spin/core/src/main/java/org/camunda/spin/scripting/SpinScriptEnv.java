@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class SpinScriptEnv {
 
-  private final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
+  private static final SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
   private static final String ENV_PATH_TEMPLATE = "script/env/%s/spin.%s";
 

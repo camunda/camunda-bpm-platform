@@ -23,10 +23,10 @@ import org.camunda.spin.test.SpinTestLogger;
  */
 public abstract class SpinLogger extends BaseLogger {
 
-  public final static String PROJECT_CODE = "SPIN";
+  public static final String PROJECT_CODE = "SPIN";
 
-  public final static SpinCoreLogger CORE_LOGGER = BaseLogger.createLogger(SpinCoreLogger.class, PROJECT_CODE, "org.camunda.spin", "01");
-  public final static SpinTestLogger TEST_LOGGER = BaseLogger.createLogger(SpinTestLogger.class, PROJECT_CODE, "org.camunda.spin.test", "02");
-  public final static XmlDomLogger XML_DOM_LOGGER = BaseLogger.createLogger(XmlDomLogger.class, PROJECT_CODE, "org.camunda.spin.xml", "03");
-  public final static JsonJacksonTreeLogger JSON_TREE_LOGGER = BaseLogger.createLogger(JsonJacksonTreeLogger.class, PROJECT_CODE, "org.camunda.spin.json", "04");
+  public static final SpinCoreLogger CORE_LOGGER = BaseLogger.createLogger(SpinCoreLogger.class, PROJECT_CODE, "org.camunda.spin", "01");
+  public static final SpinTestLogger TEST_LOGGER = BaseLogger.createLogger(SpinTestLogger.class, PROJECT_CODE, "org.camunda.spin.test", "02");
+  public static final XmlDomLogger XML_DOM_LOGGER = BaseLogger.createLogger(XmlDomLogger.class, PROJECT_CODE, "org.camunda.spin.xml", "03");
+  public static final JsonJacksonTreeLogger JSON_TREE_LOGGER = BaseLogger.createLogger(JsonJacksonTreeLogger.class, PROJECT_CODE, "org.camunda.spin.json", "04");
 }

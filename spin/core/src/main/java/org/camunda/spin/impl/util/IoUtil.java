@@ -40,9 +40,9 @@ import org.camunda.spin.logging.SpinLogger;
  */
 public class IoUtil {
   
-  public final static Charset ENCODING_CHARSET = Charset.forName("UTF-8");
+  public static final Charset ENCODING_CHARSET = Charset.forName("UTF-8");
 
-  private final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
+  private static final SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
   public static void closeSilently(Closeable closeable) {
     try {

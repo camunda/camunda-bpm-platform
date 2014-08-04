@@ -32,7 +32,7 @@ import javax.xml.xpath.XPathExpressionException;
  */
 public class SpinXmlDomXPathQuery extends SpinXmlTreeXPathQuery {
 
-  private final static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
+  private static final XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
 
   protected final SpinXmlDomElement domElement;
   protected final XPathExpression query;

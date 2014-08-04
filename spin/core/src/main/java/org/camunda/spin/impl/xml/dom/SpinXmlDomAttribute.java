@@ -32,7 +32,7 @@ import java.nio.charset.Charset;
  */
 public class SpinXmlDomAttribute extends SpinXmlTreeAttribute {
 
-  private final static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
+  private static final XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
 
   protected final Attr attributeNode;
 

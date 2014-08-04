@@ -41,7 +41,7 @@ import org.junit.runners.model.Statement;
  */
 public class ScriptRule implements TestRule {
 
-  private final static SpinTestLogger LOG = SpinLogger.TEST_LOGGER;
+  private static final SpinTestLogger LOG = SpinLogger.TEST_LOGGER;
 
   private String script;
   private String scriptPath;

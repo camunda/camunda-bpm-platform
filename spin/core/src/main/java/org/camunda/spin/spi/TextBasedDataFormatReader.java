@@ -27,7 +27,7 @@ import org.camunda.spin.logging.SpinCoreLogger;
  */
 public abstract class TextBasedDataFormatReader implements DataFormatReader {
 
-  private final static SpinCoreLogger LOG = SpinCoreLogger.CORE_LOGGER;
+  private static final SpinCoreLogger LOG = SpinCoreLogger.CORE_LOGGER;
 
   public boolean canRead(RewindableInputStream input) {
     int inputSize = input.getCurrentRewindableCapacity();

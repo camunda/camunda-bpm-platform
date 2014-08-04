@@ -27,26 +27,26 @@ import org.camunda.spin.json.mapping.RegularCustomer;
 
 public class JsonTestConstants {
 
-  public final static String EXAMPLE_JSON_FILE_NAME = "org/camunda/spin/json/example.json";
+  public static final String EXAMPLE_JSON_FILE_NAME = "org/camunda/spin/json/example.json";
 
-  public final static String EXAMPLE_JSON = IoUtil.readFileAsString(EXAMPLE_JSON_FILE_NAME);
+  public static final String EXAMPLE_JSON = IoUtil.readFileAsString(EXAMPLE_JSON_FILE_NAME);
 
-  public final static String EXAMPLE_JSON_COLLECTION = "[" + EXAMPLE_JSON + "]";
+  public static final String EXAMPLE_JSON_COLLECTION = "[" + EXAMPLE_JSON + "]";
 
-  public final static String EXAMPLE_INVALID_JSON = "{\"invalid\":";
+  public static final String EXAMPLE_INVALID_JSON = "{\"invalid\":";
 
-  public final static String EXAMPLE_EMPTY_STRING = "";
+  public static final String EXAMPLE_EMPTY_STRING = "";
 
   /**
    * A json file that can only be parsed when configuring Jackson correctly.
    */
-  public final static String EXAMPLE_JACKSON_READ_CONFIGURATION_JSON_FILE_NAME = "org/camunda/spin/json/example_jackson.json";
+  public static final String EXAMPLE_JACKSON_READ_CONFIGURATION_JSON_FILE_NAME = "org/camunda/spin/json/example_jackson.json";
 
-  public final static String EXAMPLE_JACKSON_READ_CONFIGURATION_JSON = IoUtil.readFileAsString(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON_FILE_NAME);
+  public static final String EXAMPLE_JACKSON_READ_CONFIGURATION_JSON = IoUtil.readFileAsString(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON_FILE_NAME);
 
-  public final static String EXAMPLE_JACKSON_TYPE_JSON_FILE_NAME = "org/camunda/spin/json/example_jackson_types.json";
+  public static final String EXAMPLE_JACKSON_TYPE_JSON_FILE_NAME = "org/camunda/spin/json/example_jackson_types.json";
 
-  public final static String EXAMPLE_JACKSON_TYPE_JSON = IoUtil.readFileAsString(EXAMPLE_JACKSON_TYPE_JSON_FILE_NAME);
+  public static final String EXAMPLE_JACKSON_TYPE_JSON = IoUtil.readFileAsString(EXAMPLE_JACKSON_TYPE_JSON_FILE_NAME);
 
   public static Order createExampleOrder() {
     Order order = new Order();

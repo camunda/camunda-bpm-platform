@@ -35,9 +35,9 @@ import org.camunda.spin.spi.SpinDataFormatException;
  */
 public class SpinFactoryImpl extends SpinFactory {
 
-  private final static SpinCoreLogger LOG = SpinCoreLogger.CORE_LOGGER;
+  private static final SpinCoreLogger LOG = SpinCoreLogger.CORE_LOGGER;
 
-  private final static int READ_SIZE = 256;
+  private static final int READ_SIZE = 256;
 
   @SuppressWarnings("unchecked")
   public <T extends Spin<?>> T createSpin(Object parameter) {

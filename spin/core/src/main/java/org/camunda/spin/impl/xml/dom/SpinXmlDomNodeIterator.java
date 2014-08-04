@@ -23,7 +23,7 @@ import java.util.Iterator;
  */
 public abstract class SpinXmlDomNodeIterator<T extends SpinXmlTreeNode> implements Iterator<T> {
 
-  private final static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
+  private static final XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
 
   protected int index = 0;
 

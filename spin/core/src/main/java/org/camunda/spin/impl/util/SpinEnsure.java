@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
  */
 public class SpinEnsure {
 
-  private final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
+  private static final SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
   /**
    * Ensures that the parameter is not null.

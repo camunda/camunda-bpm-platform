@@ -30,9 +30,9 @@ import org.w3c.dom.Element;
  */
 public class XmlDomDataFormat implements DataFormat<SpinXmlTreeElement> {
 
-  protected final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
+  protected static final SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
-  public final static XmlDomDataFormat INSTANCE = new XmlDomDataFormat();
+  public static final XmlDomDataFormat INSTANCE = new XmlDomDataFormat();
 
   public Class<? extends SpinXmlTreeElement> getWrapperType() {
     return SpinXmlDomElement.class;

@@ -27,7 +27,7 @@ import org.camunda.spin.logging.SpinLogger;
  */
 public class RewindableInputStream extends InputStream {
 
-  private final static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
+  private static final SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
   protected PushbackInputStream wrappedStream;
   

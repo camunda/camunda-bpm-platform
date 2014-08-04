@@ -28,7 +28,7 @@ import org.camunda.spin.xml.tree.SpinXmlTreeElement;
  */
 public abstract class Spin<T extends Spin<?>> {
 
-  protected final static SpinFactory SPIN_FACTORY = SpinFactory.getInstance();
+  protected static final SpinFactory SPIN_FACTORY = SpinFactory.getInstance();
 
   /**
    *

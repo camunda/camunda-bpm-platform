@@ -44,7 +44,7 @@ import static org.camunda.spin.impl.util.SpinEnsure.*;
  */
 public class SpinXmlDomElement extends SpinXmlTreeElement {
 
-  private final static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
+  private static final XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
 
   protected static Transformer cachedTransformer = null;
 

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 
 public class JsonJacksonTreeDataFormatMapper implements DataFormatMapper {
 
-  private final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
+  private static final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
 
   protected JsonJacksonTreeDataFormat format;
 

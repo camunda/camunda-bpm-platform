@@ -26,7 +26,7 @@ import org.camunda.spin.logging.SpinLogger;
  */
 public class SpinJsonPathQuery extends SpinJsonTreePathQuery {
 
-  private final static JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
+  private static final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
 
   protected final SpinJsonNode spinJsonNode;
   protected final JsonPath query;

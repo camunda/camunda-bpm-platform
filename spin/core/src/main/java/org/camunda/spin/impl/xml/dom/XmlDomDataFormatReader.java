@@ -31,7 +31,7 @@ import org.xml.sax.SAXException;
  */
 public class XmlDomDataFormatReader extends TextBasedDataFormatReader {
 
-  private static XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
+  private static final XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
   private static final Pattern INPUT_MATCHING_PATTERN = Pattern.compile("\\A(\\s)*<");
 
   public Element readInput(InputStream input) {

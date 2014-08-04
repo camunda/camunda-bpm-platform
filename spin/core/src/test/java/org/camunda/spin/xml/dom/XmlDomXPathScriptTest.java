@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public abstract class XmlDomXPathScriptTest extends ScriptTest {
 
-  private final static String xml = "<root><child id=\"child\"><a id=\"a\"/><b id=\"b\"/><a id=\"c\"/></child></root>";
+  private static final String xml = "<root><child id=\"child\"><a id=\"a\"/><b id=\"b\"/><a id=\"c\"/></child></root>";
 
   @Test
   @Script(

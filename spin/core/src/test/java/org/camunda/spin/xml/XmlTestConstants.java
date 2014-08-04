@@ -22,17 +22,17 @@ import java.io.InputStream;
  */
 public class XmlTestConstants {
 
-  public final static String EXAMPLE_NAMESPACE = "http://camunda.org/example";
+  public static final String EXAMPLE_NAMESPACE = "http://camunda.org/example";
 
-  public final static String EXAMPLE_XML_FILE_NAME = "org/camunda/spin/xml/example.xml";
+  public static final String EXAMPLE_XML_FILE_NAME = "org/camunda/spin/xml/example.xml";
 
-  public final static String EXAMPLE_XML = IoUtil.readFileAsString(EXAMPLE_XML_FILE_NAME);
+  public static final String EXAMPLE_XML = IoUtil.readFileAsString(EXAMPLE_XML_FILE_NAME);
 
-  public final static String EXAMPLE_INVALID_XML = "<invalid";
+  public static final String EXAMPLE_INVALID_XML = "<invalid";
 
-  public final static String EXAMPLE_EMPTY_STRING = "";
+  public static final String EXAMPLE_EMPTY_STRING = "";
 
-  public final static String NON_EXISTING = "nonExisting";
+  public static final String NON_EXISTING = "nonExisting";
 
   public static InputStream exampleXmlFileAsStream() {
     return IoUtil.getFileAsStream(EXAMPLE_XML_FILE_NAME);
