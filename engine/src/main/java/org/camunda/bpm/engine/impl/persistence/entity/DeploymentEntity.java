@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.repository.Deployment;
 
 
 /**
  * @author Tom Baeyens
  */
-public class DeploymentEntity implements Serializable, Deployment, PersistentObject {
+public class DeploymentEntity implements Serializable, Deployment, DbEntity {
 
   private static final long serialVersionUID = 1L;
 

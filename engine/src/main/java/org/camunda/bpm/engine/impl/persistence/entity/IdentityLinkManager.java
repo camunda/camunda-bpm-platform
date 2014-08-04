@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,12 +29,12 @@ public class IdentityLinkManager extends AbstractManager {
   public void deleteIdentityLink(IdentityLinkEntity identityLink) {
     getDbSqlSession().delete(identityLink);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<IdentityLinkEntity> findIdentityLinksByTaskId(String taskId) {
     return getDbSqlSession().selectList("selectIdentityLinksByTask", taskId);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<IdentityLinkEntity> findIdentityLinksByProcessDefinitionId(String processDefinitionId) {
     return getDbSqlSession().selectList("selectIdentityLinksByProcessDefinition", processDefinitionId);
@@ -49,7 +49,7 @@ public class IdentityLinkManager extends AbstractManager {
     parameters.put("type", type);
     return getDbSqlSession().selectList("selectIdentityLinkByTaskUserGroupAndType", parameters);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<IdentityLinkEntity> findIdentityLinkByProcessDefinitionUserAndGroup(String processDefinitionId, String userId, String groupId) {
     Map<String, String> parameters = new HashMap<String, String>();
@@ -65,9 +65,9 @@ public class IdentityLinkManager extends AbstractManager {
       deleteIdentityLink(identityLink);
     }
   }
-  
+
   public void deleteIdentityLinksByProcDef(String processDefId) {
-    getDbSqlSession().delete("deleteIdentityLinkByProcDef", processDefId);
+    getDbSqlSession().delete(IdentityLinkEntity.class, "deleteIdentityLinkByProcDef", processDefId);
   }
-  
+
 }

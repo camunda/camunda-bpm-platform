@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.impl.history.event;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 
 /**
@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
  * them as an intermediate representation for later processing
  * (ie. in an asynchronous implementation).</p>
  *
- * <p>This class implements {@link PersistentObject}. This was chosen so
+ * <p>This class implements {@link DbEntity}. This was chosen so
  * that {@link HistoryEvent}s can be easily persisted using the
  * {@link DbSqlSession}. This may not be used by all {@link HistoryEventHandler}
  * implementations but it does also not cause harm.</p>
@@ -39,7 +39,7 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
  * @author Daniel Meyer
  *
  */
-public class HistoryEvent implements Serializable, PersistentObject {
+public class HistoryEvent implements Serializable, DbEntity {
 
   private static final long serialVersionUID = 1L;
 

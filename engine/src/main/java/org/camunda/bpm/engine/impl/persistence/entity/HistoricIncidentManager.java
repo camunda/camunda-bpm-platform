@@ -36,13 +36,13 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
 
   public void deleteHistoricIncidentsByProcessInstanceId(String processInstanceId) {
     if (isHistoryLevelFullEnabled()) {
-      getDbSqlSession().delete("deleteHistoricIncidentsByProcessInstanceId", processInstanceId);
+      getDbSqlSession().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByProcessInstanceId", processInstanceId);
     }
   }
 
   public void deleteHistoricIncidentsByProcessDefinitionId(String processDefinitionId) {
     if (isHistoryLevelFullEnabled()) {
-      getDbSqlSession().delete("deleteHistoricIncidentsByProcessDefinitionId", processDefinitionId);
+      getDbSqlSession().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByProcessDefinitionId", processDefinitionId);
     }
   }
 

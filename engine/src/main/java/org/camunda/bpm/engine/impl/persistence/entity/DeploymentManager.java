@@ -133,7 +133,7 @@ public class DeploymentManager extends AbstractManager {
     getResourceManager()
       .deleteResourcesByDeploymentId(deploymentId);
 
-    getDbSqlSession().delete("deleteDeployment", deploymentId);
+    getDbSqlSession().delete(DeploymentEntity.class, "deleteDeployment", deploymentId);
   }
 
   protected void deleteCaseDeployment(String deploymentId, boolean cascade) {

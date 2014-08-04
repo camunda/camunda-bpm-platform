@@ -37,8 +37,8 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.delegate.TaskListenerInvocation;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextCloseListener;
@@ -59,7 +59,7 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class TaskEntity extends CoreVariableScope implements Task, DelegateTask, Serializable, PersistentObject, HasRevision, CommandContextCloseListener {
+public class TaskEntity extends CoreVariableScope implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, CommandContextCloseListener {
 
   public static final String DELETE_REASON_COMPLETED = "completed";
   public static final String DELETE_REASON_DELETED = "deleted";

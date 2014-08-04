@@ -22,14 +22,14 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AuthorizationEntity implements Authorization, PersistentObject, HasRevision, Serializable {
+public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
   

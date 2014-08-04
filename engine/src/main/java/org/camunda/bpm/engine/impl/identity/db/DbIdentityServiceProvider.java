@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.MembershipEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 
 /**
@@ -120,15 +121,15 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("userId", userId);
     parameters.put("groupId", groupId);
-    getDbSqlSession().delete("deleteMembership", parameters);
+    getDbSqlSession().delete(MembershipEntity.class, "deleteMembership", parameters);
   }
 
   protected void deleteMembershipsByUserId(String userId) {
-    getDbSqlSession().delete("deleteMembershipsByUserId", userId);
+    getDbSqlSession().delete(MembershipEntity.class, "deleteMembershipsByUserId", userId);
   }
 
   protected void deleteMembershipsByGroupId(String groupId) {
-    getDbSqlSession().delete("deleteMembershipsByGroupId", groupId);
+    getDbSqlSession().delete(MembershipEntity.class, "deleteMembershipsByGroupId", groupId);
   }
 
   // authorizations ////////////////////////////////////////////////////////////

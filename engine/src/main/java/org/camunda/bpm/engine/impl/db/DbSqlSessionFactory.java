@@ -268,11 +268,11 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   // insert, update and delete statements /////////////////////////////////////
 
-  public String getInsertStatement(PersistentObject object) {
+  public String getInsertStatement(DbEntity object) {
     return getStatement(object.getClass(), insertStatements, "insert");
   }
 
-  public String getUpdateStatement(PersistentObject object) {
+  public String getUpdateStatement(DbEntity object) {
     return getStatement(object.getClass(), updateStatements, "update");
   }
 

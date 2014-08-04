@@ -155,28 +155,28 @@ public class TaskManager extends AbstractManager {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
   }
 
   public void updateTaskSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
   }
 
   public void updateTaskSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
   }
 
   public void updateTaskSuspensionStateByCaseExecutionId(String caseExecutionId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("caseExecutionId", caseExecutionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
+    getDbSqlSession().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
 
   }
 

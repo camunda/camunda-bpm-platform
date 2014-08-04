@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -595,7 +595,7 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
           for (HistoricIncident historicIncident : historicIncidents) {
             commandContext
               .getDbSqlSession()
-              .delete((PersistentObject) historicIncident);
+              .delete((DbEntity) historicIncident);
           }
 
           return null;

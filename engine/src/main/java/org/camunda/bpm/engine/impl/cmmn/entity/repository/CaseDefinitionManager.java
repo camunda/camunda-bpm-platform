@@ -31,7 +31,7 @@ public class CaseDefinitionManager extends AbstractManager {
   }
 
   public void deleteCaseDefinitionsByDeploymentId(String deploymentId) {
-    getDbSqlSession().delete("deleteCaseDefinitionsByDeploymentId", deploymentId);
+    getDbSqlSession().delete(CaseDefinitionEntity.class, "deleteCaseDefinitionsByDeploymentId", deploymentId);
   }
 
   public CaseDefinitionEntity findCaseDefinitionById(String caseDefinitionId) {

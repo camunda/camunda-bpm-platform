@@ -15,8 +15,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.management.JobDefinition;
 
@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.management.JobDefinition;
  * @author Daniel Meyer
  *
  */
-public class JobDefinitionEntity implements JobDefinition, HasRevision, PersistentObject, Serializable {
+public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 

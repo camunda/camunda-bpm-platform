@@ -17,15 +17,15 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.task.Attachment;
 
 
 /**
  * @author Tom Baeyens
  */
-public class AttachmentEntity implements Attachment, PersistentObject, HasRevision, Serializable {
+public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
   

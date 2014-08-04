@@ -19,8 +19,8 @@ import java.util.HashMap;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.event.EventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
@@ -34,7 +34,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 /**
  * @author Daniel Meyer
  */
-public abstract class EventSubscriptionEntity implements EventSubscription, PersistentObject, HasRevision, Serializable {
+public abstract class EventSubscriptionEntity implements EventSubscription, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
   

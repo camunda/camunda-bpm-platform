@@ -15,15 +15,15 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 
 
 
 /**
  * @author Tom Baeyens
  */
-public class PropertyEntity implements PersistentObject, HasRevision, Serializable {
+public class PropertyEntity implements DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
   

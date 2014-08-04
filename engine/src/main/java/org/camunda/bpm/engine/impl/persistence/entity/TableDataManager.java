@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.TablePageQueryImpl;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.management.TableMetaData;
@@ -56,7 +56,7 @@ public class TableDataManager extends AbstractManager {
   private static Logger log = Logger.getLogger(TableDataManager.class.getName());
 
   public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<Class<?>, String>();
-  public static Map<Class<? extends PersistentObject>, String> persistentObjectToTableNameMap = new HashMap<Class<? extends PersistentObject>, String>();
+  public static Map<Class<? extends DbEntity>, String> persistentObjectToTableNameMap = new HashMap<Class<? extends DbEntity>, String>();
 
   static {
     // runtime
@@ -201,7 +201,7 @@ public class TableDataManager extends AbstractManager {
     String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
     String tableName = null;
 
-    if (PersistentObject.class.isAssignableFrom(entityClass)) {
+    if (DbEntity.class.isAssignableFrom(entityClass)) {
       tableName = persistentObjectToTableNameMap.get(entityClass);
     }
     else {

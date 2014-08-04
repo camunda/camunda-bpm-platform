@@ -49,19 +49,19 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void deleteOperationLogEntriesByProcessInstanceId(String historicProcessInstanceId) {
-    getDbSqlSession().delete("deleteUserOperationLogEntriesByProcessInstanceId", historicProcessInstanceId);
+    getDbSqlSession().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByProcessInstanceId", historicProcessInstanceId);
   }
 
   public void deleteOperationLogEntriesByCaseInstanceId(String caseInstanceId) {
-    getDbSqlSession().delete("deleteUserOperationLogEntriesByCaseInstanceId", caseInstanceId);
+    getDbSqlSession().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByCaseInstanceId", caseInstanceId);
   }
 
   public void deleteOperationLogEntriesByCaseDefinitionId(String caseInstanceId) {
-    getDbSqlSession().delete("deleteUserOperationLogEntriesByCaseDefinitionId", caseInstanceId);
+    getDbSqlSession().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByCaseDefinitionId", caseInstanceId);
   }
 
   public void deleteOperationLogEntriesByTaskId(String taskId) {
-    getDbSqlSession().delete("deleteUserOperationLogEntriesByTaskId", taskId);
+    getDbSqlSession().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByTaskId", taskId);
   }
 
   public void logUserOperations(UserOperationLogContext context) {
