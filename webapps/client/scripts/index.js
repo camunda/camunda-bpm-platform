@@ -93,12 +93,10 @@ define('camunda-tasklist-ui', [
       '$routeProvider',
       '$locationProvider',
       '$translateProvider',
-      'AuthenticationServiceProvider',
     function(
       $routeProvider,
       $locationProvider,
-      $translateProvider,
-      AuthenticationServiceProvider
+      $translateProvider
     ) {
 
       // Simply register translation table as object hash

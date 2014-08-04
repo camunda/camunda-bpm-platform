@@ -40,8 +40,10 @@ define([
 
 
   pileModule.factory('camTasklistPileFilterConversion', [
-          '$rootScope',
-  function($rootScope) {
+    '$rootScope',
+  function(
+    $rootScope
+  ) {
     var tokenExp = /(\{[^\}]+\})/g;
 
 
@@ -82,29 +84,55 @@ define([
 
 
   pileModule.controller('pilesCtrl', [
-           '$scope', '$rootScope', 'camAPI',
-  function ($scope,   $rootScope,   camAPI) {
+    '$scope',
+    '$rootScope',
+    'camAPI',
+  function (
+    $scope,
+    $rootScope,
+    camAPI
+  ) {
     var Pile = camAPI.resource('pile');
 
     $scope.piles = [];
     $scope.loading = true;
 
-    Pile.list({}, function(err, res) {
-      $scope.loading = false;
-      if (err) {
-        throw err;
-      }
+    function listPiles() {
+      Pile.list({}, function(err, res) {
+        $scope.loading = false;
+        if (err) {
+          throw err;
+        }
 
-      $scope.piles = res.items;
-      $rootScope.currentPile = $scope.piles[0];
-      $rootScope.$broadcast('tasklist.pile.current');
+        $scope.piles = res.items;
+        $rootScope.currentPile = $scope.piles[0];
+        $rootScope.$broadcast('tasklist.pile.current');
+      });
+    }
+
+    function authed() {
+      return $rootScope.authentication && $rootScope.authentication.name;
+    }
+
+    if (authed()) {
+      listPiles();
+    }
+
+    $rootScope.$watch('authentication', function() {
+      if (authed()) {
+        listPiles();
+      }
     });
   }]);
 
 
   pileModule.controller('pileCreateModalCtrl', [
-          '$modalInstance', '$scope',
-  function($modalInstance,   $scope) {
+    '$modalInstance',
+    '$scope',
+  function(
+    $modalInstance,
+    $scope
+  ) {
     $scope.createPile = function() {
       console.info('createPile', arguments);
     };
@@ -118,11 +146,13 @@ define([
 
 
   pileModule.controller('pileCreateCtrl', [
-          '$modal', '$scope',
-  function($modal,   $scope) {
+    '$modal',
+    '$scope',
+  function(
+    $modal,
+    $scope
+  ) {
     $scope.createPile = function() {
-      // $rootScope.currentPile = blankPile;
-
       $modal.open({
         // pass the current scope to the $modalInstance
         scope: $scope,

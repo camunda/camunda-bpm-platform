@@ -1,5 +1,6 @@
 <div class="dropdown">
   <a href
+     tabindex="-1"
      role="button"
      class="dropdown-toggle"
      data-toggle="dropdown">
@@ -8,15 +9,17 @@
   </a>
 
   <a href
+     tabindex="-1"
      title="{{ order | translate }}"
      class="sort-direction glyphicon glyphicon-chevron-up"
-     ng-class="{'glyphicon-chevron-up': order === 'asc', 'glyphicon-chevron-down': order === 'desc'}"
+     ng-class="{'glyphicon-chevron-up': order === 'desc', 'glyphicon-chevron-down': order === 'asc'}"
      ng-click="changeOrder()"></a>
 
   <ul class="dropdown-menu dropdown-menu-right"
       role="menu">
     <li>
       <a href
+         tabindex="-1"
          sort-by="priority"
          translate="PRIORITY"
          ng-click="changeBy('priority')">Creation date</a>
@@ -24,6 +27,7 @@
 
     <li>
       <a href
+         tabindex="-1"
          sort-by="created"
          translate="CREATION_DATE"
          ng-click="changeBy('created')">Creation date</a>
@@ -31,6 +35,7 @@
 
     <li>
       <a href
+         tabindex="-1"
          sort-by="dueDate"
          translate="DUE_DATE"
          ng-click="changeBy('dueDate')">Due date</a>
@@ -38,6 +43,7 @@
 
     <li>
       <a href
+         tabindex="-1"
          sort-by="followUpDate"
          translate="FOLLOW_UP_DATE"
          ng-click="changeBy('followUpDate')">Follow up date</a>
@@ -45,6 +51,7 @@
 
     <li>
       <a href
+         tabindex="-1"
          sort-by="name"
          translate="TASK_NAME"
          ng-click="changeBy('name')">Task name</a>
@@ -52,6 +59,7 @@
 
     <li>
       <a href
+         tabindex="-1"
          sort-by="assignee"
          translate="ASSIGNEE"
          ng-click="changeBy('assignee')">Assignee</a>
@@ -60,6 +68,7 @@
 <!--
     <li>
       <a href
+         tabindex="-1"
          sort-by="owner"
          translate="OWNER"
          ng-click="changeBy('owner')">Owner</a>

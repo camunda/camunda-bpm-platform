@@ -49,18 +49,22 @@ define([
    */
   userModule.controller('userLogoutCtrl', [
     '$rootScope',
+    '$translate',
     'AuthenticationService',
     'Notifications',
   function(
     $rootScope,
+    $translate,
     AuthenticationService,
     Notifications
   ) {
     AuthenticationService
       .logout()
       .then(function() {
-        Notifications.add({
-          text: 'You are logged out.'
+        $translate('LOGGED_OUT').then(function(translated) {
+          Notifications.add({
+            text: translated
+          });
         });
       });
   }]);

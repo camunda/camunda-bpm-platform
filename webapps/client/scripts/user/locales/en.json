@@ -10,5 +10,7 @@
   "LOGIN":
                         "Login",
   "LOGIN_ACTION":
-                        "Login"
+                        "Login",
+  "LOGGED_OUT":
+                        "You are logged out."
 }

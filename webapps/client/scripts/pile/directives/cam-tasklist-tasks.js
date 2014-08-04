@@ -1,8 +1,10 @@
 define([
   'angular',
+  'moment',
   'text!./cam-tasklist-tasks.html'
 ], function(
   angular,
+  moment,
   template
 ) {
   'use strict';
@@ -24,6 +26,8 @@ define([
     var Task = camAPI.resource('task');
     return {
       link: function(scope) {
+        var dateExp = /(Before|After)$/;
+
         scope.pageSize = 15;
         scope.pageNum = 1;
         scope.totalItems = 0;
@@ -49,17 +53,38 @@ define([
           loadItems();
         });
 
+
+        function buildWhere(order, by) {
+          var where = {};
+          angular.forEach(scope.pile.filters, function(pair) {
+            where[pair.key] = camTasklistPileFilterConversion(pair.value);
+            if (dateExp.test(pair.key)) {
+              /* jshint evil: true */
+              var date = new Date(eval(where[pair.key]) * 1000);
+              /* jshint evil: false */
+              date = moment(date);
+              where[pair.key] = date.toISOString();
+            }
+          });
+
+          where.firstResult = (scope.pageNum - 1) * scope.pageSize;
+          where.maxResults = scope.pageSize;
+
+          if (order && by) {
+            where.sortBy = by;
+            where.sortOrder = order;
+          }
+
+          return where;
+        }
+
         scope.lookupTask = function(val) {
           var deferred = $q.defer();
 
           scope.loading = true;
 
-          var where = {};
-          angular.forEach(scope.pile.filters, function(pair) {
-            where[pair.key] = camTasklistPileFilterConversion(pair.value);
-          });
-          where.firstResult = (scope.pageNum - 1) * scope.pageSize;
-          where.maxResults = scope.pageSize;
+          var where = buildWhere(scope.sorting.order, scope.sorting.by);
+
           where.nameLike = '%'+ val +'%';
 
           Task.list(where, function(err, res) {
@@ -83,20 +108,11 @@ define([
           scope.searchTask = '';
         };
 
-
         function loadItems() {
           scope.loading = true;
           scope.tasks = [];
 
-          var where = {};
-          angular.forEach(scope.pile.filters, function(pair) {
-            where[pair.key] = camTasklistPileFilterConversion(pair.value);
-          });
-          where.firstResult = (scope.pageNum - 1) * scope.pageSize;
-          where.maxResults = scope.pageSize;
-
-          where.sortBy = scope.sorting.by;
-          where.sortOrder = scope.sorting.order;
+          var where = buildWhere(scope.sorting.order, scope.sorting.by);
 
           Task.list(where, function(err, res) {
             scope.loading = false;

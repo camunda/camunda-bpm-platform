@@ -47,9 +47,11 @@
 
   <form ng-show="totalItems"
         role="form">
-    <ol class="list-unstyled">
+    <ol class="tasks-list list-unstyled">
       <li class="task"
-          ng-repeat="(delta, task) in tasks">
+          ng-repeat="(delta, task) in tasks"
+          tabindex="{{ (delta + 1) }}"
+          ng-focus="focus(delta)">
         <h4 ng-click="focus(delta)">{{ task.name }}</h4>
         <ul class="list-inline">
           <li>
