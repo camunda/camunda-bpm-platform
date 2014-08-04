@@ -228,11 +228,11 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
   /**
    * removes an object at the specific index of the current array
    *
-   * @param Index Index of the array
+   * @param index Index of the array
    * @return {@link SpinJsonNode} representation of the current node
    * @throws IllegalArgumentException if index is out of bound.
    */
-  public abstract SpinJsonNode removeAt(Integer Index);
+  public abstract SpinJsonNode removeAt(int index);
 
   /**
    * Check if this node is a boolean value.

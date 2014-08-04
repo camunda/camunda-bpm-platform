@@ -303,7 +303,6 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
   }
 
   public SpinJsonNode insertAt(int index, Object property) {
-    ensureNotNull("index", index);
     ensureNotNull("property", property);
 
     if(jsonNode.isArray()) {
@@ -356,8 +355,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     return removeAt(lastIndexOf(property));
   }
 
-  public SpinJsonNode removeAt(Integer index) {
-    ensureNotNull("index", index);
+  public SpinJsonNode removeAt(int index) {
     if(this.isArray()) {
       ArrayNode node = (ArrayNode) jsonNode;
 
