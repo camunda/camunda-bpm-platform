@@ -11,18 +11,22 @@
  * limitations under the License.
  */
 
-import org.apache.http.client.methods.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.camunda.bpm.connect.ConnectorException;
 import org.camunda.bpm.connect.rest.httpclient.RestHttpConnector;
 import org.camunda.bpm.connect.rest.httpclient.RestHttpRequest;
 import org.camunda.commons.utils.IoUtil;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.HashMap;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Stefan Hentschel.
@@ -46,7 +50,7 @@ public class RestHttpClientTest {
   public void shouldComposeHttpPost() throws IOException {
     request.post();
 
-    HttpPost httpPost = (HttpPost) connector.createTarget(request);
+    HttpPost httpPost = connector.createTarget(request);
 
     assertThat(httpPost.getMethod()).isEqualTo("POST");
     assertThat(httpPost.getURI().toASCIIString()).isEqualTo("http://camunda.org/rest");
@@ -60,7 +64,7 @@ public class RestHttpClientTest {
   public void shouldComposeHttpGet() throws IOException {
     request.get();
 
-    HttpGet httpGet = (HttpGet) connector.createTarget(request);
+    HttpGet httpGet = connector.createTarget(request);
 
     assertThat(httpGet.getMethod()).isEqualTo("GET");
     assertThat(httpGet.getURI().toASCIIString()).isEqualTo("http://camunda.org/rest");
@@ -72,7 +76,7 @@ public class RestHttpClientTest {
   public void shouldComposeHttpPut() throws IOException {
     request.put();
 
-    HttpPut httpPut = (HttpPut) connector.createTarget(request);
+    HttpPut httpPut = connector.createTarget(request);
 
     assertThat(httpPut.getMethod()).isEqualTo("PUT");
     assertThat(httpPut.getURI().toASCIIString()).isEqualTo("http://camunda.org/rest");
@@ -84,7 +88,7 @@ public class RestHttpClientTest {
   public void shouldComposeHttpPatch() throws IOException {
     request.patch();
 
-    HttpPatch httpPatch = (HttpPatch) connector.createTarget(request);
+    HttpPatch httpPatch = connector.createTarget(request);
 
     assertThat(httpPatch.getMethod()).isEqualTo("PATCH");
     assertThat(httpPatch.getURI().toASCIIString()).isEqualTo("http://camunda.org/rest");
@@ -96,7 +100,7 @@ public class RestHttpClientTest {
   public void shouldComposeHttpDelete() throws IOException {
     request.delete();
 
-    HttpDelete httpDelete = (HttpDelete) connector.createTarget(request);
+    HttpDelete httpDelete = connector.createTarget(request);
 
     assertThat(httpDelete.getMethod()).isEqualTo("DELETE");
     assertThat(httpDelete.getURI().toASCIIString()).isEqualTo("http://camunda.org/rest");
@@ -128,7 +132,7 @@ public class RestHttpClientTest {
   }
 
   @Test
-  public void shouldFailSetAdditionalHeadersWithNull() {
+  public void shouldNotSetAdditionalHeadersWithNull() {
     request.header("Accept", null);
 
     HttpPost httpPost = connector.createHttpPost(request);

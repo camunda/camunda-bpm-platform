@@ -1,4 +1,4 @@
 # Connect Userguide
 
-* [REST Connector][rest]
-* [SOAP Connector][soap]
+* [REST Connector](rest/index.md)
+* [SOAP Connector](soap/index.md)

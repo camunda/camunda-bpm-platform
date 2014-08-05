@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.connect.rest.httpclient;
 
-import org.camunda.bpm.connect.impl.AbstractConnectorRequest;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.camunda.bpm.connect.impl.AbstractConnectorRequest;
 
 /**
  * @author Stefan Hentschel.
@@ -73,9 +73,9 @@ public class RestHttpRequest extends AbstractConnectorRequest<RestHttpResponse> 
 
     if(headers == null) {
       headers = new HashMap<String, String>();
+      setRequestParameter(PARAM_NAME_REQUEST_HEADERS, headers);
     }
     headers.put(name, value);
-    setRequestParameter(PARAM_NAME_REQUEST_HEADERS, headers);
     return this;
   }
 

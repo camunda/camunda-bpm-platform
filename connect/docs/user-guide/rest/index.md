@@ -82,7 +82,7 @@ With this we have will have a full request which we can use to connect our REST 
   request.requestUrl("http://camunda.org");
   request.header("Accept", "application/json");
   request.payload("{\"text\": \"camunda rocks!\"}");
-  request.createHttpPost();
+  request.post()
 ```
 
 ## Execute the request
@@ -101,7 +101,7 @@ So to complete our example we will add the execution and also some response hand
   request.requestUrl("http://camunda.org");
   request.header("Accept", "application/json");
   request.payload("{\"text\": \"camunda rocks!\"}");
-  request.createHttpPost();
+  request.post();
   
   RestHttpResponse response = request.execute();
   Integer statusCode = response.getStatusCode();

@@ -12,15 +12,22 @@
  */
 package org.camunda.bpm.connect.rest.httpclient;
 
-import org.apache.http.client.methods.*;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.Charset;
+import java.util.Map;
+
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.camunda.bpm.connect.impl.AbstractConnector;
-
-import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
-import java.util.Map;
 
 /**
  * @author Stefan Hentschel.
@@ -62,7 +69,7 @@ public class RestHttpConnector extends AbstractConnector<RestHttpRequest, RestHt
   public RestHttpResponse execute(RestHttpRequest request) {
     HttpRequestBase http = createTarget(request);
 
-    return invoke(request, http);
+    return execute(request, http);
   }
 
   /**
@@ -73,10 +80,6 @@ public class RestHttpConnector extends AbstractConnector<RestHttpRequest, RestHt
    * @return {@link RestHttpResponse} The response for the given request.
    */
   public RestHttpResponse execute(RestHttpRequest request, HttpRequestBase http) {
-    return invoke(request, http);
-  }
-
-  protected RestHttpResponse invoke(RestHttpRequest request, HttpRequestBase http) {
     try {
       HttpRequestInvocation invocation = new HttpRequestInvocation(http, request, requestInterceptors, httpClient);
 
@@ -84,10 +87,8 @@ public class RestHttpConnector extends AbstractConnector<RestHttpRequest, RestHt
       return new RestHttpResponse((CloseableHttpResponse) invocation.proceed());
 
     } catch (Exception e) {
-      e.printStackTrace();
+      throw LOG.unableToExecuteRequest(e);
     }
-
-    return null;
   }
 
   /**
@@ -96,7 +97,8 @@ public class RestHttpConnector extends AbstractConnector<RestHttpRequest, RestHt
    * @param httpRequest the given request
    * @return {@link HttpRequestBase} an apache representation of the request
    */
-  public HttpRequestBase createTarget(RestHttpRequest httpRequest) {
+  @SuppressWarnings("unchecked")
+  public <T extends HttpRequestBase> T createTarget(RestHttpRequest httpRequest) {
     String requestType = httpRequest.getRequestType();
     HttpRequestBase http;
 
@@ -116,10 +118,10 @@ public class RestHttpConnector extends AbstractConnector<RestHttpRequest, RestHt
       http = createHttpPatch(httpRequest);
 
     } else {
-      throw LOG.invalidRequestParameter(RestHttpRequest.PARAM_NAME_REQUEST_TYPE, "param must be set!");
+      throw LOG.invalidRequestParameter(RestHttpRequest.PARAM_NAME_REQUEST_TYPE, "request type not implemented");
     }
 
-    return http;
+    return (T) http;
   }
 
   /**
@@ -156,7 +158,7 @@ public class RestHttpConnector extends AbstractConnector<RestHttpRequest, RestHt
     // handle headers
     handleHeaders(httpGet, httpRequest.getRequestHeaders());
 
-    //handle payload
+    // handle payload
     if(httpRequest.getRequestPayload() != null) {
       LOG.removedPayload(httpGet.getMethod());
     }
@@ -178,7 +180,7 @@ public class RestHttpConnector extends AbstractConnector<RestHttpRequest, RestHt
     // handle headers
     handleHeaders(httpDelete, httpRequest.getRequestHeaders());
 
-    //handle payload
+    // handle payload
     if(httpRequest.getRequestPayload() != null) {
       LOG.removedPayload(httpDelete.getMethod());
     }
@@ -234,7 +236,7 @@ public class RestHttpConnector extends AbstractConnector<RestHttpRequest, RestHt
    */
   protected String handleRequestUrl(String requestUrl) {
     if(requestUrl == null || requestUrl.isEmpty()) {
-      throw LOG.invalidRequestParameter(RestHttpRequest.PARAM_NAME_REQUEST_URL, "param must be set");
+      throw LOG.invalidRequestParameter(RestHttpRequest.PARAM_NAME_REQUEST_URL, "a request URL must be set");
     }
 
     return requestUrl;
@@ -264,9 +266,9 @@ public class RestHttpConnector extends AbstractConnector<RestHttpRequest, RestHt
   protected void handlePayload(HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase, String payload) {
     // handle payload
     if(payload == null || payload.isEmpty()) {
-      throw LOG.invalidRequestParameter(RestHttpRequest.PARAM_NAME_REQUEST_PAYLOAD, "param must be set");
+      throw LOG.invalidRequestParameter(RestHttpRequest.PARAM_NAME_REQUEST_PAYLOAD, "a payload must be set");
     }
-    ByteArrayInputStream envelopeStream = new ByteArrayInputStream(payload.getBytes(Charset.forName("utf-8")));
-    httpEntityEnclosingRequestBase.setEntity(new InputStreamEntity(envelopeStream));
+    ByteArrayInputStream payloadStream = new ByteArrayInputStream(payload.getBytes(Charset.forName("utf-8")));
+    httpEntityEnclosingRequestBase.setEntity(new InputStreamEntity(payloadStream));
   }
 }

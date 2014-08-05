@@ -38,4 +38,9 @@ public class RestHttpConnectorLogger extends RestHttpLogger {
   public void removeNullHeader() {
     logDebug("004", "Header cannot be null! Don't attach header to request.");
   }
+
+  public ConnectorException unableToExecuteRequest(Exception cause) {
+    return new ConnectorException(exceptionMessage("005", "Unable to execute request"), cause);
+  }
+
 }

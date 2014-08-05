@@ -12,25 +12,25 @@
  */
 package org.camunda.bpm.connect.rest.httpclient;
 
+import java.util.List;
+
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.camunda.bpm.connect.ConnectorRequest;
 import org.camunda.bpm.connect.impl.AbstractRequestInvocation;
 import org.camunda.bpm.connect.interceptor.RequestInterceptor;
-
-import java.util.List;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class HttpRequestInvocation extends  AbstractRequestInvocation<HttpRequestBase> {
+public class HttpRequestInvocation extends AbstractRequestInvocation<HttpRequestBase> {
 
   protected HttpClient client;
 
   /**
    * @param target the HttpPostRequest
-   * @param interceptorChain the intceptor chain
+   * @param interceptorChain the interceptor chain
    * @param client the HttpClient to execute the request on
    */
   public HttpRequestInvocation(HttpRequestBase target, ConnectorRequest<?> request, List<RequestInterceptor> interceptorChain, HttpClient client) {
