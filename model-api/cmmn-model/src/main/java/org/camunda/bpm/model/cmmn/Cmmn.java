@@ -85,8 +85,14 @@ import org.camunda.bpm.model.cmmn.impl.instance.TimerEventListenerImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.TimerExpression;
 import org.camunda.bpm.model.cmmn.impl.instance.TransformationExpression;
 import org.camunda.bpm.model.cmmn.impl.instance.UserEventListenerImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaCaseExecutionListenerImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaExpressionImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaFieldImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaInImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaOutImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaScriptImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaStringImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaTaskListenerImpl;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.ModelException;
@@ -323,8 +329,14 @@ public class Cmmn {
     UserEventListenerImpl.registerType(modelBuilder);
 
     /** camunda extensions */
+    CamundaCaseExecutionListenerImpl.registerType(modelBuilder);
+    CamundaExpressionImpl.registerType(modelBuilder);
+    CamundaFieldImpl.registerType(modelBuilder);
     CamundaInImpl.registerType(modelBuilder);
     CamundaOutImpl.registerType(modelBuilder);
+    CamundaScriptImpl.registerType(modelBuilder);
+    CamundaStringImpl.registerType(modelBuilder);
+    CamundaTaskListenerImpl.registerType(modelBuilder);
   }
 
   /**

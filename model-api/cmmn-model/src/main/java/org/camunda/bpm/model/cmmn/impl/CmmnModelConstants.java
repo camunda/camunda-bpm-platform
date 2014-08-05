@@ -136,6 +136,12 @@ public class CmmnModelConstants {
   // camunda elements
   public static final String CAMUNDA_ELEMENT_IN = "in";
   public static final String CAMUNDA_ELEMENT_OUT = "out";
+  public static final String CAMUNDA_ELEMENT_TASK_LISTENER = "taskListener";
+  public static final String CAMUNDA_ELEMENT_CASE_EXECUTION_LISTENER = "caseExecutionListener";
+  public static final String CAMUNDA_ELEMENT_FIELD = "field";
+  public static final String CAMUNDA_ELEMENT_EXPRESSION = "expression";
+  public static final String CAMUNDA_ELEMENT_STRING = "string";
+  public static final String CAMUNDA_ELEMENT_SCRIPT = "script";
 
   // attributes /////////////////////////////////////////////////////////////////////////
 
@@ -193,5 +199,13 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_PROCESS_VERSION = "processVersion";
   public static final String CAMUNDA_ATTRIBUTE_CASE_BINDING = "caseBinding";
   public static final String CAMUNDA_ATTRIBUTE_CASE_VERSION = "caseVersion";
+  public static final String CAMUNDA_ATTRIBUTE_EVENT = "event";
+  public static final String CAMUNDA_ATTRIBUTE_CLASS = "class";
+  public static final String CAMUNDA_ATTRIBUTE_EXPRESSION = "expression";
+  public static final String CAMUNDA_ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";
+  public static final String CAMUNDA_ATTRIBUTE_STRING_VALUE = "stringValue";
+  public static final String CAMUNDA_ATTRIBUTE_NAME = "name";
+  public static final String CAMUNDA_ATTRIBUTE_SCRIPT_FORMAT = "scriptFormat";
+  public static final String CAMUNDA_ATTRIBUTE_RESOURCE = "resource";
 
 }
