@@ -32,6 +32,8 @@ import org.camunda.bpm.model.bpmn.impl.instance.bpmndi.BpmnLabelImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.bpmndi.BpmnLabelStyleImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.bpmndi.BpmnPlaneImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.bpmndi.BpmnShapeImpl;
+import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaConnectorIdImpl;
+import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaConnectorImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaConstraintImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaEntryImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaExecutionListenerImpl;
@@ -449,6 +451,8 @@ public class Bpmn {
     BpmnShapeImpl.registerType(bpmnModelBuilder);
 
     /** camunda extensions */
+    CamundaConnectorImpl.registerType(bpmnModelBuilder);
+    CamundaConnectorIdImpl.registerType(bpmnModelBuilder);
     CamundaConstraintImpl.registerType(bpmnModelBuilder);
     CamundaEntryImpl.registerType(bpmnModelBuilder);
     CamundaExecutionListenerImpl.registerType(bpmnModelBuilder);

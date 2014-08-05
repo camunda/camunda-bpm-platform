@@ -77,6 +77,13 @@
         camunda:type="mail">
       <extensionElements>
         <camunda:executionListener event="start" delegateExpression="${org.camunda.test.Test}"/>
+        <camunda:connector>
+          <camunda:connectorId>soap-http-connector</camunda:connectorId>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="endpointUrl">http://example.com/webservice</camunda:inputParameter>
+            <camunda:outputParameter name="result">output</camunda:outputParameter>
+          </camunda:inputOutput>
+        </camunda:connector>
         <camunda:inputOutput>
           <camunda:inputParameter name="shouldBeNull"/>
           <camunda:inputParameter name="shouldBeConstant">foo</camunda:inputParameter>

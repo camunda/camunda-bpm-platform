@@ -230,7 +230,9 @@ public final class BpmnModelConstants {
   public static final String BPMNDI_ELEMENT_BPMN_EDGE = "BPMNEdge";
 
   /** camunda extensions */
-  
+
+  public static final String CAMUNDA_ELEMENT_CONNECTOR = "connector";
+  public static final String CAMUNDA_ELEMENT_CONNECTOR_ID = "connectorId";
   public static final String CAMUNDA_ELEMENT_CONSTRAINT = "constraint";
   public static final String CAMUNDA_ELEMENT_ENTRY = "entry";
   public static final String CAMUNDA_ELEMENT_EXECUTION_LISTENER = "executionListener";

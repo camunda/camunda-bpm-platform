@@ -71,6 +71,8 @@ import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaConnector;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaConnectorId;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaConstraint;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaEntry;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
@@ -609,6 +611,32 @@ public class CamundaExtensionsTest {
   public void testScriptResource() {
     assertThat(scriptTask.getScriptFormat()).isEqualTo("groovy");
     assertThat(scriptTask.getCamundaResource()).isEqualTo("test.groovy");
+  }
+
+  @Test
+  public void testCamundaConnector() {
+    CamundaConnector camundaConnector = serviceTask.getExtensionElements().getElementsQuery().filterByType(CamundaConnector.class).singleResult();
+    assertThat(camundaConnector).isNotNull();
+
+    CamundaConnectorId camundaConnectorId = camundaConnector.getCamundaConnectorId();
+    assertThat(camundaConnectorId).isNotNull();
+    assertThat(camundaConnectorId.getTextContent()).isEqualTo("soap-http-connector");
+
+    CamundaInputOutput camundaInputOutput = camundaConnector.getCamundaInputOutput();
+
+    Collection<CamundaInputParameter> inputParameters = camundaInputOutput.getCamundaInputParameters();
+    assertThat(inputParameters).hasSize(1);
+
+    CamundaInputParameter inputParameter = inputParameters.iterator().next();
+    assertThat(inputParameter.getCamundaName()).isEqualTo("endpointUrl");
+    assertThat(inputParameter.getTextContent()).isEqualTo("http://example.com/webservice");
+
+    Collection<CamundaOutputParameter> outputParameters = camundaInputOutput.getCamundaOutputParameters();
+    assertThat(outputParameters).hasSize(1);
+
+    CamundaOutputParameter outputParameter = outputParameters.iterator().next();
+    assertThat(outputParameter.getCamundaName()).isEqualTo("result");
+    assertThat(outputParameter.getTextContent()).isEqualTo("output");
   }
 
   @Test
