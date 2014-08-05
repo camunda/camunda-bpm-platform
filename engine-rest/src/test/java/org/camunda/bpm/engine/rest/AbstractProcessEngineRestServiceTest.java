@@ -197,6 +197,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
 
     TaskQuery mockTaskQuery = mock(TaskQuery.class);
     when(mockTaskQuery.taskId(eq(MockProvider.EXAMPLE_TASK_ID))).thenReturn(mockTaskQuery);
+    when(mockTaskQuery.initializeFormKeys()).thenReturn(mockTaskQuery);
     when(mockTaskQuery.singleResult()).thenReturn(mockTask);
     when(mockTaskService.createTaskQuery()).thenReturn(mockTaskQuery);
   }

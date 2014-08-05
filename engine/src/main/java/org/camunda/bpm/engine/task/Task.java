@@ -127,4 +127,14 @@ public interface Task {
 
   /** Indicated whether this task is suspended or not. */
   boolean isSuspended();
+
+  /**
+   * Provides the form key for the task.
+   * <p />
+   * <strong>NOTE:</strong> If the task instance us obtained through a query, this property is only populated in case the
+   * {@link TaskQuery#initializeFormKeys()} method is called.
+   *
+   * @return the form key for this task
+   */
+  String getFormKey();
 }

@@ -435,6 +435,7 @@ public abstract class MockProvider {
         .caseDefinitionId(EXAMPLE_CASE_DEFINITION_ID)
         .caseInstanceId(EXAMPLE_CASE_INSTANCE_ID)
         .caseExecutionId(EXAMPLE_CASE_EXECUTION_ID)
+        .formKey(EXAMPLE_FORM_KEY)
         .build();
     return mockTask;
   }

@@ -14,12 +14,14 @@ package org.camunda.bpm.engine.rest.hal.processDefinition;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.hal.HalResource;
 import org.camunda.bpm.engine.rest.hal.HalRelation;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResourcesResource;
+import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 
 /**
  * @author Daniel Meyer
@@ -45,8 +47,9 @@ public class HalProcessDefinition extends HalResource<HalProcessDefinition> {
   protected String deploymentId;
   protected String diagram;
   protected boolean suspended;
+  protected String contextPath;
 
-  public static HalProcessDefinition fromProcessDefinition(ProcessDefinition processDefinition) {
+  public static HalProcessDefinition fromProcessDefinition(ProcessDefinition processDefinition, ProcessEngine processEngine) {
     HalProcessDefinition halProcDef = new HalProcessDefinition();
 
     halProcDef.id = processDefinition.getId();
@@ -59,6 +62,7 @@ public class HalProcessDefinition extends HalResource<HalProcessDefinition> {
     halProcDef.deploymentId = processDefinition.getDeploymentId();
     halProcDef.diagram = processDefinition.getDiagramResourceName();
     halProcDef.suspended = processDefinition.isSuspended();
+    halProcDef.contextPath = ApplicationContextPathUtil.getApplicationPathForDeployment(processEngine, processDefinition.getDeploymentId());
 
     halProcDef.linker.createLink(REL_SELF, processDefinition.getId());
     halProcDef.linker.createLink(REL_DEPLOYMENT, processDefinition.getDeploymentId());
@@ -105,6 +109,10 @@ public class HalProcessDefinition extends HalResource<HalProcessDefinition> {
 
   public boolean isSuspended() {
     return suspended;
+  }
+
+  public String getContextPath() {
+    return contextPath;
   }
 
 }

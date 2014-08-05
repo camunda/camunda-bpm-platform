@@ -3581,6 +3581,28 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/oneTaskWithFormKeyProcess.bpmn20.xml"})
+  public void testInitializeFormKeys() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // if initializeFormKeys
+    Task task = taskService.createTaskQuery()
+      .processInstanceId(processInstance.getId())
+      .initializeFormKeys()
+      .singleResult();
+
+    // then the form key is present
+    assertEquals("exampleFormKey", task.getFormKey());
+
+    // if NOT initializeFormKeys
+    task = taskService.createTaskQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult();
+
+    // then the form key is present
+    assertNull(task.getFormKey());
+  }
+
   /**
    * Generates some test tasks. - 6 tasks where kermit is a candidate - 1 tasks
    * where gonzo is assignee - 2 tasks assigned to management group - 2 tasks

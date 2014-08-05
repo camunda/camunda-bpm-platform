@@ -16,21 +16,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Joram Barrez
@@ -81,6 +80,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Date followUpAfter;
   protected boolean excludeSubtasks = false;
   protected SuspensionState suspensionState;
+  protected boolean initialzeFormKeys = false;
 
   // case management /////////////////////////////
   protected String caseDefinitionKey;
@@ -503,6 +503,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  public TaskQuery initializeFormKeys() {
+    this.initialzeFormKeys = true;
+    return this;
+  }
+
   public List<String> getCandidateGroups() {
     if (candidateGroup!=null) {
       return Collections.singletonList(candidateGroup);
@@ -622,9 +627,18 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public List<Task> executeList(CommandContext commandContext, Page page) {
     ensureVariablesInitialized();
     checkQueryOk();
-    return commandContext
+    List<Task> taskList = commandContext
       .getTaskManager()
       .findTasksByQueryCriteria(this);
+
+    if(initialzeFormKeys) {
+      for (Task task : taskList) {
+        // initialize the form keys of the tasks
+        ((TaskEntity) task).initializeFormKey();
+      }
+    }
+
+    return taskList;
   }
 
   public long executeCount(CommandContext commandContext) {

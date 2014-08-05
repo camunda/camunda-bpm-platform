@@ -84,6 +84,10 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   protected List<Task> executeTaskQuery(Integer firstResult, Integer maxResults, TaskQuery query) {
+
+    // enable initialization of form key:
+    query.initializeFormKeys();
+
     List<Task> matchingTasks;
     if (firstResult != null || maxResults != null) {
       matchingTasks = executePaginatedQuery(query, firstResult, maxResults);

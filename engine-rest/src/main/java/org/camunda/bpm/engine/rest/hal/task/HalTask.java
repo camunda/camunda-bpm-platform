@@ -63,6 +63,7 @@ public class HalTask extends HalResource<HalTask> {
   private String caseInstanceId;
   private String caseDefinitionId;
   private boolean suspended;
+  private String formKey;
 
   public static HalTask fromTask(Task task) {
     HalTask dto = new HalTask();
@@ -87,6 +88,7 @@ public class HalTask extends HalResource<HalTask> {
     dto.caseExecutionId = task.getCaseExecutionId();
     dto.caseInstanceId = task.getCaseInstanceId();
     dto.suspended = task.isSuspended();
+    dto.formKey = task.getFormKey();
 
     // links
     dto.linker.createLink(REL_SELF, task.getId());
@@ -175,9 +177,13 @@ public class HalTask extends HalResource<HalTask> {
   public String getCaseInstanceId() {
     return caseInstanceId;
   }
-  
+
   public boolean isSuspended() {
     return suspended;
+  }
+
+  public String getFormKey() {
+    return formKey;
   }
 
 }

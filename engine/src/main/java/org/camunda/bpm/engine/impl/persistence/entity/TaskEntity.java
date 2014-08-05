@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
@@ -111,6 +112,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   protected String deleteReason;
 
   protected String eventName;
+  protected String formKey;
 
   protected AbstractVariableStore variableStore;
 
@@ -842,6 +844,22 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
+  }
+
+  public void initializeFormKey() {
+    if(taskDefinitionKey != null) {
+      TaskDefinition taskDefinition = getTaskDefinition();
+      if(taskDefinition != null) {
+        Expression formKey = taskDefinition.getFormKey();
+        if(formKey != null) {
+          this.formKey = (String) formKey.getValue(this);
+        }
+      }
+    }
+  }
+
+  public String getFormKey() {
+    return formKey;
   }
 
   public void setProcessDefinitionId(String processDefinitionId) {

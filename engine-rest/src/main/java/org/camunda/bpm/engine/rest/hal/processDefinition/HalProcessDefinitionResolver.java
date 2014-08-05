@@ -37,7 +37,7 @@ public class HalProcessDefinitionResolver implements HalLinkResolver {
 
     List<HalResource<?>> resolved = new ArrayList<HalResource<?>>();
     for (ProcessDefinition procDef : processDefinitions) {
-      resolved.add(HalProcessDefinition.fromProcessDefinition(procDef));
+      resolved.add(HalProcessDefinition.fromProcessDefinition(procDef, processEngine));
     }
 
     return resolved;

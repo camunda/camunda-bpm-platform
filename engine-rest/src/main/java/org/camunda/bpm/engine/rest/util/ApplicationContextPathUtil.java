@@ -15,8 +15,13 @@ public class ApplicationContextPathUtil {
       return null;
     }
 
+    return getApplicationPathForDeployment(engine, processDefinition.getDeploymentId());
+  }
+
+  public static String getApplicationPathForDeployment(ProcessEngine engine, String deploymentId) {
+
     // get the name of the process application that made the deployment
-    String processApplicationName = engine.getManagementService().getProcessApplicationForDeployment(processDefinition.getDeploymentId());
+    String processApplicationName = engine.getManagementService().getProcessApplicationForDeployment(deploymentId);
 
     if (processApplicationName == null) {
       // no a process application deployment

@@ -149,6 +149,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     mockTask = MockProvider.createMockTask();
     mockQuery = mock(TaskQuery.class);
+    when(mockQuery.initializeFormKeys()).thenReturn(mockQuery);
     when(mockQuery.taskId(anyString())).thenReturn(mockQuery);
     when(mockQuery.singleResult()).thenReturn(mockTask);
     when(taskServiceMock.createTaskQuery()).thenReturn(mockQuery);

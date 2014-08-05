@@ -38,6 +38,7 @@ public class TaskDto {
   private String caseInstanceId;
   private String caseDefinitionId;
   private boolean suspended;
+  private String formKey;
 
   public String getId() {
     return id;
@@ -115,6 +116,10 @@ public class TaskDto {
     return suspended;
   }
 
+  public String getFormKey() {
+    return formKey;
+  }
+
   public static TaskDto fromTask(Task task) {
     TaskDto dto = new TaskDto();
     dto.id = task.getId();
@@ -136,6 +141,7 @@ public class TaskDto {
     dto.caseExecutionId = task.getCaseExecutionId();
     dto.caseInstanceId = task.getCaseInstanceId();
     dto.suspended = task.isSuspended();
+    dto.formKey = task.getFormKey();
     return dto;
   }
 }

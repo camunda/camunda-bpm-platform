@@ -21,6 +21,9 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.ProcessApplicationService;
+import org.camunda.bpm.application.ProcessApplicationInfo;
+import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -138,6 +141,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
     String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
     boolean returnedSuspensionState = from(content).getBoolean("[0].suspended");
+    String returnedFormKey = from(content).getString("[0].formKey");
 
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_NAME, returnedTaskName);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_ID, returnedId);
@@ -158,6 +162,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, returnedCaseExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE, returnedSuspensionState);
+    Assert.assertEquals(MockProvider.EXAMPLE_FORM_KEY, returnedFormKey);
 
   }
 
@@ -181,6 +186,19 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     when(sampleProcessDefinitionQuery.processDefinitionIdIn(new String[] {MockProvider.EXAMPLE_PROCESS_DEFINITION_ID})).thenReturn(sampleProcessDefinitionQuery);
     when(sampleProcessDefinitionQuery.count()).thenReturn(1l);
     when(processEngine.getRepositoryService().createProcessDefinitionQuery()).thenReturn(sampleProcessDefinitionQuery);
+
+    // setup example process application context path
+    when(processEngine.getManagementService().getProcessApplicationForDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID))
+      .thenReturn(MockProvider.EXAMPLE_PROCESS_APPLICATION_NAME);
+
+    // replace the runtime container delegate & process application service with a mock
+    ProcessApplicationService processApplicationService = mock(ProcessApplicationService.class);
+    ProcessApplicationInfo appMock = MockProvider.createMockProcessApplicationInfo();
+    when(processApplicationService.getProcessApplicationInfo(MockProvider.EXAMPLE_PROCESS_APPLICATION_NAME)).thenReturn(appMock);
+
+    RuntimeContainerDelegate delegate = mock(RuntimeContainerDelegate.class);
+    when(delegate.getProcessApplicationService()).thenReturn(processApplicationService);
+    RuntimeContainerDelegate.INSTANCE.set(delegate);
 
     Response response = given().queryParam("name", queryName)
       .header("accept", Hal.MEDIA_TYPE_HAL)
@@ -219,6 +237,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     String returnedCaseInstanceId = (String) taskObject.get("caseInstanceId");
     String returnedCaseExecutionId = (String) taskObject.get("caseExecutionId");
     boolean returnedSuspensionState = (Boolean) taskObject.get("suspended");
+    String returnedFormKey = (String) taskObject.get("formKey");
 
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_NAME, returnedTaskName);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_ID, returnedId);
@@ -239,6 +258,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, returnedCaseExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE, returnedSuspensionState);
+    Assert.assertEquals(MockProvider.EXAMPLE_FORM_KEY, returnedFormKey);
 
     // validate the task count
     Assert.assertEquals(1l, from(content).getLong("count"));
@@ -283,6 +303,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_ID, embeddedProcessDefinition.get("deploymentId"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME, embeddedProcessDefinition.get("diagram"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED, embeddedProcessDefinition.get("suspended"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH, embeddedProcessDefinition.get("contextPath"));
   }
 
   @Test
@@ -292,6 +313,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     .expect().statusCode(Status.OK.getStatusCode())
     .when().get(TASK_QUERY_URL);
 
+    verify(mockQuery).initializeFormKeys();
     verify(mockQuery).list();
     verifyNoMoreInteractions(mockQuery);
   }

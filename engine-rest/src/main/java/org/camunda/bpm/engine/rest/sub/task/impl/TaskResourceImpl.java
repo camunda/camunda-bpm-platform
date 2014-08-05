@@ -206,7 +206,7 @@ public class TaskResourceImpl implements TaskResource {
    * @return
    */
   protected Task getTaskById(String id) {
-    return engine.getTaskService().createTaskQuery().taskId(id).singleResult();
+    return engine.getTaskService().createTaskQuery().taskId(id).initializeFormKeys().singleResult();
   }
 
   public void setAssignee(UserIdDto dto) {

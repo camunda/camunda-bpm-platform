@@ -413,6 +413,14 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery active();
 
+  /**
+   * If called, the form keys of the fetched tasks are initialized and
+   * {@link Task#getFormKey()} will return a value (in case the task has a form key).
+   *
+   * @return the query itself
+   */
+  TaskQuery initializeFormKeys();
+
   // ordering ////////////////////////////////////////////////////////////
 
   /** Order by task id (needs to be followed by {@link #asc()} or {@link #desc()}). */
