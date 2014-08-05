@@ -78,19 +78,27 @@ public class ModelElementTypeImpl implements ModelElementType {
   }
 
   public void registerAttribute(Attribute<?> attribute) {
-    attributes.add(attribute);
+    if (!attributes.contains(attribute)) {
+      attributes.add(attribute);
+    }
   }
 
   public void registerChildElementType(ModelElementType childElementType) {
-    childElementTypes.add(childElementType);
+    if (!childElementTypes.contains(childElementType)) {
+      childElementTypes.add(childElementType);
+    }
   }
 
   public void registerChildElementCollection(ChildElementCollection<?> childElementCollection) {
-    childElementCollections.add(childElementCollection);
+    if (!childElementCollections.contains(childElementCollection)) {
+      childElementCollections.add(childElementCollection);
+    }
   }
 
   public void registerExtendingType(ModelElementType modelType) {
-    extendingTypes.add(modelType);
+    if (!extendingTypes.contains(modelType)) {
+      extendingTypes.add(modelType);
+    }
   }
 
   protected ModelElementInstance createModelElementInstance(ModelTypeInstanceContext instanceContext) {
@@ -126,7 +134,7 @@ public class ModelElementTypeImpl implements ModelElementType {
     if (this.baseType == null) {
       this.baseType = baseType;
     }
-    else if (this.baseType != baseType) {
+    else if (!this.baseType.equals(baseType)) {
       throw new ModelException("Type can not have multiple base types. " + this.getClass() + " already extends type " + this.baseType.getClass()
           + " and can not also extend type " + baseType.getClass());
     }
