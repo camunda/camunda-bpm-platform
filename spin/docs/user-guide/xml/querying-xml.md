@@ -1,6 +1,6 @@
-# Querying Xml
+# Querying XML
 
-The Xml datatype supports querying with the XPath 1.0 query language.
+The XML datatype supports querying with the XPath 1.0 query language.
 
 ## Querying an element
 

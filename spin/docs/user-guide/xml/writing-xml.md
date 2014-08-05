@@ -1,6 +1,6 @@
-# Writing Xml
+# Writing XML
 
-The Xml datatype supports writing Xml to Strings, output streams or writers.
+The XML datatype supports writing XML to Strings, output streams or writers.
 
 ## Writing to a String:
 
@@ -15,7 +15,7 @@ String xml = element.toString();
 String value = element.attr("id").toString();
 ```
 
-## Writing to a output stream:
+## Writing to an output stream:
 
 ```java
 import static org.camunda.spin.Spin.XML;

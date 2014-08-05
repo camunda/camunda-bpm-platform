@@ -1,6 +1,6 @@
-#Getting stated using Spin
+#Getting started using Spin
 
-Spin can be used in any java-based application by adding the following maven dependency to your
+Spin can be used in any Java-based application by adding the following maven dependency to your
 `pom.xml` file:
 
 ```xml

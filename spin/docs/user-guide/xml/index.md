@@ -1,13 +1,13 @@
-# Xml handling in Spin
+# XML handling in Spin
 
-Spin supports various usecases for handling xml:
+Spin supports various use cases for handling XML:
 
-* [Reading Xml][reading-xml]
-* [Manipulating Xml][manipulating-xml]
-* [Writing Xml][writing-xml]
-* [Querying Xml][querying-xml]
-* Transforming Xml
-* Mapping Xml to Java Objects
+* [Reading XML][reading-xml]
+* [Manipulating XML][manipulating-xml]
+* [Writing XML][writing-xml]
+* [Querying XML][querying-xml]
+* Transforming XML
+* Mapping XML to Java Objects
 
 [reading-xml]: reading-xml.md
 [manipulating-xml]: manipulating-xml.md

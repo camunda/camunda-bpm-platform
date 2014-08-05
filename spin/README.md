@@ -65,11 +65,11 @@ of this repository.
 
 # FAQ
 
-## Why should I use Spin instead of the Java DOM Api?
+## Why should I use Spin instead of the Java DOM API?
 
-Java provides a Built-in Dom API along with a Parser. Spin provides a lightweight Wrapper around
-the Dom API which makes it easier to work with than the Dom API. At any time you can access the
-underlying Dom object by unwrapping it: 
+Java provides a built-in Dom API along with a Parser. Spin provides a lightweight Wrapper around 
+the Dom API which makes it easier to work with than the Dom API. You can access the underlying Dom object 
+at any time by unwrapping it: 
 
 ```java
 Element e = XML( xmlSource ).childElement("customer").unwrap();

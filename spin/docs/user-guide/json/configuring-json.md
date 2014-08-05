@@ -1,10 +1,8 @@
-# Configuring Json Handling
+# Configuring JSON Handling
 
-Spin can be configured to change Json parsing, writing and mapping settings, for example to tolerate documents that are not strictly compliant to the standard. As Spin uses [Jackson][jackson-wiki] to handle json, most of Jackson's configuration options also apply to Spin.
+Spin can be configured to change JSON parsing, writing and mapping settings, for example to tolerate documents that are not strictly compliant to the standard. As Spin uses [Jackson][jackson-wiki] to handle JSON, most of Jackson's configuration options also apply to Spin.
 
-Whenever the json data format is explicitly declared, i.e. by using `JSON(..., jsonTree())`
-or `S(..., jsonTree())`, configuration to Jackson can be passed. This can be either done by using
-a fluent API or by providing a map of configuration parameters.
+Whenever the JSON data format is explicitly declared, i.e., by using `JSON(..., jsonTree())` or `S(..., jsonTree())`, configuration to Jackson can be passed. This can be either done by using a fluent API or by providing a map of configuration parameters.
 
 ## Examples:
 
@@ -24,8 +22,7 @@ SpinJsonNode json = S("{\"age\": 042}",
 json.writeToStream(..)
 ```
 
-The data format can also be configured using a map, which comes in handy in scripting environments. The following
-example uses Javascript:
+The data format can also be configured using a map, which comes in handy in scripting environments. The following example uses Javascript:
 
 ```javascript
 var customer = S('{"age": 042}', 

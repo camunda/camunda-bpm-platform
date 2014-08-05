@@ -130,7 +130,7 @@ public abstract class JsonTreeSetPropertyScriptTest extends ScriptTest {
   }
 
   /**
-   * Please note: in jython exists a known issue that Boolean
+   * Please note: in jython there is a known issue that Boolean
    * and boolean values are casted to long if a matching method
    * is found first. See script source code for workaround.
    */
@@ -146,7 +146,7 @@ public abstract class JsonTreeSetPropertyScriptTest extends ScriptTest {
   }
 
   /**
-   * Please note: in jython exists a known issue that Boolean
+   * Please note: in jython there is a known issue that Boolean
    * and boolean values are casted to long if a matching method
    * is found first. See script source code for workaround.
    */

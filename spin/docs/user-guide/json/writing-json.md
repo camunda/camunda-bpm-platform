@@ -1,6 +1,6 @@
-# Writing Json
+# Writing JSON
 
-The Json datatype supports writing Json to Strings, output streams or writers.
+The JSON datatype supports writing JSON to Strings, output streams or writers.
 
 ## Writing to a String:
 

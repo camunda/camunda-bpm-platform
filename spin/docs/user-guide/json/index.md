@@ -1,14 +1,14 @@
-# Json handling in Spin
+# JSON handling in Spin
 
-Spin supports various usecases for handling Json:
+Spin supports various use cases for handling JSON:
 
-* [Reading Json][reading-json]
-* Manipulating Json
-* [Writing Json][writing-json]
-* [Querying Json][querying-json]
-* Transforming Json
-* [Mapping between Json and Java representation][mapping-json]
-* [Configuring Json Handling][configuring-json]
+* [Reading JSON][reading-json]
+* Manipulating JSON
+* [Writing JSON][writing-json]
+* [Querying JSON][querying-json]
+* Transforming JSON
+* [Mapping between JSON and Java representation][mapping-json]
+* [Configuring JSON Handling][configuring-json]
 
 
 [reading-json]: reading-json.md

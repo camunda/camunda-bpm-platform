@@ -1,12 +1,10 @@
 # Manipulating XML
 
-The Xml data type supports manipulation of Xml attributes and child elements.
-
+The XML data type supports manipulation of XML attributes and child elements.
 
 ## Attributes
 
-
-### Checking for attributes in Xml
+### Checking for attributes in XML
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -20,8 +18,7 @@ hasAttr = XML(xml).hasAttrNs("http://camunda.org/example", "id");
 assertTrue(hasAttr);
 ```
 
-
-### Reading attributes from Xml
+### Reading attributes from XML
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -30,8 +27,7 @@ SpinXmlDomAttribute attribute = XML("<order id=\"order1\" />").attr("id");
 String id = XML("<order id=\"order1\" />").attr("id").value();
 ```
 
-The `attr` method returns a wrapper of the Xml attribute and with `value` the value of the
-attribute can be accessed.
+The `attr` method returns a wrapper of the XML attribute and with `value` the value of the attribute can be accessed.
 
 If you want to access an attribute in another namespace you have to use the `attrNs` method.
 
@@ -72,10 +68,9 @@ names = XML(xml).attrNames("http://camunda.org/example");
 ```
 
 
-### Writing attributes to Xml
+### Writing attributes to XML
 
-It is possible to set a new attribute value directly from the element wrapper or on the attribute
-wrapper.
+It is possible to set a new attribute value directly from the element wrapper or on the attribute wrapper.
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -101,10 +96,9 @@ SpinXmlDomAttribute attribute = XML(xml).attrNs("http://camunda.org/example", "n
 attribute.value("newName");
 ```
 
+### Removing attributes from XML
 
-### Removing attributes from Xml
-
-It is possible to remove a attribute from the element directly or to remove the attribute itself.
+It is possible to remove an attribute from the element directly or to remove the attribute itself.
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -136,7 +130,7 @@ assertFalse(element.hasAttrNs("http://camunda.org/example", "name"));
 
 ## Text Content
 
-It is possible to read and write the text content of a Xml element with the `textContent` method.
+It is possible to read and write the text content of an XML element with the `textContent` method.
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -150,10 +144,9 @@ element.textContent("Bar");
 ## Child Elements
 
 
-### Reading child elements from Xml
+### Reading child elements from XML
 
-Besides attributes you can also get a unique or all child elements of a specific type. Optionally a
-namespace can be passed to the methods as first parameter.
+Besides attributes you can also get a unique or all child elements of a specific type. Optionally, a namespace can be passed to the methods as first parameter.
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -171,7 +164,7 @@ SpinCollection<SpinXmlDomElement> ops = XML(xml).childElements("http://camunda.o
 
 ### Append child elements
 
-The method `append` is used to append a single or multiple child elements to a Xml element.
+The method `append` is used to append a single or multiple child elements to an XML element.
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -185,11 +178,9 @@ SpinXmlTreeElement child3 = XML("<child/>");
 root.append(child1, child2, child3);
 ```
 
-
 ### Remove child elements
 
-To remove child elements from an Xml element the method `remove` is used. It accepts
-a single or multiple child elements and removes them from the parent element.
+To remove child elements from an XML element the method `remove` is used. It accepts single or multiple child elements and removes them from the parent element.
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -202,8 +193,7 @@ root.remove(root.childElements("child"));
 
 ### Replace elements
 
-To replace an element or a child element the methods `replace` and `replaceChild`
-are used.
+To replace an element or a child element the methods `replace` and `replaceChild` are used.
 
 ```java
 import static org.camunda.spin.Spin.XML;
@@ -218,11 +208,9 @@ root.childElement("order").replace(child2);
 ```
 
 
-## Manipulating Xml using a Script Language
+## Manipulating XML using a Script Language
 
-Xml can be manipulated from script languages in the same was as from Java. Since script languages
-use dynamic typing, you do not need to hint the data format but you can use auto detection. The
-following example demonstrates how to access an attribute and a child element from Xml in Python:
+XML can be manipulated from script languages in the same was as from Java. Since script languages use dynamic typing, you do not need to hint the data format but you can use autodetection. The following example demonstrates how to access an attribute and a child element from XML in Python:
 
 ```python
 xml = """

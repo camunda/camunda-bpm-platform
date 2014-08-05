@@ -1,6 +1,6 @@
-# Querying Json
+# Querying JSON
 
-The Json datatype supports querying with the [JsonPath][json-path] query language.
+The JSON datatype supports querying with the [JSONPath][json-path] query language.
 
 ## Querying an element
 

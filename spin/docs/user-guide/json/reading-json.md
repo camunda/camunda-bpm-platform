@@ -1,8 +1,8 @@
-# Reading Json
+# Reading JSON
 
-The Json datatype supports reading Json from Strings or input streams.
+The JSON datatype supports reading JSON from Strings or input streams.
 
-## Reading Json from a String:
+## Reading JSON from a String:
 
 ```java
 import static org.camunda.spin.Spin.*;
@@ -11,9 +11,9 @@ import static org.camunda.spin.DataFormats.*;
 SpinJsonNode json = S("{\"customer\": \"Kermit\"}", jsonTree());
 ```
 
-The second paramter `jsonTree()` hints Spin to use the Jackson tree parser for parsing the json.
+The second paramter `jsonTree()` hints Spin to use the Jackson tree parser for parsing the JSON.
 
-Alternatively you can directly use the `JSON(...)` function:
+Alternatively, you can directly use the `JSON(...)` function:
 
 ```java
 import static org.camunda.spin.Spin.*;
@@ -21,11 +21,11 @@ import static org.camunda.spin.Spin.*;
 SpinJsonNode json = JSON("{\"customer\": \"Kermit\"}");
 ```
 
-String values that represent Json primitive values can also be read. For example, `JSON("true")` returns a `SpinJsonNode` that represents the boolean value `true`.
+String values that represent JSON primitive values can also be read. For example, `JSON("true")` returns a `SpinJsonNode` that represents the boolean value `true`.
 
-## Reading Json from an InputStream:
+## Reading JSON from an InputStream:
 
-Spin also supports reading Json directly from a `java.io.InputStream`:
+Spin also supports reading JSON directly from a `java.io.InputStream`:
 
 ```java
 import static org.camunda.spin.Spin.*;
@@ -34,11 +34,9 @@ import static org.camunda.spin.DataFormats.*;
 SpinJsonNode json = S(inputStram, jsonTree());
 ```
 
-> **Closing the input stream**: Note that spin does not close the input stream. Users are required
-> to close the input stream after fully processing it with spin.
+> **Closing the input stream**: Note that spin does not close the input stream. Users are required to close the input stream after fully processing it with spin.
 
-The `JSON(...)` method also supports input streams. The following example shows how to read Json
-from a File (error handling ommitted):
+The `JSON(...)` method also supports input streams. The following example shows how to read JSON from a file (error handling ommitted):
 
 ```java
 import static org.camunda.spin.Spin.*;
@@ -48,21 +46,17 @@ SpinJsonNode json = JSON(fis);
 
 ```
 
-## Reading Json using a Script Language
+## Reading JSON using a Script Language
 
-Json can be read from script languages in the same way as from Java. Since script languages use
-dynamic typing, you do not need to hint the data format but you can use auto detection. The
-following example demonstrates how to read Json in Javascript:
+JSON can be read from script languages in the same way as from Java. Since script languages use dynamic typing, you do not need to hint the data format but you can use autodetection. The following example demonstrates how to read JSON in Javascript:
 
 ```javascript
 var customer = S('{"customer": "Kermit"}');
 ```
 
-## Reading Json Properties
+## Reading JSON Properties
 
-To fetch properties from the Json tree you can use `.prop("name")`. This will return the property as
-SpinJsonNode and you can use this to get the value of the property as the following examples will
-demonstrate:
+To fetch properties from the JSON tree you can use `.prop("name")`. This will return the property as SpinJsonNode and you can use this to get the value of the property as the following examples will demonstrate:
 
 in Java:
 ```java
@@ -113,8 +107,7 @@ var customerName = customer.value();
 
 ### Fetch field names
 
-Spin allows us to use the `.fieldNames()` method to fetch the names of all child nodes and properties in a node.
-The following example shows you how to use `.fieldNames()` in Java and Javascript.
+Spin allows us to use the `.fieldNames()` method to fetch the names of all child nodes and properties in a node. The following example shows you how to use `.fieldNames()` in Java and Javascript.
 
 in Java:
 ```java
@@ -132,7 +125,7 @@ var fieldNames = json.fieldNames();
 var fieldName1 = fieldNames.get(0)
 ```
 
-## Set Json Properties
+## Set JSON Properties
 
 To set a property you can use the `.prop("name", object)` method. This allows you to set one of the following 5 simple types:
 
@@ -185,9 +178,9 @@ or one of the 2 following container types:
   json.prop("new_array", object);    
   ```
 
-## Remove Json Properties
+## Remove JSON Properties
 
-There are 2 ways to remove properties from a json object.
+There are 2 ways to remove properties from a JSON object.
  
   * `.deleteProp("name")` - Removes a property with given name.
   * `.deleteProp(<List of names>)` - Removes one or more properties with given names.
@@ -222,9 +215,9 @@ json.deleteProp("customer");
 json.deleteProp(list);
 ```
 
-## Work with Json Arrays
+## Work with JSON Arrays
 
-Json arrays represent a list of object. Spin offers the following methods to manipulate this list:
+JSON arrays represent a list of objects. Spin offers the following methods to manipulate this list:
 
   * `.indexOf(<Object>)` - Fetches the index of the FIRST occurrence of the searched object.
   * `.lastIndexOf(<Object>)` - Fetches the index of the LAST occurrence of the searched object.
@@ -236,8 +229,7 @@ Json arrays represent a list of object. Spin offers the following methods to man
   * `.removeLast(<Object>)` - Removes the LAST occurrence of the object.
   * `.removeAt(Index)` - Removes the list entry at the specified index.
   
-These methods allow us to work with json arrays in a fast way. To show this in an example we will use the following
-Json Object as example:
+These methods allow us to work with JSON arrays in a fast way. To show this, we will use the following JSON Object as an example:
 
 ```json
 {
@@ -254,7 +246,7 @@ Json Object as example:
 }
 ```
 
-So lets see how we can manipulate this list in some examples.
+So let's see how we can manipulate this list in some examples.
 
 ### Example 1 - Get the index of testdata2 and the last occurrence of '1':
 

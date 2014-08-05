@@ -38,7 +38,7 @@ import java.util.List;
 import static org.camunda.spin.impl.util.SpinEnsure.*;
 
 /**
- * Wrapper for a xml dom element.
+ * Wrapper for an xml dom element.
  *
  * @author Sebastian Menski
  */
@@ -334,7 +334,7 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
   }
 
   /**
-   * Adopts a xml dom element to the owner document of this element if necessary.
+   * Adopts an xml dom element to the owner document of this element if necessary.
    *
    * @param elementToAdopt the element to adopt
    */
