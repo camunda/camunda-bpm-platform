@@ -19,7 +19,9 @@ import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
+import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.ProcessTask;
 import org.camunda.bpm.model.cmmn.instance.Stage;
@@ -32,20 +34,22 @@ import org.camunda.bpm.model.cmmn.instance.Task;
 public class DefaultCmmnElementHandlerRegistry {
 
   protected Map<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement>> definitionElementHandlers;
-  protected Map<Class<? extends PlanItemDefinition>, PlanItemHandler> planItemElementHandlers;
-  protected Map<Class<? extends PlanItemDefinition>, DiscretionaryItemHandler> discretionaryElementHandlers;
+  protected Map<Class<? extends PlanItemDefinition>, ItemHandler> planItemElementHandlers;
+  protected Map<Class<? extends PlanItemDefinition>, ItemHandler> discretionaryElementHandlers;
 
   protected CaseHandler caseHandler = new CaseHandler();
+
+  protected StageItemHandler stagePlanItemHandler = new StageItemHandler();
   protected CasePlanModelHandler casePlanModelHandler = new CasePlanModelHandler();
+  protected TaskItemHandler taskPlanItemHandler = new TaskItemHandler();
+  protected HumanTaskItemHandler humanTaskPlanItemHandler = new HumanTaskItemHandler();
+  protected ProcessTaskItemHandler processTaskPlanItemHandler = new ProcessTaskItemHandler();
+  protected CaseTaskItemHandler caseTaskPlanItemHandler = new CaseTaskItemHandler();
+  protected MilestoneItemHandler milestonePlanItemHandler = new MilestoneItemHandler();
+  protected EventListenerItemHandler eventListenerPlanItemHandler = new EventListenerItemHandler();
 
-  protected StagePlanItemHandler stagePlanItemHandler = new StagePlanItemHandler();
-  protected TaskPlanItemHandler taskPlanItemHandler = new TaskPlanItemHandler();
-  protected HumanTaskPlanItemHandler humanTaskPlanItemHandler = new HumanTaskPlanItemHandler();
-  protected ProcessTaskPlanItemHandler processTaskPlanItemHandler = new ProcessTaskPlanItemHandler();
-  protected CaseTaskPlanItemHandler caseTaskPlanItemHandler = new CaseTaskPlanItemHandler();
-
-  protected StageDiscretionaryItemHandler stageDiscretionaryItemHandler = new StageDiscretionaryItemHandler();
-  protected HumanTaskDiscretionaryItemHandler humanTaskDiscretionaryItemHandler = new HumanTaskDiscretionaryItemHandler();
+  protected StageItemHandler stageDiscretionaryItemHandler = new StageItemHandler();
+  protected HumanTaskItemHandler humanTaskDiscretionaryItemHandler = new HumanTaskItemHandler();
 
   public DefaultCmmnElementHandlerRegistry() {
 
@@ -53,19 +57,21 @@ public class DefaultCmmnElementHandlerRegistry {
     definitionElementHandlers = new HashMap<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement>>();
 
     definitionElementHandlers.put(Case.class, caseHandler);
-    definitionElementHandlers.put(CasePlanModel.class, casePlanModelHandler);
 
     // init plan item element handler
-    planItemElementHandlers = new HashMap<Class<? extends PlanItemDefinition>, PlanItemHandler>();
+    planItemElementHandlers = new HashMap<Class<? extends PlanItemDefinition>, ItemHandler>();
 
     planItemElementHandlers.put(Stage.class, stagePlanItemHandler);
+    planItemElementHandlers.put(CasePlanModel.class, casePlanModelHandler);
     planItemElementHandlers.put(Task.class, taskPlanItemHandler);
     planItemElementHandlers.put(HumanTask.class, humanTaskPlanItemHandler);
     planItemElementHandlers.put(ProcessTask.class, processTaskPlanItemHandler);
     planItemElementHandlers.put(CaseTask.class, caseTaskPlanItemHandler);
+    planItemElementHandlers.put(Milestone.class, milestonePlanItemHandler);
+    planItemElementHandlers.put(EventListener.class, eventListenerPlanItemHandler);
 
     // init discretionary element handler
-    discretionaryElementHandlers = new HashMap<Class<? extends PlanItemDefinition>, DiscretionaryItemHandler>();
+    discretionaryElementHandlers = new HashMap<Class<? extends PlanItemDefinition>, ItemHandler>();
 
     discretionaryElementHandlers.put(Stage.class, stageDiscretionaryItemHandler);
     discretionaryElementHandlers.put(HumanTask.class, humanTaskDiscretionaryItemHandler);
@@ -79,19 +85,19 @@ public class DefaultCmmnElementHandlerRegistry {
     this.definitionElementHandlers = definitionElementHandlers;
   }
 
-  public Map<Class<? extends PlanItemDefinition>, PlanItemHandler> getPlanItemElementHandlers() {
+  public Map<Class<? extends PlanItemDefinition>, ItemHandler> getPlanItemElementHandlers() {
     return planItemElementHandlers;
   }
 
-  public void setPlanItemElementHandlers(Map<Class<? extends PlanItemDefinition>, PlanItemHandler> planItemElementHandlers) {
+  public void setPlanItemElementHandlers(Map<Class<? extends PlanItemDefinition>, ItemHandler> planItemElementHandlers) {
     this.planItemElementHandlers = planItemElementHandlers;
   }
 
-  public Map<Class<? extends PlanItemDefinition>, DiscretionaryItemHandler> getDiscretionaryElementHandlers() {
+  public Map<Class<? extends PlanItemDefinition>, ItemHandler> getDiscretionaryElementHandlers() {
     return discretionaryElementHandlers;
   }
 
-  public void setDiscretionaryElementHandlers(Map<Class<? extends PlanItemDefinition>, DiscretionaryItemHandler> discretionaryElementHandlers) {
+  public void setDiscretionaryElementHandlers(Map<Class<? extends PlanItemDefinition>, ItemHandler> discretionaryElementHandlers) {
     this.discretionaryElementHandlers = discretionaryElementHandlers;
   }
 

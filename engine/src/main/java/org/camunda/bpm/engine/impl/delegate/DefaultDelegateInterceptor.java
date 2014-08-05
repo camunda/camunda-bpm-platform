@@ -15,21 +15,24 @@ package org.camunda.bpm.engine.impl.delegate;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * Default implementation, simply proceeding the call.
  *
  * @author Daniel Meyer
+ * @author Roman Smirnov
  */
 public class DefaultDelegateInterceptor implements DelegateInterceptor {
 
   public void handleInvocation(final DelegateInvocation invocation) throws Exception {
-    ProcessApplicationReference processApplication =
-        ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) invocation.getContextExecution());
+    BaseDelegateExecution contextExecution = invocation.getContextExecution();
+
+    ProcessApplicationReference processApplication = ProcessApplicationContextUtil.getTargetProcessApplication((CoreExecution) contextExecution);
 
     if (processApplication != null && ProcessApplicationContextUtil.requiresContextSwitch(processApplication)) {
       Context.executeWithinProcessApplication(new Callable<Void>() {

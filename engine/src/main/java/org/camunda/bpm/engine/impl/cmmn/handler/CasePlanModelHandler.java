@@ -12,32 +12,23 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
+import java.util.List;
+
+import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CasePlanModelHandler extends CmmnElementHandler<CasePlanModel> {
+public class CasePlanModelHandler extends StageItemHandler {
 
-  public CmmnActivity handleElement(CasePlanModel casePlanModel, CmmnHandlerContext context) {
-    CmmnActivity newActivity = createActivity(casePlanModel, context);
-
-    initializeActivity(casePlanModel, newActivity, context);
-
-    return newActivity;
+  protected PlanItemDefinition getDefinition(CmmnElement element) {
+    return (PlanItemDefinition) element;
   }
 
-  protected void initializeActivity(CasePlanModel casePlanModel, CmmnActivity activity, CmmnHandlerContext context) {
-    activity.setName(casePlanModel.getName());
-  }
-
-  @Override
-  protected CmmnActivityBehavior getActivityBehavior() {
-    return new StageActivityBehavior();
+  protected List<String> getStandardEvents(CmmnElement element) {
+    return CASE_PLAN_MODEL_EVENTS;
   }
 
 }

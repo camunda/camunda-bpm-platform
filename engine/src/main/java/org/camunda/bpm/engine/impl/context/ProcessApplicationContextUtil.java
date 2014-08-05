@@ -15,6 +15,14 @@ public class ProcessApplicationContextUtil {
 
   private static final Logger LOGG = Logger.getLogger(ProcessApplicationContextUtil.class.getName());
 
+  public static ProcessApplicationReference getTargetProcessApplication(CoreExecution execution) {
+    if (execution instanceof ExecutionEntity) {
+      return getTargetProcessApplication((ExecutionEntity) execution);
+    } else {
+      return getTargetProcessApplication((CaseExecutionEntity) execution);
+    }
+  }
+
   public static ProcessApplicationReference getTargetProcessApplication(ExecutionEntity execution) {
     if (execution == null) {
       return null;

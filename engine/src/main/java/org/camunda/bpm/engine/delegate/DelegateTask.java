@@ -64,6 +64,15 @@ public interface DelegateTask extends VariableScope, BpmnModelExecutionContext, 
   /** Reference to the process definition or null if it is not related to a process. */
   String getProcessDefinitionId();
 
+  /** Reference to the case instance or null if it is not related to a case instance. */
+  String getCaseInstanceId();
+
+  /** Reference to the case execution or null if it is not related to a case instance. */
+  String getCaseExecutionId();
+
+  /** Reference to the case definition or null if it is not related to a case. */
+  String getCaseDefinitionId();
+
   /** The date/time when this task was created */
   Date getCreateTime();
 
@@ -72,6 +81,9 @@ public interface DelegateTask extends VariableScope, BpmnModelExecutionContext, 
 
   /** Returns the execution currently at the task. */
   DelegateExecution getExecution();
+
+  /** Returns the case execution currently at the task. */
+  DelegateCaseExecution getCaseExecution();
 
   /** Returns the event name which triggered the task listener to fire for this task. */
   String getEventName();

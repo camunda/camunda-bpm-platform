@@ -34,15 +34,16 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
-import org.camunda.bpm.engine.impl.delegate.TaskListenerInvocation;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextCloseListener;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
+import org.camunda.bpm.engine.impl.task.delegate.TaskListenerInvocation;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -371,6 +372,9 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   public CoreVariableScope getParentVariableScope() {
     if (getExecution()!=null) {
       return execution;
+    }
+    if (getCaseExecution()!=null) {
+      return caseExecution;
     }
     return null;
   }
@@ -706,14 +710,19 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
       List<TaskListener> taskEventListeners = getTaskDefinition().getTaskListener(taskEventName);
       if (taskEventListeners != null) {
         for (TaskListener taskListener : taskEventListeners) {
-          ExecutionEntity execution = getExecution();
+          CoreExecution execution = getExecution();
+          if (execution == null) {
+            execution = getCaseExecution();
+          }
+
           if (execution != null) {
             setEventName(taskEventName);
           }
           try {
+            TaskListenerInvocation listenerInvocation = new TaskListenerInvocation(taskListener, (DelegateTask) this, execution);
             Context.getProcessEngineConfiguration()
               .getDelegateInterceptor()
-              .handleInvocation(new TaskListenerInvocation(taskListener, (DelegateTask)this, execution));
+              .handleInvocation(listenerInvocation);
           }catch (Exception e) {
             throw new ProcessEngineException("Exception while invoking TaskListener: "+e.getMessage(), e);
           }

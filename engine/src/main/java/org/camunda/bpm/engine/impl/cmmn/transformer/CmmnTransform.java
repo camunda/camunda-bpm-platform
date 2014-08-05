@@ -22,8 +22,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnElementHandler;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
 import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistry;
-import org.camunda.bpm.engine.impl.cmmn.handler.DiscretionaryItemHandler;
-import org.camunda.bpm.engine.impl.cmmn.handler.PlanItemHandler;
+import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.transformer.Transform;
@@ -38,7 +37,9 @@ import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
+import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
+import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanFragment;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
@@ -157,7 +158,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
   }
 
   protected void parseCasePlanModel(CasePlanModel casePlanModel) {
-    CmmnElementHandler<CasePlanModel> transformer = getDefinitionHandler(CasePlanModel.class);
+    ItemHandler transformer = getPlanItemHandler(CasePlanModel.class);
     CmmnActivity newActivity = transformer.handleElement(casePlanModel, context);
     context.setParent(newActivity);
 
@@ -199,7 +200,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
   protected void parsePlanItem(PlanItem planItem, CmmnActivity parent) {
     PlanItemDefinition definition = planItem.getDefinition();
 
-    CmmnElementHandler<PlanItem> planItemTransformer = null;
+    ItemHandler planItemTransformer = null;
 
     if (definition instanceof HumanTask) {
       planItemTransformer = getPlanItemHandler(HumanTask.class);
@@ -211,6 +212,10 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
       planItemTransformer = getPlanItemHandler(Task.class);
     } else if (definition instanceof Stage) {
       planItemTransformer = getPlanItemHandler(Stage.class);
+    } else if (definition instanceof Milestone) {
+      planItemTransformer = getPlanItemHandler(Milestone.class);
+    } else if (definition instanceof EventListener) {
+      planItemTransformer = getPlanItemHandler(EventListener.class);
     }
 
     CmmnActivity newActivity = planItemTransformer.handleElement(planItem, context);
@@ -267,11 +272,11 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     return (CmmnElementHandler<V>) getHandlerRegistry().getDefinitionElementHandlers().get(cls);
   }
 
-  protected PlanItemHandler getPlanItemHandler(Class<? extends PlanItemDefinition> cls) {
+  protected ItemHandler getPlanItemHandler(Class<? extends PlanItemDefinition> cls) {
     return getHandlerRegistry().getPlanItemElementHandlers().get(cls);
   }
 
-  protected DiscretionaryItemHandler getDiscretionaryItemHandler(Class<? extends PlanItemDefinition> cls) {
+  protected ItemHandler getDiscretionaryItemHandler(Class<? extends PlanItemDefinition> cls) {
     return getHandlerRegistry().getDiscretionaryElementHandlers().get(cls);
   }
 

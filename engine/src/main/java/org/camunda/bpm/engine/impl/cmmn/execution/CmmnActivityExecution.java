@@ -293,14 +293,6 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p>For a {@link Task} instance, this means its purpose has been accomplished:<br>
    *  <ul>
    *    <li>{@link HumanTask} have been completed by human.</li>
-   *    <li>{@link CaseTask} have launched a new {@link CaseInstance} and if output parameters
-   *        are required and/or the property <code>isBlocking</code> is set to <code>true</code>,
-   *        then the launched {@link CaseInstance} has completed and returned the
-   *        output parameters.</li>
-   *    <li>{@link ProcessTask} have launched a new {@link ProcessInstance} and if output parameters
-   *        are required and/or the property <code>isBlocking</code> is set to <code>true</code>,
-   *        then the launched {@link ProcessInstance} has completed and returned the
-   *        output parameters.</li>
    *  </ul>
    * </p>
    *

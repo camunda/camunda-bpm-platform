@@ -12,15 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.scripting.engine;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.connector.ConnectorVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -38,6 +39,8 @@ public class VariableScopeResolver implements Resolver {
     ensureNotNull("variableScope", variableScope);
     if (variableScope instanceof ExecutionEntity) {
       variableScopeKey = "execution";
+    } else if (variableScope instanceof CaseExecutionEntity) {
+      variableScopeKey = "caseExecution";
     } else if (variableScope instanceof TaskEntity) {
       variableScopeKey = "task";
     } else if (variableScope instanceof ConnectorVariableScope) {

@@ -22,12 +22,13 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -36,7 +37,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -58,6 +58,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
+  protected CaseService caseService;
 
   public static WebArchive initWebArchiveDeployment(String name, String processesXmlPath) {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, name)
@@ -94,6 +95,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
     repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();
+    caseService = processEngine.getCaseService();
   }
 
   public void waitForJobExecutorToProcessAllJobs() {

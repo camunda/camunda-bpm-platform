@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
+import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.text.StringCharacterIterator;
@@ -34,6 +36,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CancelBoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ClassDelegateActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
@@ -64,13 +67,10 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.TaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TransactionActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.helper.ClassDelegate;
+import org.camunda.bpm.engine.impl.bpmn.listener.ClassDelegateExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionExecutionListener;
-import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionExecutionListener;
-import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ScriptExecutionListener;
-import org.camunda.bpm.engine.impl.bpmn.listener.ScriptTaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.mapping.InputParameter;
 import org.camunda.bpm.engine.impl.core.mapping.IoMapping;
@@ -121,6 +121,10 @@ import org.camunda.bpm.engine.impl.scripting.engine.JuelScriptEngineFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
+import org.camunda.bpm.engine.impl.task.listener.ClassDelegateTaskListener;
+import org.camunda.bpm.engine.impl.task.listener.DelegateExpressionTaskListener;
+import org.camunda.bpm.engine.impl.task.listener.ExpressionTaskListener;
+import org.camunda.bpm.engine.impl.task.listener.ScriptTaskListener;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.util.ResourceUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -1665,7 +1669,7 @@ public class BpmnParse extends Parse {
       if (resultVariableName != null) {
         addError("'resultVariableName' not supported for " + elementName + " elements using 'class'", serviceTaskElement);
       }
-      activity.setActivityBehavior(new ClassDelegate(className, parseFieldDeclarations(serviceTaskElement)));
+      activity.setActivityBehavior(new ClassDelegateActivityBehavior(className, parseFieldDeclarations(serviceTaskElement)));
 
     } else if (delegateExpression != null) {
       if (resultVariableName != null) {
@@ -1799,12 +1803,12 @@ public class BpmnParse extends Parse {
 
   protected void parseEmailServiceTask(ActivityImpl activity, Element serviceTaskElement, List<FieldDeclaration> fieldDeclarations) {
     validateFieldDeclarationsForEmail(serviceTaskElement, fieldDeclarations);
-    activity.setActivityBehavior((MailActivityBehavior) ClassDelegate.instantiateDelegate(MailActivityBehavior.class, fieldDeclarations));
+    activity.setActivityBehavior((MailActivityBehavior) instantiateDelegate(MailActivityBehavior.class, fieldDeclarations));
   }
 
   protected void parseShellServiceTask(ActivityImpl activity, Element serviceTaskElement, List<FieldDeclaration> fieldDeclarations) {
     validateFieldDeclarationsForShell(serviceTaskElement, fieldDeclarations);
-    activity.setActivityBehavior((ActivityBehavior) ClassDelegate.instantiateDelegate(ShellActivityBehavior.class, fieldDeclarations));
+    activity.setActivityBehavior((ActivityBehavior) instantiateDelegate(ShellActivityBehavior.class, fieldDeclarations));
   }
 
 
@@ -2261,7 +2265,7 @@ public class BpmnParse extends Parse {
     Element scriptElement = taskListenerElement.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "script");
 
     if (className != null) {
-      taskListener = new ClassDelegate(className, parseFieldDeclarations(taskListenerElement));
+      taskListener = new ClassDelegateTaskListener(className, parseFieldDeclarations(taskListenerElement));
     } else if (expression != null) {
       taskListener = new ExpressionTaskListener(expressionManager.createExpression(expression));
     } else if (delegateExpression != null) {
@@ -3132,7 +3136,7 @@ public class BpmnParse extends Parse {
     Element scriptElement = executionListenerElement.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "script");
 
     if (className != null) {
-      executionListener = new ClassDelegate(className, parseFieldDeclarations(executionListenerElement));
+      executionListener = new ClassDelegateExecutionListener(className, parseFieldDeclarations(executionListenerElement));
     } else if (expression != null) {
       executionListener = new ExpressionExecutionListener(expressionManager.createExpression(expression));
     } else if (delegateExpression != null) {

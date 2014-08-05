@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -395,23 +394,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
     variableStore.removeVariablesWithoutFiringEvents();
 
-    removeTask();
-
     // finally delete this execution
     Context.getCommandContext()
       .getCaseExecutionManager()
       .deleteCaseExecution(this);
-  }
-
-  protected void removeTask() {
-    TaskEntity task = Context
-        .getCommandContext()
-        .getTaskManager()
-        .findTaskByCaseExecutionId(getId());
-
-    if (task != null) {
-      task.delete(TaskEntity.DELETE_REASON_DELETED, false);
-    }
   }
 
   // persistence /////////////////////////////////////////////////////////

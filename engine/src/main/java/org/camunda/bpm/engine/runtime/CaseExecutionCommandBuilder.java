@@ -287,29 +287,12 @@ public interface CaseExecutionCommandBuilder {
    * criteria are fulfilled:<br>
    * <ul>
    *  <li>there are no children in the state <code>ACTIVE</code></li>
-   *  <li>all required (<code>requiredRule</code> evaluates to <code>true</code>) children
-   *      are in state:
-   *    <ul>
-   *      <li><code>DISABLED</code></li>
-   *      <li><code>COMPLETED</code></li>
-   *      <li><code>TERMINATED</code></li>
-   *      <li><code>FAILED</code></li>
-   *    </ul>
-   *  </li>
    * </ul>
    * </p>
    *
    * <p>For a {@link Task} instance, this means its purpose has been accomplished:<br>
    *  <ul>
-   *    <li>{@link HumanTask} have been completed by human.</li>
-   *    <li>{@link CaseTask} have launched a new {@link CaseInstance} and if output parameters
-   *        are required and/or the property <code>isBlocking</code> is set to <code>true</code>,
-   *        then the launched {@link CaseInstance} has completed and returned the
-   *        output parameters.</li>
-   *    <li>{@link ProcessTask} have launched a new {@link ProcessInstance} and if output parameters
-   *        are required and/or the property <code>isBlocking</code> is set to <code>true</code>,
-   *        then the launched {@link ProcessInstance} has completed and returned the
-   *        output parameters.</li>
+   *    <li>{@link HumanTask} has been completed by human.</li>
    *  </ul>
    * </p>
    *
