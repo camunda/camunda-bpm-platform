@@ -323,10 +323,6 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     if(this.isArray()) {
       Integer i = indexOf(searchObject);
 
-      if(i > 0) {
-        i = i - 1;
-      }
-
       return insertAt(i, insertObject);
 
     } else {

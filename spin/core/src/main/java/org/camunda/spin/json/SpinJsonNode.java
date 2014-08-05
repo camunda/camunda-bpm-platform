@@ -32,8 +32,9 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    * Fetches the first index of the searched object in an array.
    *
    * @param searchObject Object for which the index should be searched.
-   * @return {@link Integer} index of searchObject or -1 if object not found.
+   * @return {@link Integer} index of searchObject.
    * @throws SpinJsonTreeNodeException if the current node is not an array.
+   * @throws SpinJsonTreePropertyException if object is not found.
    */
   public abstract Integer indexOf(Object searchObject);
 

@@ -271,6 +271,24 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
     assertThat(newValue).isEqualTo("Test");
   }
 
+  @Test
+  @Script
+  @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+  public void shouldInsertBeforeSearchObject() {
+    Number oldSize = script.getVariable("oldSize");
+    String oldValue = script.getVariable("oldValue");
+    String oldValueOnNewPosition = script.getVariable("oldValueOnNewPosition");
+
+    Number newSize = script.getVariable("newSize");
+    String newValue = script.getVariable("newValue");
+
+    // casts to int because ruby returns long instead of int
+    assertThat(oldSize.intValue() + 1).isEqualTo(newSize.intValue());
+    assertThat(oldValue).isEqualTo("dollar");
+    assertThat(oldValue).isEqualTo(oldValueOnNewPosition);
+    assertThat(newValue).isEqualTo("Test");
+  }
+
   // ----------------- 6) insertAfter ----------------------
 
   @Test(expected = SpinJsonTreeNodeException.class)

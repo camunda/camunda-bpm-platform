@@ -296,6 +296,7 @@ public class JsonTreeEditListPropertyTest {
     Integer newSize = currencies.elements().size();
 
     assertThat(oldNode.equals(newNode)).isFalse();
+    assertThat(newNode.stringValue()).isEqualTo("Test");
     assertThat(oldNode.stringValue()).isEqualTo(oldNodeNewPosition.stringValue());
     assertThat(size).isNotEqualTo(newSize);
   }
@@ -305,13 +306,14 @@ public class JsonTreeEditListPropertyTest {
     SpinJsonNode oldNode = currencies.elements().get(1);
     Integer size = currencies.elements().size();
 
-    currencies.insertBefore("euro", "Test");
+    currencies.insertBefore("dollar", "Test");
 
     SpinJsonNode newNode = currencies.elements().get(1);
     SpinJsonNode oldNodeNewPosition = currencies.elements().get(2);
     Integer newSize = currencies.elements().size();
 
-    assertThat(oldNode.equals(newNode)).isFalse();
+    assertThat(oldNode).isNotEqualTo(newNode);
+    assertThat(newNode.stringValue()).isEqualTo("Test");
     assertThat(oldNode.stringValue()).isEqualTo(oldNodeNewPosition.stringValue());
     assertThat(size).isNotEqualTo(newSize);
   }
