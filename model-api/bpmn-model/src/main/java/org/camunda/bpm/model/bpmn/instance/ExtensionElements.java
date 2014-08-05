@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.model.bpmn.instance;
 
+import java.util.Collection;
+
 import org.camunda.bpm.model.bpmn.Query;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-
-import java.util.Collection;
 
 /**
  * The BPMN extensionElements element

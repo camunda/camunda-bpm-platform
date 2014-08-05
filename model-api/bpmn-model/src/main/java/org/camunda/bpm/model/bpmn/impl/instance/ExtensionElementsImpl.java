@@ -12,21 +12,20 @@
  */
 package org.camunda.bpm.model.bpmn.impl.instance;
 
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_EXTENSION_ELEMENTS;
+
+import java.util.Collection;
+
 import org.camunda.bpm.model.bpmn.Query;
 import org.camunda.bpm.model.bpmn.impl.QueryImpl;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
+import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
-import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
-import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
-
-import java.util.Collection;
-
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_EXTENSION_ELEMENTS;
 
 /**
  * The BPMN extensionElements element
@@ -35,8 +34,6 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_EX
  * @author Sebastian Menski
  */
 public class ExtensionElementsImpl extends BpmnModelElementInstanceImpl implements ExtensionElements {
-
-  protected static ChildElementCollection<ModelElementInstance> anyCollection;
 
   public static void registerType(ModelBuilder modelBuilder) {
 
@@ -48,11 +45,6 @@ public class ExtensionElementsImpl extends BpmnModelElementInstanceImpl implemen
         }
       });
 
-    SequenceBuilder sequence = typeBuilder.sequence();
-
-    anyCollection = sequence.elementCollection(ModelElementInstance.class)
-      .build();
-
     typeBuilder.build();
   }
 
@@ -61,7 +53,7 @@ public class ExtensionElementsImpl extends BpmnModelElementInstanceImpl implemen
   }
 
   public Collection<ModelElementInstance> getElements() {
-    return anyCollection.get(this);
+    return ModelUtil.getModelElementCollection(getDomElement().getChildElements(), modelInstance);
   }
 
   public Query<ModelElementInstance> getElementsQuery() {
@@ -71,14 +63,19 @@ public class ExtensionElementsImpl extends BpmnModelElementInstanceImpl implemen
   public ModelElementInstance addExtensionElement(String namespaceUri, String localName) {
     ModelElementType extensionElementType = modelInstance.registerGenericType(namespaceUri, localName);
     ModelElementInstance extensionElement = extensionElementType.newInstance(modelInstance);
-    getElements().add(extensionElement);
+    addChildElement(extensionElement);
     return extensionElement;
   }
 
   public <T extends ModelElementInstance> T addExtensionElement(Class<T> extensionElementClass) {
     ModelElementInstance extensionElement = modelInstance.newInstance(extensionElementClass);
-    getElements().add(extensionElement);
+    addChildElement(extensionElement);
     return extensionElementClass.cast(extensionElement);
+  }
+
+  @Override
+  public void addChildElement(ModelElementInstance extensionElement) {
+    getDomElement().appendChild(extensionElement.getDomElement());
   }
 
 }

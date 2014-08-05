@@ -86,7 +86,7 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
       extensionElements = modelInstance.newInstance(ExtensionElements.class);
       element.setExtensionElements(extensionElements);
     }
-    extensionElements.getElements().add(extensionElement);
+    extensionElements.addChildElement(extensionElement);
     return myself;
   }
 }
