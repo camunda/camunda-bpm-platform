@@ -1,3 +1,3 @@
 jsonNode = JSON($input)
 
-$stringValue = jsonNode.jsonPath('$.order').string()
+$stringValue = jsonNode.jsonPath('$.order').stringValue()

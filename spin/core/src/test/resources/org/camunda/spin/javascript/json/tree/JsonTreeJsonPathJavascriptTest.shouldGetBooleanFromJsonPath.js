@@ -1,3 +1,3 @@
 var jsonNode = JSON(input);
 
-booleanValue = jsonNode.jsonPath('$.active').bool();
+booleanValue = jsonNode.jsonPath('$.active').boolValue();

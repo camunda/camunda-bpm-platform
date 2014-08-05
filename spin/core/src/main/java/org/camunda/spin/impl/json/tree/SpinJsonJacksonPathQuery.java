@@ -24,7 +24,7 @@ import org.camunda.spin.logging.SpinLogger;
 /**
  * @author Stefan Hentschel
  */
-public class SpinJsonPathQuery extends SpinJsonTreePathQuery {
+public class SpinJsonJacksonPathQuery implements SpinJsonTreePathQuery {
 
   private static final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
 
@@ -32,8 +32,8 @@ public class SpinJsonPathQuery extends SpinJsonTreePathQuery {
   protected final JsonPath query;
   protected final JsonJacksonTreeDataFormat dataFormat;
 
-  public SpinJsonPathQuery(SpinJsonNode spinJsonNode, JsonPath query, JsonJacksonTreeDataFormat dataFormat) {
-    this.spinJsonNode = spinJsonNode;
+  public SpinJsonJacksonPathQuery(SpinJsonJacksonTreeNode spinJsonJacksonTreeNode, JsonPath query, JsonJacksonTreeDataFormat dataFormat) {
+    this.spinJsonNode = spinJsonJacksonTreeNode;
     this.query = query;
     this.dataFormat = dataFormat;
   }
@@ -50,7 +50,7 @@ public class SpinJsonPathQuery extends SpinJsonTreePathQuery {
   }
 
   public SpinList<SpinJsonNode> elementList() {
-    SpinJsonNode node = element();
+    SpinJsonJacksonTreeNode node = (SpinJsonJacksonTreeNode) element();
     if(node.isArray()) {
       return node.elements();
     } else {
@@ -58,8 +58,8 @@ public class SpinJsonPathQuery extends SpinJsonTreePathQuery {
     }
   }
 
-  public String string() {
-    SpinJsonNode node = element();
+  public String stringValue() {
+    SpinJsonJacksonTreeNode node = (SpinJsonJacksonTreeNode) element();
     if(node.isString()) {
       return node.stringValue();
     } else {
@@ -67,8 +67,8 @@ public class SpinJsonPathQuery extends SpinJsonTreePathQuery {
     }
   }
 
-  public Number number() {
-    SpinJsonNode node = element();
+  public Number numberValue() {
+    SpinJsonJacksonTreeNode node = (SpinJsonJacksonTreeNode) element();
     if(node.isNumber()) {
       return node.numberValue();
     } else {
@@ -76,8 +76,8 @@ public class SpinJsonPathQuery extends SpinJsonTreePathQuery {
     }
   }
 
-  public Boolean bool() {
-    SpinJsonNode node = element();
+  public Boolean boolValue() {
+    SpinJsonJacksonTreeNode node = (SpinJsonJacksonTreeNode) element();
     if(node.isBoolean()) {
       return node.boolValue();
     } else {

@@ -55,21 +55,21 @@ public class JsonTreeJsonPathTest {
 
   @Test
   public void shouldGetBooleanFromJsonPath() {
-    Boolean active = jsonNode.jsonPath("$.active").bool();
+    Boolean active = jsonNode.jsonPath("$.active").boolValue();
 
     assertThat(active).isTrue();
   }
 
   @Test
   public void shouldGetStringFromJsonPath() {
-    String order = jsonNode.jsonPath("$.order").string();
+    String order = jsonNode.jsonPath("$.order").stringValue();
 
     assertThat(order).isEqualTo("order1");
   }
 
   @Test
   public void shouldGetNumberFromJsonPath() {
-    Number order = jsonNode.jsonPath("$.id").number();
+    Number order = jsonNode.jsonPath("$.id").numberValue();
 
     assertThat(order.longValue()).isEqualTo(1234567890987654321L);
   }
@@ -175,28 +175,28 @@ public class JsonTreeJsonPathTest {
   @Test
   public void failReadingStringProperty() {
     try {
-      jsonNode.jsonPath("$.customers").string();
+      jsonNode.jsonPath("$.customers").stringValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch(SpinJsonDataFormatException ex) {
       // expected
     }
 
     try {
-      jsonNode.jsonPath("$.active").string();
+      jsonNode.jsonPath("$.active").stringValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch(SpinJsonDataFormatException ex) {
       // expected
     }
 
     try {
-      jsonNode.jsonPath("$.id").string();
+      jsonNode.jsonPath("$.id").stringValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch(SpinJsonDataFormatException ex) {
       // expected
     }
 
     try {
-      jsonNode.jsonPath("$").string();
+      jsonNode.jsonPath("$").stringValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch(SpinJsonDataFormatException ex) {
       // expected
@@ -206,28 +206,28 @@ public class JsonTreeJsonPathTest {
   @Test
    public void failReadingNumberProperty() {
     try {
-      jsonNode.jsonPath("$.customers").number();
+      jsonNode.jsonPath("$.customers").numberValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException ex) {
       // expected
     }
 
     try {
-      jsonNode.jsonPath("$.active").number();
+      jsonNode.jsonPath("$.active").numberValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException ex) {
       // expected
     }
 
     try {
-      jsonNode.jsonPath("$.order").number();
+      jsonNode.jsonPath("$.order").numberValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException ex) {
       // expected
     }
 
     try {
-      jsonNode.jsonPath("$").number();
+      jsonNode.jsonPath("$").numberValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException ex) {
       // expected
@@ -237,28 +237,28 @@ public class JsonTreeJsonPathTest {
   @Test
   public void failReadingBooleanProperty() {
     try {
-      jsonNode.jsonPath("$.customers").bool();
+      jsonNode.jsonPath("$.customers").boolValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException ex) {
       // expected
     }
 
     try {
-      jsonNode.jsonPath("$.id").bool();
+      jsonNode.jsonPath("$.id").boolValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException ex) {
       // expected
     }
 
     try {
-      jsonNode.jsonPath("$.order").bool();
+      jsonNode.jsonPath("$.order").boolValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException ex) {
       // expected
     }
 
     try {
-      jsonNode.jsonPath("$").bool();
+      jsonNode.jsonPath("$").boolValue();
       fail("Expected: SpinJsonDataFormatException");
     } catch (SpinJsonDataFormatException ex) {
       // expected

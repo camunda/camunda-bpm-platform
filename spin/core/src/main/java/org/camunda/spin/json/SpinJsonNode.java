@@ -12,7 +12,6 @@
  */
 package org.camunda.spin.json;
 
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.spi.SpinDataFormatException;
@@ -317,13 +316,6 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    * @throws SpinDataFormatException if this node is not a array value
    */
   public abstract List<String> fieldNames();
-
-  /**
-   * Fetch the type of the current node
-   *
-   * @return Type of the node
-   */
-  public abstract JsonNodeType getNodeType();
 
   /**
    * Creates a JsonPath query on this element.

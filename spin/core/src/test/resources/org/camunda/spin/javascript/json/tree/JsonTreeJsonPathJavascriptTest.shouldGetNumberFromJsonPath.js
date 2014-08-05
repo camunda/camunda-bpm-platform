@@ -1,3 +1,3 @@
 var jsonNode = JSON(input);
 
-numberValue = jsonNode.jsonPath('$.id').number();
+numberValue = jsonNode.jsonPath('$.id').numberValue();

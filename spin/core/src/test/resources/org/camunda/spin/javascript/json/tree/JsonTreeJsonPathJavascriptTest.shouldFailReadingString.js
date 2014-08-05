@@ -1,3 +1,3 @@
 var jsonNode = JSON(input);
 
-jsonNode.jsonPath('$.id').string();
+jsonNode.jsonPath('$.id').stringValue();

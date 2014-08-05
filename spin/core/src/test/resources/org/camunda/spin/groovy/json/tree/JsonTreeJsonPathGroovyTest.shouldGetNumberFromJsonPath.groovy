@@ -2,4 +2,4 @@ package org.camunda.spin.groovy.json.tree
 
 jsonNode = JSON(input);
 
-numberValue = jsonNode.jsonPath('$.id').number();
+numberValue = jsonNode.jsonPath('$.id').numberValue();

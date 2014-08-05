@@ -18,7 +18,7 @@ import org.camunda.spin.SpinList;
 /**
  * @author Stefan Hentschel
  */
-public abstract class SpinJsonTreePathQuery {
+public interface SpinJsonTreePathQuery {
 
   /**
    * Fetches the node from the result of JsonPath.
@@ -26,7 +26,7 @@ public abstract class SpinJsonTreePathQuery {
    * @return {@link SpinJsonNode} representation of the found node
    * @throws SpinJsonTreePathException if node value is not a valid json path expression or the path is not found.
    */
-  public abstract SpinJsonNode element();
+  SpinJsonNode element();
 
   /**
    * Fetches the list of nodes from the result of JsonPath.
@@ -34,7 +34,7 @@ public abstract class SpinJsonTreePathQuery {
    * @return {@link SpinList} list of found nodes
    * @throws SpinJsonDataFormatException if node value is not Array.
    */
-  public abstract SpinList<SpinJsonNode> elementList();
+  SpinList<SpinJsonNode> elementList();
 
   /**
    * Fetches the string value from the result of JsonPath.
@@ -42,7 +42,7 @@ public abstract class SpinJsonTreePathQuery {
    * @return String value of found node
    * @throws SpinJsonDataFormatException if node value is not String.
    */
-  public abstract String string();
+  String stringValue();
 
   /**
    * Fetches the number value from the result of JsonPath.
@@ -50,7 +50,7 @@ public abstract class SpinJsonTreePathQuery {
    * @return Number value of found node
    * @throws SpinJsonDataFormatException if node value is not Number.
    */
-  public abstract Number number();
+  Number numberValue();
 
   /**
    * Fetches the boolean value from the result of JsonPath.
@@ -58,5 +58,5 @@ public abstract class SpinJsonTreePathQuery {
    * @return Boolean value of found node
    * @throws SpinJsonDataFormatException if node value is not Boolean.
    */
-  public abstract Boolean bool();
+  Boolean boolValue();
 }

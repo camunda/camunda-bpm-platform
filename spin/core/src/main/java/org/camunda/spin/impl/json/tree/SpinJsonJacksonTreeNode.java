@@ -460,7 +460,7 @@ public class SpinJsonJacksonTreeNode extends SpinJsonNode {
     ensureNotNull("expression", expression);
     try {
       JsonPath query = JsonPath.compile(expression);
-      return new SpinJsonPathQuery(this, query, dataFormat);
+      return new SpinJsonJacksonPathQuery(this, query, dataFormat);
     } catch(InvalidPathException pex) {
       throw LOG.unableToCompileJsonPathExpression(expression, pex);
     } catch(IllegalArgumentException aex) {

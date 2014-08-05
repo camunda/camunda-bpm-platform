@@ -29,7 +29,7 @@ import static org.camunda.spin.Spin.JSON;
 
 String json = "{\"child\": [{\"id\": 1,\"name\": \"Lucy\",\"sex\": \"female\"},{\"id\": 2,\"name\": \"Tracy\",\"sex\": \"female\"}],\"number\": 1,\"boolean\": true}";
 
-String value = JSON(json).jsonPath("$.child[0].name").string();
+String value = JSON(json).jsonPath("$.child[0].name").stringValue();
 ```
 
 ## Querying a Number
@@ -39,7 +39,7 @@ import static org.camunda.spin.Spin.JSON;
 
 String json = "{\"child\": [{\"id\": 1,\"name\": \"Lucy\",\"sex\": \"female\"},{\"id\": 2,\"name\": \"Tracy\",\"sex\": \"female\"}],\"number\": 1,\"boolean\": true}";
 
-Double count = JSON(json).jsonPath("$.number").number();
+Double count = JSON(json).jsonPath("$.number").numberValue();
 ```
 
 ## Querying a Boolean
@@ -49,7 +49,7 @@ import static org.camunda.spin.Spin.JSON;
 
 String json = "{\"child\": [{\"id\": 1,\"name\": \"Lucy\",\"sex\": \"female\"},{\"id\": 2,\"name\": \"Tracy\",\"sex\": \"female\"}],\"number\": 1,\"boolean\": true}";
 
-Boolean exists = JSON(json).jsonPath("$.boolean").bool();
+Boolean exists = JSON(json).jsonPath("$.boolean").boolValue();
 ```
 
 ## Filtering a Query
