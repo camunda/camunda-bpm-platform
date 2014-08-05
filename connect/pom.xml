@@ -20,6 +20,7 @@
     <module>core</module>
     <module>soap-httpclient</module>
     <module>dist</module>
+    <module>rest-httpclient</module>
   </modules>
 
   <dependencyManagement>

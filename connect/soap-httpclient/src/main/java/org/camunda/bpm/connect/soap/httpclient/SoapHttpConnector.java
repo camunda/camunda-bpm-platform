@@ -88,7 +88,7 @@ public class SoapHttpConnector extends AbstractConnector<SoapHttpRequest, SoapHt
     if(endpointUrl == null || endpointUrl.isEmpty()) {
       throw LOG.invalidRequestParameter(SoapHttpRequest.PARAM_NAME_ENDPOINT_URL, "param must be set");
     }
-    HttpPost httpPost = new HttpPost(soapHttpRequest.getEndpointUrl());
+    HttpPost httpPost = new HttpPost(endpointUrl);
 
     // handle headers
     Map<String, String> headers = soapHttpRequest.getHeaders();

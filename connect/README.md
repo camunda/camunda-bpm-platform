@@ -15,6 +15,7 @@ Simple API for connecting HTTP Services and other things.
 # List of connectors
 
 * SOAP Http Connector
+* REST Http Connector
 
 # Using a Connector
 
