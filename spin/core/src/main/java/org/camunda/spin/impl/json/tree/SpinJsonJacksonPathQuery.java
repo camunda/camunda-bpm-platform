@@ -41,8 +41,14 @@ public class SpinJsonJacksonPathQuery implements SpinJsonTreePathQuery {
 
   public SpinJsonNode element() {
     try {
-      JsonNode node = dataFormat.createJsonNode(query.read(spinJsonNode.toString(), dataFormat.getJsonPathConfiguration()));
-      return dataFormat.createWrapperInstance(node);
+      Object result = query.read(spinJsonNode.toString(), dataFormat.getJsonPathConfiguration());
+      if (result != null) {
+        JsonNode node = dataFormat.createJsonNode(result);
+        return dataFormat.createWrapperInstance(node);
+      }
+      else {
+        throw LOG.unableToFindJsonPath(query.getPath(), spinJsonNode.toString());
+      }
     } catch(PathNotFoundException pex) {
       throw LOG.unableToEvaluateJsonPathExpressionOnNode(spinJsonNode, pex);
     } catch (ClassCastException cex) {

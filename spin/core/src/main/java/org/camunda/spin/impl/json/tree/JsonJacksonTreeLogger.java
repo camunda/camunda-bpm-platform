@@ -12,15 +12,17 @@
  */
 package org.camunda.spin.impl.json.tree;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.json.SpinJsonTreeNodeException;
 import org.camunda.spin.json.SpinJsonTreePathException;
 import org.camunda.spin.json.SpinJsonTreePropertyException;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.jayway.jsonpath.PathNotFoundException;
 
 /**
  * @author Thorben Lindhauer
@@ -99,5 +101,9 @@ public class JsonJacksonTreeLogger extends SpinLogger {
   public SpinJsonTreePathException unableToCastJsonPathResultTo(Class<?> castClass, Exception cause) {
     return new SpinJsonTreePathException(
       exceptionMessage("015", "Unable to cast JsonPath expression to '{}'", castClass.getName()), cause);
+  }
+
+  public PathNotFoundException unableToFindJsonPath(String path, String json) {
+    return new PathNotFoundException(exceptionMessage("016", "Unable to find json path '{}' on json node '{}'", path, json));
   }
 }

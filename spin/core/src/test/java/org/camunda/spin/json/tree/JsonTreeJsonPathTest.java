@@ -12,17 +12,17 @@
  */
 package org.camunda.spin.json.tree;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.spin.Spin.JSON;
+import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
+
 import org.camunda.spin.SpinList;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.json.SpinJsonTreePathException;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.spin.Spin.JSON;
-import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 
 /**
  * @author Stefan Hentschel
@@ -264,4 +264,11 @@ public class JsonTreeJsonPathTest {
       // expected
     }
   }
+
+  @Test(expected = SpinJsonTreePathException.class)
+  public void failOnNonExistingJsonPath() {
+    SpinJsonNode json = JSON("{\"a\": {\"id\": \"a\"}, \"b\": {\"id\": \"b\"}}");
+    json.jsonPath("$.c?(@.id)").element();
+  }
+
 }
