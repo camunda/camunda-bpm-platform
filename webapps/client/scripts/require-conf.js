@@ -18,6 +18,7 @@
  */
 (function(factory) {
   'use strict';
+  /*jshint node: true */
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = factory();
   }
