@@ -11,22 +11,18 @@
  * limitations under the License.
  */
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.util.HashMap;
-
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.*;
 import org.camunda.bpm.connect.ConnectorException;
 import org.camunda.bpm.connect.rest.httpclient.RestHttpConnector;
 import org.camunda.bpm.connect.rest.httpclient.RestHttpRequest;
 import org.camunda.commons.utils.IoUtil;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Stefan Hentschel.
@@ -112,14 +108,15 @@ public class RestHttpClientTest {
   public void shouldNotFailIfNoPayLoadIsSet() {
     request.requestPayload(null);
 
-    request.get().execute();
-    request.delete().execute();
+    connector.createHttpGet(request);
+    connector.createHttpDelete(request);
   }
 
   @Test
   public void shouldNotFailIfNoHeadersAreSet() {
     request.setRequestParameter(RestHttpRequest.PARAM_NAME_REQUEST_HEADERS, null);
-    request.post().execute();
+    request.post();
+    connector.createTarget(request);
   }
 
   @Test
