@@ -25,7 +25,7 @@
   ];
 
   var commons = [
-    'camunda-commons-ui/plugin/index',
+    'camunda-commons-ui'
   ];
 
   var plugins = window.PLUGIN_DEPENDENCIES || [];
@@ -33,7 +33,9 @@
   var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ui.bootstrap:angular-ui' ].concat(commons, adminCore, plugins);
 
   ngDefine('admin', dependencies, function(module, $) {
+
     var ModuleConfig = [ '$routeProvider', 'UriProvider', function($routeProvider, UriProvider) {
+
       $routeProvider.otherwise({ redirectTo: '/users' });
 
       function getUri(id) {
@@ -65,6 +67,8 @@
     }];
 
     module.config(ModuleConfig);
+
+    return module;
   });
 
 })(window || this);

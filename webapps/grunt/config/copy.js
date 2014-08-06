@@ -1,5 +1,5 @@
 'use strict';
-/* jshint node: true */
+
 var commentLineExp =  /^[\s]*<!-- (\/|#) (CE|EE)/;
 var requireConfExp =  /require-conf.js$/;
 
@@ -137,7 +137,6 @@ module.exports = function(config) {
         // others
         {
           expand: true,
-          // cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/assets',
           cwd: '<%= pkg.gruntConfig.clientDir %>/bower_components',
           src: [
             '!jquery.ui/{demos,external,tests,themes}/**/*',

@@ -14,7 +14,7 @@
  */
 
 /**
- * @namespace cam.common
+ * @namespace cam.admin
  */
 (function(factory) {
   'use strict';
@@ -23,6 +23,7 @@
     module.exports = factory();
   }
   else {
+    /* global define: false */
     define([], factory);
   }
 }(function() {
@@ -152,6 +153,11 @@
     {
       name: 'camunda-commons-ui',
       location: './'+ vendor +'/camunda-commons-ui/lib',
+      main: 'index'
+    },
+    {
+      name: 'camunda-commons-ui/util',
+      location: './'+ vendor +'/camunda-commons-ui/lib/util',
       main: 'index'
     }
   ];
