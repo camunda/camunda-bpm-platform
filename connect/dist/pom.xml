@@ -18,6 +18,11 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-rest-httpclient</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
