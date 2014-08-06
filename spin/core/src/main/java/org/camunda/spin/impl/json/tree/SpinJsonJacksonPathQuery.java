@@ -13,13 +13,14 @@
 
 package org.camunda.spin.impl.json.tree;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.json.SpinJsonTreePathQuery;
 import org.camunda.spin.logging.SpinLogger;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 
 /**
  * @author Stefan Hentschel
@@ -40,7 +41,7 @@ public class SpinJsonJacksonPathQuery implements SpinJsonTreePathQuery {
 
   public SpinJsonNode element() {
     try {
-      JsonNode node = dataFormat.createJsonNode(query.read(spinJsonNode.toString()));
+      JsonNode node = dataFormat.createJsonNode(query.read(spinJsonNode.toString(), dataFormat.getJsonPathConfiguration()));
       return dataFormat.createWrapperInstance(node);
     } catch(PathNotFoundException pex) {
       throw LOG.unableToEvaluateJsonPathExpressionOnNode(spinJsonNode, pex);
