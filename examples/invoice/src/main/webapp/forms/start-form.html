@@ -1,5 +1,4 @@
 <form role="form"
-      cam-form
       class="form-horizontal">
 
   <div class="panel panel-info">Please fill in the details for the invoice you received</div>
@@ -9,6 +8,7 @@
            for="creditor">Creditor</label>
     <div class="controls">
       <input cam-variable-name="creditor"
+             cam-variable-type="String"
              id="creditor"
              class="form-control"
              type="text"/>
@@ -23,6 +23,7 @@
            for="amount">Amount</label>
     <div class="controls">
       <input cam-variable-name="amount"
+             cam-variable-type="String"
              id="amount"
              class="form-control"
              type="text"/>
@@ -37,6 +38,7 @@
            for="invoiceNumber">Invoice Number</label>
     <div class="controls">
       <input cam-variable-name="invoiceNumber"
+             cam-variable-type="String"
              id="invoiceNumber"
              class="form-control"
              type="text"/>
