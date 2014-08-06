@@ -12,31 +12,40 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.handler.StageItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.test.cmmn.handler.specification.AbstractExecutionListenerSpec;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
 import org.camunda.bpm.model.cmmn.instance.PlanningTable;
 import org.camunda.bpm.model.cmmn.instance.Stage;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
- * @author Roman Smirnov
+ * @author Thorben Lindhauer
  *
  */
-public class StageDiscretionaryItemHandlerTest extends CmmnElementHandlerTest {
+@RunWith(Parameterized.class)
+public class StageDiscretionaryItemExecutionListenerHandlerTest extends CmmnElementHandlerTest {
+
+  @Parameters(name = "testListener: {0}")
+  public static Iterable<Object[]> data() {
+    return ExecutionListenerCases.ITEM_CASES;
+  }
 
   protected Stage stage;
   protected PlanningTable planningTable;
   protected DiscretionaryItem discretionaryItem;
   protected StageItemHandler handler = new StageItemHandler();
+
+  protected AbstractExecutionListenerSpec testSpecification;
+
+  public StageDiscretionaryItemExecutionListenerHandlerTest(AbstractExecutionListenerSpec testSpecification) {
+    this.testSpecification = testSpecification;
+  }
 
   @Before
   public void setUp() {
@@ -50,55 +59,15 @@ public class StageDiscretionaryItemHandlerTest extends CmmnElementHandlerTest {
   }
 
   @Test
-  public void testStageActivityName() {
+  public void testCaseExecutionListener() {
     // given:
-    // the stage has a name "A Stage"
-    String name = "A Stage";
-    stage.setName(name);
+    testSpecification.addListenerToElement(modelInstance, stage);
 
     // when
     CmmnActivity activity = handler.handleElement(discretionaryItem, context);
 
     // then
-    assertEquals(name, activity.getName());
-  }
-
-  @Test
-  public void testActivityBehavior() {
-    // given: a discretionaryItem
-
-    // when
-    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
-
-    // then
-    CmmnActivityBehavior behavior = activity.getActivityBehavior();
-    assertTrue(behavior instanceof StageActivityBehavior);
-  }
-
-  @Test
-  public void testWithoutParent() {
-    // given: a discretionaryItem
-
-    // when
-    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
-
-    // then
-    assertNull(activity.getParent());
-  }
-
-  @Test
-  public void testWithParent() {
-    // given:
-    // a new activity as parent
-    CmmnCaseDefinition parent = new CmmnCaseDefinition("aParentActivity");
-    context.setParent(parent);
-
-    // when
-    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
-
-    // then
-    assertEquals(parent, activity.getParent());
-    assertTrue(parent.getActivities().contains(activity));
+    testSpecification.verify(activity);
   }
 
 }
