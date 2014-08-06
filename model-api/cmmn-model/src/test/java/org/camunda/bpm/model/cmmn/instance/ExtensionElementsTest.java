@@ -12,10 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
-import java.util.Arrays;
 import java.util.Collection;
-
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
  * @author Roman Smirnov
@@ -28,9 +25,7 @@ public class ExtensionElementsTest extends CmmnModelElementInstanceTest {
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
-    return Arrays.asList(
-      new ChildElementAssumption(null, ModelElementInstance.class)
-    );
+    return null;
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {

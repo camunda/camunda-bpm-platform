@@ -22,10 +22,10 @@ import org.camunda.bpm.model.cmmn.impl.QueryImpl;
 import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
+import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
-import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
 /**
@@ -33,8 +33,6 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
  *
  */
 public class ExtensionElementsImpl extends CmmnModelElementInstanceImpl implements ExtensionElements {
-
-  protected static ChildElementCollection<ModelElementInstance> anyCollection;
 
   public static void registerType(ModelBuilder modelBuilder) {
 
@@ -48,9 +46,6 @@ public class ExtensionElementsImpl extends CmmnModelElementInstanceImpl implemen
 
     SequenceBuilder sequence = typeBuilder.sequence();
 
-    anyCollection = sequence.elementCollection(ModelElementInstance.class)
-      .build();
-
     typeBuilder.build();
   }
 
@@ -59,7 +54,7 @@ public class ExtensionElementsImpl extends CmmnModelElementInstanceImpl implemen
   }
 
   public Collection<ModelElementInstance> getElements() {
-    return anyCollection.get(this);
+    return ModelUtil.getModelElementCollection(getDomElement().getChildElements(), modelInstance);
   }
 
   public Query<ModelElementInstance> getElementsQuery() {
@@ -69,14 +64,18 @@ public class ExtensionElementsImpl extends CmmnModelElementInstanceImpl implemen
   public ModelElementInstance addExtensionElement(String namespaceUri, String localName) {
     ModelElementType extensionElementType = modelInstance.registerGenericType(namespaceUri, localName);
     ModelElementInstance extensionElement = extensionElementType.newInstance(modelInstance);
-    getElements().add(extensionElement);
+    addChildElement(extensionElement);
     return extensionElement;
   }
 
   public <T extends ModelElementInstance> T addExtensionElement(Class<T> extensionElementClass) {
     ModelElementInstance extensionElement = modelInstance.newInstance(extensionElementClass);
-    getElements().add(extensionElement);
+    addChildElement(extensionElement);
     return extensionElementClass.cast(extensionElement);
   }
 
+  @Override
+  public void addChildElement(ModelElementInstance extensionElement) {
+    getDomElement().appendChild(extensionElement.getDomElement());
+  }
 }
