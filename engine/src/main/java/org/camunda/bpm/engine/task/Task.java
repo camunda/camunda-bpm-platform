@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.task;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.TaskService;
 
 
@@ -130,11 +131,13 @@ public interface Task {
 
   /**
    * Provides the form key for the task.
-   * <p />
-   * <strong>NOTE:</strong> If the task instance us obtained through a query, this property is only populated in case the
-   * {@link TaskQuery#initializeFormKeys()} method is called.
+   *
+   * <p><strong>NOTE:</strong> If the task instance us obtained through a query, this property is only populated in case the
+   * {@link TaskQuery#initializeFormKeys()} method is called. If this method is called without a prior call to
+   * {@link TaskQuery#initializeFormKeys()}, it will throw a {@link BadUserRequestException}.</p>
    *
    * @return the form key for this task
+   * @throws BadUserRequestException in case the form key is not initialized.
    */
   String getFormKey();
 }

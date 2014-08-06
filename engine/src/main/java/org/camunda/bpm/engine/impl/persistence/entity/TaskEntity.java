@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
@@ -112,6 +113,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   protected String deleteReason;
 
   protected String eventName;
+  protected boolean isFormKeyInitialized = false;
   protected String formKey;
 
   protected AbstractVariableStore variableStore;
@@ -119,7 +121,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   /**
    * contains all changed properties of this entity
    */
-  private transient Map<String, PropertyChange> propertyChanges = new HashMap<String, PropertyChange>();
+  protected transient Map<String, PropertyChange> propertyChanges = new HashMap<String, PropertyChange>();
 
   // name references of tracked properties
   public static final String ASSIGNEE = "assignee";
@@ -847,6 +849,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   }
 
   public void initializeFormKey() {
+    isFormKeyInitialized = true;
     if(taskDefinitionKey != null) {
       TaskDefinition taskDefinition = getTaskDefinition();
       if(taskDefinition != null) {
@@ -859,6 +862,9 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   }
 
   public String getFormKey() {
+    if(!isFormKeyInitialized) {
+      throw new BadUserRequestException("The form key is not initialized. You must call initializeFormKeys() on the task query prior to retrieving the form key.");
+    }
     return formKey;
   }
 

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -3599,8 +3600,13 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .processInstanceId(processInstance.getId())
       .singleResult();
 
-    // then the form key is present
-    assertNull(task.getFormKey());
+    try {
+      // then the form key is not retrievable
+      task.getFormKey();
+      fail("exception expected.");
+    } catch (BadUserRequestException e) {
+      assertEquals("The form key is not initialized. You must call initializeFormKeys() on the task query prior to retrieving the form key.", e.getMessage());
+    }
   }
 
   /**
