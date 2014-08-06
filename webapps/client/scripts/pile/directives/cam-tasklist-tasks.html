@@ -52,7 +52,16 @@
           ng-repeat="(delta, task) in tasks"
           tabindex="{{ (delta + 1) }}"
           ng-focus="focus(delta)">
-        <h4 ng-click="focus(delta)">{{ task.name }}</h4>
+
+        <div class="names">
+          <h4 class="task"
+              ng-click="focus(delta)">{{ task.name }}</h4>
+          <h6 class="process-definition"
+              ng-class="{suspended: task._embedded.processDefinition}">
+            {{ task._embedded.processDefinition.name || task._embedded.processDefinition.key }}
+          </h6>
+        </div>
+
         <ul class="list-inline">
           <li>
             <input type="checkbox"

@@ -20,5 +20,50 @@
   "DESCRIPTION":
         "Description",
   "SELECT_TASK_IN_LIST":
-        "Select a task in the list."
+        "Select a task in the list.",
+  "CLAIM_TASK":
+        "Claim",
+  "UNCLAIM_TASK":
+        "Unclaim",
+  "DELEGATE_TASK":
+        "Delegate",
+  "SET_FOLLOW_UP_DATE":
+        "Set follow up",
+  "SET_DUE_DATE":
+        "Set due date",
+  "ASSIGNED_TO_YOU":
+        "Assigned to you",
+  "OWNER_IS_YOU":
+        "You are owner",
+
+  "CLAIM_OK":
+        "The task has been claimed.",
+  "CLAIM_ERROR":
+        "An error append while claiming the task.",
+
+  "UNCLAIM_OK":
+        "The task has been unclaimed.",
+  "UNCLAIM_ERROR":
+        "An error append while unclaiming the task.",
+
+  "RESOLVE_OK":
+        "The task has been resolved.",
+  "RESOLVE_ERROR":
+        "An error append while resolving the task.",
+
+  "DELEGATE_ERROR":
+        "An error append while delegating the task.",
+  "DELEGATE_OK":
+        "The task has been delegated.",
+
+  "ASSIGNEE_ERROR":
+        "An error append while delegating the task.",
+  "ASSIGNEE_OK":
+        "The task has been delegated.",
+
+  "COMPLETE":
+        "Complete",
+
+  "NONE":
+        "None"
 }

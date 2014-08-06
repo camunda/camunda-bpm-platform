@@ -12,5 +12,7 @@
   "LOGIN_ACTION":
                         "Login",
   "LOGGED_OUT":
-                        "You are logged out."
+                        "You are logged out.",
+  "USER_NAME":
+                        "User name"
 }
