@@ -799,6 +799,69 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCompleteShouldCompleteCaseInstanceViaTaskService() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .withCaseDefinition(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNotNull(task);
+
+    // when
+
+    taskService.complete(task.getId());
+
+    // then
+
+    // the task has been completed and has been deleted
+    task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNull(task);
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance has been completed
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .completed()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testDisableShouldCompleteCaseInstance() {
     // given:
     // a deployed case definition
