@@ -20,7 +20,6 @@ define([
     function errorNotification(src, err) {
       $translate(src).then(function(translated) {
         Notifications.addError({
-          duration: 3000,
           message: translated +' '+ (err ? err.message : '')
         });
       });
@@ -41,12 +40,21 @@ define([
       },
       link: function(scope) {
 
-        function delegated(err) {
+        // function delegated(err) {
+        //   if (err) {
+        //     return errorNotification('DELEGATE_ERROR', err);
+        //   }
+
+        //   successNotification('DELEGATE_OK');
+        // }
+
+
+        function assigned(err) {
           if (err) {
-            return errorNotification('DELEGATE_ERROR', err);
+            return errorNotification('ASSIGNED_ERROR', err);
           }
 
-          successNotification('DELEGATE_OK');
+          successNotification('ASSIGNED_OK');
         }
 
 
@@ -84,7 +92,7 @@ define([
         };
 
 
-        scope.validateUser = function(info) {
+        scope.validateUser = function(/*info*/) {
           // console.info('validateUser', this, this === scope, info);
         };
 
@@ -118,35 +126,47 @@ define([
         // };
 
 
+        // scope.assigning = function(info) {
+        //   // delegation
+        //   if (scope.userIsAssignee()) {
+        //     Task.delegate(scope.task.id, info.varValue, function(err) {
+        //       if (err) {
+        //         return delegated(err);
+        //       }
+
+        //       // scope.task.owner = $rootScope.authentication.name;
+        //       scope.task.assignee = info.varValue;
+
+        //       delegated();
+        //     });
+        //   }
+        //   // assignment
+        //   else if (scope.userIsOwner()) {
+        //     Task.assignee(scope.task.id, info.varValue, function(err) {
+        //       if (err) {
+        //         return assigned(err);
+        //       }
+
+        //       scope.task.assignee = info.varValue;
+
+        //       assigned();
+        //     });
+        //   }
+        //   else {
+        //     errorNotification('NEED_OWNER_OR_ASSIGNEE');
+        //   }
+        // };
+
         scope.assigning = function(info) {
-          // delegation
-          if (scope.userIsAssignee()) {
-            Task.assignee(scope.task.id, info.varValue, function(err) {
-              if (err) {
-                return delegated(err);
-              }
+          Task.assignee(scope.task.id, info.varValue, function(err) {
+            if (err) {
+              return assigned(err);
+            }
 
-              scope.task.owner = $rootScope.authentication.name;
-              scope.task.assignee = info.varValue;
+            scope.task.assignee = info.varValue;
 
-              delegated();
-            });
-          }
-          // assignment
-          else if (scope.userIsOwner()) {
-            Task.assignee(scope.task.id, info.varValue, function(err) {
-              if (err) {
-                return errorNotification('ASSIGNMENT_ERROR', err);
-              }
-
-              scope.task.assignee = info.varValue;
-
-              successNotification('ASSIGNMENT_OK');
-            });
-          }
-          else {
-            errorNotification('NEED_OWNER_OR_ASSIGNEE');
-          }
+            assigned();
+          });
         };
 
 
