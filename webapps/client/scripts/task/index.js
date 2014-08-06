@@ -6,6 +6,8 @@ define([
   'moment',
   'camunda-tasklist-ui/task/directives/cam-tasklist-task',
   'camunda-tasklist-ui/task/directives/cam-tasklist-task-history',
+  'camunda-tasklist-ui/task/directives/cam-tasklist-task-meta',
+  'camunda-tasklist-ui/task/directives/cam-tasklist-task-form',
 
   'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api',
@@ -14,7 +16,9 @@ define([
   angular,
   moment,
   taskDirective,
-  taskHistoryDirective
+  taskHistoryDirective,
+  taskMetaDirective,
+  taskFormDirective
 ) {
 
   var taskModule = angular.module('cam.tasklist.task', [
@@ -36,6 +40,10 @@ define([
   taskModule.directive('camTasklistTask', taskDirective);
 
   taskModule.directive('camTasklistTaskHistory', taskHistoryDirective);
+
+  taskModule.directive('camTasklistTaskMeta', taskMetaDirective);
+
+  taskModule.directive('camTasklistTaskForm', taskFormDirective);
 
   return taskModule;
 });

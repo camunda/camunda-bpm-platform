@@ -1,0 +1,28 @@
+<span class="view"
+      ng-show="!editing"
+      ng-click="toggleEditing()"
+      ng-transclude>
+  {{ varValue }}
+</span>
+
+<span class="edit"
+      ng-show="editing">
+
+  <input type="{{ varType }}"
+         ng-model="editValue"
+         placeholder="{{ placeholder }}">
+
+  <div class="btn-group">
+    <button type="button"
+            class="btn btn-xs btn-default"
+            ng-click="applyChange()">
+      <span class="glyphicon glyphicon-ok"></span>
+    </button>
+
+    <button type="button"
+            class="btn btn-xs btn-default"
+            ng-click="cancelChange()">
+      <span class="glyphicon glyphicon-remove"></span>
+    </button>
+  </div>
+</span>

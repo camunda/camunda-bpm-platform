@@ -1,11 +1,13 @@
-'use strict';
-
-
 define([
-           'angular', 'angular-moment',
-           'text!camunda-tasklist-ui/form/inline-field.html',
-           'text!camunda-tasklist-ui/form/form.html'
-], function(angular) {
+  'angular',
+  './directives/cam-form-inline-field',
+  'angular-moment',
+  'text!camunda-tasklist-ui/form/form.html'
+], function(
+  angular,
+  inlineField
+) {
+  'use strict';
 
   /**
    * @module cam.form
@@ -18,34 +20,7 @@ define([
 
 
 
-  formModule.directive('camFormInlineField', function() {
-    return {
-      scope: {
-        'value': '='
-      },
-      link: function(scope) {
-        scope.editing = false;
-        scope.toggleEditing = function() {
-          scope.editing = !scope.editing;
-        };
-
-        scope.applyChange = function() {
-          // should
-          // - validate
-          // - update the value
-          scope.editing = false;
-        };
-
-        scope.cancelChange = function() {
-          scope.editing = false;
-        };
-      },
-
-      transclude: true,
-
-      template: require('text!camunda-tasklist-ui/form/inline-field.html')
-    };
-  });
+  formModule.directive('camFormInlineField', inlineField);
 
 
 

@@ -4,7 +4,7 @@
     {{ 'SELECT_TASK_IN_LIST' | translate }}
   </div>
 </div>
-<section ng-show="!!task && task.name"
+<section ng-if="!!task && task.name"
          class="task-card">
   <header class="row">
     <div class="col-xs-12">
@@ -26,71 +26,32 @@
         <h4>{{ task.processDefinitionName }}</h4>
       </div>
 
-      <ul class="meta list-inline">
-        <li data-toggle="tooltip"
-            data-placement="top"
-            title="{{ 'FOLLOW_UP_DATE' | translate }}"
-            class="followup-date"
-            ng-class="(task.followUp < now ? 'overdue' : '')">
-          <span class="glyphicon glyphicon-bell"></span>
-          <span cam-form-inline-field
-                value="task.followUp">
-            <span am-time-ago="task.followUp">{{ task.followUp }}</span>
-          </span>
-        </li>
-        <li data-toggle="tooltip"
-            data-placement="top"
-            title="{{ 'DUE_DATE' | translate }}"
-            class="due-date"
-            ng-class="(task.due < now ? 'overdue' : '')">
-          <span class="glyphicon glyphicon-calendar"></span>
-          <span cam-form-inline-field
-                value="task.due">
-            <span am-time-ago="task.due">{{ task.due }}</span>
-          </span>
-        </li>
-
-        <li data-toggle="tooltip"
-            data-placement="top"
-            title="{{ 'ASSIGNEE' | translate }}"
-            class="assignee">
-          <span class="glyphicon glyphicon-user"></span>
-          <span cam-form-inline-field
-                value="task.assignee">
-            {{ task.assignee }}
-          </span>
-        </li>
-        <li data-toggle="tooltip"
-            data-placement="top"
-            title="{{ 'OWNER' | translate }}"
-            class="owner">
-          <span class="glyphicon glyphicon-certificate"></span>
-          <span cam-form-inline-field
-                value="task.owner">
-            {{ task.owner }}
-          </span>
-        </li>
-      </ul>
+      <div cam-tasklist-task-meta
+          task="task"></div>
     </div>
   </header>
 
-  <div class="row tabbed-content">
+  <div ng-if="!!task"
+       class="row tabbed-content">
     <div class="col-xs-12">
       <tabset>
         <tab heading="{{ 'FORM' | translate }}">
-          <div class="tab-pane"
-             cam-tasklist-task-form
-             task="task"></div>
+          <div class="tab-pane">
+            <div cam-tasklist-task-form
+                 task="task"></div>
+          </div>
         </tab>
 
-        <tab heading="{{ 'DESCRIPTION' | translate }}">
+        <tab ng-if="task.description"
+             heading="{{ 'DESCRIPTION' | translate }}">
           <div class="tab-pane">{{ task.description }}</div>
         </tab>
 
-        <tab heading="{{ 'HISTORY' | translate }}">
-          <div class="tab-pane"
-             cam-tasklist-task-history
-             history="history">
+        <tab ng-if="history"
+             heading="{{ 'HISTORY' | translate }}">
+          <div class="tab-pane">
+            <div cam-tasklist-task-history
+                 history="history"></div>
           </div>
         </tab>
 
