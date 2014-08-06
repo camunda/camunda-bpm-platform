@@ -63,7 +63,7 @@ define([
       .then(function() {
         $translate('LOGGED_OUT').then(function(translated) {
           Notifications.add({
-            text: translated
+            status: translated
           });
         });
       });
@@ -95,7 +95,8 @@ define([
       function success() {
         $translate('LOGGED_IN').then(function(translated) {
           Notifications.addMessage({
-            message: translated
+            duration: 5000,
+            status: translated
           });
         });
 
@@ -106,7 +107,7 @@ define([
       function error() {
         $translate('CREDENTIALS_ERROR').then(function(translated) {
           Notifications.addError({
-            message: translated
+            status: translated
           });
         });
       }
