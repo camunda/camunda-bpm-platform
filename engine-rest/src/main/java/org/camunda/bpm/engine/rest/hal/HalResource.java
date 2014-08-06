@@ -84,14 +84,14 @@ public abstract class HalResource<T extends HalResource<?>> {
   }
 
   /**
-   * Can be used to embedd a relation. Embedded all linked resources in the given relation.
+   * Can be used to embed a relation. Embedded all linked resources in the given relation.
    *
    * @param relation the relation to embedded
    * @param processEngine used to resolve the resources
    * @return the resource itself.
    */
   @SuppressWarnings("unchecked")
-  public T embedd(HalRelation relation, ProcessEngine processEngine) {
+  public T embed(HalRelation relation, ProcessEngine processEngine) {
     List<HalResource<?>> resolvedLinks = linker.resolve(relation, processEngine);
     if(resolvedLinks != null && resolvedLinks.size() > 0) {
       addEmbedded(relation.relName, resolvedLinks);

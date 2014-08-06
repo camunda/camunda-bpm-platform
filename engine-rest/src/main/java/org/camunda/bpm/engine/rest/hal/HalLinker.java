@@ -106,7 +106,7 @@ public class HalLinker {
   /**
    * merge the links of an embedded resource into this linker.
    * This is useful when building resources which are actually resource collections.
-   * You can then merge the relations of all resources in the collection and the unique the set of linked resources to embedd.
+   * You can then merge the relations of all resources in the collection and the unique the set of linked resources to embed.
    *
    * @param embedded the embedded resource for which the links should be merged into this linker.
    */

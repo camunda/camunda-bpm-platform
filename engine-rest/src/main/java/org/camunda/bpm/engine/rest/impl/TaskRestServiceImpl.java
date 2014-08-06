@@ -59,9 +59,9 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
     long count = query.count();
 
     HalTaskList list = HalTaskList.fromTaskList(matchingTasks, count)
-        .embedd(HalTask.REL_ASSIGNEE, engine)
-        .embedd(HalTask.REL_OWNER, engine)
-        .embedd(HalTask.REL_PROCESS_DEFINITION, engine);
+        .embed(HalTask.REL_ASSIGNEE, engine)
+        .embed(HalTask.REL_OWNER, engine)
+        .embed(HalTask.REL_PROCESS_DEFINITION, engine);
 
     return list;
   }

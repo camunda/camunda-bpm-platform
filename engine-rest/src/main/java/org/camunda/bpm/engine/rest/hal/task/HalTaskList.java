@@ -12,14 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.hal.task;
 
+import static javax.ws.rs.core.UriBuilder.fromResource;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.hal.HalResource;
 import org.camunda.bpm.engine.task.Task;
-
-import static javax.ws.rs.core.UriBuilder.fromResource;
 
 /**
  * @author Daniel Meyer
@@ -37,7 +37,7 @@ public class HalTaskList extends HalResource<HalTaskList> {
 
     HalTaskList taskList = new HalTaskList();
 
-    // embedd tasks
+    // embed tasks
     List<HalResource<?>> embeddedTasks = new ArrayList<HalResource<?>>();
     for (Task task : tasks) {
       embeddedTasks.add(HalTask.fromTask(task));
