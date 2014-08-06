@@ -68,7 +68,7 @@ define('camunda-tasklist-ui', [
         return uri;
       }
 
-      UriProvider.replace(':appName', 'admin');
+      UriProvider.replace(':appName', 'tasklist');
       UriProvider.replace('app://', getUri('href'));
       UriProvider.replace('adminbase://', getUri('app-root') + '/app/admin/');
       UriProvider.replace('tasklistbase://', getUri('app-root') + '/app/tasklist/');
@@ -76,6 +76,10 @@ define('camunda-tasklist-ui', [
       UriProvider.replace('admin://', getUri('admin-api'));
       UriProvider.replace('plugin://', getUri('admin-api') + 'plugin/');
       UriProvider.replace('engine://', getUri('engine-api'));
+
+      // for forms
+      UriProvider.replace('app:', 'tasklist');
+      UriProvider.replace('embedded:', getUri('app-root'));
 
       UriProvider.replace(':engine', [ '$window', function($window) {
         var uri = $window.location.href;

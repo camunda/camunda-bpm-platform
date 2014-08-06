@@ -39,27 +39,32 @@
   "CLAIM_OK":
         "The task has been claimed.",
   "CLAIM_ERROR":
-        "An error append while claiming the task.",
+        "An error happend while claiming the task.",
 
   "UNCLAIM_OK":
         "The task has been unclaimed.",
   "UNCLAIM_ERROR":
-        "An error append while unclaiming the task.",
+        "An error happend while unclaiming the task.",
 
   "RESOLVE_OK":
         "The task has been resolved.",
   "RESOLVE_ERROR":
-        "An error append while resolving the task.",
+        "An error happend while resolving the task.",
 
   "DELEGATE_ERROR":
-        "An error append while delegating the task.",
+        "An error happend while delegating the task.",
   "DELEGATE_OK":
         "The task has been delegated.",
 
   "ASSIGNEE_ERROR":
-        "An error append while delegating the task.",
+        "An error happend while delegating the task.",
   "ASSIGNEE_OK":
         "The task has been delegated.",
+
+  "COMPLETE_ERROR":
+        "An error happend while submitting the task form.",
+  "COMPLETE_OK":
+        "The task is completed.",
 
   "COMPLETE":
         "Complete",

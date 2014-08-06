@@ -7,7 +7,8 @@ define([
     '$modal',
     '$rootScope',
     'camUID',
-  function($modal,
+  function(
+    $modal,
     $rootScope,
     camUID
   ) {

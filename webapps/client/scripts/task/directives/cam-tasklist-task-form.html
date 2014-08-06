@@ -1,2 +1,12 @@
-...
-<pre>{{ task | json}}</pre>
+<div class="form-container"></div>
+<div ng-if="_camForm"
+     class="form-actions">
+<!--
+    <button class="btn btn-xs btn-link"
+            type="button">Cancel</button>
+-->
+    <button class="btn btn-primary"
+            type="submit"
+            ng-click="completeTask()"
+            translate="COMPLETE">Complete</button>
+</div>

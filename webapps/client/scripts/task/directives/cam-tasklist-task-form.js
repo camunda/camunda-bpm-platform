@@ -5,50 +5,94 @@ define([
 
   return [
     'camAPI',
+    'CamForm',
+    '$translate',
+    'Notifications',
   function(
-    camAPI
+    camAPI,
+    CamForm,
+    $translate,
+    Notifications
   ) {
-    var Task = camAPI.resource('task');
+    // var Task = camAPI.resource('task');
 
     return {
       scope: {
         task: '='
       },
-      link: function(scope) {
-        console.info('scope.task', scope.task);
-        scope.currentTaskURL = null;
+      link: function(scope, element) {
+        var container = element.find('.form-container');
+        scope.currentTaskId = null;
+        scope._camForm = null;
 
+        scope.completeTask = function() {
+          scope._camForm.submit(function(err, resp) {
+            if (err) {
+              $translate('COMPLETE_ERROR').then(function(translated) {
+                Notifications.addError({
+                  status: translated,
+                  message: err.message
+                });
+              });
+            }
+
+            console.info('task submit response', resp);
+            // TODO: reload the tasks list
+            $translate('COMPLETE_OK').then(function(translated) {
+              Notifications.addMessage({
+                duration: 3000,
+                status: translated
+              });
+            });
+          });
+        };
 
         function loadForm() {
-          var url = scope.task.formKey;
-          url = '/camunda'+ url.split(':').pop();
-          console.info('load form from '+ url);
-          Task.http.load(url, {
-            done: processForm
-          });
-        }
+          scope._camForm = null;
 
-        function processForm(err, resp) {
-          if (err) {
-            throw err;
+          var parts = (scope.task.formKey || '').split('embedded:');
+          var ctx = scope.task._embedded.processDefinition.contextPath;
+          var formUrl;
+
+          if (parts.length > 1) {
+            formUrl = parts.pop();
+            // ensure a trailing slash
+            ctx = ctx + (ctx.slice(-1) !== '/' ? '/' : '');
+            formUrl = formUrl.replace(/app:(\/?)/, ctx);
+          }
+          else {
+            formUrl = scope.task.formKey;
           }
 
-          console.info(resp);
+          if (formUrl) {
+            scope._camForm = new CamForm({
+              taskId:           scope.task.id,
+              containerElement: container,
+              client:           camAPI,
+              formUrl:          formUrl
+            });
+          }
+          else {
+            // clear the content (to avoid other tasks form to appear)
+            $translate('NO_TASK_FORM').then(function(translated) {
+              container.html(translated || '');
+            });
+          }
         }
 
         scope.$watch('task', function() {
           if (!scope.task) {
-            scope.currentTaskURL = null;
+            scope.currentTaskId = null;
           }
-          else if (scope.currentTaskURL !== scope.task._links.self.href) {
-            scope.currentTaskURL = scope.task._links.self.href;
+          else if (scope.currentTaskId !== scope.task.id) {
+            scope.currentTaskId = scope.task.id;
 
             loadForm();
           }
         });
 
         if (scope.task) {
-          scope.currentTaskURL = scope.task._links.self.href;
+          scope.currentTaskId = scope.task.id;
 
           loadForm();
         }
