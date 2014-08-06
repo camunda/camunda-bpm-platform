@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "async": "~0.2.10",
-    "bower": "~1.3.7",
+    "bower": "~1.3.6",
     "camunda-commons-ui": "git+ssh://git@github.com:camunda/camunda-commons-ui",
     "grunt": "~0.4.0",
     "grunt-bower-task": "~0.3.4",
@@ -44,9 +44,5 @@
     "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define.git",
     "time-grunt": "~0.2.1",
     "underscore": "~1.5.2"
-  },
-  "dependencies": {
-    "grunt-cli": "~0.1.13",
-    "grunt": "~0.4.5"
   }
 }
