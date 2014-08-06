@@ -46,6 +46,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
+import org.camunda.bpm.connect.rest.httpclient.RestHttpConnector;
 import org.camunda.bpm.connect.soap.httpclient.SoapHttpConnector;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
@@ -1241,6 +1242,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       // register default connectors
       connectors.addConnector(SoapHttpConnector.ID, SoapHttpConnector.class);
+      connectors.addConnector(RestHttpConnector.ID, RestHttpConnector.class);
     }
   }
 

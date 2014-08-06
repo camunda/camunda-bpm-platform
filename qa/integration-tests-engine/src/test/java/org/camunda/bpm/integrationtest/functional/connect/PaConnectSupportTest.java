@@ -15,6 +15,7 @@ package org.camunda.bpm.integrationtest.functional.connect;
 
 import org.camunda.bpm.connect.interceptor.ConnectorInvocation;
 import org.camunda.bpm.connect.interceptor.RequestInterceptor;
+import org.camunda.bpm.connect.rest.httpclient.RestHttpConnector;
 import org.camunda.bpm.connect.soap.httpclient.SoapHttpConnector;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -37,7 +38,7 @@ public class PaConnectSupportTest extends AbstractFoxPlatformIntegrationTest {
   }
 
   @Test
-  public void connectShouldBeAvailable() {
+  public void soapConnectorShouldBeAvailable() {
     SoapHttpConnector soapHttpConnector = new SoapHttpConnector();
 
     soapHttpConnector.addRequestInterceptor(new RequestInterceptor() {
@@ -54,6 +55,27 @@ public class PaConnectSupportTest extends AbstractFoxPlatformIntegrationTest {
       .endpointUrl("http://foo")
       .soapAction("bar")
       .soapEnvelope("foo")
+      .execute();
+  }
+
+  @Test
+  public void restConnectorShouldBeAvailable() {
+    RestHttpConnector restHttpConnector = new RestHttpConnector();
+
+    restHttpConnector.addRequestInterceptor(new RequestInterceptor() {
+
+      public Object handleInvocation(ConnectorInvocation invocation) throws Exception {
+        // by not calling invocation.proceed(), here, we make sure the connector does not actually execute the request
+        // nevertheless it will use the internal apache httpclient api for creating a post request etc.
+        return null;
+      }
+
+    });
+
+    restHttpConnector.createRequest()
+      .requestUrl("http://foo")
+      .requestPayload("bar")
+      .post()
       .execute();
   }
 

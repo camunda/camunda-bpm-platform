@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.bpmn.servicetask;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.connect.rest.httpclient.RestHttpConnector;
 import org.camunda.bpm.connect.soap.httpclient.SoapHttpConnector;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -60,6 +61,7 @@ public class ConnectorServiceTaskTest extends PluggableProcessEngineTestCase {
 
   public void testDefaultConnectorsRegistered() {
     assertEquals(SoapHttpConnector.class, processEngineConfiguration.getConnectors().getConnector(SoapHttpConnector.ID));
+    assertEquals(RestHttpConnector.class, processEngineConfiguration.getConnectors().getConnector(RestHttpConnector.ID));
   }
 
   @Deployment
