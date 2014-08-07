@@ -56,6 +56,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
@@ -733,8 +734,37 @@ public class CamundaExtensionsTest {
     list.getValues().clear();
     assertThat(list.getValues()).isEmpty();
 
+    // test standard list interactions
+    Collection<BpmnModelElementInstance> elements = list.getValues();
+
+    CamundaValue value = modelInstance.newInstance(CamundaValue.class);
+    elements.add(value);
+
+    List<CamundaValue> newValues = new ArrayList<CamundaValue>();
+    newValues.add(modelInstance.newInstance(CamundaValue.class));
+    newValues.add(modelInstance.newInstance(CamundaValue.class));
+    elements.addAll(newValues);
+    assertThat(elements).hasSize(3);
+
+    assertThat(elements).doesNotContain(modelInstance.newInstance(CamundaValue.class));
+    assertThat(elements.containsAll(Arrays.asList(modelInstance.newInstance(CamundaValue.class)))).isFalse();
+
+    assertThat(elements.remove(modelInstance.newInstance(CamundaValue.class))).isFalse();
+    assertThat(elements).hasSize(3);
+
+    assertThat(elements.remove(value)).isTrue();
+    assertThat(elements).hasSize(2);
+
+    assertThat(elements.removeAll(newValues)).isTrue();
+    assertThat(elements).isEmpty();
+
+    elements.add(modelInstance.newInstance(CamundaValue.class));
+    elements.clear();
+    assertThat(elements).isEmpty();
+
     inputParameter.removeValue();
     assertThat(inputParameter.getValue()).isNull();
+
   }
 
   @Test
@@ -768,6 +798,10 @@ public class CamundaExtensionsTest {
     entry = map.getCamundaEntries().iterator().next();
     assertThat(entry.getCamundaKey()).isEqualTo("test");
     assertThat(entry.getTextContent()).isEqualTo("value");
+
+    Collection<CamundaEntry> entries = map.getCamundaEntries();
+    entries.add(modelInstance.newInstance(CamundaEntry.class));
+    assertThat(entries).hasSize(2);
 
     inputParameter.removeValue();
     assertThat(inputParameter.getValue()).isNull();

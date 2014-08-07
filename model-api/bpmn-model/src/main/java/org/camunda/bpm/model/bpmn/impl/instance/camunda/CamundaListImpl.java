@@ -57,30 +57,32 @@ public class CamundaListImpl extends BpmnModelElementInstanceImpl implements Cam
 
     return new Collection<T>() {
 
-      protected Collection<T> elements = ModelUtil.getModelElementCollection(getDomElement().getChildElements(), getModelInstance());
+      protected Collection<T> getElements() {
+        return ModelUtil.getModelElementCollection(getDomElement().getChildElements(), getModelInstance());
+      }
 
       public int size() {
-        return elements.size();
+        return getElements().size();
       }
 
       public boolean isEmpty() {
-        return elements.isEmpty();
+        return getElements().isEmpty();
       }
 
       public boolean contains(Object o) {
-        return elements.contains(o);
+        return getElements().contains(o);
       }
 
       public Iterator<T> iterator() {
-        return (Iterator<T>) elements.iterator();
+        return (Iterator<T>) getElements().iterator();
       }
 
       public Object[] toArray() {
-        return elements.toArray();
+        return getElements().toArray();
       }
 
       public <T1> T1[] toArray(T1[] a) {
-        return elements.toArray(a);
+        return getElements().toArray(a);
       }
 
       public boolean add(T t) {
