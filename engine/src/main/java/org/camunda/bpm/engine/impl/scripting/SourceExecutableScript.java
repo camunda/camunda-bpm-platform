@@ -12,13 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.scripting;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-
+import java.util.logging.Logger;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
@@ -42,7 +41,7 @@ public class SourceExecutableScript extends ExecutableScript {
 
   public Object execute(ScriptEngine engine, VariableScope variableScope, Bindings bindings) {
     try {
-      LOG.log(Level.FINE, "Evaluating un-compiled script using {0} script engine ", language);
+      LOG.fine("Evaluating un-compiled script using " + language + " script engine ");
       return engine.eval(scriptSrc, bindings);
 
     } catch (ScriptException e) {

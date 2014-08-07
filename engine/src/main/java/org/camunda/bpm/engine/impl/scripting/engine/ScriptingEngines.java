@@ -104,7 +104,7 @@ public class ScriptingEngines {
       try {
         CompiledScript compiledScript = compilingEngine.compile(src);
 
-        LOG.log(Level.FINE, "Compiled script using {0} script engine ", language);
+        LOG.fine("Compiled script using " + language + " script engine");
 
         return compiledScript;
 
