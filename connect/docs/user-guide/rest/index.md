@@ -13,10 +13,10 @@ You can use the `.createRequest()` method to create a plain request.
 
 ## Defining a request url
 
-To define a request url there would be the `.requestUrl(String url)`. 
+To define a request url you can use the `.requestUrl(String url)` method. 
 This allows you to set an endpoint for your request. 
 
-Let us use the previous example and extend it for this method:
+Let's use the previous example and extend it for this method:
 
 ```java
   RestHttpConnector connector = new RestHttpConnector();
@@ -26,8 +26,8 @@ Let us use the previous example and extend it for this method:
 
 ## Defining additional headers
 
-You can add any additional header you want to your request. To do this you would use
-`.header(String name, Object value)`. This will append the new header to the request.
+You can add any additional header that you want to your request. To do this, you can use the
+`.header(String name, Object value)` method. This will append the new header to the request.
 
 In our example we will add an Accept header for our request:
 
@@ -38,14 +38,14 @@ In our example we will add an Accept header for our request:
   request.header("Accept", "application/json");
 ```
 
-Now the server knows that we want a json response to our rest call
+Now the server knows that we want a JSON response to our rest call.
 
 ## Defining the payload
 
-For POST, PUT and PATCH request you would have to attach a request body to change data
-on the server side. For this there is a `.requestPayload(String payload)` method.
+For POST, PUT and PATCH requests you have to attach a request body to change data
+on the server side. For this, there is a `.requestPayload(String payload)` method.
 
-So we add some informations as payload to our example:
+So let's add some informations as payload to our example:
 
 ```java
   RestHttpConnector connector = new RestHttpConnector();
@@ -57,7 +57,7 @@ So we add some informations as payload to our example:
 
 ## Defining the request type
 
-As we know a HTTP request must have at least one of the following request types:
+As we know, an HTTP request must have at least one of the following request types:
 
 * GET
 * PUT
@@ -65,7 +65,7 @@ As we know a HTTP request must have at least one of the following request types:
 * PATCH
 * DELETE
 
-So there will be also a way to set this request type in our example. For this we have 
+So there's be also a way to set this request type in our example. For this we have 
 one of the following methods:
 
 * `.get()`
@@ -74,7 +74,7 @@ one of the following methods:
 * `.patch()`
 * `.delete()`
 
-With this we have will have a full request which we can use to connect our REST service:
+With this we have a full request which we can use to connect our REST service:
 
 ```java
   RestHttpConnector connector = new RestHttpConnector();
@@ -87,13 +87,13 @@ With this we have will have a full request which we can use to connect our REST 
 
 ## Execute the request
 
-Now that we have a complete request we can trigger it with the `.execute()` method.
-After the execution we get an RestHttpResponse as answer for our request. This response
-will let us fetch two main information of the response. The status code and the response 
+Now that we have a complete request, we can trigger it with the `.execute()` method.
+After the execution, we get a RestHttpResponse as answer to our request. This response
+lets us fetch two main pieces of information of the response: the status code and the response 
 body. The status code can be fetched with the `.getStatusCode()` method and the response 
-body with `.getResponse()`.
+body with the `.getResponse()` method.
 
-So to complete our example we will add the execution and also some response handling:
+So, to complete our example we'll add the execution and also some response handling:
 
 ```java
   RestHttpConnector connector = new RestHttpConnector();
