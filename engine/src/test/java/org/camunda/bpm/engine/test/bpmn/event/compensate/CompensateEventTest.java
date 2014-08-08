@@ -335,9 +335,16 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void FAILING_testExecutionListeners() {
+  public void testExecutionListeners() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
-    assertTrue((Boolean) runtimeService.getVariable(processInstance.getId(), "end"));
+
+    int started = (Integer) runtimeService.getVariable(processInstance.getId(), "start");
+    assertNotNull("Variable 'start' should exist", started);
+    assertEquals(5, started);
+
+    int ended = (Integer) runtimeService.getVariable(processInstance.getId(), "end");
+    assertNotNull("Variable 'end' should exist", ended);
+    assertEquals(5, ended);
   }
 
 }

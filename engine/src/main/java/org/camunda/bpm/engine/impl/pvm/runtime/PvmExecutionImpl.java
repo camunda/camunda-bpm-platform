@@ -211,6 +211,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     performOperation(PvmAtomicOperation.ACTIVITY_NOTIFY_LISTENER_END);
   }
 
+  public void endCompensation() {
+    remove();
+    performOperation(PvmAtomicOperation.FIRE_ACTIVITY_END);
+    getParent().signal("compensationDone", null);
+  }
+
   public void remove() {
     PvmExecutionImpl parent = getParent();
     if (parent!=null) {

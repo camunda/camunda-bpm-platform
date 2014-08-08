@@ -100,6 +100,12 @@ public interface ActivityExecution extends DelegateExecution {
    */
   void end(boolean isScopeComplete);
 
+  /**
+   * Execution finished compensation. Removes this
+   * execution and notifies listeners.
+   */
+  void endCompensation();
+
   /* State management */
 
   /**
