@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -29,12 +30,12 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  * @author Tom Baeyens
  */
 public class StandaloneMybatisTransactionContext implements TransactionContext {
-  
+
   private static Logger log = Logger.getLogger(StandaloneMybatisTransactionContext.class.getName());
 
   protected CommandContext commandContext;
   protected Map<TransactionState,List<TransactionListener>> stateTransactionListeners = null;
-  
+
   public StandaloneMybatisTransactionContext(CommandContext commandContext) {
     this.commandContext = commandContext;
   }
@@ -50,7 +51,7 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
     }
     transactionListeners.add(transactionListener);
   }
-  
+
   public void commit() {
     log.fine("firing event committing...");
     fireTransactionEvent(TransactionState.COMMITTING);
@@ -82,18 +83,19 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
       try {
         log.fine("firing event rolling back...");
         fireTransactionEvent(TransactionState.ROLLINGBACK);
-        
+
       } catch (Throwable exception) {
         log.info("Exception during transaction: " + exception.getMessage());
-        commandContext.exception(exception);
+        Context.getCommandInvocationContext().trySetThrowable(exception);
       } finally {
         log.fine("rolling back ibatis sql session...");
         getDbSqlSession().rollback();
       }
-      
+
     } catch (Throwable exception) {
+
       log.info("Exception during transaction: " + exception.getMessage());
-      commandContext.exception(exception);
+      Context.getCommandInvocationContext().trySetThrowable(exception);
 
     } finally {
       log.fine("firing event rolled back...");

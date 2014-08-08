@@ -12,43 +12,33 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
-
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 
 /**
- * @author Tom Baeyens
+ * Throws an exception from a nested command; Unlike {@link TweetExceptionHandler}, this handler always throws exceptions.
+ *
+ * @author Thorben Lindhauer
  */
-public class TweetExceptionHandler implements JobHandler {
+public class TweetNestedCommandExceptionHandler implements JobHandler {
 
-  private static Logger log = Logger.getLogger(TweetExceptionHandler.class.getName());
-
-  public static final String TYPE = "tweet-exception";
-
-  protected AtomicInteger exceptionsRemaining = new AtomicInteger(2);
+  public static final String TYPE = "tweet-exception-nested";
 
   public String getType() {
     return TYPE;
   }
 
   public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
-    if (exceptionsRemaining.decrementAndGet() >= 0) {
-      throw new RuntimeException("exception remaining: "+exceptionsRemaining);
-    }
-    log.info("no more exceptions to throw.");
-  }
+    Context.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
 
+      public Void execute(CommandContext commandContext) {
+        throw new RuntimeException("nested command exception");
+      }
 
-  public int getExceptionsRemaining() {
-    return exceptionsRemaining.get();
-  }
-
-
-  public void setExceptionsRemaining(int exceptionsRemaining) {
-    this.exceptionsRemaining.set(exceptionsRemaining);
+    });
   }
 }

@@ -17,23 +17,27 @@ import org.camunda.bpm.engine.runtime.JobQuery;
 
 /**
  * @author Tom Baeyens
+ * @author Thorben Lindhauer
  */
 public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase {
 
   protected TweetExceptionHandler tweetExceptionHandler = new TweetExceptionHandler();
+  protected TweetNestedCommandExceptionHandler nestedCommandExceptionHandler = new TweetNestedCommandExceptionHandler();
 
   public void setUp() throws Exception {
     processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
+    processEngineConfiguration.getJobHandlers().put(nestedCommandExceptionHandler.getType(), nestedCommandExceptionHandler);
   }
 
   public void tearDown() throws Exception {
     processEngineConfiguration.getJobHandlers().remove(tweetExceptionHandler.getType());
+    processEngineConfiguration.getJobHandlers().remove(nestedCommandExceptionHandler.getType());
     clearDatabase();
   }
 
   public void testJobCommandsWith2Exceptions() {
     // create a job
-    createJob();
+    createJob(TweetExceptionHandler.TYPE);
 
     // execute the existing job
     executeAvailableJobs();
@@ -50,7 +54,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     tweetExceptionHandler.setExceptionsRemaining(3);
 
     // create a job
-    createJob();
+    createJob(TweetExceptionHandler.TYPE);
 
     // execute the existing job
     executeAvailableJobs();
@@ -69,7 +73,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
 
     // create 40 jobs
     for(int i = 0; i < 40; i++) {
-      createJob();
+      createJob(TweetExceptionHandler.TYPE);
     }
 
     // execute the existing jobs
@@ -85,20 +89,40 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     }
   }
 
-  protected void createJob() {
+  public void testJobCommandsWithNestedFailingCommand() {
+    // create a job
+    createJob(TweetNestedCommandExceptionHandler.TYPE);
+
+    // execute the existing job
+    Job job = managementService.createJobQuery().singleResult();
+
+    assertEquals(3, job.getRetries());
+
+    try {
+      managementService.executeJob(job.getId());
+      fail("Exception expected");
+    } catch (Exception e) {
+      // expected
+    }
+
+    job = managementService.createJobQuery().singleResult();
+    assertEquals(2, job.getRetries());
+  }
+
+  protected void createJob(final String handlerType) {
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<String>() {
 
       public String execute(CommandContext commandContext) {
-        MessageEntity message = createTweetExceptionMessage();
+        MessageEntity message = createMessage(handlerType);
         commandContext.getJobManager().send(message);
         return message.getId();
       }
     });
   }
 
-  protected MessageEntity createTweetExceptionMessage() {
+  protected MessageEntity createMessage(String handlerType) {
     MessageEntity message = new MessageEntity();
-    message.setJobHandlerType("tweet-exception");
+    message.setJobHandlerType(handlerType);
     return message;
   }
 

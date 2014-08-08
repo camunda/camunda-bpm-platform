@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandInvocationContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
@@ -33,12 +34,15 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
+ * @author Thorben Lindhauer
  */
 public class Context {
 
   private final static Logger LOGGER = Logger.getLogger(Context.class.getName());
 
   protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
+  protected static ThreadLocal<Stack<CommandInvocationContext>> commandInvocationContextThreadLocal = new ThreadLocal<Stack<CommandInvocationContext>>();
+
   protected static ThreadLocal<Stack<ProcessEngineConfigurationImpl>> processEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<ProcessEngineConfigurationImpl>>();
   protected static ThreadLocal<Stack<CoreExecutionContext<? extends CoreExecution>>> executionContextStackThreadLocal = new ThreadLocal<Stack<CoreExecutionContext<? extends CoreExecution>>>();
   protected static ThreadLocal<JobExecutorContext> jobExecutorContextThreadLocal = new ThreadLocal<JobExecutorContext>();
@@ -58,6 +62,22 @@ public class Context {
 
   public static void removeCommandContext() {
     getStack(commandContextThreadLocal).pop();
+  }
+
+  public static CommandInvocationContext getCommandInvocationContext() {
+    Stack<CommandInvocationContext> stack = getStack(commandInvocationContextThreadLocal);
+    if (stack.isEmpty()) {
+      return null;
+    }
+    return stack.peek();
+  }
+
+  public static void setCommandInvocationContext(CommandInvocationContext commandInvocationContext) {
+    getStack(commandInvocationContextThreadLocal).push(commandInvocationContext);
+  }
+
+  public static void removeCommandInvocationContext() {
+    getStack(commandInvocationContextThreadLocal).pop();
   }
 
   public static ProcessEngineConfigurationImpl getProcessEngineConfiguration() {

@@ -761,7 +761,6 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
-
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/cmd/FoxJobRetryCmdTest.testBrokenFoxJobRetryValue.bpmn20.xml" })
