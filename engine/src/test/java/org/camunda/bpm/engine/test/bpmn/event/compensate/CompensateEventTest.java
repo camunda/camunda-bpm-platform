@@ -13,11 +13,14 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -336,15 +339,23 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testExecutionListeners() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("start", 0);
+    variables.put("end", 0);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     int started = (Integer) runtimeService.getVariable(processInstance.getId(), "start");
-    assertNotNull("Variable 'start' should exist", started);
     assertEquals(5, started);
 
     int ended = (Integer) runtimeService.getVariable(processInstance.getId(), "end");
-    assertNotNull("Variable 'end' should exist", ended);
     assertEquals(5, ended);
+
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      long finishedCount = historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").finished().count();
+      assertEquals(5, finishedCount);
+    }
   }
 
 }

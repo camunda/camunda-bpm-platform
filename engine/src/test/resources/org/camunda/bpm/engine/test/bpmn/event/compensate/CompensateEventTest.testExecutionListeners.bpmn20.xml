@@ -27,20 +27,12 @@
 
       <camunda:executionListener event="start">
         <camunda:script scriptFormat="groovy">
-          start = execution.getVariable('start');
-          if (start == null) {
-            start = 0;
-          }
           execution.setVariable('start', start + 1);
         </camunda:script>
       </camunda:executionListener>
 
      <camunda:executionListener event="end">
         <camunda:script scriptFormat="groovy">
-          end = execution.getVariable('end');
-          if (end == null) {
-            end = 0;
-          }
           execution.setVariable('end', end + 1);
         </camunda:script>
       </camunda:executionListener>
