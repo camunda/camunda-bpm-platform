@@ -4,12 +4,12 @@ var Base = require('./base');
 
 module.exports = Base.extend({
 
-  diagramActivitiy: function(activityName) {
+  diagramActivity: function(activityName) {
     return element(by.css('.process-diagram *[data-activity-id=' + '"' + activityName + '"' + ']'));
   },
 
-  selectActivitiy: function(activityName) {
-    this.diagramActivitiy(activityName).click();
+  selectActivity: function(activityName) {
+    this.diagramActivity(activityName).click();
   },
 
   deselectActivity: function(activityName) {
@@ -18,14 +18,21 @@ module.exports = Base.extend({
     protractor.getInstance().actions()
         .keyDown(protractor.Key.CONTROL)
         .click(selectedActivity)
+        .keyUp(protractor.Key.CONTROL)
         .perform();
   },
 
-  isActivitySelected: function(activityName) {
-    var selectedElement = this.diagramActivitiy(activityName);
+  activitiySelectionState: function(activityName) {
+    return this.diagramActivity(activityName).getAttribute('class');
+  },
 
-    expect(selectedElement.getAttribute('class')).toMatch('activity-highlight');
-    return selectedElement;
+  isActivitySelected: function(activityName) {
+    //return this.diagramActivity(activityName).getAttribute('class');
+    expect(this.activitiySelectionState(activityName)).toMatch('activity-highlight');
+  },
+
+  isActivityNotSelected: function(activityName) {
+    expect(this.activitiySelectionState(activityName)).not.toMatch('activity-highlight');
   }
 
 });
