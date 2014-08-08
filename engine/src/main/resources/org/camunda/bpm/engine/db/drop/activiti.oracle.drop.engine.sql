@@ -88,6 +88,13 @@ drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_EVENT_SUBSCR;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
 
+-- indexes for deadlock problems - https://app.camunda.com/jira/browse/CAM-2567
+drop index ACT_IDX_INC_CAUSEINCID;
+drop index ACT_IDX_INC_EXID;
+drop index ACT_IDX_INC_PROCDEFID;
+drop index ACT_IDX_INC_PROCINSTID;
+drop index ACT_IDX_INC_ROOTCAUSEINCID;
+
 drop table  ACT_GE_PROPERTY;
 drop table  ACT_GE_BYTEARRAY;
 drop table  ACT_RE_DEPLOYMENT;

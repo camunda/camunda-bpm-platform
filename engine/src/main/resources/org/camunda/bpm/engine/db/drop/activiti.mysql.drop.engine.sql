@@ -67,7 +67,14 @@ alter table ACT_RU_INCIDENT
     
 drop index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR;
-    
+
+-- indexes for deadlock problems - https://app.camunda.com/jira/browse/CAM-2567
+drop index ACT_IDX_INC_CAUSEINCID on ACT_RU_INCIDENT;
+drop index ACT_IDX_INC_EXID on ACT_RU_INCIDENT;
+drop index ACT_IDX_INC_PROCDEFID on ACT_RU_INCIDENT;
+drop index ACT_IDX_INC_PROCINSTID on ACT_RU_INCIDENT;
+drop index ACT_IDX_INC_ROOTCAUSEINCID on ACT_RU_INCIDENT;
+
 drop table if exists ACT_GE_PROPERTY;
 drop table if exists ACT_RU_VARIABLE;
 drop table if exists ACT_GE_BYTEARRAY;
