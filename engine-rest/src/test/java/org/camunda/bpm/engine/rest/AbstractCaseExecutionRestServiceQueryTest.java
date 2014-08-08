@@ -278,6 +278,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
 
     String returnedId = from(content).getString("[0].id");
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedParentId = from(content).getString("[0].parentId");
     String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
     String returnedActivityId = from(content).getString("[0].activityId");
     String returnedActivityName = from(content).getString("[0].activityName");
@@ -287,6 +288,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     assertThat(returnedCaseInstanceId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID);
+    assertThat(returnedParentId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_PARENT_ID);
     assertThat(returnedCaseDefinitionId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID);
     assertThat(returnedActivityId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_ID);
     assertThat(returnedActivityName).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
@@ -321,9 +323,11 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
 
     assertThat(caseExecutions).hasSize(1);
     assertThat(caseExecutions.get(0)).isNotNull();
+    assertThat(caseExecutions.get(0)).isNotNull();
 
     String returnedId = from(content).getString("[0].id");
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedParentId = from(content).getString("[0].parentId");
     String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
     String returnedActivityId = from(content).getString("[0].activityId");
     String returnedActivityName = from(content).getString("[0].activityName");
@@ -333,6 +337,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     assertThat(returnedCaseInstanceId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID);
+    assertThat(returnedParentId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_PARENT_ID);
     assertThat(returnedCaseDefinitionId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID);
     assertThat(returnedActivityId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_ID);
     assertThat(returnedActivityName).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);

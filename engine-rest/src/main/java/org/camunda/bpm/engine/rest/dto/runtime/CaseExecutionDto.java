@@ -26,6 +26,7 @@ public class CaseExecutionDto {
   protected String caseDefinitionId;
   protected String activityId;
   protected String activityName;
+  protected String parentId;
   protected boolean enabled;
   protected boolean active;
   protected boolean disabled;
@@ -50,6 +51,10 @@ public class CaseExecutionDto {
     return activityName;
   }
 
+  public String getParentId() {
+    return parentId;
+  }
+
   public boolean isEnabled() {
     return enabled;
   }
@@ -70,6 +75,7 @@ public class CaseExecutionDto {
     dto.caseDefinitionId = caseExecution.getCaseDefinitionId();
     dto.activityId = caseExecution.getActivityId();
     dto.activityName = caseExecution.getActivityName();
+    dto.parentId = caseExecution.getParentId();
     dto.active = caseExecution.isActive();
     dto.enabled = caseExecution.isEnabled();
     dto.disabled = caseExecution.isDisabled();

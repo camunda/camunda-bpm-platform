@@ -106,6 +106,9 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(caseInstance.getId(), caseInstance.getCaseInstanceId());
     assertEquals("1", caseInstance.getBusinessKey());
     assertEquals(caseDefinitionId, caseInstance.getCaseDefinitionId());
+    assertEquals("CasePlanModel_1", caseInstance.getActivityId());
+    assertNull(caseInstance.getActivityName());
+    assertNull(caseInstance.getParentId());
     assertTrue(caseInstance.isActive());
     assertFalse(caseInstance.isEnabled());
 
@@ -1319,4 +1322,5 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     query = caseService.createCaseInstanceQuery();
 
   }
+
 }

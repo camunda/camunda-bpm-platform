@@ -50,6 +50,11 @@ public interface CaseExecution {
   String getActivityName();
 
   /**
+   * <p>The id of the parent of <code>this</code> case execution.</p>
+   */
+  String getParentId();
+
+  /**
    * <p>Returns <code>true</code> if the case execution is active.</p>
    */
   boolean isActive();

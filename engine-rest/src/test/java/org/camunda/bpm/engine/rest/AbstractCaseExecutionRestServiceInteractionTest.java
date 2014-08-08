@@ -132,6 +132,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
         .statusCode(Status.OK.getStatusCode())
         .body("id", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID))
         .body("caseInstanceId", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID))
+        .body("parentId", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_PARENT_ID))
         .body("caseDefinitionId", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID))
         .body("activityId", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_ID))
         .body("activityName", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME))
