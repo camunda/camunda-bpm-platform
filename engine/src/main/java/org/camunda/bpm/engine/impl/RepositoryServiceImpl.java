@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeployCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentBpmnModelInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.GetDeploymentCmmnModelInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramLayoutCmd;
@@ -53,6 +54,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 
 
 /**
@@ -174,6 +176,10 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public BpmnModelInstance getBpmnModelInstance(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentBpmnModelInstanceCmd(processDefinitionId));
+  }
+
+  public CmmnModelInstance getCmmnModelInstance(String caseDefinitionId) {
+    return commandExecutor.execute(new GetDeploymentCmmnModelInstanceCmd(caseDefinitionId));
   }
 
   public void addCandidateStarterUser(String processDefinitionId, String userId) {

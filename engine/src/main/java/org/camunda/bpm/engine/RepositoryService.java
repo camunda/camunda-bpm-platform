@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 
 
 /** Service providing access to the repository of process definitions and deployments.
@@ -277,6 +278,15 @@ public interface RepositoryService {
    * @return the {@link BpmnModelInstance}
    */
   BpmnModelInstance getBpmnModelInstance(String processDefinitionId);
+
+  /**
+   * Returns the {@link CmmnModelInstance} for the given caseDefinitionId.
+   *
+   * @param caseDefinitionId the id of the Case Definition for which the {@link CmmnModelInstance}
+   *  should be retrieved.
+   * @return the {@link CmmnModelInstance}
+   */
+  CmmnModelInstance getCmmnModelInstance(String caseDefinitionId);
 
   /**
    * Authorizes a candidate user for a process definition.
