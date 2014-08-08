@@ -1,6 +1,6 @@
 'use strict';
 
-var Base = require('./base');
+var Base = require('./../../tasklist/pages/base');
 
 module.exports = Base.extend({
 

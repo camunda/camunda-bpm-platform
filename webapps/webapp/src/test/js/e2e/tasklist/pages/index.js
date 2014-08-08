@@ -1,6 +1,8 @@
 'use strict';
 
-var AuthenticationPage = require('./authentication');
+var TasklistDashboardPage = require('./dashboard-view');
+var AuthenticationPage = require('./../../commons/pages/authentication');
 
-module.exports = new AuthenticationPage();
+module.exports = new TasklistDashboardPage();
+module.exports.authentication = new AuthenticationPage();
 
