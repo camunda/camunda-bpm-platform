@@ -413,6 +413,9 @@ public abstract class MockProvider {
   // case execution
   public static final String EXAMPLE_CASE_EXECUTION_ID = "aCaseExecutionId";
   public static final String EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID = "aCaseInstanceId";
+  public static final String EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID = "aCaseDefinitionId";
+  public static final String EXAMPLE_CASE_EXECUTION_ACTIVITY_ID = "anActivityId";
+  public static final String EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME = "anActivityName";
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_ENABLED = true;
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_ACTIVE = true;
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_DISABLED = true;
@@ -1347,6 +1350,9 @@ public abstract class MockProvider {
 
     when(mock.getId()).thenReturn(EXAMPLE_CASE_EXECUTION_ID);
     when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID);
+    when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID);
+    when(mock.getActivityId()).thenReturn(EXAMPLE_CASE_EXECUTION_ACTIVITY_ID);
+    when(mock.getActivityName()).thenReturn(EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
     when(mock.isActive()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
     when(mock.isEnabled()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     when(mock.isDisabled()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_DISABLED);

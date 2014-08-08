@@ -13,12 +13,15 @@
 
 package org.camunda.bpm.engine.impl.persistence.deploy;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
@@ -32,8 +35,6 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -225,6 +226,19 @@ public class DeploymentCache {
 
     ensureNotNull("no case definition deployed with key = '" + caseDefinitionKey + "' in deployment = '" + deploymentId + "'", "caseDefinition", caseDefinition);
     caseDefinition = resolveCaseDefinition(caseDefinition);
+
+    return caseDefinition;
+  }
+
+  public CaseDefinitionEntity getCaseDefinitionById(String caseDefinitionId) {
+    ensureNotNull("caseDefinitionId", caseDefinitionId);
+
+    CaseDefinitionEntity caseDefinition = caseDefinitionCache.get(caseDefinitionId);
+
+    if (caseDefinition == null) {
+      caseDefinition = findDeployedCaseDefinitionById(caseDefinitionId);
+
+    }
 
     return caseDefinition;
   }

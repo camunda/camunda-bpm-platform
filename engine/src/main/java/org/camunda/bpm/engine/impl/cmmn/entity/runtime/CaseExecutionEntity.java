@@ -109,7 +109,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
       CaseDefinitionEntity deployedCaseDefinition = Context
         .getProcessEngineConfiguration()
         .getDeploymentCache()
-        .findDeployedCaseDefinitionById(caseDefinitionId);
+        .getCaseDefinitionById(caseDefinitionId);
 
       setCaseDefinition(deployedCaseDefinition);
     }
@@ -165,7 +165,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     super.setActivity(activity);
     if (activity != null) {
       this.activityId = activity.getId();
-      this.activityName = (String) activity.getProperty("name");
+      this.activityName = (String) activity.getName();
     } else {
       this.activityId = null;
       this.activityName = null;

@@ -35,6 +35,21 @@ public interface CaseExecution {
   String getCaseInstanceId();
 
   /**
+   * <p>The id of the case definition of the case execution.</p>
+   */
+  String getCaseDefinitionId();
+
+  /**
+   * <p>The id of the activity associated with <code>this</code> case execution.</p>
+   */
+  String getActivityId();
+
+  /**
+   * <p>The name of the activity associated with <code>this</code> case execution.</p>
+   */
+  String getActivityName();
+
+  /**
    * <p>Returns <code>true</code> if the case execution is active.</p>
    */
   boolean isActive();

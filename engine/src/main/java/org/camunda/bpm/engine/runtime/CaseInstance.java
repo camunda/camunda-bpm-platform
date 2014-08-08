@@ -19,11 +19,6 @@ package org.camunda.bpm.engine.runtime;
 public interface CaseInstance extends CaseExecution {
 
   /**
-   * The id of the case definition of the case instance.
-   */
-  String getCaseDefinitionId();
-
-  /**
    * The business key of this process instance.
    */
   String getBusinessKey();

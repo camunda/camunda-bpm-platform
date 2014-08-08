@@ -2380,4 +2380,32 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   }
 
+  public void testCaseExecutionProperties() {
+    // given
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .caseDefinitionKey(CASE_DEFINITION_KEY)
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = caseService
+        .withCaseDefinition(caseDefinitionId)
+        .create()
+        .getId();
+
+    // when
+    CaseExecution task  = caseService
+        .createCaseExecutionQuery()
+        .caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    // then
+    assertEquals("PI_HumanTask_1", task.getActivityId());
+    assertEquals("A HumanTask", task.getActivityName());
+    assertEquals(caseDefinitionId, task.getCaseDefinitionId());
+    assertEquals(caseInstanceId, task.getCaseInstanceId());
+    assertNotNull(task.getId());
+
+  }
 }

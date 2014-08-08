@@ -12,7 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
+
 import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.QueryOperator;
@@ -21,8 +24,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -167,9 +168,18 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   public List<CaseExecution> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
+    List<CaseExecution> result = commandContext
       .getCaseExecutionManager()
       .findCaseExecutionsByQueryCriteria(this, page);
+
+    for (CaseExecution caseExecution : result) {
+      CaseExecutionEntity caseExecutionEntity = (CaseExecutionEntity) caseExecution;
+      // initializes the name of the activity
+      // on current case execution
+      caseExecutionEntity.getActivity();
+    }
+
+    return result;
   }
 
   // getters /////////////////////////////////////////////

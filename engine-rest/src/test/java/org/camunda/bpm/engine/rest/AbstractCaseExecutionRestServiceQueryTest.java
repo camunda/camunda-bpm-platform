@@ -278,13 +278,21 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
 
     String returnedId = from(content).getString("[0].id");
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
+    String returnedActivityId = from(content).getString("[0].activityId");
+    String returnedActivityName = from(content).getString("[0].activityName");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
     boolean returnedEnabledState = from(content).getBoolean("[0].enabled");
+    boolean returnedDisabledState = from(content).getBoolean("[0].disabled");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     assertThat(returnedCaseInstanceId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID);
+    assertThat(returnedCaseDefinitionId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID);
+    assertThat(returnedActivityId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_ID);
+    assertThat(returnedActivityName).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
     assertThat(returnedEnabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
+    assertThat(returnedDisabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_DISABLED);
   }
 
   @Test
@@ -316,12 +324,18 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
 
     String returnedId = from(content).getString("[0].id");
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
+    String returnedActivityId = from(content).getString("[0].activityId");
+    String returnedActivityName = from(content).getString("[0].activityName");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
     boolean returnedEnabledState = from(content).getBoolean("[0].enabled");
     boolean returnedDisabledState = from(content).getBoolean("[0].disabled");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     assertThat(returnedCaseInstanceId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID);
+    assertThat(returnedCaseDefinitionId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID);
+    assertThat(returnedActivityId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_ID);
+    assertThat(returnedActivityName).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
     assertThat(returnedEnabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
     assertThat(returnedDisabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_DISABLED);
