@@ -13,9 +13,11 @@ describe('groups page -', function() {
 
     it('should login', function() {
 
+      console.log('\n' + 'groups-spec');
+
       // when
       groupsPage.navigateToWebapp('Admin');
-      groupsPage.login('demo', 'demo');
+      groupsPage.authentication.userLogin('jonny1', 'jonny1');
       groupsPage.selectNavbarItem('Groups');
 
       // then

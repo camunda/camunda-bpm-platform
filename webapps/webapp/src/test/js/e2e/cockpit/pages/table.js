@@ -1,23 +1,23 @@
 'use strict';
 
-var Base = require('./base');
+var Table = require('./base');
 
-module.exports = Base.extend({
+module.exports = Table.extend({
 
-  tableTabs: function(repeater) {
-    return element.all(by.repeater(repeater));
+  tableTabs: function() {
+    return element.all(by.repeater(this.repeater));
   },
 
-  selectTab: function(repeater, tab) {
-    this.tableTabs(repeater).get(tab).click();
+  selectTab: function() {
+    this.tableTabs().get(this.tabIndex).click();
   },
 
-  isTabSelected: function(repeater, tab) {
-    return this.tableTabs(repeater).get(tab).getAttribute('class');
+  isTabSelected: function() {
+    return this.tableTabs(this.repeater).get(this.tabIndex).getAttribute('class');
   },
 
-  tabName: function(repeater, tab) {
-    return this.tableTabs(repeater).get(tab).element(by.css('[class="ng-binding"]')).getText();
+  tabName: function() {
+    return this.tableTabs(this.repeater).get(this.tabIndex).element(by.css('[class="ng-binding"]')).getText();
   }
 
 });

@@ -13,9 +13,11 @@ describe('users page - ', function() {
 
     it('should login', function() {
 
+      console.log('\n' + 'users-spec');
+
       // when
       usersPage.navigateToWebapp('Admin');
-      usersPage.login('jonny1', 'jonny1');
+      usersPage.authentication.userLogin('jonny1', 'jonny1');
 
       // then
       usersPage.isActive();
@@ -97,7 +99,7 @@ describe('users page - ', function() {
 
       // when
       usersPage.editUserProfile.logout();
-      usersPage.login('Icke', 'password1234');
+      usersPage.authentication.userLogin('Icke', 'password1234');
 
       // then
       expect(usersPage.loggedInUser()).toBe('Icke');
@@ -118,7 +120,7 @@ describe('users page - ', function() {
     it('should validate profile page', function() {
 
       // given
-      usersPage.login('jonny1', 'jonny1');
+      usersPage.authentication.userLogin('jonny1', 'jonny1');
 
       // when
       usersPage.selectUser(0);
@@ -198,7 +200,7 @@ describe('users page - ', function() {
     it('should login as non-Admin user', function() {
 
       // when
-      usersPage.login('Icke', 'password1234');
+      usersPage.authentication.userLogin('Icke', 'password1234');
 
       // then
       expect(usersPage.loggedInUser()).toBe('Icke');
@@ -230,7 +232,7 @@ describe('users page - ', function() {
     it('should navigate to Account menu', function() {
 
       // when
-      usersPage.login('jonny1', 'jonny1');
+      usersPage.authentication.userLogin('jonny1', 'jonny1');
       usersPage.selectUser(0);
       usersPage.editUserAccount.selectUserNavbarItem('Account');
 

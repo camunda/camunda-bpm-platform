@@ -15,9 +15,11 @@ describe('admin user -', function() {
 
     it('should login', function() {
 
+      console.log('\n' + 'administrator-spec');
+
       // when
       usersPage.navigateToWebapp('Admin');
-      usersPage.login('jonny1', 'jonny1');
+      usersPage.authentication.userLogin('jonny1', 'jonny1');
 
       // then
       usersPage.isActive();
@@ -90,7 +92,7 @@ describe('admin user -', function() {
 
       // when
       usersPage.navigateToWebapp('Admin');
-      usersPage.login('Admin', 'admin123');
+      usersPage.authentication.userLogin('Admin', 'admin123');
 
       // then
       expect(usersPage.userFirstNameAndLastName(0)).toBe('Über Admin');

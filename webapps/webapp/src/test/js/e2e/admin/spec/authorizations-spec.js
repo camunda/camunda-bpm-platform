@@ -10,9 +10,11 @@ describe('authorizations page -', function() {
 
     it('should login', function () {
 
+      console.log('\n' + 'authorizations-spec');
+
       // when
       authorizationsPage.navigateToWebapp('Admin');
-      authorizationsPage.login('demo', 'demo');
+      authorizationsPage.authentication.userLogin('jonny1', 'jonny1');
       authorizationsPage.selectNavbarItem('Authorizations');
 
       // then

@@ -10,9 +10,11 @@ describe('system page -', function() {
 
     it('should login', function () {
 
+      console.log('\n' + 'system-spec');
+
       // when
       systemPage.navigateToWebapp('Admin');
-      systemPage.login('demo', 'demo');
+      systemPage.authentication.userLogin('demo', 'demo');
       systemPage.selectNavbarItem('System');
 
       // then

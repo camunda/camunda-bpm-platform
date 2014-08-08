@@ -12,7 +12,7 @@ describe('cockpit dashboard - ', function() {
 
       // when
       dashboardPage.navigateToWebapp('Cockpit');
-      dashboardPage.login('jonny1', 'jonny1');
+      dashboardPage.authentication.userLogin('jonny1', 'jonny1');
 
       // then
       dashboardPage.isActive();
@@ -79,27 +79,35 @@ describe('cockpit dashboard - ', function() {
     });
 
 
+    function clickFirstProcessInstance() {
+      return processDefinitionPage.table.processInstancesTab.processInstanceName(0).then(function(title) {
+        processDefinitionPage.table.processInstancesTab.selectProcessInstance(0);
+        return title;
+      });
+    }
+
+    function getPageHeaderId() {
+      return processInstancePage.pageHeaderProcessInstanceName().then(function(id) {
+        return id.replace('<', '').replace('>', '');
+      });
+    }
+
     it('should select process instance and check instance view page', function() {
 
       // when
-      var tableInstanceId = processDefinitionPage.table.processInstancesTab.processInstanceName(0);
-      processDefinitionPage.table.processInstancesTab.selectProcessInstance(0);
+      var instanceId;
 
-      // then
-      var tableInstanceIdString;
-      var instanceViewInstanceIdString;
-      tableInstanceId.then(function(instanceIDString) {
-        tableInstanceIdString = instanceIDString;
-      });
-
-      processInstancePage.pageHeaderProcessInstanceName().then(function(instanceViewInstanceId) {
-        instanceViewInstanceId = instanceViewInstanceId.replace('<', '');
-        instanceViewInstanceId = instanceViewInstanceId.replace('>', '');
-        instanceViewInstanceIdString = instanceViewInstanceId;
-      }).then(function() {
-        expect(instanceViewInstanceIdString).toBe(tableInstanceIdString);
-        processInstancePage.isActive({ instance: tableInstanceIdString});
-      });
+      clickFirstProcessInstance()
+        .then(function(id) {
+          instanceId = id;
+        })
+        .then(getPageHeaderId)
+        .then(function(headerId) {
+          expect(instanceId).toBe(headerId);
+        })
+        .then(function() {
+          processInstancePage.isActive({ instance: instanceId });
+        });
 
     });
 

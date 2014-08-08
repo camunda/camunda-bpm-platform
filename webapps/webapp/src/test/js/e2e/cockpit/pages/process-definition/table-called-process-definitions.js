@@ -1,25 +1,27 @@
 'use strict';
 
-var Base = require('./../table');
-var repeater = 'tabProvider in processDefinitionTabs';
-var tabIndex = 1;
+var Table = require('./../table');
 
-module.exports = Base.extend({
+
+module.exports = Table.extend({
+
+  repeater: 'tabProvider in processDefinitionTabs',
+  tabIndex: 1,
 
   selectCalledProcessDefinitionsTab: function() {
-    this.selectTab(repeater, tabIndex);
+    this.selectTab();
   },
 
   calledProcessDefinitionsTabName: function() {
-    return this.tabName(repeater, tabIndex);
+    return this.tabName();
   },
 
   isCalledProcessDefinitionsTabSelected: function() {
-    expect(this.isTabSelected(repeater, tabIndex)).toMatch('ng-scope active');
+    expect(this.isTabSelected()).toMatch('ng-scope active');
   },
 
   isCalledProcessDefinitionsTabNotSelected: function() {
-    expect(this.isTabSelected(repeater, tabIndex)).not.toMatch('ng-scope active');
+    expect(this.isTabSelected()).not.toMatch('ng-scope active');
   },
 
   calledProcessDefinitionsTable: function() {

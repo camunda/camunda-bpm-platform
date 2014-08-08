@@ -1,13 +1,13 @@
 'use strict';
 
-var Base = require('./../../tasklist/pages/base');
+var Page = require('../../page');
 
-module.exports = Base.extend({
+module.exports = Page.extend({
 
-  url: '/camunda/app/tasklist/default/#/login',
+  url: '/camunda/app/:webapp/default/#/login',
 
   formElement: function() {
-    return element(by.css('form[name="userLogin"]'));
+    return element(by.css('form[name="signinForm"]'));
   },
 
   loginButton: function() {
@@ -23,6 +23,8 @@ module.exports = Base.extend({
   },
 
   userLogin: function(username, password) {
+    this.usernameInput().clear();
+    this.passwordInput().clear();
     this.usernameInput().sendKeys(username);
     this.passwordInput().sendKeys(password);
     this.loginButton().click();

@@ -63,7 +63,7 @@ Page.prototype.notification = function() {
 };
 
 /* header menu */
-Page.prototype.login = function(username, password) {
+/*Page.prototype.login = function(username, password) {
   username = username || 'jonny1';
   password = password || 'jonny1';
 
@@ -74,7 +74,7 @@ Page.prototype.login = function(username, password) {
 
   var submitButton = element(by.css('[type="submit"]'));
   submitButton.click();
-};
+};*/
 
 Page.prototype.logout = function() {
   element(by.css('.navbar [sem-show-user-actions]')).click();
