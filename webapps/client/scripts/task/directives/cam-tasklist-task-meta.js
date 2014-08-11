@@ -20,7 +20,8 @@ define([
     function errorNotification(src, err) {
       $translate(src).then(function(translated) {
         Notifications.addError({
-          message: translated +' '+ (err ? err.message : '')
+          status: translated,
+          message: (err ? err.message : '')
         });
       });
     }
@@ -29,15 +30,15 @@ define([
       $translate(src).then(function(translated) {
         Notifications.addMessage({
           duration: 3000,
-          message: translated
+          status: translated
         });
       });
     }
 
     return {
-      scope: {
-        task: '='
-      },
+      // scope: {
+      //   task: '='
+      // },
       link: function(scope) {
 
         // function delegated(err) {

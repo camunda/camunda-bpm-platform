@@ -16,34 +16,47 @@ define([
   ) {
     // var Task = camAPI.resource('task');
 
+
+    function errorNotification(src, err) {
+      $translate(src).then(function(translated) {
+        Notifications.addError({
+          status: translated,
+          message: (err ? err.message : '')
+        });
+      });
+    }
+
+    function successNotification(src) {
+      $translate(src).then(function(translated) {
+        Notifications.addMessage({
+          duration: 3000,
+          status: translated
+        });
+      });
+    }
+
     return {
-      scope: {
-        task: '='
-      },
+      // scope: {
+      //   task: '='
+      // },
       link: function(scope, element) {
         var container = element.find('.form-container');
         scope.currentTaskId = null;
         scope._camForm = null;
 
         scope.completeTask = function() {
-          scope._camForm.submit(function(err, resp) {
+          scope._camForm.submit(function(err) {
             if (err) {
-              $translate('COMPLETE_ERROR').then(function(translated) {
-                Notifications.addError({
-                  status: translated,
-                  message: err.message
-                });
-              });
+              return errorNotification('COMPLETE_ERROR', err);
             }
 
-            console.info('task submit response', resp);
-            // TODO: reload the tasks list
-            $translate('COMPLETE_OK').then(function(translated) {
-              Notifications.addMessage({
-                duration: 3000,
-                status: translated
-              });
-            });
+            scope.currentTaskId = null;
+            scope._camForm = null;
+            container.html('');
+
+            scope.$emit('tasklist.task.complete');
+
+            successNotification('COMPLETE_OK');
           });
         };
 

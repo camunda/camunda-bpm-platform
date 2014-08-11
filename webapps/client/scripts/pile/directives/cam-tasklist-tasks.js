@@ -151,6 +151,10 @@ define([
           setCurrentTask(scope.tasks[delta]);
         };
 
+        scope.$on('tasklist.task.complete', function() {
+          setCurrentTask(null);
+          loadItems();
+        });
 
         scope.$on('tasklist.pile.current', function() {
           if (

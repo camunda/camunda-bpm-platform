@@ -26,8 +26,7 @@ define([
 
         scope.$on('tasklist.task.current', function() {
           if (
-            !$rootScope.currentTask ||
-            (scope.task && scope.task._links.self.href === $rootScope.currentTask._links.self.href)
+            (scope.task && $rootScope.currentTask && scope.task.id === $rootScope.currentTask.id)
           ) {
             return;
           }
