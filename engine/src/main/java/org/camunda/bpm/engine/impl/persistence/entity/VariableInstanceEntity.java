@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
 /**
@@ -374,10 +375,6 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
     return errorMessage;
   }
 
-  public Object getRawValue() {
-    return getType().getRawValue(this);
-  }
-
   public String getDataFormatId() {
     return dataFormatId;
   }
@@ -396,6 +393,10 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
     }
 
     return caseExecutionId;
+  }
+
+  public SerializedVariableValue getSerializedValue() {
+    return type.getSerializedValue(this);
   }
 
   @Override

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+
 
 
 /**
@@ -44,7 +46,8 @@ public class NullType implements VariableType {
     return "Null";
   }
 
-  public Object getRawValue(ValueFields valueFields) {
+  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
+    // TODO Auto-generated method stub
     return null;
   }
 }

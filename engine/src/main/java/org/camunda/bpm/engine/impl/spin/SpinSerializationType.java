@@ -17,8 +17,10 @@ import java.io.UnsupportedEncodingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.runtime.SerializedVariableValueImpl;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
 import org.camunda.spin.SpinRuntimeException;
@@ -27,6 +29,9 @@ import org.camunda.spin.spi.DataFormat;
 public class SpinSerializationType implements VariableType {
 
   public static final String TYPE_NAME = "SpinSerialization";
+
+  public static final String CONFIG_DATA_FORMAT_ID = "dataFormatId";
+  public static final String CONFIG_TYPE = "configType";
 
   protected DataFormat<?> dataFormat;
 
@@ -93,25 +98,30 @@ public class SpinSerializationType implements VariableType {
     }
   }
 
-  public Object getRawValue(ValueFields valueFields) {
-    String value = null;
+  public DataFormat<?> getDataFormat() {
+    return dataFormat;
+  }
 
+  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
+    SerializedVariableValueImpl value = new SerializedVariableValueImpl();;
+
+    String serializedValue = null;
     if (valueFields.getTextValue() != null) {
-      value = valueFields.getTextValue();
+      serializedValue = valueFields.getTextValue();
     } else if (valueFields.getByteArrayValue() != null){
       try {
         ByteArrayEntity byteArray = valueFields.getByteArrayValue();
-        value = new String(byteArray.getBytes(), "UTF-8");
+        serializedValue = new String(byteArray.getBytes(), "UTF-8");
       } catch (UnsupportedEncodingException e) {
         throw new ProcessEngineException("UTF-8 is not a supported encoding");
       }
     }
 
-    return value;
-  }
+    value.setValue(serializedValue);
+    value.setConfigValue(CONFIG_DATA_FORMAT_ID, valueFields.getDataFormatId());
+    value.setConfigValue(CONFIG_TYPE, valueFields.getTextValue2());
 
-  public DataFormat<?> getDataFormat() {
-    return dataFormat;
+    return value;
   }
 
 }

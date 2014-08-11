@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
+import org.camunda.bpm.engine.impl.runtime.SerializedVariableValueImpl;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+
 
 
 /**
@@ -55,7 +58,9 @@ public class LongType implements VariableType {
     return Long.class.getSimpleName();
   }
 
-  public Object getRawValue(ValueFields valueFields) {
-    return getValue(valueFields);
+  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
+    SerializedVariableValueImpl result = new SerializedVariableValueImpl();
+    result.setValue(getValue(valueFields));
+    return result;
   }
 }

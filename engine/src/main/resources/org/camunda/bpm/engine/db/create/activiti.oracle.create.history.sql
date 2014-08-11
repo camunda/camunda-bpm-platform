@@ -95,6 +95,7 @@ create table ACT_HI_DETAIL (
     LONG_ NUMBER(19,0),
     TEXT_ NVARCHAR2(2000),
     TEXT2_ NVARCHAR2(2000),
+    DATA_FORMAT_ID_ NVARCHAR2(64),
     primary key (ID_)
 );
 

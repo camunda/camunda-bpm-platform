@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.history;
 
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+
 /**
  * A single process variable containing the last value when its process instance has finished.
  * It is only available when HISTORY_LEVEL is set >= VARIABLE
@@ -57,5 +59,11 @@ public interface HistoricVariableInstance {
    * @return an error message indicating why the variable value could not be loaded.
    */
   String getErrorMessage();
+
+  /**
+   * Returns the value of this variable in its serialized form, represented by a
+   * {@link SerializedVariableValue}.
+   */
+  SerializedVariableValue getSerializedValue();
 
 }

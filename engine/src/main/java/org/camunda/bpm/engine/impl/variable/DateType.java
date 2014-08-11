@@ -14,6 +14,9 @@ package org.camunda.bpm.engine.impl.variable;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.impl.runtime.SerializedVariableValueImpl;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+
 
 /**
  * @author Tom Baeyens
@@ -58,7 +61,9 @@ public class DateType implements VariableType {
     return Date.class.getSimpleName();
   }
 
-  public Object getRawValue(ValueFields valueFields) {
-    return valueFields.getLongValue();
+  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
+    SerializedVariableValueImpl result = new SerializedVariableValueImpl();
+    result.setValue(valueFields.getLongValue());
+    return result;
   }
 }

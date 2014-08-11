@@ -1,11 +1,15 @@
 package org.camunda.bpm.engine.test.variables;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.spin.SpinSerializationType;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.spin.DataFormats;
 import org.json.JSONException;
@@ -42,11 +46,49 @@ public class HistoricVariableDataFormatTest extends AbstractProcessEngineTestCas
     assertEquals(bean.getStringProperty(), historyValue.getStringProperty());
     assertEquals(bean.getIntProperty(), historyValue.getIntProperty());
     assertEquals(bean.getBooleanProperty(), historyValue.getBooleanProperty());
-
-    // currently internal API
-    HistoricVariableInstanceEntity variableEntity = (HistoricVariableInstanceEntity) historicVariable;
-    assertEquals(JSON_FORMAT_NAME, variableEntity.getDataFormatId());
-    JSONAssert.assertEquals(bean.toExpectedJsonString(), (String) variableEntity.getRawValue(), true);
   }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testSelectHistoricSerializedValues() throws JSONException {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    SimpleBean bean = new SimpleBean("a String", 42, false);
+    runtimeService.setVariable(instance.getId(), "simpleBean", bean);
+
+    SerializedVariableValue historicValue =
+        historyService.createHistoricVariableInstanceQuery().singleResult().getSerializedValue();
+    assertNotNull(historicValue);
+
+    Map<String, Object> config = historicValue.getConfig();
+    assertEquals(2, config.size());
+    assertEquals(JSON_FORMAT_NAME, config.get(SpinSerializationType.CONFIG_DATA_FORMAT_ID));
+    assertEquals(bean.getClass().getCanonicalName(), config.get(SpinSerializationType.CONFIG_TYPE));
+
+    String variableAsJson = (String) historicValue.getValue();
+    JSONAssert.assertEquals(bean.toExpectedJsonString(), variableAsJson, true);
+  }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testSelectHistoricSerializedValuesUpdate() throws JSONException {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    SimpleBean bean = new SimpleBean("a String", 42, false);
+    runtimeService.setVariable(instance.getId(), "simpleBean", bean);
+
+    HistoricVariableUpdate historicUpdate = (HistoricVariableUpdate)
+        historyService.createHistoricDetailQuery().variableUpdates().singleResult();
+    SerializedVariableValue serializedValue = historicUpdate.getSerializedValue();
+    assertNotNull(serializedValue);
+
+    Map<String, Object> config = serializedValue.getConfig();
+    assertEquals(2, config.size());
+    assertEquals(JSON_FORMAT_NAME, config.get(SpinSerializationType.CONFIG_DATA_FORMAT_ID));
+    assertEquals(bean.getClass().getCanonicalName(), config.get(SpinSerializationType.CONFIG_TYPE));
+
+    String variableAsJson = (String) serializedValue.getValue();
+    JSONAssert.assertEquals(bean.toExpectedJsonString(), variableAsJson, true);
+  }
+
+
 
 }

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+
 
 /**
  * Custom object type
@@ -59,7 +61,8 @@ public class CustomObjectType implements VariableType {
     }
   }
 
-  public Object getRawValue(ValueFields valueFields) {
-    return getValue(valueFields);
+  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

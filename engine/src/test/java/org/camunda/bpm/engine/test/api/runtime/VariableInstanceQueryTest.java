@@ -23,13 +23,13 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
@@ -2443,58 +2443,6 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
       }
 
     }
-  }
-
-  /**
-   * This tests a currently internal API and may be subject to change
-   */
-  @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-  public void testGetRawValues() {
-    byte[] byteArray = new byte[] {42};
-    long aLongValue = 12345678L;
-    DummySerializable serializable = new DummySerializable();
-
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("booleanVariable", true);
-    variables.put("byteArrayVariable", byteArray);
-    variables.put("serializableVariable", serializable);
-    variables.put("dateVariable", new Date(aLongValue));
-    variables.put("doubleVariable", 4.2d);
-    variables.put("integerVariable", 42);
-    variables.put("longVariable", aLongValue);
-    variables.put("shortVariable", (short) 42);
-    variables.put("stringVariable", "a String Value");
-
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
-
-    assertEquals(1L, getSingleVariable("booleanVariable").getRawValue());
-    Assert.assertArrayEquals(byteArray, (byte[]) getSingleVariable("byteArrayVariable").getRawValue());
-    Assert.assertArrayEquals(serialize(serializable), (byte[]) getSingleVariable("serializableVariable").getRawValue());
-    assertEquals(aLongValue, getSingleVariable("dateVariable").getRawValue());
-    assertEquals(4.2d, getSingleVariable("doubleVariable").getRawValue());
-    assertEquals(42L, getSingleVariable("integerVariable").getRawValue());
-    assertEquals(aLongValue, getSingleVariable("longVariable").getRawValue());
-    assertEquals(42L, getSingleVariable("shortVariable").getRawValue());
-    assertEquals("a String Value", getSingleVariable("stringVariable").getRawValue());
-  }
-
-  protected VariableInstanceEntity getSingleVariable(String name) {
-    return (VariableInstanceEntity) runtimeService.createVariableInstanceQuery().variableName(name).singleResult();
-  }
-
-  protected byte[] serialize(Object o) {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    ObjectOutputStream ois = null;
-    try {
-      ois = new ObjectOutputStream(baos);
-      ois.writeObject(o);
-    } catch (IOException e) {
-      throw new ProcessEngineException(e);
-    } finally {
-      IoUtil.closeSilently(ois);
-    }
-    return baos.toByteArray();
   }
 
 }

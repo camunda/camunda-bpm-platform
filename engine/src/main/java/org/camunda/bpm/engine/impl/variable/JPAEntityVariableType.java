@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.variable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.runtime.SerializedVariableValueImpl;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 
 
 /**
@@ -26,6 +28,9 @@ import org.camunda.bpm.engine.impl.context.Context;
 public class JPAEntityVariableType implements VariableType {
 
   public static final String TYPE_NAME = "jpa-entity";
+
+  public static final String CONFIG_CLASS_NAME = "className";
+  public static final String CONFIG_ENTITY_ID_STRING = "entityId";
 
   private JPAEntityMappings mappings;
 
@@ -87,8 +92,12 @@ public class JPAEntityVariableType implements VariableType {
     }
   }
 
-  public Object getRawValue(ValueFields valueFields) {
-    return valueFields.getTextValue() + ":" + valueFields.getTextValue2();
+  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
+    SerializedVariableValueImpl result = new SerializedVariableValueImpl();
+    result.setConfigValue(CONFIG_CLASS_NAME, valueFields.getTextValue());
+    result.setConfigValue(CONFIG_ENTITY_ID_STRING, valueFields.getTextValue2());
+
+    return result;
   }
 
 }

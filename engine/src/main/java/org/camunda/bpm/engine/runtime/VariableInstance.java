@@ -77,4 +77,10 @@ public interface VariableInstance {
    * @return an error message indicating why the variable value could not be loaded.
    */
   String getErrorMessage();
+
+  /**
+   * Returns the value of this variable in its serialized form, represented by a
+   * {@link SerializedVariableValue}.
+   */
+  SerializedVariableValue getSerializedValue();
 }

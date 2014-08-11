@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+
 
 
 /**
@@ -36,6 +38,6 @@ public interface VariableType {
   boolean isAbleToStore(Object value);
   void setValue(Object value, ValueFields valueFields);
   Object getValue(ValueFields valueFields);
-  Object getRawValue(ValueFields valueFields);
+  SerializedVariableValue getSerializedValue(ValueFields valueFields);
 
 }

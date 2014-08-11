@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 
 
 /**
@@ -165,6 +166,10 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
     this.variableType = variableType;
   }
 
+  public SerializedVariableValue getSerializedValue() {
+    return variableType.getSerializedValue(this);
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -188,4 +193,5 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
            + ", timestamp=" + timestamp
            + "]";
   }
+
 }

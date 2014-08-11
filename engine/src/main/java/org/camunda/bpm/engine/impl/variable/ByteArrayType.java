@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.impl.variable;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.runtime.SerializedVariableValueImpl;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 
 /**
  * @author Tom Baeyens
@@ -63,7 +65,14 @@ public class ByteArrayType implements VariableType {
     return "Binary";
   }
 
-  public Object getRawValue(ValueFields valueFields) {
-    return getValue(valueFields);
+  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
+    SerializedVariableValueImpl result = new SerializedVariableValueImpl();
+
+    ByteArrayEntity byteArrayValue = valueFields.getByteArrayValue();
+    if (byteArrayValue != null) {
+      result.setValue(byteArrayValue.getBytes());
+    }
+
+    return result;
   }
 }

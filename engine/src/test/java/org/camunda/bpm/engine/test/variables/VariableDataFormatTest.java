@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.variables;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.impl.spin.SpinVariableTypeResolver;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.variable.SerializableType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.DummySerializable;
@@ -74,7 +76,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     VariableInstanceEntity variableEntity = (VariableInstanceEntity) beanVariable;
     assertEquals(JSON_FORMAT_NAME, variableEntity.getDataFormatId());
 
-    String persistedValue = (String) variableEntity.getRawValue();
+    String persistedValue = (String) variableEntity.getSerializedValue().getValue();
     String expectedJson = bean.toExpectedJsonString();
     JSONAssert.assertEquals(expectedJson, persistedValue, true);
 
@@ -104,7 +106,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     VariableInstanceEntity variableEntity = (VariableInstanceEntity) beansVariable;
     assertEquals(JSON_FORMAT_NAME, variableEntity.getDataFormatId());
 
-    String persistedValue = (String) variableEntity.getRawValue();
+    String persistedValue = (String) variableEntity.getSerializedValue().getValue();
     String expectedJson = toExpectedJsonArray(beans);
     JSONAssert.assertEquals(expectedJson, persistedValue, true);
 
@@ -169,7 +171,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     // currently internal API
     VariableInstanceEntity variableEntity = (VariableInstanceEntity) beansVariable;
-    String rawJson = (String) variableEntity.getRawValue();
+    String rawJson = (String) variableEntity.getSerializedValue().getValue();
     JSONAssert.assertEquals(toExpectedJsonArray(lengthExceedingBeans), rawJson, true);
   }
 
@@ -244,6 +246,28 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     assertEquals("The global configuration should have been applied to the variable type's format",
         "aValue", dataFormat.mapper().getConfiguration().get("aKey"));
+  }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testGetSerializedVariableValue() throws JSONException {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    SimpleBean bean = new SimpleBean("a String", 42, true);
+    runtimeService.setVariable(instance.getId(), "simpleBean", bean);
+
+    VariableInstance beanVariable = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(beanVariable);
+    assertEquals(SpinSerializationType.TYPE_NAME, beanVariable.getTypeName());
+
+    SerializedVariableValue serializedVariable = beanVariable.getSerializedValue();
+
+    Map<String, Object> config = serializedVariable.getConfig();
+    assertEquals(2, config.size());
+    assertEquals(JSON_FORMAT_NAME, config.get(SpinSerializationType.CONFIG_DATA_FORMAT_ID));
+    assertEquals(bean.getClass().getCanonicalName(), config.get(SpinSerializationType.CONFIG_TYPE));
+
+    String variableAsJson = (String) serializedVariable.getValue();
+    JSONAssert.assertEquals(bean.toExpectedJsonString(), variableAsJson, true);
   }
 
   protected void assertListsEqual(List<SimpleBean> expectedBeans, List<SimpleBean> actualBeans) {

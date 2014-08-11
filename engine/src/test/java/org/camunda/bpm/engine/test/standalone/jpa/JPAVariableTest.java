@@ -33,8 +33,11 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.variable.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.EntityManagerSessionFactory;
+import org.camunda.bpm.engine.impl.variable.JPAEntityVariableType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.variables.SimpleBean;
 
 
 /**
@@ -180,17 +183,19 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     manager.close();
   }
 
-  public void setupQueryJPAEntity() {
-    EntityManager manager = entityManagerFactory.createEntityManager();
-    manager.getTransaction().begin();
+  public void setupQueryJPAEntity(long id) {
+    if (entityToQuery == null) {
+      EntityManager manager = entityManagerFactory.createEntityManager();
+      manager.getTransaction().begin();
 
-    entityToQuery = new FieldAccessJPAEntity();
-    entityToQuery.setId(2L);
-    manager.persist(entityToQuery);
+      entityToQuery = new FieldAccessJPAEntity();
+      entityToQuery.setId(id);
+      manager.persist(entityToQuery);
 
-    manager.flush();
-    manager.getTransaction().commit();
-    manager.close();
+      manager.flush();
+      manager.getTransaction().commit();
+      manager.close();
+    }
   }
 
   public void setupJPAEntityToUpdate() {
@@ -391,7 +396,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
 
   @Deployment
   public void testQueryJPAVariable() {
-    setupQueryJPAEntity();
+    setupQueryJPAEntity(2L);
 
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("entityToQuery", entityToQuery);
@@ -455,5 +460,23 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     Object updatedEntity = runtimeService.getVariable(processInstance.getId(), "entityToUpdate");
     assertTrue(updatedEntity instanceof FieldAccessJPAEntity);
     assertEquals("updatedValue", ((FieldAccessJPAEntity)updatedEntity).getValue());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml")
+  public void testGetSerializedValue() {
+    setupQueryJPAEntity(4L);
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    runtimeService.setVariable(instance.getId(), "short-variable", entityToQuery);
+
+    SerializedVariableValue variableValue = runtimeService.createVariableInstanceQuery().singleResult().getSerializedValue();
+
+    assertNotNull(variableValue);
+    assertNull(variableValue.getValue());
+    assertEquals(2, variableValue.getConfig().size());
+
+    assertEquals(entityToQuery.getClass().getCanonicalName(), variableValue.getConfig().get(JPAEntityVariableType.CONFIG_CLASS_NAME));
+    assertEquals(Long.toString(entityToQuery.getId()), variableValue.getConfig().get(JPAEntityVariableType.CONFIG_ENTITY_ID_STRING));
   }
 }

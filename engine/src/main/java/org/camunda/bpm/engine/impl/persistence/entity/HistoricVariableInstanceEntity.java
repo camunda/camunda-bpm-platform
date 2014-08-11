@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
+import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 
 /**
  * @author Christian Lipphardt (camunda)
@@ -338,8 +339,8 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.dataFormatId = dataFormatId;
   }
 
-  public Object getRawValue() {
-    return variableType.getRawValue(this);
+  public SerializedVariableValue getSerializedValue() {
+    return variableType.getSerializedValue(this);
   }
 
 }
