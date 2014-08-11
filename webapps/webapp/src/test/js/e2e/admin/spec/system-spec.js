@@ -14,16 +14,17 @@ describe('system page -', function() {
 
       // when
       systemPage.navigateToWebapp('Admin');
-      systemPage.authentication.userLogin('demo', 'demo');
+      systemPage.authentication.userLogin('jonny1', 'jonny1');
       systemPage.selectNavbarItem('System');
 
       // then
       systemPage.general.isActive();
-      systemPage.general.loggedInUser('demo');
+      systemPage.general.loggedInUser('jonny1');
       expect(systemPage.pageHeader()).toBe('System Settings');
     });
 
   });
+
 
   describe('system sub pages', function() {
 
@@ -45,7 +46,7 @@ describe('system page -', function() {
     });
 
 
-    it('should license key page', function() {
+    xit('should validate license key page', function() {
 
       // when
       systemPage.selectSystemNavbarItem('License Key');
@@ -53,6 +54,16 @@ describe('system page -', function() {
       // then
       systemPage.licenseKey.isActive();
       expect(systemPage.licenseKey.boxHeader()).toBe('License Key');
+    });
+
+  });
+
+
+  describe('end test', function() {
+
+    it('should logout', function() {
+
+      systemPage.logout();
     });
 
   });

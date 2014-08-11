@@ -25,6 +25,7 @@ describe('authorizations page -', function() {
 
   });
 
+
   describe('authorizations sub pages', function() {
 
     beforeEach(function() {
@@ -91,6 +92,16 @@ describe('authorizations page -', function() {
       authorizationsPage.user.isActive();
       expect(authorizationsPage.user.createNewButton().isEnabled()).toBe(true);
       expect(authorizationsPage.user.boxHeader()).toBe('User Authorizations');
+    });
+
+  });
+
+
+  describe('end test', function() {
+
+    it('should logout', function() {
+
+      authorizationsPage.logout();
     });
 
   });
