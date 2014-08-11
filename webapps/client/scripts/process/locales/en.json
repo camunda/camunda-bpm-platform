@@ -1,6 +1,10 @@
 {
   "PROCESS_NAME":
                         "Process name",
+  "PROCESS_START_OK":
+                        "The process has been started.",
+  "PROCESS_START_ERROR":
+                        "The process could not be started.",
   "SEARCH_PROCESS_BY_NAME":
                         "Search by process name, case sensitive.",
   "START_PROCESS":

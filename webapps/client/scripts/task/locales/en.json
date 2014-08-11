@@ -56,10 +56,10 @@
   "DELEGATE_OK":
         "The task has been delegated.",
 
-  "ASSIGNEE_ERROR":
-        "An error happend while delegating the task.",
-  "ASSIGNEE_OK":
-        "The task has been delegated.",
+  "ASSIGNED_ERROR":
+        "An error happend while assigning the task.",
+  "ASSIGNED_OK":
+        "The task has been assigned.",
 
   "COMPLETE_ERROR":
         "An error happend while submitting the task form.",

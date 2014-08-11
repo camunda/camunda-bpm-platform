@@ -2,10 +2,14 @@
 
 
 define([
-           'angular', 'angular-bootstrap',
-           'camunda-tasklist-ui/api',
-           'text!camunda-tasklist-ui/process/start.html'
-], function(angular) {
+  'angular',
+  'text!camunda-tasklist-ui/process/start.html',
+  'camunda-tasklist-ui/api',
+  'angular-bootstrap'
+], function(
+  angular,
+  templateStartForm
+) {
 
   var processModule = angular.module('cam.tasklist.process', [
     'cam.tasklist.client',
@@ -17,17 +21,40 @@ define([
   processModule.controller('processStartModalFormCtrl', [
     '$scope',
     '$q',
+    '$translate',
     'camAPI',
     'CamForm',
     'Notifications',
   function(
     $scope,
     $q,
+    $translate,
     camAPI,
     CamForm,
     Notifications
   ) {
     var $ = angular.element;
+
+
+
+    function errorNotification(src, err) {
+      $translate(src).then(function(translated) {
+        Notifications.addError({
+          status: translated,
+          message: (err ? err.message : '')
+        });
+      });
+    }
+
+    function successNotification(src) {
+      $translate(src).then(function(translated) {
+        Notifications.addMessage({
+          duration: 3000,
+          status: translated
+        });
+      });
+    }
+
 
     var ProcessDefinition = camAPI.resource('process-definition');
 
@@ -60,10 +87,6 @@ define([
 
       cb(result);
     }
-
-    // function loadError(err) {
-    //   $scope.loadingProcesses = false;
-    // }
 
     // used by the pagination directive
     $scope.currentPage = 1;
@@ -143,8 +166,6 @@ define([
             return 1;
           return 0;
         });
-        // $scope.$apply(function() {
-        // });
       });
     };
     $scope.loadProcesses();
@@ -193,8 +214,6 @@ define([
           // generic form
         }
       });
-      // $scope.variables = [];
-      // $scope.addVariable();
     };
 
 
@@ -224,32 +243,14 @@ define([
 
       function submitCb(err, res) {
         if (err) {
-          Notifications.addError(err);
+          errorNotification('PROCESS_START_ERROR', err);
           throw err;
         }
-
-        Notifications.addMessage({
-          text: 'The process has been started.'
-        });
+        successNotification('PROCESS_START_OK');
         close(res);
       }
 
-      var vars = {};
-      if (!$scope.startingProcess._form) {
-        angular.forEach($scope.variables, function(val) {
-          if (val.name[0] !== '$' && val.name) {
-            vars[val.name] = {type: val.type, value: val.value};
-          }
-        });
-
-        ProcessDefinition.submit({
-          key: $scope.startingProcess.key,
-          variables: vars
-        }, submitCb);
-      }
-      else {
-        $scope.startingProcess._form.submit(submitCb);
-      }
+      $scope.startingProcess._form.submit(submitCb);
     };
   }]);
 
@@ -261,7 +262,7 @@ define([
       $modal.open({
         size: 'lg',
         controller: 'processStartModalFormCtrl',
-        template: require('text!camunda-tasklist-ui/process/start.html')
+        template: templateStartForm
       });
     };
   }]);

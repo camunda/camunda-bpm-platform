@@ -48,27 +48,12 @@ define([
 
         scope.sorting.$on('sorting.order.change', loadItems);
 
+
         function setCurrentTask(task) {
-          task._embedded = task._embedded || {};
-          // if (!task._embedded.processDefinition) {
-          //   task._embedded.processDefinition = taskProcessDefinition(task);
-          // }
           $rootScope.currentTask = task;
           $rootScope.$broadcast('tasklist.task.current');
         }
 
-        // function taskProcessDefinition(task) {
-        //   if (task._embedded && task._embedded.processDefinition) {
-        //     return task._embedded.processDefinition;
-        //   }
-
-        //   for (var p in scope.processDefinitions) {
-        //     var procDef = scope.processDefinitions[p];
-        //     if (procDef.id === task.processDefinitionId) {
-        //       return procDef;
-        //     }
-        //   }
-        // }
 
         function loadItems() {
           scope.loading = true;
