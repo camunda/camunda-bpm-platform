@@ -21,6 +21,9 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotAllowedException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.rest.dto.runtime.CaseExecutionTriggerDto;
 import org.camunda.bpm.engine.rest.dto.runtime.CaseInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.TriggerVariableValueDto;
@@ -72,8 +75,19 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
       initializeCommand(commandBuilder, triggerDto, "complete");
 
       commandBuilder.complete();
+
+    } catch (NotFoundException e) {
+      throwInvalidRequestException("complete", Status.NOT_FOUND, e);
+
+    } catch (NotValidException e) {
+      throwInvalidRequestException("complete", Status.BAD_REQUEST, e);
+
+    } catch (NotAllowedException e) {
+      throwInvalidRequestException("complete", Status.BAD_REQUEST, e);
+
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot complete case instance with id '" + caseInstanceId + "'.");
+      throwRestException("complete", Status.INTERNAL_SERVER_ERROR, e);
+
     }
   }
 
@@ -85,9 +99,31 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
       initializeCommand(commandBuilder, triggerDto, "close");
 
       commandBuilder.close();
+
+    } catch (NotFoundException e) {
+      throwInvalidRequestException("close", Status.NOT_FOUND, e);
+
+    } catch (NotValidException e) {
+      throwInvalidRequestException("close", Status.BAD_REQUEST, e);
+
+    } catch (NotAllowedException e) {
+      throwInvalidRequestException("close", Status.BAD_REQUEST, e);
+
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot close case instance with id '" + caseInstanceId + "'.");
+      throwRestException("close", Status.INTERNAL_SERVER_ERROR, e);
+
     }
+
+  }
+
+  protected void throwInvalidRequestException(String transition, Status status, ProcessEngineException cause) {
+    String errorMessage = String.format("Cannot %s case instance %s: %s", transition, caseInstanceId, cause.getMessage());
+    throw new InvalidRequestException(status, cause, errorMessage);
+  }
+
+  protected void throwRestException(String transition, Status status, ProcessEngineException cause) {
+    String errorMessage = String.format("Cannot %s case instance %s: %s", transition, caseInstanceId, cause.getMessage());
+    throw new RestException(status, cause, errorMessage);
   }
 
   protected void initializeCommand(CaseExecutionCommandBuilder commandBuilder, CaseExecutionTriggerDto triggerDto, String transition) {

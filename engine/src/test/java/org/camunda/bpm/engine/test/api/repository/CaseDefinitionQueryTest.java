@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.api.repository;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
@@ -134,7 +135,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.deploymentId(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
   }
 
   public void testQueryByName() {
@@ -162,7 +163,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionName(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
   }
 
   public void testQueryByNameLike() {
@@ -185,7 +186,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionNameLike(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
   }
 
   public void testQueryByKey() {
@@ -215,7 +216,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionKey(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
   }
 
   public void testQueryByKeyLike() {
@@ -238,7 +239,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionKeyLike(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
   }
 
   public void testQueryByCategory() {
@@ -261,7 +262,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionCategory(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
   }
 
   public void testQueryByCategoryLike() {
@@ -289,7 +290,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionCategoryLike(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
   }
 
   public void testQueryByVersion() {
@@ -317,12 +318,12 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionVersion(-1);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
     try {
       query.caseDefinitionVersion(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
   }
 
   public void testQueryByLatest() {
@@ -353,7 +354,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
         .latestVersion()
         .list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
     try {
       query
@@ -361,7 +362,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
         .latestVersion()
         .list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
     try {
       query
@@ -369,7 +370,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
         .latestVersion()
         .list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
     try {
       query
@@ -377,7 +378,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
         .latestVersion()
         .list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
     try {
       query
@@ -385,7 +386,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
         .latestVersion()
         .list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
   }
 
   public void testQuerySorting() {

@@ -19,6 +19,8 @@ import java.util.List;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -284,7 +286,14 @@ public interface RepositoryService {
    *
    * @param caseDefinitionId the id of the Case Definition for which the {@link CmmnModelInstance}
    *  should be retrieved.
+   *
    * @return the {@link CmmnModelInstance}
+   *
+   * @throws NotValidException when the given case definition id or deployment id or resource name is null
+   * @throws NotFoundException when no CMMN model instance or deployment resource is found for the given
+   *     case definition id
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   CmmnModelInstance getCmmnModelInstance(String caseDefinitionId);
 
@@ -329,6 +338,11 @@ public interface RepositoryService {
 
   /**
    * Returns the {@link CaseDefinition}.
+   *
+   * @throws NotValidException when the given case definition id is null
+   * @throws NotFoundException when no case definition is found for the given case definition id
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   CaseDefinition getCaseDefinition(String caseDefinitionId);
 
@@ -338,8 +352,10 @@ public interface RepositoryService {
    *
    * @param caseDefinitionId
    *          id of a {@link CaseDefinition}, cannot be null.
-   * @throws ProcessEngineException
-   *           when the case model doesn't exist.
+   *
+   * @throws NotValidException when the given case definition id or deployment id or resource name is null
+   * @throws NotFoundException when no case definition or deployment resource is found for the given case definition id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
   InputStream getCaseModel(String caseDefinitionId);
 

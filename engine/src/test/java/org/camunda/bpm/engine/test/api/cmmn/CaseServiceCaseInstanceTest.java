@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotAllowedException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -73,14 +76,14 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
           .withCaseDefinitionByKey("invalid")
           .create();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (NotFoundException e) { }
 
     try {
       caseService
           .withCaseDefinitionByKey(null)
           .create();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (NotValidException e) { }
 
   }
 
@@ -128,14 +131,14 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
           .withCaseDefinition("invalid")
           .create();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (NotFoundException e) { }
 
     try {
       caseService
           .withCaseDefinition(null)
           .create();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (NotValidException e) { }
 
   }
 
@@ -417,7 +420,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
         .withCaseExecution(caseInstanceId)
         .manualStart();
       fail("It should not be possible to start a case instance manually.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
 
   }
@@ -443,7 +446,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
         .withCaseExecution(caseInstanceId)
         .disable();
       fail("It should not be possible to disable a case instance.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -468,7 +471,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
         .withCaseExecution(caseInstanceId)
         .reenable();
       fail("It should not be possible to re-enable a case instance.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 

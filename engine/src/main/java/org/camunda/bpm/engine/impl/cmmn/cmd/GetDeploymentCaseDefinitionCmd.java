@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -33,6 +36,8 @@ public class GetDeploymentCaseDefinitionCmd implements Command<CaseDefinition>, 
   }
 
   public CaseDefinition execute(CommandContext commandContext) {
+    ensureNotNull(NullValueException.class, "caseDefinitionId", caseDefinitionId);
+
     return Context
       .getProcessEngineConfiguration()
       .getDeploymentCache()

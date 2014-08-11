@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -311,7 +311,7 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .reenable();
       fail("It should not be possible to re-enable an enabled process task.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -363,7 +363,7 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .reenable();
       fail("It should not be possible to re-enable an active process task.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -402,7 +402,7 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .disable();
       fail("It should not be possible to disable a already disabled process task.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -425,7 +425,7 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .disable();
       fail("It should not be possible to disable an active process task.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -445,7 +445,7 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .manualStart();
       fail("It should not be possible to start a disabled process task manually.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -468,7 +468,7 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .manualStart();
       fail("It should not be possible to start an already active process task manually.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -491,7 +491,7 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .complete();
       fail("It should not be possible to complete a process task, while the process instance is still running.");
-    } catch (Exception e) {}
+    } catch (NotAllowedException e) {}
 
   }
 
@@ -564,10 +564,10 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .complete();
       fail("Should not be able to complete an enabled process task.");
-    } catch (ProcessEngineException e) {}
+    } catch (NotAllowedException e) {}
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskAndOneHumanTaskCase.cmmn"})
   public void testCompleteADisabledProcessTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -583,7 +583,7 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .complete();
       fail("Should not be able to complete a disabled process task.");
-    } catch (ProcessEngineException e) {}
+    } catch (NotAllowedException e) {}
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn"})
@@ -598,7 +598,7 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .close();
       fail("It should not be possible to close a process task.");
-    } catch (ProcessEngineException e) {
+    } catch (NotAllowedException e) {
 
     }
 

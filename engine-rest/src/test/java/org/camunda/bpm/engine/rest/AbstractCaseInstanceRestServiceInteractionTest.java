@@ -40,6 +40,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableNameDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -811,7 +812,7 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
 
   @Test
   public void testUnsuccessfulComplete() {
-    doThrow(new ProcessEngineException("expected exception")).when(caseExecutionCommandBuilderMock).complete();
+    doThrow(new NotValidException("expected exception")).when(caseExecutionCommandBuilderMock).complete();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
@@ -821,7 +822,7 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", containsString("Cannot complete case instance with id '" + MockProvider.EXAMPLE_CASE_INSTANCE_ID + "'."))
+        .body("message", containsString("Cannot complete case instance " + MockProvider.EXAMPLE_CASE_INSTANCE_ID + ": expected exception"))
     .when()
       .post(CASE_INSTANCE_COMPLETE_URL);
 
@@ -1194,7 +1195,7 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
 
   @Test
   public void testUnsuccessfulClose() {
-    doThrow(new ProcessEngineException("expected exception")).when(caseExecutionCommandBuilderMock).close();
+    doThrow(new NotValidException("expected exception")).when(caseExecutionCommandBuilderMock).close();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
@@ -1204,7 +1205,7 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", containsString("Cannot close case instance with id '" + MockProvider.EXAMPLE_CASE_INSTANCE_ID + "'."))
+        .body("message", containsString("Cannot close case instance " + MockProvider.EXAMPLE_CASE_INSTANCE_ID + ": expected exception"))
     .when()
       .post(CASE_INSTANCE_CLOSE_URL);
 

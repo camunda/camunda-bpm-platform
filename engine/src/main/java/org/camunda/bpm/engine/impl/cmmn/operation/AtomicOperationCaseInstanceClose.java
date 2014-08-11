@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.CLOS
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Roman Smirnov
@@ -34,15 +33,10 @@ public class AtomicOperationCaseInstanceClose extends AbstractCmmnEventAtomicOpe
   }
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
-    try {
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
-      behavior.onClose(execution);
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    behavior.onClose(execution);
 
-      execution.setCurrentState(CLOSED);
-    } catch (RuntimeException e) {
-      String id = execution.getId();
-      throw new PvmException("Cannot close case instance '"+id+"'.", e);
-    }
+    execution.setCurrentState(CLOSED);
 
     return execution;
   }

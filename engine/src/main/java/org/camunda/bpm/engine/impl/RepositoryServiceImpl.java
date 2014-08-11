@@ -19,6 +19,12 @@ import java.util.List;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
+import org.camunda.bpm.engine.exception.cmmn.CmmnModelInstanceNotFoundException;
 import org.camunda.bpm.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.AddIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
@@ -179,7 +185,19 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public CmmnModelInstance getCmmnModelInstance(String caseDefinitionId) {
-    return commandExecutor.execute(new GetDeploymentCmmnModelInstanceCmd(caseDefinitionId));
+    try {
+      return commandExecutor.execute(new GetDeploymentCmmnModelInstanceCmd(caseDefinitionId));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CmmnModelInstanceNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    } catch (DeploymentResourceNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
   }
 
   public void addCandidateStarterUser(String processDefinitionId, String userId) {
@@ -203,11 +221,33 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public CaseDefinition getCaseDefinition(String caseDefinitionId) {
-    return commandExecutor.execute(new GetDeploymentCaseDefinitionCmd(caseDefinitionId));
+    try {
+      return commandExecutor.execute(new GetDeploymentCaseDefinitionCmd(caseDefinitionId));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseDefinitionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
   }
 
   public InputStream getCaseModel(String caseDefinitionId) {
-    return commandExecutor.execute(new GetDeploymentCaseModelCmd(caseDefinitionId));
+    try {
+      return commandExecutor.execute(new GetDeploymentCaseModelCmd(caseDefinitionId));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseDefinitionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    } catch (DeploymentResourceNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
+
   }
 
 }

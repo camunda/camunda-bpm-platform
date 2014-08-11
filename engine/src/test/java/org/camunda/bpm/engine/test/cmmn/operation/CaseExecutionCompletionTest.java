@@ -14,7 +14,8 @@ package org.camunda.bpm.engine.test.cmmn.operation;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.camunda.bpm.engine.ProcessEngineException;
+
+import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
@@ -199,7 +200,7 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
       // completing task A
       taskA.complete();
       fail("It should not be possible to complete an enabled task.");
-    } catch (ProcessEngineException e) {
+    } catch (CaseIllegalStateTransitionException e) {
       // then
 
       // task A is still enabled
@@ -250,7 +251,7 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
       // completing task A
       taskA.manualComplete();
       fail("It should not be possible to complete an enabled task.");
-    } catch (ProcessEngineException e) {
+    } catch (CaseIllegalStateTransitionException e) {
       // then
 
       // task A is still enabled
@@ -304,7 +305,7 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
       // complete A
       taskA.complete();
       fail("It should not be possible to complete an already completed task.");
-    } catch (ProcessEngineException e) {
+    } catch (CaseIllegalStateTransitionException e) {
       // then
 
       // task A is still completed
@@ -358,7 +359,7 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
       // complete A
       taskA.manualComplete();
       fail("It should not be possible to complete an already completed task.");
-    } catch (ProcessEngineException e) {
+    } catch (CaseIllegalStateTransitionException e) {
       // then
 
       // task A is still completed
@@ -411,7 +412,7 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
       // complete A
       taskA.complete();
       fail("It should not be possible to complete an already completed task.");
-    } catch (ProcessEngineException e) {
+    } catch (CaseIllegalStateTransitionException e) {
       // then
 
       // task A is still completed
@@ -463,7 +464,7 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
       // complete A
       taskA.manualComplete();
       fail("It should not be possible to complete an already completed task.");
-    } catch (ProcessEngineException e) {
+    } catch (CaseIllegalStateTransitionException e) {
       // then
 
       // task A is still completed
@@ -756,7 +757,7 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
       // when
       caseInstance.complete();
       fail("It should not be possible to complete a case instance containing an active task.");
-    } catch (ProcessEngineException e) {
+    } catch (CaseIllegalStateTransitionException e) {
       // then
 
       // the case instance is still active
@@ -808,7 +809,7 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
       // when
       caseInstance.manualComplete();
       fail("It should not be possible to complete a case instance containing an active task.");
-    } catch (ProcessEngineException e) {
+    } catch (CaseIllegalStateTransitionException e) {
       // then
 
       // the case instance is still active
@@ -861,7 +862,7 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
       // when
       caseInstance.complete();
       fail("It should not be possible to complete an already completed case instance.");
-    } catch (ProcessEngineException e) {
+    } catch (CaseIllegalStateTransitionException e) {
       // then
 
       // the case instance is still completed
@@ -914,7 +915,7 @@ public class CaseExecutionCompletionTest extends PvmTestCase {
       // when
       caseInstance.manualComplete();
       fail("It should not be possible to complete an already completed case instance.");
-    } catch (ProcessEngineException e) {
+    } catch (CaseIllegalStateTransitionException e) {
       // then
 
       // the case instance is still completed

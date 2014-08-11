@@ -15,6 +15,8 @@ package org.camunda.bpm.engine;
 import java.util.Collection;
 import java.util.Map;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
@@ -37,6 +39,7 @@ public interface CaseService {
    * <p>Starts a new case instance with the latest version of the corresponding case definition.</p>
    *
    * @param caseDefinitionKey the key of a case definition to create a new case instance of, cannot be null
+   *
    * @return a {@link CaseInstanceBuilder fluent builder} for defining a new case instance
    */
   CaseInstanceBuilder withCaseDefinitionByKey(String caseDefinitionKey);
@@ -47,6 +50,7 @@ public interface CaseService {
    * <p>Starts a new case instance with the case definition version corresponding to the given id.</p>
    *
    * @param caseDefinitionId the id of a case definition to create a new case instance, cannot be null
+   *
    * @return a {@link CaseInstanceBuilder fluent builder} for defining a new case instance
    */
   CaseInstanceBuilder withCaseDefinition(String caseDefinitionId);
@@ -67,6 +71,7 @@ public interface CaseService {
    * <p>Define a command to be executed for a {@link CaseExecution} using a fluent builder.</p>
    *
    * @param caseExecutionId the id of a case execution to define a command for it
+   *
    * @return a {@link CaseExecutionCommandBuilder fluent builder} for defining a command
    *         for a case execution
    */
@@ -79,8 +84,12 @@ public interface CaseService {
    * using {@link #getVariables(String, Collection)} for better performance.</p>
    *
    * @param caseExecutionId the id of a case instance or case execution, cannot be null
+   *
    * @return the variables or an empty map if no such variables are found
-   * @throws ProcessEngineException when no case execution is found for the given case execution id
+   *
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the given case execution id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
   Map<String, Object> getVariables(String caseExecutionId);
 
@@ -92,8 +101,12 @@ public interface CaseService {
    * using {@link #getVariablesLocal(String, Collection)} for better performance.</p>
    *
    * @param caseExecutionId the id of a case execution, cannot be null
+   *
    * @return the variables or an empty map if no such variables are found
-   * @throws ProcessEngineException when no case execution is found for the given case execution id
+   *
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the given case execution id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
   Map<String, Object> getVariablesLocal(String caseExecutionId);
 
@@ -104,8 +117,12 @@ public interface CaseService {
    *
    * @param caseExecutionId the id of a case instance or case execution, cannot be null
    * @param variableNames the collection of variable names that should be retrieved
+   *
    * @return the variables or an empty map if no such variables are found
-   * @throws ProcessEngineException when no case execution is found for the given case execution id
+   *
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the given case execution id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
   Map<String, Object> getVariables(String caseExecutionId, Collection<String> variableNames);
 
@@ -115,8 +132,12 @@ public interface CaseService {
    *
    * @param caseExecutionId the id of a case execution, cannot be null
    * @param variableNames the collection of variable names that should be retrieved
+   *
    * @return the variables or an empty map if no such variables are found
-   * @throws ProcessEngineException when no case execution is found for the given case execution id
+   *
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the given case execution id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
   Map<String, Object> getVariablesLocal(String caseExecutionId, Collection<String> variableNames);
 
@@ -129,8 +150,12 @@ public interface CaseService {
    *
    * @param caseExecutionId the id of a case instance or case execution, cannot be null
    * @param variableName the name of a variable, cannot be null
+   *
    * @return the variable value or null if the variable is undefined or the value of the variable is null
-   * @throws ProcessEngineException when no case execution is found for the given case execution id
+   *
+   * @throws NotValidException when the given case execution id or variable name is null
+   * @throws NotFoundException when no case execution is found for the given case execution id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
   Object getVariable(String caseExecutionId, String variableName);
 
@@ -145,7 +170,10 @@ public interface CaseService {
    * @param variableName the name of a variable, cannot be null
    *
    * @return the variable value or null if the variable is undefined or the value of the variable is null
-   * @throws ProcessEngineException when no case execution is found for the given case execution id
+   *
+   * @throws NotValidException when the given case execution id or variable name is null
+   * @throws NotFoundException when no case execution is found for the given case execution id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
   Object getVariableLocal(String caseExecutionId, String variableName);
 }

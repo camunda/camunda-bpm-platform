@@ -18,7 +18,6 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISA
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Roman Smirnov
@@ -35,17 +34,10 @@ public class AtomicOperationCaseExecutionDisable extends AbstractCmmnEventAtomic
   }
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
-    try {
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    behavior.onDisable(execution);
 
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
-      behavior.onDisable(execution);
-
-      execution.setCurrentState(DISABLED);
-
-    } catch (RuntimeException e) {
-      String id = execution.getId();
-      throw new PvmException("Cannot disable case execution '"+id+"'.", e);
-    }
+    execution.setCurrentState(DISABLED);
 
     return execution;
   }

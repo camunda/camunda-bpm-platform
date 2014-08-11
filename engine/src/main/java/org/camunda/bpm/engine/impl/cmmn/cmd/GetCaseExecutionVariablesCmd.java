@@ -12,15 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.cmmn.CaseExecutionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -41,13 +44,13 @@ public class GetCaseExecutionVariablesCmd implements Command<Map<String, Object>
   }
 
   public Map<String, Object> execute(CommandContext commandContext) {
-    ensureNotNull("caseExecutionId", caseExecutionId);
+    ensureNotNull(NullValueException.class, "caseExecutionId", caseExecutionId);
 
     CaseExecutionEntity caseExecution = commandContext
       .getCaseExecutionManager()
       .findCaseExecutionById(caseExecutionId);
 
-    ensureNotNull("case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
+    ensureNotNull(CaseExecutionNotFoundException.class, "case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
 
     Map<String, Object> caseExecutionVariables;
 

@@ -12,9 +12,13 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -22,8 +26,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.query.QueryProperty;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -82,7 +84,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
 
   @SuppressWarnings("unchecked")
   public T direction(Direction direction) {
-    ensureNotNull("You should call any of the orderBy methods first before specifying a direction", "orderProperty", orderProperty);
+    ensureNotNull(NotValidException.class, "You should call any of the orderBy methods first before specifying a direction", "orderProperty", orderProperty);
     addOrder(orderProperty.getName(), direction.getName());
     orderProperty = null;
     return (T) this;
@@ -90,7 +92,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
 
   protected void checkQueryOk() {
     if (orderProperty != null) {
-      throw new ProcessEngineException("Invalid query: call asc() or desc() after using orderByXX()");
+      throw new NotValidException("Invalid query: call asc() or desc() after using orderByXX()");
     }
   }
 

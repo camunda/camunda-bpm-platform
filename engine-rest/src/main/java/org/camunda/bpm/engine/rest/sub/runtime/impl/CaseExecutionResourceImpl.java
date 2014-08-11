@@ -21,6 +21,9 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotAllowedException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.rest.dto.runtime.CaseExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.CaseExecutionTriggerDto;
 import org.camunda.bpm.engine.rest.dto.runtime.TriggerVariableValueDto;
@@ -73,8 +76,18 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
 
       commandBuilder.manualStart();
 
+    } catch (NotFoundException e) {
+      throwInvalidRequestException("manualStart", Status.NOT_FOUND, e);
+
+    } catch (NotValidException e) {
+      throwInvalidRequestException("manualStart", Status.BAD_REQUEST, e);
+
+    } catch (NotAllowedException e) {
+      throwInvalidRequestException("manualStart", Status.BAD_REQUEST, e);
+
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot start case execution with id '" + caseExecutionId + "' manually.");
+      throwRestException("manualStart", Status.INTERNAL_SERVER_ERROR, e);
+
     }
 
   }
@@ -88,9 +101,20 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
 
       commandBuilder.disable();
 
+    } catch (NotFoundException e) {
+      throwInvalidRequestException("disable", Status.NOT_FOUND, e);
+
+    } catch (NotValidException e) {
+      throwInvalidRequestException("disable", Status.BAD_REQUEST, e);
+
+    } catch (NotAllowedException e) {
+      throwInvalidRequestException("disable", Status.BAD_REQUEST, e);
+
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot disable case execution with id '" + caseExecutionId + "'.");
+      throwRestException("disable", Status.INTERNAL_SERVER_ERROR, e);
+
     }
+
   }
 
   public void reenable(CaseExecutionTriggerDto triggerDto) {
@@ -101,8 +125,19 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
       initializeCommand(commandBuilder, triggerDto, "reenable");
 
       commandBuilder.reenable();
+
+    } catch (NotFoundException e) {
+      throwInvalidRequestException("reenable", Status.NOT_FOUND, e);
+
+    } catch (NotValidException e) {
+      throwInvalidRequestException("reenable", Status.BAD_REQUEST, e);
+
+    } catch (NotAllowedException e) {
+      throwInvalidRequestException("reenable", Status.BAD_REQUEST, e);
+
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot re-enable case execution with id '" + caseExecutionId + "'.");
+      throwRestException("reenable", Status.INTERNAL_SERVER_ERROR, e);
+
     }
   }
 
@@ -114,9 +149,30 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
       initializeCommand(commandBuilder, triggerDto, "complete");
 
       commandBuilder.complete();
+
+    } catch (NotFoundException e) {
+      throwInvalidRequestException("complete", Status.NOT_FOUND, e);
+
+    } catch (NotValidException e) {
+      throwInvalidRequestException("complete", Status.BAD_REQUEST, e);
+
+    } catch (NotAllowedException e) {
+      throwInvalidRequestException("complete", Status.BAD_REQUEST, e);
+
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot complete case execution with id '" + caseExecutionId + "'.");
+      throwRestException("complete", Status.INTERNAL_SERVER_ERROR, e);
+
     }
+  }
+
+  protected void throwInvalidRequestException(String transition, Status status, ProcessEngineException cause) {
+    String errorMessage = String.format("Cannot %s case execution %s: %s", transition, caseExecutionId, cause.getMessage());
+    throw new InvalidRequestException(status, cause, errorMessage);
+  }
+
+  protected void throwRestException(String transition, Status status, ProcessEngineException cause) {
+    String errorMessage = String.format("Cannot %s case execution %s: %s", transition, caseExecutionId, cause.getMessage());
+    throw new RestException(status, cause, errorMessage);
   }
 
   protected void initializeCommand(CaseExecutionCommandBuilder commandBuilder, CaseExecutionTriggerDto triggerDto, String transition) {

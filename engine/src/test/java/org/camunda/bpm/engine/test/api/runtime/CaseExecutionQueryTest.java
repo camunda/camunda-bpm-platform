@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
@@ -109,7 +110,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionKey(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -147,7 +148,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionId(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -185,7 +186,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceId(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -207,7 +208,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceBusinessKey(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -272,7 +273,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseExecutionId(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -299,7 +300,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.activityId(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -623,7 +624,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.variableValueGreaterThan("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -652,7 +653,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.variableValueGreaterThan("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -776,7 +777,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.variableValueGreaterThanOrEqual("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -811,7 +812,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.variableValueGreaterThanOrEqual("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -965,7 +966,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.variableValueLessThan("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -994,7 +995,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.variableValueLessThan("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -1118,7 +1119,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.variableValueLessThanOrEqual("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -1153,7 +1154,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.variableValueLessThanOrEqual("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -1307,7 +1308,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.variableValueLike("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -1617,7 +1618,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceVariableValueGreaterThan("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -1646,7 +1647,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceVariableValueGreaterThan("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -1770,7 +1771,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceVariableValueGreaterThanOrEqual("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -1805,7 +1806,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceVariableValueGreaterThanOrEqual("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -1959,7 +1960,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceVariableValueLessThan("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -1988,7 +1989,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceVariableValueLessThan("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -2112,7 +2113,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceVariableValueLessThanOrEqual("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -2147,7 +2148,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceVariableValueLessThanOrEqual("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -2301,7 +2302,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceVariableValueLike("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 

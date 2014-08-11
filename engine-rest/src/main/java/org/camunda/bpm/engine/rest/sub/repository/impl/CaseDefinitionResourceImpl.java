@@ -26,6 +26,9 @@ import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.exception.NotAllowedException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
@@ -60,13 +63,20 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
   public CaseDefinitionDto getCaseDefinition() {
     RepositoryService repositoryService = engine.getRepositoryService();
 
-    CaseDefinition definition;
+    CaseDefinition definition = null;
 
     try {
       definition = repositoryService.getCaseDefinition(caseDefinitionId);
 
+    } catch (NotFoundException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e, e.getMessage());
+
+    } catch (NotValidException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());
+
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND, e, "No matching definition with id " + caseDefinitionId);
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e);
+
     }
 
     return CaseDefinitionDto.fromCaseDefinition(definition);
@@ -81,8 +91,14 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
       byte[] caseModel = IoUtil.readInputStream(caseModelInputStream, "caseModelCmmnXml");
       return CaseDefinitionDiagramDto.create(caseDefinitionId, new String(caseModel, "UTF-8"));
 
+    } catch (NotFoundException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e, e.getMessage());
+
+    } catch (NotValidException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());
+
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "No matching definition with id " + caseDefinitionId);
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e);
 
     } catch (UnsupportedEncodingException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e);
@@ -106,6 +122,18 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
           .businessKey(businessKey)
           .setVariables(variables)
           .create();
+
+    } catch (NotFoundException e) {
+      String errorMessage = String.format("Cannot instantiate case definition %s: %s", caseDefinitionId, e.getMessage());
+      throw new InvalidRequestException(Status.NOT_FOUND, e, errorMessage);
+
+    } catch (NotValidException e) {
+      String errorMessage = String.format("Cannot instantiate case definition %s: %s", caseDefinitionId, e.getMessage());
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, errorMessage);
+
+    } catch (NotAllowedException e) {
+      String errorMessage = String.format("Cannot instantiate case definition %s: %s", caseDefinitionId, e.getMessage());
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, errorMessage);
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot instantiate case definition %s: %s", caseDefinitionId, e.getMessage());

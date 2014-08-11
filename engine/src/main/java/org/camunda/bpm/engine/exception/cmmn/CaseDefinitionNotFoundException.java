@@ -10,28 +10,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmmn.behavior;
+package org.camunda.bpm.engine.exception.cmmn;
 
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
+ * <p>This is exception is thrown when a specific case definition is not found.</p>
+ *
  * @author Roman Smirnov
  *
  */
-public class EventListenerActivityBehavior extends EventListenerOrMilestoneActivityBehavior {
+public class CaseDefinitionNotFoundException extends CaseException {
 
-  public void created(CmmnActivityExecution execution) {
-    // TODO: implement this:
+  private static final long serialVersionUID = 1L;
 
-    // (1) in case of a UserEventListener there is nothing to do!
-
-    // (2) in case of TimerEventListener we have to check
-    // whether the timer must be triggered, when a transition
-    // on another plan item or case file item happens!
+  public CaseDefinitionNotFoundException() {
   }
 
-  protected String getTypeName() {
-    return "event listener";
+  public CaseDefinitionNotFoundException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public CaseDefinitionNotFoundException(String message) {
+    super(message);
+  }
+
+  public CaseDefinitionNotFoundException(Throwable cause) {
+    super(cause);
   }
 
 }

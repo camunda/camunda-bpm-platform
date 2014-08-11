@@ -12,15 +12,22 @@
  */
 package org.camunda.bpm.engine.impl.cmmn;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import org.camunda.bpm.engine.exception.NotAllowedException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
+import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
 import org.camunda.bpm.engine.impl.cmmn.cmd.CreateCaseInstanceCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -50,7 +57,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
 
   private CaseInstanceBuilderImpl(String caseDefinitionKey, String caseDefinitionId) {
     this.caseDefinitionKey = caseDefinitionKey;
-    this.caseDefinitionId= caseDefinitionId;
+    this.caseDefinitionId = caseDefinitionId;
   }
 
   public CaseInstanceBuilder businessKey(String businessKey) {
@@ -59,7 +66,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
   }
 
   public CaseInstanceBuilder setVariable(String variableName, Object variableValue) {
-    ensureNotNull("variableName", variableName);
+    ensureNotNull(NotValidException.class, "variableName", variableName);
     if (variables == null) {
       variables = new HashMap<String, Object>();
     }
@@ -78,11 +85,23 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
   }
 
   public CaseInstance create() {
-    CreateCaseInstanceCmd command = new CreateCaseInstanceCmd(this);
-    if(commandExecutor != null) {
-      return commandExecutor.execute(command);
-    } else {
-      return command.execute(commandContext);
+    try {
+      CreateCaseInstanceCmd command = new CreateCaseInstanceCmd(this);
+      if(commandExecutor != null) {
+        return commandExecutor.execute(command);
+      } else {
+        return command.execute(commandContext);
+      }
+
+    } catch (CaseDefinitionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseIllegalStateTransitionException e) {
+      throw new NotAllowedException(e.getMessage(), e);
+
     }
   }
 

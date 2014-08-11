@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTI
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Roman Smirnov
@@ -34,17 +33,10 @@ public class AtomicOperationCaseExecutionReactivate extends AbstractCmmnEventAto
   }
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
-    try {
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
-      behavior.onReactivation(execution);
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    behavior.onReactivation(execution);
 
-      execution.setCurrentState(ACTIVE);
-
-    } catch (RuntimeException e) {
-      String id = execution.getId();
-      throw new PvmException("Cannot re-activate case execution '"+id+"'.", e);
-    }
-
+    execution.setCurrentState(ACTIVE);
 
     return execution;
   }

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.cmmn.processtask;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -1412,8 +1413,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(processTaskId)
         .complete();
       fail("It should not be possible to complete a process task, while the process instance is running.");
-    } catch (ProcessEngineException e) {}
-
+    } catch (NotAllowedException e) {}
 
     // complete ////////////////////////////////////////////////////////
 
@@ -1492,10 +1492,10 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     closeCaseInstance(caseInstanceId);
     assertCaseEnded(caseInstanceId);
-    
+
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    
+
     assertProcessEnded(processInstance.getId());
 
   }

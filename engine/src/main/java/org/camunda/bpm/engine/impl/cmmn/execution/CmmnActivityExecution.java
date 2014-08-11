@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
+import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -114,10 +115,6 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    *
    * @param activities a collection of {@link CmmnActivity activities} of planned items
    *                   to execute inside <code>this</code> case execution
-   *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
-   *         is not <code>ACTIVE</code>.
-   *
    */
   void createChildExecutions(List<CmmnActivity> activities);
 
@@ -130,8 +127,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p>It is only possible to enable a case execution which is associated with a
    * {@link Stage} or {@link Task}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not {@link CaseExecutionState#AVAILABLE}.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void enable();
 
@@ -149,8 +148,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * disabled. This can lead to a completion of the parent case execution, for more
    * details when the parent case execution can be completed see {@link #complete()}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not {@link CaseExecutionState#ENABLED}.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void disable();
 
@@ -163,8 +164,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p>It is only possible to re-enable a case execution which is associated with a
    * {@link Stage} or {@link Task}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not {@link CaseExecutionState#DISABLED}.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void reenable();
 
@@ -177,8 +180,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p>It is only possible to start a case execution manually which is associated with a
    * {@link Stage} or {@link Task}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not {@link CaseExecutionState#ENABLED}.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void manualStart();
 
@@ -191,8 +196,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p>It is only possible to start a case execution which is associated with a
    * {@link Stage} or {@link Task}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not {@link CaseExecutionState#AVAILABLE}.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void start();
 
@@ -255,9 +262,11 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    *  </ul>
    * </p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not {@link CaseExecutionState#ACTIVE} or when the case execution cannot be
    *         completed.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void complete();
 
@@ -296,9 +305,11 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    *  </ul>
    * </p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not {@link CaseExecutionState#ACTIVE} or when the case execution cannot be
    *         completed.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void manualComplete();
 
@@ -321,8 +332,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * the parent case execution, for more details when the parent case execution can
    * be completed see {@link #complete()}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not {@link CaseExecutionState#AVAILABLE}.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void occur();
 
@@ -345,8 +358,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * terminated. This can lead to a completion of the parent case execution, for more
    * details when the parent case execution can be completed see {@link #complete()}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void terminate();
 
@@ -360,8 +375,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p>It is only possible to execute a parent termination on a case execution which is
    * associated with a {@link EventListener} or {@link Milestone}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void parentTerminate();
 
@@ -391,8 +408,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * terminated. This can lead to a completion of the parent case execution, for more
    * details when the parent case execution can be completed see {@link #complete()}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void exit();
 
@@ -410,8 +429,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * will be propagated down to all its contained {@link EventListener EventListener}, {@link Milestone},
    * {@link Stage}, and {@link Task} instances.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void suspend();
 
@@ -431,8 +452,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p>It is only possible to execute a parent suspension on a case execution which is
    * associated with a {@link Stage} or {@link Task}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void parentSuspend();
 
@@ -448,8 +471,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * will be propagated down to all its contained {@link EventListener EventListener}, {@link Milestone},
    * {@link Stage}, and {@link Task} instances.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void resume();
 
@@ -465,8 +490,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p>It is only possible to execute a parent resume on a case execution which is
    * associated with a {@link Stage} or {@link Task}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void parentResume();
 
@@ -491,8 +518,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * {@link Milestone}, {@link Stage}, and {@link Task} instances, see {@link #resume()} and
    * {@link #parentResume()}.</p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void reactivate();
 
@@ -510,8 +539,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * </ul>
    * </p>
    *
-   * @throws ProcessEngineException will be thrown, if <code>this</code> case execution
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void close();
 

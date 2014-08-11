@@ -10,28 +10,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmmn.behavior;
+package org.camunda.bpm.engine.exception;
 
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+import org.camunda.bpm.engine.BadUserRequestException;
 
 /**
+ * <p>This exception is thrown, if an entity (case execution, case definition) is not found.</p>
+ *
  * @author Roman Smirnov
  *
  */
-public class EventListenerActivityBehavior extends EventListenerOrMilestoneActivityBehavior {
+public class NotFoundException extends BadUserRequestException {
 
-  public void created(CmmnActivityExecution execution) {
-    // TODO: implement this:
+  private static final long serialVersionUID = 1L;
 
-    // (1) in case of a UserEventListener there is nothing to do!
-
-    // (2) in case of TimerEventListener we have to check
-    // whether the timer must be triggered, when a transition
-    // on another plan item or case file item happens!
+  public NotFoundException() {
   }
 
-  protected String getTypeName() {
-    return "event listener";
+  public NotFoundException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public NotFoundException(String message) {
+    super(message);
+  }
+
+  public NotFoundException(Throwable cause) {
+    super(cause);
   }
 
 }

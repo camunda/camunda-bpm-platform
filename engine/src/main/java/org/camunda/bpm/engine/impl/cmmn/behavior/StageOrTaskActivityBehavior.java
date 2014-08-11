@@ -12,12 +12,17 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAILABLE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
+
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.*;
 
 /**
  * @author Roman Smirnov
@@ -94,25 +99,31 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
   }
 
   public void onParentTermination(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition parentTerminate on a task or a stage.");
+    String id = execution.getId();
+    String message = "It is not possible to parentTerminate case execution '"+id+"' which associated with a "+getTypeName()+".";
+    throwIllegalStateTransitionException("parentTerminate", message, execution);
   }
 
   public void onExit(CmmnActivityExecution execution) {
     String id = execution.getId();
 
     if (execution.isTerminated()) {
-      throw new ProcessEngineException("Case execution '"+id+"' is already terminated.");
+      String message = "Case execution '"+id+"' is already terminated.";
+      throwIllegalStateTransitionException("exit", message, execution);
     }
 
     if (execution.isCompleted()) {
-      String message = "Case execution '"+id+"' must be available|enabled|disabled|active|failed|suspended to exit it, but was completed.";
-      throw new ProcessEngineException(message);
+      String message = "Case execution '"+id+"' must be {available|enabled|disabled|active|failed|suspended} to exit it, but was completed.";
+      throwIllegalStateTransitionException("exit", message, execution);
     }
+
     terminating(execution);
   }
 
   public void onOccur(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition occur on a task or a stage.");
+    String id = execution.getId();
+    String message = "It is not possible to occur case execution '"+id+"' which associated with a "+getTypeName()+".";
+    throwIllegalStateTransitionException("occur", message, execution);
   }
 
   public void onSuspension(CmmnActivityExecution execution) {
@@ -126,13 +137,15 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     String id = execution.getId();
 
     if (execution.isSuspended()) {
-      throw new ProcessEngineException("Case execution '"+id+"' is already suspended.");
+      String message = "Case execution '"+id+"' is already suspended.";
+      throwIllegalStateTransitionException("parentSuspend", message, execution);
     }
 
     if (execution.isCompleted() || execution.isTerminated()) {
-      String message = "Case execution '"+id+"' must be available|enabled|disabled|active to suspend it, but was completed or terminated.";
-      throw new ProcessEngineException(message);
+      String message = "Case execution '"+id+"' must be {available|enabled|disabled|active} to suspend it, but was "+execution.getCurrentState()+".";
+      throwIllegalStateTransitionException("parentSuspend", message, execution);
     }
+
     suspending(execution);
   }
 
@@ -143,7 +156,9 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     CmmnActivityExecution parent = execution.getParent();
     if (parent != null) {
       if (!parent.isActive()) {
-        throw new ProcessEngineException("It is not possible to resume a case execution which parent is not active.");
+        String id = execution.getId();
+        String message = "It is not possible to resume case execution '"+id+"' which parent is not active.";
+        throwIllegalStateTransitionException("resume", message, execution);
       }
     }
 
@@ -153,17 +168,18 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
   public void onParentResume(CmmnActivityExecution execution) {
     ensureNotCaseInstance(execution, "parentResume");
+    String id = execution.getId();
 
     if (!execution.isSuspended()) {
-      String id = execution.getId();
-      String message = "Case execution '"+id+"' must be available|enabled|disabled|active to suspend it, but was completed or terminated.";
-      throw new ProcessEngineException(message);
+      String message = "Case execution '"+id+"' must be suspended to resume it, but was "+execution.getCurrentState()+".";
+      throwIllegalStateTransitionException("parentResume", message, execution);
     }
 
     CmmnActivityExecution parent = execution.getParent();
     if (parent != null) {
       if (!parent.isActive()) {
-        throw new ProcessEngineException("It is not possible to resume a case execution which parent is not active.");
+        String message = "It is not possible to resume case execution '"+id+"' which parent is not active.";
+        throwIllegalStateTransitionException("parentResume", message, execution);
       }
     }
 
@@ -171,7 +187,7 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
   }
 
-  public void started(CmmnActivityExecution execution) throws Exception {
+  public void started(CmmnActivityExecution execution) {
     // only perform start behavior, when this case execution is
     // still active.
     // it can happen that a exit sentry will be triggered, so that
@@ -183,5 +199,7 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
   }
 
   protected abstract void performStart(CmmnActivityExecution execution);
+
+  protected abstract String getTypeName();
 
 }

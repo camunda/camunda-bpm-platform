@@ -17,6 +17,9 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotAllowedException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.ProcessTask;
@@ -81,9 +84,11 @@ public interface CaseExecutionCommandBuilder {
    *
    * @param variableName the name of the variable to set
    * @param variableValue the value of the variable to set
+   *
    * @return the builder
-   * @throws ProcessEngineException when the same variable should be removed in the
-   *         same command
+   *
+   * @throws NotValidException when the given variable name is null or the same variable
+   *   should be removed in the same command
    */
   CaseExecutionCommandBuilder setVariable(String variableName, Object variableValue);
 
@@ -95,8 +100,10 @@ public interface CaseExecutionCommandBuilder {
    * <p>Invoking this method multiple times allows passing multiple variables.</p>
    *
    * @param variables the map of variables
+   *
    * @return the builder
-   * @throws ProcessEngineException when one of the passed variables should be removed
+   *
+   * @throws NotValidException when one of the passed variables should be removed
    *         in the same command
    */
   CaseExecutionCommandBuilder setVariables(Map<String, Object> variables);
@@ -108,9 +115,11 @@ public interface CaseExecutionCommandBuilder {
    *
    * @param variableName the name of the variable to set
    * @param variableValue the value of the variable to set
+   *
    * @return the builder
-   * @throws ProcessEngineException when the same variable should be removed in the
-   *         same command
+   *
+   * @throws NotValidException when the given variable name is null or the same variable
+   *   should be removed in the same command
    */
   CaseExecutionCommandBuilder setVariableLocal(String variableName, Object variableValue);
 
@@ -120,8 +129,10 @@ public interface CaseExecutionCommandBuilder {
    * <p>Invoking this method multiple times allows passing multiple variables.</p>
    *
    * @param variables the map of variables
+   *
    * @return the builder
-   * @throws ProcessEngineException when one of the passed variables should be removed
+   *
+   * @throws NotValidException when one of the passed variables should be removed
    *         in the same command
    */
   CaseExecutionCommandBuilder setVariablesLocal(Map<String, Object> variables);
@@ -132,9 +143,11 @@ public interface CaseExecutionCommandBuilder {
    * <p>Invoking this method multiple times allows passing multiple variable names.</p>
    *
    * @param variableName the name of a variable to remove
+   *
    * @return the builder
-   * @throws ProcessEngineException when the same variable should be set in the
-   *         same command
+   *
+   * @throws NotValidException when the given variable name is null or the same variable
+   *         should be set in the same command
    */
   CaseExecutionCommandBuilder removeVariable(String variableName);
 
@@ -145,8 +158,10 @@ public interface CaseExecutionCommandBuilder {
    * <p>Invoking this method multiple times allows passing multiple variable names.</p>
    *
    * @param variableNames a collection of names of variables to remove
+   *
    * @return the builder
-   * @throws ProcessEngineException when one of the passed variables should be removed
+   *
+   * @throws NotValidException when one of the passed variables should be removed
    *         in the same command
    */
   CaseExecutionCommandBuilder removeVariables(Collection<String> variableNames);
@@ -158,9 +173,11 @@ public interface CaseExecutionCommandBuilder {
    * <p>Invoking this method multiple times allows passing multiple variable names.</p>
    *
    * @param variableName the name of a variable to remove
+   *
    * @return the builder
-   * @throws ProcessEngineException when the same variable should be set in the
-   *         same command
+   *
+   * @throws NotValidException when the given variable name is null or the same
+   *         variable should be set in same command
    */
   CaseExecutionCommandBuilder removeVariableLocal(String variableName);
 
@@ -171,8 +188,10 @@ public interface CaseExecutionCommandBuilder {
    * <p>Invoking this method multiple times allows passing multiple variable names.</p>
    *
    * @param variableNames a collection of names of variables to remove
+   *
    * @return the builder
-   * @throws ProcessEngineException when one of the passed variables should be removed
+   *
+   * @throws NotValidException when one of the passed variables should be removed
    *         in the same command
    */
   CaseExecutionCommandBuilder removeVariablesLocal(Collection<String> variableNames);
@@ -197,12 +216,11 @@ public interface CaseExecutionCommandBuilder {
    *   </li>
    * </ol>
    *
-   *
-   * @throws ProcessEngineException this exception will be thrown
-   *  <ul>
-   *    <li>when the passed case execution id is null or</li>
-   *    <li>when no case execution is found for the given case execution id</li>
-   *  </ul>
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void execute();
 
@@ -222,13 +240,13 @@ public interface CaseExecutionCommandBuilder {
    *   </ul>
    * </p>
    *
-   * @throws ProcessEngineException this exception will be thrown
-   *  <ul>
-   *    <li>when the passed case execution id is null or</li>
-   *    <li>when no case execution is found for the given case execution id or</li>
-   *    <li>when the transition is not allowed to be done or</li>
-   *    <li>when the case execution is a case instance</li>
-   *  </ul>
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws NotAllowedException when the transition is not allowed to be done or
+   *      when the case execution is a case instance
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void manualStart();
 
@@ -246,13 +264,13 @@ public interface CaseExecutionCommandBuilder {
    * disabled. This can lead to a completion of the parent case execution if
    * the completion criteria are fulfilled.</p>
    *
-   * @throws ProcessEngineException this exception will be thrown
-   *  <ul>
-   *    <li>when the passed case execution id is null or</li>
-   *    <li>when no case execution is found for the given case execution id or</li>
-   *    <li>when the transition is not allowed to be done or</li>
-   *    <li>when the case execution is a case instance</li>
-   *  </ul>
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws NotAllowedException when the transition is not allowed to be done or
+   *      when the case execution is a case instance
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void disable();
 
@@ -265,13 +283,13 @@ public interface CaseExecutionCommandBuilder {
    * that the with the case execution related {@link Stage} or {@link Task} is waiting
    * for a decision to become <code>ACTIVE</code> or <code>DISABLED</code> once again.</p>
    *
-   * @throws ProcessEngineException this exception will be thrown
-   *  <ul>
-   *    <li>when the passed case execution id is null or</li>
-   *    <li>when no case execution is found for the given case execution id or</li>
-   *    <li>when the transition is not allowed to be done or</li>
-   *    <li>when the case execution is a case instance</li>
-   *  </ul>
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws NotAllowedException when the transition is not allowed to be done or
+   *      when the case execution is a case instance
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void reenable();
 
@@ -301,12 +319,12 @@ public interface CaseExecutionCommandBuilder {
    * completed. This can lead to a completion of the parent case execution if
    * the completion criteria are fulfilled.</p>
    *
-   * @throws ProcessEngineException this exception will be thrown
-   *  <ul>
-   *    <li>when the passed case execution id is null or</li>
-   *    <li>when no case execution is found for the given case execution id or</li>
-   *    <li>when the transition is not allowed to be done or</li>
-   *  </ul>
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws NotAllowedException when the transition is not allowed to be done
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void complete();
 
@@ -316,13 +334,12 @@ public interface CaseExecutionCommandBuilder {
    * associated case instance. Therefore there happens a transition from the
    * state <code>COMPLETED</code> to state <code>CLOSED</code>.</p>
    *
-   * @throws ProcessEngineException this exception will be thrown
-   *  <ul>
-   *    <li>when the passed case execution id is null or</li>
-   *    <li>when no case execution (ie. case instance) is found for the given
-   *        case execution id or</li>
-   *    <li>when the transition is not allowed to be done</li>
-   *  </ul>
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws NotAllowedException when the transition is not allowed to be done
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
    */
   void close();
 

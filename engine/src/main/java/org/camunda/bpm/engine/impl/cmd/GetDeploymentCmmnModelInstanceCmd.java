@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.cmmn.CmmnModelInstanceNotFoundException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -33,14 +35,14 @@ public class GetDeploymentCmmnModelInstanceCmd implements Command<CmmnModelInsta
   }
 
   public CmmnModelInstance execute(CommandContext commandContext) {
-    ensureNotNull("caseDefinitionId", caseDefinitionId);
+    ensureNotNull(NullValueException.class, "caseDefinitionId", caseDefinitionId);
 
     CmmnModelInstance modelInstance = Context
         .getProcessEngineConfiguration()
         .getDeploymentCache()
         .findCmmnModelInstanceForCaseDefinition(caseDefinitionId);
 
-    ensureNotNull("no CMMN model instance found for case definition id " + caseDefinitionId, "modelInstance", modelInstance);
+    ensureNotNull(CmmnModelInstanceNotFoundException.class, "No CMMN model instance found for case definition id " + caseDefinitionId, "modelInstance", modelInstance);
     return modelInstance;
   }
 

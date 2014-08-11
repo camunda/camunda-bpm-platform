@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -81,11 +83,11 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testDeleteDeploymentSkipCustomListeners() {
-    DeploymentBuilder deploymentBuilder = 
+    DeploymentBuilder deploymentBuilder =
         repositoryService
           .createDeployment()
           .addClasspathResource("org/camunda/bpm/engine/test/api/repository/RepositoryServiceTest.testDeleteProcessInstanceSkipCustomListeners.bpmn20.xml");
-    
+
     String deploymentId = deploymentBuilder.deploy().getId();
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -93,11 +95,11 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deploymentId, true, false);
     assertTrue(TestExecutionListener.collectedEvents.size() == 1);
     TestExecutionListener.reset();
-    
+
     deploymentId = deploymentBuilder.deploy().getId();
 
     runtimeService.startProcessInstanceByKey("testProcess");
-    
+
     repositoryService.deleteDeployment(deploymentId, true, true);
     assertTrue(TestExecutionListener.collectedEvents.size() == 0);
     TestExecutionListener.reset();
@@ -304,15 +306,15 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   public void testGetCaseDefinitionByInvalidId() {
     try {
       repositoryService.getCaseDefinition("invalid");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
       assertTextPresent("no deployed case definition found with id 'invalid'", e.getMessage());
     }
 
     try {
       repositoryService.getCaseDefinition(null);
       fail();
-    } catch (ProcessEngineException e) {
-      assertTextPresent("Invalid case definition id: caseDefinitionId is null", e.getMessage());
+    } catch (NotValidException e) {
+      assertTextPresent("caseDefinitionId is null", e.getMessage());
     }
   }
 
@@ -345,8 +347,8 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     try {
       repositoryService.getCaseModel(null);
       fail();
-    } catch (ProcessEngineException e) {
-      assertTextPresent("The case definition id is mandatory, but 'null' has been provided.", e.getMessage());
+    } catch (NotValidException e) {
+      assertTextPresent("caseDefinitionId is null", e.getMessage());
     }
   }
 

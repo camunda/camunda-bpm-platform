@@ -16,6 +16,10 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.cmmn.CaseExecutionNotFoundException;
 import org.camunda.bpm.engine.impl.ServiceImpl;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetCaseExecutionVariableCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetCaseExecutionVariablesCmd;
@@ -53,27 +57,83 @@ public class CaseServiceImpl extends ServiceImpl implements CaseService {
   }
 
   public Map<String, Object> getVariables(String caseExecutionId) {
-    return commandExecutor.execute(new GetCaseExecutionVariablesCmd(caseExecutionId, null, false));
+    try {
+      return commandExecutor.execute(new GetCaseExecutionVariablesCmd(caseExecutionId, null, false));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseExecutionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
   }
 
   public Map<String, Object> getVariablesLocal(String caseExecutionId) {
-    return commandExecutor.execute(new GetCaseExecutionVariablesCmd(caseExecutionId, null, true));
+    try {
+      return commandExecutor.execute(new GetCaseExecutionVariablesCmd(caseExecutionId, null, true));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseExecutionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
   }
 
   public Map<String, Object> getVariables(String caseExecutionId, Collection<String> variableNames) {
-    return commandExecutor.execute(new GetCaseExecutionVariablesCmd(caseExecutionId, variableNames, false));
+    try {
+      return commandExecutor.execute(new GetCaseExecutionVariablesCmd(caseExecutionId, variableNames, false));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseExecutionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
+
   }
 
   public Map<String, Object> getVariablesLocal(String caseExecutionId, Collection<String> variableNames) {
-    return commandExecutor.execute(new GetCaseExecutionVariablesCmd(caseExecutionId, variableNames, true));
+    try {
+      return commandExecutor.execute(new GetCaseExecutionVariablesCmd(caseExecutionId, variableNames, true));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseExecutionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
   }
 
   public Object getVariable(String caseExecutionId, String variableName) {
-    return commandExecutor.execute(new GetCaseExecutionVariableCmd(caseExecutionId, variableName, false));
+    try {
+      return commandExecutor.execute(new GetCaseExecutionVariableCmd(caseExecutionId, variableName, false));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseExecutionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
+
   }
 
   public Object getVariableLocal(String caseExecutionId, String variableName) {
-    return commandExecutor.execute(new GetCaseExecutionVariableCmd(caseExecutionId, variableName, true));
+    try {
+      return commandExecutor.execute(new GetCaseExecutionVariableCmd(caseExecutionId, variableName, true));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseExecutionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
   }
 
 }

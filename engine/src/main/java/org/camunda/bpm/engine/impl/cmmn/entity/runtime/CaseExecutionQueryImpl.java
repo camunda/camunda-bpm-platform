@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.QueryOperator;
@@ -53,37 +54,37 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   }
 
   public CaseExecutionQuery caseInstanceId(String caseInstanceId) {
-    ensureNotNull("caseInstanceId", caseInstanceId);
+    ensureNotNull(NotValidException.class, "caseInstanceId", caseInstanceId);
     this.caseInstanceId = caseInstanceId;
     return this;
   }
 
   public CaseExecutionQuery caseDefinitionId(String caseDefinitionId) {
-    ensureNotNull("caseDefinitionId", caseDefinitionId);
+    ensureNotNull(NotValidException.class, "caseDefinitionId", caseDefinitionId);
     this.caseDefinitionId = caseDefinitionId;
     return this;
   }
 
   public CaseExecutionQuery caseDefinitionKey(String caseDefinitionKey) {
-    ensureNotNull("caseDefinitionKey", caseDefinitionKey);
+    ensureNotNull(NotValidException.class, "caseDefinitionKey", caseDefinitionKey);
     this.caseDefinitionKey = caseDefinitionKey;
     return this;
   }
 
   public CaseExecutionQuery caseInstanceBusinessKey(String caseInstanceBusinessKey) {
-    ensureNotNull("caseInstanceBusinessKey", caseInstanceBusinessKey);
+    ensureNotNull(NotValidException.class, "caseInstanceBusinessKey", caseInstanceBusinessKey);
     this.businessKey = caseInstanceBusinessKey;
     return this;
   }
 
   public CaseExecutionQuery caseExecutionId(String caseExecutionId) {
-    ensureNotNull("caseExecutionId", caseExecutionId);
+    ensureNotNull(NotValidException.class, "caseExecutionId", caseExecutionId);
     this.caseExecutionId = caseExecutionId;
     return this;
   }
 
   public CaseExecutionQuery activityId(String activityId) {
-    ensureNotNull("activityId", activityId);
+    ensureNotNull(NotValidException.class, "activityId", activityId);
     this.activityId = activityId;
     return this;
   }

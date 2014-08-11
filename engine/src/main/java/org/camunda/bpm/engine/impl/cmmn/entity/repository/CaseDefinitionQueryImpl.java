@@ -12,16 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.repository;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
+
 import java.util.List;
-import org.camunda.bpm.engine.ProcessEngineException;
+
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -58,58 +60,56 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   // Query parameter //////////////////////////////////////////////////////////////
 
   public CaseDefinitionQuery caseDefinitionId(String caseDefinitionId) {
-    ensureNotNull("caseDefinitionId", caseDefinitionId);
+    ensureNotNull(NotValidException.class, "caseDefinitionId", caseDefinitionId);
     this.id = caseDefinitionId;
     return this;
   }
 
   public CaseDefinitionQuery caseDefinitionCategory(String caseDefinitionCategory) {
-    ensureNotNull("category", caseDefinitionCategory);
+    ensureNotNull(NotValidException.class, "category", caseDefinitionCategory);
     this.category = caseDefinitionCategory;
     return this;
   }
 
   public CaseDefinitionQuery caseDefinitionCategoryLike(String caseDefinitionCategoryLike) {
-    ensureNotNull("categoryLike", caseDefinitionCategoryLike);
+    ensureNotNull(NotValidException.class, "categoryLike", caseDefinitionCategoryLike);
     this.categoryLike = caseDefinitionCategoryLike;
     return this;
   }
 
   public CaseDefinitionQuery caseDefinitionName(String caseDefinitionName) {
-    ensureNotNull("name", caseDefinitionName);
+    ensureNotNull(NotValidException.class, "name", caseDefinitionName);
     this.name = caseDefinitionName;
     return this;
   }
 
   public CaseDefinitionQuery caseDefinitionNameLike(String caseDefinitionNameLike) {
-    ensureNotNull("nameLike", caseDefinitionNameLike);
+    ensureNotNull(NotValidException.class, "nameLike", caseDefinitionNameLike);
     this.nameLike = caseDefinitionNameLike;
     return this;
   }
 
   public CaseDefinitionQuery caseDefinitionKey(String caseDefinitionKey) {
-    ensureNotNull("key", caseDefinitionKey);
+    ensureNotNull(NotValidException.class, "key", caseDefinitionKey);
     this.key = caseDefinitionKey;
     return this;
   }
 
   public CaseDefinitionQuery caseDefinitionKeyLike(String caseDefinitionKeyLike) {
-    ensureNotNull("keyLike", caseDefinitionKeyLike);
+    ensureNotNull(NotValidException.class, "keyLike", caseDefinitionKeyLike);
     this.keyLike = caseDefinitionKeyLike;
     return this;
   }
 
   public CaseDefinitionQuery deploymentId(String deploymentId) {
-    ensureNotNull("deploymentId", deploymentId);
+    ensureNotNull(NotValidException.class, "deploymentId", deploymentId);
     this.deploymentId = deploymentId;
     return this;
   }
 
   public CaseDefinitionQuery caseDefinitionVersion(Integer caseDefinitionVersion) {
-    ensureNotNull("version", caseDefinitionVersion);
-    if (caseDefinitionVersion <= 0) {
-      throw new ProcessEngineException("version must be positive");
-    }
+    ensureNotNull(NotValidException.class, "version", caseDefinitionVersion);
+    ensurePositive("version", caseDefinitionVersion, NotValidException.class);
     this.version = caseDefinitionVersion;
     return this;
   }
@@ -120,13 +120,13 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   }
 
   public CaseDefinitionQuery caseDefinitionResourceName(String resourceName) {
-    ensureNotNull("resourceName", resourceName);
+    ensureNotNull(NotValidException.class, "resourceName", resourceName);
     this.resourceName = resourceName;
     return this;
   }
 
   public CaseDefinitionQuery caseDefinitionResourceNameLike(String resourceNameLike) {
-    ensureNotNull("resourceNameLike", resourceNameLike);
+    ensureNotNull(NotValidException.class, "resourceNameLike", resourceNameLike);
     this.resourceNameLike = resourceNameLike;
     return this;
   }
@@ -182,7 +182,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
     // latest() makes only sense when used with key() or keyLike()
     if (latest && ( (id != null) || (name != null) || (nameLike != null) || (version != null) || (deploymentId != null) ) ){
-      throw new ProcessEngineException("Calling latest() can only be used in combination with key(String) and keyLike(String)");
+      throw new NotValidException("Calling latest() can only be used in combination with key(String) and keyLike(String)");
     }
   }
 

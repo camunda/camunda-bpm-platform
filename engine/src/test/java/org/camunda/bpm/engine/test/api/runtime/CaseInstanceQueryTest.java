@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -138,7 +139,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionKey(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -166,7 +167,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionId(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -215,7 +216,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceBusinessKey(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 
@@ -275,7 +276,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceId(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (NotValidException e) {}
 
   }
 

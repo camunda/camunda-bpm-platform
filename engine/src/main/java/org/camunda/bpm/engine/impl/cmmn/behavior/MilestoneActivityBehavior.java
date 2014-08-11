@@ -33,4 +33,8 @@ public class MilestoneActivityBehavior extends EventListenerOrMilestoneActivityB
     // then perform transition "occur" on given case execution.
   }
 
+  protected String getTypeName() {
+    return "milestone";
+  }
+
 }

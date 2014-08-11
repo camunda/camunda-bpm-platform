@@ -41,4 +41,8 @@ public class TaskActivityBehavior extends StageOrTaskActivityBehavior {
     return false;
   }
 
+  protected String getTypeName() {
+    return "task";
+  }
+
 }

@@ -17,7 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
@@ -55,14 +56,14 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
           .withCaseExecution("invalid")
           .manualStart();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (NotFoundException e) { }
 
     try {
       caseService
         .withCaseExecution(null)
         .manualStart();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (NotValidException e) { }
 
   }
 
@@ -72,7 +73,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .withCaseExecution("invalid")
         .complete();
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
 
     }
 
@@ -81,7 +82,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(null)
         .complete();
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
 
     }
   }
@@ -92,7 +93,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .withCaseExecution("invalid")
         .close();
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
 
     }
 
@@ -101,7 +102,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(null)
         .close();
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
 
     }
   }
@@ -1064,7 +1065,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .removeVariable("aVariableName")
         .setVariable("aVariableName", "xyz")
         .execute();
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
       // then
       assertTextPresent("Cannot set and remove a variable with the same variable name: 'aVariableName' within a command.", e.getMessage());
     }
@@ -1099,7 +1100,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .setVariableLocal("aVariableName", "xyz")
         .removeVariableLocal("aVariableName")
         .execute();
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
       // then
       assertTextPresent("Cannot set and remove a variable with the same variable name: 'aVariableName' within a command.", e.getMessage());
     }
@@ -1145,14 +1146,14 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     try {
       caseService.getVariables("invalid");
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
 
     }
 
     try {
       caseService.getVariables(null);
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
 
     }
   }
@@ -1202,14 +1203,14 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     try {
       caseService.getVariables("invalid", null);
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
 
     }
 
     try {
       caseService.getVariables(null, null);
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
 
     }
   }
@@ -1258,14 +1259,14 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     try {
       caseService.getVariablesLocal("invalid");
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
 
     }
 
     try {
       caseService.getVariablesLocal(null);
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
 
     }
   }
@@ -1318,14 +1319,14 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     try {
       caseService.getVariablesLocal("invalid", null);
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
 
     }
 
     try {
       caseService.getVariablesLocal(null, null);
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
 
     }
   }
@@ -1366,14 +1367,14 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     try {
       caseService.getVariable("invalid", "aVariableName");
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
 
     }
 
     try {
       caseService.getVariable(null, "aVariableName");
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
 
     }
   }
@@ -1417,14 +1418,14 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     try {
       caseService.getVariableLocal("invalid", "aVariableName");
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
 
     }
 
     try {
       caseService.getVariableLocal(null, "aVariableName");
       fail("The case execution should not be found.");
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
 
     }
   }

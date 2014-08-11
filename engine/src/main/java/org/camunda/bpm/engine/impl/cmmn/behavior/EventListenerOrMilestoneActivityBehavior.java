@@ -12,10 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAILABLE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
 
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.*;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
  * @author Roman Smirnov
@@ -24,35 +26,31 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.*;
 public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemDefinitionActivityBehavior {
 
   public void onEnable(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition enable on a event listener or a milestone.");
+    throwIllegalStateTransitionException("enable", execution);
   }
 
   public void onReenable(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition re-enable on a event listener or a milestone.");
+    throwIllegalStateTransitionException("reenable", execution);
   }
 
   public void onDisable(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition disable on a event listener or a milestone.");
+    throwIllegalStateTransitionException("disable", execution);
   }
 
   public void onStart(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition start on a event listener or a milestone.");
+    throwIllegalStateTransitionException("start", execution);
   }
 
   public void onManualStart(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition manualStart on a event listener or a milestone.");
-  }
-
-  public void started(CmmnActivityExecution execution) throws Exception {
-    throw new UnsupportedOperationException("It is not possible to execute the started behavior of a event listener or a milestone.");
+    throwIllegalStateTransitionException("manualStart", execution);
   }
 
   public void onCompletion(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition complete on a event listener or a milestone.");
+    throwIllegalStateTransitionException("complete", execution);
   }
 
   public void onManualCompletion(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition complete on a event listener or a milestone.");
+    throwIllegalStateTransitionException("complete", execution);
   }
 
   public void onTermination(CmmnActivityExecution execution) {
@@ -64,18 +62,19 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
     String id = execution.getId();
 
     if (execution.isTerminated()) {
-      throw new ProcessEngineException("Case execution '"+id+"' is already terminated.");
+      String message = "Case execution '"+id+"' is already terminated.";
+      throwIllegalStateTransitionException("parentTerminate", message, execution);
     }
 
     if (execution.isCompleted()) {
-      String message = "Case execution '"+id+"' must be available or suspended to parentTerminate it, but was completed.";
-      throw new ProcessEngineException(message);
+      String message = "Case execution '"+id+"' must be available or suspended, but was completed.";
+      throwIllegalStateTransitionException("parentTerminate", message, execution);
     }
     terminating(execution);
   }
 
   public void onExit(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition exit on a event listener or a milestone.");
+    throwIllegalStateTransitionException("exit", execution);
   }
 
   public void onOccur(CmmnActivityExecution execution) {
@@ -88,7 +87,7 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
   }
 
   public void onParentSuspension(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition parentSuspend on a event listener or a milestone.");
+    throwIllegalStateTransitionException("parentSuspend", execution);
   }
 
   public void onResume(CmmnActivityExecution execution) {
@@ -97,7 +96,9 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
     CmmnActivityExecution parent = execution.getParent();
     if (parent != null) {
       if (!parent.isActive()) {
-        throw new ProcessEngineException("It is not possible to resume a case execution which parent is not active.");
+        String id = execution.getId();
+        String message = "It is not possible to resume case execution '"+id+"' which parent is not active.";
+        throwIllegalStateTransitionException("resume", message, execution);
       }
     }
 
@@ -105,11 +106,19 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
   }
 
   public void onParentResume(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition parentResume on a event listener or a milestone.");
+    throwIllegalStateTransitionException("parentResume", execution);
   }
 
   public void onReactivation(CmmnActivityExecution execution) {
-    throw new UnsupportedOperationException("It is not possible to execute the transition re-activate on a event listener or a milestone.");
+    throwIllegalStateTransitionException("reactivate", execution);
   }
+
+  protected void throwIllegalStateTransitionException(String transition, CmmnActivityExecution execution) {
+    String id = execution.getId();
+    String message = String.format("It is not possible to %s case execution '%s' which associated with a %s.", transition, id, getTypeName());
+    throwIllegalStateTransitionException(transition, message, execution);
+  }
+
+  protected abstract String getTypeName();
 
 }

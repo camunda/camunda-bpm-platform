@@ -23,13 +23,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -182,7 +185,7 @@ public class DeploymentCache {
 
     }
 
-    ensureNotNull("no deployed case definition found with id '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);
+    ensureNotNull(CaseDefinitionNotFoundException.class, "no deployed case definition found with id '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);
 
     caseDefinition = resolveCaseDefinition(caseDefinition);
 
@@ -198,7 +201,7 @@ public class DeploymentCache {
       .getCaseDefinitionManager()
       .findLatestCaseDefinitionByKey(caseDefinitionKey);
 
-    ensureNotNull("no case definition deployed with key '" + caseDefinitionKey + "'", "caseDefinition", caseDefinition);
+    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key '" + caseDefinitionKey + "'", "caseDefinition", caseDefinition);
 
     caseDefinition = resolveCaseDefinition(caseDefinition);
 
@@ -212,7 +215,7 @@ public class DeploymentCache {
       .getCaseDefinitionManager()
       .findCaseDefinitionByKeyAndVersion(caseDefinitionKey, caseDefinitionVersion);
 
-    ensureNotNull("no case definition deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'", "caseDefinition", caseDefinition);
+    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'", "caseDefinition", caseDefinition);
     caseDefinition = resolveCaseDefinition(caseDefinition);
 
     return caseDefinition;
@@ -224,7 +227,7 @@ public class DeploymentCache {
       .getCaseDefinitionManager()
       .findCaseDefinitionByDeploymentAndKey(deploymentId, caseDefinitionKey);
 
-    ensureNotNull("no case definition deployed with key = '" + caseDefinitionKey + "' in deployment = '" + deploymentId + "'", "caseDefinition", caseDefinition);
+    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key = '" + caseDefinitionKey + "' in deployment = '" + deploymentId + "'", "caseDefinition", caseDefinition);
     caseDefinition = resolveCaseDefinition(caseDefinition);
 
     return caseDefinition;
@@ -337,10 +340,18 @@ public class DeploymentCache {
   }
 
   public void removeDeployment(String deploymentId) {
+    removeAllProcessDefinitionsByDeploymentId(deploymentId);
+    removeAllCaseDefinitionsByDeploymentId(deploymentId);
+  }
+
+  protected void removeAllProcessDefinitionsByDeploymentId(String deploymentId) {
     // remove all process definitions for a specific deployment
-    List<ProcessDefinition> allDefinitionsForDeployment = new ProcessDefinitionQueryImpl(Context.getCommandContext())
-      .deploymentId(deploymentId)
-      .list();
+    CommandContext commandContext = Context.getCommandContext();
+
+    List<ProcessDefinition> allDefinitionsForDeployment = new ProcessDefinitionQueryImpl(commandContext)
+        .deploymentId(deploymentId)
+        .list();
+
     for (ProcessDefinition processDefinition : allDefinitionsForDeployment) {
       try {
         removeProcessDefinition(processDefinition.getId());
@@ -350,6 +361,24 @@ public class DeploymentCache {
 
       }
     }
+  }
 
+  protected void removeAllCaseDefinitionsByDeploymentId(String deploymentId) {
+    // remove all case definitions for a specific deployment
+    CommandContext commandContext = Context.getCommandContext();
+
+    List<CaseDefinition> allDefinitionsForDeployment = new CaseDefinitionQueryImpl(commandContext)
+        .deploymentId(deploymentId)
+        .list();
+
+    for (CaseDefinition caseDefinition : allDefinitionsForDeployment) {
+      try {
+        removeCaseDefinition(caseDefinition.getId());
+
+      } catch(Exception e) {
+        LOGGER.log(Level.WARNING, "Could not remove case definition with id '"+caseDefinition.getId()+"' from the cache.", e);
+
+      }
+    }
   }
 }

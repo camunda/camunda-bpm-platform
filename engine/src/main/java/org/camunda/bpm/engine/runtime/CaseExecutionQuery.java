@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.runtime;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.query.Query;
 
@@ -28,13 +29,19 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Only select case executions which have the given case instance id.
    *
    * @param caseInstanceId the id of the case instance
+   *
+   * @throws NotValidException when the given case instance id is null
+   *
    */
   CaseExecutionQuery caseInstanceId(String caseInstanceId);
 
   /**
    * Only select case executions which have the given case definition id.
    *
-   * @param caseDefinitionId the id of hte case definition
+   * @param caseDefinitionId the id of the case definition
+   *
+   * @throws NotValidException when the given case definition id is null
+   *
    */
   CaseExecutionQuery caseDefinitionId(String caseDefinitionId);
 
@@ -42,6 +49,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Only select case executions which have the given case definition key.
    *
    * @param caseDefinitionKey the key of the case definition
+   *
+   * @throws NotValidException when the given case definition key is null
+   *
    */
   CaseExecutionQuery caseDefinitionKey(String caseDefinitionKey);
 
@@ -49,6 +59,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Only select case executions that belong to a case instance with the given business key
    *
    * @param caseInstanceBusinessKey the business key of the case instance
+   *
+   * @throws NotValidException when the given case instance business key is null
+   *
    */
   CaseExecutionQuery caseInstanceBusinessKey(String caseInstanceBusinessKey);
 
@@ -56,6 +69,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Only select case executions with the given id.
    *
    * @param executionId the id of the case execution
+   *
+   * @throws NotValidException when the given case execution id is null
+   *
    */
   CaseExecutionQuery caseExecutionId(String executionId);
 
@@ -63,6 +79,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * Only select case executions which contain an activity with the given id.
    *
    * @param activityId the id of the activity
+   *
+   * @throws NotValidException when the given activity id is null
+   *
    */
   CaseExecutionQuery activityId(String activityId);
 
@@ -85,6 +104,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable
+   *
+   * @throws NotValidException when the given name is null
+   *
    */
   CaseExecutionQuery variableValueEquals(String name, Object value);
 
@@ -97,6 +119,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable
+   *
+   * @throws NotValidException when the given name is null
+   *
    */
   CaseExecutionQuery variableValueNotEquals(String name, Object value);
 
@@ -109,6 +134,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable, cannot be null
+   *
+   * @throws NotValidException when the given name is null or a null-value or a boolean-value is used
+   *
    */
   CaseExecutionQuery variableValueGreaterThan(String name, Object value);
 
@@ -121,6 +149,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable, cannot be null
+   *
+   * @throws NotValidException when the given name is null or a null-value or a boolean-value is used
+   *
    */
   CaseExecutionQuery variableValueGreaterThanOrEqual(String name, Object value);
 
@@ -132,6 +163,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable, cannot be null
+   *
+   * @throws NotValidException when the given name is null or a null-value or a boolean-value is used
+   *
    */
   CaseExecutionQuery variableValueLessThan(String name, Object value);
 
@@ -143,6 +177,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable, cannot be null
+   *
+   * @throws NotValidException when the given name is null or a null-value or a boolean-value is used
+   *
    */
   CaseExecutionQuery variableValueLessThanOrEqual(String name, Object value);
 
@@ -155,6 +192,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * @param value the value of the variable, cannot be null. The string can include the
    *              wildcard character '%' to express like-strategy:
    *              starts with (string%), ends with (%string) or contains (%string%).
+   *
+   * @throws NotValidException when the given name is null or a null-value or a boolean-value is used
+   *
    */
   CaseExecutionQuery variableValueLike(String name, String value);
 
@@ -168,6 +208,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable
+   *
+   * @throws NotValidException when the given name is null
+   *
    */
   CaseExecutionQuery caseInstanceVariableValueEquals(String name, Object value);
 
@@ -180,6 +223,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable
+   *
+   * @throws NotValidException when the given name is null
+   *
    */
   CaseExecutionQuery caseInstanceVariableValueNotEquals(String name, Object value);
 
@@ -193,6 +239,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable, cannot be null
+   *
+   * @throws NotValidException when the given name is null or a null-value or a boolean-value is used
+   *
    */
   CaseExecutionQuery caseInstanceVariableValueGreaterThan(String name, Object value);
 
@@ -205,6 +254,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable, cannot be null
+   *
+   * @throws NotValidException when the given name is null or a null-value or a boolean-value is used
+   *
    */
   CaseExecutionQuery caseInstanceVariableValueGreaterThanOrEqual(String name, Object value);
 
@@ -217,6 +269,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable, cannot be null
+   *
+   * @throws NotValidException when the given name is null or a null-value or a boolean-value is used
+   *
    */
   CaseExecutionQuery caseInstanceVariableValueLessThan(String name, Object value);
 
@@ -229,6 +284,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    *
    * @param name the name of the variable, cannot be null
    * @param value the value of the variable, cannot be null
+   *
+   * @throws NotValidException when the given name is null or a null-value or a boolean-value is used
+   *
    */
   CaseExecutionQuery caseInstanceVariableValueLessThanOrEqual(String name, Object value);
 
@@ -242,6 +300,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    * @param value the value of the variable, cannot be null. The string can include the
    *              wildcard character '%' to express like-strategy:
    *              starts with (string%), ends with (%string) or contains (%string%).
+   *
+   * @throws NotValidException when the given name is null or a null-value or a boolean-value is used
+   *
    */
   CaseExecutionQuery caseInstanceVariableValueLike(String name, String value);
 

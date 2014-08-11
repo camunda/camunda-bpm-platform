@@ -35,7 +35,7 @@ public interface CmmnActivityBehavior extends CoreActivityBehavior<CmmnActivityE
 
   public void onManualStart(CmmnActivityExecution execution);
 
-  public void started(CmmnActivityExecution execution) throws Exception;
+  public void started(CmmnActivityExecution execution);
 
   public void onCompletion(CmmnActivityExecution execution);
 

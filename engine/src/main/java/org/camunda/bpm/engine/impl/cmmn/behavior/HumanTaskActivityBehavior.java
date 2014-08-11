@@ -86,6 +86,10 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
         .findTaskByCaseExecutionId(execution.getId());
   }
 
+  protected String getTypeName() {
+    return "human task";
+  }
+
   // getters/setters /////////////////////////////////////////////////
 
   public TaskDecorator getTaskDecorator() {

@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl.cmmn.behavior;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -59,7 +58,13 @@ public class ProcessTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavi
     // task manually. If the called process instance has
     // been completed, the associated process task will
     // be notified to complete automatically.
-    throw new ProcessEngineException("It is not possible to complete a process task manually.");
+    String id = execution.getId();
+    String message = "It is not possible to complete case execution '"+id+"' which associated with a process task manually.";
+    throwIllegalStateTransitionException("complete", message, execution);
+  }
+
+  protected String getTypeName() {
+    return "process task";
   }
 
 }

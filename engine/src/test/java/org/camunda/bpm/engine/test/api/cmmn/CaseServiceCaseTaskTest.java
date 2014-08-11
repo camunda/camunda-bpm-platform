@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -306,7 +306,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .reenable();
       fail("It should not be possible to re-enable an enabled case task.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -358,7 +358,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .reenable();
       fail("It should not be possible to re-enable an active case task.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -397,7 +397,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .disable();
       fail("It should not be possible to disable a already disabled case task.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -420,7 +420,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .disable();
       fail("It should not be possible to disable an active case task.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -440,7 +440,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .manualStart();
       fail("It should not be possible to start a disabled case task manually.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -463,7 +463,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .manualStart();
       fail("It should not be possible to start an already active case task manually.");
-    } catch (Exception e) {
+    } catch (NotAllowedException e) {
     }
   }
 
@@ -486,7 +486,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .complete();
       fail("It should not be possible to complete a case task, while the process instance is still running.");
-    } catch (Exception e) {}
+    } catch (NotAllowedException e) {}
 
   }
 
@@ -565,10 +565,10 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .complete();
       fail("Should not be able to complete an enabled case task.");
-    } catch (ProcessEngineException e) {}
+    } catch (NotAllowedException e) {}
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskAndOneHumanTaskCase.cmmn"})
   public void testCompleteADisabledCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -584,7 +584,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .complete();
       fail("Should not be able to complete a disabled case task.");
-    } catch (ProcessEngineException e) {}
+    } catch (NotAllowedException e) {}
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"})
@@ -599,7 +599,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
         .withCaseExecution(caseTaskId)
         .close();
       fail("It should not be possible to close a case task.");
-    } catch (ProcessEngineException e) {
+    } catch (NotAllowedException e) {
 
     }
 

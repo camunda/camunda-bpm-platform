@@ -12,12 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
-
 import static org.camunda.bpm.engine.delegate.CaseExecutionListener.CREATE;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
+
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
  * @author Roman Smirnov
@@ -42,19 +41,13 @@ public class AtomicOperationCaseInstanceCreate extends AbstractCmmnEventAtomicOp
   }
 
   protected void eventNotificationsCompleted(CmmnExecution execution) {
-    try {
-      // the case instance is associated with the
-      // casePlanModel as activity
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    // the case instance is associated with the
+    // casePlanModel as activity
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
 
-      // perform start() on associated behavior
-      // because the case instance is ACTIVE
-      behavior.started(execution);
-
-    } catch (Exception e) {
-      String id = execution.getId();
-      throw new PvmException("During the execution of case execution '"+id+"' occurred an exception.", e);
-    }
+    // perform start() on associated behavior
+    // because the case instance is ACTIVE
+    behavior.started(execution);
   }
 
 }

@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.cmmn.operation;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Roman Smirnov
@@ -24,17 +23,11 @@ import org.camunda.bpm.engine.impl.pvm.PvmException;
 public abstract class AbstractAtomicOperationCaseExecutionResume extends AbstractCmmnEventAtomicOperation {
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
-    try {
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
-      triggerBehavior(behavior, execution);
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    triggerBehavior(behavior, execution);
 
-      CaseExecutionState newState = getPreviousState(execution);
-      execution.setCurrentState(newState);
-
-    } catch (RuntimeException e) {
-      String id = execution.getId();
-      throw new PvmException("Cannot resume case execution '"+id+"'.", e);
-    }
+    CaseExecutionState newState = getPreviousState(execution);
+    execution.setCurrentState(newState);
 
     return execution;
   }

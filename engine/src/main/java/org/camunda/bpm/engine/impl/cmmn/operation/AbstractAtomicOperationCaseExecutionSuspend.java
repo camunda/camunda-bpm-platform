@@ -16,7 +16,6 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSP
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Roman Smirnov
@@ -25,16 +24,10 @@ import org.camunda.bpm.engine.impl.pvm.PvmException;
 public abstract class AbstractAtomicOperationCaseExecutionSuspend extends AbstractCmmnEventAtomicOperation {
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
-    try {
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
-      triggerBehavior(behavior, execution);
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    triggerBehavior(behavior, execution);
 
-      execution.setCurrentState(SUSPENDED);
-
-    } catch (RuntimeException e) {
-      String id = execution.getId();
-      throw new PvmException("Cannot suspend case execution '"+id+"'.", e);
-    }
+    execution.setCurrentState(SUSPENDED);
 
     return execution;
 

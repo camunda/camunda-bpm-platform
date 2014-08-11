@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.cmmn.operation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
@@ -226,7 +227,7 @@ public class CaseInstanceCloseTest extends PvmTestCase {
     try {
       // when
       caseInstance.close();
-    } catch (Exception e) {
+    } catch (CaseIllegalStateTransitionException e) {
 
     }
 
@@ -275,7 +276,7 @@ public class CaseInstanceCloseTest extends PvmTestCase {
       // when
       taskA.close();
       fail("It should not be possible to close a task.");
-    } catch (Exception e) {
+    } catch (CaseIllegalStateTransitionException e) {
 
     }
 
@@ -333,7 +334,7 @@ public class CaseInstanceCloseTest extends PvmTestCase {
       // when
       stageX.close();
       fail("It should not be possible to close a stage.");
-    } catch (Exception e) {
+    } catch (CaseIllegalStateTransitionException e) {
 
     }
 

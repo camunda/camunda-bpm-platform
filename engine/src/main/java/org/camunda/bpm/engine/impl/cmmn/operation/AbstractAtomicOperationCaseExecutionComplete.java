@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.TransferVariablesActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Roman Smirnov
@@ -34,23 +33,17 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
   }
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
-    try {
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
-      triggerBehavior(behavior, execution);
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    triggerBehavior(behavior, execution);
 
-      List<? extends CmmnExecution> children = execution.getCaseExecutions();
-      if (children != null && !children.isEmpty()) {
-        for (CmmnExecution child : children) {
-          child.remove();
-        }
+    List<? extends CmmnExecution> children = execution.getCaseExecutions();
+    if (children != null && !children.isEmpty()) {
+      for (CmmnExecution child : children) {
+        child.remove();
       }
-
-      execution.setCurrentState(COMPLETED);
-
-    } catch (RuntimeException e) {
-      String id = execution.getId();
-      throw new PvmException("Cannot complete case execution '"+id+"'.", e);
     }
+
+    execution.setCurrentState(COMPLETED);
 
     return execution;
   }

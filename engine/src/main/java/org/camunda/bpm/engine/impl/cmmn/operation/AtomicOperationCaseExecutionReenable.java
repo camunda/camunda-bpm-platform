@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENAB
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Roman Smirnov
@@ -34,16 +33,10 @@ public class AtomicOperationCaseExecutionReenable extends AbstractCmmnEventAtomi
   }
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
-    try {
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
-      behavior.onReenable(execution);
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    behavior.onReenable(execution);
 
-      execution.setCurrentState(ENABLED);
-
-    } catch (RuntimeException e) {
-      String id = execution.getId();
-      throw new PvmException("Cannot re-enable case execution '"+id+"'.", e);
-    }
+    execution.setCurrentState(ENABLED);
 
     return execution;
   }

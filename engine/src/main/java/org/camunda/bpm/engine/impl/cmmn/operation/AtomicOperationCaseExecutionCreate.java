@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.cmmn.operation;
 import static org.camunda.bpm.engine.delegate.CaseExecutionListener.CREATE;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAILABLE;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
@@ -34,16 +33,10 @@ public class AtomicOperationCaseExecutionCreate extends AbstractCmmnEventAtomicO
   }
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
-    try {
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
-      behavior.onCreate(execution);
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    behavior.onCreate(execution);
 
-      execution.setCurrentState(AVAILABLE);
-
-    } catch (RuntimeException e) {
-      String id = execution.getId();
-      throw new ProcessEngineException("Cannot create case execution '"+id+"'.", e);
-    }
+    execution.setCurrentState(AVAILABLE);
 
     return execution;
   }

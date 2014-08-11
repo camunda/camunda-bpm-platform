@@ -12,12 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
-
 import static org.camunda.bpm.engine.delegate.CaseExecutionListener.MANUAL_START;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
+
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
  * @author Roman Smirnov
@@ -34,28 +33,17 @@ public class AtomicOperationCaseExecutionManualStart extends AbstractCmmnEventAt
   }
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
-    try {
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
-      behavior.onManualStart(execution);
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    behavior.onManualStart(execution);
 
-      execution.setCurrentState(ACTIVE);
-    } catch (RuntimeException e) {
-      String id = execution.getId();
-      throw new PvmException("Cannot start case execution '"+id+"' manually.", e);
-    }
+    execution.setCurrentState(ACTIVE);
 
     return execution;
   }
 
   protected void eventNotificationsCompleted(CmmnExecution execution) {
-    try {
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
-      behavior.started(execution);
-
-    } catch (Exception e) {
-      String id = execution.getId();
-      throw new PvmException("During the execution of case execution '"+id+"' occurred an exception.", e);
-    }
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    behavior.started(execution);
 
   }
 

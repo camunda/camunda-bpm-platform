@@ -16,7 +16,6 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERM
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Roman Smirnov
@@ -25,17 +24,10 @@ import org.camunda.bpm.engine.impl.pvm.PvmException;
 public abstract class AbstractAtomicOperationCaseExecutionTerminate extends AbstractCmmnEventAtomicOperation {
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
-    try {
-      CmmnActivityBehavior behavior = getActivityBehavior(execution);
-      triggerBehavior(behavior, execution);
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    triggerBehavior(behavior, execution);
 
-      execution.setCurrentState(TERMINATED);
-
-    } catch (RuntimeException e) {
-      String id = execution.getId();
-      throw new PvmException("Cannot "+getEventName()+" case execution '"+id+"'.", e);
-    }
-
+    execution.setCurrentState(TERMINATED);
 
     return execution;
   }

@@ -12,15 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.cmmn.CaseExecutionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.CaseExecutionCommandBuilderImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -55,13 +58,13 @@ public class CaseExecutionVariableCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
-    ensureNotNull("caseExecutionId", caseExecutionId);
+    ensureNotNull(NullValueException.class, "caseExecutionId", caseExecutionId);
 
     caseExecution = commandContext
       .getCaseExecutionManager()
       .findCaseExecutionById(caseExecutionId);
 
-    ensureNotNull("There does not exist any case execution with id: '" + caseExecutionId + "'", "caseExecution", caseExecution);
+    ensureNotNull(CaseExecutionNotFoundException.class, "There does not exist any case execution with id: '" + caseExecutionId + "'", "caseExecution", caseExecution);
 
     if (variablesDeletions != null && !variablesDeletions.isEmpty()) {
       caseExecution.removeVariables(variablesDeletions);

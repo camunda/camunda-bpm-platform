@@ -12,18 +12,29 @@
  */
 package org.camunda.bpm.engine.impl.cmmn;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cmmn.cmd.*;
+
+import org.camunda.bpm.engine.exception.NotAllowedException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.cmmn.CaseExecutionNotFoundException;
+import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
+import org.camunda.bpm.engine.impl.cmmn.cmd.CaseExecutionVariableCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.CloseCaseInstanceCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.CompleteCaseExecutionCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.DisableCaseExecutionCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.ManualStartCaseExecutionCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.ReenableCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -57,7 +68,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder setVariable(String variableName, Object variableValue) {
-    ensureNotNull("variableName", variableName);
+    ensureNotNull(NotValidException.class, "variableName", variableName);
     ensureVariableShouldNotBeRemoved(variableName);
     if (variables == null) {
       variables = new HashMap<String, Object>();
@@ -78,7 +89,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder setVariableLocal(String localVariableName, Object localVariableValue) {
-    ensureNotNull("localVariableName", localVariableName);
+    ensureNotNull(NotValidException.class, "localVariableName", localVariableName);
     ensureVariableShouldNotBeRemoved(localVariableName);
     if (variablesLocal == null) {
       variablesLocal = new HashMap<String, Object>();
@@ -99,6 +110,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder removeVariable(String variableName) {
+    ensureNotNull(NotValidException.class, "variableName", variableName);
     ensureVariableShouldNotBeSet(variableName);
     if (variableDeletions == null) {
       variableDeletions = new ArrayList<String>();
@@ -119,6 +131,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   public CaseExecutionCommandBuilder removeVariableLocal(String variableName) {
+    ensureNotNull(NotValidException.class, "localVariableName", variableName);
     ensureVariableShouldNotBeSet(variableName);
     if (variableLocalDeletions == null) {
       variableLocalDeletions = new ArrayList<String>();
@@ -147,7 +160,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   protected void ensureVariableShouldNotBeRemoved(String variableName) {
     if ((variableDeletions != null && variableDeletions.contains(variableName))
         || (variableLocalDeletions != null && variableLocalDeletions.contains(variableName))) {
-      throw new ProcessEngineException("Cannot set and remove a variable with the same variable name: '"+variableName+"' within a command.");
+      throw new NotValidException("Cannot set and remove a variable with the same variable name: '"+variableName+"' within a command.");
     }
   }
 
@@ -160,7 +173,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   protected void ensureVariableShouldNotBeSet(String variableName) {
     if ((variables != null && variables.keySet().contains(variableName))
         || (variablesLocal != null && variablesLocal.keySet().contains(variableName))) {
-      throw new ProcessEngineException("Cannot set and remove a variable with the same variable name: '"+variableName+"' within a command.");
+      throw new NotValidException("Cannot set and remove a variable with the same variable name: '"+variableName+"' within a command.");
     }
   }
 
@@ -195,10 +208,22 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   }
 
   protected void executeCommand(Command<?> command) {
-    if(commandExecutor != null) {
-      commandExecutor.execute(command);
-    } else {
-      command.execute(commandContext);
+    try {
+      if(commandExecutor != null) {
+        commandExecutor.execute(command);
+      } else {
+        command.execute(commandContext);
+      }
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseExecutionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    } catch (CaseIllegalStateTransitionException e) {
+      throw new NotAllowedException(e.getMessage(), e);
+
     }
   }
 

@@ -12,15 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
-import org.camunda.bpm.engine.ProcessEngineException;
+
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.*;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -40,16 +43,20 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
   }
 
   public void onReactivation(CmmnActivityExecution execution) {
+    String id = execution.getId();
+
     if (execution.isActive()) {
-      throw new ProcessEngineException("Case execution is already active.");
+      String message = "Case execution '"+id+"' is already active.";
+      throwIllegalStateTransitionException("reactivate", message, execution);
     }
 
     if (execution.isCaseInstanceExecution()) {
       if (execution.isClosed()) {
-        throw new ProcessEngineException("It is not possible to re-activate a closed case instance.");
+        String message = "it is not possible to reactivate the closed case instance '"+id+"'.";
+        throwIllegalStateTransitionException("reactivate", message, execution);
       }
     } else {
-      ensureTransitionAllowed(execution, FAILED, ACTIVE, "re-activate");
+      ensureTransitionAllowed(execution, FAILED, ACTIVE, "reactivate");
     }
 
   }
@@ -68,6 +75,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
 
   protected boolean canComplete(CmmnActivityExecution execution, boolean manualCompletion, boolean throwException) {
     CmmnActivity activity = execution.getActivity();
+    String id = execution.getId();
 
     List<? extends CmmnExecution> children = execution.getCaseExecutions();
 
@@ -83,7 +91,8 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       if (child.isActive()) {
 
         if (throwException) {
-          throw new ProcessEngineException("At least one child case execution is active.");
+          String message = "At least one child case execution of case execution '"+id+"' is active.";
+          throwIllegalStateTransitionException("complete", message, execution);
         }
 
         return false;
@@ -106,7 +115,8 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         if (child.isRequired() && !child.isDisabled()) {
 
           if (throwException) {
-            throw new ProcessEngineException("At least one required child case execution is active.");
+            String message = "At least one required child case execution of case execution '"+id+"'is active.";
+            throwIllegalStateTransitionException("complete", message, execution);
           }
 
           return false;
@@ -122,7 +132,8 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         if (!child.isDisabled()) {
 
           if (throwException) {
-            throw new ProcessEngineException("At least one required child case execution is available|enabled|suspended.");
+            String message = "At least one required child case execution of case execution '"+id+"' is {available|enabled|suspended}.";
+            throwIllegalStateTransitionException("complete", message, execution);
           }
 
           return false;
@@ -217,6 +228,10 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         resumed(execution);
       }
     }
+  }
+
+  protected String getTypeName() {
+    return "stage";
   }
 
 }

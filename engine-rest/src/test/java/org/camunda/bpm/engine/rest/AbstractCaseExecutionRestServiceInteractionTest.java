@@ -41,6 +41,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.wink.common.RestException;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableNameDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -165,7 +166,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
   @Test
   public void testUnsuccessfulManualStart() {
-    doThrow(new ProcessEngineException("expected exception")).when(caseExecutionCommandBuilderMock).manualStart();
+    doThrow(new NotValidException("expected exception")).when(caseExecutionCommandBuilderMock).manualStart();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
@@ -175,7 +176,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", containsString("Cannot start case execution with id '" + MockProvider.EXAMPLE_CASE_EXECUTION_ID + "' manually."))
+        .body("message", containsString("Cannot manualStart case execution " + MockProvider.EXAMPLE_CASE_EXECUTION_ID + ": expected exception"))
     .when()
       .post(CASE_EXECUTION_MANUAL_START_URL);
 
@@ -547,7 +548,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
   @Test
   public void testUnsuccessfulDisable() {
-    doThrow(new ProcessEngineException("expected exception")).when(caseExecutionCommandBuilderMock).disable();
+    doThrow(new NotValidException("expected exception")).when(caseExecutionCommandBuilderMock).disable();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
@@ -557,7 +558,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", containsString("Cannot disable case execution with id '" + MockProvider.EXAMPLE_CASE_EXECUTION_ID + "'."))
+        .body("message", containsString("Cannot disable case execution " + MockProvider.EXAMPLE_CASE_EXECUTION_ID + ": expected exception"))
     .when()
       .post(CASE_EXECUTION_DISABLE_URL);
 
@@ -929,7 +930,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
   @Test
   public void testUnsuccessfulReenable() {
-    doThrow(new ProcessEngineException("expected exception")).when(caseExecutionCommandBuilderMock).reenable();
+    doThrow(new NotValidException("expected exception")).when(caseExecutionCommandBuilderMock).reenable();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
@@ -939,7 +940,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", containsString("Cannot re-enable case execution with id '" + MockProvider.EXAMPLE_CASE_EXECUTION_ID + "'."))
+        .body("message", containsString("Cannot reenable case execution " + MockProvider.EXAMPLE_CASE_EXECUTION_ID + ": expected exception"))
     .when()
       .post(CASE_EXECUTION_REENABLE_URL);
 
@@ -2611,7 +2612,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
   @Test
   public void testUnsuccessfulComplete() {
-    doThrow(new ProcessEngineException("expected exception")).when(caseExecutionCommandBuilderMock).complete();
+    doThrow(new NotValidException("expected exception")).when(caseExecutionCommandBuilderMock).complete();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
@@ -2621,7 +2622,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", containsString("Cannot complete case execution with id '" + MockProvider.EXAMPLE_CASE_EXECUTION_ID + "'."))
+        .body("message", containsString("Cannot complete case execution " + MockProvider.EXAMPLE_CASE_EXECUTION_ID + ": expected exception"))
     .when()
       .post(CASE_EXECUTION_COMPLETE_URL);
 

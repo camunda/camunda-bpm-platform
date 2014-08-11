@@ -12,12 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
+
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.cmmn.CaseExecutionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -38,14 +41,14 @@ public class GetCaseExecutionVariableCmd implements Command<Object>, Serializabl
   }
 
   public Object execute(CommandContext commandContext) {
-    ensureNotNull("caseExecutionId", caseExecutionId);
-    ensureNotNull("variableName", variableName);
+    ensureNotNull(NullValueException.class, "caseExecutionId", caseExecutionId);
+    ensureNotNull(NullValueException.class, "variableName", variableName);
 
     CaseExecutionEntity caseExecution = commandContext
       .getCaseExecutionManager()
       .findCaseExecutionById(caseExecutionId);
 
-    ensureNotNull("case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
+    ensureNotNull(CaseExecutionNotFoundException.class, "case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
 
     Object value;
 

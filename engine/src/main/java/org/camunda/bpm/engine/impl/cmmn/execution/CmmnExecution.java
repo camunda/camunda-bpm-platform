@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
@@ -312,13 +311,6 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   public void createChildExecutions(List<CmmnActivity> activities) {
-    // this execution must be in the active state
-    if (!isActive()) {
-      String message = "Cannot create child case executions on case execution '"
-          +id+"' as parent because the case execution is not active.";
-      throw new ProcessEngineException(message);
-    }
-
     List<CmmnExecution> children = new ArrayList<CmmnExecution>();
 
     // first create new child case executions
