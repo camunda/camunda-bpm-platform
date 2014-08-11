@@ -107,6 +107,13 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
 
     job = managementService.createJobQuery().singleResult();
     assertEquals(2, job.getRetries());
+
+    executeAvailableJobs();
+
+    // the job execution failed (job.retries = 0)
+    job = managementService.createJobQuery().noRetriesLeft().singleResult();
+    assertNotNull(job);
+    assertEquals(0, job.getRetries());
   }
 
   protected void createJob(final String handlerType) {
