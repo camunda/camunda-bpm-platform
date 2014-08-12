@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.exception.cmmn.CaseExecutionNotFoundException;
 import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
 import org.camunda.bpm.engine.impl.cmmn.cmd.CaseExecutionVariableCmd;
@@ -220,11 +221,13 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
 
     } catch (CaseExecutionNotFoundException e) {
       throw new NotFoundException(e.getMessage(), e);
-
+    } catch (CaseDefinitionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
     } catch (CaseIllegalStateTransitionException e) {
       throw new NotAllowedException(e.getMessage(), e);
 
     }
+
   }
 
   // getters ////////////////////////////////////////////////////////////////////////////////

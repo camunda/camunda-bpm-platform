@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.test.cmmn.casetask;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotAllowedException;
-import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -812,8 +812,8 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
       caseService
         .withCaseExecution(caseTaskId)
         .manualStart();
-      fail("It should not be possible to start a case instance.");
-    } catch (CaseDefinitionNotFoundException e) {}
+      fail("It should not be possible to start a not existing case instance.");
+    } catch (NotFoundException e) {}
 
     // complete //////////////////////////////////////////////////////////
 
