@@ -47,13 +47,13 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
 
     if (execution.isActive()) {
       String message = "Case execution '"+id+"' is already active.";
-      throwIllegalStateTransitionException("reactivate", message, execution);
+      throw createIllegalStateTransitionException("reactivate", message, execution);
     }
 
     if (execution.isCaseInstanceExecution()) {
       if (execution.isClosed()) {
         String message = "it is not possible to reactivate the closed case instance '"+id+"'.";
-        throwIllegalStateTransitionException("reactivate", message, execution);
+        throw createIllegalStateTransitionException("reactivate", message, execution);
       }
     } else {
       ensureTransitionAllowed(execution, FAILED, ACTIVE, "reactivate");
@@ -92,7 +92,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
 
         if (throwException) {
           String message = "At least one child case execution of case execution '"+id+"' is active.";
-          throwIllegalStateTransitionException("complete", message, execution);
+          throw createIllegalStateTransitionException("complete", message, execution);
         }
 
         return false;
@@ -116,7 +116,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
 
           if (throwException) {
             String message = "At least one required child case execution of case execution '"+id+"'is active.";
-            throwIllegalStateTransitionException("complete", message, execution);
+            throw createIllegalStateTransitionException("complete", message, execution);
           }
 
           return false;
@@ -133,7 +133,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
 
           if (throwException) {
             String message = "At least one required child case execution of case execution '"+id+"' is {available|enabled|suspended}.";
-            throwIllegalStateTransitionException("complete", message, execution);
+            throw createIllegalStateTransitionException("complete", message, execution);
           }
 
           return false;

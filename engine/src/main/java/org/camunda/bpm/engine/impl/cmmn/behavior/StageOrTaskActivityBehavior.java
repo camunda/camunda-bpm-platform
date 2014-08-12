@@ -101,7 +101,7 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
   public void onParentTermination(CmmnActivityExecution execution) {
     String id = execution.getId();
     String message = "It is not possible to parentTerminate case execution '"+id+"' which associated with a "+getTypeName()+".";
-    throwIllegalStateTransitionException("parentTerminate", message, execution);
+    throw createIllegalStateTransitionException("parentTerminate", message, execution);
   }
 
   public void onExit(CmmnActivityExecution execution) {
@@ -109,12 +109,12 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
     if (execution.isTerminated()) {
       String message = "Case execution '"+id+"' is already terminated.";
-      throwIllegalStateTransitionException("exit", message, execution);
+      throw createIllegalStateTransitionException("exit", message, execution);
     }
 
     if (execution.isCompleted()) {
       String message = "Case execution '"+id+"' must be {available|enabled|disabled|active|failed|suspended} to exit it, but was completed.";
-      throwIllegalStateTransitionException("exit", message, execution);
+      throw createIllegalStateTransitionException("exit", message, execution);
     }
 
     terminating(execution);
@@ -123,7 +123,7 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
   public void onOccur(CmmnActivityExecution execution) {
     String id = execution.getId();
     String message = "It is not possible to occur case execution '"+id+"' which associated with a "+getTypeName()+".";
-    throwIllegalStateTransitionException("occur", message, execution);
+    throw createIllegalStateTransitionException("occur", message, execution);
   }
 
   public void onSuspension(CmmnActivityExecution execution) {
@@ -138,12 +138,12 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
     if (execution.isSuspended()) {
       String message = "Case execution '"+id+"' is already suspended.";
-      throwIllegalStateTransitionException("parentSuspend", message, execution);
+      throw createIllegalStateTransitionException("parentSuspend", message, execution);
     }
 
     if (execution.isCompleted() || execution.isTerminated()) {
       String message = "Case execution '"+id+"' must be {available|enabled|disabled|active} to suspend it, but was "+execution.getCurrentState()+".";
-      throwIllegalStateTransitionException("parentSuspend", message, execution);
+      throw createIllegalStateTransitionException("parentSuspend", message, execution);
     }
 
     suspending(execution);
@@ -158,7 +158,7 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
       if (!parent.isActive()) {
         String id = execution.getId();
         String message = "It is not possible to resume case execution '"+id+"' which parent is not active.";
-        throwIllegalStateTransitionException("resume", message, execution);
+        throw createIllegalStateTransitionException("resume", message, execution);
       }
     }
 
@@ -172,14 +172,14 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
     if (!execution.isSuspended()) {
       String message = "Case execution '"+id+"' must be suspended to resume it, but was "+execution.getCurrentState()+".";
-      throwIllegalStateTransitionException("parentResume", message, execution);
+      throw createIllegalStateTransitionException("parentResume", message, execution);
     }
 
     CmmnActivityExecution parent = execution.getParent();
     if (parent != null) {
       if (!parent.isActive()) {
         String message = "It is not possible to resume case execution '"+id+"' which parent is not active.";
-        throwIllegalStateTransitionException("parentResume", message, execution);
+        throw createIllegalStateTransitionException("parentResume", message, execution);
       }
     }
 

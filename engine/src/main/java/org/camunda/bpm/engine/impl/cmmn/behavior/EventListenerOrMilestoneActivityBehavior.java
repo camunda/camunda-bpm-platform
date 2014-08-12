@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMP
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
 
+import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
@@ -26,31 +27,31 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemDefinitionActivityBehavior {
 
   public void onEnable(CmmnActivityExecution execution) {
-    throwIllegalStateTransitionException("enable", execution);
+    throw createIllegalStateTransitionException("enable", execution);
   }
 
   public void onReenable(CmmnActivityExecution execution) {
-    throwIllegalStateTransitionException("reenable", execution);
+    throw createIllegalStateTransitionException("reenable", execution);
   }
 
   public void onDisable(CmmnActivityExecution execution) {
-    throwIllegalStateTransitionException("disable", execution);
+    throw createIllegalStateTransitionException("disable", execution);
   }
 
   public void onStart(CmmnActivityExecution execution) {
-    throwIllegalStateTransitionException("start", execution);
+    throw createIllegalStateTransitionException("start", execution);
   }
 
   public void onManualStart(CmmnActivityExecution execution) {
-    throwIllegalStateTransitionException("manualStart", execution);
+    throw createIllegalStateTransitionException("manualStart", execution);
   }
 
   public void onCompletion(CmmnActivityExecution execution) {
-    throwIllegalStateTransitionException("complete", execution);
+    throw createIllegalStateTransitionException("complete", execution);
   }
 
   public void onManualCompletion(CmmnActivityExecution execution) {
-    throwIllegalStateTransitionException("complete", execution);
+    throw createIllegalStateTransitionException("complete", execution);
   }
 
   public void onTermination(CmmnActivityExecution execution) {
@@ -63,18 +64,18 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
 
     if (execution.isTerminated()) {
       String message = "Case execution '"+id+"' is already terminated.";
-      throwIllegalStateTransitionException("parentTerminate", message, execution);
+      throw createIllegalStateTransitionException("parentTerminate", message, execution);
     }
 
     if (execution.isCompleted()) {
       String message = "Case execution '"+id+"' must be available or suspended, but was completed.";
-      throwIllegalStateTransitionException("parentTerminate", message, execution);
+      throw createIllegalStateTransitionException("parentTerminate", message, execution);
     }
     terminating(execution);
   }
 
   public void onExit(CmmnActivityExecution execution) {
-    throwIllegalStateTransitionException("exit", execution);
+    throw createIllegalStateTransitionException("exit", execution);
   }
 
   public void onOccur(CmmnActivityExecution execution) {
@@ -87,7 +88,7 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
   }
 
   public void onParentSuspension(CmmnActivityExecution execution) {
-    throwIllegalStateTransitionException("parentSuspend", execution);
+    throw createIllegalStateTransitionException("parentSuspend", execution);
   }
 
   public void onResume(CmmnActivityExecution execution) {
@@ -98,7 +99,7 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
       if (!parent.isActive()) {
         String id = execution.getId();
         String message = "It is not possible to resume case execution '"+id+"' which parent is not active.";
-        throwIllegalStateTransitionException("resume", message, execution);
+        throw createIllegalStateTransitionException("resume", message, execution);
       }
     }
 
@@ -106,17 +107,17 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
   }
 
   public void onParentResume(CmmnActivityExecution execution) {
-    throwIllegalStateTransitionException("parentResume", execution);
+    throw createIllegalStateTransitionException("parentResume", execution);
   }
 
   public void onReactivation(CmmnActivityExecution execution) {
-    throwIllegalStateTransitionException("reactivate", execution);
+    throw createIllegalStateTransitionException("reactivate", execution);
   }
 
-  protected void throwIllegalStateTransitionException(String transition, CmmnActivityExecution execution) {
+  protected CaseIllegalStateTransitionException createIllegalStateTransitionException(String transition, CmmnActivityExecution execution) {
     String id = execution.getId();
     String message = String.format("It is not possible to %s case execution '%s' which associated with a %s.", transition, id, getTypeName());
-    throwIllegalStateTransitionException(transition, message, execution);
+    return createIllegalStateTransitionException(transition, message, execution);
   }
 
   protected abstract String getTypeName();

@@ -60,7 +60,7 @@ public class ProcessTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavi
     // be notified to complete automatically.
     String id = execution.getId();
     String message = "It is not possible to complete case execution '"+id+"' which associated with a process task manually.";
-    throwIllegalStateTransitionException("complete", message, execution);
+    throw createIllegalStateTransitionException("complete", message, execution);
   }
 
   protected String getTypeName() {

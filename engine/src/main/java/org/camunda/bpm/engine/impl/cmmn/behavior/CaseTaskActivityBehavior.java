@@ -58,7 +58,7 @@ public class CaseTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavior 
     // notified to complete automatically.
     String id = execution.getId();
     String message = "It is not possible to complete case execution '"+id+"' which associated with a case task manually.";
-    throwIllegalStateTransitionException("complete", message, execution);
+    throw createIllegalStateTransitionException("complete", message, execution);
   }
 
   protected String getTypeName() {
