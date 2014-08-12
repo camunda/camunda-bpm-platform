@@ -58,23 +58,10 @@ Page.prototype.notifications = function() {
   return element.all(by.repeater('notification in notifications'));
 };
 
-Page.prototype.notification = function() {
-  return this.notifications().first().element(by.binding('notification.message')).getText();
+Page.prototype.notification = function(item) {
+  item = item || 0;
+  return this.notifications().get(item).element(by.binding('notification.message')).getText();
 };
-
-/* header menu */
-/*Page.prototype.login = function(username, password) {
-  username = username || 'jonny1';
-  password = password || 'jonny1';
-
-  element(by.model('username')).clear();
-  element(by.model('password')).clear();
-  element(by.model('username')).sendKeys(username);
-  element(by.model('password')).sendKeys(password);
-
-  var submitButton = element(by.css('[type="submit"]'));
-  submitButton.click();
-};*/
 
 Page.prototype.logout = function() {
   element(by.css('.navbar [sem-show-user-actions]')).click();
