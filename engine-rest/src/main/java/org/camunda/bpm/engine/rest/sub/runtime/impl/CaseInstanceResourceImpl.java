@@ -77,16 +77,16 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
       commandBuilder.complete();
 
     } catch (NotFoundException e) {
-      throwInvalidRequestException("complete", Status.NOT_FOUND, e);
+      throw createInvalidRequestException("complete", Status.NOT_FOUND, e);
 
     } catch (NotValidException e) {
-      throwInvalidRequestException("complete", Status.BAD_REQUEST, e);
+      throw createInvalidRequestException("complete", Status.BAD_REQUEST, e);
 
     } catch (NotAllowedException e) {
-      throwInvalidRequestException("complete", Status.FORBIDDEN, e);
+      throw createInvalidRequestException("complete", Status.FORBIDDEN, e);
 
     } catch (ProcessEngineException e) {
-      throwRestException("complete", Status.INTERNAL_SERVER_ERROR, e);
+      throw createRestException("complete", Status.INTERNAL_SERVER_ERROR, e);
 
     }
   }
@@ -101,29 +101,29 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
       commandBuilder.close();
 
     } catch (NotFoundException e) {
-      throwInvalidRequestException("close", Status.NOT_FOUND, e);
+      throw createInvalidRequestException("close", Status.NOT_FOUND, e);
 
     } catch (NotValidException e) {
-      throwInvalidRequestException("close", Status.BAD_REQUEST, e);
+      throw createInvalidRequestException("close", Status.BAD_REQUEST, e);
 
     } catch (NotAllowedException e) {
-      throwInvalidRequestException("close", Status.FORBIDDEN, e);
+      throw createInvalidRequestException("close", Status.FORBIDDEN, e);
 
     } catch (ProcessEngineException e) {
-      throwRestException("close", Status.INTERNAL_SERVER_ERROR, e);
+      throw createRestException("close", Status.INTERNAL_SERVER_ERROR, e);
 
     }
 
   }
 
-  protected void throwInvalidRequestException(String transition, Status status, ProcessEngineException cause) {
+  protected InvalidRequestException createInvalidRequestException(String transition, Status status, ProcessEngineException cause) {
     String errorMessage = String.format("Cannot %s case instance %s: %s", transition, caseInstanceId, cause.getMessage());
-    throw new InvalidRequestException(status, cause, errorMessage);
+    return new InvalidRequestException(status, cause, errorMessage);
   }
 
-  protected void throwRestException(String transition, Status status, ProcessEngineException cause) {
+  protected RestException createRestException(String transition, Status status, ProcessEngineException cause) {
     String errorMessage = String.format("Cannot %s case instance %s: %s", transition, caseInstanceId, cause.getMessage());
-    throw new RestException(status, cause, errorMessage);
+    return new RestException(status, cause, errorMessage);
   }
 
   protected void initializeCommand(CaseExecutionCommandBuilder commandBuilder, CaseExecutionTriggerDto triggerDto, String transition) {
