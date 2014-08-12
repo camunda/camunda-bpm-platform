@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine;
 
+import org.camunda.bpm.engine.exception.NotAllowedException;
+
 /**
  * This exception is thrown, if an operation that requires a non-suspended entity (execution, task, process definition) 
  * is executed on a suspended one. 
@@ -19,7 +21,7 @@ package org.camunda.bpm.engine;
  * 
  * @author Thorben Lindhauer
  */
-public class SuspendedEntityInteractionException extends BadUserRequestException {
+public class SuspendedEntityInteractionException extends NotAllowedException {
 
   private static final long serialVersionUID = 1L;
 
