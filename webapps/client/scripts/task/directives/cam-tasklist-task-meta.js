@@ -99,21 +99,23 @@ define([
 
 
         scope.claim = function() {
-          if (scope.userIsOwner()) {
-            Task.assignee(scope.task.id, $rootScope.authentication.name, function(err) {
-              if (err) {
-                return claimed(err);
-              }
+          // if (scope.userIsOwner()) {
+          //   Task.assignee(scope.task.id, $rootScope.authentication.name, function(err) {
+          //     if (err) {
+          //       return claimed(err);
+          //     }
 
-              scope.task.owner = null;
-              scope.task.assignee = $rootScope.authentication.name;
+          //     scope.task.owner = null;
+          //     scope.task.assignee = $rootScope.authentication.name;
 
-              claimed();
-            });
-          }
-          else {
-            Task.claim(scope.task.id, $rootScope.authentication.name, claimed);
-          }
+          //     claimed();
+          //   });
+          // }
+          // else {
+          //   Task.claim(scope.task.id, $rootScope.authentication.name, claimed);
+          // }
+
+          Task.claim(scope.task.id, $rootScope.authentication.name, claimed);
         };
 
 

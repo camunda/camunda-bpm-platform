@@ -1,4 +1,6 @@
 <ul class="meta list-inline times">
+
+
   <li class="followup-date"
       ng-class="(task.followUp < now ? 'overdue' : '')">
     <span tooltip-placement="top"
@@ -92,7 +94,7 @@
 
 
 
-  <li ng-if="task.owner"
+<!--   <li ng-if="task.owner"
       class="owner">
     <span tooltip-placement="top"
           tooltip="{{ 'OWNER' | translate }}"
@@ -103,7 +105,7 @@
           value="task.owner">
       {{ task.owner }}
     </span>
-  </li>
+  </li> -->
 </ul>
 
 
