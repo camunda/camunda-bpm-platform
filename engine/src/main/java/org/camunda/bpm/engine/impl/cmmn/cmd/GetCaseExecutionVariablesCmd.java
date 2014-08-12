@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.exception.cmmn.CaseExecutionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -44,7 +43,7 @@ public class GetCaseExecutionVariablesCmd implements Command<Map<String, Object>
   }
 
   public Map<String, Object> execute(CommandContext commandContext) {
-    ensureNotNull(NullValueException.class, "caseExecutionId", caseExecutionId);
+    ensureNotNull("caseExecutionId", caseExecutionId);
 
     CaseExecutionEntity caseExecution = commandContext
       .getCaseExecutionManager()

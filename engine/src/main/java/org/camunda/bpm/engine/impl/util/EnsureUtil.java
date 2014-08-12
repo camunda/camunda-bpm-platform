@@ -17,6 +17,7 @@ import java.lang.reflect.Constructor;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NullValueException;
 
 /**
  * @author Sebastian Menski
@@ -33,7 +34,7 @@ public final class EnsureUtil {
   }
 
   public static void ensureNotNull(String message, String variableName, Object value) {
-    ensureNotNull(ProcessEngineException.class, message, variableName, value);
+    ensureNotNull(NullValueException.class, message, variableName, value);
   }
 
   public static void ensureNotNull(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Object value) {
@@ -51,7 +52,7 @@ public final class EnsureUtil {
   }
 
   public static void ensureNotNull(String message, String variableName, Object... values) {
-    ensureNotNull(ProcessEngineException.class, message, variableName, values);
+    ensureNotNull(NullValueException.class, message, variableName, values);
   }
 
   public static void ensureNotNull(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Object... values) {
@@ -147,7 +148,7 @@ public final class EnsureUtil {
   }
 
   public static void ensureOnlyOneNotNull(String message, Object... values) {
-    ensureOnlyOneNotNull(ProcessEngineException.class, message, values);
+    ensureOnlyOneNotNull(NullValueException.class, message, values);
   }
 
   public static void ensureOnlyOneNotNull(Class<? extends ProcessEngineException> exceptionClass, String message, Object... values) {
@@ -166,7 +167,7 @@ public final class EnsureUtil {
   }
 
   public static void ensureAtLeastOneNotNull(String message, Object... values) {
-    ensureAtLeastOneNotNull(ProcessEngineException.class, message, values);
+    ensureAtLeastOneNotNull(NullValueException.class, message, values);
   }
 
   public static void ensureAtLeastOneNotNull(Class<? extends ProcessEngineException> exceptionClass, String message, Object... values) {
@@ -176,10 +177,6 @@ public final class EnsureUtil {
       }
     }
     throw generateException(exceptionClass, null, null, message);
-  }
-
-  protected static ProcessEngineException generateException(String message, String variableName, String description) {
-    return generateException(ProcessEngineException.class, message, variableName, description);
   }
 
   protected static <T extends ProcessEngineException> T generateException(Class<T> exceptionClass, String message, String variableName, String description) {

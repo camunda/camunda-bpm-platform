@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -39,7 +38,7 @@ public class GetDeploymentCaseModelCmd implements Command<InputStream>, Serializ
   }
 
   public InputStream execute(CommandContext commandContext) {
-    ensureNotNull(NullValueException.class, "caseDefinitionId", caseDefinitionId);
+    ensureNotNull("caseDefinitionId", caseDefinitionId);
 
     CaseDefinitionEntity caseDefinition = Context
             .getProcessEngineConfiguration()

@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.Map;
 
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.CaseInstanceBuilderImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
@@ -52,28 +52,26 @@ public class CreateCaseInstanceCmd implements Command<CaseInstance>, Serializabl
         .getProcessEngineConfiguration()
         .getDeploymentCache();
 
-      // Find the case definition
-      CaseDefinitionEntity caseDefinition = null;
+    // Find the case definition
+    CaseDefinitionEntity caseDefinition = null;
 
-      if (caseDefinitionId!=null) {
-        caseDefinition = deploymentCache.findDeployedCaseDefinitionById(caseDefinitionId);
+    ensureAtLeastOneNotNull("caseDefinition and caseDefinitionKey are null", caseDefinitionId, caseDefinitionKey);
 
-        ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for id = '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);
+    if (caseDefinitionId!=null) {
+      caseDefinition = deploymentCache.findDeployedCaseDefinitionById(caseDefinitionId);
 
-      } else if (caseDefinitionKey!=null){
-        caseDefinition = deploymentCache.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
+      ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for id = '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);
 
-        ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for key '" + caseDefinitionKey + "'", "caseDefinition", caseDefinition);
+    } else {
+      caseDefinition = deploymentCache.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
 
-      } else {
-        throw new NullValueException("caseDefinitionId and caseDefinitionKey are null");
+      ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for key '" + caseDefinitionKey + "'", "caseDefinition", caseDefinition);
+    }
 
-      }
-
-      // Start the case instance
-      CaseExecutionEntity caseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance();
-      caseInstance.create(businessKey, variables);
-      return caseInstance;
+    // Start the case instance
+    CaseExecutionEntity caseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance();
+    caseInstance.create(businessKey, variables);
+    return caseInstance;
   }
 
 }

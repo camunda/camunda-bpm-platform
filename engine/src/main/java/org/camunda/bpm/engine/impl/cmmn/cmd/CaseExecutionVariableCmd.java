@@ -18,7 +18,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.exception.cmmn.CaseExecutionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.CaseExecutionCommandBuilderImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
@@ -58,7 +57,7 @@ public class CaseExecutionVariableCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
-    ensureNotNull(NullValueException.class, "caseExecutionId", caseExecutionId);
+    ensureNotNull("caseExecutionId", caseExecutionId);
 
     caseExecution = commandContext
       .getCaseExecutionManager()
