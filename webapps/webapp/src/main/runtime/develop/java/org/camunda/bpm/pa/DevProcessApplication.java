@@ -92,6 +92,8 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("CallActivity");
     runtimeService.startProcessInstanceByKey("CallActivity");
 
+    runtimeService.startProcessInstanceByKey("invoice");
+
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("value1", "a");
     params.put("value2", "b");
