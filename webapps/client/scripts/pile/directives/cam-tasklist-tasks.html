@@ -49,13 +49,13 @@
         role="form">
     <ol class="tasks-list list-unstyled">
       <li class="task"
-          ng-repeat="(delta, task) in tasks"
-          tabindex="{{ (delta + 1) }}"
-          ng-focus="focus(delta)">
+          ng-repeat="(delta, task) in tasks">
 
         <div class="names">
-          <h4 class="task"
-              ng-click="focus(delta)">{{ task.name }}</h4>
+          <h4 class="task">
+            <a ng-href="#/?task={{ task.id }}"
+               tabindex="{{ (delta + 1) }}">{{ task.name }}</a>
+          </h4>
           <h6 class="process-definition"
               ng-class="{suspended: task._embedded.processDefinition}">
             {{ task._embedded.processDefinition.name || task._embedded.processDefinition.key }}
@@ -69,23 +69,27 @@
                    ng-model="batch"
                    ng-change="batchOperationSelect()" />
           </li>
+
           <li data-toggle="tooltip"
               data-placement="top"
               title="{{ 'FOLLOW_UP_DATE' | translate }}"
               class="followup-date"
               ng-class="(task.followUp < now ? 'overdue' : '')">
             <span class="glyphicon glyphicon-bell"></span>
-            <span cam-form-inline-field value="task.followUp">
+            <span cam-form-inline-field
+                  value="task.followUp">
               <span am-time-ago="task.followUp">{{ task.followUp }}</span>
             </span>
           </li>
+
           <li data-toggle="tooltip"
               data-placement="top"
               title="{{ 'DUE_DATE' | translate }}"
               class="due-date"
               ng-class="(task.due < now ? 'overdue' : '')">
             <span class="glyphicon glyphicon-calendar"></span>
-            <span cam-form-inline-field value="task.due">
+            <span cam-form-inline-field
+                  value="task.due">
               <span am-time-ago="task.due">{{ task.due }}</span>
             </span>
           </li>
@@ -100,6 +104,7 @@
               {{ task.assignee }}
             </span>
           </li>
+
           <li data-toggle="tooltip"
               data-placement="top"
               title="{{ 'OWNER' | translate }}"

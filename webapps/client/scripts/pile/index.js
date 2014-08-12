@@ -80,52 +80,6 @@ define([
 
 
 
-
-
-
-  pileModule.controller('pilesCtrl', [
-    '$scope',
-    '$rootScope',
-    'camAPI',
-  function (
-    $scope,
-    $rootScope,
-    camAPI
-  ) {
-    var Pile = camAPI.resource('pile');
-
-    $scope.piles = [];
-    $scope.loading = true;
-
-    function listPiles() {
-      Pile.list({}, function(err, res) {
-        $scope.loading = false;
-        if (err) {
-          throw err;
-        }
-
-        $scope.piles = res.items;
-        $rootScope.currentPile = $scope.piles[0];
-        $rootScope.$broadcast('tasklist.pile.current');
-      });
-    }
-
-    function authed() {
-      return $rootScope.authentication && $rootScope.authentication.name;
-    }
-
-    if (authed()) {
-      listPiles();
-    }
-
-    $rootScope.$watch('authentication', function() {
-      if (authed()) {
-        listPiles();
-      }
-    });
-  }]);
-
-
   pileModule.controller('pileCreateModalCtrl', [
     '$modalInstance',
     '$scope',

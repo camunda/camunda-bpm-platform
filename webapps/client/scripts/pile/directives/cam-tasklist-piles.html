@@ -1,11 +1,10 @@
-<div ng-controller="pilesCtrl">
-  <div ng-show="loading"
-       class="loader">
-    <i class="animate-spin glyphicon glyphicon-refresh"></i>
-    {{ 'LOADING' | translate }}
-  </div>
-
-  <div ng-hide="loading"
-       ng-repeat="pile in piles"
-       cam-tasklist-pile></div>
+<div ng-show="loading"
+     class="loader">
+  <i class="animate-spin glyphicon glyphicon-refresh"></i>
+  {{ 'LOADING' | translate }}
 </div>
+
+<div ng-hide="loading"
+     ng-repeat="pile in piles"
+     ng-class="{active: pile.id === focusedId}"
+     cam-tasklist-pile></div>

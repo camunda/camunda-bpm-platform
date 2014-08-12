@@ -14,18 +14,9 @@ define([
     $routeProvider
       .when('/', {
         template: tasklistTemplate,
-        authentication: 'required'
+        authentication: 'required',
+        reloadOnSearch: false
       })
-
-      // // Would be great to be able to start processes with a URL
-      // .when('/process/:processDefinitionId/start', {
-      //   template: tasklistTemplate,
-      //   controller: 'processStartCtrl'
-      // })
-      // .when('/process/key/:processDefinitionKey/start', {
-      //   template: tasklistTemplate,
-      //   controller: 'processStartCtrl'
-      // })
 
 
       .when('/login', {

@@ -5,40 +5,21 @@ define([
 ) {
   'use strict';
   return [
-    '$modal',
-    '$rootScope',
+    // '$modal',
+    // '$rootScope',
   function(
-    $modal,
-    $rootScope
+    // $modal,
+    // $rootScope
   ) {
     return {
+      template: template,
+
       link: function(scope, element) {
-        function setFocus() {
-          element
-            .parent()
-              .find('.task-pile')
-                .removeClass('active')
-          ;
-          element
-            .addClass('active')
-            .find('.task-pile')
-              .addClass('active')
-          ;
-        }
-
-        scope.focus = function() {
-          setFocus();
-          $rootScope.currentPile = scope.pile;
-          $rootScope.$broadcast('tasklist.pile.current');
-        };
-
-        if ($rootScope.currentPile && scope.pile.id === $rootScope.currentPile.id) {
-          setFocus();
-        }
-
-
-
-
+        // scope.focus = function() {
+        //   console.info('DEPRECATE');
+        //   $rootScope.currentPile = scope.pile;
+        //   $rootScope.$broadcast('tasklist.pile.current');
+        // };
 
         // scope.edit = function() {
         //   modalUID++;
@@ -94,9 +75,7 @@ define([
               .css(style)
           ;
         }
-      },
-
-      template: template
+      }
     };
   }];
 });

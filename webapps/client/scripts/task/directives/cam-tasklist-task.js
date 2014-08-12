@@ -6,16 +6,20 @@ define([
   return [
     '$modal',
     '$rootScope',
+    '$location',
     'camUID',
   function(
     $modal,
     $rootScope,
+    $location,
     camUID
   ) {
     $rootScope.batchActions = {};
     $rootScope.batchActions.selected = [];
 
     return {
+      template: template,
+
       link: function(scope, element) {
         scope.task = scope.task || $rootScope.currentTask;
 
@@ -25,16 +29,12 @@ define([
         element.find('.tab-pane').eq(0).addClass('active');
 
         scope.$on('tasklist.task.current', function() {
-          if (
-            (scope.task && $rootScope.currentTask && scope.task.id === $rootScope.currentTask.id)
-          ) {
+          if (scope.task && $rootScope.currentTask && scope.task.id === $rootScope.currentTask.id) {
             return;
           }
-
           scope.task = $rootScope.currentTask;
         });
-      },
-      template: template
+      }
     };
   }];
 });

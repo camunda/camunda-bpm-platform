@@ -1,6 +1,7 @@
 <div class="task-pile">
-  <h4 class="name"
-      ng-click="focus()">{{ pile.name }}</h4>
+  <h4 class="name">
+    <a ng-href="#/?tasks={{ pile.id }}">{{ pile.name }}</a>
+  </h4>
 
   <div class="info">
     <div ng-if="pile.description"

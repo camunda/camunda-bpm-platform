@@ -8,8 +8,18 @@ define([
   template
 ) {
   'use strict';
+
+  function itemById(items, id) {
+    var i, item;
+    for (i in items) {
+      item = items[i];
+      if (item.id === id) { return item; }
+    }
+  }
+
   return [
     '$modal',
+    '$location',
     '$rootScope',
     '$timeout',
     '$q',
@@ -17,6 +27,7 @@ define([
     'camAPI',
   function(
     $modal,
+    $location,
     $rootScope,
     $timeout,
     $q,
@@ -24,7 +35,10 @@ define([
     camAPI
   ) {
     var Task = camAPI.resource('task');
+
     return {
+      template: template,
+
       link: function(scope) {
         var dateExp = /(Before|After)$/;
 
@@ -44,18 +58,24 @@ define([
 
         scope.sorting = angular.element('[cam-sorting-choices]').scope();
 
-        scope.sorting.$on('sorting.by.change', loadItems);
+        scope.sorting.$on('sorting.by.change', loadTasks);
 
-        scope.sorting.$on('sorting.order.change', loadItems);
+        scope.sorting.$on('sorting.order.change', loadTasks);
 
 
         function setCurrentTask(task) {
+          if (task) {
+            $location.search({
+              // tasks: scope.pile.id,
+              task: task.id
+            });
+          }
           $rootScope.currentTask = task;
           $rootScope.$broadcast('tasklist.task.current');
         }
 
 
-        function loadItems() {
+        function loadTasks() {
           scope.loading = true;
           scope.tasks = [];
 
@@ -65,15 +85,21 @@ define([
             scope.loading = false;
             if (err) { throw err; }
 
+            // update the URL of the page
+            $location.search({
+              tasks:      scope.pile.id,
+              sortOrder:  where.sortOrder || 'desc',
+              sortBy:     where.sortBy || 'priority'
+            });
+
+
             scope.totalItems = res.count;
             scope.processDefinitions = res._embedded.processDefinition;
             // TODO: refactor that when #CAM-2550 done
             scope.tasks = res._embedded.task || res._embedded.tasks;
-            // angular.forEach(scope.tasks, function(task, t) {
-            //   // taskProcessDefinition(task);
-            // });
           });
         }
+
 
         function buildWhere(order, by) {
           var where = {};
@@ -100,7 +126,7 @@ define([
         }
 
 
-        scope.pageChange = loadItems;
+        scope.pageChange = loadTasks;
 
 
         scope.lookupTask = function(val) {
@@ -136,9 +162,26 @@ define([
           setCurrentTask(scope.tasks[delta]);
         };
 
+
+
+        $rootScope.$on('$locationChangeSuccess', function() {
+          var state = $location.search();
+          if (state.task) {
+            if ($rootScope.currentTask && state.task === $rootScope.currentTask.id) {
+              return;
+            }
+
+            setCurrentTask(itemById(scope.tasks, state.task));
+          }
+          else {
+            scope.sorting.order = state.sortOrder;
+            scope.sorting.by = state.sortBy;
+          }
+        });
+
         scope.$on('tasklist.task.complete', function() {
           setCurrentTask(null);
-          loadItems();
+          loadTasks();
         });
 
         scope.$on('tasklist.pile.current', function() {
@@ -149,11 +192,9 @@ define([
             return;
           }
           scope.pile = $rootScope.currentPile;
-          loadItems();
+          loadTasks();
         });
-      },
-
-      template: template
+      }
     };
   }];
 });
