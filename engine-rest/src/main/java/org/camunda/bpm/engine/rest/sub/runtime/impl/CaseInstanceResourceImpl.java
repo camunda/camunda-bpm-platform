@@ -83,7 +83,7 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
       throwInvalidRequestException("complete", Status.BAD_REQUEST, e);
 
     } catch (NotAllowedException e) {
-      throwInvalidRequestException("complete", Status.BAD_REQUEST, e);
+      throwInvalidRequestException("complete", Status.FORBIDDEN, e);
 
     } catch (ProcessEngineException e) {
       throwRestException("complete", Status.INTERNAL_SERVER_ERROR, e);
@@ -107,7 +107,7 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
       throwInvalidRequestException("close", Status.BAD_REQUEST, e);
 
     } catch (NotAllowedException e) {
-      throwInvalidRequestException("close", Status.BAD_REQUEST, e);
+      throwInvalidRequestException("close", Status.FORBIDDEN, e);
 
     } catch (ProcessEngineException e) {
       throwRestException("close", Status.INTERNAL_SERVER_ERROR, e);

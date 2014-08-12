@@ -133,7 +133,7 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
 
     } catch (NotAllowedException e) {
       String errorMessage = String.format("Cannot instantiate case definition %s: %s", caseDefinitionId, e.getMessage());
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, errorMessage);
+      throw new InvalidRequestException(Status.FORBIDDEN, e, errorMessage);
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot instantiate case definition %s: %s", caseDefinitionId, e.getMessage());

@@ -83,7 +83,7 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
       throwInvalidRequestException("manualStart", Status.BAD_REQUEST, e);
 
     } catch (NotAllowedException e) {
-      throwInvalidRequestException("manualStart", Status.BAD_REQUEST, e);
+      throwInvalidRequestException("manualStart", Status.FORBIDDEN, e);
 
     } catch (ProcessEngineException e) {
       throwRestException("manualStart", Status.INTERNAL_SERVER_ERROR, e);
@@ -108,7 +108,7 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
       throwInvalidRequestException("disable", Status.BAD_REQUEST, e);
 
     } catch (NotAllowedException e) {
-      throwInvalidRequestException("disable", Status.BAD_REQUEST, e);
+      throwInvalidRequestException("disable", Status.FORBIDDEN, e);
 
     } catch (ProcessEngineException e) {
       throwRestException("disable", Status.INTERNAL_SERVER_ERROR, e);
@@ -133,7 +133,7 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
       throwInvalidRequestException("reenable", Status.BAD_REQUEST, e);
 
     } catch (NotAllowedException e) {
-      throwInvalidRequestException("reenable", Status.BAD_REQUEST, e);
+      throwInvalidRequestException("reenable", Status.FORBIDDEN, e);
 
     } catch (ProcessEngineException e) {
       throwRestException("reenable", Status.INTERNAL_SERVER_ERROR, e);
@@ -157,7 +157,7 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
       throwInvalidRequestException("complete", Status.BAD_REQUEST, e);
 
     } catch (NotAllowedException e) {
-      throwInvalidRequestException("complete", Status.BAD_REQUEST, e);
+      throwInvalidRequestException("complete", Status.FORBIDDEN, e);
 
     } catch (ProcessEngineException e) {
       throwRestException("complete", Status.INTERNAL_SERVER_ERROR, e);
