@@ -54,16 +54,16 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected String deploymentId;
   protected String resourceName;
   protected Integer historyLevel;
-  protected StartFormHandler startFormHandler;
+  protected transient StartFormHandler startFormHandler;
   protected String diagramResourceName;
   protected boolean isGraphicalNotationDefined;
-  protected Map<String, TaskDefinition> taskDefinitions;
+  protected transient Map<String, TaskDefinition> taskDefinitions;
   protected boolean hasStartFormKey;
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
   protected boolean isIdentityLinksInitialized = false;
-  protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
-  protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
-  protected Set<Expression> candidateStarterGroupIdExpressions = new HashSet<Expression>();
+  protected transient List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
+  protected transient Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
+  protected transient Set<Expression> candidateStarterGroupIdExpressions = new HashSet<Expression>();
 
   public ProcessDefinitionEntity() {
     super(null);
@@ -154,7 +154,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     for (IdentityLinkEntity identityLink: identityLinks) {
       Context
         .getCommandContext()
-        .getDbSqlSession()
+        .getDbEntityManger()
         .delete(identityLink);
     }
   }

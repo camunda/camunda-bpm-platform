@@ -13,15 +13,12 @@
 
 package org.camunda.bpm.engine.impl.persistence.deploy;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
@@ -38,6 +35,8 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -65,7 +64,7 @@ public class DeploymentCache {
   public ProcessDefinitionEntity findDeployedProcessDefinitionById(String processDefinitionId) {
     ensureNotNull("Invalid process definition id", "processDefinitionId", processDefinitionId);
     CommandContext commandContext = Context.getCommandContext();
-    ProcessDefinitionEntity processDefinition = commandContext.getDbSqlSession().findInCache(ProcessDefinitionEntity.class, processDefinitionId);
+    ProcessDefinitionEntity processDefinition = commandContext.getDbEntityManger().getCachedEntity(ProcessDefinitionEntity.class, processDefinitionId);
     if (processDefinition == null) {
       processDefinition = commandContext
         .getProcessDefinitionManager()
@@ -172,8 +171,8 @@ public class DeploymentCache {
 
     // try to load case definition from cache
     CaseDefinitionEntity caseDefinition = commandContext
-      .getDbSqlSession()
-      .findInCache(CaseDefinitionEntity.class, caseDefinitionId);
+      .getDbEntityManger()
+      .getCachedEntity(CaseDefinitionEntity.class, caseDefinitionId);
 
     if (caseDefinition == null) {
 

@@ -53,11 +53,11 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
     if(userEntity.getRevision() == 0) {
       checkAuthorization(Permissions.CREATE, Resources.USER, null);
-      getDbSqlSession().insert(userEntity);
+      getDbEntityManager().insert(userEntity);
       createDefaultAuthorizations(userEntity);
     } else {
       checkAuthorization(Permissions.UPDATE, Resources.USER, user.getId());
-      getDbSqlSession().merge(userEntity);
+      getDbEntityManager().merge(userEntity);
     }
 
     return userEntity;
@@ -69,7 +69,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     if(user != null) {
       deleteMembershipsByUserId(userId);
       deleteAuthorizations(Resources.USER, userId);
-      getDbSqlSession().delete(user);
+      getDbEntityManager().delete(user);
     }
   }
 
@@ -84,11 +84,11 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     GroupEntity groupEntity = (GroupEntity) group;
     if(groupEntity.getRevision() == 0) {
       checkAuthorization(Permissions.CREATE, Resources.GROUP, null);
-      getDbSqlSession().insert(groupEntity);
+      getDbEntityManager().insert(groupEntity);
       createDefaultAuthorizations(group);
     } else {
       checkAuthorization(Permissions.UPDATE, Resources.GROUP, group.getId());
-      getDbSqlSession().merge(groupEntity);
+      getDbEntityManager().merge(groupEntity);
     }
     return groupEntity;
   }
@@ -99,7 +99,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     if(group != null) {
       deleteMembershipsByGroupId(groupId);
       deleteAuthorizations(Resources.GROUP, groupId);
-      getDbSqlSession().delete(group);
+      getDbEntityManager().delete(group);
     }
   }
 
@@ -121,15 +121,15 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("userId", userId);
     parameters.put("groupId", groupId);
-    getDbSqlSession().delete(MembershipEntity.class, "deleteMembership", parameters);
+    getDbEntityManager().delete(MembershipEntity.class, "deleteMembership", parameters);
   }
 
   protected void deleteMembershipsByUserId(String userId) {
-    getDbSqlSession().delete(MembershipEntity.class, "deleteMembershipsByUserId", userId);
+    getDbEntityManager().delete(MembershipEntity.class, "deleteMembershipsByUserId", userId);
   }
 
   protected void deleteMembershipsByGroupId(String groupId) {
-    getDbSqlSession().delete(MembershipEntity.class, "deleteMembershipsByGroupId", groupId);
+    getDbEntityManager().delete(MembershipEntity.class, "deleteMembershipsByGroupId", groupId);
   }
 
   // authorizations ////////////////////////////////////////////////////////////

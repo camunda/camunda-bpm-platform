@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.camunda.bpm.engine.impl.cfg.standalone;
 
 import java.util.ArrayList;
@@ -17,26 +18,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
- * @author Tom Baeyens
+ * @author Sebastian Menski
  */
-public class StandaloneMybatisTransactionContext implements TransactionContext {
+public class StandaloneTransactionContext implements TransactionContext {
 
-  private static Logger log = Logger.getLogger(StandaloneMybatisTransactionContext.class.getName());
-
+  private static Logger log = Logger.getLogger(StandaloneTransactionContext.class.getName());
   protected CommandContext commandContext;
-  protected Map<TransactionState,List<TransactionListener>> stateTransactionListeners = null;
+  protected Map<TransactionState, List<TransactionListener>> stateTransactionListeners = null;
 
-  public StandaloneMybatisTransactionContext(CommandContext commandContext) {
+  public StandaloneTransactionContext(CommandContext commandContext) {
     this.commandContext = commandContext;
   }
 
@@ -55,8 +53,8 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
   public void commit() {
     log.fine("firing event committing...");
     fireTransactionEvent(TransactionState.COMMITTING);
-    log.fine("committing the ibatis sql session...");
-    getDbSqlSession().commit();
+    log.fine("committing the persistence session...");
+    getPersistenceProvider().commit();
     log.fine("firing event committed...");
     fireTransactionEvent(TransactionState.COMMITTED);
   }
@@ -74,8 +72,8 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
     }
   }
 
-  private DbSqlSession getDbSqlSession() {
-    return commandContext.getSession(DbSqlSession.class);
+  private PersistenceSession getPersistenceProvider() {
+    return commandContext.getSession(PersistenceSession.class);
   }
 
   public void rollback() {
@@ -88,8 +86,8 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
         log.info("Exception during transaction: " + exception.getMessage());
         Context.getCommandInvocationContext().trySetThrowable(exception);
       } finally {
-        log.fine("rolling back ibatis sql session...");
-        getDbSqlSession().rollback();
+        log.fine("rolling back persistence session...");
+        getPersistenceProvider().rollback();
       }
 
     } catch (Throwable exception) {

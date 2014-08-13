@@ -55,7 +55,7 @@ public class SerializableType extends ByteArrayType {
         if (valueFields instanceof VariableInstanceEntity) {
           Context
             .getCommandContext()
-            .getDbSqlSession()
+            .getSession(DeserializedObjectsSession.class)
             .addDeserializedObject(deserializedObject, bytes, (VariableInstanceEntity) valueFields);
         }
 
@@ -79,7 +79,7 @@ public class SerializableType extends ByteArrayType {
       if(valueFields instanceof VariableInstanceEntity) {
         Context
           .getCommandContext()
-          .getDbSqlSession()
+          .getSession(DeserializedObjectsSession.class)
           .addDeserializedObject(valueFields.getCachedValue(), byteArray, (VariableInstanceEntity)valueFields);
       }
     }

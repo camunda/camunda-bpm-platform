@@ -161,7 +161,9 @@
       <artifactId>jsonassert</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
+
 
   <properties>
       <history.level>full</history.level>

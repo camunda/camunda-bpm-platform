@@ -29,25 +29,25 @@ public class AttachmentManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public List<Attachment> findAttachmentsByProcessInstanceId(String processInstanceId) {
     checkHistoryEnabled();
-    return getDbSqlSession().selectList("selectAttachmentsByProcessInstanceId", processInstanceId);
+    return getDbEntityManager().selectList("selectAttachmentsByProcessInstanceId", processInstanceId);
   }
 
   @SuppressWarnings("unchecked")
   public List<Attachment> findAttachmentsByTaskId(String taskId) {
     checkHistoryEnabled();
-    return getDbSqlSession().selectList("selectAttachmentsByTaskId", taskId);
+    return getDbEntityManager().selectList("selectAttachmentsByTaskId", taskId);
   }
 
   @SuppressWarnings("unchecked")
   public void deleteAttachmentsByTaskId(String taskId) {
     checkHistoryEnabled();
-    List<AttachmentEntity> attachments = getDbSqlSession().selectList("selectAttachmentsByTaskId", taskId);
+    List<AttachmentEntity> attachments = getDbEntityManager().selectList("selectAttachmentsByTaskId", taskId);
     for (AttachmentEntity attachment: attachments) {
       String contentId = attachment.getContentId();
       if (contentId!=null) {
         getByteArrayManager().deleteByteArrayById(contentId);
       }
-      getDbSqlSession().delete(attachment);
+      getDbEntityManager().delete(attachment);
     }
   }
 
@@ -58,7 +58,7 @@ public class AttachmentManager extends AbstractHistoricManager {
     parameters.put("taskId", taskId);
     parameters.put("id", attachmentId);
 
-    return (AttachmentEntity) getDbSqlSession().selectOne("selectAttachmentByTaskIdAndAttachmentId", parameters);
+    return (AttachmentEntity) getDbEntityManager().selectOne("selectAttachmentByTaskIdAndAttachmentId", parameters);
   }
 
 }

@@ -44,7 +44,7 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
 
   public UserEntity findUserById(String userId) {
     checkAuthorization(Permissions.READ, Resources.USER, userId);
-    return getDbSqlSession().selectById(UserEntity.class, userId);
+    return getDbEntityManager().selectById(UserEntity.class, userId);
   }
 
   public UserQuery createUserQuery() {
@@ -57,12 +57,12 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
 
   public long findUserCountByQueryCriteria(DbUserQueryImpl query) {
     configureQuery(query, Resources.USER);
-    return (Long) getDbSqlSession().selectOne("selectUserCountByQueryCriteria", query);
+    return (Long) getDbEntityManager().selectOne("selectUserCountByQueryCriteria", query);
   }
 
   public List<User> findUserByQueryCriteria(DbUserQueryImpl query) {
     configureQuery(query, Resources.USER);
-    return getDbSqlSession().selectList("selectUserByQueryCriteria", query);
+    return getDbEntityManager().selectList("selectUserByQueryCriteria", query);
   }
 
   public boolean checkPassword(String userId, String password) {
@@ -84,7 +84,7 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
 
   public GroupEntity findGroupById(String groupId) {
     checkAuthorization(Permissions.READ, Resources.GROUP, groupId);
-    return getDbSqlSession().selectById(GroupEntity.class, groupId);
+    return getDbEntityManager().selectById(GroupEntity.class, groupId);
   }
 
   public GroupQuery createGroupQuery() {
@@ -97,12 +97,12 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
 
   public long findGroupCountByQueryCriteria(DbGroupQueryImpl query) {
     configureQuery(query, Resources.GROUP);
-    return (Long) getDbSqlSession().selectOne("selectGroupCountByQueryCriteria", query);
+    return (Long) getDbEntityManager().selectOne("selectGroupCountByQueryCriteria", query);
   }
 
   public List<Group> findGroupByQueryCriteria(DbGroupQueryImpl query) {
     configureQuery(query, Resources.GROUP);
-    return getDbSqlSession().selectList("selectGroupByQueryCriteria", query);
+    return getDbEntityManager().selectList("selectGroupByQueryCriteria", query);
   }
 
 

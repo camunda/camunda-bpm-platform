@@ -29,29 +29,29 @@ public class StatisticsManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<ProcessDefinitionStatistics> getStatisticsGroupedByProcessDefinitionVersion(
       ProcessDefinitionStatisticsQueryImpl query, Page page) {
-    return getDbSqlSession().selectList("selectProcessDefinitionStatistics", query, page);
+    return getDbEntityManager().selectList("selectProcessDefinitionStatistics", query, page);
   }
   
   public long getStatisticsCountGroupedByProcessDefinitionVersion(ProcessDefinitionStatisticsQueryImpl query) {
-    return (Long) getDbSqlSession().selectOne("selectProcessDefinitionStatisticsCount", query);
+    return (Long) getDbEntityManager().selectOne("selectProcessDefinitionStatisticsCount", query);
   }
   
   @SuppressWarnings("unchecked")
   public List<ActivityStatistics> getStatisticsGroupedByActivity(ActivityStatisticsQueryImpl query, Page page) {
-    return getDbSqlSession().selectList("selectActivityStatistics", query, page);
+    return getDbEntityManager().selectList("selectActivityStatistics", query, page);
   }
   
   public long getStatisticsCountGroupedByActivity(ActivityStatisticsQueryImpl query) {
-    return (Long) getDbSqlSession().selectOne("selectActivityStatisticsCount", query);
+    return (Long) getDbEntityManager().selectOne("selectActivityStatisticsCount", query);
   }
 
   @SuppressWarnings("unchecked")
   public List<DeploymentStatistics> getStatisticsGroupedByDeployment(DeploymentStatisticsQueryImpl query, Page page) {
-    return getDbSqlSession().selectList("selectDeploymentStatistics", query, page);
+    return getDbEntityManager().selectList("selectDeploymentStatistics", query, page);
   }
 
   public long getStatisticsCountGroupedByDeployment(
       DeploymentStatisticsQueryImpl query) {
-    return (Long) getDbSqlSession().selectOne("selectDeploymentStatisticsCount", query);
+    return (Long) getDbEntityManager().selectOne("selectDeploymentStatisticsCount", query);
   }
 }

@@ -51,7 +51,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
     IdentityLinkEntity identityLinkEntity = new IdentityLinkEntity();
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManger()
       .insert(identityLinkEntity);
     return identityLinkEntity;
   }

@@ -49,22 +49,22 @@ public class AuthorizationManager extends AbstractManager {
 
   public void insert(DbEntity authorization) {
     checkAuthorization(CREATE, AUTHORIZATION, null);
-    getDbSqlSession().insert(authorization);
+    getDbEntityManager().insert(authorization);
   }
 
   public List<Authorization> selectAuthorizationByQueryCriteria(AuthorizationQueryImpl authorizationQuery) {
     configureQuery(authorizationQuery, AUTHORIZATION);
-    return getDbSqlSession().selectList("selectAuthorizationByQueryCriteria", authorizationQuery);
+    return getDbEntityManager().selectList("selectAuthorizationByQueryCriteria", authorizationQuery);
   }
 
   public Long selectAuthorizationCountByQueryCriteria(AuthorizationQueryImpl authorizationQuery) {
     configureQuery(authorizationQuery, AUTHORIZATION);
-    return (Long) getDbSqlSession().selectOne("selectAuthorizationCountByQueryCriteria", authorizationQuery);
+    return (Long) getDbEntityManager().selectOne("selectAuthorizationCountByQueryCriteria", authorizationQuery);
   }
 
   public void update(AuthorizationEntity authorization) {
     checkAuthorization(UPDATE, AUTHORIZATION, authorization.getId());
-    getDbSqlSession().merge(authorization);
+    getDbEntityManager().merge(authorization);
   }
 
   public void delete(DbEntity authorization) {
@@ -114,7 +114,7 @@ public class AuthorizationManager extends AbstractManager {
     authCheck.setAuthResourceId(resourceId);
     authCheck.setAuthPerms(permission.getValue());
 
-    return getDbSqlSession().selectBoolean("isUserAuthorizedForResource", authCheck);
+    return getDbEntityManager().selectBoolean("isUserAuthorizedForResource", authCheck);
   }
 
   public boolean isAuthorized(Permission permission, Resource resource, String resourceId) {
@@ -142,7 +142,7 @@ public class AuthorizationManager extends AbstractManager {
       Map<String, Object> deleteParams = new HashMap<String, Object>();
       deleteParams.put("resourceType", resource.resourceType());
       deleteParams.put("resourceId", resourceId);
-      getDbSqlSession().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId", deleteParams);
+      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId", deleteParams);
     }
 
   }

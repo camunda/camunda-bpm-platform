@@ -34,7 +34,7 @@ public class TaskManager extends AbstractManager {
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason, boolean cascade) {
-    List<TaskEntity> tasks = (List) getDbSqlSession()
+    List<TaskEntity> tasks = (List) getDbEntityManager()
       .createTaskQuery()
       .processInstanceId(processInstanceId)
       .list();
@@ -48,7 +48,7 @@ public class TaskManager extends AbstractManager {
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public void deleteTasksByCaseInstanceId(String caseInstanceId, String deleteReason, boolean cascade) {
-    List<TaskEntity> tasks = (List) getDbSqlSession()
+    List<TaskEntity> tasks = (List) getDbEntityManager()
         .createTaskQuery()
         .caseInstanceId(caseInstanceId)
         .list();
@@ -95,28 +95,28 @@ public class TaskManager extends AbstractManager {
         }
       }
 
-      getDbSqlSession().delete(task);
+      getDbEntityManager().delete(task);
     }
   }
 
 
   public TaskEntity findTaskById(String id) {
     ensureNotNull("Invalid task id", "id", id);
-    return (TaskEntity) getDbSqlSession().selectById(TaskEntity.class, id);
+    return getDbEntityManager().selectById(TaskEntity.class, id);
   }
 
   @SuppressWarnings("unchecked")
   public List<TaskEntity> findTasksByExecutionId(String executionId) {
-    return getDbSqlSession().selectList("selectTasksByExecutionId", executionId);
+    return getDbEntityManager().selectList("selectTasksByExecutionId", executionId);
   }
 
   public TaskEntity findTaskByCaseExecutionId(String caseExecutionId) {
-    return (TaskEntity) getDbSqlSession().selectOne("selectTaskByCaseExecutionId", caseExecutionId);
+    return (TaskEntity) getDbEntityManager().selectOne("selectTaskByCaseExecutionId", caseExecutionId);
   }
 
   @SuppressWarnings("unchecked")
   public List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId) {
-    return getDbSqlSession().selectList("selectTasksByProcessInstanceId", processInstanceId);
+    return getDbEntityManager().selectList("selectTasksByProcessInstanceId", processInstanceId);
   }
 
 
@@ -130,53 +130,53 @@ public class TaskManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery) {
     final String query = "selectTaskByQueryCriteria";
-    return getDbSqlSession().selectList(query, taskQuery);
+    return getDbEntityManager().selectList(query, taskQuery);
   }
 
   public long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery) {
-    return (Long) getDbSqlSession().selectOne("selectTaskCountByQueryCriteria", taskQuery);
+    return (Long) getDbEntityManager().selectOne("selectTaskCountByQueryCriteria", taskQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectTaskByNativeQuery", parameterMap, firstResult, maxResults);
+    return getDbEntityManager().selectListWithRawParameter("selectTaskByNativeQuery", parameterMap, firstResult, maxResults);
   }
 
   public long findTaskCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectTaskCountByNativeQuery", parameterMap);
+    return (Long) getDbEntityManager().selectOne("selectTaskCountByNativeQuery", parameterMap);
   }
 
   @SuppressWarnings("unchecked")
   public List<Task> findTasksByParentTaskId(String parentTaskId) {
-    return getDbSqlSession().selectList("selectTasksByParentTaskId", parentTaskId);
+    return getDbEntityManager().selectList("selectTasksByParentTaskId", parentTaskId);
   }
 
   public void updateTaskSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
   }
 
   public void updateTaskSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
   }
 
   public void updateTaskSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
   }
 
   public void updateTaskSuspensionStateByCaseExecutionId(String caseExecutionId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("caseExecutionId", caseExecutionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
 
   }
 

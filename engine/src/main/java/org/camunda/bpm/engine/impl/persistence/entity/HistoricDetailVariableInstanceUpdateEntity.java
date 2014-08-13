@@ -14,10 +14,9 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Date;
-
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
@@ -55,11 +54,11 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
 
   public void delete() {
 
-    DbSqlSession dbSqlSession = Context
+    DbEntityManager dbEntityManger = Context
         .getCommandContext()
-        .getDbSqlSession();
+        .getDbEntityManger();
 
-    dbSqlSession.delete(this);
+    dbEntityManger.delete(this);
 
     if (byteArrayId != null) {
       // the next apparently useless line is probably to ensure consistency in the DbSqlSession
@@ -97,7 +96,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
       if(Context.getCommandContext() != null) {
         byteArrayValue = Context
           .getCommandContext()
-          .getDbSqlSession()
+          .getDbEntityManger()
           .selectById(ByteArrayEntity.class, byteArrayId);
       }
     }
@@ -117,7 +116,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
       byteArrayValue = new ByteArrayEntity(bytes);
       Context
         .getCommandContext()
-        .getDbSqlSession()
+        .getDbEntityManger()
         .insert(byteArrayValue);
     }
     this.byteArrayValue = byteArrayValue;

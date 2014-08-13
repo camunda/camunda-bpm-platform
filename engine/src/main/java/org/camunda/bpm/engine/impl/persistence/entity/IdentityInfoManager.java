@@ -36,10 +36,10 @@ public class IdentityInfoManager extends AbstractManager {
   }
 
   public void deleteIdentityInfo(IdentityInfoEntity identityInfo) {
-    getDbSqlSession().delete(identityInfo);
+    getDbEntityManager().delete(identityInfo);
     if (IdentityInfoEntity.TYPE_USERACCOUNT.equals(identityInfo.getType())) {
       for (IdentityInfoEntity identityInfoDetail: findIdentityInfoDetails(identityInfo.getId())) {
-        getDbSqlSession().delete(identityInfoDetail);
+        getDbEntityManager().delete(identityInfoDetail);
       }
     }
   }
@@ -115,7 +115,7 @@ public class IdentityInfoManager extends AbstractManager {
       identityInfoEntity.setKey(key);
       identityInfoEntity.setValue(value);
       identityInfoEntity.setPasswordBytes(storedPassword);
-      getDbSqlSession().insert(identityInfoEntity);
+      getDbEntityManager().insert(identityInfoEntity);
       if (accountDetails!=null) {
         insertAccountDetails(identityInfoEntity, accountDetails, accountDetails.keySet());
       }
@@ -129,7 +129,7 @@ public class IdentityInfoManager extends AbstractManager {
       identityInfoDetail.setParentId(identityInfoEntity.getId());
       identityInfoDetail.setKey(newKey);
       identityInfoDetail.setValue(accountDetails.get(newKey));
-      getDbSqlSession().insert(identityInfoDetail);
+      getDbEntityManager().insert(identityInfoDetail);
     }
   }
 
@@ -147,7 +147,7 @@ public class IdentityInfoManager extends AbstractManager {
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("userId", userId);
     parameters.put("key", key);
-    return (IdentityInfoEntity) getDbSqlSession().selectOne("selectIdentityInfoByUserIdAndKey", parameters);
+    return (IdentityInfoEntity) getDbEntityManager().selectOne("selectIdentityInfoByUserIdAndKey", parameters);
   }
 
   @SuppressWarnings("unchecked")
@@ -159,7 +159,7 @@ public class IdentityInfoManager extends AbstractManager {
   }
 
   public void deleteUserInfoByUserId(String userId) {
-    List<IdentityInfoEntity> identityInfos = getDbSqlSession().selectList("selectIdentityInfoByUserId", userId);
+    List<IdentityInfoEntity> identityInfos = getDbEntityManager().selectList("selectIdentityInfoByUserId", userId);
     for (IdentityInfoEntity identityInfo: identityInfos) {
       getIdentityInfoManager().deleteIdentityInfo(identityInfo);
     }    

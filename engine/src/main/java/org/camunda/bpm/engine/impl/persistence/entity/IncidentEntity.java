@@ -147,7 +147,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     // persist new incident
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManger()
       .insert(incident);
 
     incident.fireHistoricIncidentEvent(HistoryEvent.INCIDENT_CREATE);
@@ -191,7 +191,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     // always delete the incident
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManger()
       .delete(this);
 
     // update historic incident

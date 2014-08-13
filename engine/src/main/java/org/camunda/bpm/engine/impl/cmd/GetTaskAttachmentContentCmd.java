@@ -53,7 +53,7 @@ public class GetTaskAttachmentContentCmd implements Command<InputStream>, Serial
     }
 
     ByteArrayEntity byteArray = commandContext
-        .getDbSqlSession()
+        .getDbEntityManger()
         .selectById(ByteArrayEntity.class, contentId);
 
     byte[] bytes = byteArray.getBytes();

@@ -51,10 +51,10 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
 
     variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals("coca-cola", variables.get("stringVar"));
     assertEquals(928374L, variables.get("longVar"));
     assertEquals((short) 123, variables.get("shortVar"));
     assertEquals(1234, variables.get("integerVar"));
-    assertEquals("coca-cola", variables.get("stringVar"));
     assertEquals(now, variables.get("dateVar"));
     assertEquals(null, variables.get("nullVar"));
     assertEquals(serializable, variables.get("serializableVar"));

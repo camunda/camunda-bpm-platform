@@ -10,17 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.db.entitymanager.operation.executor;
+package org.camunda.bpm.engine.impl.variable;
 
-import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
-
+import org.camunda.bpm.engine.impl.interceptor.Session;
+import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 
 /**
  * @author Daniel Meyer
  *
  */
-public interface DbOperationExecutor {
+public class DeserializedObjectsSessionFactory implements SessionFactory {
 
-  void execute(DbOperation operation);
+  public Class<?> getSessionType() {
+    return DeserializedObjectsSession.class;
+  }
+
+  public Session openSession() {
+    return new DeserializedObjectsSession();
+  }
 
 }

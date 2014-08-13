@@ -13,31 +13,16 @@
 
 package org.camunda.bpm.engine.impl.test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import junit.framework.AssertionFailedError;
 
-import org.camunda.bpm.engine.AuthorizationService;
-import org.camunda.bpm.engine.CaseService;
-import org.camunda.bpm.engine.FormService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -133,15 +118,15 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
    * If the DB is not clean, it is cleaned by performing a create a drop. */
   protected void assertAndEnsureCleanDb() throws Throwable {
     log.fine("verifying that db is clean after test");
-
     Map<String, Long> tableCounts = managementService.getTableCount();
+
     StringBuilder outputMessage = new StringBuilder();
     for (String tableName : tableCounts.keySet()) {
       String tableNameWithoutPrefix = tableName.replace(processEngineConfiguration.getDatabaseTablePrefix(), "");
       if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
         Long count = tableCounts.get(tableName);
-        if (count!=0L) {
-          outputMessage.append("  "+tableName + ": " + count + " record(s) ");
+        if (count != 0L) {
+          outputMessage.append("  " + tableName + ": " + count + " record(s)\n");
         }
       }
     }
@@ -152,17 +137,17 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
       log.info("dropping and recreating db");
 
-      CommandExecutor commandExecutor = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration().getCommandExecutorTxRequired();
+      CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutorTxRequired();
       commandExecutor.execute(new Command<Object>() {
         public Object execute(CommandContext commandContext) {
-          DbSqlSession session = commandContext.getSession(DbSqlSession.class);
-          session.dbSchemaDrop();
-          session.dbSchemaCreate();
+          PersistenceSession persistenceSession = commandContext.getSession(PersistenceSession.class);
+          persistenceSession.dbSchemaDrop();
+          persistenceSession.dbSchemaCreate();
           return null;
         }
       });
 
-      if (exception!=null) {
+      if (exception != null) {
         throw exception;
       } else {
         Assert.fail(outputMessage.toString());

@@ -13,10 +13,7 @@
 package org.camunda.bpm.engine.impl.db.entitymanager;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.impl.db.DbEntity;
-import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -25,7 +22,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Daniel Meyer
@@ -58,10 +56,8 @@ public class DbOperationsOrderingTest {
 
   @Before
   public void setup() {
-    DbSqlSessionFactory dbSqlSessionFactory = new DbSqlSessionFactory();
     TestIdGenerator idGenerator = new TestIdGenerator();
-    dbSqlSessionFactory.setIdGenerator(idGenerator);
-    entityManager = new DbEntityManager(dbSqlSessionFactory, null);
+    entityManager = new DbEntityManager(idGenerator, null);
 
     execution1 = new ExecutionEntity();
     execution1.setId("101");

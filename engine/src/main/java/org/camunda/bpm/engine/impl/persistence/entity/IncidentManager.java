@@ -28,11 +28,11 @@ public class IncidentManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<Incident> findIncidentsByExecution(String id) {
-    return getDbSqlSession().selectList("selectIncidentsByExecutionId", id);
+    return getDbEntityManager().selectList("selectIncidentsByExecutionId", id);
   }
 
   public long findIncidentCountByQueryCriteria(IncidentQueryImpl jobQuery) {
-    return (Long) getDbSqlSession().selectOne("selectIncidentCountByQueryCriteria", jobQuery);
+    return (Long) getDbEntityManager().selectOne("selectIncidentCountByQueryCriteria", jobQuery);
   }
 
   public List<Incident> findIncidentByConfiguration(String configuration) {
@@ -44,12 +44,12 @@ public class IncidentManager extends AbstractManager {
     Map<String,Object> params = new HashMap<String, Object>();
     params.put("configuration", configuration);
     params.put("incidentType", incidentType);
-    return getDbSqlSession().selectList("selectIncidentsByConfiguration", params);
+    return getDbEntityManager().selectList("selectIncidentsByConfiguration", params);
   }
 
   @SuppressWarnings("unchecked")
   public List<Incident> findIncidentByQueryCriteria(IncidentQueryImpl jobQuery, Page page) {
-    return getDbSqlSession().selectList("selectIncidentByQueryCriteria", jobQuery, page);
+    return getDbEntityManager().selectList("selectIncidentByQueryCriteria", jobQuery, page);
   }
 
 }

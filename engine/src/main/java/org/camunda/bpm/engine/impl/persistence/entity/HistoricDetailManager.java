@@ -31,24 +31,24 @@ public class HistoricDetailManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public void deleteHistoricDetailsByProcessInstanceId(String historicProcessInstanceId) {
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      getDbSqlSession().delete(ByteArrayEntity.class, "deleteHistoricDetailsByProcessInstanceId_byteArray", historicProcessInstanceId);
-      getDbSqlSession().delete(HistoricDetailEventEntity.class, "deleteHistoricDetailsByProcessInstanceId", historicProcessInstanceId);
+      getDbEntityManager().delete(ByteArrayEntity.class, "deleteHistoricDetailsByProcessInstanceId_byteArray", historicProcessInstanceId);
+      getDbEntityManager().delete(HistoricDetailEventEntity.class, "deleteHistoricDetailsByProcessInstanceId", historicProcessInstanceId);
     }
   }
 
   public long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
-    return (Long) getDbSqlSession().selectOne("selectHistoricDetailCountByQueryCriteria", historicVariableUpdateQuery);
+    return (Long) getDbEntityManager().selectOne("selectHistoricDetailCountByQueryCriteria", historicVariableUpdateQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery, Page page) {
-    return getDbSqlSession().selectList("selectHistoricDetailsByQueryCriteria", historicVariableUpdateQuery, page);
+    return getDbEntityManager().selectList("selectHistoricDetailsByQueryCriteria", historicVariableUpdateQuery, page);
   }
 
   public void deleteHistoricDetailsByTaskId(String taskId) {
     if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
-      getDbSqlSession().delete(ByteArrayEntity.class, "deleteHistoricDetailsByTaskId_byteArray", taskId);
-      getDbSqlSession().delete(HistoricDetailEventEntity.class, "deleteHistoricDetailsByTaskId", taskId);
+      getDbEntityManager().delete(ByteArrayEntity.class, "deleteHistoricDetailsByTaskId_byteArray", taskId);
+      getDbEntityManager().delete(HistoricDetailEventEntity.class, "deleteHistoricDetailsByTaskId", taskId);
     }
   }
 }

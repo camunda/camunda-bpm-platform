@@ -20,9 +20,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 /**
  * @author Tom Baeyens
  */
-public class StandaloneMybatisTransactionContextFactory implements TransactionContextFactory {
+public class StandaloneTransactionContextFactory implements TransactionContextFactory {
 
   public TransactionContext openTransactionContext(CommandContext commandContext) {
-    return new StandaloneMybatisTransactionContext(commandContext);
+    return new StandaloneTransactionContext(commandContext);
   }
 }

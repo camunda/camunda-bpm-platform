@@ -31,12 +31,12 @@ public class HistoricActivityInstanceManager extends AbstractHistoricManager {
 
   public void deleteHistoricActivityInstancesByProcessInstanceId(String historicProcessInstanceId) {
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      getDbSqlSession().delete(HistoricActivityInstanceEntity.class, "deleteHistoricActivityInstancesByProcessInstanceId", historicProcessInstanceId);
+      getDbEntityManager().delete(HistoricActivityInstanceEntity.class, "deleteHistoricActivityInstancesByProcessInstanceId", historicProcessInstanceId);
     }
   }
 
   public void insertHistoricActivityInstance(HistoricActivityInstanceEntity historicActivityInstance) {
-    getDbSqlSession().insert(historicActivityInstance);
+    getDbEntityManager().insert(historicActivityInstance);
   }
 
   public HistoricActivityInstanceEntity findHistoricActivityInstance(String activityId, String processInstanceId) {
@@ -44,24 +44,24 @@ public class HistoricActivityInstanceManager extends AbstractHistoricManager {
     parameters.put("activityId", activityId);
     parameters.put("processInstanceId", processInstanceId);
 
-    return (HistoricActivityInstanceEntity) getDbSqlSession().selectOne("selectHistoricActivityInstance", parameters);
+    return (HistoricActivityInstanceEntity) getDbEntityManager().selectOne("selectHistoricActivityInstance", parameters);
   }
 
   public long findHistoricActivityInstanceCountByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
-    return (Long) getDbSqlSession().selectOne("selectHistoricActivityInstanceCountByQueryCriteria", historicActivityInstanceQuery);
+    return (Long) getDbEntityManager().selectOne("selectHistoricActivityInstanceCountByQueryCriteria", historicActivityInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery, Page page) {
-    return getDbSqlSession().selectList("selectHistoricActivityInstancesByQueryCriteria", historicActivityInstanceQuery, page);
+    return getDbEntityManager().selectList("selectHistoricActivityInstancesByQueryCriteria", historicActivityInstanceQuery, page);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectHistoricActivityInstanceByNativeQuery", parameterMap, firstResult, maxResults);
+    return getDbEntityManager().selectListWithRawParameter("selectHistoricActivityInstanceByNativeQuery", parameterMap, firstResult, maxResults);
   }
 
   public long findHistoricActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectHistoricActivityInstanceCountByNativeQuery", parameterMap);
+    return (Long) getDbEntityManager().selectOne("selectHistoricActivityInstanceCountByNativeQuery", parameterMap);
   }
 }

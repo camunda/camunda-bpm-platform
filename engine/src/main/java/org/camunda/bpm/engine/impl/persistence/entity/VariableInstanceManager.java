@@ -29,17 +29,17 @@ public class VariableInstanceManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
-    return getDbSqlSession().selectList("selectVariablesByTaskId", taskId);
+    return getDbEntityManager().selectList("selectVariablesByTaskId", taskId);
   }
 
   @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId) {
-    return getDbSqlSession().selectList("selectVariablesByExecutionId", executionId);
+    return getDbEntityManager().selectList("selectVariablesByExecutionId", executionId);
   }
 
   @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByCaseExecutionId(String caseExecutionId) {
-    return getDbSqlSession().selectList("selectVariablesByCaseExecutionId", caseExecutionId);
+    return getDbEntityManager().selectList("selectVariablesByCaseExecutionId", caseExecutionId);
   }
 
   public void deleteVariableInstanceByTask(TaskEntity task) {
@@ -52,12 +52,12 @@ public class VariableInstanceManager extends AbstractManager {
   }
 
   public long findVariableInstanceCountByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
-    return (Long) getDbSqlSession().selectOne("selectVariableInstanceCountByQueryCriteria", variableInstanceQuery);
+    return (Long) getDbEntityManager().selectOne("selectVariableInstanceCountByQueryCriteria", variableInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<VariableInstance> findVariableInstanceByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery, Page page) {
-    return getDbSqlSession().selectList("selectVariableInstanceByQueryCriteria", variableInstanceQuery, page);
+    return getDbEntityManager().selectList("selectVariableInstanceByQueryCriteria", variableInstanceQuery, page);
   }
 
 }

@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -146,7 +146,7 @@ public class BpmnDeployer implements Deployer {
     CommandContext commandContext = Context.getCommandContext();
     ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-    DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
+    DbEntityManager dbEntityManager = commandContext.getDbEntityManger();
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
       if (deployment.isNew()) {
@@ -160,7 +160,7 @@ public class BpmnDeployer implements Deployer {
         updateJobDeclarations(declarations, processDefinition, deployment.isNew());
         adjustStartEventSubscriptions(processDefinition, latestProcessDefinition);
 
-        dbSqlSession.insert(processDefinition);
+        dbEntityManager.insert(processDefinition);
         deploymentCache.addProcessDefinition(processDefinition);
         addAuthorizations(processDefinition);
 
@@ -338,8 +338,8 @@ public class BpmnDeployer implements Deployer {
             .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageEventDefinition.getEventName());
           // also look for subscriptions created in the session:
           List<MessageEventSubscriptionEntity> cachedSubscriptions = commandContext
-            .getDbSqlSession()
-            .findInCache(MessageEventSubscriptionEntity.class);
+            .getDbEntityManger()
+            .getCachedEntitiesByType(MessageEventSubscriptionEntity.class);
           for (MessageEventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
             if(messageEventDefinition.getEventName().equals(cachedSubscription.getEventName())
                     && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
@@ -348,7 +348,7 @@ public class BpmnDeployer implements Deployer {
           }
           // remove subscriptions deleted in the same command
           subscriptionsForSameMessageName = commandContext
-                  .getDbSqlSession()
+                  .getDbEntityManger()
                   .pruneDeletedEntities(subscriptionsForSameMessageName);
 
           if(!subscriptionsForSameMessageName.isEmpty()) {
@@ -385,7 +385,7 @@ public class BpmnDeployer implements Deployer {
           identityLink.setGroupId(expr.toString());
         }
         identityLink.setType(IdentityLinkType.CANDIDATE);
-        commandContext.getDbSqlSession().insert(identityLink);
+        commandContext.getDbEntityManger().insert(identityLink);
       }
     }
   }
@@ -459,7 +459,7 @@ public class BpmnDeployer implements Deployer {
 
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManger()
       .insert(resource);
   }
 

@@ -13,26 +13,12 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
-import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.DelegateTask;
-import org.camunda.bpm.engine.delegate.Expression;
-import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.delegate.*;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -40,8 +26,8 @@ import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.DbEntity;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextCloseListener;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -159,8 +145,8 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
     ensureParentTaskActive();
 
     CommandContext commandContext = Context.getCommandContext();
-    DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-    dbSqlSession.insert(this);
+    DbEntityManager dbEntityManger = commandContext.getDbEntityManger();
+    dbEntityManger.insert(this);
 
     if(execution != null) {
       execution.addTask(this);
@@ -171,8 +157,8 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
     setAssignee(this.getAssignee());
 
     CommandContext commandContext = Context.getCommandContext();
-    DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-    dbSqlSession.merge(this);
+    DbEntityManager dbEntityManger = commandContext.getDbEntityManger();
+    dbEntityManger.merge(this);
 
     commandContext.registerCommandContextCloseListener(this);
   }
@@ -511,7 +497,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
     for (IdentityLinkEntity identityLink: identityLinks) {
       Context
         .getCommandContext()
-        .getDbSqlSession()
+        .getDbEntityManger()
         .delete(identityLink);
     }
   }
@@ -978,7 +964,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   }
 
   public void onCommandContextClose(CommandContext commandContext) {
-    if(commandContext.getDbSqlSession().hasStateChanged(this)) {
+    if(commandContext.getDbEntityManger().isDirty(this)) {
       commandContext.getHistoricTaskInstanceManager().updateHistoricTaskInstance(this);
     }
   }

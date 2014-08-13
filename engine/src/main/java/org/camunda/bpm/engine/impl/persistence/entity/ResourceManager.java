@@ -26,30 +26,30 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 public class ResourceManager extends AbstractManager {
 
   public void insertResource(ResourceEntity resource) {
-    getDbSqlSession().insert(resource);
+    getDbEntityManager().insert(resource);
   }
 
   public void deleteResourcesByDeploymentId(String deploymentId) {
-    getDbSqlSession().delete(ResourceEntity.class, "deleteResourcesByDeploymentId", deploymentId);
+    getDbEntityManager().delete(ResourceEntity.class, "deleteResourcesByDeploymentId", deploymentId);
   }
 
   public ResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("deploymentId", deploymentId);
     params.put("resourceName", resourceName);
-    return (ResourceEntity) getDbSqlSession().selectOne("selectResourceByDeploymentIdAndResourceName", params);
+    return (ResourceEntity) getDbEntityManager().selectOne("selectResourceByDeploymentIdAndResourceName", params);
   }
 
   public ResourceEntity findResourceByDeploymentIdAndResourceId(String deploymentId, String resourceId) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("deploymentId", deploymentId);
     params.put("resourceId", resourceId);
-    return (ResourceEntity) getDbSqlSession().selectOne("selectResourceByDeploymentIdAndResourceId", params);
+    return (ResourceEntity) getDbEntityManager().selectOne("selectResourceByDeploymentIdAndResourceId", params);
   }
 
   @SuppressWarnings("unchecked")
   public List<ResourceEntity> findResourcesByDeploymentId(String deploymentId) {
-    return getDbSqlSession().selectList("selectResourcesByDeploymentId", deploymentId);
+    return getDbEntityManager().selectList("selectResourcesByDeploymentId", deploymentId);
   }
 
 }

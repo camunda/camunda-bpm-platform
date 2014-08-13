@@ -57,12 +57,12 @@ public class SetUserPictureCmd implements Command<Void>, Serializable {
       pictureInfo = new IdentityInfoEntity();
       pictureInfo.setUserId(userId);
       pictureInfo.setKey("picture");
-      commandContext.getDbSqlSession().insert(pictureInfo);
+      commandContext.getDbEntityManger().insert(pictureInfo);
     }
 
     ByteArrayEntity byteArrayEntity = new ByteArrayEntity(picture.getMimeType(), picture.getBytes());
 
-    commandContext.getDbSqlSession()
+    commandContext.getDbEntityManger()
       .insert(byteArrayEntity);
 
     pictureInfo.setValue(byteArrayEntity.getId());

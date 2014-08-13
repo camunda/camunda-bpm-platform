@@ -43,7 +43,7 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
       }
 
       //delete entries in Cache
-      List<HistoricVariableInstanceEntity> cachedHistoricVariableInstances = getDbSqlSession().findInCache(HistoricVariableInstanceEntity.class);
+      List<HistoricVariableInstanceEntity> cachedHistoricVariableInstances = getDbEntityManager().getCachedEntitiesByType(HistoricVariableInstanceEntity.class);
       for (HistoricVariableInstanceEntity historicProcessVariable : cachedHistoricVariableInstances) {
         // make sure we only delete the right ones (as we cannot make a proper query in the cache)
         if (historicProcessVariable.getProcessInstanceId().equals(historicProcessInstanceId )) {
@@ -55,20 +55,20 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
 
   @SuppressWarnings("unchecked")
   public List<HistoricVariableInstance> findHistoricVariableInstancesByProcessInstanceId(String processInstanceId) {
-    return getDbSqlSession().selectList("selectHistoricVariablesByProcessInstanceId", processInstanceId);
+    return getDbEntityManager().selectList("selectHistoricVariablesByProcessInstanceId", processInstanceId);
   }
 
   public long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
-    return (Long) getDbSqlSession().selectOne("selectHistoricVariableInstanceCountByQueryCriteria", historicProcessVariableQuery);
+    return (Long) getDbEntityManager().selectOne("selectHistoricVariableInstanceCountByQueryCriteria", historicProcessVariableQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery, Page page) {
-    return getDbSqlSession().selectList("selectHistoricVariableInstanceByQueryCriteria", historicProcessVariableQuery, page);
+    return getDbEntityManager().selectList("selectHistoricVariableInstanceByQueryCriteria", historicProcessVariableQuery, page);
   }
 
   public HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId) {
-    return (HistoricVariableInstanceEntity) getDbSqlSession().selectOne("selectHistoricVariableInstanceByVariableInstanceId", variableInstanceId);
+    return (HistoricVariableInstanceEntity) getDbEntityManager().selectOne("selectHistoricVariableInstanceByVariableInstanceId", variableInstanceId);
   }
 
   public void deleteHistoricVariableInstancesByTaskId(String taskId) {

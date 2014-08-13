@@ -13,9 +13,8 @@
 package org.camunda.bpm.engine.impl.history.event;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 
 /**
@@ -33,7 +32,7 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
  *
  * <p>This class implements {@link DbEntity}. This was chosen so
  * that {@link HistoryEvent}s can be easily persisted using the
- * {@link DbSqlSession}. This may not be used by all {@link HistoryEventHandler}
+ * {@link DbEntityManager}. This may not be used by all {@link HistoryEventHandler}
  * implementations but it does also not cause harm.</p>
  *
  * @author Daniel Meyer

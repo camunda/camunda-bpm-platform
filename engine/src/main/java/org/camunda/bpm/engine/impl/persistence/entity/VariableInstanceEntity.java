@@ -62,6 +62,8 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
   protected String dataFormatId;
   protected String configuration;
 
+  protected String typeName;
+
   // Default constructor for SQL mapping
   public VariableInstanceEntity() {
   }
@@ -71,7 +73,7 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
 
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManger()
       .insert(variableInstance);
 
     return variableInstance;
@@ -80,7 +82,7 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
   public static VariableInstanceEntity create(String name, VariableType type, Object value) {
     VariableInstanceEntity variableInstance = new VariableInstanceEntity();
     variableInstance.name = name;
-    variableInstance.type = type;
+    variableInstance.setType(type);
     variableInstance.setValue(value);
 
     return variableInstance;
@@ -96,7 +98,7 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
     // delete variable
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManger()
       .delete(this);
 
     deleteByteArrayValue();
@@ -174,7 +176,7 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
       if(Context.getCommandContext() != null) {
         byteArrayValue = Context
           .getCommandContext()
-          .getDbSqlSession()
+          .getDbEntityManger()
           .selectById(ByteArrayEntity.class, byteArrayValueId);
       }
     }
@@ -194,7 +196,7 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
       byteArrayValue = new ByteArrayEntity(bytes);
       Context
         .getCommandContext()
-        .getDbSqlSession()
+        .getDbEntityManger()
         .insert(byteArrayValue);
     }
     this.byteArrayValue = byteArrayValue;
@@ -220,9 +222,9 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
   // type /////////////////////////////////////////////////////////////////////
 
   public Object getValue() {
-    if (errorMessage == null && (!type.isCachable() || cachedValue==null)) {
+    if (errorMessage == null && (!getType().isCachable() || cachedValue==null)) {
       try {
-        cachedValue = type.getValue(this);
+        cachedValue = getType().getValue(this);
 
       } catch(RuntimeException e) {
         // catch error message
@@ -236,12 +238,12 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
   }
 
   public void setValue(Object value) {
-    type.setValue(value, this);
+    getType().setValue(value, this);
     cachedValue = value;
   }
 
   public boolean isAbleToStore(Object value) {
-    return type.isAbleToStore(value);
+    return getType().isAbleToStore(value);
   }
 
   // getters and setters //////////////////////////////////////////////////////
@@ -312,10 +314,24 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
 
   public void setType(VariableType type) {
     this.type = type;
+    this.typeName = type.getTypeName();
+  }
+
+  public void setTypeName(String type) {
+    this.typeName = type;
   }
 
   public VariableType getType() {
+    ensureTypeInitialized();
     return type;
+  }
+
+  protected void ensureTypeInitialized() {
+    if(type == null && typeName != null) {
+      type = Context.getProcessEngineConfiguration()
+          .getVariableTypes()
+          .getVariableType(typeName);
+    }
   }
 
   public Object getCachedValue() {
@@ -351,7 +367,7 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
   }
 
   public String getTypeName() {
-    return (type != null ? type.getTypeName() : null);
+    return typeName;
   }
 
   public String getErrorMessage() {
@@ -359,7 +375,7 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
   }
 
   public Object getRawValue() {
-    return type.getRawValue(this);
+    return getType().getRawValue(this);
   }
 
   public String getDataFormatId() {
@@ -405,4 +421,5 @@ public class VariableInstanceEntity implements CoreVariableInstance, VariableIns
            + ", configuration=" + configuration
            + "]";
   }
+
 }

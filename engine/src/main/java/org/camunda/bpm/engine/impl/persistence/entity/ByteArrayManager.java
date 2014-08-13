@@ -27,7 +27,7 @@ public class ByteArrayManager extends AbstractManager {
    * optimistic locking!.
    */
   public void deleteByteArrayById(String byteArrayEntityId) {
-    getDbSqlSession().delete(ByteArrayEntity.class, "deleteByteArrayNoRevisionCheck", byteArrayEntityId);
+    getDbEntityManager().delete(ByteArrayEntity.class, "deleteByteArrayNoRevisionCheck", byteArrayEntityId);
   }
 
 }

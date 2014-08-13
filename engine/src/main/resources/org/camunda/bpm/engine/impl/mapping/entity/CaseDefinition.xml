@@ -53,6 +53,10 @@
     select * from ${prefix}ACT_RE_CASE_DEF where ID_ = #{caseDefinitionId}
   </select>
 
+  <select id="selectCaseDefinitionByDeploymentId" parameterType="string" resultMap="caseDefinitionResultMap">
+    select * from ${prefix}ACT_RE_CASE_DEF where DEPLOYMENT_ID_ = #{parameter}
+  </select>
+
   <select id="selectCaseDefinitionByDeploymentAndKey" parameterType="map" resultMap="caseDefinitionResultMap">
     select * 
     from ${prefix}ACT_RE_CASE_DEF 

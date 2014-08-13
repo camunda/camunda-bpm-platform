@@ -91,7 +91,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     deleteByteArrayValue();
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManger()
       .delete(this);
   }
 
@@ -151,7 +151,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
       if(Context.getCommandContext() != null) {
         byteArrayValue = Context
           .getCommandContext()
-          .getDbSqlSession()
+          .getDbEntityManger()
           .selectById(ByteArrayEntity.class, byteArrayId);
       }
     }
@@ -165,7 +165,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
       byteArrayValue = new ByteArrayEntity(name, bytes);
       Context
         .getCommandContext()
-        .getDbSqlSession()
+        .getDbEntityManger()
         .insert(byteArrayValue);
     }
     this.byteArrayValue = byteArrayValue;

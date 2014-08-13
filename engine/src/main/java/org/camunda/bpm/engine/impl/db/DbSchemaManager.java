@@ -10,20 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.db.entitymanager.operation;
+package org.camunda.bpm.engine.impl.db;
+
+import org.camunda.bpm.engine.impl.interceptor.Session;
+
 
 /**
  * @author Daniel Meyer
  *
  */
-public enum DbOperationType {
+public class DbSchemaManager implements Session {
 
-  INSERT,
+  public void flush() {
 
-  UPDATE,
-  UPDATE_BULK,
+  }
 
-  DELETE,
-  DELETE_BULK;
+  public void close() {
+
+  }
 
 }

@@ -12,13 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,40 +31,16 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
 import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
-import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
-import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IncidentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
-import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
-import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -84,6 +54,7 @@ public class CommandContext {
   protected TransactionContext transactionContext;
   protected Map<Class< ? >, SessionFactory> sessionFactories;
   protected Map<Class< ? >, Session> sessions = new HashMap<Class< ? >, Session>();
+  protected List<Session> sessionList = new ArrayList<Session>();
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
 
@@ -235,15 +206,13 @@ public class CommandContext {
   }
 
   protected void flushSessions() {
-    List<Session> sessions = new ArrayList<Session>(this.sessions.values());
-    for (Session session : sessions) {
+    for (Session session : sessionList) {
       session.flush();
     }
   }
 
   protected void closeSessions(CommandInvocationContext commandInvocationContext) {
-    List<Session> sessions = new ArrayList<Session>(this.sessions.values());
-    for (Session session : sessions) {
+    for (Session session : sessionList) {
       try {
         session.close();
       } catch (Throwable exception) {
@@ -260,9 +229,14 @@ public class CommandContext {
       ensureNotNull("no session factory configured for " + sessionClass.getName(), "sessionFactory", sessionFactory);
       session = sessionFactory.openSession();
       sessions.put(sessionClass, session);
+      sessionList.add(0, session);
     }
 
     return (T) session;
+  }
+
+  public DbEntityManager getDbEntityManger() {
+    return getSession(DbEntityManager.class);
   }
 
   public DbSqlSession getDbSqlSession() {

@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
 
@@ -24,18 +23,12 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 public class PropertyManager extends AbstractManager {
 
   public PropertyEntity findPropertyById(String propertyId) {
-    return getDbSqlSession().selectById(PropertyEntity.class, propertyId);
+    return getDbEntityManager().selectById(PropertyEntity.class, propertyId);
   }
 
   public void acquireExclusiveLock() {
-    // do not perform locking if H2 database is used. H2 uses table level locks
-    // by default which may cause deadlocks if the deploy command needs to get a new
-    // Id using the DbIdGenerator while performing a deployment.
-    if(!"h2".equals(Context.getCommandContext().getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-
-      // We lock a special deployment lock property
-      getDbSqlSession().lock("lockDeploymentLockProperty");
-    }
+    // We lock a special deployment lock property
+    getDbEntityManager().lock("lockDeploymentLockProperty");
 
   }
 

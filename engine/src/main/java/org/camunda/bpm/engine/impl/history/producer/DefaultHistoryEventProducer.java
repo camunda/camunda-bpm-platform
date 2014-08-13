@@ -199,7 +199,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     if(variableInstance.getExecutionId() != null) {
       ExecutionEntity scopeExecution = Context.getCommandContext()
-        .getDbSqlSession()
+        .getDbEntityManger()
         .selectById(ExecutionEntity.class, variableInstance.getExecutionId());
 
       if (variableInstance.getTaskId() == null

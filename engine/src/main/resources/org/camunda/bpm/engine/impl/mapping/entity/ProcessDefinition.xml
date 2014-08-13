@@ -70,8 +70,12 @@
 
   <!-- PROCESSDEFINITION SELECT -->
   
-  <select id="selectProcessDefinitionById" parameterType="string" resultMap="processDefinitionResultMap">
+  <select id="selectProcessDefinition" parameterType="string" resultMap="processDefinitionResultMap">
     select * from ${prefix}ACT_RE_PROCDEF where ID_ = #{processDefinitionId}
+  </select>
+
+  <select id="selectProcessDefinitionByDeploymentId" parameterType="string" resultMap="processDefinitionResultMap">
+    select * from ${prefix}ACT_RE_PROCDEF where DEPLOYMENT_ID_ = #{parameter}
   </select>
 
   <select id="selectProcessDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">

@@ -16,23 +16,11 @@ package org.camunda.bpm.engine.impl.persistence;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.interceptor.Session;
-import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
-import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
 
 
 /**
@@ -41,11 +29,15 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 public abstract class AbstractManager implements Session {
 
   public void insert(DbEntity dbEntity) {
-    getDbSqlSession().insert(dbEntity);
+    getDbEntityManager().insert(dbEntity);
   }
 
   public void delete(DbEntity dbEntity) {
-    getDbSqlSession().delete(dbEntity);
+    getDbEntityManager().delete(dbEntity);
+  }
+
+  protected DbEntityManager getDbEntityManager() {
+    return getSession(DbEntityManager.class);
   }
 
   protected DbSqlSession getDbSqlSession() {
@@ -129,4 +121,5 @@ public abstract class AbstractManager implements Session {
 
   public void flush() {
   }
+
 }

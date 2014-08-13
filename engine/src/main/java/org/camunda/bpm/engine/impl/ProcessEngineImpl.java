@@ -14,22 +14,9 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.Map;
 import java.util.logging.Logger;
-
-import org.camunda.bpm.engine.AuthorizationService;
-import org.camunda.bpm.engine.CaseService;
-import org.camunda.bpm.engine.FormService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngines;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
-import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
@@ -114,10 +101,6 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
 
     commandExecutorSchemaOperations.execute(new SchemaOperationProcessEngineClose());
-  }
-
-  public DbSqlSessionFactory getDbSqlSessionFactory() {
-    return (DbSqlSessionFactory) sessionFactories.get(DbSqlSession.class);
   }
 
   // getters and setters //////////////////////////////////////////////////////

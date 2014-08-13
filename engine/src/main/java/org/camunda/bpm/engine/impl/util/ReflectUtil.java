@@ -156,6 +156,14 @@ public abstract class ReflectUtil {
     }
   }
 
+  public static <T> T instantiate(Class<T> type) {
+    try {
+      return type.newInstance();
+    } catch (Exception e) {
+      throw new ProcessEngineException("couldn't instantiate class "+type, e);
+    }
+  }
+
   public static Object invoke(Object target, String methodName, Object[] args) {
     try {
       Class<? extends Object> clazz = target.getClass();

@@ -34,14 +34,14 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
 
   public HistoricProcessInstanceEntity findHistoricProcessInstance(String processInstanceId) {
     if (isHistoryEnabled()) {
-      return (HistoricProcessInstanceEntity) getDbSqlSession().selectById(HistoricProcessInstanceEntity.class, processInstanceId);
+      return getDbEntityManager().selectById(HistoricProcessInstanceEntity.class, processInstanceId);
     }
     return null;
   }
 
   public HistoricProcessInstanceEventEntity findHistoricProcessInstanceEvent(String eventId) {
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      return (HistoricProcessInstanceEventEntity) getDbSqlSession().selectById(HistoricProcessInstanceEventEntity.class, eventId);
+      return getDbEntityManager().selectById(HistoricProcessInstanceEventEntity.class, eventId);
     }
     return null;
   }
@@ -49,7 +49,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public void deleteHistoricProcessInstanceByProcessDefinitionId(String processDefinitionId) {
     if (isHistoryEnabled()) {
-      List<String> historicProcessInstanceIds = getDbSqlSession()
+      List<String> historicProcessInstanceIds = getDbEntityManager()
         .selectList("selectHistoricProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
 
       for (String historicProcessInstanceId: historicProcessInstanceIds) {
@@ -86,14 +86,14 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
           .getHistoricIncidentManager()
           .deleteHistoricIncidentsByProcessInstanceId(historicProcessInstanceId);
 
-      commandContext.getDbSqlSession().delete(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstance", historicProcessInstanceId);
+      commandContext.getDbEntityManger().delete(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstance", historicProcessInstanceId);
 
     }
   }
 
   public long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
     if (isHistoryEnabled()) {
-      return (Long) getDbSqlSession().selectOne("selectHistoricProcessInstanceCountByQueryCriteria", historicProcessInstanceQuery);
+      return (Long) getDbEntityManager().selectOne("selectHistoricProcessInstanceCountByQueryCriteria", historicProcessInstanceQuery);
     }
     return 0;
   }
@@ -101,17 +101,17 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery, Page page) {
     if (isHistoryEnabled()) {
-      return getDbSqlSession().selectList("selectHistoricProcessInstancesByQueryCriteria", historicProcessInstanceQuery, page);
+      return getDbEntityManager().selectList("selectHistoricProcessInstancesByQueryCriteria", historicProcessInstanceQuery, page);
     }
     return Collections.EMPTY_LIST;
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectHistoricProcessInstanceByNativeQuery", parameterMap, firstResult, maxResults);
+    return getDbEntityManager().selectListWithRawParameter("selectHistoricProcessInstanceByNativeQuery", parameterMap, firstResult, maxResults);
   }
 
   public long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectHistoricProcessInstanceCountByNativeQuery", parameterMap);
+    return (Long) getDbEntityManager().selectOne("selectHistoricProcessInstanceCountByNativeQuery", parameterMap);
   }
 }

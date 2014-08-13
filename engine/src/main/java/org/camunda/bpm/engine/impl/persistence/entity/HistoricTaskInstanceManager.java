@@ -13,12 +13,9 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -30,6 +27,8 @@ import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 
 /**
  * @author  Tom Baeyens
@@ -39,7 +38,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public void deleteHistoricTaskInstancesByProcessInstanceId(final String processInstanceId) {
     if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      List<String> taskInstanceIds = (List<String>) getDbSqlSession()
+      List<String> taskInstanceIds = (List<String>) getDbEntityManager()
           .selectList("selectHistoricTaskInstanceIdsByProcessInstanceId", processInstanceId);
       for (String taskInstanceId : taskInstanceIds) {
         deleteHistoricTaskInstanceById(taskInstanceId);
@@ -49,7 +48,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
 
   public long findHistoricTaskInstanceCountByQueryCriteria(final HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
     if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      return (Long) getDbSqlSession()
+      return (Long) getDbEntityManager()
         .selectOne("selectHistoricTaskInstanceCountByQueryCriteria",historicTaskInstanceQuery);
     }
 
@@ -59,7 +58,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(final HistoricTaskInstanceQueryImpl historicTaskInstanceQuery, final Page page) {
     if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      return getDbSqlSession().selectList("selectHistoricTaskInstancesByQueryCriteria", historicTaskInstanceQuery, page);
+      return getDbEntityManager().selectList("selectHistoricTaskInstancesByQueryCriteria", historicTaskInstanceQuery, page);
     }
 
     return Collections.EMPTY_LIST;
@@ -69,7 +68,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
     ensureNotNull("Invalid historic task id", "taskId", taskId);
 
     if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      return (HistoricTaskInstanceEntity) getDbSqlSession().selectOne("selectHistoricTaskInstance", taskId);
+      return (HistoricTaskInstanceEntity) getDbEntityManager().selectOne("selectHistoricTaskInstance", taskId);
     }
 
     return null;
@@ -101,7 +100,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
           .getOperationLogManager()
           .deleteOperationLogEntriesByTaskId(taskId);
 
-        getDbSqlSession().delete(historicTaskInstance);
+        getDbEntityManager().delete(historicTaskInstance);
       }
     }
   }
@@ -109,12 +108,12 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(final Map<String, Object> parameterMap,
           final int firstResult, final int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectHistoricTaskInstanceByNativeQuery", parameterMap,
+    return getDbEntityManager().selectListWithRawParameter("selectHistoricTaskInstanceByNativeQuery", parameterMap,
             firstResult, maxResults);
   }
 
   public long findHistoricTaskInstanceCountByNativeQuery(final Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectHistoricTaskInstanceCountByNativeQuery", parameterMap);
+    return (Long) getDbEntityManager().selectOne("selectHistoricTaskInstanceCountByNativeQuery", parameterMap);
   }
 
   public void updateHistoricTaskInstance(TaskEntity taskEntity) {
@@ -142,7 +141,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
       final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
 
       TaskEntity taskEntity = Context.getCommandContext()
-          .getDbSqlSession()
+          .getDbEntityManger()
           .selectById(TaskEntity.class, taskId);
 
       HistoryEvent evt = eventProducer.createTaskInstanceCompleteEvt(taskEntity, deleteReason);

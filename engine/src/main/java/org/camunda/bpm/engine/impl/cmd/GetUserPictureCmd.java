@@ -46,7 +46,7 @@ public class GetUserPictureCmd implements Command<Picture>, Serializable {
     if (pictureInfo != null) {
       String pictureByteArrayId = pictureInfo.getValue();
       if (pictureByteArrayId != null) {
-        ByteArrayEntity byteArray = commandContext.getDbSqlSession()
+        ByteArrayEntity byteArray = commandContext.getDbEntityManger()
           .selectById(ByteArrayEntity.class, pictureByteArrayId);
         return new Picture(byteArray.getBytes(), byteArray.getName());
       }

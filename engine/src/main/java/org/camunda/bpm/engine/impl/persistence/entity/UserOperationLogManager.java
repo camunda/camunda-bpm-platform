@@ -12,14 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_ATTACHMENT;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_IDENTITY_LINK;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
-
 import java.util.Arrays;
 import java.util.List;
-
 import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
@@ -32,6 +26,8 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.*;
+
 /**
  * Manager for {@link UserOperationLogEntryEventEntity} that also provides a generic and some specific log methods.
  *
@@ -40,28 +36,28 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 public class UserOperationLogManager extends AbstractHistoricManager {
 
   public long findOperationLogEntryCountByQueryCriteria(UserOperationLogQueryImpl query) {
-    return (Long) getDbSqlSession().selectOne("selectUserOperationLogEntryCountByQueryCriteria", query);
+    return (Long) getDbEntityManager().selectOne("selectUserOperationLogEntryCountByQueryCriteria", query);
   }
 
   @SuppressWarnings("unchecked")
   public List<UserOperationLogEntry> findOperationLogEntriesByQueryCriteria(UserOperationLogQueryImpl query, Page page) {
-    return getDbSqlSession().selectList("selectUserOperationLogEntriesByQueryCriteria", query, page);
+    return getDbEntityManager().selectList("selectUserOperationLogEntriesByQueryCriteria", query, page);
   }
 
   public void deleteOperationLogEntriesByProcessInstanceId(String historicProcessInstanceId) {
-    getDbSqlSession().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByProcessInstanceId", historicProcessInstanceId);
+    getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByProcessInstanceId", historicProcessInstanceId);
   }
 
   public void deleteOperationLogEntriesByCaseInstanceId(String caseInstanceId) {
-    getDbSqlSession().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByCaseInstanceId", caseInstanceId);
+    getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByCaseInstanceId", caseInstanceId);
   }
 
   public void deleteOperationLogEntriesByCaseDefinitionId(String caseInstanceId) {
-    getDbSqlSession().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByCaseDefinitionId", caseInstanceId);
+    getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByCaseDefinitionId", caseInstanceId);
   }
 
   public void deleteOperationLogEntriesByTaskId(String taskId) {
-    getDbSqlSession().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByTaskId", taskId);
+    getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByTaskId", taskId);
   }
 
   public void logUserOperations(UserOperationLogContext context) {

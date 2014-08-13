@@ -27,17 +27,17 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 public class IdentityLinkManager extends AbstractManager {
 
   public void deleteIdentityLink(IdentityLinkEntity identityLink) {
-    getDbSqlSession().delete(identityLink);
+    getDbEntityManager().delete(identityLink);
   }
 
   @SuppressWarnings("unchecked")
   public List<IdentityLinkEntity> findIdentityLinksByTaskId(String taskId) {
-    return getDbSqlSession().selectList("selectIdentityLinksByTask", taskId);
+    return getDbEntityManager().selectList("selectIdentityLinksByTask", taskId);
   }
 
   @SuppressWarnings("unchecked")
   public List<IdentityLinkEntity> findIdentityLinksByProcessDefinitionId(String processDefinitionId) {
-    return getDbSqlSession().selectList("selectIdentityLinksByProcessDefinition", processDefinitionId);
+    return getDbEntityManager().selectList("selectIdentityLinksByProcessDefinition", processDefinitionId);
   }
 
   @SuppressWarnings("unchecked")
@@ -47,7 +47,7 @@ public class IdentityLinkManager extends AbstractManager {
     parameters.put("userId", userId);
     parameters.put("groupId", groupId);
     parameters.put("type", type);
-    return getDbSqlSession().selectList("selectIdentityLinkByTaskUserGroupAndType", parameters);
+    return getDbEntityManager().selectList("selectIdentityLinkByTaskUserGroupAndType", parameters);
   }
 
   @SuppressWarnings("unchecked")
@@ -56,7 +56,7 @@ public class IdentityLinkManager extends AbstractManager {
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("userId", userId);
     parameters.put("groupId", groupId);
-    return getDbSqlSession().selectList("selectIdentityLinkByProcessDefinitionUserAndGroup", parameters);
+    return getDbEntityManager().selectList("selectIdentityLinkByProcessDefinitionUserAndGroup", parameters);
   }
 
   public void deleteIdentityLinksByTaskId(String taskId) {
@@ -67,7 +67,7 @@ public class IdentityLinkManager extends AbstractManager {
   }
 
   public void deleteIdentityLinksByProcDef(String processDefId) {
-    getDbSqlSession().delete(IdentityLinkEntity.class, "deleteIdentityLinkByProcDef", processDefId);
+    getDbEntityManager().delete(IdentityLinkEntity.class, "deleteIdentityLinkByProcDef", processDefId);
   }
 
 }
