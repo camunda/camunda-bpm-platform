@@ -54,14 +54,14 @@ public class LdapGroupQueryTest extends LdapIdentityProviderTest {
   }
   
   public void testFilterByGroupNameLike() {
-    Group group = identityService.createGroupQuery().groupName("manage*").singleResult();
+    Group group = identityService.createGroupQuery().groupNameLike("manage*").singleResult();
     assertNotNull(group);
     
     // validate result
     assertEquals("management", group.getId());
     assertEquals("management", group.getName());
     
-    group = identityService.createGroupQuery().groupName("what*").singleResult();
+    group = identityService.createGroupQuery().groupNameLike("what*").singleResult();
     assertNull(group);
   }
   
