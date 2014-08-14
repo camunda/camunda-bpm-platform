@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import javax.script.ScriptException;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
@@ -21,6 +19,8 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
+
+import javax.script.ScriptException;
 
 
 /**
@@ -73,6 +73,10 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
     if (noErrors) {
       leave(execution);
     }
+  }
+
+  public ExecutableScript getScript() {
+    return script;
   }
 
 }

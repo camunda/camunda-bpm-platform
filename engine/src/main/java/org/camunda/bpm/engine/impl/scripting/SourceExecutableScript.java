@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.scripting;
 
-import java.util.logging.Logger;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.VariableScope;
+
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.VariableScope;
+import java.util.logging.Logger;
 
 /**
  * A script which is provided as source code. This is used if the corresponding
@@ -32,7 +32,7 @@ public class SourceExecutableScript extends ExecutableScript {
   private static final Logger LOG = Logger.getLogger(SourceExecutableScript.class.getName());
 
   /** The source of the script. */
-  protected final String scriptSrc;
+  protected String scriptSrc;
 
   public SourceExecutableScript(String language, String src) {
     super(language);
@@ -49,4 +49,11 @@ public class SourceExecutableScript extends ExecutableScript {
     }
   }
 
+  public String getScriptSrc() {
+    return scriptSrc;
+  }
+
+  public void setScriptSrc(String scriptSrc) {
+    this.scriptSrc = scriptSrc;
+  }
 }

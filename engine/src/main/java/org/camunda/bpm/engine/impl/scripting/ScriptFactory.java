@@ -28,14 +28,21 @@ import javax.script.CompiledScript;
 public class ScriptFactory {
 
   protected ScriptingEngines scriptingEngines;
+  protected boolean compileScripts;
 
-  public ScriptFactory(ScriptingEngines scriptingEngines) {
+
+  public ScriptFactory(ScriptingEngines scriptingEngines, boolean compileScripts) {
     this.scriptingEngines = scriptingEngines;
+    this.compileScripts = compileScripts;
   }
 
   public ExecutableScript createScript(String src, String language) {
 
-    CompiledScript compiledScript = scriptingEngines.compile(src, language);
+    CompiledScript compiledScript = null;
+    if (compileScripts) {
+      compiledScript = scriptingEngines.compile(src, language);
+    }
+
     if(compiledScript != null) {
       return new CompiledExecutableScript(language, compiledScript);
 
