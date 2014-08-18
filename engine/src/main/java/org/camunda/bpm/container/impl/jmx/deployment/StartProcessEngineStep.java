@@ -82,7 +82,7 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     
     // set UUid generator
     // TODO: move this to configuration and use as default?
-    ProcessEngineConfigurationImpl configurationImpl = (ProcessEngineConfigurationImpl)configuration;
+    ProcessEngineConfigurationImpl configurationImpl = configuration;
     configurationImpl.setIdGenerator(new StrongUuidGenerator());
     
     configureCustomRetryStrategy(configurationImpl);

@@ -170,7 +170,7 @@ public class ScopeUtil {
     if(eventSubscriptions.size() > 0) {
 
       ExecutionEntity eventScopeExecution = eventScope.createExecution();
-      eventScopeExecution.setActivity((ActivityImpl) execution.getActivity());
+      eventScopeExecution.setActivity(execution.getActivity());
       eventScopeExecution.enterActivityInstance();
       eventScopeExecution.setActive(false);
       eventScopeExecution.setConcurrent(false);

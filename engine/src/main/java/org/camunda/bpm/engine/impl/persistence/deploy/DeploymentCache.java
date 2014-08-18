@@ -96,7 +96,7 @@ public class DeploymentCache {
   }
 
   public ProcessDefinitionEntity findDeployedProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) Context
+    ProcessDefinitionEntity processDefinition = Context
       .getCommandContext()
       .getProcessDefinitionManager()
       .findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
@@ -209,7 +209,7 @@ public class DeploymentCache {
 
   public CaseDefinitionEntity findDeployedCaseDefinitionByKeyAndVersion(String caseDefinitionKey, Integer caseDefinitionVersion) {
 
-    CaseDefinitionEntity caseDefinition = (CaseDefinitionEntity) Context
+    CaseDefinitionEntity caseDefinition = Context
       .getCommandContext()
       .getCaseDefinitionManager()
       .findCaseDefinitionByKeyAndVersion(caseDefinitionKey, caseDefinitionVersion);
@@ -221,7 +221,7 @@ public class DeploymentCache {
   }
 
   public CaseDefinitionEntity findDeployedCaseDefinitionByDeploymentAndKey(String deploymentId, String caseDefinitionKey) {
-    CaseDefinitionEntity caseDefinition = (CaseDefinitionEntity) Context
+    CaseDefinitionEntity caseDefinition = Context
       .getCommandContext()
       .getCaseDefinitionManager()
       .findCaseDefinitionByDeploymentAndKey(deploymentId, caseDefinitionKey);

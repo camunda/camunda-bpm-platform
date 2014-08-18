@@ -42,7 +42,7 @@ public class ProcessDefinitionManager extends AbstractManager {
   }
 
   public ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
-    return (ProcessDefinitionEntity) getDbEntityManager().selectById(ProcessDefinitionEntity.class, processDefinitionId);
+    return getDbEntityManager().selectById(ProcessDefinitionEntity.class, processDefinitionId);
   }
 
   @SuppressWarnings("unchecked")

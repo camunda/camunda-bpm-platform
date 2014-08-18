@@ -79,7 +79,7 @@ public class CaseExecutionManager extends AbstractManager {
   }
 
   public CaseExecutionEntity findCaseExecutionById(String caseExecutionId) {
-    return (CaseExecutionEntity) getDbEntityManager().selectById(CaseExecutionEntity.class, caseExecutionId);
+    return getDbEntityManager().selectById(CaseExecutionEntity.class, caseExecutionId);
   }
 
   public CaseExecutionEntity findSubCaseInstanceBySuperCaseExecutionId(String superCaseExecutionId) {

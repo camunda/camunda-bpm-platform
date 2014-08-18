@@ -709,7 +709,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
             setEventName(taskEventName);
           }
           try {
-            TaskListenerInvocation listenerInvocation = new TaskListenerInvocation(taskListener, (DelegateTask) this, execution);
+            TaskListenerInvocation listenerInvocation = new TaskListenerInvocation(taskListener, this, execution);
             Context.getProcessEngineConfiguration()
               .getDelegateInterceptor()
               .handleInvocation(listenerInvocation);

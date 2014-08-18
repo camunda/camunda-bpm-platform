@@ -14,21 +14,10 @@
 package org.camunda.bpm.engine.test.api.history;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-
+import java.util.*;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -36,6 +25,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.ProcessInstanceQueryTest;
+import org.junit.Assert;
 
 /**
  * @author Frederik Heremans
@@ -146,7 +136,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
             .singleResult();
     HistoricProcessInstance historicProcessInstanceSuper = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("orderProcess")
             .singleResult();
-    assertEquals(historicProcessInstanceSuper.getId(), ((HistoricProcessInstanceEntity) historicProcessInstanceSub).getSuperProcessInstanceId());
+    assertEquals(historicProcessInstanceSuper.getId(), historicProcessInstanceSub.getSuperProcessInstanceId());
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })

@@ -34,7 +34,7 @@ public class ScriptCondition implements Condition {
   }
 
   public boolean evaluate(DelegateExecution execution) {
-    Object result = (Boolean) Context.getProcessEngineConfiguration()
+    Object result = Context.getProcessEngineConfiguration()
       .getScriptingEnvironment()
       .execute(script, execution);
 

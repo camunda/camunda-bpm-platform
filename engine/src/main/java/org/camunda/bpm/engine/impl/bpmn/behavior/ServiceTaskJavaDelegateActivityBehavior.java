@@ -42,7 +42,7 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
   }
   
   public void notify(DelegateExecution execution) throws Exception {
-    execute((DelegateExecution) execution);
+    execute(execution);
   }
   
   public void execute(DelegateExecution execution) throws Exception {

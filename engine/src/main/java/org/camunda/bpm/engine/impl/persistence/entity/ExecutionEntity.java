@@ -810,7 +810,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   public void removeEventSubscriptions() {
     for (EventSubscriptionEntity eventSubscription : getEventSubscriptions()) {
       if (replacedBy != null) {
-        eventSubscription.setExecution((ExecutionEntity) replacedBy);
+        eventSubscription.setExecution(replacedBy);
       } else {
         eventSubscription.delete();
       }
@@ -820,7 +820,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   private void removeJobs() {
     for (Job job: getJobs()) {
       if (replacedBy!=null) {
-        ((JobEntity)job).setExecution((ExecutionEntity) replacedBy);
+        ((JobEntity)job).setExecution(replacedBy);
       } else {
         ((JobEntity)job).delete();
       }
@@ -830,7 +830,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   private void removeIncidents() {
     for (IncidentEntity incident: getIncidents()) {
       if (replacedBy!=null) {
-        incident.setExecution((ExecutionEntity) replacedBy);
+        incident.setExecution(replacedBy);
       } else {
         incident.delete();
       }

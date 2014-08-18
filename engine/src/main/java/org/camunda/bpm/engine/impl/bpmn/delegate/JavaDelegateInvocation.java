@@ -32,7 +32,7 @@ public class JavaDelegateInvocation extends DelegateInvocation {
   }
 
   protected void invoke() throws Exception {
-    delegateInstance.execute((DelegateExecution) execution);
+    delegateInstance.execute(execution);
   }
   
   public Object getTarget() {

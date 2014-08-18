@@ -596,7 +596,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     // special treatment for starting process instance
     if(activity == null && processInstanceStartContext!= null) {
-      activity = (ActivityImpl) processInstanceStartContext.getInitial();
+      activity = processInstanceStartContext.getInitial();
     }
 
     activityInstanceId = generateActivityInstanceId(activity.getId());

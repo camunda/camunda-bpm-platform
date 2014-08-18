@@ -353,42 +353,55 @@ public class DbEntityManager implements Session {
   public DeploymentQueryImpl createDeploymentQuery() {
     return new DeploymentQueryImpl();
   }
+
   public ProcessDefinitionQueryImpl createProcessDefinitionQuery() {
     return new ProcessDefinitionQueryImpl();
   }
+
   public CaseDefinitionQueryImpl createCaseDefinitionQuery() {
     return new CaseDefinitionQueryImpl();
   }
+
   public ProcessInstanceQueryImpl createProcessInstanceQuery() {
     return new ProcessInstanceQueryImpl();
   }
+
   public ExecutionQueryImpl createExecutionQuery() {
     return new ExecutionQueryImpl();
   }
+
   public TaskQueryImpl createTaskQuery() {
     return new TaskQueryImpl();
   }
+
   public JobQueryImpl createJobQuery() {
     return new JobQueryImpl();
   }
+
   public HistoricProcessInstanceQueryImpl createHistoricProcessInstanceQuery() {
     return new HistoricProcessInstanceQueryImpl();
   }
+
   public HistoricActivityInstanceQueryImpl createHistoricActivityInstanceQuery() {
     return new HistoricActivityInstanceQueryImpl();
   }
+
   public HistoricTaskInstanceQueryImpl createHistoricTaskInstanceQuery() {
     return new HistoricTaskInstanceQueryImpl();
   }
+
   public HistoricDetailQueryImpl createHistoricDetailQuery() {
     return new HistoricDetailQueryImpl();
   }
+
   public HistoricVariableInstanceQueryImpl createHistoricVariableInstanceQuery() {
     return new HistoricVariableInstanceQueryImpl();
   }
+
   public UserQueryImpl createUserQuery() {
     return new DbUserQueryImpl();
   }
+
   public GroupQueryImpl createGroupQuery() {
     return new DbGroupQueryImpl();
   }

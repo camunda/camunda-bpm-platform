@@ -44,7 +44,7 @@ public class FoxDeleteProcessInstanceCmd implements Command<Void>, Serializable 
   @SuppressWarnings("unchecked")
   public List<PvmExecutionImpl> collectExecutionToDelete(PvmExecutionImpl execution) {
     List<PvmExecutionImpl> result = new ArrayList<PvmExecutionImpl>();
-    for (PvmExecutionImpl currentExecution : (List<PvmExecutionImpl>) execution.getExecutions()) {
+    for (PvmExecutionImpl currentExecution : execution.getExecutions()) {
       result.addAll(this.collectExecutionToDelete(currentExecution));
     }
     if (execution.getSubProcessInstance() != null) {

@@ -55,7 +55,7 @@ public class EnumFormType extends AbstractFormFieldType {
       if(!(modelValue instanceof String)) {
         throw new ProcessEngineException("Model value should be a String");
       }
-      validateValue((String) modelValue);
+      validateValue(modelValue);
     }
     return (String) modelValue;
   }

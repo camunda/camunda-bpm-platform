@@ -54,7 +54,7 @@ public class PvmAtomicOperationProcessStart extends AbstractPvmEventAtomicOperat
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
     ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
     ProcessInstanceStartContext processInstanceStartContext = execution.getProcessInstanceStartContext();
-    List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack((ActivityImpl) processInstanceStartContext.getInitial());
+    List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack(processInstanceStartContext.getInitial());
     execution.setActivity(initialActivityStack.get(0));
     execution.performOperation(PROCESS_START_INITIAL);
   }

@@ -72,7 +72,7 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
       Enumeration<URL> resourceRoots = loadClasspathResourceRoots(classLoader, strippedPath);
       
       while (resourceRoots.hasMoreElements()) {
-        URL resourceRoot = (URL) resourceRoots.nextElement();
+        URL resourceRoot = resourceRoots.nextElement();
         scanUrl(resourceRoot, strippedPath, false, additionalResourceSuffixes, resourceMap);
       }
 
@@ -155,14 +155,14 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
       ZipFile zipFile = new ZipFile(file);
       Enumeration< ? extends ZipEntry> entries = zipFile.entries();
       while (entries.hasMoreElements()) {
-        ZipEntry zipEntry = (ZipEntry) entries.nextElement();
+        ZipEntry zipEntry = entries.nextElement();
         String processFileName = zipEntry.getName();        
         if (ProcessApplicationScanningUtil.isDeployable(processFileName, additionalResourceSuffixes) && isBelowPath(processFileName, paResourceRootPath)) {
           addResource(zipFile.getInputStream(zipEntry), resourceMap, file.getName()+"!", processFileName);
           // find diagram(s) for process
           Enumeration< ? extends ZipEntry> entries2 = zipFile.entries();
           while (entries2.hasMoreElements()) {
-            ZipEntry zipEntry2 = (ZipEntry) entries2.nextElement();
+            ZipEntry zipEntry2 = entries2.nextElement();
             String diagramFileName = zipEntry2.getName();
             if (ProcessApplicationScanningUtil.isDiagramForProcess(diagramFileName, processFileName)) {
               addResource(zipFile.getInputStream(zipEntry), resourceMap, file.getName()+"!", diagramFileName);

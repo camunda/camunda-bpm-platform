@@ -61,27 +61,35 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
   public String getId() {
     return id;
   }
+
   public void setId(String id) {
     this.id = id;
   }
+
   public String getName() {
     return name;
   }
+
   public void setName(String name) {
     this.name = name;
   }
+
   public String getDeploymentId() {
     return deploymentId;
   }
+
   public void setDeploymentId(String deploymentId) {
     this.deploymentId = deploymentId;
   }
+
   public void setBytes(byte[] bytes) {
     this.bytes = bytes;
   }
+
   public int getRevision() {
     return revision;
   }
+
   public void setRevision(int revision) {
     this.revision = revision;
   }

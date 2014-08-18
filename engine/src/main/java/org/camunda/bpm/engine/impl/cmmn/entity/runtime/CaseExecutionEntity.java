@@ -168,7 +168,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     super.setActivity(activity);
     if (activity != null) {
       this.activityId = activity.getId();
-      this.activityName = (String) activity.getName();
+      this.activityName = activity.getName();
     } else {
       this.activityId = null;
       this.activityName = null;

@@ -67,7 +67,7 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
         }
         
         while (resourceRoots.hasMoreElements()) {
-          URL resourceRoot = (URL) resourceRoots.nextElement();
+          URL resourceRoot = resourceRoots.nextElement();
           VirtualFile virtualRoot = getVirtualFileForUrl(resourceRoot);
           scanRoot(virtualRoot, additionalResourceSuffixes, resources);
         }

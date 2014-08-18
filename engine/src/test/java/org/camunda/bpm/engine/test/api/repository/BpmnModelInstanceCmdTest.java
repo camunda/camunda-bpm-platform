@@ -58,7 +58,7 @@ public class BpmnModelInstanceCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(1, tasks.size());
 
     Task task = taskService.createTaskQuery().singleResult();
-    UserTask userTask = (UserTask) modelInstance.getModelElementById(task.getTaskDefinitionKey());
+    UserTask userTask = modelInstance.getModelElementById(task.getTaskDefinitionKey());
     assertNotNull(userTask);
 
     taskService.complete(task.getId());

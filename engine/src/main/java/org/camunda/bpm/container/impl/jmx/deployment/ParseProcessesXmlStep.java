@@ -12,18 +12,10 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment;
 
-import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESSES_XML_RESOURCES;
-import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESS_APPLICATION;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.metadata.ProcessesXmlParser;
@@ -32,6 +24,9 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+
+import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESSES_XML_RESOURCES;
+import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESS_APPLICATION;
 
 
 /**
@@ -100,7 +95,7 @@ public class ParseProcessesXmlStep extends MBeanDeploymentOperationStep {
       }
 
       while (processesXmlFileLocations.hasMoreElements()) {
-        result.add((URL) processesXmlFileLocations.nextElement());
+        result.add(processesXmlFileLocations.nextElement());
       }
 
     }

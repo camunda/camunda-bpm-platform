@@ -98,7 +98,7 @@ public class ExecutionManager extends AbstractManager {
   }
 
   public ExecutionEntity findExecutionById(String executionId) {
-    return (ExecutionEntity) getDbEntityManager().selectById(ExecutionEntity.class, executionId);
+    return getDbEntityManager().selectById(ExecutionEntity.class, executionId);
   }
 
   public long findExecutionCountByQueryCriteria(AbstractVariableQueryImpl executionQuery) {

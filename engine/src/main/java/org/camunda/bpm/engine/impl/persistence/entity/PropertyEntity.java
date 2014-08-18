@@ -42,18 +42,23 @@ public class PropertyEntity implements DbEntity, HasDbRevision, Serializable {
   public String getName() {
     return name;
   }
+
   public void setName(String name) {
     this.name = name;
   }
+
   public int getRevision() {
     return revision;
   }
+
   public void setRevision(int revision) {
     this.revision = revision;
   }
+
   public String getValue() {
     return value;
   }
+
   public void setValue(String value) {
     this.value = value;
   }

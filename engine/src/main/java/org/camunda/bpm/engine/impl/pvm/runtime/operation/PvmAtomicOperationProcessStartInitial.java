@@ -63,7 +63,7 @@ public class PvmAtomicOperationProcessStartInitial extends PvmAtomicOperationAct
       execution.performOperation(ACTIVITY_EXECUTE);
 
     } else {
-      List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack((ActivityImpl) processInstanceStartContext.getInitial());
+      List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack(processInstanceStartContext.getInitial());
       int index = initialActivityStack.indexOf(activity);
       // starting the next one
       activity = initialActivityStack.get(index+1);
@@ -72,7 +72,7 @@ public class PvmAtomicOperationProcessStartInitial extends PvmAtomicOperationAct
       PvmExecutionImpl executionToUse = execution;
       if (executionToUse.getActivity().isScope()) {
         executionToUse.setActive(false); // Deactivate since we jump to a node further down the hierarchy
-        executionToUse = (PvmExecutionImpl) executionToUse.getExecutions().get(0);
+        executionToUse = executionToUse.getExecutions().get(0);
       }
       executionToUse.setActivity(activity);
       executionToUse.performOperation(PROCESS_START_INITIAL);
