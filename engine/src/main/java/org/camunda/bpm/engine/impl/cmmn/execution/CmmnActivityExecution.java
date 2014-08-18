@@ -585,6 +585,29 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
   PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition);
 
   /**
+   * <p>Creates a new sub process instance.</p>
+   *
+   * <p><code>This</code> case execution will be the super case execution of the
+   * created sub process instance.</p>
+   *
+   * @param processDefinition The {@link PvmProcessDefinition} of the subprocess.
+   * @param businessKey The businessKey to be set on sub process instance.
+   */
+  PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey);
+
+  /**
+   * <p>Creates a new sub process instance.</p>
+   *
+   * <p><code>This</code> case execution will be the super case execution of the
+   * created sub process instance.</p>
+   *
+   * @param processDefinition The {@link PvmProcessDefinition} of the subprocess.
+   * @param businessKey The businessKey to be set on sub process instance.
+   * @param caseInstanceId The caseInstanceId to be set on sub process instance.
+   */
+  PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId);
+
+  /**
    * <p>Creates a new sub case instance.</p>
    *
    * <p><code>This</code> case execution will be the super case execution of the
@@ -593,5 +616,16 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * @param caseDefinition The {@link CmmnCaseDefinition} of the subprocess.
    */
   CmmnCaseInstance createSubCaseInstance(CmmnCaseDefinition caseDefinition);
+
+  /**
+   * <p>Creates a new sub case instance.</p>
+   *
+   * <p><code>This</code> case execution will be the super case execution of the
+   * created sub case instance.</p>
+   *
+   * @param caseDefinition The {@link CmmnCaseDefinition} of the subprocess.
+   * @param businessKey The businessKey to be set on sub case instance.
+   */
+  CmmnCaseInstance createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey);
 
 }

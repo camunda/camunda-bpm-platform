@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
@@ -144,18 +143,6 @@ public class DeploymentManager extends AbstractManager {
 
         getCaseInstanceManager()
           .deleteCaseInstancesByCaseDefinition(caseDefinitionId, "deleted deployment", cascade);
-
-        // TODO: move this later to HistoricCaseInstance
-        int historyLevel = Context
-          .getProcessEngineConfiguration()
-          .getHistoryLevel();
-
-        if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-          Context
-            .getCommandContext()
-            .getOperationLogManager()
-            .deleteOperationLogEntriesByCaseDefinitionId(caseDefinitionId);
-        }
 
       }
     }

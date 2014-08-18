@@ -13,18 +13,19 @@
 
 package org.camunda.bpm.engine.impl.pvm.process;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -52,13 +53,28 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     return createProcessInstanceForInitial(initial);
   }
 
+  public PvmProcessInstance createProcessInstance(String businessKey) {
+    return createProcessInstance(businessKey, null);
+  }
+
+  public PvmProcessInstance createProcessInstance(String businessKey, String caseInstanceId) {
+    PvmExecutionImpl processInstance = (PvmExecutionImpl) createProcessInstanceForInitial(initial);
+
+    processInstance.setBusinessKey(businessKey);
+    processInstance.setCaseInstanceId(caseInstanceId);
+
+    return processInstance;
+  }
+
   /** creates a process instance using the provided activity as initial */
   public PvmProcessInstance createProcessInstanceForInitial(ActivityImpl initial) {
     ensureNotNull("Cannot start process instance, initial activity where the process instance should start is null", "initial", initial);
 
     PvmExecutionImpl processInstance = newProcessInstance(initial);
+
     processInstance.setProcessDefinition(this);
     processInstance.setProcessInstance(processInstance);
+
     processInstance.initialize();
 
     PvmExecutionImpl scopeInstance = processInstance;

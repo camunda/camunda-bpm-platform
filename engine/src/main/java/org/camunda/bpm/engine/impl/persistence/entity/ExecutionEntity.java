@@ -244,8 +244,19 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     return createSubProcessInstance(processDefinition, null);
   }
 
-  @SuppressWarnings("unchecked")
   public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
+    ExecutionEntity processInstance = getProcessInstance();
+
+    String caseInstanceId = null;
+    if (processInstance != null) {
+      caseInstanceId = processInstance.getCaseInstanceId();
+    }
+
+    return createSubProcessInstance(processDefinition, businessKey, caseInstanceId);
+  }
+
+  @SuppressWarnings("unchecked")
+  public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
     ExecutionEntity subProcessInstance = newExecution((ActivityImpl) processDefinition.getInitial());
 
     shouldQueryForSubprocessInstance = true;
@@ -257,8 +268,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     // Initialize the new execution
     subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
     subProcessInstance.setProcessInstance(subProcessInstance);
-
-    subProcessInstance.setCaseInstanceId(getCaseInstanceId());
 
     // create event subscriptions for the current scope
     for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(subProcessInstance.getScopeActivity())) {
@@ -275,6 +284,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
     if(businessKey != null) {
       subProcessInstance.setBusinessKey(businessKey);
+    }
+
+    if(caseInstanceId != null) {
+      subProcessInstance.setCaseInstanceId(caseInstanceId);
     }
 
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();

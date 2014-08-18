@@ -13,16 +13,17 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 
 
 /**
@@ -50,6 +51,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected Date finishedAfter;
   protected String processDefinitionKey;
   protected Set<String> processInstanceIds;
+
+  protected String caseInstanceId;
 
   public HistoricProcessInstanceQueryImpl() {
   }
@@ -150,6 +153,11 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 	 return this;
   }
 
+  public HistoricProcessInstanceQuery caseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
 	public HistoricProcessInstanceQuery orderByProcessInstanceBusinessKey() {
     return orderBy(HistoricProcessInstanceQueryProperty.BUSINESS_KEY);
   }
@@ -193,39 +201,51 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public String getBusinessKey() {
     return businessKey;
   }
+
   public String getBusinessKeyLike() {
     return businessKeyLike;
   }
+
   public boolean isOpen() {
     return unfinished;
   }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
+
   public String getProcessDefinitionIdLike() {
     return processDefinitionKey + ":%:%";
   }
+
   public String getProcessDefinitionName() {
     return processDefinitionName;
   }
+
   public String getProcessDefinitionNameLike() {
     return processDefinitionNameLike;
   }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public Set<String> getProcessInstanceIds() {
     return processInstanceIds;
   }
+
   public String getStartedBy() {
     return startedBy;
   }
+
   public String getSuperProcessInstanceId() {
     return superProcessInstanceId;
   }
+
   public void setSuperProcessInstanceId(String superProcessInstanceId) {
     this.superProcessInstanceId = superProcessInstanceId;
   }
@@ -233,17 +253,25 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public List<String> getProcessKeyNotIn() {
     return processKeyNotIn;
   }
+
   public Date getStartedAfter() {
     return startedAfter;
   }
+
   public Date getStartedBefore() {
     return startedBefore;
   }
+
   public Date getFinishedAfter() {
     return finishedAfter;
   }
+
   public Date getFinishedBefore() {
     return finishedBefore;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
   }
 
   // below is deprecated and to be removed in 5.12

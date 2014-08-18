@@ -78,6 +78,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String processDefinitionId = execution.getProcessDefinitionId();
     String processInstanceId = execution.getProcessInstanceId();
     String executionId = execution.getId();
+    // the given execution is the process instance!
+    String caseInstanceId = execution.getCaseInstanceId();
 
     evt.setId(processInstanceId);
     evt.setEventType(eventType);
@@ -85,6 +87,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessInstanceId(processInstanceId);
     evt.setExecutionId(executionId);
     evt.setBusinessKey(execution.getProcessBusinessKey());
+    evt.setCaseInstanceId(caseInstanceId);
 
   }
 
@@ -94,6 +97,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String processInstanceId = taskEntity.getProcessInstanceId();
     String executionId = taskEntity.getExecutionId();
 
+    String caseDefinitionId = taskEntity.getCaseDefinitionId();
+    String caseExecutionId = taskEntity.getCaseExecutionId();
+    String caseInstanceId = taskEntity.getCaseInstanceId();
+
     evt.setId(taskEntity.getId());
     evt.setEventType(eventType);
     evt.setTaskId(taskEntity.getId());
@@ -101,6 +108,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessDefinitionId(processDefinitionId);
     evt.setProcessInstanceId(processInstanceId);
     evt.setExecutionId(executionId);
+
+    evt.setCaseDefinitionId(caseDefinitionId);
+    evt.setCaseExecutionId(caseExecutionId);
+    evt.setCaseInstanceId(caseInstanceId);
 
     evt.setAssignee(taskEntity.getAssignee());
     evt.setDescription(taskEntity.getDescription());

@@ -108,6 +108,10 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition);
 
+  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey);
+
+  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId);
+
   // sub-/super- case instance ////////////////////////////////////////////////////
 
   public abstract CmmnExecution getSubCaseInstance();
@@ -115,6 +119,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   public abstract void setSubCaseInstance(CmmnExecution subCaseInstance);
 
   public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition);
+
+  public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey);
 
   public abstract CmmnExecution getSuperCaseExecution();
 
@@ -287,24 +293,12 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   // state transition ///////////////////////////////////////////
 
   public void create() {
-    create(null, null);
+    create(null);
   }
 
   public void create(Map<String, Object> variables) {
-    create(null, variables);
-  }
-
-  public void create(String businessKey) {
-    create(businessKey, null);
-  }
-
-  public void create(String businessKey, Map<String, Object> variables) {
     if(variables != null) {
       setVariables(variables);
-    }
-
-    if(businessKey != null) {
-      setBusinessKey(businessKey);
     }
 
     performOperation(CASE_INSTANCE_CREATE);

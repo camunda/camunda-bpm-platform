@@ -31,6 +31,10 @@ public class CmmnCaseDefinition extends CmmnActivity {
   }
 
   public CmmnCaseInstance createCaseInstance() {
+    return createCaseInstance(null);
+  }
+
+  public CmmnCaseInstance createCaseInstance(String businessKey) {
 
     // create a new case instance
     CmmnExecution caseInstance = newCaseInstance();
@@ -40,8 +44,12 @@ public class CmmnCaseDefinition extends CmmnActivity {
     // ... and the case instance (identity)
     caseInstance.setCaseInstance(caseInstance);
 
+    // set the business key
+    caseInstance.setBusinessKey(businessKey);
+
     // get the case plan model as "initial" activity
     CmmnActivity casePlanModel = getActivities().get(0);
+
 
     // set the case plan model activity
     caseInstance.setActivity(casePlanModel);

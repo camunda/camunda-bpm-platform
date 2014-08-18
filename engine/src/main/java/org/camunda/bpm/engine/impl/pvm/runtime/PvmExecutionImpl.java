@@ -119,28 +119,17 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey);
 
+  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId);
+
   public abstract void initialize();
 
   public void start() {
-    start(null, null);
+    start(null);
   }
 
   public void start(Map<String, Object> variables) {
-    start(null, variables);
-  }
-
-  public void start(String businessKey) {
-    start(businessKey, null);
-  }
-
-  public void start(String businessKey, Map<String, Object> variables) {
-
     if(variables != null) {
       setVariables(variables);
-    }
-
-    if(businessKey != null) {
-      setBusinessKey(businessKey);
     }
 
     performOperation(PvmAtomicOperation.PROCESS_START);

@@ -46,8 +46,8 @@ public class CaseTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavior 
       caseDefinition = deploymentCache.findDeployedCaseDefinitionByKeyAndVersion(caseDefinitionKey, version);
     }
 
-    CmmnCaseInstance caseInstance = execution.createSubCaseInstance(caseDefinition);
-    caseInstance.create(businessKey, variables);
+    CmmnCaseInstance caseInstance = execution.createSubCaseInstance(caseDefinition, businessKey);
+    caseInstance.create(variables);
   }
 
   public void onManualCompletion(CmmnActivityExecution execution) {

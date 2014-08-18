@@ -46,6 +46,23 @@ public class CaseExecutionManager extends AbstractManager {
       deleteCaseInstance(caseInstanceId, deleteReason, cascade);
     }
 
+    // TODO: move this later to HistoricCaseInstance
+    int historyLevel = Context
+      .getProcessEngineConfiguration()
+      .getHistoryLevel();
+
+    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      CommandContext commandContext = Context.getCommandContext();
+
+      commandContext
+        .getHistoricTaskInstanceManager()
+        .deleteHistoricTaskInstancesByCaseDefinitionId(caseDefinitionId);
+
+      commandContext
+        .getOperationLogManager()
+        .deleteOperationLogEntriesByCaseDefinitionId(caseDefinitionId);
+    }
+
   }
 
   public void deleteCaseInstance(String caseInstanceId, String deleteReason) {
@@ -72,6 +89,11 @@ public class CaseExecutionManager extends AbstractManager {
       .getHistoryLevel();
 
     if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+
+      commandContext
+        .getHistoricTaskInstanceManager()
+        .deleteHistoricTaskInstancesByCaseInstanceId(caseInstanceId);
+
       commandContext
         .getOperationLogManager()
         .deleteOperationLogEntriesByCaseInstanceId(caseInstanceId);

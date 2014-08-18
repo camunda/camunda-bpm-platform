@@ -69,8 +69,8 @@ public class CreateCaseInstanceCmd implements Command<CaseInstance>, Serializabl
     }
 
     // Start the case instance
-    CaseExecutionEntity caseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance();
-    caseInstance.create(businessKey, variables);
+    CaseExecutionEntity caseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance(businessKey);
+    caseInstance.create(variables);
     return caseInstance;
   }
 

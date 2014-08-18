@@ -303,7 +303,7 @@
         and RES.PARENT_TASK_ID_ IS NULL
       </if>
       <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
-        and <include refid="actInstIdColumn"/> in
+        and E1.ACT_INST_ID_ in
         <foreach item="item" index="index" collection="activityInstanceIdIn"
                  open="(" separator="," close=")">
           #{item}
@@ -420,17 +420,6 @@
         </if>
       </if>
     </where>
-  </sql>
-
-  <sql id="actInstIdColumn">
-  case
-    when
-      RES.CASE_EXECUTION_ID_ is not null
-    <!-- caseExecutionId == activityInstanceId -->
-    then RES.CASE_EXECUTION_ID_
-
-    else E1.ACT_INST_ID_
-  end
   </sql>
 
   <sql id="executionVariableOperator">

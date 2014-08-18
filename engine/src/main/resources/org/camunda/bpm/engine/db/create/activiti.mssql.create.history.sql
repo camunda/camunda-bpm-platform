@@ -10,6 +10,7 @@ create table ACT_HI_PROCINST (
     START_ACT_ID_ nvarchar(255),
     END_ACT_ID_ nvarchar(255),
     SUPER_PROCESS_INSTANCE_ID_ nvarchar(64),
+    CASE_INST_ID_ nvarchar(64),
     DELETE_REASON_ nvarchar(4000),
     primary key (ID_),
     unique (PROC_INST_ID_)
@@ -40,6 +41,9 @@ create table ACT_HI_TASKINST (
     TASK_DEF_KEY_ nvarchar(255),
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    CASE_DEF_ID_ nvarchar(64),
+    CASE_INST_ID_ nvarchar(64),
+    CASE_EXECUTION_ID_ nvarchar(64),
     ACT_INST_ID_ nvarchar(64),
     NAME_ nvarchar(255),
     PARENT_TASK_ID_ nvarchar(64),

@@ -20,14 +20,14 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /** A single execution of a whole process definition that is stored permanently.
- * 
+ *
  * @author Christian Stettler
  */
 public interface HistoricProcessInstance {
-  
+
   /** The process instance id (== as the id for the runtime {@link ProcessInstance process instance}). */
   String getId();
-  
+
   /** The user provided unique reference to this process instance. */
   String getBusinessKey();
 
@@ -50,19 +50,24 @@ public interface HistoricProcessInstance {
    *  */
   @Deprecated
   String getEndActivityId();
-  
-  /** The authenticated user that started this process instance. 
+
+  /** The authenticated user that started this process instance.
    * @see IdentityService#setAuthenticatedUserId(String) */
   String getStartUserId();
-  
+
   /** The start activity. */
   String getStartActivityId();
 
   /** Obtains the reason for the process instance's deletion. */
   String getDeleteReason();
-  
+
   /**
    * The process instance id of a potential super process instance or null if no super process instance exists
    */
-  String getSuperProcessInstanceId(); 
+  String getSuperProcessInstanceId();
+
+  /**
+   * The case instance id of a potential super case instance or null if no super case instance exists
+   */
+  String getCaseInstanceId();
 }

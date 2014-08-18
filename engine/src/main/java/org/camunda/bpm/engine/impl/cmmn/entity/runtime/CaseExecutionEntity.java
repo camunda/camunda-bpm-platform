@@ -278,7 +278,15 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   }
 
   public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition) {
-    ExecutionEntity subProcessInstance = (ExecutionEntity) processDefinition.createProcessInstance();
+    return createSubProcessInstance(processDefinition, null);
+  }
+
+  public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
+    return createSubProcessInstance(processDefinition, businessKey, getCaseInstanceId());
+  }
+
+  public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
+    ExecutionEntity subProcessInstance = (ExecutionEntity) processDefinition.createProcessInstance(businessKey, caseInstanceId);
 
     // manage bidirectional super-subprocess relation
     subProcessInstance.setSuperCaseExecution(this);
@@ -308,7 +316,11 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   }
 
   public CaseExecutionEntity createSubCaseInstance(CmmnCaseDefinition caseDefinition) {
-    CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance();
+    return createSubCaseInstance(caseDefinition, null);
+  }
+
+  public CaseExecutionEntity createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey) {
+    CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance(businessKey);
 
     // manage bidirectional super-sub-case-instances relation
     subCaseInstance.setSuperCaseExecution(this);

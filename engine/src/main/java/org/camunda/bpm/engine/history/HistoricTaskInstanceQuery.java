@@ -53,6 +53,31 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    */
   HistoricTaskInstanceQuery processDefinitionName(String processDefinitionName);
 
+  /** Only select historic task instances for the given case definition. */
+  HistoricTaskInstanceQuery caseDefinitionId(String caseDefinitionId);
+
+  /**
+   * Only select historic task instances which are part of a case instance
+   * which has the given case definition key.
+   */
+  HistoricTaskInstanceQuery caseDefinitionKey(String caseDefinitionKey);
+
+  /**
+   * Only select historic task instances which are part of a (historic) case instance
+   * which has the given case definition name.
+   */
+  HistoricTaskInstanceQuery caseDefinitionName(String caseDefinitionName);
+
+  /**
+   * Only select historic task instances for the given case instance.
+   */
+  HistoricTaskInstanceQuery caseInstanceId(String caseInstanceId);
+
+  /**
+   * Only select historic task instances for the given case execution id.
+   */
+  HistoricTaskInstanceQuery caseExecutionId(String caseExecutionId);
+
   /**
    * Only select historic task instances with the given task name.
    * This is the last name given to the task.
@@ -246,4 +271,13 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
 
   /** Order by task priority key (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricTaskInstanceQuery orderByTaskPriority();
+
+  /** Order by case definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricTaskInstanceQuery orderByCaseDefinitionId();
+
+  /** Order by case instance id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricTaskInstanceQuery orderByCaseInstanceId();
+
+  /** Order by case execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricTaskInstanceQuery orderByCaseExecutionId();
 }

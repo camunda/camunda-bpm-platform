@@ -37,24 +37,6 @@ public interface CmmnCaseInstance extends CmmnActivityExecution {
   void create(Map<String, Object> variables);
 
   /**
-   * <p><code>This</code> case instance transitions to <code>ACTIVE</code>
-   * state.</p>
-   *
-   * <p>The given <code>businessKey</code> will be set as case instance business key.</p>
-   */
-  void create(String businessKey);
-
-  /**
-   * <p><code>This</code> case instance transitions to <code>ACTIVE</code>
-   * state.</p>
-   *
-   * <p>The given <code>variables</code> will be set a case instance variables.
-   * Furthermore the given <code>businessKey</code> will be set as case instance
-   * business key.</p>
-   */
-  void create(String businessKey, Map<String, Object> variables);
-
-  /**
    * <p>Find a case execution by the given <code>activityId</code>.</p>
    *
    * @param activityId the id of the {@link CmmnActivity activity} to

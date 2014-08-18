@@ -65,7 +65,7 @@ public abstract class AbstractCorrelateMessageCmd implements Command<Void> {
     ProcessDefinitionEntity processDefinitionEntity = correlationResult.getProcessDefinitionEntity();
     ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
     ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(businessKey, messageStartEvent);
-    processInstance.start(businessKey, processVariables);
+    processInstance.start(processVariables);
   }
 
 }

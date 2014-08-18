@@ -122,7 +122,15 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   }
 
   public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition) {
-    ExecutionImpl subProcessInstance = (ExecutionImpl) processDefinition.createProcessInstance();
+    return createSubProcessInstance(processDefinition, null);
+  }
+
+  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
+    return createSubProcessInstance(processDefinition, businessKey, getCaseInstanceId());
+  }
+
+  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
+    ExecutionImpl subProcessInstance = (ExecutionImpl) processDefinition.createProcessInstance(businessKey, caseInstanceId);
 
     // manage bidirectional super-subprocess relation
     subProcessInstance.setSuperCaseExecution(this);
@@ -142,7 +150,11 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   }
 
   public CaseExecutionImpl createSubCaseInstance(CmmnCaseDefinition caseDefinition) {
-    CaseExecutionImpl caseInstance = (CaseExecutionImpl) caseDefinition.createCaseInstance();
+    return createSubCaseInstance(caseDefinition, null);
+  }
+
+  public CaseExecutionImpl createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey) {
+    CaseExecutionImpl caseInstance = (CaseExecutionImpl) caseDefinition.createCaseInstance(businessKey);
 
     // manage bidirectional super-sub-case-instances relation
     subCaseInstance.setSuperCaseExecution(this);

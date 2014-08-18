@@ -1083,35 +1083,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId).list().size());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
-  public void testQueryByCaseActivityInstanceId() throws Exception {
-    String caseDefinitionKey = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getKey();
-
-    caseService
-      .withCaseDefinitionByKey(caseDefinitionKey)
-      .create();
-
-    String caseExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
-
-    TaskQuery query = taskService.createTaskQuery();
-
-    query.activityInstanceIdIn(caseExecutionId);
-
-    verifyQueryResults(query, 1);
-
-  }
-
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testQueryByMultipleActivityInstanceIds() throws Exception {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -1434,6 +1405,50 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     query.caseInstanceId(caseInstanceId);
 
     verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources=
+    {
+      "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testQueryByCaseInstanceIdHierarchy.cmmn",
+      "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testQueryByCaseInstanceIdHierarchy.bpmn20.xml"
+      })
+  public void testQueryByCaseInstanceIdHierarchy() {
+    // given
+    String caseInstanceId = caseService
+      .withCaseDefinitionByKey("case")
+      .create()
+      .getId();
+
+    String processTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_ProcessTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService
+      .withCaseExecution(processTaskId)
+      .manualStart();
+
+    // then
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceId(caseInstanceId);
+
+    verifyQueryResults(query, 2);
+
+    for (Task task : query.list()) {
+      assertEquals(caseInstanceId, task.getCaseInstanceId());
+      taskService.complete(task.getId());
+    }
+
+    verifyQueryResults(query, 1);
+    assertEquals(caseInstanceId, query.singleResult().getCaseInstanceId());
+
+    taskService.complete(query.singleResult().getId());
+
+    verifyQueryResults(query, 0);
   }
 
   public void testQueryByInvalidCaseInstanceId() {

@@ -404,8 +404,10 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
 
       // get the process instance
       ExecutionEntity instance = this.execution.getProcessInstance();
-      // set case instance id on this task
-      this.caseInstanceId = instance.getCaseInstanceId();
+      if (instance != null) {
+        // set case instance id on this task
+        this.caseInstanceId = instance.getCaseInstanceId();
+      }
 
     } else {
       this.execution = null;

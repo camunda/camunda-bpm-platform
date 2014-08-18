@@ -118,6 +118,13 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   }
 
   public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
+    ExecutionImpl processInstance = getProcessInstance();
+    String caseInstanceId = processInstance.getCaseInstanceId();
+
+    return createSubProcessInstance(processDefinition, businessKey, caseInstanceId);
+  }
+
+  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
     ExecutionImpl subProcessInstance = newExecution();
 
     // manage bidirectional super-subprocess relation
@@ -130,6 +137,10 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
     if(businessKey != null) {
       subProcessInstance.setBusinessKey(businessKey);
+    }
+
+    if(caseInstanceId != null) {
+      subProcessInstance.setCaseInstanceId(caseInstanceId);
     }
 
     return subProcessInstance;
@@ -200,14 +211,14 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   // process instance /////////////////////////////////////////////////////////
 
-  public void start(String businessKey, Map<String, Object> variables) {
+  public void start(Map<String, Object> variables) {
     if (isProcessInstanceExecution()) {
       if (processInstanceStartContext == null) {
         processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
       }
     }
 
-    super.start(businessKey, variables);
+    super.start(variables);
   }
 
 

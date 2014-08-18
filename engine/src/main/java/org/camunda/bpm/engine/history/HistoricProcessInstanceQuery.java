@@ -79,6 +79,9 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   /** Only select historic process instance that are not yet finished. */
   HistoricProcessInstanceQuery unfinished();
 
+  /** Only select historic process instances which are associated with the given case instance id. */
+  HistoricProcessInstanceQuery caseInstanceId(String caseInstanceId);
+
   /** Only select process instances which had a global variable with the given value
    * when they ended. Only select process instances which have a variable value
    * greater than the passed value. The type only applies to already ended

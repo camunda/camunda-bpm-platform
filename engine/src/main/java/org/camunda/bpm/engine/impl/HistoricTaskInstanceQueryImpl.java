@@ -13,17 +13,18 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -63,6 +64,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected Date followUpDate;
   protected Date followUpBefore;
   protected Date followUpAfter;
+
+  protected String caseDefinitionId;
+  protected String caseDefinitionKey;
+  protected String caseDefinitionName;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
 
   public HistoricTaskInstanceQueryImpl() {
   }
@@ -177,6 +184,31 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public HistoricTaskInstanceQueryImpl taskOwnerLike(String taskOwnerLike) {
     this.taskOwnerLike = taskOwnerLike;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery caseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery caseDefinitionKey(String caseDefinitionKey) {
+    this.caseDefinitionKey = caseDefinitionKey;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery caseDefinitionName(String caseDefinitionName) {
+    this.caseDefinitionName = caseDefinitionName;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery caseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery caseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
     return this;
   }
 
@@ -344,66 +376,121 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return this;
   }
 
+  public HistoricTaskInstanceQuery orderByCaseDefinitionId() {
+    orderBy(HistoricTaskInstanceQueryProperty.CASE_DEFINITION_ID);
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery orderByCaseInstanceId() {
+    orderBy(HistoricTaskInstanceQueryProperty.CASE_INSTANCE_ID);
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery orderByCaseExecutionId() {
+    orderBy(HistoricTaskInstanceQueryProperty.CASE_EXECUTION_ID);
+    return this;
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public String getExecutionId() {
     return executionId;
   }
+
   public String[] getActivityInstanceIds() {
     return activityInstanceIds;
   }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
   public boolean isFinished() {
     return finished;
   }
+
   public boolean isUnfinished() {
     return unfinished;
   }
+
   public String getTaskName() {
     return taskName;
   }
+
   public String getTaskNameLike() {
     return taskNameLike;
   }
+
   public String getTaskDescription() {
     return taskDescription;
   }
+
   public String getTaskDescriptionLike() {
     return taskDescriptionLike;
   }
+
   public String getTaskDeleteReason() {
     return taskDeleteReason;
   }
+
   public String getTaskDeleteReasonLike() {
     return taskDeleteReasonLike;
   }
+
   public String getTaskAssignee() {
     return taskAssignee;
   }
+
   public String getTaskAssigneeLike() {
     return taskAssigneeLike;
   }
+
   public String getTaskId() {
     return taskId;
   }
+
   public String getTaskDefinitionKey() {
     return taskDefinitionKey;
   }
+
   public List<TaskQueryVariableValue> getVariables() {
     return variables;
   }
+
   public String getTaskOwnerLike() {
     return taskOwnerLike;
   }
+
   public String getTaskOwner() {
     return taskOwner;
   }
+
   public String getTaskParentTaskId() {
     return taskParentTaskId;
   }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
+  }
+
+  public String getCaseDefinitionName() {
+    return caseDefinitionName;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
+  }
+
 }

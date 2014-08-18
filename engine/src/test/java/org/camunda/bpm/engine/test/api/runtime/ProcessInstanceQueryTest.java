@@ -1376,4 +1376,42 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/superCase.cmmn",
+      "org/camunda/bpm/engine/test/api/runtime/superProcessWithCallActivityInsideSubProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"
+    })
+  public void testQueryByCaseInstanceIdHierarchy() {
+    String caseInstanceId = caseService
+      .withCaseDefinitionByKey("oneProcessTaskCase")
+      .businessKey("aBusinessKey")
+      .create()
+      .getId();
+
+    String processTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_ProcessTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(processTaskId)
+      .manualStart();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    query.caseInstanceId(caseInstanceId);
+
+    assertEquals(2, query.count());
+
+    List<ProcessInstance> result = query.list();
+    assertEquals(2, result.size());
+
+    ProcessInstance firstProcessInstance = result.get(0);
+    assertEquals(caseInstanceId, firstProcessInstance.getCaseInstanceId());
+
+    ProcessInstance secondProcessInstance = result.get(1);
+    assertEquals(caseInstanceId, secondProcessInstance.getCaseInstanceId());
+  }
+
 }

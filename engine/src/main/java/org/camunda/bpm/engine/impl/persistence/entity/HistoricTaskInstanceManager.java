@@ -13,9 +13,13 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -27,22 +31,38 @@ import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 
 /**
  * @author  Tom Baeyens
  */
 public class HistoricTaskInstanceManager extends AbstractHistoricManager {
 
+  public void deleteHistoricTaskInstancesByProcessInstanceId(String processInstanceId) {
+    deleteHistoricTaskInstances("processInstanceId", processInstanceId);
+  }
+
+  public void deleteHistoricTaskInstancesByCaseInstanceId(String caseInstanceId) {
+    deleteHistoricTaskInstances("caseInstanceId", caseInstanceId);
+  }
+
+  public void deleteHistoricTaskInstancesByCaseDefinitionId(String caseDefinitionId) {
+    deleteHistoricTaskInstances("caseDefinitionId", caseDefinitionId);
+  }
+
   @SuppressWarnings("unchecked")
-  public void deleteHistoricTaskInstancesByProcessInstanceId(final String processInstanceId) {
+  protected void deleteHistoricTaskInstances(String key, String value) {
     if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+
+      Map<String, String> params = new HashMap<String, String>();
+      params.put(key, value);
+
       List<String> taskInstanceIds = (List<String>) getDbEntityManager()
-          .selectList("selectHistoricTaskInstanceIdsByProcessInstanceId", processInstanceId);
+          .selectList("selectHistoricTaskInstanceIdsByParameters", params);
+
       for (String taskInstanceId : taskInstanceIds) {
         deleteHistoricTaskInstanceById(taskInstanceId);
       }
+
     }
   }
 
@@ -165,4 +185,5 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
 
     }
   }
+
 }

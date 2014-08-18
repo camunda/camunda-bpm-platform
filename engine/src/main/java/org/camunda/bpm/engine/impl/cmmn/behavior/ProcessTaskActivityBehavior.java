@@ -48,8 +48,8 @@ public class ProcessTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavi
       processDefinition = deploymentCache.findDeployedProcessDefinitionByKeyAndVersion(processDefinitionKey, version);
     }
 
-    PvmProcessInstance caseInstance = execution.createSubProcessInstance(processDefinition);
-    caseInstance.start(businessKey, variables);
+    PvmProcessInstance caseInstance = execution.createSubProcessInstance(processDefinition, businessKey);
+    caseInstance.start(variables);
   }
 
   public void onManualCompletion(CmmnActivityExecution execution) {

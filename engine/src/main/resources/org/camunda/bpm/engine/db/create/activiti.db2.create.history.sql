@@ -10,6 +10,7 @@ create table ACT_HI_PROCINST (
     START_ACT_ID_ varchar(255),
     END_ACT_ID_ varchar(255),
     SUPER_PROCESS_INSTANCE_ID_ varchar(64),
+    CASE_INST_ID_ varchar(64),
     DELETE_REASON_ varchar(4000),
     primary key (ID_)
 );
@@ -42,6 +43,9 @@ create table ACT_HI_TASKINST (
     TASK_DEF_KEY_ varchar(255),
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
+    CASE_DEF_ID_ varchar(64),
+    CASE_INST_ID_ varchar(64),
+    CASE_EXECUTION_ID_ varchar(64),
     ACT_INST_ID_ varchar(64),
     NAME_ varchar(255),
     PARENT_TASK_ID_ varchar(64),

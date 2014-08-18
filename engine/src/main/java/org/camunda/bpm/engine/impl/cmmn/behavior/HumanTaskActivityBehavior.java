@@ -35,6 +35,10 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
 
     taskDecorator.decorate(task, execution);
 
+    Context.getCommandContext()
+      .getHistoricTaskInstanceManager()
+      .createHistoricTask(task);
+
     // All properties set, now firing 'create' event
     task.fireEvent(TaskListener.EVENTNAME_CREATE);
 
