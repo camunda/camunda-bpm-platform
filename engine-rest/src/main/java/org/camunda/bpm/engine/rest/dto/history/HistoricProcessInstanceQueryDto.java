@@ -69,6 +69,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Date finishedAfter;
   private String startedBy;
   private String superProcessInstanceId;
+  private String caseInstanceId;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -163,6 +164,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.superProcessInstanceId = superProcessInstanceId;
   }
 
+  @CamundaQueryParam("caseInstanceId")
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
   @CamundaQueryParam(value = "variables", converter = VariableListConverter.class)
   public void setVariables(List<VariableQueryParameterDto> variables) {
     this.variables = variables;
@@ -231,6 +237,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (superProcessInstanceId != null) {
       query.superProcessInstanceId(superProcessInstanceId);
+    }
+    if (caseInstanceId != null) {
+      query.caseInstanceId(caseInstanceId);
     }
 
     if (variables != null) {

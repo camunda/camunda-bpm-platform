@@ -341,6 +341,7 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     String returnedStartActivityId = from(content).getString("[0].startActivityId");
     String returnedDeleteReason = from(content).getString("[0].deleteReason");
     String returnedSuperProcessInstanceId = from(content).getString("[0].superProcessInstanceId");
+    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, returnedProcessInstanceBusinessKey);
@@ -352,6 +353,7 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_ACTIVITY_ID, returnedStartActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON, returnedDeleteReason);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID, returnedSuperProcessInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID, returnedCaseInstanceId);
   }
 
   @Test
@@ -397,6 +399,7 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     parameters.put("processDefinitionNameLike", MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME_LIKE);
     parameters.put("startedBy", "startedBySomeone");
     parameters.put("superProcessInstanceId", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID);
+    parameters.put("caseInstanceId", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID);
 
     return parameters;
   }
@@ -413,6 +416,7 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     verify(mockedQuery).processDefinitionNameLike(stringQueryParameters.get("processDefinitionNameLike"));
     verify(mockedQuery).startedBy(stringQueryParameters.get("startedBy"));
     verify(mockedQuery).superProcessInstanceId(stringQueryParameters.get("superProcessInstanceId"));
+    verify(mockedQuery).caseInstanceId(stringQueryParameters.get("caseInstanceId"));
 
     verify(mockedQuery).list();
   }
