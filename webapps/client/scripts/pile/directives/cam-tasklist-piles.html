@@ -5,6 +5,8 @@
 </div>
 
 <div ng-hide="loading"
-     ng-repeat="pile in piles"
+     ng-repeat="(delta, pile) in piles"
+     class="task-pile-wrapper"
      ng-class="{active: pile.id === focusedId}"
+     style="z-index: {{ ((piles.length + 10) - delta) }}"
      cam-tasklist-pile></div>
