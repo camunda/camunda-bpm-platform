@@ -547,7 +547,10 @@ public interface ManagementService {
    */
   void deleteProperty(String name);
 
-  /** programmatic schema update on a given connection returning feedback about what happened */
+  /** programmatic schema update on a given connection returning feedback about what happened
+   *
+   *  Note: will always return an empty string
+   */
   String databaseSchemaUpgrade(Connection connection, String catalog, String schema);
 
   /**

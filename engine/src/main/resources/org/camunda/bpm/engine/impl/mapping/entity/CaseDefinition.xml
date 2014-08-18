@@ -49,7 +49,7 @@
 
   <!-- CASEDEFINITION SELECT -->
 
-  <select id="selectCaseDefinitionById" parameterType="string" resultMap="caseDefinitionResultMap">
+  <select id="selectCaseDefinition" parameterType="string" resultMap="caseDefinitionResultMap">
     select * from ${prefix}ACT_RE_CASE_DEF where ID_ = #{caseDefinitionId}
   </select>
 

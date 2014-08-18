@@ -34,7 +34,7 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
 
   protected String id;
   protected String name;
-  protected transient Map<String, ResourceEntity> resources;
+  protected Map<String, ResourceEntity> resources;
   protected Date deploymentTime;
   protected boolean validatingSchema = true;
   protected boolean isNew;

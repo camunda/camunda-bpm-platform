@@ -54,16 +54,16 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected String deploymentId;
   protected String resourceName;
   protected Integer historyLevel;
-  protected transient StartFormHandler startFormHandler;
+  protected StartFormHandler startFormHandler;
   protected String diagramResourceName;
   protected boolean isGraphicalNotationDefined;
-  protected transient Map<String, TaskDefinition> taskDefinitions;
+  protected Map<String, TaskDefinition> taskDefinitions;
   protected boolean hasStartFormKey;
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
   protected boolean isIdentityLinksInitialized = false;
-  protected transient List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
-  protected transient Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
-  protected transient Set<Expression> candidateStarterGroupIdExpressions = new HashSet<Expression>();
+  protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
+  protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
+  protected Set<Expression> candidateStarterGroupIdExpressions = new HashSet<Expression>();
 
   public ProcessDefinitionEntity() {
     super(null);

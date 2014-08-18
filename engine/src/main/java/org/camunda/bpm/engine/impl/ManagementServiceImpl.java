@@ -123,7 +123,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
         dbSqlSession.dbSchemaUpdate();
 
-        return "ok";
+        return "";
       }
     });
   }

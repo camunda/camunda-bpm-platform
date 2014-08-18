@@ -35,7 +35,7 @@ public class CaseDefinitionManager extends AbstractManager {
   }
 
   public CaseDefinitionEntity findCaseDefinitionById(String caseDefinitionId) {
-    return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionById", caseDefinitionId);
+    return getDbEntityManager().selectById(CaseDefinitionEntity.class, caseDefinitionId);
   }
 
   public CaseDefinitionEntity findLatestCaseDefinitionByKey(String caseDefinitionKey) {
