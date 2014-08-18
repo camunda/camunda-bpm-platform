@@ -18,6 +18,7 @@
     <label for="lastname">Last name</label>
     <input cam-variable-name="LASTNAME"
            cam-variable-type="String"
+           ng-model="lastname"
            type="text"
            class="form-control"
            value="Pusterman"
@@ -28,6 +29,7 @@
     <label for="longStringVar">A longer string</label>
     <textarea cam-variable-name="longStringVar"
               cam-variable-type="String"
+              ng-model="longstring"
               cols="30"
               rows="10"
               class="form-control"
@@ -37,6 +39,8 @@
   <div class="form-group">
     <label for="singleChoiceSelect">1 choice</label>
     <select cam-variable-name="singleChoiceSelect"
+            cam-variable-type="String"
+            ng-model="singleChoice"
             class="form-control"
             id="singleChoiceSelect">
       <option> - None - </option>
@@ -48,6 +52,8 @@
   <div class="form-group">
     <label for="multipleChoicesSelect">Multple choices</label>
     <select cam-variable-name="multipleChoicesSelect"
+            cam-variable-type="String"
+            ng-model="multipleChoice"
             class="form-control"
             id="multipleChoicesSelect"
             multiple>
