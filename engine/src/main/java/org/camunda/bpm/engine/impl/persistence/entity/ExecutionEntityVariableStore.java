@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
+import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +23,7 @@ import java.util.Map;
  * @author Sebastian Menski
  *
  */
-public class ExecutionEntityVariableStore extends AbstractVariableStore {
+public class ExecutionEntityVariableStore extends AbstractPersistentVariableStore {
 
   private static final long serialVersionUID = 1L;
 

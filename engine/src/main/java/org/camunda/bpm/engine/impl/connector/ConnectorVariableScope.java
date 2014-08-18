@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 
 import org.camunda.bpm.connect.ConnectorRequest;
 import org.camunda.bpm.connect.ConnectorResponse;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.delegate.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 
@@ -27,24 +27,24 @@ import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
  * @author Daniel Meyer
  *
  */
-public class ConnectorVariableScope extends CoreVariableScope {
+public class ConnectorVariableScope extends CoreVariableScope<CoreVariableInstance> {
 
   private static final long serialVersionUID = 1L;
 
-  protected CoreVariableScope parent;
+  protected CoreVariableScope<CoreVariableInstance> parent;
 
   protected ConnectorVariableStore variableStore;
 
-  public ConnectorVariableScope(CoreVariableScope parent) {
+  public ConnectorVariableScope(CoreVariableScope<CoreVariableInstance> parent) {
     this.parent = parent;
     this.variableStore = new ConnectorVariableStore();
   }
 
-  protected CoreVariableStore getVariableStore() {
+  protected CoreVariableStore<CoreVariableInstance> getVariableStore() {
     return variableStore;
   }
 
-  public CoreVariableScope getParentVariableScope() {
+  public CoreVariableScope<CoreVariableInstance> getParentVariableScope() {
     return parent;
   }
 

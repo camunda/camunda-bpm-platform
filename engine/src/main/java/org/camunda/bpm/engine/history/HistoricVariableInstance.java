@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.history;
 
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 
 /**
  * A single process variable containing the last value when its process instance has finished.
@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.runtime.SerializedVariableValue;
  * @author Christian Lipphardt (camunda)
  * @author ruecker
  */
-public interface HistoricVariableInstance {
+public interface HistoricVariableInstance extends PersistentVariableInstance {
 
   /**
    * @return the Id of this variable instance
@@ -40,11 +40,6 @@ public interface HistoricVariableInstance {
   String getVariableTypeName();
 
   /**
-   * Returns the value of <code>this</code> variable instance.
-   */
-  Object getValue();
-
-  /**
    * The process instance reference.
    */
   String getProcessInstanceId();
@@ -53,17 +48,4 @@ public interface HistoricVariableInstance {
    * Returns the corresponding activity instance id.
    */
   String getActivtyInstanceId();
-
-  /**
-   * If the variable value could not be loaded, this returns the error message.
-   * @return an error message indicating why the variable value could not be loaded.
-   */
-  String getErrorMessage();
-
-  /**
-   * Returns the value of this variable in its serialized form, represented by a
-   * {@link SerializedVariableValue}.
-   */
-  SerializedVariableValue getSerializedValue();
-
 }

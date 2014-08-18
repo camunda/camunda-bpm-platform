@@ -10,20 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.core.variable;
+package org.camunda.bpm.engine.delegate;
 
-/**
- * @author Daniel Meyer
- * @author Roman Smirnov
- * @author Sebastian Menski
- *
- */
 public interface CoreVariableInstance {
 
+  /**
+   * Returns the name of <code>this</code> variable instance.
+   */
   String getName();
 
+  /**
+   * Returns the value of <code>this</code> variable instance.
+   */
   Object getValue();
-
-  boolean isAbleToStore(Object value);
-
 }

@@ -12,10 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.core.variable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import org.camunda.bpm.engine.delegate.CoreVariableInstance;
 
 /**
  * @author Daniel Meyer
@@ -23,7 +20,7 @@ import java.util.Set;
  * @author Sebastian Menski
  *
  */
-public class SimpleVariableStore implements CoreVariableStore {
+public class SimpleVariableStore extends MapBasedVariableStore<CoreVariableInstance> {
 
   public static class SimpleVariableInstance implements CoreVariableInstance {
 
@@ -38,60 +35,25 @@ public class SimpleVariableStore implements CoreVariableStore {
     public String getName() {
       return name;
     }
-
+    public void setName(String name) {
+      this.name = name;
+    }
     public Object getValue() {
       return value;
     }
-
-    public boolean isAbleToStore(Object value) {
-      return true;
+    public void setValue(Object value) {
+      this.value = value;
     }
   }
 
-  protected Map<String, SimpleVariableInstance> variables = new HashMap<String, SimpleVariableStore.SimpleVariableInstance>();
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public Collection<CoreVariableInstance> getVariableInstancesValues() {
-    return (Collection) variables.values();
-  }
-
-  public CoreVariableInstance getVariableInstance(String variableName) {
-    return variables.get(variableName);
-  }
-
-  public Set<String> getVariableNames() {
-    return variables.keySet();
-  }
-
-  public boolean isEmpty() {
-    return variables.isEmpty();
-  }
-
-  public boolean containsVariableInstance(String variableName) {
-    return variables.containsKey(variableName);
-  }
-
-  public CoreVariableInstance removeVariableInstance(String variableName, CoreVariableScope sourceActivityExecution) {
-    return variables.remove(variableName);
-  }
-
-  public void setVariableInstanceValue(CoreVariableInstance variableInstance, Object value, CoreVariableScope sourceActivityExecution) {
+  public void setVariableInstanceValue(CoreVariableInstance variableInstance, Object value, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
     ((SimpleVariableInstance)variableInstance).value = value;
   }
 
-  public CoreVariableInstance createVariableInstance(String variableName, Object value, CoreVariableScope sourceActivityExecution) {
-    SimpleVariableInstance variableInstance = new SimpleVariableInstance(variableName, value);
-    variables.put(variableName, variableInstance);
-    return variableInstance;
-  }
-
-  public void clearForNewValue(CoreVariableInstance variableInstance, Object newValue) {
-    ((SimpleVariableInstance)variableInstance).value = null;
-  }
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public Map<String, CoreVariableInstance> getVariableInstances() {
-    return (Map) variables;
+  public CoreVariableInstance createVariableInstance(String variableName, Object value, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
+    SimpleVariableInstance instance = new SimpleVariableInstance(variableName, value);
+    variables.put(variableName, instance);
+    return instance;
   }
 
 }

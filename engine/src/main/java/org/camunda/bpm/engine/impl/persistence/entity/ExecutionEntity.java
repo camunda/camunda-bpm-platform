@@ -24,7 +24,9 @@ import java.util.logging.Logger;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
+import org.camunda.bpm.engine.delegate.CoreVariableInstance;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -33,7 +35,6 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
@@ -983,9 +984,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   public void fireHistoricVariableInstanceCreateEvents() {
     // this method is called by the start context and batch-fires create events for all variable instances
-    Map<String, CoreVariableInstance> variableInstances = variableStore.getVariableInstances();
+    Map<String, PersistentVariableInstance> variableInstances = variableStore.getVariableInstances();
     if(variableInstances != null) {
-      for (Entry<String, CoreVariableInstance> variable : variableInstances.entrySet()) {
+      for (Entry<String, PersistentVariableInstance> variable : variableInstances.entrySet()) {
         variableStore.fireHistoricVariableInstanceCreate((VariableInstanceEntity) variable.getValue(), this);
       }
     }
@@ -1245,7 +1246,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   // variables /////////////////////////////////////////////////////////
 
-  protected CoreVariableStore getVariableStore() {
+  protected CoreVariableStore<PersistentVariableInstance> getVariableStore() {
     return variableStore;
   }
 

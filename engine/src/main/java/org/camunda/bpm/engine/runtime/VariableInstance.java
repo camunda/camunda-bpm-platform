@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.runtime;
 
+import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
+
 /**
  * A {@link VariableInstance} represents a variable in the execution of
  * a process instance.
@@ -19,7 +21,7 @@ package org.camunda.bpm.engine.runtime;
  * @author roman.smirnov
  *
  */
-public interface VariableInstance {
+public interface VariableInstance extends PersistentVariableInstance {
 
   /**
    * @return the Id of this variable instance
@@ -27,20 +29,10 @@ public interface VariableInstance {
   String getId();
 
   /**
-   * Returns the name of <code>this</code> variable instance.
-   */
-  String getName();
-
-  /**
    * Returns the name of the type of <code>this</code> variable instance
    * @return
    */
   String getTypeName();
-
-  /**
-   * Returns the value of <code>this</code> variable instance.
-   */
-  Object getValue();
 
   /**
    * Returns the corresponding process instance id.
@@ -72,15 +64,4 @@ public interface VariableInstance {
    */
   String getActivityInstanceId();
 
-  /**
-   * If the variable value could not be loaded, this returns the error message.
-   * @return an error message indicating why the variable value could not be loaded.
-   */
-  String getErrorMessage();
-
-  /**
-   * Returns the value of this variable in its serialized form, represented by a
-   * {@link SerializedVariableValue}.
-   */
-  SerializedVariableValue getSerializedValue();
 }

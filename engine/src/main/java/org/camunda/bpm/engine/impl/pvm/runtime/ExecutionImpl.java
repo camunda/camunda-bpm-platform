@@ -21,11 +21,12 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.BpmnModelExecutionContext;
+import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
-import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.PseudoPersistentVariableStore;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -77,7 +78,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   // variables/////////////////////////////////////////////////////////////////
 
-  protected SimpleVariableStore variableStrore = new SimpleVariableStore();
+  protected PseudoPersistentVariableStore variableStore = new PseudoPersistentVariableStore();
 
   // lifecycle methods ////////////////////////////////////////////////////////
 
@@ -285,8 +286,8 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   // getters and setters //////////////////////////////////////////////////////
 
-  protected CoreVariableStore getVariableStore() {
-    return variableStrore;
+  protected CoreVariableStore<PersistentVariableInstance> getVariableStore() {
+    return variableStore;
   }
 
   public PvmExecutionImpl getReplacedBy() {

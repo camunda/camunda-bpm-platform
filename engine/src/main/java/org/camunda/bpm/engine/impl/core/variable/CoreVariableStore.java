@@ -16,17 +16,19 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.delegate.CoreVariableInstance;
+
 /**
  * @author Daniel Meyer
  * @author Roman Smirnov
  * @author Sebastian Menski
  *
  */
-public interface CoreVariableStore {
+public interface CoreVariableStore<T extends CoreVariableInstance> {
 
-  Collection<CoreVariableInstance> getVariableInstancesValues();
+  Collection<T> getVariableInstancesValues();
 
-  CoreVariableInstance getVariableInstance(String variableName);
+  T getVariableInstance(String variableName);
 
   Set<String> getVariableNames();
 
@@ -34,14 +36,13 @@ public interface CoreVariableStore {
 
   boolean containsVariableInstance(String variableName);
 
-  CoreVariableInstance removeVariableInstance(String variableName, CoreVariableScope sourceActivityExecution);
+  T removeVariableInstance(String variableName, CoreVariableScope<T> sourceActivityExecution);
 
-  void setVariableInstanceValue(CoreVariableInstance variableInstance, Object value, CoreVariableScope sourceActivityExecution);
+  void setVariableInstanceValue(T variableInstance, Object value, CoreVariableScope<T> sourceActivityExecution);
 
-  CoreVariableInstance createVariableInstance(String variableName, Object value, CoreVariableScope sourceActivityExecution);
+  T createVariableInstance(String variableName, Object value, CoreVariableScope<T> sourceActivityExecution);
 
-  void clearForNewValue(CoreVariableInstance variableInstance, Object newValue);
+  Map<String, T> getVariableInstances();
 
-  Map<String, CoreVariableInstance> getVariableInstances();
-
+  void createOrUpdateVariable(String variableName, Object value, CoreVariableScope<T> sourceActivityExecution);
 }

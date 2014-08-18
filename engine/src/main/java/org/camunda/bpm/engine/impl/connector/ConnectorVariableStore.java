@@ -17,15 +17,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.delegate.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
+import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class ConnectorVariableStore implements CoreVariableStore {
+public class ConnectorVariableStore extends AbstractVariableStore<CoreVariableInstance> {
 
   public static class ConnectorParamVariable implements CoreVariableInstance {
 
@@ -43,10 +43,6 @@ public class ConnectorVariableStore implements CoreVariableStore {
 
     public Object getValue() {
       return value;
-    }
-
-    public boolean isAbleToStore(Object value) {
-      return true;
     }
   }
 
@@ -73,22 +69,18 @@ public class ConnectorVariableStore implements CoreVariableStore {
     return variables.containsKey(variableName);
   }
 
-  public CoreVariableInstance removeVariableInstance(String variableName, CoreVariableScope sourceActivityExecution) {
+  public CoreVariableInstance removeVariableInstance(String variableName, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
     return variables.remove(variableName);
   }
 
-  public void setVariableInstanceValue(CoreVariableInstance variableInstance, Object value, CoreVariableScope sourceActivityExecution) {
+  public void setVariableInstanceValue(CoreVariableInstance variableInstance, Object value, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
     ((ConnectorParamVariable)variableInstance).value = value;
   }
 
-  public CoreVariableInstance createVariableInstance(String variableName, Object value, CoreVariableScope sourceActivityExecution) {
+  public CoreVariableInstance createVariableInstance(String variableName, Object value, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
     ConnectorParamVariable variableInstance = new ConnectorParamVariable(variableName, value);
     variables.put(variableName, variableInstance);
     return variableInstance;
-  }
-
-  public void clearForNewValue(CoreVariableInstance variableInstance, Object newValue) {
-    ((ConnectorParamVariable)variableInstance).value = null;
   }
 
   public Map<String, ConnectorParamVariable> getVariables() {

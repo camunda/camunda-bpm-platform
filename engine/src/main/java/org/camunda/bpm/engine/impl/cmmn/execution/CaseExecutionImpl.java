@@ -18,11 +18,12 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.CmmnModelExecutionContext;
+import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
-import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.PseudoPersistentVariableStore;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -53,7 +54,7 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   // variables ////////////////////////////////////////////////////////////////
 
-  protected SimpleVariableStore variableStore = new SimpleVariableStore();
+  protected PseudoPersistentVariableStore variableStore = new PseudoPersistentVariableStore();
 
   public CaseExecutionImpl() {
   }
@@ -198,7 +199,7 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   // variables //////////////////////////////////////////////////////////////
 
-  protected CoreVariableStore getVariableStore() {
+  protected CoreVariableStore<PersistentVariableInstance> getVariableStore() {
     return variableStore;
   }
 

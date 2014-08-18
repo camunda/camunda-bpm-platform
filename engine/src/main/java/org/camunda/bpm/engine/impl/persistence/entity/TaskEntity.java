@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
@@ -47,7 +48,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.task.delegate.TaskListenerInvocation;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
+import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
@@ -62,7 +63,7 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class TaskEntity extends CoreVariableScope implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, CommandContextListener {
+public class TaskEntity extends CoreVariableScope<PersistentVariableInstance> implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, CommandContextListener {
 
   public static final String DELETE_REASON_COMPLETED = "completed";
   public static final String DELETE_REASON_DELETED = "deleted";
@@ -116,7 +117,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   protected boolean isFormKeyInitialized = false;
   protected String formKey;
 
-  protected AbstractVariableStore variableStore;
+  protected AbstractPersistentVariableStore variableStore;
 
   /**
    * contains all changed properties of this entity
@@ -146,7 +147,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   }
 
   /** creates and initializes a new persistent task. */
-  public static TaskEntity createAndInsert(VariableScope execution) {
+  public static TaskEntity createAndInsert(VariableScope<PersistentVariableInstance> execution) {
     TaskEntity task = create();
     if (execution instanceof ExecutionEntity) {
       task.insert((ExecutionEntity) execution);
@@ -367,15 +368,15 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
 
   // variables ////////////////////////////////////////////////////////////////
 
-  protected AbstractVariableStore createVariableStore() {
+  protected AbstractPersistentVariableStore createVariableStore() {
     return new TaskEntityVariableStore(this);
   }
 
-  protected CoreVariableStore getVariableStore() {
+  protected CoreVariableStore<PersistentVariableInstance> getVariableStore() {
     return variableStore;
   }
 
-  public CoreVariableScope getParentVariableScope() {
+  public CoreVariableScope<PersistentVariableInstance> getParentVariableScope() {
     if (getExecution()!=null) {
       return execution;
     }

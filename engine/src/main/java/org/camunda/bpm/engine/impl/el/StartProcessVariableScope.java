@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,19 +18,20 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.delegate.CoreVariableInstance;
 import org.camunda.bpm.engine.delegate.VariableScope;
 
 
 /**
  * Variable-scope only used to resolve variables when NO execution is active but
  * expression-resolving is needed. This occurs eg. when start-form properties have default's
- * defined. Even though variables are not available yet, expressions should be resolved 
+ * defined. Even though variables are not available yet, expressions should be resolved
  * anyway.
- * 
+ *
  * @author Frederik Heremans
  */
-public class StartProcessVariableScope implements VariableScope {
-  
+public class StartProcessVariableScope implements VariableScope<CoreVariableInstance> {
+
   private static final StartProcessVariableScope INSTANCE = new StartProcessVariableScope();
 
   /**
@@ -40,7 +41,7 @@ public class StartProcessVariableScope implements VariableScope {
   public static StartProcessVariableScope getSharedInstance()  {
     return INSTANCE;
   }
-  
+
   @SuppressWarnings("unchecked")
   public Map<String, Object> getVariables() {
     return Collections.EMPTY_MAP;
@@ -122,6 +123,24 @@ public class StartProcessVariableScope implements VariableScope {
 
   public void removeVariablesLocal(Collection<String> variableNames) {
     throw new UnsupportedOperationException("No execution active, no variables can be removed");
+  }
+
+  @SuppressWarnings("unchecked")
+  public Map<String, CoreVariableInstance> getVariableInstances() {
+    return Collections.EMPTY_MAP;
+  }
+
+  public CoreVariableInstance getVariableInstance(String name) {
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public Map<String, CoreVariableInstance> getVariableInstancesLocal() {
+    return Collections.EMPTY_MAP;
+  }
+
+  public CoreVariableInstance getVariableInstanceLocal(String name) {
+    return null;
   }
 
 }
