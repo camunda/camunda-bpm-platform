@@ -185,34 +185,32 @@ define([
           throw err;
         }
 
-        if (result.key) {
-          var parts = result.key.split('embedded:');
-          var ctx = result.contextPath;
-          var formUrl;
+        // stop here if there is no "embedded form"
+        if (!result.key) { return; }
 
-          if (parts.length > 1) {
-            formUrl = parts.pop();
-            // ensure a trailing slash
-            ctx = ctx + (ctx.slice(-1) !== '/' ? '/' : '');
-            // formUrl = formUrl[0] === '/' ? formUrl.slice(1) : formUrl;
-            formUrl = formUrl.replace(/app:(\/?)/, ctx);
-          }
-          else {
-            formUrl = result.key;
-          }
+        var parts = result.key.split('embedded:');
+        var ctx = result.contextPath;
+        var formUrl;
 
-          var form = new CamForm({
-            processDefinitionId:  startingProcess.id,
-            containerElement:     $('.start-form-container'),
-            client:               camAPI,
-            formUrl:              formUrl
-          });
-
-          $scope.startingProcess._form = form;
+        if (parts.length > 1) {
+          formUrl = parts.pop();
+          // ensure a trailing slash
+          ctx = ctx + (ctx.slice(-1) !== '/' ? '/' : '');
+          // formUrl = formUrl[0] === '/' ? formUrl.slice(1) : formUrl;
+          formUrl = formUrl.replace(/app:(\/?)/, ctx);
         }
         else {
-          // generic form
+          formUrl = result.key;
         }
+
+        var form = new CamForm({
+          processDefinitionId:  startingProcess.id,
+          containerElement:     $('.start-form-container'),
+          client:               camAPI,
+          formUrl:              formUrl
+        });
+
+        $scope.startingProcess._form = form;
       });
     };
 
@@ -250,7 +248,21 @@ define([
         close(res);
       }
 
-      $scope.startingProcess._form.submit(submitCb);
+      if ($scope.startingProcess._form) {
+        $scope.startingProcess._form.submit(submitCb);
+      }
+      else {
+        var data = {};
+        data.id = $scope.startingProcess.id;
+        data.variables = {};
+        angular.forEach($scope.variables, function(variable) {
+          data.variables[variable.name] = {
+            type: variable.type,
+            value: variable.value
+          };
+        });
+        ProcessDefinition.submitForm(data, submitCb);
+      }
     };
   }]);
 
