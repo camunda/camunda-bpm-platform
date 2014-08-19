@@ -547,8 +547,8 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivtyId-super.bpmn20.xml",
-      "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivtyId-sub.bpmn20.xml"
+      "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivityId-super.bpmn20.xml",
+      "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivityId-sub.bpmn20.xml"
   })
   public void testStartActivityId() {
     // given
@@ -567,7 +567,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivtyId-super.bpmn20.xml",
+      "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivityId-super.bpmn20.xml",
       "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testAsyncStartActivityId-sub.bpmn20.xml"
   })
   public void testAsyncStartActivityId() {
