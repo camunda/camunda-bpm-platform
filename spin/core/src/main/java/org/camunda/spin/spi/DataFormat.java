@@ -26,14 +26,14 @@ public interface DataFormat<T extends Spin<?>> {
   T createWrapperInstance(Object parameter);
 
   String getName();
-  
+
   DataFormat<T> newInstance();
-  
+
   DataFormatReader getReader();
-  
+
   DataFormatMapper getMapper();
-  
+
   String getCanonicalTypeName(Object object);
-  
+
   void addTypeDetector(TypeDetector typeDetector);
 }

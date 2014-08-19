@@ -13,6 +13,7 @@
 package org.camunda.spin;
 
 import java.util.HashSet;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
@@ -26,29 +27,55 @@ import org.camunda.spin.spi.DataFormat;
  * @author Daniel Meyer
  */
 public class DataFormats {
-  
-  public static final Set<DataFormat<? extends Spin<?>>> AVAILABLE_FORMATS;
-  
-  static {
-    AVAILABLE_FORMATS = new HashSet<DataFormat<? extends Spin<?>>>();
-    AVAILABLE_FORMATS.add(xmlDomFormat());
-    AVAILABLE_FORMATS.add(jsonTreeFormat());
+
+  protected static Set<DataFormat<? extends Spin<?>>> AVAILABLE_FORMATS;
+
+  public static JsonJacksonTreeDataFormat DEFAULT_JSON_DATA_FORMAT;
+  public static XmlDomDataFormat DEFAULT_XML_DATA_FORMAT;
+
+  public static Set<DataFormat<? extends Spin<?>>> getAvailableDataFormats() {
+    ensureDataformatsInitialized();
+    return AVAILABLE_FORMATS;
   }
 
-  public static XmlDomDataFormat xmlDomFormat() {
-    return XmlDomDataFormat.INSTANCE;
+  /**
+   * Detect all available dataformats on the classpath using a {@link ServiceLoader}.
+   */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  protected static void ensureDataformatsInitialized() {
+    if(AVAILABLE_FORMATS == null) {
+      synchronized(DataFormats.class) {
+        if(AVAILABLE_FORMATS == null) {
+          AVAILABLE_FORMATS = new HashSet<DataFormat<? extends Spin<?>>>();
+          // find available dataformats on the classpath
+          ServiceLoader<DataFormat> dataFormatLoader = ServiceLoader.load(DataFormat.class, Spin.class.getClassLoader());
+          for (DataFormat dataFormat : dataFormatLoader) {
+
+            // add to list of available data formats
+            AVAILABLE_FORMATS.add(dataFormat);
+
+            // detect default data formats
+            if(dataFormat instanceof JsonJacksonTreeDataFormat) {
+              DEFAULT_JSON_DATA_FORMAT = (JsonJacksonTreeDataFormat) dataFormat;
+
+            } else if(dataFormat instanceof XmlDomDataFormat) {
+              DEFAULT_XML_DATA_FORMAT = (XmlDomDataFormat) dataFormat;
+
+            }
+          }
+        }
+      }
+    }
   }
-  
+
   public static XmlDomDataFormat xmlDom() {
-    return XmlDomDataFormat.INSTANCE.newInstance();
+    ensureDataformatsInitialized();
+    return DEFAULT_XML_DATA_FORMAT.newInstance();
   }
-  
-  public static JsonJacksonTreeDataFormat jsonTreeFormat() {
-    return JsonJacksonTreeDataFormat.INSTANCE;
-  }
-  
+
   public static JsonJacksonTreeDataFormat jsonTree() {
-    return JsonJacksonTreeDataFormat.INSTANCE.newInstance();
+    ensureDataformatsInitialized();
+    return DEFAULT_JSON_DATA_FORMAT.newInstance();
   }
 
 }

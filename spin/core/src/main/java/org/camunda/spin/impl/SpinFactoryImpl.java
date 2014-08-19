@@ -100,7 +100,7 @@ public class SpinFactoryImpl extends SpinFactory {
     RewindableInputStream rewindableStream = new RewindableInputStream(parameter, READ_SIZE);
 
     DataFormat<T> matchingDataFormat = null;
-    for (DataFormat<?> format : DataFormats.AVAILABLE_FORMATS) {
+    for (DataFormat<?> format : DataFormats.getAvailableDataFormats()) {
       if (format.getReader().canRead(rewindableStream)) {
         matchingDataFormat = (DataFormat<T>) format;
       }

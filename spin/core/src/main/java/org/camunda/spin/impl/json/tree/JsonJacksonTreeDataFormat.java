@@ -51,7 +51,6 @@ import com.jayway.jsonpath.spi.JsonProvider;
  */
 public class JsonJacksonTreeDataFormat implements DataFormat<SpinJsonNode>, JsonJacksonTreeConfigurable {
 
-  public static final JsonJacksonTreeDataFormat INSTANCE = new JsonJacksonTreeDataFormat();
   private static final JsonJacksonTreeLogger LOG = SpinLogger.JSON_TREE_LOGGER;
 
   protected JsonJacksonParserConfiguration parserConfiguration;

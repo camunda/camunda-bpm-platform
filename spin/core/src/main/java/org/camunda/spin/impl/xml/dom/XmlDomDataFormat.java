@@ -32,8 +32,6 @@ public class XmlDomDataFormat implements DataFormat<SpinXmlTreeElement> {
 
   protected static final SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
-  public static final XmlDomDataFormat INSTANCE = new XmlDomDataFormat();
-
   public Class<? extends SpinXmlTreeElement> getWrapperType() {
     return SpinXmlDomElement.class;
   }
@@ -65,7 +63,7 @@ public class XmlDomDataFormat implements DataFormat<SpinXmlTreeElement> {
   public DataFormatReader getReader() {
     return new XmlDomDataFormatReader();
   }
-  
+
   public DataFormatMapper getMapper() {
     throw LOG.methodNotImplement("getMapper");
   }

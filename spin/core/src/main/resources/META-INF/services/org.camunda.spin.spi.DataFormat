@@ -1,0 +1,2 @@
+org.camunda.spin.impl.xml.dom.XmlDomDataFormat
+org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat
