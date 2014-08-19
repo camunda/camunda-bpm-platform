@@ -9,10 +9,10 @@ define([
 
   return [function() {
     return {
-      link: function(scope, element) {
-        scope.order = scope.order || 'asc';
+      link: function(scope, element, attrs) {
+        scope.order = attrs.order;//scope.order || 'asc';
 
-        scope.by = scope.by || 'priority';
+        scope.by = attrs.by;//scope.by || 'priority';
 
         scope.changeOrder = function() {
           scope.order = scope.order === 'asc' ? 'desc' : 'asc';
@@ -30,6 +30,8 @@ define([
         }
 
         scope.$watch('by', setSortingLabel);
+
+        scope.$watch('order', setSortingLabel);
 
         setSortingLabel();
       },

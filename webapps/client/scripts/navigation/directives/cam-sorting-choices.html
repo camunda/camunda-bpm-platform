@@ -12,28 +12,28 @@
      tabindex="-1"
      title="{{ order | translate }}"
      class="sort-direction glyphicon glyphicon-chevron-up"
-     ng-class="{'glyphicon-chevron-up': order === 'desc', 'glyphicon-chevron-down': order === 'asc'}"
+     ng-class="{'glyphicon-chevron-up': order === 'asc', 'glyphicon-chevron-down': order === 'desc'}"
      ng-click="changeOrder()"></a>
 
   <ul class="dropdown-menu dropdown-menu-right"
       role="menu">
-    <li>
+    <li ng-show="by !== 'priority'">
       <a href
          tabindex="-1"
          sort-by="priority"
          translate="PRIORITY"
-         ng-click="changeBy('priority')">Creation date</a>
+         ng-click="changeBy('priority')">Priority</a>
     </li>
 
-    <li>
+    <li ng-show="by !== 'created'">
       <a href
          tabindex="-1"
          sort-by="created"
          translate="CREATION_DATE"
-         ng-click="changeBy('created')">Creation date</a>
+         ng-click="changeBy('created')">Created</a>
     </li>
 
-    <li>
+    <li ng-show="by !== 'dueDate'">
       <a href
          tabindex="-1"
          sort-by="dueDate"
@@ -41,7 +41,7 @@
          ng-click="changeBy('dueDate')">Due date</a>
     </li>
 
-    <li>
+    <li ng-show="by !== 'followUpDate'">
       <a href
          tabindex="-1"
          sort-by="followUpDate"
@@ -49,7 +49,7 @@
          ng-click="changeBy('followUpDate')">Follow up date</a>
     </li>
 
-    <li>
+    <li ng-show="by !== 'name'">
       <a href
          tabindex="-1"
          sort-by="name"
@@ -57,7 +57,7 @@
          ng-click="changeBy('name')">Task name</a>
     </li>
 
-    <li>
+    <li ng-show="by !== 'assignee'">
       <a href
          tabindex="-1"
          sort-by="assignee"
@@ -66,7 +66,7 @@
     </li>
 
 <!--
-    <li>
+    <li ng-show="by !== 'owner'">
       <a href
          tabindex="-1"
          sort-by="owner"
