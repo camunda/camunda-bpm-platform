@@ -12,6 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -19,7 +26,11 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.rest.dto.FormVariablesDto;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
-import org.camunda.bpm.engine.rest.dto.task.*;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
+import org.camunda.bpm.engine.rest.dto.task.FormDto;
+import org.camunda.bpm.engine.rest.dto.task.IdentityLinkDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskDto;
+import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.hal.task.HalTask;
@@ -32,13 +43,6 @@ import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
-
-import javax.ws.rs.core.Response.Status;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class TaskResourceImpl implements TaskResource {
 
@@ -138,8 +142,7 @@ public class TaskResourceImpl implements TaskResource {
       throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
     }
 
-    return HalTask.fromTask(task)
-      .embed(HalTask.REL_PROCESS_DEFINITION, engine);
+    return HalTask.fromTask(task);
   }
 
   @Override
