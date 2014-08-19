@@ -545,4 +545,45 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(businessKey, historicProcessInstance.getBusinessKey());
 
   }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivtyId-super.bpmn20.xml",
+      "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivtyId-sub.bpmn20.xml"
+  })
+  public void testStartActivityId() {
+    // given
+
+    // when
+    runtimeService.startProcessInstanceByKey("super");
+
+    // then
+    HistoricProcessInstance hpi = historyService
+        .createHistoricProcessInstanceQuery()
+        .processDefinitionKey("sub")
+        .singleResult();
+
+    assertEquals("theSubStart", hpi.getStartActivityId());
+
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivtyId-super.bpmn20.xml",
+      "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testAsyncStartActivityId-sub.bpmn20.xml"
+  })
+  public void testAsyncStartActivityId() {
+    // given
+    runtimeService.startProcessInstanceByKey("super");
+
+    // when
+    executeAvailableJobs();
+
+    // then
+    HistoricProcessInstance hpi = historyService
+        .createHistoricProcessInstanceQuery()
+        .processDefinitionKey("sub")
+        .singleResult();
+
+    assertEquals("theSubStart", hpi.getStartActivityId());
+
+  }
 }

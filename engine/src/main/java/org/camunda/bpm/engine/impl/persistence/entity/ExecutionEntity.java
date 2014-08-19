@@ -35,9 +35,9 @@ import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
-import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -257,7 +257,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   @SuppressWarnings("unchecked")
   public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
-    ExecutionEntity subProcessInstance = newExecution((ActivityImpl) processDefinition.getInitial());
+    ActivityImpl initial = (ActivityImpl) processDefinition.getInitial();
+    ExecutionEntity subProcessInstance = newExecution(initial);
+    subProcessInstance.setActivity(initial);
 
     shouldQueryForSubprocessInstance = true;
 

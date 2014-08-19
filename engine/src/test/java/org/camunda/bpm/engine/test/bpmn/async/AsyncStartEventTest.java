@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -181,6 +182,24 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
 
       }
     }
+
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testCallActivity-super.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testCallActivity-sub.bpmn20.xml"
+  })
+  public void testCallActivity() {
+    runtimeService.startProcessInstanceByKey("super");
+
+    ProcessInstance pi = runtimeService
+        .createProcessInstanceQuery()
+        .processDefinitionKey("sub")
+        .singleResult();
+
+    assertTrue(pi instanceof ExecutionEntity);
+
+    assertEquals("theSubStart", ((ExecutionEntity)pi).getActivityId());
 
   }
 
