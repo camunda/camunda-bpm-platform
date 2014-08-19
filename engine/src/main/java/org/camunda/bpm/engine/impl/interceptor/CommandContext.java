@@ -58,7 +58,7 @@ public class CommandContext {
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
 
-  protected List<CommandContextCloseListener> commandContextCloseListeners = new LinkedList<CommandContextCloseListener>();
+  protected List<CommandContextListener> commandContextListeners = new LinkedList<CommandContextListener>();
 
   public CommandContext(ProcessEngineConfigurationImpl processEngineConfiguration) {
     this(processEngineConfiguration, processEngineConfiguration.getTransactionContextFactory());
@@ -165,6 +165,9 @@ public class CommandContext {
           }
 
           if (commandInvocationContext.getThrowable() != null) {
+            // fire command failed (must not fail itself)
+            fireCommandFailed(commandInvocationContext.getThrowable());
+
             Level loggingLevel = Level.SEVERE;
             if (shouldLogInfo(commandInvocationContext.getThrowable())) {
               loggingLevel = Level.INFO; // reduce log level, because this is not really a technical exception
@@ -200,8 +203,18 @@ public class CommandContext {
   }
 
   protected void fireCommandContextClose() {
-    for (CommandContextCloseListener listener : commandContextCloseListeners) {
+    for (CommandContextListener listener : commandContextListeners) {
       listener.onCommandContextClose(this);
+    }
+  }
+
+  protected void fireCommandFailed(Throwable t) {
+    for (CommandContextListener listener : commandContextListeners) {
+      try {
+        listener.onCommandFailed(this, t);
+      } catch(Throwable ex) {
+        log.log(Level.SEVERE, "Exception while invoking onCommandFailed()", t);
+      }
     }
   }
 
@@ -375,9 +388,9 @@ public class CommandContext {
 
   // getters and setters //////////////////////////////////////////////////////
 
-  public void registerCommandContextCloseListener(CommandContextCloseListener commandContextCloseListener) {
-    if(!commandContextCloseListeners.contains(commandContextCloseListener)) {
-      commandContextCloseListeners.add(commandContextCloseListener);
+  public void registerCommandContextListener(CommandContextListener commandContextListener) {
+    if(!commandContextListeners.contains(commandContextListener)) {
+      commandContextListeners.add(commandContextListener);
     }
   }
 

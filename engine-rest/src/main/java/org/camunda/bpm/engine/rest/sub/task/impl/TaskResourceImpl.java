@@ -138,7 +138,8 @@ public class TaskResourceImpl implements TaskResource {
       throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
     }
 
-    return HalTask.fromTask(task);
+    return HalTask.fromTask(task)
+      .embed(HalTask.REL_PROCESS_DEFINITION, engine);
   }
 
   @Override

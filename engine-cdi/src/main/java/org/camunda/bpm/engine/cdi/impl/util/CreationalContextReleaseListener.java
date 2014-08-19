@@ -19,7 +19,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.interceptor.CommandContextCloseListener;
+import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 
 /**
  * {@link CommandContextCloseListener} which releases a CDI Creational Context when the command context is closed.
@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContextCloseListener;
  * @author Daniel Meyer
  *
  */
-public class CreationalContextReleaseListener implements CommandContextCloseListener {
+public class CreationalContextReleaseListener implements CommandContextListener {
 
   protected final static Logger LOG = Logger.getLogger(CreationalContextReleaseListener.class.getName());
 
@@ -40,6 +40,10 @@ public class CreationalContextReleaseListener implements CommandContextCloseList
 
   public void onCommandContextClose(CommandContext commandContext) {
     release(context);
+  }
+
+  public void onCommandFailed(CommandContext commandContext, Throwable t) {
+    // ignore
   }
 
   protected void release(CreationalContext<?> creationalContext) {

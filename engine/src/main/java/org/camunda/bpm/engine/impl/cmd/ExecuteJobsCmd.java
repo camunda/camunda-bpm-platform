@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -75,6 +74,16 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
     }
 
+    // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
+    FailedJobListener failedJobListener = createFailedJobListener(commandExecutor);
+
+    // the listener is ALWAYS added to the transaction as SNYC on ROLLABCK. If the transaction does not rollback, it is ignored.
+    commandContext.getTransactionContext().addTransactionListener(
+        TransactionState.ROLLED_BACK,
+        failedJobListener);
+
+    // register as command context close lister to intercept exceptions on flush
+    commandContext.registerCommandContextListener(failedJobListener);
 
     if (jobExecutorContext != null) { // if null, then we are not called by the job executor
       jobExecutorContext.setCurrentJob(job);
@@ -85,26 +94,10 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       return null;
 
     } catch (RuntimeException exception) {
-
       log.warning("Exception while excuting job '" + job + "': " + exception.getMessage());
 
-      // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
-      FailedJobListener failedJobListener = createFailedJobListener(exception, commandExecutor);
-
-      try {
-
-        commandContext.getTransactionContext().addTransactionListener(
-          TransactionState.ROLLED_BACK,
-          failedJobListener);
-
-      } catch (Exception ex) {
-        // if the TX has already been rolled back, the listener cannot be registered.
-        log.log(Level.FINE, "Could not register transaction synchronization. Probably the TX has already been rolled back by application code.", ex);
-
-        // Execute the listener in new TX, here.
-        executeCmdInNewTx(commandContext, failedJobListener);
-
-      }
+      // log the exception in the job
+      failedJobListener.setException(exception);
 
       // throw the original exception to indicate the ExecuteJobCmd failed
       throw exception;
@@ -117,17 +110,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
   }
 
-  protected void executeCmdInNewTx(CommandContext commandContext, FailedJobListener failedJobListener) {
-    try {
-
-      failedJobListener.execute(commandContext);
-
-    } catch(Exception ex) {
-      log.log(Level.SEVERE, "Could not execute the FailedJobListener: "+ex.getMessage(), ex);
-    }
-  }
-
-  protected FailedJobListener createFailedJobListener(RuntimeException exception, CommandExecutor commandExecutor) {
-    return new FailedJobListener(commandExecutor, jobId, exception);
+  protected FailedJobListener createFailedJobListener(CommandExecutor commandExecutor) {
+    return new FailedJobListener(commandExecutor, jobId);
   }
 }

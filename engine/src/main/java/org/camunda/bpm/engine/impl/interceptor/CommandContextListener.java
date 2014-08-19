@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,13 +13,15 @@
 package org.camunda.bpm.engine.impl.interceptor;
 
 /**
- * invoked on command context close
- * 
+ * Command context lifecycle events
+ *
  * @author Daniel Meyer
  *
  */
-public interface CommandContextCloseListener {
-  
+public interface CommandContextListener {
+
   public void onCommandContextClose(CommandContext commandContext);
-  
+
+  public void onCommandFailed(CommandContext commandContext, Throwable t);
+
 }

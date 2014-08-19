@@ -123,7 +123,7 @@ public class ProgrammaticBeanLookup {
   private static void releaseOnContextClose(CreationalContext<?> creationalContext, Bean<?> bean) {
     CommandContext commandContext = Context.getCommandContext();
     if(commandContext != null) {
-      commandContext.registerCommandContextCloseListener(new CreationalContextReleaseListener(creationalContext));
+      commandContext.registerCommandContextListener(new CreationalContextReleaseListener(creationalContext));
 
     } else {
       LOG.warning("Obtained instance of @Dependent scoped bean "+bean +" outside of process engine command context. "

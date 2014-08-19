@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 import java.util.*;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
@@ -29,7 +30,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.interceptor.CommandContextCloseListener;
+import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.task.delegate.TaskListenerInvocation;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -48,7 +49,7 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class TaskEntity extends CoreVariableScope implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, CommandContextCloseListener {
+public class TaskEntity extends CoreVariableScope implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, CommandContextListener {
 
   public static final String DELETE_REASON_COMPLETED = "completed";
   public static final String DELETE_REASON_DELETED = "deleted";
@@ -160,7 +161,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
     DbEntityManager dbEntityManger = commandContext.getDbEntityManger();
     dbEntityManger.merge(this);
 
-    commandContext.registerCommandContextCloseListener(this);
+    commandContext.registerCommandContextListener(this);
   }
 
   /** new task.  Embedded state and create time will be initialized.
@@ -970,10 +971,15 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
       commandContext.getHistoricTaskInstanceManager().updateHistoricTaskInstance(this);
     }
   }
+
+  public void onCommandFailed(CommandContext commandContext, Throwable t) {
+    // ignore
+  }
+
   protected void registerCommandContextCloseListener() {
     CommandContext commandContext = Context.getCommandContext();
     if (commandContext!=null) {
-      commandContext.registerCommandContextCloseListener(this);
+      commandContext.registerCommandContextListener(this);
     }
   }
 

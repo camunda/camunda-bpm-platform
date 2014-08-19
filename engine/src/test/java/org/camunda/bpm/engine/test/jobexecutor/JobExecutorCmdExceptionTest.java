@@ -14,6 +14,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Tom Baeyens
@@ -113,6 +114,27 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     // the job execution failed (job.retries = 0)
     job = managementService.createJobQuery().noRetriesLeft().singleResult();
     assertNotNull(job);
+    assertEquals(0, job.getRetries());
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/jobexecutor/jobFailingOnFlush.bpmn20.xml")
+  public void testJobRetriesDecrementedOnFailedFlush() {
+
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    // there should be 1 job created:
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    // with 3 retries
+    assertEquals(3, job.getRetries());
+
+    // if we execute the job
+    waitForJobExecutorToProcessAllJobs(6000);
+
+    // the job is still present
+    job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    // but has no more retires
     assertEquals(0, job.getRetries());
   }
 
