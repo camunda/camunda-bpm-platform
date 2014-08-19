@@ -101,7 +101,7 @@ public class DurationHelper {
       }
       return cur.before(date) ? null : cur;
     }
-    Date cur = add(end, period.negate());;
+    Date cur = add(end, period.negate());
     Date next = end;
 
     for (int i=0;i<times && cur.after(date);i++) {

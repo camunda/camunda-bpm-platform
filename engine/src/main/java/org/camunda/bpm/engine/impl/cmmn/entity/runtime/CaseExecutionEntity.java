@@ -253,7 +253,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     child.setCaseDefinition(getCaseDefinition());
 
     return child;
-  };
+  }
 
   protected CaseExecutionEntity newCaseExecution() {
     CaseExecutionEntity newCaseExecution = new CaseExecutionEntity();

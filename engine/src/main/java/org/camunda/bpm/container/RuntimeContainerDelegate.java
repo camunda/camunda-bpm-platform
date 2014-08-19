@@ -82,8 +82,8 @@ public interface RuntimeContainerDelegate {
   public static class RuntimeContainerDelegateInstance {
     
     // hide
-    private RuntimeContainerDelegateInstance() {};
-    
+    private RuntimeContainerDelegateInstance() {}
+
     private RuntimeContainerDelegate delegate = new JmxRuntimeContainerDelegate();
     
     public RuntimeContainerDelegate get() {

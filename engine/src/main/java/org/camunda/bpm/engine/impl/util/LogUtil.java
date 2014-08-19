@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmException;
 public class LogUtil {
   
   public static enum ThreadLogMode {
-    NONE, INDENT, PRINT_ID;
+    NONE, INDENT, PRINT_ID
   }
 
   private static final String LINE_SEPARATOR = System.getProperty("line.separator");

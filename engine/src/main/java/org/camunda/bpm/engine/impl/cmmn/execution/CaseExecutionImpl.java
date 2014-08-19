@@ -190,7 +190,7 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
     child.setCaseDefinition(getCaseDefinition());
 
     return child;
-  };
+  }
 
   protected CaseExecutionImpl newCaseExecution() {
     return new CaseExecutionImpl();

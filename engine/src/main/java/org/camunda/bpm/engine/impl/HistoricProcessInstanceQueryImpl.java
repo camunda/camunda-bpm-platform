@@ -287,7 +287,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   @Deprecated
   public HistoricProcessInstanceQuery startDateBy(Date date) {
-    this.startDateBy = this.calculateMidnight(date);;
+    this.startDateBy = this.calculateMidnight(date);
     return this;
   }
 

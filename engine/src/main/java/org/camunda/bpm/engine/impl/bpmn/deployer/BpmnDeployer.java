@@ -67,7 +67,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
  */
 public class BpmnDeployer implements Deployer {
 
-  private static final Logger LOG = Logger.getLogger(BpmnDeployer.class.getName());;
+  private static final Logger LOG = Logger.getLogger(BpmnDeployer.class.getName());
 
   public static final String[] BPMN_RESOURCE_SUFFIXES = new String[] { "bpmn20.xml", "bpmn" };
   public static final String[] DIAGRAM_SUFFIXES = new String[]{"png", "jpg", "gif", "svg"};

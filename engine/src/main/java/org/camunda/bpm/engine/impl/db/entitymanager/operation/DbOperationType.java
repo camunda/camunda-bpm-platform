@@ -24,6 +24,6 @@ public enum DbOperationType {
   UPDATE_BULK,
 
   DELETE,
-  DELETE_BULK;
+  DELETE_BULK
 
 }

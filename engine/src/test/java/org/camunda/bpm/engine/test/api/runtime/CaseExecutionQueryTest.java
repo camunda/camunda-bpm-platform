@@ -793,7 +793,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueGreaterThanOrEqual("aStringValue", "abc");
 
@@ -828,7 +828,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueGreaterThanOrEqual("aShortValue", (short) 123);
 
@@ -848,7 +848,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueGreaterThanOrEqual("anIntegerValue", 456);
 
@@ -868,7 +868,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueGreaterThanOrEqual("aLongValue", (long) 789);
 
@@ -892,7 +892,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueGreaterThanOrEqual("aDateValue", now);
 
@@ -912,7 +912,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueGreaterThanOrEqual("aDoubleValue", 1.5);
 
@@ -1135,7 +1135,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueLessThanOrEqual("aStringValue", "abc");
 
@@ -1170,7 +1170,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueLessThanOrEqual("aShortValue", (short) 123);
 
@@ -1190,7 +1190,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueLessThanOrEqual("anIntegerValue", 456);
 
@@ -1210,7 +1210,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueLessThanOrEqual("aLongValue", (long) 789);
 
@@ -1234,7 +1234,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueLessThanOrEqual("aDateValue", now);
 
@@ -1254,7 +1254,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueLessThanOrEqual("aDoubleValue", 1.5);
 
@@ -1324,13 +1324,13 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueLike("aStringValue", "%bc");
 
     verifyQueryResults(query, 1);
 
-    query = caseService.createCaseExecutionQuery();;
+    query = caseService.createCaseExecutionQuery();
 
     query.variableValueLike("aStringValue", "%b%");
 

@@ -32,5 +32,5 @@ public class SuspensionStateDto {
     return dto;
   }
 
-  public void updateSuspensionState(ProcessEngine engine) {};
+  public void updateSuspensionState(ProcessEngine engine) {}
 }

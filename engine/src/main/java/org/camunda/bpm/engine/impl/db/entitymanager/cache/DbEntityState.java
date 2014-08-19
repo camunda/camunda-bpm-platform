@@ -47,5 +47,5 @@ public enum DbEntityState {
 
   /** A {@link #MERGED} object which may exists in the database and is set to be deleted by the current session.
    * It will be removed from the cache at the next flush. */
-  DELETED_MERGED;
+  DELETED_MERGED
 }

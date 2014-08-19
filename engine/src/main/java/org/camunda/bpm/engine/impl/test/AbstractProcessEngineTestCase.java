@@ -287,7 +287,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     for (Job job : jobs) {
       try {
         managementService.executeJob(job.getId());
-      } catch (Exception e) {};
+      } catch (Exception e) {}
     }
 
     executeAvailableJobs();
