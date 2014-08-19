@@ -1,6 +1,6 @@
 'use strict';
 
-var Page = require('../../page');
+var Page = require('./page');
 
 module.exports = Page.extend({
 
@@ -14,19 +14,29 @@ module.exports = Page.extend({
     return this.formElement().element(by.css('[type="submit"]'));
   },
 
-  usernameInput: function() {
-    return this.formElement().element(by.model('username'));
+  usernameInput: function(inputValue) {
+    var inputField = this.formElement().element(by.model('username'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  passwordInput: function() {
-    return this.formElement().element(by.model('password'));
+  passwordInput: function(inputValue) {
+    var inputField = this.formElement().element(by.model('password'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
   userLogin: function(username, password) {
     this.usernameInput().clear();
     this.passwordInput().clear();
-    this.usernameInput().sendKeys(username);
-    this.passwordInput().sendKeys(password);
+    this.usernameInput(username);
+    this.passwordInput(password);
     this.loginButton().click();
   }
 

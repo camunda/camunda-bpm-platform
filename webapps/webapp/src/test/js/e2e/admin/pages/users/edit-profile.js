@@ -12,16 +12,31 @@ module.exports = Page.extend({
     return formElement.element(by.css('legend')).getText();
   },
 
-	firstName: function() {
-  	return formElement.element(by.model('profile.firstName'));
+	firstNameInput: function(inputValue) {
+    var inputField = element(by.model('profile.firstName'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  lastName: function() { 
-  	return formElement.element(by.model('profile.lastName'));
+  lastNameInput: function(inputValue) {
+    var inputField = element(by.model('profile.lastName'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  email: function() {
-    return formElement.element(by.model('profile.email'));
+  emailInput: function(inputValue) {
+    var inputField = element(by.model('profile.email'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
   updateProfileButton: function() { 
@@ -29,10 +44,10 @@ module.exports = Page.extend({
   },
 
   changeUserProfile: function(firstName, lastName) {
-    this.firstName().clear();
-    this.lastName().clear();
-    this.firstName().sendKeys(firstName);
-    this.lastName().sendKeys(lastName);
+    this.firstNameInput().clear();
+    this.lastNameInput().clear();
+    this.firstNameInput(firstName);
+    this.lastNameInput(lastName);
     this.updateProfileButton().click();
   }
 

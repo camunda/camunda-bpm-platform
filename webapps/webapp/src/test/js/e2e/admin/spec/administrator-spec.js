@@ -74,12 +74,12 @@ describe('admin user -', function() {
     it('should enter new admin profile', function() {
 
       // when
-      usersPage.adminUserSetup.userId().sendKeys('Admin');
-      usersPage.adminUserSetup.password().sendKeys('admin123');
-      usersPage.adminUserSetup.passwordRepeat().sendKeys('admin123');
-      usersPage.adminUserSetup.userFirstName().sendKeys('Über');
-      usersPage.adminUserSetup.userLastName().sendKeys('Admin');
-      usersPage.adminUserSetup.userEmail().sendKeys('uea@camundo.org');
+      usersPage.adminUserSetup.userIdInput('Admin');
+      usersPage.adminUserSetup.passwordInput('admin123');
+      usersPage.adminUserSetup.passwordRepeatInput('admin123');
+      usersPage.adminUserSetup.userFirstNameInput('Über');
+      usersPage.adminUserSetup.userLastNameInput('Admin');
+      usersPage.adminUserSetup.userEmailInput('uea@camundo.org');
 
       usersPage.adminUserSetup.createNewAdminButton().click();
 

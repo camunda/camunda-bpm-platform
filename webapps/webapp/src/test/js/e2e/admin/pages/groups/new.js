@@ -6,16 +6,31 @@ module.exports = Base.extend({
 
   url: '/camunda/app/admin/default/#/group-create',
 
-  newGroupId: function() {
-    return element(by.model('group.id'));
+  newGroupIdInput: function(inputValue) {
+    var inputField = element(by.model('group.id'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  newGroupName: function () {
-    return element(by.model('group.name'));
+  newGroupNameInput: function (inputValue) {
+    var inputField = element(by.model('group.name'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  newGroupType: function () {
-    return element(by.model('group.type'));
+  newGroupTypeInput: function (inputValue) {
+    var inputField = element(by.model('group.type'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
   createNewGroupButton: function () {
@@ -23,9 +38,9 @@ module.exports = Base.extend({
   },
 
   createNewGroup: function (groupID, groupName, groupType) {
-    this.newGroupId().sendKeys(groupID);
-    this.newGroupName().sendKeys(groupName);
-    this.newGroupType().sendKeys(groupType);
+    this.newGroupIdInput(groupID);
+    this.newGroupNameInput(groupName);
+    this.newGroupTypeInput(groupType);
     this.createNewGroupButton().click();
   }
 });

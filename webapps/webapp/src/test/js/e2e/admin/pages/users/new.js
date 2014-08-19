@@ -11,12 +11,12 @@ module.exports = Base.extend({
   },
 
   createNewUser: function(userId, userPassword, userPasswordRepeat, userFirstName, userLastName, userEmail) {
-    this.userId().sendKeys(userId);
-    this.password().sendKeys(userPassword);
-    this.passwordRepeat().sendKeys(userPasswordRepeat);
-    this.userFirstName().sendKeys(userFirstName);
-    this.userLastName().sendKeys(userLastName);
-    this.userEmail().sendKeys(userEmail);
+    this.userIdInput(userId);
+    this.passwordInput(userPassword);
+    this.passwordRepeatInput(userPasswordRepeat);
+    this.userFirstNameInput(userFirstName);
+    this.userLastNameInput(userLastName);
+    this.userEmailInput(userEmail);
 
     this.createNewUserButton().click();
   }

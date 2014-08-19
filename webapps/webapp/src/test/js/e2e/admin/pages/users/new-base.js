@@ -4,28 +4,58 @@ var Base = require('./../base');
 
 module.exports = Base.extend({
 
-  userId: function() {
-    return element(by.model('profile.id'));
+  userIdInput: function(inputValue) {
+    var inputField = element(by.model('profile.id'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  password: function() {
-    return element(by.model('credentials.password'));
+  passwordInput: function(inputValue) {
+    var inputField = element(by.model('credentials.password'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  passwordRepeat: function() {
-    return element(by.model('credentials.password2'));
+  passwordRepeatInput: function(inputValue) {
+    var inputField = element(by.model('credentials.password2'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  userFirstName: function() {
-    return element(by.model('profile.firstName'));
+  userFirstNameInput: function(inputValue) {
+    var inputField = element(by.model('profile.firstName'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  userLastName: function() {
-    return element(by.model('profile.lastName'));
+  userLastNameInput: function(inputValue) {
+    var inputField = element(by.model('profile.lastName'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  userEmail: function() {
-    return element(by.model('profile.email'));
+  userEmailInput: function(inputValue) {
+    var inputField = element(by.model('profile.email'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   }
 
 });

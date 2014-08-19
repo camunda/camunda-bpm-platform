@@ -135,7 +135,7 @@ describe('users page - ', function() {
     it('should update profile', function() {
 
       // when
-      usersPage.editUserProfile.firstName().sendKeys('i');
+      usersPage.editUserProfile.firstNameInput('i');
       usersPage.editUserProfile.updateProfileButton().click();
 
       // then
@@ -178,9 +178,9 @@ describe('users page - ', function() {
     it('should change password (password repeat wrong)', function() {
 
       // when
-      usersPage.editUserAccount.myPassword('password1234');
-      usersPage.editUserAccount.newPassword('asdfasdf');
-      usersPage.editUserAccount.newPasswordRepeat('asdfasdg')
+      usersPage.editUserAccount.myPasswordInput('password1234');
+      usersPage.editUserAccount.newPasswordInput('asdfasdf');
+      usersPage.editUserAccount.newPasswordRepeatInput('asdfasdg');
 
       // then
       expect(usersPage.editUserAccount.changePasswordButton().isEnabled()).toBe(false);

@@ -17,16 +17,31 @@ module.exports = Page.extend({
     return deleteUserFormElement.element(by.css('legend')).getText();
   },
 
-  myPassword: function() {
-    return changePasswordFormElement.element(by.model('credentials.authenticatedUserPassword'));
+  myPasswordInput: function(inputValue) {
+    var inputField = element(by.model('credentials.authenticatedUserPassword'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  newPassword: function() {
-    return changePasswordFormElement.element(by.model('credentials.password'));
+  newPasswordInput: function(inputValue) {
+    var inputField = element(by.model('credentials.password'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  newPasswordRepeat: function() {
-    return changePasswordFormElement.element(by.model('credentials.password2'));
+  newPasswordRepeatInput: function(inputValue) {
+    var inputField = element(by.model('credentials.password2'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
   changePasswordButton: function() {
@@ -34,9 +49,9 @@ module.exports = Page.extend({
   },
 
   changePassword: function(myPassword, newPassword, newPasswordRepeat) {
-    this.myPassword().sendKeys(myPassword);
-    this.newPassword().sendKeys(newPassword);
-    this.newPasswordRepeat().sendKeys(newPasswordRepeat);
+    this.myPasswordInput(myPassword);
+    this.newPasswordInput(newPassword);
+    this.newPasswordRepeatInput(newPasswordRepeat);
     this.changePasswordButton().click();
   },
 

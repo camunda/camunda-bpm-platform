@@ -10,12 +10,22 @@ module.exports = Page.extend({
     return element(by.css('[data-ng-click="updateGroup()"]'));
   },
 
-  groupName: function() {
-    return element(by.model('group.name'));
+  groupNameInput: function(inputValue) {
+    var inputField = element(by.model('group.name'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  groupType: function() {
-    return element(by.model('group.type'));
+  groupTypeInput: function(inputValue) {
+    var inputField = element(by.model('group.type'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
   deleteGroupButton: function() {

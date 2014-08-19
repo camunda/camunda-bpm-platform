@@ -76,18 +76,18 @@ describe('groups page -', function() {
       expect(groupsPage.newGroup.createNewGroupButton().isEnabled()).toBe(false);
 
       // when
-      groupsPage.newGroup.newGroupId().sendKeys('Hallo');
-      groupsPage.newGroup.newGroupName().sendKeys('Gruppe');
+      groupsPage.newGroup.newGroupIdInput('Hallo');
+      groupsPage.newGroup.newGroupNameInput('Gruppe');
       // then
       expect(groupsPage.newGroup.createNewGroupButton().isEnabled()).toBe(true);
 
       // when
-      groupsPage.newGroup.newGroupId().clear();
+      groupsPage.newGroup.newGroupIdInput().clear();
       // then
       expect(groupsPage.newGroup.createNewGroupButton().isEnabled()).toBe(false);
 
       // when
-      groupsPage.newGroup.newGroupName().clear();
+      groupsPage.newGroup.newGroupNameInput().clear();
       // then
       expect(groupsPage.newGroup.createNewGroupButton().isEnabled()).toBe(false);
     });
@@ -135,7 +135,7 @@ describe('groups page -', function() {
     it('should edit group', function() {
 
       // when
-      groupsPage.editGroup.groupName().sendKeys('i');
+      groupsPage.editGroup.groupNameInput('i');
       groupsPage.editGroup.updateGroupButton().click();
 
       // then

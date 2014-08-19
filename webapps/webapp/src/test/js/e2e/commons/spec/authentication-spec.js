@@ -29,8 +29,8 @@ describe('authentication page - ', function() {
 
         // when
         authenticationPage.navigateTo(({webapp: 'tasklist'}));
-        authenticationPage.usernameInput().sendKeys('jonny1');
-        authenticationPage.passwordInput().sendKeys('yada-yada');
+        authenticationPage.usernameInput('jonny1');
+        authenticationPage.passwordInput('yada-yada');
 
         // then
         expect(authenticationPage.loginButton().isEnabled()).toBe(true);
@@ -60,8 +60,8 @@ describe('authentication page - ', function() {
       it('should login via login button', function() {
 
         // when
-        authenticationPage.usernameInput().sendKeys('jonny1');
-        authenticationPage.passwordInput().sendKeys('jonny1');
+        authenticationPage.usernameInput('jonny1');
+        authenticationPage.passwordInput('jonny1');
         authenticationPage.loginButton().click();
 
         // then
@@ -72,8 +72,8 @@ describe('authentication page - ', function() {
       it('should login via ENTER key', function() {
 
         // when
-        authenticationPage.usernameInput().sendKeys('jonny1');
-        authenticationPage.passwordInput().sendKeys('jonny1');
+        authenticationPage.usernameInput('jonny1');
+        authenticationPage.passwordInput('jonny1');
         protractor.getInstance().actions().sendKeys(protractor.Key.ENTER).perform();
 
         // then
@@ -108,8 +108,8 @@ describe('authentication page - ', function() {
 
         // when
         authenticationPage.navigateTo(({webapp: 'cockpit'}));
-        authenticationPage.usernameInput().sendKeys('jonny1');
-        authenticationPage.passwordInput().sendKeys('yada-yada');
+        authenticationPage.usernameInput('jonny1');
+        authenticationPage.passwordInput('yada-yada');
 
         // then
         expect(authenticationPage.loginButton().isEnabled()).toBe(true);
@@ -139,8 +139,8 @@ describe('authentication page - ', function() {
       it('should login via login button', function() {
 
         // when
-        authenticationPage.usernameInput().sendKeys('jonny1');
-        authenticationPage.passwordInput().sendKeys('jonny1');
+        authenticationPage.usernameInput('jonny1');
+        authenticationPage.passwordInput('jonny1');
         authenticationPage.loginButton().click();
 
         // then
@@ -152,8 +152,8 @@ describe('authentication page - ', function() {
       it('should login via ENTER key', function() {
 
         // when
-        authenticationPage.usernameInput().sendKeys('jonny1');
-        authenticationPage.passwordInput().sendKeys('jonny1');
+        authenticationPage.usernameInput('jonny1');
+        authenticationPage.passwordInput('jonny1');
         protractor.getInstance().actions().sendKeys(protractor.Key.ENTER).perform();
 
         // then
@@ -201,8 +201,8 @@ describe('authentication page - ', function() {
 
         // when
         authenticationPage.navigateTo(({webapp: 'admin'}));
-        authenticationPage.usernameInput().sendKeys('jonny1');
-        authenticationPage.passwordInput().sendKeys('yada-yada');
+        authenticationPage.usernameInput('jonny1');
+        authenticationPage.passwordInput('yada-yada');
 
         // then
         expect(authenticationPage.loginButton().isEnabled()).toBe(true);
@@ -232,8 +232,8 @@ describe('authentication page - ', function() {
       it('should login via login button', function() {
 
         // when
-        authenticationPage.usernameInput().sendKeys('jonny1');
-        authenticationPage.passwordInput().sendKeys('jonny1');
+        authenticationPage.usernameInput('jonny1');
+        authenticationPage.passwordInput('jonny1');
         authenticationPage.loginButton().click();
 
         // then
@@ -245,8 +245,8 @@ describe('authentication page - ', function() {
       it('should login via ENTER key', function() {
 
         // when
-        authenticationPage.usernameInput().sendKeys('jonny1');
-        authenticationPage.passwordInput().sendKeys('jonny1');
+        authenticationPage.usernameInput('jonny1');
+        authenticationPage.passwordInput('jonny1');
         protractor.getInstance().actions().sendKeys(protractor.Key.ENTER).perform();
 
         // then
