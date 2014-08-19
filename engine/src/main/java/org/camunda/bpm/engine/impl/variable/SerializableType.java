@@ -20,9 +20,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.variable.SerializedVariableValueImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -32,10 +36,8 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
  */
 public class SerializableType extends ByteArrayType {
 
-  public static final String TYPE_NAME = "serializable";
-
   public String getTypeName() {
-    return TYPE_NAME;
+    return SerializedVariableTypes.Serializable.getName();
   }
 
   public Object getValue(ValueFields valueFields) {
@@ -112,8 +114,18 @@ public class SerializableType extends ByteArrayType {
     return "Serializable";
   }
 
-  public Object getRawValue(ValueFields valueFields) {
-    return super.getValue(valueFields);
+  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
+    SerializedVariableValueImpl result = new SerializedVariableValueImpl();
+    result.setValue(super.getValue(valueFields));
+    return result;
+  }
+
+  public void setValueFromSerialized(Object serializedValue, Map<String, Object> configuration, ValueFields valueFields) {
+    super.setValue(serializedValue, valueFields);
+  }
+
+  public boolean isAbleToStoreSerializedValue(Object value, Map<String, Object> configuration) {
+    return super.isAbleToStoreSerializedValue(value, configuration);
   }
 
   protected static class ClassloaderAwareObjectInputStream extends ObjectInputStream {

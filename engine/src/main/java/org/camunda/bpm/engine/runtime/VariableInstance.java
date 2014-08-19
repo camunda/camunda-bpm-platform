@@ -29,12 +29,6 @@ public interface VariableInstance extends PersistentVariableInstance {
   String getId();
 
   /**
-   * Returns the name of the type of <code>this</code> variable instance
-   * @return
-   */
-  String getTypeName();
-
-  /**
    * Returns the corresponding process instance id.
    */
   String getProcessInstanceId();

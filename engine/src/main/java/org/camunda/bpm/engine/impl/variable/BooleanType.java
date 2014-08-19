@@ -12,20 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
-import org.camunda.bpm.engine.impl.runtime.SerializedVariableValueImpl;
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+
 
 
 
 /**
  * @author Frederik Heremans
  */
-public class BooleanType implements VariableType {
-
-  public static final String TYPE_NAME = "boolean";
+public class BooleanType extends PrimitiveVariableType {
 
   public String getTypeName() {
-    return TYPE_NAME;
+    return SerializedVariableTypes.Boolean.getName();
   }
 
   public boolean isCachable() {
@@ -63,11 +61,5 @@ public class BooleanType implements VariableType {
   public String getTypeNameForValue(Object value) {
     // typename independent of value
     return Boolean.class.getSimpleName();
-  }
-
-  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
-    SerializedVariableValueImpl result = new SerializedVariableValueImpl();
-    result.setValue(getValue(valueFields));
-    return result;
   }
 }

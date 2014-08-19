@@ -27,4 +27,6 @@ public abstract class AbstractVariableStore<T extends CoreVariableInstance> impl
       setVariableInstanceValue(variableInstance, value, sourceActivityExecution);
     }
   }
+
+  protected abstract void setVariableInstanceValue(T variableInstance, Object value, CoreVariableScope<T> sourceActivityExecution);
 }

@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.cmd.GetStartFormCmd;
 import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
 import org.camunda.bpm.engine.impl.cmd.PatchExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
+import org.camunda.bpm.engine.impl.cmd.SetExecutionVariableFromSerializedCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalEventReceivedCmd;
@@ -168,11 +169,27 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, false));
   }
 
+  public void setVariableFromSerialized(String executionId, String variableName, Object serializedValue, String variableTypeName,
+      Map<String, Object> variableConfiguration) {
+    ensureNotNull("variableName", variableName);
+
+    commandExecutor.execute(new SetExecutionVariableFromSerializedCmd(executionId, variableName,
+        serializedValue, variableTypeName, variableConfiguration, false));
+  }
+
   public void setVariableLocal(String executionId, String variableName, Object value) {
     ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
     commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));
+  }
+
+  public void setVariableLocalFromSerialized(String executionId, String variableName, Object serializedValue, String variableTypeName,
+      Map<String, Object> variableConfiguration) {
+    ensureNotNull("variableName", variableName);
+
+    commandExecutor.execute(new SetExecutionVariableFromSerializedCmd(executionId, variableName,
+        serializedValue, variableTypeName, variableConfiguration, true));
   }
 
   public void setVariables(String executionId, Map<String, ? extends Object> variables) {

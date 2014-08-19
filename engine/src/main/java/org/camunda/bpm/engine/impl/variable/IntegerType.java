@@ -12,20 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
-import org.camunda.bpm.engine.impl.runtime.SerializedVariableValueImpl;
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+
 
 
 
 /**
  * @author Joram Barrez
  */
-public class IntegerType implements VariableType {
-
-  public static final String TYPE_NAME = "integer";
+public class IntegerType extends PrimitiveVariableType {
 
   public String getTypeName() {
-    return TYPE_NAME;
+    return SerializedVariableTypes.Integer.getName();
   }
 
   public boolean isCachable() {
@@ -60,11 +58,5 @@ public class IntegerType implements VariableType {
   public String getTypeNameForValue(Object value) {
     // typename independent of value
     return Integer.class.getSimpleName();
-  }
-
-  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
-    SerializedVariableValueImpl result = new SerializedVariableValueImpl();
-    result.setValue(getValue(valueFields));
-    return result;
   }
 }

@@ -50,7 +50,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableScope;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
@@ -190,7 +190,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   // variables ////////////////////////////////////////////
 
-  public CoreVariableScope getParentVariableScope() {
+  public CorePersistentVariableScope getParentVariableScope() {
     return getParent();
   }
 

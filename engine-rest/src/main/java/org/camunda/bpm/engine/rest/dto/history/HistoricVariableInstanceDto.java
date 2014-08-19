@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.camunda.bpm.engine.impl.variable.SerializableType;
 import org.camunda.bpm.engine.rest.dto.runtime.SerializedObjectDto;
 
 public class HistoricVariableInstanceDto {
@@ -65,7 +65,7 @@ public class HistoricVariableInstanceDto {
     dto.name = entity.getVariableName();
     dto.processInstanceId = entity.getProcessInstanceId();
     dto.activityInstanceId = entity.getActivtyInstanceId();
-    if(SerializableType.TYPE_NAME.equals(entity.getVariableType().getTypeName())) {
+    if(SerializedVariableTypes.Serializable.getName().equals(entity.getVariableType().getTypeName())) {
       if(entity.getValue() != null) {
         dto.value = new SerializedObjectDto(entity.getValue());
       }

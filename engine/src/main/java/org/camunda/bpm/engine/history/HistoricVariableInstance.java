@@ -34,9 +34,12 @@ public interface HistoricVariableInstance extends PersistentVariableInstance {
   String getVariableName();
 
   /**
-   * Returns the name of the type of <code>this</code> variable instance
+   * <p>Returns the name of the type of <code>this</code> variable instance</p>
+   *
+   * <p>Deprecated since 7.2: use {@link #getTypeName()} instead.</p>
    *
    */
+  @Deprecated
   String getVariableTypeName();
 
   /**

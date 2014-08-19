@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.delegate;
 
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 
 public interface PersistentVariableInstance extends CoreVariableInstance {
 
@@ -28,4 +27,10 @@ public interface PersistentVariableInstance extends CoreVariableInstance {
    * {@link SerializedVariableValue}.
    */
   SerializedVariableValue getSerializedValue();
+
+  /**
+   * Returns the name of the type of <code>this</code> variable instance
+   * @return
+   */
+  String getTypeName();
 }

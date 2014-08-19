@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -42,7 +43,7 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
       throw new BadUserRequestException("Cannot find task with id '"+resourceId+"'.");
     }
 
-    Map<String, VariableInstance> result = new HashMap<String, VariableInstance>();
+    Map<String, PersistentVariableInstance> result = new HashMap<String, PersistentVariableInstance>();
 
     // first, evaluate form fields
     TaskFormData taskFormData = task.getTaskDefinition().getTaskFormHandler().createTaskForm(task);
@@ -55,7 +56,7 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
     // collect remaining variables from task scope and parent scopes
     task.collectVariableInstances(result, formVariableNames);
 
-    return result;
+    return (Map) result;
   }
 
 }

@@ -13,9 +13,11 @@
 package org.camunda.bpm.engine.impl.variable;
 
 import java.util.Date;
+import java.util.Map;
 
-import org.camunda.bpm.engine.impl.runtime.SerializedVariableValueImpl;
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
+import org.camunda.bpm.engine.impl.core.variable.SerializedVariableValueImpl;
 
 
 /**
@@ -23,10 +25,8 @@ import org.camunda.bpm.engine.runtime.SerializedVariableValue;
  */
 public class DateType implements VariableType {
 
-  public static final String TYPE_NAME = "date";
-
   public String getTypeName() {
-    return TYPE_NAME;
+    return SerializedVariableTypes.Date.getName();
   }
 
   public boolean isCachable() {
@@ -65,5 +65,22 @@ public class DateType implements VariableType {
     SerializedVariableValueImpl result = new SerializedVariableValueImpl();
     result.setValue(valueFields.getLongValue());
     return result;
+  }
+
+  public void setValueFromSerialized(Object serializedValue, Map<String, Object> configuration, ValueFields valueFields) {
+    if (serializedValue != null) {
+      valueFields.setLongValue((Long) serializedValue);
+    } else {
+      valueFields.setLongValue(null);
+    }
+
+  }
+
+  public boolean isAbleToStoreSerializedValue(Object value, Map<String, Object> configuration) {
+    if (value == null) {
+      return true;
+    }
+
+    return Long.class.isAssignableFrom(value.getClass());
   }
 }

@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import org.camunda.bpm.connect.ConnectorRequest;
 import org.camunda.bpm.connect.ConnectorResponse;
 import org.camunda.bpm.engine.delegate.CoreVariableInstance;
+import org.camunda.bpm.engine.impl.connector.ConnectorVariableStore.ConnectorParamVariable;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 

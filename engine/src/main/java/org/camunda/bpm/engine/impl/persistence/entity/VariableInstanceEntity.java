@@ -16,12 +16,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
 /**
@@ -70,13 +70,16 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Db
 
   public static VariableInstanceEntity createAndInsert(String name, VariableType type, Object value) {
     VariableInstanceEntity variableInstance = create(name, type, value);
-
-    Context
-      .getCommandContext()
-      .getDbEntityManger()
-      .insert(variableInstance);
+    insert(variableInstance);
 
     return variableInstance;
+  }
+
+  public static void insert(VariableInstanceEntity variableInstance) {
+    Context
+    .getCommandContext()
+    .getDbEntityManger()
+    .insert(variableInstance);
   }
 
   public static VariableInstanceEntity create(String name, VariableType type, Object value) {
@@ -84,6 +87,16 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Db
     variableInstance.name = name;
     variableInstance.setType(type);
     variableInstance.setValue(value);
+
+    return variableInstance;
+  }
+
+  public static VariableInstanceEntity createFromSerializedValue(String name, VariableType type,
+      Object value, Map<String, Object> configuration) {
+    VariableInstanceEntity variableInstance = new VariableInstanceEntity();
+    variableInstance.name = name;
+    variableInstance.setType(type);
+    variableInstance.setValueFromSerialized(value, configuration);
 
     return variableInstance;
   }
@@ -219,6 +232,19 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Db
     }
   }
 
+  public void clear() {
+    if (byteArrayValueId == null) {
+      // reset the current value temporarily to null
+      setValue(null);
+    } else {
+      // the type has changed from (SerializableType||ByteArrayType) -> another type:
+      // the next apparently useless line is probably to ensure consistency in the DbSqlSession
+      // cache, but should be checked and docced here (or removed if it turns out to be unnecessary)
+      deleteByteArrayValue();
+      setByteArrayValueId(null);
+    }
+  }
+
   // type /////////////////////////////////////////////////////////////////////
 
   public Object getValue() {
@@ -242,8 +268,17 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Db
     cachedValue = value;
   }
 
+  public void setValueFromSerialized(Object value, Map<String, Object> configuration) {
+    type.setValueFromSerialized(value, configuration, this);
+    cachedValue = null;
+  }
+
   public boolean isAbleToStore(Object value) {
     return getType().isAbleToStore(value);
+  }
+
+  public boolean isAbleToStoreSerializedValue(Object value, Map<String, Object> configuration) {
+    return type.isAbleToStoreSerializedValue(value, configuration);
   }
 
   // getters and setters //////////////////////////////////////////////////////

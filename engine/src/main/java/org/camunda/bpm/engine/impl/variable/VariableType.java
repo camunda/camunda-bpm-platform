@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+import java.util.Map;
+
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 
 
 
@@ -39,5 +41,7 @@ public interface VariableType {
   void setValue(Object value, ValueFields valueFields);
   Object getValue(ValueFields valueFields);
   SerializedVariableValue getSerializedValue(ValueFields valueFields);
+  void setValueFromSerialized(Object serializedValue, Map<String, Object> configuration, ValueFields valueFields);
+  boolean isAbleToStoreSerializedValue(Object value, Map<String, Object> configuration);
 
 }

@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.engine.history;
 
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 
 /** Update of a process variable.  This is only available if history
  * level is configured to FULL.

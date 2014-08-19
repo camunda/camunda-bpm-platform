@@ -69,7 +69,7 @@ public class ConnectorVariableStore extends AbstractVariableStore<CoreVariableIn
     return variables.containsKey(variableName);
   }
 
-  public CoreVariableInstance removeVariableInstance(String variableName, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
+  public ConnectorParamVariable removeVariableInstance(String variableName, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
     return variables.remove(variableName);
   }
 
@@ -77,14 +77,10 @@ public class ConnectorVariableStore extends AbstractVariableStore<CoreVariableIn
     ((ConnectorParamVariable)variableInstance).value = value;
   }
 
-  public CoreVariableInstance createVariableInstance(String variableName, Object value, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
+  public ConnectorParamVariable createVariableInstance(String variableName, Object value, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
     ConnectorParamVariable variableInstance = new ConnectorParamVariable(variableName, value);
     variables.put(variableName, variableInstance);
     return variableInstance;
-  }
-
-  public Map<String, ConnectorParamVariable> getVariables() {
-    return variables;
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

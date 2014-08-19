@@ -12,19 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+
 
 
 
 /**
  * @author Tom Baeyens
  */
-public class NullType implements VariableType {
-
-  public static final String TYPE_NAME = "null";
+public class NullType extends PrimitiveVariableType {
 
   public String getTypeName() {
-    return TYPE_NAME;
+    return SerializedVariableTypes.Null.getName();
   }
 
   public boolean isCachable() {
@@ -44,10 +43,5 @@ public class NullType implements VariableType {
 
   public String getTypeNameForValue(Object value) {
     return "Null";
-  }
-
-  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
-    // TODO Auto-generated method stub
-    return null;
   }
 }

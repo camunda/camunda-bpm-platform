@@ -61,6 +61,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
 import org.camunda.bpm.engine.impl.FormServiceImpl;
@@ -1297,11 +1298,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     if(jpaEntityManagerFactory!=null) {
       sessionFactories.put(EntityManagerSession.class, new EntityManagerSessionFactory(jpaEntityManagerFactory, jpaHandleTransaction, jpaCloseEntityManager));
-      VariableType jpaType = variableTypes.getVariableType(JPAEntityVariableType.TYPE_NAME);
+      VariableType jpaType = variableTypes.getVariableType(SerializedVariableTypes.JPA.getName());
       // Add JPA-type
       if(jpaType == null) {
         // We try adding the variable right before SerializableType, if available
-        int serializableIndex = variableTypes.getTypeIndex(SerializableType.TYPE_NAME);
+        int serializableIndex = variableTypes.getTypeIndex(SerializedVariableTypes.Serializable.getName());
         if(serializableIndex > -1) {
           variableTypes.addType(new JPAEntityVariableType(), serializableIndex);
         } else {

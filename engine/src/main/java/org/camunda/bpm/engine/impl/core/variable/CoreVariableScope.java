@@ -300,11 +300,6 @@ public abstract class CoreVariableScope<T extends CoreVariableInstance> implemen
     getVariableStore().removeVariableInstance(variableName, sourceActivityExecution);
   }
 
-  protected void updateVariableInstance(T variableInstance, Object value, CoreVariableScope<T> sourceActivityExecution) {
-    // update variable instance
-    getVariableStore().setVariableInstanceValue(variableInstance, value, sourceActivityExecution);
-  }
-
   protected CoreVariableInstance createVariableInstance(String variableName, Object value, CoreVariableScope<T> sourceActivityExecution) {
     return getVariableStore().createVariableInstance(variableName, value, sourceActivityExecution);
   }

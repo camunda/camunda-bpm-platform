@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
@@ -24,7 +25,6 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 
 /**
  * @author Christian Lipphardt (camunda)
@@ -192,8 +192,12 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   // getters and setters //////////////////////////////////////////////////////
 
-  public String getVariableTypeName() {
+  public String getTypeName() {
     return variableTypeName;
+  }
+
+  public String getVariableTypeName() {
+    return getTypeName();
   }
 
   public String getVariableName() {
@@ -342,5 +346,6 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   public SerializedVariableValue getSerializedValue() {
     return variableType.getSerializedValue(this);
   }
+
 
 }

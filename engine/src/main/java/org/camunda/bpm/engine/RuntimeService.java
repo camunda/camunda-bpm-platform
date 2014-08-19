@@ -505,7 +505,8 @@ public interface RuntimeService {
    * for the execution (and not searching parent scopes). Returns null when no variable value is found with the given name or when the value is set to null.  */
   Object getVariableLocal(String executionId, String variableName);
 
-  /** Update or create a variable for an execution.  If the variable is not already existing somewhere in the execution hierarchy,
+  /** Update or create a variable for an execution.  If the variable does not already exist
+   * somewhere in the execution hierarchy (i.e. the specified execution or any ancestor),
    * it will be created in the process instance (which is the root execution).
    * @param executionId id of process instance or execution to set variable in, cannot be null.
    * @param variableName name of variable to set, cannot be null.
@@ -515,8 +516,55 @@ public interface RuntimeService {
    */
   void setVariable(String executionId, String variableName, Object value);
 
+  /**
+   * <p>Update or create a variable for an execution from its serialized representation.
+   * If the variable does not already exist
+   * in the upwards execution hierarchy (i.e. the specified execution or any ancestor),
+   * it will be created in the process instance (which is the root execution).</p>
+   *
+   * <p>
+   * See {@link SerializedVariableTypes} for available variable types and their required
+   * configuration options.
+   * </p>
+   *
+   * @param executionId id of process instance or execution to set variable in, cannot be null.
+   * @param variableName name of variable to set, cannot be null
+   * @param serializedValue Serialized value of the variable to set; Expected value types are defined
+   * variable-type-specific and defined in {@link SerializedVariableTypes}.
+   * @param variableTypeName Type of the variable to set. Defined in {@link SerializedVariableTypes}.
+   * @param variableConfiguration Variable-type-specific configuration of the serialized value. Defined in {@link SerializedVariableTypes}.
+   * @throws ProcessEngineException when no execution is found or the serialized value or its
+   * configuration is not consistent with the chosen variable type
+   */
+  void setVariableFromSerialized(String executionId, String variableName, Object serializedValue,
+      String variableTypeName, Map<String, Object> variableConfiguration);
+
+  /**
+   * <p>
+   * Update or create a variable for an execution (not considering parent scopes) from its serialized
+   * representation.
+   * If the variable does not already exist, it will be created in the given execution.
+   * </p>
+   *
+   * <p>
+   * See {@link SerializedVariableTypes} for available variable types and their required
+   * configuration options.
+   * </p>
+   *
+   * @param executionId id of process instance or execution to set variable in, cannot be null.
+   * @param variableName name of variable to set, cannot be null
+   * @param serializedValue Serialized value of the variable to set; Expected value types are defined
+   * variable-type-specific and defined in {@link SerializedVariableTypes}.
+   * @param variableTypeName Type of the variable to set. Defined in {@link SerializedVariableTypes}.
+   * @param variableConfiguration Variable-type-specific configuration of the serialized value. Defined in {@link SerializedVariableTypes}.
+   * @throws ProcessEngineException when no execution is found or the serialized value or its
+   * configuration is not consistent with the chosen variable type
+   */
+  void setVariableLocalFromSerialized(String executionId, String variableName, Object serializedValue,
+      String variableTypeName, Map<String, Object> variableConfiguration);
+
   /** Update or create a variable for an execution (not considering parent scopes).
-   * If the variable is not already existing, it will be created in the given execution.
+   * If the variable does not already exist, it will be created in the given execution.
    * @param executionId id of execution to set variable in, cannot be null.
    * @param variableName name of variable to set, cannot be null.
    * @param value value to set. When null is passed, the variable is not removed,

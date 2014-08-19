@@ -12,13 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.core.variable;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 
-public class PseudoPersistentVariableStore extends MapBasedVariableStore<PersistentVariableInstance> {
+public class PseudoPersistentVariableStore extends MapBasedVariableStore<PersistentVariableInstance> implements CorePersistentVariableStore {
 
   public void setVariableInstanceValue(PersistentVariableInstance variableInstance, Object value,
       CoreVariableScope<PersistentVariableInstance> sourceActivityExecution) {
-    ((PseudoPersistentVariableInstance)variableInstance).value = value;
+    ((PseudoPersistentVariableInstance) variableInstance).value = value;
   }
 
   public PersistentVariableInstance createVariableInstance(String variableName, Object value,
@@ -26,6 +28,16 @@ public class PseudoPersistentVariableStore extends MapBasedVariableStore<Persist
     PseudoPersistentVariableInstance instance = new PseudoPersistentVariableInstance(variableName, value);
     variables.put(variableName, instance);
     return instance;
+  }
+
+  public PersistentVariableInstance createVariableInstanceFromSerialized(String variableName, Object value, String variableTypeName,
+      Map<String, Object> configuration, CoreVariableScope<PersistentVariableInstance> sourceActivityExecution) {
+    throw new UnsupportedOperationException("The variables of PseudoPersistentVariableStore are not truly serialized");
+  }
+
+  public void createOrUpdateVariableFromSerialized(String variableName, Object value, String variableTypeName, Map<String, Object> configuration,
+      CoreVariableScope<PersistentVariableInstance> sourceActivityExecution) {
+    throw new UnsupportedOperationException("The variables of PseudoPersistentVariableStore are not truly serialized");
   }
 
 }

@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.impl.core.variable;
 
 import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 
 public class PseudoPersistentVariableInstance implements PersistentVariableInstance {
 
@@ -34,11 +34,15 @@ public class PseudoPersistentVariableInstance implements PersistentVariableInsta
   }
 
   public String getErrorMessage() {
-   throw new UnsupportedOperationException("This variable type is not truly persistent");
+   throw new UnsupportedOperationException("This variable is not truly persistent");
   }
 
   public SerializedVariableValue getSerializedValue() {
-    throw new UnsupportedOperationException("This variable type is not truly persistent");
+    throw new UnsupportedOperationException("This variable is not truly persistent");
+  }
+
+  public String getTypeName() {
+    throw new UnsupportedOperationException("This variable is not truly persistent");
   }
 
 }

@@ -47,7 +47,7 @@ public class SimpleVariableStore extends MapBasedVariableStore<CoreVariableInsta
   }
 
   public void setVariableInstanceValue(CoreVariableInstance variableInstance, Object value, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
-    ((SimpleVariableInstance)variableInstance).value = value;
+    ((SimpleVariableInstance) variableInstance).value = value;
   }
 
   public CoreVariableInstance createVariableInstance(String variableName, Object value, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {

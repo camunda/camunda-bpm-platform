@@ -22,6 +22,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -30,7 +31,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
-import org.camunda.bpm.engine.impl.variable.IntegerType;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -1010,7 +1010,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
 
     assertEquals(47, variableInstance.getValue());
-    assertEquals(IntegerType.TYPE_NAME, variableInstance.getTypeName());
+    assertEquals(SerializedVariableTypes.Integer.getName(), variableInstance.getTypeName());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")

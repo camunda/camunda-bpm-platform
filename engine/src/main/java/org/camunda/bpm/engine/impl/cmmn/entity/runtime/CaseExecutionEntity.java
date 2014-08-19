@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
-import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
@@ -28,7 +27,7 @@ import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableStore;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
@@ -375,7 +374,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   // variables //////////////////////////////////////////////////////////////
 
-  protected CoreVariableStore<PersistentVariableInstance> getVariableStore() {
+  protected CorePersistentVariableStore getVariableStore() {
     return variableStore;
   }
 

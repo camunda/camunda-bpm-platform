@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.variable.SerializableType;
@@ -58,7 +59,7 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
     dto.revision = entity.getRevision();
     dto.variableName = entity.getVariableName();
     dto.variableTypeName = entity.getVariableTypeName();
-    if(SerializableType.TYPE_NAME.equals(entity.getVariableType().getTypeName())) {
+    if(SerializedVariableTypes.Serializable.getName().equals(entity.getVariableType().getTypeName())) {
       if(entity.getValue() != null) {
         dto.value = new SerializedObjectDto(entity.getValue());
       }

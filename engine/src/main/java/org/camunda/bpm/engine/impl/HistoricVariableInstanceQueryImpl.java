@@ -16,6 +16,8 @@ package org.camunda.bpm.engine.impl;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -140,7 +142,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
         // do not fetch values for byte arrays eagerly (unless requested by the user)
         if (isByteArrayFetchingEnabled
-            || !ByteArrayType.TYPE_NAME.equals(variableInstanceEntity.getVariableType().getTypeName())) {
+            || !SerializedVariableTypes.ByteArray.getName().equals(variableInstanceEntity.getVariableType().getTypeName())) {
 
           try {
             variableInstanceEntity.getValue();

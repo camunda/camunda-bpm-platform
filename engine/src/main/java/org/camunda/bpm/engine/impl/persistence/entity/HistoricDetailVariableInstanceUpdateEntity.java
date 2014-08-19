@@ -14,13 +14,14 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Date;
+
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
 
 
 /**

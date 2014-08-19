@@ -1,9 +1,9 @@
-package org.camunda.bpm.engine.impl.runtime;
+package org.camunda.bpm.engine.impl.core.variable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 
 public class SerializedVariableValueImpl implements SerializedVariableValue {
 

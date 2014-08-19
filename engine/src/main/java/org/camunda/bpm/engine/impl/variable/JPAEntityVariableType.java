@@ -13,10 +13,13 @@
 
 package org.camunda.bpm.engine.impl.variable;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.runtime.SerializedVariableValueImpl;
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+import org.camunda.bpm.engine.impl.core.variable.SerializedVariableValueImpl;
 
 
 /**
@@ -27,10 +30,8 @@ import org.camunda.bpm.engine.runtime.SerializedVariableValue;
  */
 public class JPAEntityVariableType implements VariableType {
 
-  public static final String TYPE_NAME = "jpa-entity";
-
-  public static final String CONFIG_CLASS_NAME = "className";
-  public static final String CONFIG_ENTITY_ID_STRING = "entityId";
+  public static final String CONFIG_CLASS_NAME = SerializedVariableTypes.JPA_TYPE_CONFIG_CLASS_NAME;
+  public static final String CONFIG_ENTITY_ID_STRING = SerializedVariableTypes.JPA_TYPE_CONFIG_ENTITY_ID;
 
   private JPAEntityMappings mappings;
 
@@ -39,7 +40,7 @@ public class JPAEntityVariableType implements VariableType {
   }
 
   public String getTypeName() {
-    return TYPE_NAME;
+    return SerializedVariableTypes.JPA.getName();
   }
 
   public boolean isCachable() {
@@ -88,7 +89,7 @@ public class JPAEntityVariableType implements VariableType {
     if(value != null) {
       return value.getClass().getSimpleName();
     } else {
-      return TYPE_NAME;
+      return getTypeName();
     }
   }
 
@@ -98,6 +99,18 @@ public class JPAEntityVariableType implements VariableType {
     result.setConfigValue(CONFIG_ENTITY_ID_STRING, valueFields.getTextValue2());
 
     return result;
+  }
+
+  public void setValueFromSerialized(Object serializedValue, Map<String, Object> configuration, ValueFields valueFields) {
+    valueFields.setTextValue((String) configuration.get(CONFIG_CLASS_NAME));
+    valueFields.setTextValue2((String) configuration.get(CONFIG_ENTITY_ID_STRING));
+  }
+
+  public boolean isAbleToStoreSerializedValue(Object value, Map<String, Object> configuration) {
+    return value == null
+        && configuration != null
+        && configuration.get(CONFIG_CLASS_NAME) instanceof String
+        && configuration.get(CONFIG_ENTITY_ID_STRING) instanceof String;
   }
 
 }

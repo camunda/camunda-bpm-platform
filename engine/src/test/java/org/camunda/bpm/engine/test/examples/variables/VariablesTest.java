@@ -12,16 +12,22 @@
  */
 package org.camunda.bpm.engine.test.examples.variables;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.variable.*;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
-
-import java.util.*;
 
 /**
  * @author Tom Baeyens
@@ -139,15 +145,15 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableName("aVariable");
 
     VariableInstance variable = query.singleResult();
-    assertEquals(IntegerType.TYPE_NAME, variable.getTypeName());
+    assertEquals(SerializedVariableTypes.Integer.getName(), variable.getTypeName());
 
     runtimeService.setVariable(pi.getId(), "aVariable", 1234L);
     variable = query.singleResult();
-    assertEquals(LongType.TYPE_NAME, variable.getTypeName());
+    assertEquals(SerializedVariableTypes.Long.getName(), variable.getTypeName());
 
     runtimeService.setVariable(pi.getId(), "aVariable", (short)1234);
     variable = query.singleResult();
-    assertEquals(ShortType.TYPE_NAME, variable.getTypeName());
+    assertEquals(SerializedVariableTypes.Short.getName(), variable.getTypeName());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml"})
@@ -160,11 +166,11 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableName("aVariable");
 
     VariableInstance variable = query.singleResult();
-    assertEquals(SerializableType.TYPE_NAME, variable.getTypeName());
+    assertEquals(SerializedVariableTypes.Serializable.getName(), variable.getTypeName());
 
     runtimeService.setVariable(pi.getId(), "aVariable", null);
     variable = query.singleResult();
-    assertEquals(NullType.TYPE_NAME, variable.getTypeName());
+    assertEquals(SerializedVariableTypes.Null.getName(), variable.getTypeName());
 
   }
 
@@ -189,11 +195,11 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableName("aVariable");
 
     VariableInstance variable = query.singleResult();
-    assertEquals(StringType.TYPE_NAME, variable.getTypeName());
+    assertEquals(SerializedVariableTypes.String.getName(), variable.getTypeName());
 
     runtimeService.setVariable(processInstance.getId(), "aVariable", new SerializableVariable("foo"));
     variable = query.singleResult();
-    assertEquals(SerializableType.TYPE_NAME, variable.getTypeName());
+    assertEquals(SerializedVariableTypes.Serializable.getName(), variable.getTypeName());
 
   }
 }

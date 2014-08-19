@@ -1,4 +1,4 @@
-package org.camunda.bpm.engine.runtime;
+package org.camunda.bpm.engine.delegate;
 
 import java.util.Map;
 

@@ -21,11 +21,10 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.BpmnModelExecutionContext;
-import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.PseudoPersistentVariableStore;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
@@ -78,6 +77,8 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   // variables/////////////////////////////////////////////////////////////////
 
+  // This variable store is not truly persistent but implementing BaseDelegateExecution
+  // requires one. As ExecutionImpl is only used internally for PVM testing, this is ok.
   protected PseudoPersistentVariableStore variableStore = new PseudoPersistentVariableStore();
 
   // lifecycle methods ////////////////////////////////////////////////////////
@@ -286,7 +287,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   // getters and setters //////////////////////////////////////////////////////
 
-  protected CoreVariableStore<PersistentVariableInstance> getVariableStore() {
+  protected CorePersistentVariableStore getVariableStore() {
     return variableStore;
   }
 

@@ -19,13 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.camunda.bpm.engine.impl.variable.BooleanType;
-import org.camunda.bpm.engine.impl.variable.DateType;
-import org.camunda.bpm.engine.impl.variable.DoubleType;
-import org.camunda.bpm.engine.impl.variable.IntegerType;
-import org.camunda.bpm.engine.impl.variable.LongType;
-import org.camunda.bpm.engine.impl.variable.ShortType;
-import org.camunda.bpm.engine.impl.variable.StringType;
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 
 public class DtoUtil {
@@ -54,37 +48,37 @@ public class DtoUtil {
 
     if (type != null && !type.equals("") && value != null) {
       // boolean
-      if (type.equalsIgnoreCase(BooleanType.TYPE_NAME)) {
+      if (type.equalsIgnoreCase(SerializedVariableTypes.Boolean.getName())) {
         return Boolean.valueOf(value.toString());
       }
 
       // string
-      if (type.equalsIgnoreCase(StringType.TYPE_NAME)) {
+      if (type.equalsIgnoreCase(SerializedVariableTypes.String.getName())) {
         return String.valueOf(value);
       }
 
       // integer
-      if (type.equalsIgnoreCase(IntegerType.TYPE_NAME)) {
+      if (type.equalsIgnoreCase(SerializedVariableTypes.Integer.getName())) {
         return Integer.valueOf(value.toString());
       }
 
       // short
-      if (type.equalsIgnoreCase(ShortType.TYPE_NAME)) {
+      if (type.equalsIgnoreCase(SerializedVariableTypes.Short.getName())) {
         return Short.valueOf(value.toString());
       }
 
       // long
-      if (type.equalsIgnoreCase(LongType.TYPE_NAME)) {
+      if (type.equalsIgnoreCase(SerializedVariableTypes.Long.getName())) {
         return Long.valueOf(value.toString());
       }
 
       // double
-      if (type.equalsIgnoreCase(DoubleType.TYPE_NAME)) {
+      if (type.equalsIgnoreCase(SerializedVariableTypes.Double.getName())) {
         return Double.valueOf(value.toString());
       }
 
       // date
-      if (type.equalsIgnoreCase(DateType.TYPE_NAME)) {
+      if (type.equalsIgnoreCase(SerializedVariableTypes.Date.getName())) {
         SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Date date = pattern.parse(String.valueOf(value));
         return date;

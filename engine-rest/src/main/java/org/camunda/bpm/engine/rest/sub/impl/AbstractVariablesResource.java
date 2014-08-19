@@ -22,13 +22,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.variable.BooleanType;
-import org.camunda.bpm.engine.impl.variable.DateType;
-import org.camunda.bpm.engine.impl.variable.DoubleType;
-import org.camunda.bpm.engine.impl.variable.IntegerType;
-import org.camunda.bpm.engine.impl.variable.LongType;
-import org.camunda.bpm.engine.impl.variable.ShortType;
-import org.camunda.bpm.engine.impl.variable.StringType;
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
 import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -104,43 +98,43 @@ public abstract class AbstractVariablesResource implements VariableResource {
       if (type != null && !type.equals("") && value != null) {
 
         // boolean
-        if (type.equalsIgnoreCase(BooleanType.TYPE_NAME)) {
+        if (type.equalsIgnoreCase(SerializedVariableTypes.Boolean.getName())) {
           setVariableEntity(variableName, Boolean.valueOf(value.toString()));
           return;
         }
 
         // string
-        if (type.equalsIgnoreCase(StringType.TYPE_NAME)) {
+        if (type.equalsIgnoreCase(SerializedVariableTypes.String.getName())) {
           setVariableEntity(variableName, String.valueOf(value));
           return;
         }
 
         // integer
-        if (type.equalsIgnoreCase(IntegerType.TYPE_NAME)) {
+        if (type.equalsIgnoreCase(SerializedVariableTypes.Integer.getName())) {
           setVariableEntity(variableName, Integer.valueOf(value.toString()));
           return;
         }
 
         // short
-        if (type.equalsIgnoreCase(ShortType.TYPE_NAME)) {
+        if (type.equalsIgnoreCase(SerializedVariableTypes.Short.getName())) {
           setVariableEntity(variableName, Short.valueOf(value.toString()));
           return;
         }
 
         // long
-        if (type.equalsIgnoreCase(LongType.TYPE_NAME)) {
+        if (type.equalsIgnoreCase(SerializedVariableTypes.Long.getName())) {
           setVariableEntity(variableName, Long.valueOf(value.toString()));
           return;
         }
 
         // double
-        if (type.equalsIgnoreCase(DoubleType.TYPE_NAME)) {
+        if (type.equalsIgnoreCase(SerializedVariableTypes.Double.getName())) {
           setVariableEntity(variableName, Double.valueOf(value.toString()));
           return;
         }
 
         // date
-        if (type.equalsIgnoreCase(DateType.TYPE_NAME)) {
+        if (type.equalsIgnoreCase(SerializedVariableTypes.Date.getName())) {
           setVariableEntity(variableName, DtoUtil.toDate(value));
           return;
         }

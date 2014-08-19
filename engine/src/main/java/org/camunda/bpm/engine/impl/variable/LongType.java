@@ -12,20 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
-import org.camunda.bpm.engine.impl.runtime.SerializedVariableValueImpl;
-import org.camunda.bpm.engine.runtime.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+
 
 
 
 /**
  * @author Tom Baeyens
  */
-public class LongType implements VariableType {
-
-  public static final String TYPE_NAME = "long";
+public class LongType extends PrimitiveVariableType {
 
   public String getTypeName() {
-    return TYPE_NAME;
+    return SerializedVariableTypes.Long.getName();
   }
 
   public boolean isCachable() {
@@ -58,9 +56,4 @@ public class LongType implements VariableType {
     return Long.class.getSimpleName();
   }
 
-  public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
-    SerializedVariableValueImpl result = new SerializedVariableValueImpl();
-    result.setValue(getValue(valueFields));
-    return result;
-  }
 }
