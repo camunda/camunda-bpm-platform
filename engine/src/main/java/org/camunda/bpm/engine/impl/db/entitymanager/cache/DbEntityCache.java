@@ -12,7 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.db.entitymanager.cache;
 
-import static org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState.*;
+import static org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState.DELETED_MERGED;
+import static org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState.DELETED_PERSISTENT;
+import static org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState.DELETED_TRANSIENT;
+import static org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState.MERGED;
+import static org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState.PERSISTENT;
+import static org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState.TRANSIENT;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -165,7 +170,7 @@ public class DbEntityCache {
       switch (entityToAdd.getEntityState()) {
 
       case TRANSIENT:
-        // cannot put TRANSIENT entity if entity with same id already exinsts in cache.
+        // cannot put TRANSIENT entity if entity with same id already exists in cache.
         if(existingCachedEntity.getEntityState() == TRANSIENT) {
           throw new ProcessEngineException("Same entity with Id "+entityToAdd.getEntity().getId()
               + " and type "+entityToAdd.getEntity().getClass()+ " is inserted twice.");
@@ -193,7 +198,8 @@ public class DbEntityCache {
             + existingCachedEntity.getEntityState());
 
       case MERGED:
-        if(existingCachedEntity.getEntityState() == PERSISTENT) {
+        if(existingCachedEntity.getEntityState() == PERSISTENT
+            || existingCachedEntity.getEntityState() == MERGED) {
           // use new entity state, replacing the existing one.
           map.put(entityToAdd.getEntity().getId(), entityToAdd);
           break;
@@ -203,6 +209,11 @@ public class DbEntityCache {
           // ignore put -> this is already marked to be deleted
           break;
         }
+
+        // otherwise fail:
+        throw new ProcessEngineException("Cannot add MERGED entity with id "+entityToAdd.getEntity().getId()
+            + " and type "+entityToAdd.getEntity().getClass() + " into cache: entity with same Id and type is already "
+            + existingCachedEntity.getEntityState());
 
       default:
         // deletes are always added

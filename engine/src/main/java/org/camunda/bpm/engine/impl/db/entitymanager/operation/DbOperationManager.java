@@ -12,7 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.db.entitymanager.operation;
 
-import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType.*;
+import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType.DELETE;
+import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType.INSERT;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -176,7 +177,7 @@ public class DbOperationManager {
   /**
    * Assumptions:
    * a) all operations in the set work on entities such that the entities implement {@link HasDbReferences}.
-   * b) all operations in the set work on the same type (ie. all operations are INSERTs or DELETEs
+   * b) all operations in the set work on the same type (ie. all operations are INSERTs or DELETEs).
    *
    */
   protected List<DbEntityOperation> sortByReferences(SortedSet<DbEntityOperation> preSorted) {
