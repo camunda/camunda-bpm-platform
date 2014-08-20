@@ -54,6 +54,7 @@
         <div class="names">
           <h4 class="task">
             <a ng-href="#/?task={{ task.id }}"
+               ng-click="focus(delta)"
                tabindex="{{ (delta + 1) }}">{{ task.name }}</a>
           </h4>
           <h6 class="process-definition"

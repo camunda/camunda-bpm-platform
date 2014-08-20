@@ -21,7 +21,6 @@ define([
     '$modal',
     '$location',
     '$rootScope',
-    '$timeout',
     '$q',
     'camTasklistPileFilterConversion',
     'camAPI',
@@ -29,7 +28,6 @@ define([
     $modal,
     $location,
     $rootScope,
-    $timeout,
     $q,
     camTasklistPileFilterConversion,
     camAPI
@@ -37,6 +35,8 @@ define([
     var Task = camAPI.resource('task');
 
     return {
+      scope: {},
+
       template: template,
 
       link: function(scope) {
@@ -56,6 +56,7 @@ define([
 
         scope.searchTask = '';
 
+
         scope.sorting = angular.element('[cam-sorting-choices]').scope();
 
         scope.sorting.$on('sorting.by.change', loadTasks);
@@ -63,35 +64,33 @@ define([
         scope.sorting.$on('sorting.order.change', loadTasks);
 
 
-        function setCurrentTask(task) {
-          if (task) {
-            $location.search({
-              // tasks: scope.pile.id,
-              task: task.id
-            });
-          }
+        function setCurrentTask(task, silent) {
           $rootScope.currentTask = task;
-          $rootScope.$broadcast('tasklist.task.current');
+          if (!silent) {
+            // if there's a task, we pass its ID to the URL,
+            // otherwise we clear the URL
+            $location.search(task ? {
+              task: task.id
+            } : {});
+
+            $rootScope.$broadcast('tasklist.task.current');
+          }
         }
 
 
         function loadTasks() {
           scope.loading = true;
-          scope.tasks = [];
+          // scope.tasks = [];
+
+          if (arguments[0]) {
+            console.info('loadTasks because of', arguments[0].name);
+          }
 
           var where = buildWhere(scope.sorting.order, scope.sorting.by);
 
           Task.list(where, function(err, res) {
             scope.loading = false;
             if (err) { throw err; }
-
-            // update the URL of the page
-            $location.search({
-              tasks:      scope.pile.id,
-              sortOrder:  where.sortOrder || 'desc',
-              sortBy:     where.sortBy || 'priority'
-            });
-
 
             scope.totalItems = res.count;
             scope.processDefinitions = res._embedded.processDefinition;
@@ -159,39 +158,28 @@ define([
 
 
         scope.focus = function(delta) {
-          setCurrentTask(scope.tasks[delta]);
+          setCurrentTask(scope.tasks[delta], true);
         };
 
 
-
-        $rootScope.$on('$locationChangeSuccess', function() {
-          var state = $location.search();
-          if (state.task) {
-            if ($rootScope.currentTask && state.task === $rootScope.currentTask.id) {
-              return;
-            }
-
-            setCurrentTask(itemById(scope.tasks, state.task));
-          }
-          else {
-            scope.sorting.order = state.sortOrder;
-            scope.sorting.by = state.sortBy;
+        scope.$on('tasklist.pile.current', function() {
+          if ($rootScope.currentPile) {
+            scope.pile = $rootScope.currentPile;
+            loadTasks();
           }
         });
+
+
+        scope.$on('tasklist.task.assign', loadTasks);
+
+        scope.$on('tasklist.task.delegate', loadTasks);
+
+        scope.$on('tasklist.task.claim', loadTasks);
+
+        scope.$on('tasklist.task.unclaim', loadTasks);
 
         scope.$on('tasklist.task.complete', function() {
           setCurrentTask(null);
-          loadTasks();
-        });
-
-        scope.$on('tasklist.pile.current', function() {
-          if (
-            !$rootScope.currentPile ||
-            (scope.pile && (scope.pile.id === $rootScope.currentPile.id))
-          ) {
-            return;
-          }
-          scope.pile = $rootScope.currentPile;
           loadTasks();
         });
       }
