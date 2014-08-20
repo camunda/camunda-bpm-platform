@@ -24,12 +24,10 @@ define([
 
       controller: [
         '$scope',
-        '$location',
         '$rootScope',
         'camAPI',
       function (
         $scope,
-        $location,
         $rootScope,
         camAPI
       ) {
@@ -40,15 +38,12 @@ define([
         $scope.loading = true;
 
 
-
-        function focus() {
-          var state = $location.search();
-          var pile = state.tasks ? itemById($scope.piles, state.tasks) : $scope.piles[0];
-
-          $scope.focusedId = pile ? pile.id : null;
+        $scope.focus = function(pile) {
+          if ($scope.focusedId === pile.id) { return; }
+          $scope.focusedId = pile.id;
           $rootScope.currentPile = pile;
           $rootScope.$broadcast('tasklist.pile.current');
-        }
+        };
 
 
 
@@ -68,21 +63,9 @@ define([
             }
 
             $scope.piles = res.items;
-            if ($scope.piles.length) {
-              focus();
-            }
+            $scope.focus(res.items[0]);
           });
         }
-
-
-
-        listPiles();
-
-
-
-        $rootScope.$on('$locationChangeSuccess', function() {
-          focus();
-        });
 
         $rootScope.$watch('authentication', function() {
           listPiles();

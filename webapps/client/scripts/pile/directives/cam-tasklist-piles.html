@@ -8,5 +8,32 @@
      ng-repeat="(delta, pile) in piles"
      class="task-pile-wrapper"
      ng-class="{active: pile.id === focusedId}"
-     style="z-index: {{ ((piles.length + 10) - delta) }}"
-     cam-tasklist-pile></div>
+     style="z-index: {{ ((piles.length + 10) - delta) }};">
+
+  <div class="task-pile"
+       style="background-color: {{ pile.color }}">
+
+    <h4 class="name"
+        ng-click="focus(pile)">{{ pile.name }}</h4>
+
+    <div class="info"
+         style="background-color: {{ pile.color }}">
+      <div ng-if="pile.description"
+           class="description">
+        {{ pile.description }}
+      </div>
+
+      <ul class="filters list-unstyled">
+        <li ng-click="edit()"
+            ng-repeat="filter in pile.filters">
+          <span class="key">{{ filter.key }}</span>:
+
+          <span class="operator"
+                ng-if="filter.operator">{{ filter.operator }}</span>
+
+          <span class="value">{{ filter.value }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -15,7 +15,6 @@ define([
   'require',
   'angular',
   'moment',
-  './directives/cam-tasklist-pile',
   './directives/cam-tasklist-piles',
   './directives/cam-tasklist-tasks',
   'camunda-tasklist-ui/utils',
@@ -25,7 +24,6 @@ define([
   require,
   angular,
   moment,
-  camTasklistPile,
   camTasklistPiles,
   camTasklistPileTasks
 ) {
@@ -126,7 +124,6 @@ define([
 
 
 
-  pileModule.directive('camTasklistPile', camTasklistPile);
 
   pileModule.directive('camTasklistPiles', camTasklistPiles);
 
