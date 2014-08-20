@@ -288,4 +288,17 @@ public class TaskResourceImpl implements TaskResource {
     return FormVariablesDto.fromVariableInstanceMap(startFormVariables);
   }
 
+  public void updateTask(TaskDto taskDto) {
+    TaskService taskService = engine.getTaskService();
+
+    Task task = getTaskById(taskId);
+
+    if (task == null) {
+      throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
+    }
+
+    taskDto.updateTask(task);
+    taskService.saveTask(task);
+  }
+
 }

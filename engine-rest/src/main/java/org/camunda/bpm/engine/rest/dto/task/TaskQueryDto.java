@@ -113,7 +113,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private Date createdBefore;
   private Date createdOn;
 
-  private DelegationState delegationState;
+  private String delegationState;
 
   private List<String> candidateGroups;
 
@@ -309,8 +309,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.createdOn = createdOn;
   }
 
-  @CamundaQueryParam(value = "delegationState", converter = DelegationStateConverter.class)
-  public void setDelegationState(DelegationState taskDelegationState) {
+  @CamundaQueryParam(value = "delegationState")
+  public void setDelegationState(String taskDelegationState) {
     this.delegationState = taskDelegationState;
   }
 
@@ -489,7 +489,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       query.taskCreatedOn(createdOn);
     }
     if (delegationState != null) {
-      query.taskDelegationState(delegationState);
+      DelegationStateConverter converter = new DelegationStateConverter();
+      DelegationState state = converter.convertQueryParameterToType(delegationState);
+      query.taskDelegationState(state);
     }
     if (candidateGroups != null) {
       query.taskCandidateGroupIn(candidateGroups);

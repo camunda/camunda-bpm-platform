@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import static org.camunda.bpm.engine.rest.hal.Hal.MEDIA_TYPE_HAL;
+
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -30,8 +32,6 @@ import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.hal.task.HalTaskList;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
-
-import static org.camunda.bpm.engine.rest.hal.Hal.*;
 
 @Path(TaskRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -76,5 +76,10 @@ public interface TaskRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto queryTasksCount(TaskQueryDto query);
+
+  @POST
+  @Path("/create")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void createTask(TaskDto taskDto);
 
 }

@@ -18,6 +18,7 @@ import java.util.List;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
@@ -128,5 +129,15 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   @Override
   public TaskResource getTask(String id) {
     return new TaskResourceImpl(getProcessEngine(), id, relativeRootResourcePath);
+  }
+
+  public void createTask(TaskDto taskDto) {
+    ProcessEngine engine = getProcessEngine();
+    TaskService taskService = engine.getTaskService();
+
+    Task newTask = taskService.newTask(taskDto.getId());
+    taskDto.updateTask(newTask);
+    taskService.saveTask(newTask);
+
   }
 }

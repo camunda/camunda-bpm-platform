@@ -12,11 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.sub.task;
 
+import static org.camunda.bpm.engine.rest.hal.Hal.MEDIA_TYPE_HAL;
+
 import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -30,8 +33,6 @@ import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.hal.task.HalTask;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
-
-import static org.camunda.bpm.engine.rest.hal.Hal.MEDIA_TYPE_HAL;
 
 public interface TaskResource {
 
@@ -116,6 +117,8 @@ public interface TaskResource {
   @Produces(MediaType.APPLICATION_JSON)
   FormVariablesDto getFormVariables(@QueryParam("variableNames") String variableNames);
 
+  @PUT
+  @Consumes(MediaType.APPLICATION_JSON)
+  public void updateTask(TaskDto task);
+
 }
-
-
