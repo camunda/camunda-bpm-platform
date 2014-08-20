@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.history.*;
@@ -383,6 +384,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   public void testTaskServiceEngineAccess() {
     given().pathParam("name", EXAMPLE_ENGINE_NAME)
       .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(TASK_URL);

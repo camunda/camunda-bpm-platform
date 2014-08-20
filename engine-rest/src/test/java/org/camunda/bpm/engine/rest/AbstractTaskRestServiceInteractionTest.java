@@ -1,73 +1,19 @@
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_DEFINITION_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_EXECUTION_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_INSTANCE_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_DESCRIPTION;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_NAME;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_TYPE;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_URL;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_FULL_MESSAGE;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_TIME;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_EXECUTION_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_OWNER;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_PARENT_TASK_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_USER_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstance;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.path.json.JsonPath;
+import com.jayway.restassured.response.Response;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.engine.FormService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -87,13 +33,7 @@ import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstance;
-import org.camunda.bpm.engine.task.Attachment;
-import org.camunda.bpm.engine.task.Comment;
-import org.camunda.bpm.engine.task.DelegationState;
-import org.camunda.bpm.engine.task.IdentityLink;
-import org.camunda.bpm.engine.task.IdentityLinkType;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.task.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.fest.assertions.Assertions;
@@ -102,9 +42,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.path.json.JsonPath;
-import com.jayway.restassured.response.Response;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.*;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.endsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.*;
 
 public abstract class AbstractTaskRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -254,6 +204,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   @Test
   public void testGetSingleTask() {
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("id", equalTo(EXAMPLE_TASK_ID))
       .body("name", equalTo(MockProvider.EXAMPLE_TASK_NAME))
@@ -296,7 +247,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(sampleProcessDefinitionQuery.count()).thenReturn(1l);
     when(processEngine.getRepositoryService().createProcessDefinitionQuery()).thenReturn(sampleProcessDefinitionQuery);
 
-    given()
+    Response response = given()
       .header("accept", Hal.MEDIA_TYPE_HAL)
       .pathParam("id", EXAMPLE_TASK_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -332,11 +283,51 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .body("_links.self.href", endsWith(EXAMPLE_TASK_ID))
 
       .when().get(SINGLE_TASK_URL);
+
+    String content = response.asString();
+
+    // validate embedded assignees:
+    List<Map<String,Object>> embeddedAssignees = from(content).getList("_embedded.assignee");
+    Assert.assertEquals("There should be one assignee returned.", 1, embeddedAssignees.size());
+    Map<String, Object> embeddedAssignee = embeddedAssignees.get(0);
+    Assert.assertNotNull("The returned assignee should not be null.", embeddedAssignee);
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_ID, embeddedAssignee.get("id"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, embeddedAssignee.get("firstName"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, embeddedAssignee.get("lastName"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_EMAIL, embeddedAssignee.get("email"));
+
+    // validate embedded owners:
+    List<Map<String,Object>> embeddedOwners = from(content).getList("_embedded.owner");
+    Assert.assertEquals("There should be one owner returned.", 1, embeddedOwners.size());
+    Map<String, Object> embeddedOwner = embeddedOwners.get(0);
+    Assert.assertNotNull("The returned owner should not be null.", embeddedOwner);
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_ID, embeddedOwner.get("id"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, embeddedOwner.get("firstName"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, embeddedOwner.get("lastName"));
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_EMAIL, embeddedOwner.get("email"));
+
+    // validate embedded processDefinitions:
+    List<Map<String,Object>> embeddedDefinitions = from(content).getList("_embedded.processDefinition");
+    Assert.assertEquals("There should be one processDefinition returned.", 1, embeddedDefinitions.size());
+    Map<String, Object> embeddedProcessDefinition = embeddedDefinitions.get(0);
+    Assert.assertNotNull("The returned processDefinition should not be null.", embeddedProcessDefinition);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, embeddedProcessDefinition.get("id"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, embeddedProcessDefinition.get("key"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY, embeddedProcessDefinition.get("category"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME, embeddedProcessDefinition.get("name"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DESCRIPTION, embeddedProcessDefinition.get("description"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION, embeddedProcessDefinition.get("version"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME, embeddedProcessDefinition.get("resource"));
+    Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_ID, embeddedProcessDefinition.get("deploymentId"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME, embeddedProcessDefinition.get("diagram"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED, embeddedProcessDefinition.get("suspended"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH, embeddedProcessDefinition.get("contextPath"));
   }
 
   @Test
   public void testGetForm() {
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
       .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
@@ -351,6 +342,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(managementServiceMock.getProcessApplicationForDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID)).thenReturn(null);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+    .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
       .body("contextPath", nullValue())
@@ -365,6 +357,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(mockTask.getProcessDefinitionId()).thenReturn(null);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
       .body("contextPath", nullValue())
@@ -379,6 +372,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(formServiceMock.getTaskFormData(EXAMPLE_TASK_ID)).thenReturn(mockTaskFormData);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("key", equalTo("embedded:engine://engine/:engine/task/" + EXAMPLE_TASK_ID + "/rendered-form"))
       .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
@@ -423,10 +417,11 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   @Test
   public void testSubmitForm() {
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
-    .then().expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().post(SUBMIT_FORM_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(SUBMIT_FORM_URL);
 
     verify(formServiceMock).submitTaskForm(EXAMPLE_TASK_ID, null);
   }
@@ -442,6 +437,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("variables", variables);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -467,12 +463,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
-    .when().post(SUBMIT_FORM_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+      .when().post(SUBMIT_FORM_URL);
   }
 
   @Test
@@ -487,12 +484,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
-    .when().post(SUBMIT_FORM_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+      .when().post(SUBMIT_FORM_URL);
   }
 
   @Test
@@ -507,12 +505,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
-    .when().post(SUBMIT_FORM_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+      .when().post(SUBMIT_FORM_URL);
   }
 
   @Test
@@ -527,12 +526,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
-    .when().post(SUBMIT_FORM_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+      .when().post(SUBMIT_FORM_URL);
   }
 
   @Test
@@ -547,12 +547,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot submit task form anId due to parse exception: Unparseable date: \"1abc\""))
-    .when().post(SUBMIT_FORM_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId due to parse exception: Unparseable date: \"1abc\""))
+      .when().post(SUBMIT_FORM_URL);
   }
 
   @Test
@@ -567,12 +568,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot submit task form anId: The variable type 'X' is not supported."))
-    .when().post(SUBMIT_FORM_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId: The variable type 'X' is not supported."))
+      .when().post(SUBMIT_FORM_URL);
   }
 
   @Test
@@ -580,6 +582,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     doThrow(new ProcessEngineException("expected exception")).when(formServiceMock).submitTaskForm(any(String.class), Matchers.<Map<String, Object>>any());
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
@@ -592,6 +595,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   public void testGetTaskFormVariables() {
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect()
         .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
         .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".id", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID))
@@ -609,9 +613,10 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .queryParam("variableNames", "a,b,c")
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
-    .when().get(FORM_VARIABLES_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+      .when().get(FORM_VARIABLES_URL);
 
     verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, Arrays.asList(new String[]{"a","b","c"}));
   }
@@ -622,6 +627,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("userId", EXAMPLE_USER_ID);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -636,6 +642,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("userId", null);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -649,6 +656,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).claim(any(String.class), any(String.class));
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
@@ -660,6 +668,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   @Test
   public void testUnclaimTask() {
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(UNCLAIM_TASK_URL);
@@ -672,6 +681,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).setAssignee(any(String.class), any(String.class));
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
@@ -685,6 +695,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("userId", EXAMPLE_USER_ID);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -699,6 +710,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("userId", null);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -712,6 +724,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).setAssignee(any(String.class), any(String.class));
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
@@ -735,13 +748,14 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     Map<String, Object> expectedGroupIdentityLink2 = toExpectedJsonMap(mockCandidateGroup2IdentityLink);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
-      .body("$.size()", equalTo(3))
-      .body("$", hasItem(expectedUserIdentityLink))
-      .body("$", hasItem(expectedGroupIdentityLink))
-      .body("$", hasItem(expectedGroupIdentityLink2))
-    .when().get(TASK_IDENTITY_LINKS_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+        .body("$.size()", equalTo(3))
+        .body("$", hasItem(expectedUserIdentityLink))
+        .body("$", hasItem(expectedGroupIdentityLink))
+        .body("$", hasItem(expectedGroupIdentityLink2))
+      .when().get(TASK_IDENTITY_LINKS_URL);
 
     verify(taskServiceMock).getIdentityLinksForTask(EXAMPLE_TASK_ID);
   }
@@ -752,12 +766,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     Map<String, Object> expectedGroupIdentityLink2 = toExpectedJsonMap(mockCandidateGroup2IdentityLink);
 
     given().pathParam("id", EXAMPLE_TASK_ID).queryParam("type", IdentityLinkType.CANDIDATE)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
-      .body("$.size()", equalTo(2))
-      .body("$", hasItem(expectedGroupIdentityLink))
-      .body("$", hasItem(expectedGroupIdentityLink2))
-    .when().get(TASK_IDENTITY_LINKS_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+        .body("$.size()", equalTo(2))
+        .body("$", hasItem(expectedGroupIdentityLink))
+        .body("$", hasItem(expectedGroupIdentityLink2))
+      .when().get(TASK_IDENTITY_LINKS_URL);
 
     verify(taskServiceMock).getIdentityLinksForTask(EXAMPLE_TASK_ID);
   }
@@ -774,10 +789,11 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("type", type);
 
     given().pathParam("id", taskId)
-    .contentType(POST_JSON_CONTENT_TYPE).body(json)
-    .then().expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().post(TASK_IDENTITY_LINKS_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(TASK_IDENTITY_LINKS_URL);
 
     verify(taskServiceMock).addUserIdentityLink(taskId, userId, type);
   }
@@ -794,10 +810,11 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("type", type);
 
     given().pathParam("id", taskId)
-    .contentType(POST_JSON_CONTENT_TYPE).body(json)
-    .then().expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().post(TASK_IDENTITY_LINKS_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(TASK_IDENTITY_LINKS_URL);
 
     verify(taskServiceMock).addGroupIdentityLink(taskId, groupId, type);
   }
@@ -816,13 +833,14 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("type", type);
 
     given().pathParam("id", taskId)
-    .contentType(POST_JSON_CONTENT_TYPE).body(json)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("Identity Link requires userId or groupId, but not both"))
-    .when().post(TASK_IDENTITY_LINKS_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Identity Link requires userId or groupId, but not both"))
+      .when().post(TASK_IDENTITY_LINKS_URL);
 
     verify(taskServiceMock, never()).addGroupIdentityLink(anyString(), anyString(), anyString());
     verify(taskServiceMock, never()).addGroupIdentityLink(anyString(), anyString(), anyString());
@@ -838,13 +856,14 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("type", type);
 
     given().pathParam("id", taskId)
-    .contentType(POST_JSON_CONTENT_TYPE).body(json)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("Identity Link requires userId or groupId"))
-    .when().post(TASK_IDENTITY_LINKS_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Identity Link requires userId or groupId"))
+      .when().post(TASK_IDENTITY_LINKS_URL);
 
     verify(taskServiceMock, never()).addGroupIdentityLink(anyString(), anyString(), anyString());
     verify(taskServiceMock, never()).addGroupIdentityLink(anyString(), anyString(), anyString());
@@ -863,6 +882,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("type", type);
 
     given().pathParam("id", taskId)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -885,6 +905,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("type", type);
 
     given().pathParam("id", taskId)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -897,10 +918,11 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   @Test
   public void testCompleteTask() {
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
-    .then().expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().post(COMPLETE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(COMPLETE_TASK_URL);
 
     verify(taskServiceMock).complete(EXAMPLE_TASK_ID, null);
   }
@@ -916,6 +938,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("variables", variables);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -941,12 +964,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
-    .when().post(COMPLETE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+      .when().post(COMPLETE_TASK_URL);
   }
 
   @Test
@@ -961,12 +985,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
-    .when().post(COMPLETE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+      .when().post(COMPLETE_TASK_URL);
   }
 
   @Test
@@ -981,12 +1006,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
-    .when().post(COMPLETE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+      .when().post(COMPLETE_TASK_URL);
   }
 
   @Test
@@ -1001,12 +1027,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
-    .when().post(COMPLETE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+      .when().post(COMPLETE_TASK_URL);
   }
 
   @Test
@@ -1021,12 +1048,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot complete task anId due to parse exception: Unparseable date: \"1abc\""))
-    .when().post(COMPLETE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId due to parse exception: Unparseable date: \"1abc\""))
+      .when().post(COMPLETE_TASK_URL);
   }
 
   @Test
@@ -1041,12 +1069,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot complete task anId: The variable type 'X' is not supported."))
-    .when().post(COMPLETE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId: The variable type 'X' is not supported."))
+      .when().post(COMPLETE_TASK_URL);
   }
 
   @Test
@@ -1054,6 +1083,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).complete(any(String.class), Matchers.<Map<String, Object>>any());
 
     given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
@@ -1073,10 +1103,11 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("variables", variables);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(json)
-    .then().expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().post(RESOLVE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(RESOLVE_TASK_URL);
 
     Map<String, Object> expectedVariables = new HashMap<String, Object>();
     expectedVariables.put("aVariable", "aStringValue");
@@ -1098,12 +1129,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
-    .when().post(RESOLVE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+      .when().post(RESOLVE_TASK_URL);
   }
 
   @Test
@@ -1118,12 +1150,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
-    .when().post(RESOLVE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+      .when().post(RESOLVE_TASK_URL);
   }
 
   @Test
@@ -1138,12 +1171,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
-    .when().post(RESOLVE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+      .when().post(RESOLVE_TASK_URL);
   }
 
   @Test
@@ -1158,12 +1192,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
-    .when().post(RESOLVE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+      .when().post(RESOLVE_TASK_URL);
   }
 
   @Test
@@ -1178,12 +1213,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot resolve task anId due to parse exception: Unparseable date: \"1abc\""))
-    .when().post(RESOLVE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId due to parse exception: Unparseable date: \"1abc\""))
+      .when().post(RESOLVE_TASK_URL);
   }
 
   @Test
@@ -1198,12 +1234,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     variables.put("variables", variableJson);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot resolve task anId: The variable type 'X' is not supported."))
-    .when().post(RESOLVE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId: The variable type 'X' is not supported."))
+      .when().post(RESOLVE_TASK_URL);
   }
 
   @Test
@@ -1211,12 +1248,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).resolveTask(any(String.class), any(Map.class));
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
-    .then().expect()
-      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
-      .body("message", equalTo("expected exception"))
-    .when().post(RESOLVE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+        .body("message", equalTo("expected exception"))
+      .when().post(RESOLVE_TASK_URL);
   }
 
   @Test
@@ -1224,6 +1262,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(mockQuery.singleResult()).thenReturn(null);
 
     given().pathParam("id", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("No matching task with id " + NON_EXISTING_ID))
@@ -1235,6 +1274,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(formServiceMock.getTaskFormData(anyString())).thenThrow(new ProcessEngineException("Expected exception: task does not exist."));
 
     given().pathParam("id", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot get form for task " + NON_EXISTING_ID))
@@ -1247,10 +1287,11 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("userId", EXAMPLE_USER_ID);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(json)
-    .then().expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().post(DELEGATE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(DELEGATE_TASK_URL);
 
     verify(taskServiceMock).delegateTask(EXAMPLE_TASK_ID, EXAMPLE_USER_ID);
   }
@@ -1263,12 +1304,13 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("userId", EXAMPLE_USER_ID);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(json)
-    .then().expect()
-      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
-      .body("message", equalTo("expected exception"))
-    .when().post(DELEGATE_TASK_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+        .body("message", equalTo("expected exception"))
+      .when().post(DELEGATE_TASK_URL);
   }
 
   @Test
@@ -1276,6 +1318,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .pathParam("commentId", EXAMPLE_TASK_COMMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
@@ -1295,6 +1338,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .pathParam("commentId", EXAMPLE_TASK_COMMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body(containsString("History is not enabled"))
@@ -1307,6 +1351,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .pathParam("commentId", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body(containsString("Task comment with id " + NON_EXISTING_ID + " does not exist for task id '" + EXAMPLE_TASK_ID + "'."))
@@ -1320,6 +1365,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .pathParam("commentId", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body(containsString("History is not enabled"))
@@ -1331,6 +1377,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", NON_EXISTING_ID)
       .pathParam("commentId", EXAMPLE_TASK_COMMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body(containsString("Task comment with id " + EXAMPLE_TASK_COMMENT_ID + " does not exist for task id '" + NON_EXISTING_ID + "'"))
@@ -1345,6 +1392,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", NON_EXISTING_ID)
       .pathParam("commentId", EXAMPLE_TASK_COMMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body(containsString("History is not enabled"))
@@ -1356,6 +1404,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   public void testGetTaskComments() {
     Response response = given()
       .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
@@ -1373,6 +1422,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
@@ -1387,6 +1437,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
@@ -1401,6 +1452,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
@@ -1416,6 +1468,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .contentType(ContentType.JSON)
@@ -1430,6 +1483,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
@@ -1444,6 +1498,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     Response response = given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .multiPart("message", "aTaskCommentFullMessage")
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
@@ -1460,6 +1515,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .multiPart("message", "aTaskCommentFullMessage")
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body(containsString("History is not enabled"))
@@ -1475,6 +1531,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", NON_EXISTING_ID)
       .multiPart("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("No task found for task id " + NON_EXISTING_ID))
@@ -1489,6 +1546,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", NON_EXISTING_ID)
       .multiPart("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body(containsString("History is not enabled"))
@@ -1500,6 +1558,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   public void testAddTaskCommentWithoutMultiparts() {
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode())
     .when()
@@ -1514,6 +1573,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .multiPart("nonExistingPart", "test")
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Not enough parameters submitted"))
@@ -1526,6 +1586,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
       .pathParam("attachmentId", MockProvider.EXAMPLE_TASK_ATTACHMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect().statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
       .body("id", equalTo(MockProvider.EXAMPLE_TASK_ATTACHMENT_ID))
       .body("taskId", equalTo(MockProvider.EXAMPLE_TASK_ID))
@@ -1541,13 +1602,14 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     mockHistoryDisabled();
 
     given()
-    .pathParam("id", EXAMPLE_TASK_ID)
-    .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
-    .then().expect()
-    .statusCode(Status.NOT_FOUND.getStatusCode())
-    .body(containsString("History is not enabled"))
-    .when()
-    .get(SINGLE_TASK_SINGLE_ATTACHMENT_URL);
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("History is not enabled"))
+      .when()
+        .get(SINGLE_TASK_SINGLE_ATTACHMENT_URL);
   }
 
   @Test
@@ -1555,7 +1617,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .pathParam("attachmentId", NON_EXISTING_ID)
-    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body(containsString("Task attachment with id " + NON_EXISTING_ID + " does not exist for task id '" + EXAMPLE_TASK_ID +  "'."))
     .when().get(SINGLE_TASK_SINGLE_ATTACHMENT_URL);
   }
@@ -1567,6 +1630,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .pathParam("attachmentId", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body(containsString("History is not enabled"))
@@ -1578,6 +1642,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", NON_EXISTING_ID)
       .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body(containsString("Task attachment with id " + EXAMPLE_TASK_ATTACHMENT_ID + " does not exist for task id '" + NON_EXISTING_ID + "'"))
@@ -1592,6 +1657,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", NON_EXISTING_ID)
       .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body(containsString("History is not enabled"))
@@ -1602,10 +1668,11 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   @Test
   public void testGetTaskAttachments() {
     Response response = given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
-      .body("$.size()", equalTo(1))
-    .when().get(SINGLE_TASK_ATTACHMENTS_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+        .body("$.size()", equalTo(1))
+      .when().get(SINGLE_TASK_ATTACHMENTS_URL);
 
     verifyTaskAttachments(mockTaskAttachments, response);
     verify(taskServiceMock).getTaskAttachments(MockProvider.EXAMPLE_TASK_ID);
@@ -1616,6 +1683,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     mockHistoryDisabled();
 
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
       .body("$.size()", equalTo(0))
@@ -1628,6 +1696,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(historicTaskInstanceQueryMock.singleResult()).thenReturn(null);
 
     given().pathParam("id", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body(containsString("No task found for task id " + NON_EXISTING_ID))
@@ -1640,6 +1709,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
@@ -1654,6 +1724,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
@@ -1668,6 +1739,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
@@ -1684,6 +1756,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
       .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
       .multiPart("content", createMockByteData())
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
@@ -1703,6 +1776,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
       .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
       .multiPart("content", createMockByteData())
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("No task found for task id " + NON_EXISTING_ID))
@@ -1718,6 +1792,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
       .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
       .multiPart("url", EXAMPLE_TASK_ATTACHMENT_URL)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
@@ -1737,6 +1812,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
         .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
         .multiPart("url", EXAMPLE_TASK_ATTACHMENT_URL)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body(containsString("History is not enabled"))
@@ -1755,6 +1831,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
       .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
       .multiPart("url", EXAMPLE_TASK_ATTACHMENT_URL)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("No task found for task id " + NON_EXISTING_ID))
@@ -1772,6 +1849,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .multiPart("attachment-description", EXAMPLE_TASK_ATTACHMENT_DESCRIPTION)
       .multiPart("attachment-type", EXAMPLE_TASK_ATTACHMENT_TYPE)
       .multiPart("url", EXAMPLE_TASK_ATTACHMENT_URL)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body(containsString("History is not enabled"))
@@ -1783,6 +1861,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   public void testCreateTaskAttachmentWithoutMultiparts() {
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode())
     .when()
@@ -1870,6 +1949,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
       .pathParam("attachmentId", MockProvider.EXAMPLE_TASK_ATTACHMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().delete(SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL);
@@ -1880,11 +1960,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     mockHistoryDisabled();
 
     given()
-    .pathParam("id", EXAMPLE_TASK_ID)
-    .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
-    .statusCode(Status.FORBIDDEN.getStatusCode())
-    .body(containsString("History is not enabled"))
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body(containsString("History is not enabled"))
     .when()
     .delete(SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL);
   }
@@ -1896,6 +1977,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .pathParam("attachmentId", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body(containsString("Deletion is not possible. No attachment exists for task id '" + EXAMPLE_TASK_ID + "' and attachment id '" + NON_EXISTING_ID + "'."))
     .when().delete(SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL);
@@ -1908,6 +1990,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .pathParam("attachmentId", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body(containsString("History is not enabled"))
@@ -1921,6 +2004,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", NON_EXISTING_ID)
       .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body(containsString("Deletion is not possible. No attachment exists for task id '" + NON_EXISTING_ID + "' and attachment id '" + EXAMPLE_TASK_ATTACHMENT_ID + "'."))
@@ -1935,6 +2019,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", NON_EXISTING_ID)
       .pathParam("attachmentId", EXAMPLE_TASK_ATTACHMENT_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body(containsString("History is not enabled"))
@@ -1945,6 +2030,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   @Test
   public void testGetLocalVariables() {
     Response response = given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body(EXAMPLE_VARIABLE_KEY, notNullValue())
       .body(EXAMPLE_VARIABLE_KEY + ".value", equalTo(EXAMPLE_VARIABLE_VALUE))
@@ -1959,6 +2045,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(taskServiceMock.getVariablesLocal(NON_EXISTING_ID)).thenThrow(new ProcessEngineException("task " + NON_EXISTING_ID + " doesn't exist"));
 
     given().pathParam("id", NON_EXISTING_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
       .body("message", equalTo("task " + NON_EXISTING_ID + " doesn't exist"))
@@ -1982,6 +2069,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     messageBodyJson.put("deletions", deletions);
 
     given().pathParam("id", EXAMPLE_TASK_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(SINGLE_TASK_MODIFY_VARIABLES_URL);
 
@@ -2004,6 +2092,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     messageBodyJson.put("modifications", modifications);
 
     given().pathParam("id", NON_EXISTING_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot modify variables for task " + NON_EXISTING_ID + ": Cannot find task with id " + NON_EXISTING_ID))
@@ -2015,6 +2104,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     mockTaskServiceImpl();
 
     given().pathParam("id", EXAMPLE_TASK_ID).contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(SINGLE_TASK_MODIFY_VARIABLES_URL);
   }
@@ -2027,6 +2117,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(taskServiceMock.getVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey))).thenReturn(variableValue);
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("value", is(123))
       .body("type", is("Integer"))
@@ -2040,6 +2131,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(taskServiceMock.getVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey))).thenReturn(null);
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
       .body("type", is(InvalidRequestException.class.getSimpleName()))
       .body("message", is("task variable with name " + variableKey + " does not exist or is null"))
@@ -2054,6 +2146,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .thenThrow(new ProcessEngineException("task " + NON_EXISTING_ID + " doesn't exist"));
 
     given().pathParam("id", NON_EXISTING_ID).pathParam("varId", variableKey)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot get task variable " + variableKey + ": task " + NON_EXISTING_ID + " doesn't exist"))
@@ -2069,6 +2162,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
@@ -2086,6 +2180,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
@@ -2103,6 +2198,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot put task variable " + variableKey + " due to number format exception: For input string: \"1abc\""))
@@ -2119,6 +2215,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
@@ -2136,6 +2233,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot put task variable " +  variableKey + " due to number format exception: For input string: \"1abc\""))
@@ -2152,6 +2250,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
@@ -2169,6 +2268,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot put task variable " + variableKey + " due to number format exception: For input string: \"1abc\""))
@@ -2185,6 +2285,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
@@ -2202,6 +2303,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot put task variable " + variableKey + " due to number format exception: For input string: \"1abc\""))
@@ -2218,6 +2320,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
@@ -2240,6 +2343,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
@@ -2257,6 +2361,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot put task variable " + variableKey + " due to parse exception: Unparseable date: \"1abc\""))
@@ -2273,6 +2378,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot put task variable " + variableKey + ": The variable type 'X' is not supported."))
@@ -2285,6 +2391,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
@@ -2304,6 +2411,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given().pathParam("id", NON_EXISTING_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot put task variable " + variableKey + ": Cannot find task with id " + NON_EXISTING_ID))
@@ -2319,6 +2427,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", "unspecified", bytes)
+      .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2337,6 +2446,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", "unspecified", bytes)
+      .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2362,6 +2472,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", jsonBytes, MediaType.APPLICATION_JSON)
       .multiPart("type", typeName, MediaType.TEXT_PLAIN)
+      .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2387,6 +2498,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", jsonBytes, "unsupported")
       .multiPart("type", typeName, MediaType.TEXT_PLAIN)
+      .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Unrecognized content type for serialized java type: unsupported"))
@@ -2402,6 +2514,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     String variableKey = "aVariableKey";
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().delete(SINGLE_TASK_DELETE_SINGLE_VARIABLE_URL);
 
@@ -2416,6 +2529,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when(taskServiceMock).removeVariableLocal(eq(NON_EXISTING_ID), eq(variableKey));
 
     given().pathParam("id", NON_EXISTING_ID).pathParam("varId", variableKey)
+      .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .contentType(ContentType.JSON)
       .body("type", is(RestException.class.getSimpleName()))
@@ -2445,6 +2559,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2481,6 +2596,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2512,6 +2628,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2534,6 +2651,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2556,6 +2674,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .contentType(ContentType.JSON)
@@ -2577,6 +2696,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given()
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2607,6 +2727,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .pathParam("id", EXAMPLE_TASK_ID)
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2640,6 +2761,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .pathParam("id", EXAMPLE_TASK_ID)
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2666,6 +2788,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .pathParam("id", EXAMPLE_TASK_ID)
       .body(EMPTY_JSON_OBJECT)
       .contentType(ContentType.JSON)
+      .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .contentType(ContentType.JSON)
@@ -2685,6 +2808,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .pathParam("id", EXAMPLE_TASK_ID)
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2707,6 +2831,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .pathParam("id", EXAMPLE_TASK_ID)
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2729,6 +2854,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .pathParam("id", EXAMPLE_TASK_ID)
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .contentType(ContentType.JSON)
@@ -2751,6 +2877,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .pathParam("id", EXAMPLE_TASK_ID)
         .body(json)
         .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
